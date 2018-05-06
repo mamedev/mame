@@ -155,8 +155,10 @@ class mmd1_state : public driver_device
 {
 public:
 	mmd1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
 	DECLARE_WRITE8_MEMBER(mmd1_port0_w);
 	DECLARE_WRITE8_MEMBER(mmd1_port1_w);
@@ -169,18 +171,22 @@ public:
 	DECLARE_WRITE8_MEMBER(mmd2_digit_w);
 	DECLARE_WRITE8_MEMBER(mmd2_status_callback);
 	DECLARE_WRITE_LINE_MEMBER(mmd2_inte_callback);
-	uint8_t m_return_code;
-	uint8_t m_digit;
 	DECLARE_DRIVER_INIT(mmd2);
 	DECLARE_MACHINE_RESET(mmd1);
 	DECLARE_MACHINE_RESET(mmd2);
-	required_device<cpu_device> m_maincpu;
 	void mmd1(machine_config &config);
 	void mmd2(machine_config &config);
 	void mmd1_io(address_map &map);
 	void mmd1_mem(address_map &map);
 	void mmd2_io(address_map &map);
 	void mmd2_mem(address_map &map);
+
+private:
+	uint8_t m_return_code;
+	uint8_t m_digit;
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	output_finder<9> m_digits;
 };
 
 
@@ -404,7 +410,7 @@ WRITE8_MEMBER( mmd1_state::mmd2_scanlines_w )
 WRITE8_MEMBER( mmd1_state::mmd2_digit_w )
 {
 	if (m_digit < 9)
-		output().set_digit_value(m_digit, data);
+		m_digits[m_digit] = data;
 }
 
 READ8_MEMBER( mmd1_state::mmd2_kbd_r )
@@ -487,9 +493,9 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 
 MACHINE_CONFIG_START(mmd1_state::mmd1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, 6750000 / 9)
-	MCFG_CPU_PROGRAM_MAP(mmd1_mem)
-	MCFG_CPU_IO_MAP(mmd1_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, 6750000 / 9)
+	MCFG_DEVICE_PROGRAM_MAP(mmd1_mem)
+	MCFG_DEVICE_IO_MAP(mmd1_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd1)
 
@@ -499,11 +505,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mmd1_state::mmd2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, 6750000 / 9)
-	MCFG_CPU_PROGRAM_MAP(mmd2_mem)
-	MCFG_CPU_IO_MAP(mmd2_io)
-	MCFG_I8085A_STATUS(WRITE8(mmd1_state, mmd2_status_callback))
-	MCFG_I8085A_INTE(WRITELINE(mmd1_state, mmd2_inte_callback))
+	MCFG_DEVICE_ADD("maincpu",I8080, 6750000 / 9)
+	MCFG_DEVICE_PROGRAM_MAP(mmd2_mem)
+	MCFG_DEVICE_IO_MAP(mmd2_io)
+	MCFG_I8085A_STATUS(WRITE8(*this, mmd1_state, mmd2_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(*this, mmd1_state, mmd2_inte_callback))
 
 	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd2)
 
@@ -512,9 +518,9 @@ MACHINE_CONFIG_START(mmd1_state::mmd2)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("i8279", I8279, 400000) // based on divider
-	MCFG_I8279_OUT_SL_CB(WRITE8(mmd1_state, mmd2_scanlines_w))          // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(mmd1_state, mmd2_digit_w))            // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(mmd1_state, mmd2_kbd_r))                  // kbd RL lines
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, mmd1_state, mmd2_scanlines_w))          // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, mmd1_state, mmd2_digit_w))            // display A&B
+	MCFG_I8279_IN_RL_CB(READ8(*this, mmd1_state, mmd2_kbd_r))                  // kbd RL lines
 	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
 	MCFG_I8279_IN_CTRL_CB(VCC)
 

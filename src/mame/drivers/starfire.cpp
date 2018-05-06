@@ -233,8 +233,8 @@ static INPUT_PORTS_START( starfire )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) // (audio) TIE ON, see starfire_input_r
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) // (audio) LASER ON, see starfire_input_r
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) // (audio) TIE ON, see starfire_input_r
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) // (audio) LASER ON, see starfire_input_r
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT ) // SLAM/STATIC
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -331,9 +331,9 @@ INTERRUPT_GEN_MEMBER(starfire_state::vblank_int)
 MACHINE_CONFIG_START(starfire_state::fireone)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, STARFIRE_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", starfire_state, vblank_int)
+	MCFG_DEVICE_ADD("maincpu", Z80, STARFIRE_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", starfire_state, vblank_int)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -350,7 +350,7 @@ MACHINE_CONFIG_START(starfire_state::starfire)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(5)
 	MCFG_SAMPLES_NAMES(starfire_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

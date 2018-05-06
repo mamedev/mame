@@ -41,7 +41,7 @@ void vertigo_state::vertigo_map(address_map &map)
 	map(0x000008, 0x001fff).ram().mirror(0x010000);
 	map(0x002000, 0x003fff).ram().share("vectorram");
 	map(0x004000, 0x00400f).r(this, FUNC(vertigo_state::vertigo_io_convert)).mirror(0x001000);
-	map(0x004010, 0x00401f).r(this, FUNC(vertigo_state::vertigo_io_adc)).mirror(0x001000);
+	map(0x004010, 0x00401f).r(m_adc, FUNC(adc0808_device::data_r)).mirror(0x001000);
 	map(0x004020, 0x00402f).r(this, FUNC(vertigo_state::vertigo_coin_r)).mirror(0x001000);
 	map(0x004030, 0x00403f).portr("GIO").mirror(0x001000);
 	map(0x004040, 0x00404f).r(this, FUNC(vertigo_state::vertigo_sio_r)).mirror(0x001000);
@@ -76,10 +76,11 @@ void vertigo_state::exidy440_audio_map(address_map &map)
  *************************************/
 
 #if 0
-ADDRESS_MAP_START(vertigo_state::vertigo_motor)
-	AM_RANGE(0x010, 0x07f) AM_RAM
-	AM_RANGE(0x080, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void vertigo_state::vertigo_motor(address_map &map)
+{
+	map(0x010, 0x07f).ram();
+	map(0x080, 0x7ff).rom();
+}
 #endif
 
 
@@ -127,24 +128,31 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(vertigo_state::vertigo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 24_MHz_XTAL / 3)
-	MCFG_CPU_PROGRAM_MAP(vertigo_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vertigo_state, vertigo_interrupt, 60)
+	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 3)
+	MCFG_DEVICE_PROGRAM_MAP(vertigo_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(vertigo_state, vertigo_interrupt, 60)
+
+	MCFG_DEVICE_ADD("adc", ADC0808, 24_MHz_XTAL / 30) // E clock from 68000
+	MCFG_ADC0808_EOC_FF_CB(WRITELINE(*this, vertigo_state, adc_eoc_w))
+	MCFG_ADC0808_IN0_CB(IOPORT("P1X"))
+	MCFG_ADC0808_IN1_CB(IOPORT("P1Y"))
+	MCFG_ADC0808_IN2_CB(IOPORT("PADDLE"))
+	// IN3-IN7 tied to Vss
 
 	exidy440_audio(config);
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(24_MHz_XTAL / 100)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(vertigo_state, v_irq4_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, vertigo_state, v_irq4_w))
 	MCFG_PIT8253_CLK1(24_MHz_XTAL / 100)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(vertigo_state, v_irq3_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, vertigo_state, v_irq3_w))
 	MCFG_PIT8253_CLK2(24_MHz_XTAL / 100)
 
 	MCFG_DEVICE_ADD("74148", TTL74148, 0)
 	MCFG_74148_OUTPUT_CB(vertigo_state, update_irq)
 
 	/* motor controller */
-	MCFG_CPU_ADD("motorcpu", M68705P3, 24_MHz_XTAL / 6)
+	MCFG_DEVICE_ADD("motorcpu", M68705P3, 24_MHz_XTAL / 6)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -159,26 +167,26 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vertigo_state::exidy440_audio)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, EXIDY440_AUDIO_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(exidy440_audio_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", driver_device, irq0_line_assert)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, EXIDY440_AUDIO_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(exidy440_audio_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", driver_device, irq0_line_assert)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("custom", EXIDY440, EXIDY440_MC3418_CLOCK)
+	MCFG_DEVICE_ADD("custom", EXIDY440, EXIDY440_MC3418_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-//  MCFG_SOUND_ADD("cvsd1", MC3418, EXIDY440_MC3418_CLOCK)
+//  MCFG_DEVICE_ADD("cvsd1", MC3418, EXIDY440_MC3418_CLOCK)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-//  MCFG_SOUND_ADD("cvsd2", MC3418, EXIDY440_MC3418_CLOCK)
+//  MCFG_DEVICE_ADD("cvsd2", MC3418, EXIDY440_MC3418_CLOCK)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-//  MCFG_SOUND_ADD("cvsd3", MC3417, EXIDY440_MC3417_CLOCK)
+//  MCFG_DEVICE_ADD("cvsd3", MC3417, EXIDY440_MC3417_CLOCK)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-//  MCFG_SOUND_ADD("cvsd4", MC3417, EXIDY440_MC3417_CLOCK)
+//  MCFG_DEVICE_ADD("cvsd4", MC3417, EXIDY440_MC3417_CLOCK)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 

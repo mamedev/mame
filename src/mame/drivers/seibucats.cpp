@@ -245,7 +245,7 @@ static INPUT_PORTS_START( seibucats )
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xffffbf3f, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -297,10 +297,10 @@ IRQ_CALLBACK_MEMBER(seibucats_state::spi_irq_callback)
 MACHINE_CONFIG_START(seibucats_state::seibucats)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I386, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(seibucats_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state, spi_irq_callback)
+	MCFG_DEVICE_ADD("maincpu",I386, MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(seibucats_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state, spi_irq_callback)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -324,7 +324,7 @@ MACHINE_CONFIG_START(seibucats_state::seibucats)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'384'000))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'384'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

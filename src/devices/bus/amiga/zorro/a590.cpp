@@ -116,15 +116,15 @@ ioport_constructor a2091_device::device_input_ports() const
 
 MACHINE_CONFIG_START(dmac_hdc_device::device_add_mconfig)
 	MCFG_DMAC_ADD("dmac", 0)
-	MCFG_DMAC_SCSI_READ_HANDLER(READ8(dmac_hdc_device, dmac_scsi_r))
-	MCFG_DMAC_SCSI_WRITE_HANDLER(WRITE8(dmac_hdc_device, dmac_scsi_w))
-	MCFG_DMAC_INT_HANDLER(WRITELINE(dmac_hdc_device, dmac_int_w))
-	MCFG_DMAC_CFGOUT_HANDLER(WRITELINE(dmac_hdc_device, dmac_cfgout_w))
+	MCFG_DMAC_SCSI_READ_HANDLER(READ8(*this, dmac_hdc_device, dmac_scsi_r))
+	MCFG_DMAC_SCSI_WRITE_HANDLER(WRITE8(*this, dmac_hdc_device, dmac_scsi_w))
+	MCFG_DMAC_INT_HANDLER(WRITELINE(*this, dmac_hdc_device, dmac_int_w))
+	MCFG_DMAC_CFGOUT_HANDLER(WRITELINE(*this, dmac_hdc_device, dmac_cfgout_w))
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_1)
 	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
 	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_WD33C93_IRQ_CB(WRITELINE(dmac_hdc_device, scsi_irq_w))
+	MCFG_WD33C93_IRQ_CB(WRITELINE(*this, dmac_hdc_device, scsi_irq_w))
 MACHINE_CONFIG_END
 
 

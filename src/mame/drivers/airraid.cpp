@@ -388,13 +388,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(airraid_state::airraid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL(12'000'000)/2)        /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(airraid_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(12'000'000)/2)        /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(airraid_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", airraid_state, cshooter_scanline, "airraid_vid:screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)      /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(airraid_sound_map)
-	MCFG_CPU_OPCODES_MAP(airraid_sound_decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)      /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(airraid_sound_map)
+	MCFG_DEVICE_OPCODES_MAP(airraid_sound_decrypted_opcodes_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -406,15 +406,15 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_ROM("audiocpu")
@@ -423,8 +423,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(airraid_state::airraid_crypt)
 	airraid(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 

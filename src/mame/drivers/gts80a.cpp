@@ -29,6 +29,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_r0_sound(*this, "r0sound")
 		, m_r1_sound(*this, "r1sound")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(gts80a);
@@ -49,9 +50,11 @@ private:
 	uint8_t m_lamprow;
 	uint8_t m_swrow;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	optional_device<gottlieb_sound_r0_device> m_r0_sound;
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
+	output_finder<60> m_digits;
 };
 
 void gts80a_state::gts80a_map(address_map &map)
@@ -296,15 +299,15 @@ WRITE8_MEMBER( gts80a_state::port2a_w )
 	{
 		case 0x10: // player 1&2
 			if (!BIT(m_segment, 7)) seg2 |= 0x300; // put '1' in the middle
-			output().set_digit_value(data & 15, seg2);
+			m_digits[data & 15] = seg2;
 			break;
 		case 0x20: // player 3&4
 			if (!BIT(m_segment, 7)) seg2 |= 0x300; // put '1' in the middle
-			output().set_digit_value((data & 15)+20, seg2);
+			m_digits[(data & 15)+20] = seg2;
 			break;
 		case 0x40: // credits & balls
 			if (!BIT(m_segment, 7)) m_segment = 1; // turn '1' back to normal
-			output().set_digit_value((data & 15)+40, patterns[m_segment & 15]);
+			m_digits[(data & 15)+40] = patterns[m_segment & 15];
 			break;
 	}
 }
@@ -312,7 +315,7 @@ WRITE8_MEMBER( gts80a_state::port2a_w )
 //d0-3 bcd data; d4-6 = centre segment; d7 = dipsw enable
 WRITE8_MEMBER( gts80a_state::port2b_w )
 {
-	m_segment = data;//printf("%s:%X ",machine().describe_context(),data);
+	m_segment = data;//printf("%s:%X ",machine().describe_context().c_str(),data);
 }
 
 // solenoids
@@ -342,8 +345,8 @@ DRIVER_INIT_MEMBER( gts80a_state, gts80a )
 /* with Sound Board */
 MACHINE_CONFIG_START(gts80a_state::gts80a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(3'579'545)/4)
-	MCFG_CPU_PROGRAM_MAP(gts80a_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(3'579'545)/4)
+	MCFG_DEVICE_PROGRAM_MAP(gts80a_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram") // must be 1
 
@@ -352,22 +355,22 @@ MACHINE_CONFIG_START(gts80a_state::gts80a)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("riot1", RIOT6532, XTAL(3'579'545)/4)
-	MCFG_RIOT6532_IN_PA_CB(READ8(gts80a_state, port1a_r)) // sw_r
-	//MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80a_state, port1a_w))
-	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80a_state, port1b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80a_state, port1b_w)) // sw_w
+	MCFG_RIOT6532_IN_PA_CB(READ8(*this, gts80a_state, port1a_r)) // sw_r
+	//MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, gts80a_state, port1a_w))
+	//MCFG_RIOT6532_IN_PB_CB(READ8(*this, gts80a_state, port1b_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gts80a_state, port1b_w)) // sw_w
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 	MCFG_DEVICE_ADD("riot2", RIOT6532, XTAL(3'579'545)/4)
-	MCFG_RIOT6532_IN_PA_CB(READ8(gts80a_state, port2a_r)) // pa7 - slam tilt
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80a_state, port2a_w)) // digit select
-	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80a_state, port2b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80a_state, port2b_w)) // seg
+	MCFG_RIOT6532_IN_PA_CB(READ8(*this, gts80a_state, port2a_r)) // pa7 - slam tilt
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, gts80a_state, port2a_w)) // digit select
+	//MCFG_RIOT6532_IN_PB_CB(READ8(*this, gts80a_state, port2b_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gts80a_state, port2b_w)) // seg
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 	MCFG_DEVICE_ADD("riot3", RIOT6532, XTAL(3'579'545)/4)
-	//MCFG_RIOT6532_IN_PA_CB(READ8(gts80a_state, port3a_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80a_state, port3a_w)) // sol, snd
-	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80a_state, port3b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80a_state, port3b_w)) // lamps
+	//MCFG_RIOT6532_IN_PA_CB(READ8(*this, gts80a_state, port3a_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, gts80a_state, port3a_w)) // sol, snd
+	//MCFG_RIOT6532_IN_PB_CB(READ8(*this, gts80a_state, port3b_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gts80a_state, port3b_w)) // lamps
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	/* Sound */
@@ -377,14 +380,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gts80a_state::gts80a_s)
 	gts80a(config);
-	MCFG_SOUND_ADD("r0sound", GOTTLIEB_SOUND_REV0, 0)
+	MCFG_DEVICE_ADD("r0sound", GOTTLIEB_SOUND_REV0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gts80a_state::gts80a_ss)
 	gts80a(config);
-	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
-	//MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)  // votrax crashes
+	MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1)
+	//MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)  // votrax crashes
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -455,9 +458,9 @@ void caveman_state::video_io_map(address_map &map)
 
 MACHINE_CONFIG_START(caveman_state::caveman)
 	gts80a_ss(config);
-	MCFG_CPU_ADD("video_cpu", I8088, 5000000)
-	MCFG_CPU_PROGRAM_MAP(video_map)
-	MCFG_CPU_IO_MAP(video_io_map)
+	MCFG_DEVICE_ADD("video_cpu", I8088, 5000000)
+	MCFG_DEVICE_PROGRAM_MAP(video_map)
+	MCFG_DEVICE_IO_MAP(video_io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

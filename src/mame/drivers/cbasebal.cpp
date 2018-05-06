@@ -163,7 +163,7 @@ static INPUT_PORTS_START( cbasebal )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")       /* ? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START( "IO_01" )
 	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
@@ -264,11 +264,11 @@ void cbasebal_state::machine_reset()
 MACHINE_CONFIG_START(cbasebal_state::cbasebal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 6000000)   /* ??? */
-	MCFG_CPU_PROGRAM_MAP(cbasebal_map)
-	MCFG_CPU_IO_MAP(cbasebal_portmap)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cbasebal_state,  irq0_line_hold)   /* ??? */
+	MCFG_DEVICE_ADD("maincpu", Z80, 6000000)   /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(cbasebal_map)
+	MCFG_DEVICE_IO_MAP(cbasebal_portmap)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cbasebal_state,  irq0_line_hold)   /* ??? */
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(cbasebal_state::cbasebal)
 	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

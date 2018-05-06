@@ -532,9 +532,9 @@ static INPUT_PORTS_START( hopmappy )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin lockout */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 1 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin lockout */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 1 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 2 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -605,9 +605,9 @@ static INPUT_PORTS_START( skykiddx )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin lockout */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 1 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin lockout */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 1 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 2 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -677,9 +677,9 @@ static INPUT_PORTS_START( roishtar )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin lockout */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 1 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin lockout */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 1 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 2 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
@@ -747,9 +747,9 @@ static INPUT_PORTS_START( genpeitd )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin lockout */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 1 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin lockout */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 1 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 2 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -821,9 +821,9 @@ static INPUT_PORTS_START( rthunder )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin lockout */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 1 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin lockout */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 1 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 2 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
@@ -900,9 +900,9 @@ static INPUT_PORTS_START( rthunder1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin lockout */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 1 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin lockout */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 1 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 2 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
@@ -974,9 +974,9 @@ static INPUT_PORTS_START( wndrmomo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin lockout */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 1 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin lockout */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 1 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 2 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
@@ -1063,18 +1063,18 @@ GFXDECODE_END
 MACHINE_CONFIG_START(namcos86_state::hopmappy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu1", MC6809E, XTAL(49'152'000)/32)
-	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("cpu1", MC6809E, XTAL(49'152'000)/32)
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("cpu2", MC6809E, XTAL(49'152'000)/32)
-	MCFG_CPU_PROGRAM_MAP(hopmappy_cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("cpu2", MC6809E, XTAL(49'152'000)/32)
+	MCFG_DEVICE_PROGRAM_MAP(hopmappy_cpu2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8)    /* or compatible 6808 with extra instructions */
-	MCFG_CPU_PROGRAM_MAP(hopmappy_mcu_map)
-	MCFG_CPU_IO_MAP(mcu_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_hold)   /* ??? */
+	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8)    /* or compatible 6808 with extra instructions */
+	MCFG_DEVICE_PROGRAM_MAP(hopmappy_mcu_map)
+	MCFG_DEVICE_IO_MAP(mcu_port_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_hold)   /* ??? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(48000)) /* heavy interleaving needed to avoid hangs in rthunder */
 
@@ -1084,7 +1084,7 @@ MACHINE_CONFIG_START(namcos86_state::hopmappy)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 3+8*8, 3+44*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos86_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos86_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos86_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos86)
@@ -1094,11 +1094,11 @@ MACHINE_CONFIG_START(namcos86_state::hopmappy)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", 3579580)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
 	MCFG_SOUND_ROUTE(0, "mono", 0.0)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)   /* only right channel is connected */
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
+	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -1108,11 +1108,11 @@ MACHINE_CONFIG_START(namcos86_state::roishtar)
 	hopmappy(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PROGRAM_MAP(roishtar_cpu2_map)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PROGRAM_MAP(roishtar_cpu2_map)
 
-	MCFG_CPU_MODIFY("mcu")
-	MCFG_CPU_PROGRAM_MAP(roishtar_mcu_map)
+	MCFG_DEVICE_MODIFY("mcu")
+	MCFG_DEVICE_PROGRAM_MAP(roishtar_mcu_map)
 MACHINE_CONFIG_END
 
 
@@ -1120,11 +1120,11 @@ MACHINE_CONFIG_START(namcos86_state::genpeitd)
 	hopmappy(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PROGRAM_MAP(genpeitd_cpu2_map)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PROGRAM_MAP(genpeitd_cpu2_map)
 
-	MCFG_CPU_MODIFY("mcu")
-	MCFG_CPU_PROGRAM_MAP(genpeitd_mcu_map)
+	MCFG_DEVICE_MODIFY("mcu")
+	MCFG_DEVICE_PROGRAM_MAP(genpeitd_mcu_map)
 
 	/* sound hardware */
 	MCFG_NAMCO_63701X_ADD("namco2", 6000000)
@@ -1136,11 +1136,11 @@ MACHINE_CONFIG_START(namcos86_state::rthunder)
 	hopmappy(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PROGRAM_MAP(rthunder_cpu2_map)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PROGRAM_MAP(rthunder_cpu2_map)
 
-	MCFG_CPU_MODIFY("mcu")
-	MCFG_CPU_PROGRAM_MAP(rthunder_mcu_map)
+	MCFG_DEVICE_MODIFY("mcu")
+	MCFG_DEVICE_PROGRAM_MAP(rthunder_mcu_map)
 
 	/* sound hardware */
 	MCFG_NAMCO_63701X_ADD("namco2", 6000000)
@@ -1152,11 +1152,11 @@ MACHINE_CONFIG_START(namcos86_state::wndrmomo)
 	hopmappy(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PROGRAM_MAP(wndrmomo_cpu2_map)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PROGRAM_MAP(wndrmomo_cpu2_map)
 
-	MCFG_CPU_MODIFY("mcu")
-	MCFG_CPU_PROGRAM_MAP(wndrmomo_mcu_map)
+	MCFG_DEVICE_MODIFY("mcu")
+	MCFG_DEVICE_PROGRAM_MAP(wndrmomo_mcu_map)
 
 	/* sound hardware */
 	MCFG_NAMCO_63701X_ADD("namco2", 6000000)

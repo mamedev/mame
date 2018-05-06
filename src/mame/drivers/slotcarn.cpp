@@ -543,9 +543,9 @@ void slotcarn_state::machine_start()
 MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?
-	MCFG_CPU_PROGRAM_MAP(slotcarn_map)
-	MCFG_CPU_IO_MAP(spielbud_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?
+	MCFG_DEVICE_PROGRAM_MAP(slotcarn_map)
+	MCFG_DEVICE_IO_MAP(spielbud_io_map)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -569,7 +569,7 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_BEGIN_UPDATE_CB(slotcarn_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(slotcarn_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(slotcarn_state, hsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, slotcarn_state, hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slotcarn)
@@ -578,7 +578,7 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd",AY8910, SND_CLOCK)
+	MCFG_DEVICE_ADD("aysnd",AY8910, SND_CLOCK)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

@@ -184,7 +184,7 @@ static INPUT_PORTS_START( crimfght )
 	PORT_DIPUNUSED_DIPLOC(0x02, IP_ACTIVE_LOW, "SW3:2")
 	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW3:3")
 	PORT_DIPUNUSED_DIPLOC(0x08, IP_ACTIVE_LOW, "SW3:4")
-	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, crimfght_state, system_r, nullptr)
+	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, crimfght_state, system_r, nullptr)
 
 	PORT_START("P1")
 	KONAMI8_B123_START(1)
@@ -303,13 +303,13 @@ CUSTOM_INPUT_MEMBER( crimfght_state::system_r )
 MACHINE_CONFIG_START(crimfght_state::crimfght)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)       /* 052001 (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(crimfght_map)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(crimfght_state, banking_callback))
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)       /* 052001 (verified on pcb) */
+	MCFG_DEVICE_PROGRAM_MAP(crimfght_map)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, crimfght_state, banking_callback))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(crimfght_sound_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, crimfght_state, audiocpu_irq_ack)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(crimfght_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, crimfght_state, audiocpu_irq_ack)
 
 	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
@@ -347,13 +347,13 @@ MACHINE_CONFIG_START(crimfght_state::crimfght)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* verified on pcb */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(crimfght_state, ym2151_ct_w))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))  /* verified on pcb */
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, crimfght_state, ym2151_ct_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(crimfght_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, crimfght_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.20)

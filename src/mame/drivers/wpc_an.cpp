@@ -22,12 +22,13 @@ class wpc_an_state : public driver_device
 {
 public:
 	wpc_an_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_bg(*this,"bg"),
-			m_wpcsnd(*this,"wpcsnd"),
-			m_cpubank(*this, "cpubank"),
-			m_wpc(*this,"wpc")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_bg(*this,"bg")
+		, m_wpcsnd(*this,"wpcsnd")
+		, m_cpubank(*this, "cpubank")
+		, m_wpc(*this,"wpc")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void wpc_an_dd(machine_config &config);
@@ -42,9 +43,11 @@ protected:
 	optional_device<wpcsnd_device> m_wpcsnd;
 	required_memory_bank m_cpubank;
 	required_device<wpc_device> m_wpc;
+	output_finder<32> m_digits;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
@@ -204,8 +207,8 @@ void wpc_an_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		// update LED segments
 		for(x=0;x<16;x++)
 		{
-			output().set_digit_value(x,bitswap<16>(m_wpc->get_alphanumeric(x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
-			output().set_digit_value(x+16,bitswap<16>(m_wpc->get_alphanumeric(20+x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			m_digits[x] = bitswap<16>(m_wpc->get_alphanumeric(x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
+			m_digits[x+16] = bitswap<16>(m_wpc->get_alphanumeric(20+x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
 		}
 		m_wpc->reset_alphanumeric();
 		m_vblank_count++;
@@ -322,16 +325,16 @@ DRIVER_INIT_MEMBER(wpc_an_state,wpc_an)
 
 MACHINE_CONFIG_START(wpc_an_state::wpc_an_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(8'000'000) / 4) // 68B09E
-	MCFG_CPU_PROGRAM_MAP(wpc_an_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(8'000'000) / 4) // 68B09E
+	MCFG_DEVICE_PROGRAM_MAP(wpc_an_map)
 
 	MCFG_WMS_WPC_ADD("wpc")
-	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(wpc_an_state,wpc_irq_w))
-	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(wpc_an_state,wpc_firq_w))
-	MCFG_WPC_ROMBANK(WRITE8(wpc_an_state,wpc_rombank_w))
-	MCFG_WPC_SOUND_CTRL(READ8(wpc_an_state,wpc_sound_ctrl_r),WRITE8(wpc_an_state,wpc_sound_ctrl_w))
-	MCFG_WPC_SOUND_DATA(READ8(wpc_an_state,wpc_sound_data_r),WRITE8(wpc_an_state,wpc_sound_data_w))
-	MCFG_WPC_SOUND_S11C(WRITE8(wpc_an_state,wpc_sound_s11_w))
+	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_an_state,wpc_irq_w))
+	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_an_state,wpc_firq_w))
+	MCFG_WPC_ROMBANK(WRITE8(*this, wpc_an_state,wpc_rombank_w))
+	MCFG_WPC_SOUND_CTRL(READ8(*this, wpc_an_state,wpc_sound_ctrl_r),WRITE8(*this, wpc_an_state,wpc_sound_ctrl_w))
+	MCFG_WPC_SOUND_DATA(READ8(*this, wpc_an_state,wpc_sound_data_r),WRITE8(*this, wpc_an_state,wpc_sound_data_w))
+	MCFG_WPC_SOUND_S11C(WRITE8(*this, wpc_an_state,wpc_sound_s11_w))
 
 	MCFG_DEFAULT_LAYOUT(layout_wpc_an)
 MACHINE_CONFIG_END
@@ -340,9 +343,9 @@ MACHINE_CONFIG_START(wpc_an_state::wpc_an)
 	wpc_an_base(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("wpcsnd", WPCSND, 0)
-	MCFG_WPC_ROM_REGION(":sound1")
-	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(wpc_an_state,wpcsnd_reply_w))
+	MCFG_DEVICE_ADD("wpcsnd", WPCSND)
+	MCFG_WPC_ROM_REGION("sound1")
+	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_an_state,wpcsnd_reply_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -350,7 +353,7 @@ MACHINE_CONFIG_START(wpc_an_state::wpc_an_dd)
 	wpc_an_base(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("bg", S11C_BG, 0)
+	MCFG_DEVICE_ADD("bg", S11C_BG)
 	MCFG_S11C_BG_ROM_REGION(":sound1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END

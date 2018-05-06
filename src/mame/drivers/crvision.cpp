@@ -722,15 +722,16 @@ void laser2001_state::machine_start()
     MACHINE DRIVERS
 ***************************************************************************/
 
-static SLOT_INTERFACE_START(crvision_cart)
-	SLOT_INTERFACE_INTERNAL("crv_rom4k",  CRVISION_ROM_4K)
-	SLOT_INTERFACE_INTERNAL("crv_rom6k",  CRVISION_ROM_6K)
-	SLOT_INTERFACE_INTERNAL("crv_rom8k",  CRVISION_ROM_8K)
-	SLOT_INTERFACE_INTERNAL("crv_rom10k", CRVISION_ROM_10K)
-	SLOT_INTERFACE_INTERNAL("crv_rom12k", CRVISION_ROM_12K)
-	SLOT_INTERFACE_INTERNAL("crv_rom16k", CRVISION_ROM_16K)
-	SLOT_INTERFACE_INTERNAL("crv_rom18k", CRVISION_ROM_18K)
-SLOT_INTERFACE_END
+static void crvision_cart(device_slot_interface &device)
+{
+	device.option_add_internal("crv_rom4k",  CRVISION_ROM_4K);
+	device.option_add_internal("crv_rom6k",  CRVISION_ROM_6K);
+	device.option_add_internal("crv_rom8k",  CRVISION_ROM_8K);
+	device.option_add_internal("crv_rom10k", CRVISION_ROM_10K);
+	device.option_add_internal("crv_rom12k", CRVISION_ROM_12K);
+	device.option_add_internal("crv_rom16k", CRVISION_ROM_16K);
+	device.option_add_internal("crv_rom18k", CRVISION_ROM_18K);
+}
 
 /*-------------------------------------------------
     MACHINE_CONFIG_START( creativision )
@@ -738,33 +739,33 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(crvision_state::creativision)
 	// basic machine hardware
-	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(crvision_map)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(crvision_map)
 
 	// devices
 	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(crvision_state, pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(crvision_state, pia_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(crvision_state, pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8(SN76489_TAG, sn76496_base_device, write))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, crvision_state, pia_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, crvision_state, pia_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, crvision_state, pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(SN76489_TAG, sn76496_base_device, write))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
 
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
+	MCFG_OUTPUT_LATCH_BIT4_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489_TAG, SN76489A, XTAL(2'000'000))
-	MCFG_SN76496_READY_HANDLER(DEVWRITELINE(PIA6821_TAG, pia6821_device, cb1_w))
+	MCFG_DEVICE_ADD(SN76489_TAG, SN76489A, XTAL(2'000'000))
+	MCFG_SN76496_READY_HANDLER(WRITELINE(PIA6821_TAG, pia6821_device, cb1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
@@ -816,24 +817,24 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(laser2001_state::lasr2001)
 	// basic machine hardware
-	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL(17'734'470)/9)
-	MCFG_CPU_PROGRAM_MAP(lasr2001_map)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(17'734'470)/9)
+	MCFG_DEVICE_PROGRAM_MAP(lasr2001_map)
 
 	// devices
 	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(laser2001_state, pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(laser2001_state, pia_pb_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(laser2001_state, pia_ca1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(laser2001_state, pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(laser2001_state, pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(laser2001_state, pia_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(laser2001_state, pia_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, laser2001_state, pia_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, laser2001_state, pia_pb_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, laser2001_state, pia_ca1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, laser2001_state, pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, laser2001_state, pia_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, laser2001_state, pia_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, laser2001_state, pia_cb2_w))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(laser2001_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, laser2001_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
@@ -846,8 +847,8 @@ MACHINE_CONFIG_START(laser2001_state::lasr2001)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489_TAG, SN76489A, XTAL(17'734'470)/9)
-	MCFG_SN76496_READY_HANDLER(WRITELINE(laser2001_state, write_psg_ready))
+	MCFG_DEVICE_ADD(SN76489_TAG, SN76489A, XTAL(17'734'470)/9)
+	MCFG_SN76496_READY_HANDLER(WRITELINE(*this, laser2001_state, write_psg_ready))
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

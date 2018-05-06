@@ -287,8 +287,8 @@ void md_boot_state::md_bootleg_map(address_map &map)
 MACHINE_CONFIG_START(md_boot_state::md_bootleg)
 	md_ntsc(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(md_bootleg_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(md_bootleg_map)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -594,7 +594,7 @@ INPUT_PORTS_START( aladmdb )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
-//  PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )         /* to avoid it being changed and corrupting Coinage settings */
+//  PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM )         /* to avoid it being changed and corrupting Coinage settings */
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )       /* code at 0x1b2680 */
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )             /* "PRACTICE" */
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )           /* "NORMAL" */

@@ -567,8 +567,8 @@ static INPUT_PORTS_START( legendoh )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_SPECIAL ) //security bit
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_CUSTOM ) //security bit
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -577,7 +577,7 @@ static INPUT_PORTS_START( legendoh )
 	PORT_DIPNAME( 0x20000000, 0x00000000, "Sound Enable" )
 	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
 	PORT_BIT( 0x4000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
@@ -616,12 +616,12 @@ static INPUT_PORTS_START( sb2003 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SPECIAL ) //security bit
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_CUSTOM ) //security bit
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_DIPNAME( 0x20000000, 0x00000000, "Sound Enable" )
 	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // checked in dynabomb I/O test, but doesn't work in game
 	PORT_BIT( 0x5f00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -659,10 +659,10 @@ static INPUT_PORTS_START( spotty )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
+	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, limenko_state,spriteram_bit_r, nullptr) //changes spriteram location
 	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SPECIAL ) //security bit
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_CUSTOM ) //security bit
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x20000000, DEF_STR( On ) )
@@ -703,10 +703,10 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(limenko_state::limenko)
-	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4) /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(limenko_map)
-	MCFG_CPU_IO_MAP(limenko_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", E132XN, 20000000*4) /* 4x internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(limenko_map)
+	MCFG_DEVICE_IO_MAP(limenko_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -727,30 +727,30 @@ MACHINE_CONFIG_START(limenko_state::limenko)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("qs1000", qs1000_device, set_irq))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("qs1000", QS1000, XTAL(24'000'000))
+	MCFG_DEVICE_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_QS1000_OUT_P1_CB(WRITE8(limenko_state, qs1000_p1_w))
-	MCFG_QS1000_OUT_P2_CB(WRITE8(limenko_state, qs1000_p2_w))
-	MCFG_QS1000_OUT_P3_CB(WRITE8(limenko_state, qs1000_p3_w))
+	MCFG_QS1000_IN_P1_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_QS1000_OUT_P1_CB(WRITE8(*this, limenko_state, qs1000_p1_w))
+	MCFG_QS1000_OUT_P2_CB(WRITE8(*this, limenko_state, qs1000_p2_w))
+	MCFG_QS1000_OUT_P3_CB(WRITE8(*this, limenko_state, qs1000_p3_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(limenko_state::spotty)
-	MCFG_CPU_ADD("maincpu", GMS30C2232, 20000000)   /* 20 MHz, no internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(spotty_map)
-	MCFG_CPU_IO_MAP(spotty_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", GMS30C2232, 20000000)   /* 20 MHz, no internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(spotty_map)
+	MCFG_DEVICE_IO_MAP(spotty_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", AT89C4051, 4000000)    /* 4 MHz */
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(limenko_state, spotty_sound_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(DEVWRITE8("oki", okim6295_device, write)) //? sound latch and ?
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(limenko_state, spotty_sound_cmd_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(limenko_state, spotty_sound_cmd_w)) //not sure about anything...
+	MCFG_DEVICE_ADD("audiocpu", AT89C4051, 4000000)    /* 4 MHz */
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, limenko_state, spotty_sound_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8("oki", okim6295_device, write)) //? sound latch and ?
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, limenko_state, spotty_sound_cmd_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, limenko_state, spotty_sound_cmd_w)) //not sure about anything...
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

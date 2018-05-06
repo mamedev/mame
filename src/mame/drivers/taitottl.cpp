@@ -53,7 +53,7 @@
  T. T. Block C (05/1978)                                                            UNKNOWN
  T. T. Block CU (08/1978)                                                           UNKNOWN
  T. T. Speed Race (06/1978)                                                         UNKNOWN
- T. T. Speed Race CL (??/1978)                                                      UNKNOWN
+ T. T. Speed Race CL (10/1978)                                                      YES
  T. T. Top Bowler (??/1978)                                                         UNKNOWN
  T. T. Zun Zun Block (??/1979)                                                      YES        3 - (2 x 512bytes, 1 x 32bytes)
  Wall Block (08/1978)                                                               UNKNOWN
@@ -307,6 +307,54 @@ ROM_START( ttblock )
 	ROM_LOAD( "tl01.4a",      0x0000, 0x0800, CRC(65b730f7) SHA1(f82931c9a128021c97d1d41b5eac05df55dd5994) ) // MMI 6353
 ROM_END
 
+/*
+
+TT Speed Race Color
+14.314 mhz XTAL
+
+ label  loc. Part #        Use?
+ ==========================================================
+TOP PCB: [CEN00008 CE070013 CE-44 B]
+ CE01   7J   Harris 7643
+ SD06   4D   Harris 7643
+ SD07   4C   Harris 7643
+ SD05   5B   MMI 6301
+
+MIDDLE PCB: [CEN00007 CE070012 CE-44]
+ CR11   4A   MMI 6301
+ CR11   4J   MMI 6301
+ TE-01  2B   Harris 7643
+
+BOTTOM PCB: [CEN00006 CE070011 CE-44 B]
+ SD08   5E   MMI 6331
+ SD09   5D   MMI 6331
+ SD10   6M   MMI 6331
+ RED    2H   MMI 6331
+
+SOUND PCB: [CEN00004A CE070004A]
+
+*/
+
+ROM_START( ttsracec )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0800, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "ce01.7j",      0x0000, 0x0800, CRC(277cd3ca) SHA1(9493f3b4575a10d0b243446d92fdc56a540bc0e4) )
+	ROM_LOAD( "sd06.4d",      0x0000, 0x0800, CRC(2ff92235) SHA1(7be446300937362e365b85181d90006e901534aa) )
+	ROM_LOAD( "sd07.4c",      0x0000, 0x0800, CRC(38b69397) SHA1(6a072e74d4537c8128bf4a3b91f5636640f2472f) )
+	ROM_LOAD( "sd05.5b",      0x0000, 0x0100, CRC(d10920ee) SHA1(39bcff62a028373193875f873a76a42b9105a647) )
+
+	ROM_LOAD( "cr11.4a",      0x0000, 0x0100, CRC(b3250118) SHA1(ab8bfa11b112b03b8ff00b09b3e6d9b221051ad2) )
+	ROM_LOAD( "cr11.4j",      0x0000, 0x0100, CRC(b3250118) SHA1(ab8bfa11b112b03b8ff00b09b3e6d9b221051ad2) )
+	ROM_LOAD( "te-01.2b",     0x0000, 0x0800, CRC(1bafaae6) SHA1(5b6dcdf1e2f3842b0a7313cbd308ae312a675298) )
+
+	ROM_LOAD( "sd08.5e",      0x0000, 0x0020, CRC(a0fc7c02) SHA1(ea2cf44ab64bfa8d5f9105069a8f38dc75505c30) )
+	ROM_LOAD( "sd09.5d",      0x0000, 0x0020, CRC(6e4fa64e) SHA1(04368bcdb2e91a17cd7815ee98ad846bb9732d9b) )
+	ROM_LOAD( "sd10.6m",      0x0000, 0x0020, CRC(402e0c59) SHA1(a8e43fe7c2f194ae49977e8ef753049f6b378937) )
+	ROM_LOAD( "red.2h",       0x0000, 0x0020, CRC(43a3b7ff) SHA1(a1ff087f7aba211a021a8ead688a3a8780d34174) )
+ROM_END
+
+
 ROM_START( zzblock )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
@@ -318,7 +366,8 @@ ROM_END
 
 
 GAME( 1977, fisco400,  0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Cisco/Fisco 400 [TTL]",     MACHINE_IS_SKELETON )
-GAME( 1977, gunman,    0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Gunman [TTL]",        MACHINE_IS_SKELETON )
-GAME( 1977, missilex,  0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Missile-X [TTL]",     MACHINE_IS_SKELETON )
-GAME( 1977, ttblock,   0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "T.T Block [TTL]",    MACHINE_IS_SKELETON )
-GAME( 1979, zzblock,   0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Zun Zun Block [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, gunman,    0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Gunman [TTL]",              MACHINE_IS_SKELETON )
+GAME( 1977, missilex,  0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Missile-X [TTL]",           MACHINE_IS_SKELETON )
+GAME( 1977, ttblock,   0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "T.T Block [TTL]",           MACHINE_IS_SKELETON )
+GAME( 1978, ttsracec,  0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "T.T. Speed Race CL [TTL]",  MACHINE_IS_SKELETON )
+GAME( 1979, zzblock,   0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Zun Zun Block [TTL]",       MACHINE_IS_SKELETON )

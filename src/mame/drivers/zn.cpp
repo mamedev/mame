@@ -378,28 +378,28 @@ void zn_state::zn_map(address_map &map)
 MACHINE_CONFIG_START(zn_state::zn1_1mb_vram)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
-	MCFG_CPU_PROGRAM_MAP( zn_map)
+	MCFG_DEVICE_ADD( m_maincpu, CXD8530CQ, XTAL(67'737'600) )
+	MCFG_DEVICE_PROGRAM_MAP( zn_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_SCK_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, zn_state, sio0_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, zn_state, sio0_txd))
+	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(*this, zn_state, sio0_sck))
+	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE(*this, zn_state, sio0_txd))
 
 	MCFG_DEVICE_ADD("cat702_1", CAT702, 0)
-	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(zn_state, cat702_dataout<0>))
+	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(*this, zn_state, cat702_dataout<0>))
 
 	MCFG_DEVICE_ADD("cat702_2", CAT702, 0)
-	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(zn_state, cat702_dataout<1>))
+	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(*this, zn_state, cat702_dataout<1>))
 
 	MCFG_DEVICE_ADD("znmcu", ZNMCU, 0)
-	MCFG_ZNMCU_DATAOUT_HANDLER(WRITELINE(zn_state, znmcu_dataout))
-	MCFG_ZNMCU_DSR_HANDLER(WRITELINE(zn_state, znmcu_dsrout))
-	MCFG_ZNMCU_DSW_HANDLER(IOPORT(":DSW"))
-	MCFG_ZNMCU_ANALOG1_HANDLER(IOPORT(":ANALOG1"))
-	MCFG_ZNMCU_ANALOG2_HANDLER(IOPORT(":ANALOG2"))
+	MCFG_ZNMCU_DATAOUT_HANDLER(WRITELINE(*this, zn_state, znmcu_dataout))
+	MCFG_ZNMCU_DSR_HANDLER(WRITELINE(*this, zn_state, znmcu_dsrout))
+	MCFG_ZNMCU_DSW_HANDLER(IOPORT("DSW"))
+	MCFG_ZNMCU_ANALOG1_HANDLER(IOPORT("ANALOG1"))
+	MCFG_ZNMCU_ANALOG2_HANDLER(IOPORT("ANALOG2"))
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
@@ -424,28 +424,28 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(zn_state::zn2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL(100'000'000) )
-	MCFG_CPU_PROGRAM_MAP( zn_map)
+	MCFG_DEVICE_ADD( m_maincpu, CXD8661R, XTAL(100'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP( zn_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_SCK_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, zn_state, sio0_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, zn_state, sio0_txd))
+	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(*this, zn_state, sio0_sck))
+	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE(*this, zn_state, sio0_txd))
 
 	MCFG_DEVICE_ADD("cat702_1", CAT702, 0)
-	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(zn_state, cat702_dataout<0>))
+	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(*this, zn_state, cat702_dataout<0>))
 
 	MCFG_DEVICE_ADD("cat702_2", CAT702, 0)
-	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(zn_state, cat702_dataout<1>))
+	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(*this, zn_state, cat702_dataout<1>))
 
 	MCFG_DEVICE_ADD("znmcu", ZNMCU, 0)
-	MCFG_ZNMCU_DATAOUT_HANDLER(WRITELINE(zn_state, znmcu_dataout))
-	MCFG_ZNMCU_DSR_HANDLER(WRITELINE(zn_state, znmcu_dsrout))
-	MCFG_ZNMCU_DSW_HANDLER(IOPORT(":DSW"))
-	MCFG_ZNMCU_ANALOG1_HANDLER(IOPORT(":ANALOG1"))
-	MCFG_ZNMCU_ANALOG2_HANDLER(IOPORT(":ANALOG2"))
+	MCFG_ZNMCU_DATAOUT_HANDLER(WRITELINE(*this, zn_state, znmcu_dataout))
+	MCFG_ZNMCU_DSR_HANDLER(WRITELINE(*this, zn_state, znmcu_dsrout))
+	MCFG_ZNMCU_DSW_HANDLER(IOPORT("DSW"))
+	MCFG_ZNMCU_ANALOG1_HANDLER(IOPORT("ANALOG1"))
+	MCFG_ZNMCU_ANALOG2_HANDLER(IOPORT("ANALOG2"))
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
@@ -585,7 +585,7 @@ READ16_MEMBER(zn_state::capcom_kickharness_r)
 
 WRITE8_MEMBER(zn_state::bank_coh1000c_w)
 {
-	m_rombank[0]->set_entry( data );
+	m_rombank[0]->set_entry( data & 0x0f);
 }
 
 WRITE8_MEMBER(zn_state::qsound_bankswitch_w)
@@ -647,21 +647,21 @@ void zn_state::qsound_portmap(address_map &map)
 
 MACHINE_CONFIG_START(zn_state::coh1000c)
 	zn1_1mb_vram(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(coh1000c_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(qsound_map)
-	MCFG_CPU_IO_MAP(qsound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.cpp)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(qsound_map)
+	MCFG_DEVICE_IO_MAP(qsound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.cpp)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000c)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
 	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("qsound", QSOUND, QSOUND_CLOCK)
+	MCFG_DEVICE_ADD("qsound", QSOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -673,21 +673,21 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::coh1002c)
 	zn1_2mb_vram(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(coh1000c_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(qsound_map)
-	MCFG_CPU_IO_MAP(qsound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.cpp)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(qsound_map)
+	MCFG_DEVICE_IO_MAP(qsound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.cpp)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000c)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
 	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("qsound", QSOUND, QSOUND_CLOCK)
+	MCFG_DEVICE_ADD("qsound", QSOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -835,21 +835,21 @@ Notes:
 
 MACHINE_CONFIG_START(zn_state::coh3002c)
 	zn2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(coh1000c_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(qsound_map)
-	MCFG_CPU_IO_MAP(qsound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.cpp)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(qsound_map)
+	MCFG_DEVICE_IO_MAP(qsound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.cpp)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000c)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
 	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("qsound", QSOUND, QSOUND_CLOCK)
+	MCFG_DEVICE_ADD("qsound", QSOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1085,7 +1085,7 @@ WRITE8_MEMBER(zn_state::bank_coh1000t_w)
 
 WRITE8_MEMBER(zn_state::fx1a_sound_bankswitch_w)
 {
-	m_soundbank->set_entry( ( data - 1 ) & 0x07 );
+	m_soundbank->set_entry( data & 0x07 );
 }
 
 void zn_state::coh1000ta_map(address_map &map)
@@ -1102,14 +1102,17 @@ MACHINE_START_MEMBER(zn_state,coh1000ta)
 {
 	m_rombank[0]->configure_entries( 0, 4, m_bankedroms->base(), 0x800000 ); /* banked game rom */
 	if (m_soundbank.found())
-		m_soundbank->configure_entries( 0, 8, memregion( "audiocpu" )->base() + 0x4000, 0x4000 );
+	{
+		m_soundbank->configure_entry( 0, memregion( "audiocpu" )->base() + 0x20000 ); /* TODO : Bank 0 is addressing First 16 KB of ROM? */
+		m_soundbank->configure_entries( 1, 7, memregion( "audiocpu" )->base() + 0x4000, 0x4000 );
+	}
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000ta)
 {
 	m_rombank[0]->set_entry( 0 );
 	if (m_soundbank.found())
-		m_soundbank->set_entry( 0 );
+		m_soundbank->set_entry( 1 );
 }
 
 void zn_state::fx1a_sound_map(address_map &map)
@@ -1129,17 +1132,17 @@ void zn_state::fx1a_sound_map(address_map &map)
 
 MACHINE_CONFIG_START(zn_state::coh1000ta)
 	zn1_1mb_vram(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(coh1000ta_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(coh1000ta_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)    /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(fx1a_sound_map)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(16'000'000) / 4)    /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fx1a_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000ta)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610B, XTAL(16'000'000)/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_DEVICE_ADD("ymsnd", YM2610B, XTAL(16'000'000)/2)
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE(m_audiocpu, 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
@@ -1187,8 +1190,8 @@ MACHINE_CONFIG_START(zn_state::coh1000tb)
 	zn1_1mb_vram(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(coh1000tb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(coh1000tb_map)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000ta)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
@@ -1197,7 +1200,7 @@ MACHINE_CONFIG_START(zn_state::coh1000tb)
 	MCFG_MB3773_ADD("mb3773")
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("spu")
+	MCFG_DEVICE_MODIFY("spu")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
@@ -1209,8 +1212,8 @@ MACHINE_CONFIG_START(zn_state::coh1002tb)
 	zn1_2mb_vram(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(coh1000tb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(coh1000tb_map)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000ta)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
@@ -1219,7 +1222,7 @@ MACHINE_CONFIG_START(zn_state::coh1002tb)
 	MCFG_MB3773_ADD("mb3773")
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("spu")
+	MCFG_DEVICE_MODIFY("spu")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
@@ -1455,14 +1458,14 @@ void zn_state::coh1000w_map(address_map &map)
 
 MACHINE_CONFIG_START(zn_state::coh1000w)
 	zn1_2mb_vram(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(coh1000w_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(coh1000w_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("8M")
 
 	MCFG_VT83C461_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin10))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&zn_state::atpsx_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&zn_state::atpsx_dma_write, this ) )
 MACHINE_CONFIG_END
@@ -1674,27 +1677,27 @@ void zn_state::oki_map(address_map &map)
 
 MACHINE_CONFIG_START(zn_state::coh1002e)
 	zn1_2mb_vram(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(coh1002e_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(coh1002e_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(psarc_snd_map)
+	MCFG_DEVICE_ADD(m_audiocpu, M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(psarc_snd_map)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1002e)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002e)
 
-	MCFG_SOUND_ADD("ymf", YMF271, XTAL(16'934'400))
+	MCFG_DEVICE_ADD("ymf", YMF271, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::beastrzrb)
 	zn1_2mb_vram(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(coh1002e_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(coh1002e_map)
 
-	MCFG_CPU_ADD("audiocpu", AT89C4051, XTAL(12'000'000)) // clock unverified
-	MCFG_CPU_PROGRAM_MAP(beastrzrb_snd_map)
+	MCFG_DEVICE_ADD(m_audiocpu, AT89C4051, XTAL(12'000'000)) // clock unverified
+	MCFG_DEVICE_PROGRAM_MAP(beastrzrb_snd_map)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1002e)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002e)
@@ -1830,8 +1833,8 @@ MACHINE_RESET_MEMBER(zn_state,bam2)
 
 MACHINE_CONFIG_START(zn_state::bam2)
 	zn1_2mb_vram(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bam2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bam2_map)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, bam2)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, bam2)
@@ -2180,14 +2183,14 @@ void zn_state::jdredd_map(address_map &map)
 
 MACHINE_CONFIG_START(zn_state::coh1000a)
 	zn1_2mb_vram(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(coh1000a_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(coh1000a_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::nbajamex)
 	coh1000a(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nbajamex_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nbajamex_map)
 
 	MCFG_NVRAM_ADD_1FILL("71256")
 
@@ -2206,14 +2209,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::jdredd)
 	coh1000a(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(jdredd_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(jdredd_map)
 
 	MCFG_DEVICE_MODIFY("gpu")
 	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&zn_state::jdredd_vblank, this))
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin10))
 MACHINE_CONFIG_END
 
 /*
@@ -2374,20 +2377,20 @@ void zn_state::atlus_snd_map(address_map &map)
 
 MACHINE_CONFIG_START(zn_state::coh1001l)
 	zn1_2mb_vram(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(coh1001l_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(coh1001l_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(atlus_snd_map)
+	MCFG_DEVICE_ADD(m_audiocpu, M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(atlus_snd_map)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1001l)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1001l)
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch16")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 3))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, 3))
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
-	MCFG_YMZ280B_IRQ_HANDLER(INPUTLINE("audiocpu", 2))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
+	MCFG_YMZ280B_IRQ_HANDLER(INPUTLINE(m_audiocpu, 2))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 MACHINE_CONFIG_END
@@ -2430,8 +2433,8 @@ MACHINE_RESET_MEMBER(zn_state,coh1002v)
 
 MACHINE_CONFIG_START(zn_state::coh1002v)
 	zn1_2mb_vram(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(coh1002v_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(coh1002v_map)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1002v)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002v)
@@ -2620,8 +2623,8 @@ MACHINE_RESET_MEMBER(zn_state,coh1002m)
 
 MACHINE_CONFIG_START(zn_state::coh1002m)
 	zn1_2mb_vram(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(coh1002m_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(coh1002m_map)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1002m)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002m)
@@ -2677,12 +2680,12 @@ MACHINE_CONFIG_START(zn_state::coh1002msnd)
 	coh1002m(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(coh1002msnd_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(coh1002msnd_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(cbaj_z80_map)
-	MCFG_CPU_IO_MAP(cbaj_z80_port_map)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(32'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(cbaj_z80_map)
+	MCFG_DEVICE_IO_MAP(cbaj_z80_port_map)
 
 	MCFG_FIFO7200_ADD("cbaj_fifo1", 0x400) // LH540202
 	MCFG_FIFO7200_ADD("cbaj_fifo2", 0x400) // "
@@ -2690,16 +2693,16 @@ MACHINE_CONFIG_START(zn_state::coh1002msnd)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::coh1002ml)
 	coh1002m(config);
-	MCFG_CPU_ADD("link", Z80, 4000000) // ?
-	MCFG_CPU_PROGRAM_MAP(coh1002ml_link_map)
-	MCFG_CPU_IO_MAP(coh1002ml_link_port_map)
+	MCFG_DEVICE_ADD("link", Z80, 4000000) // ?
+	MCFG_DEVICE_PROGRAM_MAP(coh1002ml_link_map)
+	MCFG_DEVICE_IO_MAP(coh1002ml_link_port_map)
 MACHINE_CONFIG_END
 
 
@@ -2858,7 +2861,7 @@ static INPUT_PORTS_START( jdredd )
 	PORT_BIT( 0x6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zn_state,jdredd_gun_mux_read, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zn_state,jdredd_gun_mux_read, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
@@ -4579,7 +4582,7 @@ ROM_START( mgcldate )
 	ROM_LOAD( "e32-02.6",            0x0800000, 0x400000, CRC(61c8438c) SHA1(bdbe6079cc634c0cd6580f76619eb2944c9a31d9) )
 	ROM_LOAD( "e32-03.12",           0x0c00000, 0x200000, CRC(190d1618) SHA1(838a651d32752015baa7e8caea62fd739631b8be) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e32-07.22",           0x0000000, 0x020000, CRC(adf3feb5) SHA1(bae5bc3fad99a92a3492be1b775dab861007eb3b) ) // 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x400000, "ymsnd", 0 )
@@ -4599,7 +4602,7 @@ ROM_START( mgcldtex )
 	ROM_LOAD( "e32-02.6",            0x0800000, 0x400000, CRC(61c8438c) SHA1(bdbe6079cc634c0cd6580f76619eb2944c9a31d9) )
 	ROM_LOAD( "e32-03.12",           0x0c00000, 0x200000, CRC(190d1618) SHA1(838a651d32752015baa7e8caea62fd739631b8be) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e32-10.22",           0x0000000, 0x020000, CRC(adf3feb5) SHA1(bae5bc3fad99a92a3492be1b775dab861007eb3b) ) // 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x400000, "ymsnd", 0 )
@@ -4620,7 +4623,7 @@ ROM_START( psyforce )
 	ROM_LOAD( "e22-03.19",           0x0a00000, 0x200000, CRC(8372f839) SHA1(646b3919b6be63412c11850ec1524685abececc0) )
 	ROM_LOAD( "e22-04.21",           0x0c00000, 0x200000, CRC(397b71aa) SHA1(48743c362503c1d2dbeb3c8be4cb2aaaae015b88) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e22-07.22",           0x0000000, 0x020000, CRC(739af589) SHA1(dbb4d1c6d824a99ccf27168e2c21644e19811523) )// 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
@@ -4640,7 +4643,7 @@ ROM_START( psyforcej )
 	ROM_LOAD( "e22-03.19",           0x0a00000, 0x200000, CRC(8372f839) SHA1(646b3919b6be63412c11850ec1524685abececc0) )
 	ROM_LOAD( "e22-04.21",           0x0c00000, 0x200000, CRC(397b71aa) SHA1(48743c362503c1d2dbeb3c8be4cb2aaaae015b88) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e22-07.22",           0x0000000, 0x020000, CRC(739af589) SHA1(dbb4d1c6d824a99ccf27168e2c21644e19811523) )// 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
@@ -4660,7 +4663,7 @@ ROM_START( psyforcex )
 	ROM_LOAD( "e22-03.19",           0x0a00000, 0x200000, CRC(8372f839) SHA1(646b3919b6be63412c11850ec1524685abececc0) )
 	ROM_LOAD( "e22-04.21",           0x0c00000, 0x200000, CRC(397b71aa) SHA1(48743c362503c1d2dbeb3c8be4cb2aaaae015b88) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e22-07.22",           0x0000000, 0x020000, CRC(739af589) SHA1(dbb4d1c6d824a99ccf27168e2c21644e19811523) )// 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
@@ -4757,7 +4760,7 @@ ROM_START( sfchamp )
 	ROM_LOAD( "e18-04.19",           0x0a00000, 0x200000, CRC(fc3731da) SHA1(58948aad8d7bb7a8449d2bf12e9d5e6d7b4426b5) )
 	ROM_LOAD( "e18-05.21",           0x0c00000, 0x200000, CRC(2e984c50) SHA1(6d8255e38c67d68bf489c9885663ed2edf148188) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e18-09.22",           0x0000000, 0x020000, CRC(bb5a5319) SHA1(0bb700cafc157d3af663cc9bebb8167487ff2852) ) // 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
@@ -4778,7 +4781,7 @@ ROM_START( sfchampo )
 	ROM_LOAD( "e18-04.19",           0x0a00000, 0x200000, CRC(fc3731da) SHA1(58948aad8d7bb7a8449d2bf12e9d5e6d7b4426b5) )
 	ROM_LOAD( "e18-05.21",           0x0c00000, 0x200000, CRC(2e984c50) SHA1(6d8255e38c67d68bf489c9885663ed2edf148188) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e18-09.22",           0x0000000, 0x020000, CRC(bb5a5319) SHA1(0bb700cafc157d3af663cc9bebb8167487ff2852) ) // 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
@@ -4799,7 +4802,7 @@ ROM_START( sfchampu )
 	ROM_LOAD( "e18-04.19",           0x0a00000, 0x200000, CRC(fc3731da) SHA1(58948aad8d7bb7a8449d2bf12e9d5e6d7b4426b5) )
 	ROM_LOAD( "e18-05.21",           0x0c00000, 0x200000, CRC(2e984c50) SHA1(6d8255e38c67d68bf489c9885663ed2edf148188) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e18-09.22",           0x0000000, 0x020000, CRC(bb5a5319) SHA1(0bb700cafc157d3af663cc9bebb8167487ff2852) ) // 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
@@ -4820,7 +4823,7 @@ ROM_START( sfchampj )
 	ROM_LOAD( "e18-04.19",           0x0a00000, 0x200000, CRC(fc3731da) SHA1(58948aad8d7bb7a8449d2bf12e9d5e6d7b4426b5) )
 	ROM_LOAD( "e18-05.21",           0x0c00000, 0x200000, CRC(2e984c50) SHA1(6d8255e38c67d68bf489c9885663ed2edf148188) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e18-09.22",           0x0000000, 0x020000, CRC(bb5a5319) SHA1(0bb700cafc157d3af663cc9bebb8167487ff2852) ) // 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )

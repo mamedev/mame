@@ -244,7 +244,7 @@ uint8_t xtom3d_state::piix4_config_r(int function, int reg)
 
 void xtom3d_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -405,10 +405,10 @@ void xtom3d_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(xtom3d_state::xtom3d)
-	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000/16)  // actually Pentium II 450
-	MCFG_CPU_PROGRAM_MAP(xtom3d_map)
-	MCFG_CPU_IO_MAP(xtom3d_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM2, 450000000/16)  // actually Pentium II 450
+	MCFG_DEVICE_PROGRAM_MAP(xtom3d_map)
+	MCFG_DEVICE_IO_MAP(xtom3d_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 
 	pcat_common(config);

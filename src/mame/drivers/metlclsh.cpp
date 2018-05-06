@@ -278,12 +278,12 @@ void metlclsh_state::machine_reset()
 MACHINE_CONFIG_START(metlclsh_state::metlclsh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1500000)        // ?
-	MCFG_CPU_PROGRAM_MAP(metlclsh_master_map)
+	MCFG_DEVICE_ADD("maincpu", M6809, 1500000)        // ?
+	MCFG_DEVICE_PROGRAM_MAP(metlclsh_master_map)
 	// IRQ by YM3526, NMI by cpu #2
 
-	MCFG_CPU_ADD("sub", M6809, 1500000)        // ?
-	MCFG_CPU_PROGRAM_MAP(metlclsh_slave_map)
+	MCFG_DEVICE_ADD("sub", M6809, 1500000)        // ?
+	MCFG_DEVICE_PROGRAM_MAP(metlclsh_slave_map)
 	// IRQ by cpu #1, NMI by coins insertion
 
 
@@ -303,13 +303,13 @@ MACHINE_CONFIG_START(metlclsh_state::metlclsh)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

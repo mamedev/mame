@@ -423,31 +423,25 @@ static GFXDECODE_START( skykid )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(skykid_state::main_vblank_irq)
+WRITE_LINE_MEMBER(skykid_state::vblank_irq)
 {
-	if(m_main_irq_mask)
-		device.execute().set_input_line(0, ASSERT_LINE);
-}
+	if (state && m_main_irq_mask)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 
-
-INTERRUPT_GEN_MEMBER(skykid_state::mcu_vblank_irq)
-{
-	if(m_mcu_irq_mask)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_mcu_irq_mask)
+		m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
 
 MACHINE_CONFIG_START(skykid_state::skykid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(49'152'000)/32)
-	MCFG_CPU_PROGRAM_MAP(skykid_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", skykid_state,  main_vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(49'152'000)/32)
+	MCFG_DEVICE_PROGRAM_MAP(skykid_map)
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8) /* or compatible 6808 with extra instructions */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_IO_MAP(mcu_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", skykid_state,  mcu_vblank_irq)
+	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8) /* or compatible 6808 with extra instructions */
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_IO_MAP(mcu_port_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synch */
 
@@ -461,6 +455,7 @@ MACHINE_CONFIG_START(skykid_state::skykid)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(skykid_state, screen_update_skykid)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, skykid_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skykid)
 	MCFG_PALETTE_ADD("palette", 64*4+128*4+64*8)
@@ -470,7 +465,7 @@ MACHINE_CONFIG_START(skykid_state::skykid)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
+	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, 49152000/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

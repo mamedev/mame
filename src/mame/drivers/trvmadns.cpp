@@ -385,10 +385,9 @@ void trvmadns_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(trvmadns_state::trvmadns)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/4) // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", trvmadns_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/4) // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 
 	/* video hardware */
@@ -399,6 +398,7 @@ MACHINE_CONFIG_START(trvmadns_state::trvmadns)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trvmadns_state, screen_update_trvmadns)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trvmadns)
 	MCFG_PALETTE_ADD("palette", 16)
@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(trvmadns_state::trvmadns)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(10'000'000)/2/4) //?
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(10'000'000)/2/4) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

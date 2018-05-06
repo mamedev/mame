@@ -231,6 +231,7 @@
 void bzone_state::machine_start()
 {
 	save_item(NAME(m_analog_data));
+	m_startled.resolve();
 }
 
 
@@ -363,9 +364,9 @@ void redbaron_state::redbaron_map(address_map &map)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step") \
 	/* bit 6 is the VG HALT bit. We set it to "low" */\
 	/* per default (busy vector processor). */\
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_bzone_device, done_r, nullptr)\
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_bzone_device, done_r, nullptr)\
 	/* bit 7 is tied to a 3kHz clock */\
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bzone_state,clock_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bzone_state,clock_r, nullptr)
 
 
 #define BZONEDSW0\
@@ -540,9 +541,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(bzone_state::bzone_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(bzone_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  BZONE_CLOCK_3KHZ / 12)
+	MCFG_DEVICE_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(bzone_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  BZONE_CLOCK_3KHZ / 12)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -576,8 +577,8 @@ MACHINE_CONFIG_START(redbaron_state::redbaron)
 	bzone_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(redbaron_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(redbaron_map)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
@@ -589,11 +590,11 @@ MACHINE_CONFIG_START(redbaron_state::redbaron)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey", POKEY, 1500000)
-	MCFG_POKEY_ALLPOT_R_CB(READ8(redbaron_state, redbaron_joy_r))
+	MCFG_DEVICE_ADD("pokey", POKEY, 1500000)
+	MCFG_POKEY_ALLPOT_R_CB(READ8(*this, redbaron_state, redbaron_joy_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("custom", REDBARON, 0)
+	MCFG_DEVICE_ADD("custom", REDBARON, 0)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

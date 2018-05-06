@@ -231,13 +231,14 @@ void eolith_state::eolith_map(address_map &map)
 	map(0xfff80000, 0xffffffff).rom().region("maincpu", 0);
 }
 
-ADDRESS_MAP_START(eolith_state::hidctch3_map)
-	AM_IMPORT_FROM(eolith_map)
-	AM_RANGE(0xfc200000, 0xfc200003) AM_WRITENOP // this generates pens vibration
+void eolith_state::hidctch3_map(address_map &map)
+{
+	eolith_map(map);
+	map(0xfc200000, 0xfc200003).nopw(); // this generates pens vibration
 	// It is not clear why the first reads are needed too
-	AM_RANGE(0xfce00000, 0xfce00003) AM_MIRROR(0x00080000) AM_READ(hidctch3_pen_r<0>)
-	AM_RANGE(0xfcf00000, 0xfcf00003) AM_MIRROR(0x00080000) AM_READ(hidctch3_pen_r<1>)
-ADDRESS_MAP_END
+	map(0xfce00000, 0xfce00003).mirror(0x00080000).r(this, FUNC(eolith_state::hidctch3_pen_r<0>));
+	map(0xfcf00000, 0xfcf00003).mirror(0x00080000).r(this, FUNC(eolith_state::hidctch3_pen_r<1>));
+}
 
 
 /*************************************
@@ -269,10 +270,10 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, eolith_speedup_getvblank, nullptr)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, eolith_speedup_getvblank, nullptr)
 	PORT_BIT( 0x00003f80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00008000, IP_ACTIVE_LOW )
@@ -510,7 +511,7 @@ static INPUT_PORTS_START( stealsee )
 	PORT_INCLUDE(common)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, stealsee_speedup_getvblank, nullptr)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, stealsee_speedup_getvblank, nullptr)
 INPUT_PORTS_END
 
 
@@ -533,16 +534,16 @@ INPUT_PORTS_END
  *************************************/
 
 MACHINE_CONFIG_START(eolith_state::eolith45)
-	MCFG_CPU_ADD("maincpu", E132N, 45000000)         /* 45 MHz */
-	MCFG_CPU_PROGRAM_MAP(eolith_map)
+	MCFG_DEVICE_ADD("maincpu", E132N, 45000000)         /* 45 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(eolith_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith_state, eolith_speedup, "screen", 0, 1)
 
 	/* Sound CPU */
-	MCFG_CPU_ADD("soundcpu", I8032, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(sound_prg_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(eolith_state, sound_p1_w))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(eolith_state, soundcpu_to_qs1000)) // Sound CPU -> QS1000 CPU serial link
+	MCFG_DEVICE_ADD("soundcpu", I8032, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sound_prg_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, eolith_state, sound_p1_w))
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, eolith_state, soundcpu_to_qs1000)) // Sound CPU -> QS1000 CPU serial link
 
 	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)
 
@@ -573,30 +574,30 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", MCS51_INT0_LINE))
 
-	MCFG_SOUND_ADD("qs1000", QS1000, XTAL(24'000'000))
+	MCFG_DEVICE_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(READ8(eolith_state, qs1000_p1_r))
-	MCFG_QS1000_OUT_P1_CB(WRITE8(eolith_state, qs1000_p1_w))
+	MCFG_QS1000_IN_P1_CB(READ8(*this, eolith_state, qs1000_p1_r))
+	MCFG_QS1000_OUT_P1_CB(WRITE8(*this, eolith_state, qs1000_p1_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(eolith_state::eolith50)
 	eolith45(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(50000000)         /* 50 MHz */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(50000000)         /* 50 MHz */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(eolith_state::ironfort)
 	eolith45(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(44900000) /* Normally 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(44900000) /* Normally 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(eolith_state::hidctch3)
 	eolith50(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hidctch3_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hidctch3_map)
 MACHINE_CONFIG_END
 
 
@@ -1599,7 +1600,7 @@ void eolith_state::speedup_read()
 {
 	/* for debug */
 	//if ((m_maincpu->pc()!=m_speedup_address) && (m_speedup_vblank!=1) )
-	//    printf("%s:eolith speedup_read data %02x\n",machine().describe_context(), m_speedup_vblank);
+	//    printf("%s:eolith speedup_read data %02x\n",machine().describe_context().c_str(), m_speedup_vblank);
 
 	if (m_speedup_vblank==0 && m_speedup_scanline < m_speedup_resume_scanline)
 	{

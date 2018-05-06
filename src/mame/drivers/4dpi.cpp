@@ -68,7 +68,7 @@ inline void ATTR_PRINTF(3,4) sgi_ip6_state::verboselog( int n_level, const char 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror("%08x: %s", machine().device("maincpu")->safe_pc(), buf);
+		logerror("%s: %s", machine().describe_context(), buf);
 	}
 #endif
 }
@@ -231,10 +231,10 @@ void sgi_ip6_state::sgi_ip6_map(address_map &map)
 ***************************************************************************/
 
 MACHINE_CONFIG_START(sgi_ip6_state::sgi_ip6)
-	MCFG_CPU_ADD( "maincpu", R3041, 20000000 ) // FIXME: Should be R2000
+	MCFG_DEVICE_ADD( "maincpu", R3041, 20000000 ) // FIXME: Should be R2000
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_CPU_PROGRAM_MAP( sgi_ip6_map )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sgi_ip6_state,  sgi_ip6_vbl)
+	MCFG_DEVICE_PROGRAM_MAP( sgi_ip6_map )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sgi_ip6_state,  sgi_ip6_vbl)
 
 
 	/* video hardware */

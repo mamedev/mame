@@ -361,7 +361,7 @@ static INPUT_PORTS_START( begas )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF,deco_ld_state,begas_vblank_r, nullptr) // TODO: IPT_VBLANK doesn't seem to work fine?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF,deco_ld_state,begas_vblank_r, nullptr) // TODO: IPT_VBLANK doesn't seem to work fine?
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
@@ -463,13 +463,13 @@ void deco_ld_state::machine_start()
 MACHINE_CONFIG_START(deco_ld_state::rblaster)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(rblaster_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco_ld_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M6502,8000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(rblaster_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco_ld_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu",M6502,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(rblaster_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(deco_ld_state, sound_interrupt,  640)
+	MCFG_DEVICE_ADD("audiocpu",M6502,8000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(rblaster_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(deco_ld_state, sound_interrupt,  640)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -485,8 +485,8 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
 	//MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("laserdisc", sony_ldp1000_device, write))
-	//MCFG_ACIA6850_RXD_HANDLER(DEVREADLINE("laserdisc", sony_ldp1000_device, read))
+	//MCFG_ACIA6850_TXD_HANDLER(WRITELINE("laserdisc", sony_ldp1000_device, write))
+	//MCFG_ACIA6850_RXD_HANDLER(READLINE("laserdisc", sony_ldp1000_device, read))
 
 	/* sound hardware */
 	/* TODO: mixing */
@@ -495,15 +495,15 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

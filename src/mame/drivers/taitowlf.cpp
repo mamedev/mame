@@ -119,7 +119,7 @@ uint8_t taitowlf_state::mtxc_config_r(int function, int reg)
 
 void taitowlf_state::mtxc_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
+//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
 
 	switch(reg)
 	{
@@ -202,7 +202,7 @@ uint8_t taitowlf_state::piix4_config_r(int function, int reg)
 
 void taitowlf_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -378,10 +378,10 @@ PALETTE_INIT_MEMBER(taitowlf_state, taitowlf)
 MACHINE_CONFIG_START(taitowlf_state::taitowlf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 200000000)
-	MCFG_CPU_PROGRAM_MAP(taitowlf_map)
-	MCFG_CPU_IO_MAP(taitowlf_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 200000000)
+	MCFG_DEVICE_PROGRAM_MAP(taitowlf_map)
+	MCFG_DEVICE_IO_MAP(taitowlf_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)

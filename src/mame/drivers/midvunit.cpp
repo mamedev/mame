@@ -657,12 +657,12 @@ void midvunit_state::midvplus_map(address_map &map)
 
 static INPUT_PORTS_START( midvunit )
 	PORT_START("991030")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
 
 	PORT_START("992000")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
 
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -707,22 +707,22 @@ static INPUT_PORTS_START( crusnusa )
 	PORT_INCLUDE( midvunit )
 
 	PORT_START("MOTION")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Mat Not Plugged In")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Mat Stepped On")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Opto Path Broken")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Opto Detector Not Receiving")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Opto LED Not Emitting")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Fail Safe Switch Engaged")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Fail Safe Switch Not Connected Correctly")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Board Not Plugged In")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Status - Mat Not Plugged In")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Status - Mat Stepped On")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Status - Opto Path Broken")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Status - Opto Detector Not Receiving")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Status - Opto LED Not Emitting")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Status - Fail Safe Switch Engaged")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Status - Fail Safe Switch Not Connected Correctly")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Status - Board Not Plugged In")
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Stop")
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Device 1")
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Device 2")
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Device 3")
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_NAME("Motion Status - Device 4")
-	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midvunit_state, motion_r, nullptr )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Stop")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Status - Device 1")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Status - Device 2")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Status - Device 3")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Status - Device 4")
+	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midvunit_state, motion_r, nullptr )
 
 	PORT_START("DSW")
 	/* DSW2 at U97 */
@@ -1073,8 +1073,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(midvunit_state::midvcommon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS32031, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(midvunit_map)
+	MCFG_DEVICE_ADD("maincpu", TMS32031, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(midvunit_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -1126,9 +1126,9 @@ MACHINE_CONFIG_START(midvunit_state::midvplus)
 	midvcommon(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(midvplus_map)
-	MCFG_TMS3203X_XF1_CB(WRITE8(midvunit_state, midvplus_xf1_w))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(midvplus_map)
+	MCFG_TMS3203X_XF1_CB(WRITE8(*this, midvunit_state, midvplus_xf1_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(midvunit_state,midvplus)
 	MCFG_DEVICE_REMOVE("nvram")

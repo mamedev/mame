@@ -303,7 +303,7 @@ static INPUT_PORTS_START( tm )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, tmaster_state, read_rand )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, tmaster_state, read_rand )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_COIN1    )    // "E. Coin 1" (ECA?) tmaster defaults to e. coin,
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_COIN2    )    // "E. Coin 2" (ECA?) rather than m. coin
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN3    )    // "E. Coin 3" (ECA?) so they're coin1-coin4
@@ -332,7 +332,7 @@ static INPUT_PORTS_START( tm4k )
 	PORT_INCLUDE( tm2k )
 
 	PORT_MODIFY("COIN")
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "ds1204", ds1204_device, read_dq )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "ds1204", ds1204_device, read_dq )
 
 	PORT_MODIFY( "OUT" )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( "ds1204", ds1204_device, write_rst )
@@ -364,15 +364,15 @@ int tmaster_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
 }
 
 MACHINE_CONFIG_START(tmaster_state::tm)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2) /* 12MHz */
-	MCFG_CPU_PROGRAM_MAP(tmaster_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2) /* 12MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tmaster_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmaster_state, scanline_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD( "duart68681", MC68681, XTAL(8'664'000) / 2 /*??*/)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(tmaster_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_device, rx))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, tmaster_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("microtouch", microtouch_device, rx))
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", mc68681_device, rx_a_w) )
+	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("duart68681", mc68681_device, rx_a_w) )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -390,7 +390,7 @@ MACHINE_CONFIG_START(tmaster_state::tm)
 
 	MCFG_CESBLIT_ADD("blitter", "screen", XTAL(32'000'000))
 	MCFG_CESBLIT_COMPUTE_ADDR(tmaster_compute_addr)
-	MCFG_CESBLIT_IRQ_CB(WRITELINE(tmaster_state, blitter_irq_callback))
+	MCFG_CESBLIT_IRQ_CB(WRITELINE(*this, tmaster_state, blitter_irq_callback))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

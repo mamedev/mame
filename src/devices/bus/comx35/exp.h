@@ -135,7 +135,7 @@ protected:
 DECLARE_DEVICE_TYPE(COMX_EXPANSION_SLOT, comx_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( comx_expansion_cards );
+void comx_expansion_cards(device_slot_interface &device);
 
 
 #endif // MAME_BUS_COMX35_EXP_H

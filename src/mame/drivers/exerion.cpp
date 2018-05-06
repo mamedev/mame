@@ -237,7 +237,7 @@ void exerion_state::sub_map(address_map &map)
 /* verified from Z80 code */
 static INPUT_PORTS_START( exerion )
 	PORT_START("IN0")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exerion_state, exerion_controls_r, nullptr)
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exerion_state, exerion_controls_r, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
@@ -374,11 +374,11 @@ void exerion_state::machine_reset()
 
 MACHINE_CONFIG_START(exerion_state::exerion)
 
-	MCFG_CPU_ADD("maincpu", Z80, EXERION_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, EXERION_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("sub", Z80, EXERION_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("sub", Z80, EXERION_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
 
 	/* video hardware */
@@ -397,12 +397,12 @@ MACHINE_CONFIG_START(exerion_state::exerion)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, EXERION_AY8910_CLOCK)
+	MCFG_DEVICE_ADD("ay1", AY8910, EXERION_AY8910_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8910, EXERION_AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(exerion_state, exerion_porta_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(exerion_state, exerion_portb_w))
+	MCFG_DEVICE_ADD("ay2", AY8910, EXERION_AY8910_CLOCK)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, exerion_state, exerion_porta_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, exerion_state, exerion_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

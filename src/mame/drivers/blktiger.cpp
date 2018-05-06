@@ -293,19 +293,19 @@ void blktiger_state::machine_reset()
 MACHINE_CONFIG_START(blktiger_state::blktiger)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(blktiger_map)
-	MCFG_CPU_IO_MAP(blktiger_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(blktiger_map)
+	MCFG_DEVICE_IO_MAP(blktiger_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(blktiger_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(blktiger_sound_map)
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL(24'000'000)/4) /* ??? */
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(blktiger_state, blktiger_from_main_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(blktiger_state, blktiger_to_main_w))
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(24'000'000)/4) /* ??? */
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, blktiger_state, blktiger_from_main_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, blktiger_state, blktiger_to_main_w))
 	// other ports unknown
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -316,7 +316,7 @@ MACHINE_CONFIG_START(blktiger_state::blktiger)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blktiger_state, screen_update_blktiger)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blktiger)
@@ -324,25 +324,25 @@ MACHINE_CONFIG_START(blktiger_state::blktiger)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(blktiger_state::blktigerbl)
 	blktiger(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(blktigerbl_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(blktigerbl_io_map)
 
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END

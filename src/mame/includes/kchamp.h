@@ -75,7 +75,7 @@ public:
 	DECLARE_MACHINE_START(kchamp);
 	uint32_t screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(kc_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_int);
 	void kchamp_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

@@ -440,9 +440,9 @@ const rgb_t cgenie_state::m_palette_nz[] =
 
 MACHINE_CONFIG_START(cgenie_state::cgenie)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(17'734'470) / 8)  // 2.2168 MHz
-	MCFG_CPU_PROGRAM_MAP(cgenie_mem)
-	MCFG_CPU_IO_MAP(cgenie_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(17'734'470) / 8)  // 2.2168 MHz
+	MCFG_DEVICE_PROGRAM_MAP(cgenie_mem)
+	MCFG_DEVICE_IO_MAP(cgenie_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -457,11 +457,11 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(17'734'470) / 8)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("par", cg_parallel_slot_device, pa_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("par", cg_parallel_slot_device, pa_w))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("par", cg_parallel_slot_device, pb_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("par", cg_parallel_slot_device, pb_w))
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(17'734'470) / 8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("par", cg_parallel_slot_device, pa_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("par", cg_parallel_slot_device, pa_w))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("par", cg_parallel_slot_device, pb_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("par", cg_parallel_slot_device, pb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_CASSETTE_ADD("cassette")
@@ -472,9 +472,9 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "cgenie_cass")
 
 	// serial port
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(cgenie_state, rs232_rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(cgenie_state, rs232_dcd_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, cgenie_state, rs232_rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, cgenie_state, rs232_dcd_w))
 
 	// cartridge expansion slot
 	MCFG_CG_EXP_SLOT_ADD("exp")

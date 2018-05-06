@@ -210,12 +210,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(darkseal_state::darkseal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* Custom chip 59 */
-	MCFG_CPU_PROGRAM_MAP(darkseal_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", darkseal_state,  irq6_line_assert)/* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* Custom chip 59 */
+	MCFG_DEVICE_PROGRAM_MAP(darkseal_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", darkseal_state,  irq6_line_assert)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -229,7 +229,7 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darkseal)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -270,10 +270,10 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000)/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
-	MCFG_YM2151_ADD("ym2", XTAL(32'220'000)/9)
+	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000)/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
 	MCFG_SOUND_ROUTE(0, "mono", 0.55)
 	MCFG_SOUND_ROUTE(1, "mono", 0.55)

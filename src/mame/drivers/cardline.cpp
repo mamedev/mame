@@ -266,7 +266,7 @@ static INPUT_PORTS_START( cardline )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xf5, IP_ACTIVE_HIGH, IPT_SPECIAL ) // h/w status bits
+	PORT_BIT( 0xf5, IP_ACTIVE_HIGH, IPT_CUSTOM ) // h/w status bits
 
 	PORT_START("VBLANK")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // VBLANK_Q
@@ -319,13 +319,13 @@ PALETTE_INIT_MEMBER(cardline_state, cardline)
 MACHINE_CONFIG_START(cardline_state::cardline)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C32, MASTER_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", I80C32, MASTER_CLOCK)
 	MCFG_MCS51_PORT1_CONFIG(0x10)
-	MCFG_CPU_PROGRAM_MAP(mem_prg)
-	MCFG_CPU_IO_MAP(mem_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(cardline_state, hsync_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(cardline_state, video_w))
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", cardline_state,  irq1_line_hold)
+	MCFG_DEVICE_PROGRAM_MAP(mem_prg)
+	MCFG_DEVICE_IO_MAP(mem_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, cardline_state, hsync_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, cardline_state, video_w))
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cardline_state,  irq1_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -346,8 +346,8 @@ MACHINE_CONFIG_START(cardline_state::cardline)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_BEGIN_UPDATE_CB(cardline_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(cardline_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(cardline_state, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(cardline_state, vsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, cardline_state, hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, cardline_state, vsync_changed))
 
 	MCFG_DEFAULT_LAYOUT(layout_cardline)
 

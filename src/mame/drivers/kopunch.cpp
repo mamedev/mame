@@ -147,11 +147,11 @@ static INPUT_PORTS_START( kopunch )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // related to above startbuttons
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL ) // punch strength (high 3 bits)
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) // punch strength (high 3 bits)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, kopunch_state, right_coin_inserted, 0)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) // sensor
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) // sensor
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) // sensor
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, kopunch_state, left_coin_inserted, 0)
 
 	PORT_START("DSW")
@@ -234,35 +234,35 @@ void kopunch_state::machine_start()
 MACHINE_CONFIG_START(kopunch_state::kopunch)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, 4000000) // 4 MHz?
-	MCFG_CPU_PROGRAM_MAP(kopunch_map)
-	MCFG_CPU_IO_MAP(kopunch_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kopunch_state, vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 4000000) // 4 MHz?
+	MCFG_DEVICE_PROGRAM_MAP(kopunch_map)
+	MCFG_DEVICE_IO_MAP(kopunch_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kopunch_state, vblank_interrupt)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	// $30 - always $9b (PPI mode 0, ports A & B & C as input)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(READ8(kopunch_state, sensors1_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(kopunch_state, sensors2_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, kopunch_state, sensors1_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, kopunch_state, sensors2_r))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	// $34 - always $80 (PPI mode 0, ports A & B & C as output)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kopunch_state, coin_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kopunch_state, coin_w))
 	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
 	MCFG_I8255_OUT_PORTC_CB(LOGGER("PPI8255 - unmapped write port C"))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 	// $38 - always $89 (PPI mode 0, ports A & B as output, port C as input)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kopunch_state, lamp_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kopunch_state, lamp_w))
 	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW"))
 
 	MCFG_DEVICE_ADD("ppi8255_3", I8255A, 0)
 	// $3c - always $88 (PPI mode 0, ports A & B & lower C as output, upper C as input)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kopunch_state, scroll_x_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(kopunch_state, scroll_y_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kopunch_state, scroll_x_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, kopunch_state, scroll_y_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("P2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(kopunch_state, gfxbank_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kopunch_state, gfxbank_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

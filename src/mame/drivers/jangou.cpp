@@ -556,7 +556,7 @@ static INPUT_PORTS_START( jangou )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // guess
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( macha )
@@ -617,7 +617,7 @@ static INPUT_PORTS_START( macha )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // guess
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 INPUT_PORTS_END
 
 
@@ -702,7 +702,7 @@ static INPUT_PORTS_START( cntrygrl )
 	PORT_DIPNAME( 0x40, 0x40, "Coin B setting"  )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits"  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 
 	PORT_START("IN_NOMUX")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -742,7 +742,7 @@ static INPUT_PORTS_START( jngolady )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( roylcrdn )
@@ -802,7 +802,7 @@ static INPUT_PORTS_START( roylcrdn )
 
 	PORT_START("DSW")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 
 	PORT_START("IN_NOMUX")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -869,14 +869,14 @@ MACHINE_RESET_MEMBER(jangou_state,jngolady)
 MACHINE_CONFIG_START(jangou_state::jangou)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu0", Z80, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(cpu0_map)
-	MCFG_CPU_IO_MAP(cpu0_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jangou_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("cpu0", Z80, MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(cpu0_map)
+	MCFG_DEVICE_IO_MAP(cpu0_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jangou_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("cpu1", Z80, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_IO_MAP(cpu1_io)
+	MCFG_DEVICE_ADD("cpu1", Z80, MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_IO_MAP(cpu1_io)
 
 	MCFG_JANGOU_BLITTER_ADD("blitter", MASTER_CLOCK/4)
 
@@ -894,12 +894,12 @@ MACHINE_CONFIG_START(jangou_state::jangou)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 16)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(jangou_state, input_mux_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(jangou_state, input_system_r))
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK / 16)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, jangou_state, input_mux_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jangou_state, input_system_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("cvsd", HC55516, MASTER_CLOCK / 1024)
+	MCFG_DEVICE_ADD("cvsd", HC55516, MASTER_CLOCK / 1024)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -908,15 +908,15 @@ MACHINE_CONFIG_START(jangou_state::jngolady)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("cpu0")
-	MCFG_CPU_PROGRAM_MAP(jngolady_cpu0_map)
+	MCFG_DEVICE_MODIFY("cpu0")
+	MCFG_DEVICE_PROGRAM_MAP(jngolady_cpu0_map)
 
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(jngolady_cpu1_map)
-	MCFG_CPU_IO_MAP(jngolady_cpu1_io)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(jngolady_cpu1_map)
+	MCFG_DEVICE_IO_MAP(jngolady_cpu1_io)
 
-	MCFG_CPU_ADD("nsc", NSC8105, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(nsc_map)
+	MCFG_DEVICE_ADD("nsc", NSC8105, MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(nsc_map)
 
 	MCFG_MACHINE_START_OVERRIDE(jangou_state,jngolady)
 	MCFG_MACHINE_RESET_OVERRIDE(jangou_state,jngolady)
@@ -924,8 +924,8 @@ MACHINE_CONFIG_START(jangou_state::jngolady)
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("cvsd")
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(400'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(jangou_state, jngolady_vclk_cb))
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, jangou_state, jngolady_vclk_cb))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -935,9 +935,9 @@ MACHINE_CONFIG_START(jangou_state::cntrygrl)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("cpu0")
-	MCFG_CPU_PROGRAM_MAP(cntrygrl_cpu0_map )
-	MCFG_CPU_IO_MAP(cntrygrl_cpu0_io )
+	MCFG_DEVICE_MODIFY("cpu0")
+	MCFG_DEVICE_PROGRAM_MAP(cntrygrl_cpu0_map )
+	MCFG_DEVICE_IO_MAP(cntrygrl_cpu0_io )
 
 	MCFG_DEVICE_REMOVE("cpu1")
 
@@ -954,9 +954,9 @@ MACHINE_CONFIG_START(jangou_state::roylcrdn)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("cpu0")
-	MCFG_CPU_PROGRAM_MAP(roylcrdn_cpu0_map )
-	MCFG_CPU_IO_MAP(roylcrdn_cpu0_io )
+	MCFG_DEVICE_MODIFY("cpu0")
+	MCFG_DEVICE_PROGRAM_MAP(roylcrdn_cpu0_map )
+	MCFG_DEVICE_IO_MAP(roylcrdn_cpu0_io )
 
 	MCFG_DEVICE_REMOVE("cpu1")
 

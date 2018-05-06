@@ -755,24 +755,24 @@ INTERRUPT_GEN_MEMBER(m63_state::vblank_irq)
 MACHINE_CONFIG_START(m63_state::m63)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,XTAL(12'000'000)/4)     /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(m63_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu",Z80,XTAL(12'000'000)/4)     /* 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(m63_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // probably chip at E7 obscured by pulldown resistor
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(m63_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(m63_state, m63_flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(m63_state, pal_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(m63_state, coin1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(m63_state, coin2_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, m63_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, m63_state, m63_flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, m63_state, pal_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, m63_state, coin1_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, m63_state, coin2_w))
 
-	MCFG_CPU_ADD("soundcpu",I8039,XTAL(12'000'000)/4) /* ????? */
-	MCFG_CPU_PROGRAM_MAP(i8039_map)
-	MCFG_CPU_IO_MAP(i8039_port_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(m63_state, p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(m63_state, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(m63_state, irq_r))
-	MCFG_CPU_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60)
+	MCFG_DEVICE_ADD("soundcpu",I8039,XTAL(12'000'000)/4) /* ????? */
+	MCFG_DEVICE_PROGRAM_MAP(i8039_map)
+	MCFG_DEVICE_IO_MAP(i8039_port_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, m63_state, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, m63_state, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, m63_state, irq_r))
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60)
 
 	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
 	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
@@ -797,35 +797,35 @@ MACHINE_CONFIG_START(m63_state::m63)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8) /* ????? */
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8) /* ????? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m63_state::atomboy)
 	m63(config);
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m63_state::fghtbskt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)     /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(fghtbskt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)     /* 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fghtbskt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(m63_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(m63_state, fghtbskt_flipscreen_w))
-	//MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(m63_state, fghtbskt_samples_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, m63_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, m63_state, fghtbskt_flipscreen_w))
+	//MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, m63_state, fghtbskt_samples_w))
 
-	MCFG_CPU_ADD("soundcpu", I8039,XTAL(12'000'000)/4)    /* ????? */
-	MCFG_CPU_PROGRAM_MAP(i8039_map)
-	MCFG_CPU_IO_MAP(i8039_port_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
+	MCFG_DEVICE_ADD("soundcpu", I8039,XTAL(12'000'000)/4)    /* ????? */
+	MCFG_DEVICE_PROGRAM_MAP(i8039_map)
+	MCFG_DEVICE_IO_MAP(i8039_port_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
 
 	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
 	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
@@ -848,10 +848,10 @@ MACHINE_CONFIG_START(m63_state::fghtbskt)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(m63_state, fghtbskt_sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

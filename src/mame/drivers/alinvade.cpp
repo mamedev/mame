@@ -42,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(irqmask_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(sounden_w);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void alinvade(machine_config &config);
@@ -199,18 +199,17 @@ uint32_t alinvade_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(alinvade_state::vblank_irq)
+WRITE_LINE_MEMBER(alinvade_state::vblank_irq)
 {
-	if(m_irqmask & 1)
+	if (state && BIT(m_irqmask, 0))
 		m_maincpu->set_input_line(0,HOLD_LINE);
 }
 
 MACHINE_CONFIG_START(alinvade_state::alinvade)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,2000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(alinvade_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", alinvade_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", M6502,2000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(alinvade_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -219,6 +218,7 @@ MACHINE_CONFIG_START(alinvade_state::alinvade)
 	MCFG_SCREEN_SIZE(128, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alinvade_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, alinvade_state, vblank_irq))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

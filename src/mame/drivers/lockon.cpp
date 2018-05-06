@@ -16,6 +16,7 @@
 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0808.h"
 #include "sound/2203intf.h"
 #include "sound/flt_vol.h"
 #include "speaker.h"
@@ -200,7 +201,7 @@ void lockon_state::sound_prg(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x6fff).rom();
 	map(0x7000, 0x7000).w(this, FUNC(lockon_state::sound_vol));
-	map(0x7400, 0x7403).r(this, FUNC(lockon_state::adc_r)).nopw();
+	map(0x7400, 0x7407).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w));
 	map(0x7800, 0x7fff).mirror(0x8000).ram();
 }
 
@@ -330,24 +331,6 @@ static INPUT_PORTS_START( lockone )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On )  )
 INPUT_PORTS_END
 
-
-/*************************************
- *
- *  M58990P ADC
- *
- *************************************/
-
-READ8_MEMBER(lockon_state::adc_r)
-{
-	switch (offset)
-	{
-		case 0:  return ioport("ADC_BANK")->read();
-		case 1:  return ioport("ADC_PITCH")->read();
-		case 2:  return ioport("ADC_MISSILE")->read();
-		case 3:  return ioport("ADC_HOVER")->read();
-		default: return 0;
-	}
-}
 
 /*************************************
  *
@@ -487,29 +470,34 @@ void lockon_state::machine_reset()
 
 MACHINE_CONFIG_START(lockon_state::lockon)
 
-	MCFG_CPU_ADD("maincpu", V30, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(main_v30)
+	MCFG_DEVICE_ADD("maincpu", V30, 16_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(main_v30)
 
-	MCFG_CPU_ADD("ground", V30, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(ground_v30)
+	MCFG_DEVICE_ADD("ground", V30, 16_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(ground_v30)
 
-	MCFG_CPU_ADD("object", V30, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(object_v30)
+	MCFG_DEVICE_ADD("object", V30, 16_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(object_v30)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(sound_prg)
-	MCFG_CPU_IO_MAP(sound_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_prg)
+	MCFG_DEVICE_IO_MAP(sound_io)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(10000, 4700, 10000e-12) * 4096)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_DEVICE_ADD("adc", M58990, 16_MHz_XTAL / 16)
+	MCFG_ADC0808_IN0_CB(IOPORT("ADC_BANK"))
+	MCFG_ADC0808_IN1_CB(IOPORT("ADC_PITCH"))
+	MCFG_ADC0808_IN2_CB(IOPORT("ADC_MISSILE"))
+	MCFG_ADC0808_IN3_CB(IOPORT("ADC_HOVER"))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(lockon_state, screen_update_lockon)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(lockon_state, screen_vblank_lockon))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lockon_state, screen_vblank_lockon))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lockon)
@@ -518,10 +506,10 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(16'000'000) / 4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lockon_state, ym2203_irq))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, lockon_state, ym2203_irq))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM2203"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lockon_state, ym2203_out_b))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lockon_state, ym2203_out_b))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "f2203.1l", 1.0)

@@ -140,8 +140,8 @@ static INPUT_PORTS_START( stadhero )
 	PORT_DIPUNUSED( 0x8000, IP_ACTIVE_LOW )
 
 	PORT_START("COIN")  /* 0x30c002 & 0x30c003 */
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
 
 	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
@@ -204,12 +204,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(stadhero_state::stadhero)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 20_MHz_XTAL/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", stadhero_state,  irq5_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", stadhero_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 24_MHz_XTAL/16)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 24_MHz_XTAL/16)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -238,13 +238,13 @@ MACHINE_CONFIG_START(stadhero_state::stadhero)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 24_MHz_XTAL/16)
+	MCFG_DEVICE_ADD("ym1", YM2203, 24_MHz_XTAL/16)
 	MCFG_SOUND_ROUTE(0, "mono", 0.95)
 	MCFG_SOUND_ROUTE(1, "mono", 0.95)
 	MCFG_SOUND_ROUTE(2, "mono", 0.95)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 24_MHz_XTAL/8)
+	MCFG_DEVICE_ADD("ym2", YM3812, 24_MHz_XTAL/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 

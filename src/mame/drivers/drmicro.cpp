@@ -243,10 +243,10 @@ void drmicro_state::machine_reset()
 MACHINE_CONFIG_START(drmicro_state::drmicro)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MCLK/6) /* 3.072MHz? */
-	MCFG_CPU_PROGRAM_MAP(drmicro_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", drmicro_state,  drmicro_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80,MCLK/6) /* 3.072MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(drmicro_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drmicro_state,  drmicro_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -268,17 +268,17 @@ MACHINE_CONFIG_START(drmicro_state::drmicro)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76496, MCLK/4)
+	MCFG_DEVICE_ADD("sn1", SN76496, MCLK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76496, MCLK/4)
+	MCFG_DEVICE_ADD("sn2", SN76496, MCLK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn3", SN76496, MCLK/4)
+	MCFG_DEVICE_ADD("sn3", SN76496, MCLK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(drmicro_state, pcm_w))          /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, drmicro_state, pcm_w))          /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END

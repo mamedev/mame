@@ -686,23 +686,23 @@ WRITE_LINE_MEMBER(c65_state::cia0_irq)
 MACHINE_CONFIG_START(c65_state::c65)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M4510, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(c65_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", c65_state, vic3_vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", M4510, MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(c65_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", c65_state, vic3_vblank_irq)
 
 	MCFG_DEVICE_ADD("cia_0", MOS6526, MAIN_CLOCK)
 	MCFG_MOS6526_TOD(60)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c65_state, cia0_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c65_state, cia0_porta_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c65_state, cia0_porta_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c65_state, cia0_portb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c65_state, cia0_portb_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c65_state, cia0_irq))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c65_state, cia0_porta_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c65_state, cia0_porta_w))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c65_state, cia0_portb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c65_state, cia0_portb_w))
 
 	MCFG_DEVICE_ADD("cia_1", MOS6526, MAIN_CLOCK)
 	MCFG_MOS6526_TOD(60)
-//  MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c65_state, c65_cia1_interrupt))
-//  MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c65_state, c65_cia1_port_a_r))
-//  MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c65_state, c65_cia1_port_a_w))
+//  MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c65_state, c65_cia1_interrupt))
+//  MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c65_state, c65_cia1_port_a_r))
+//  MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c65_state, c65_cia1_port_a_w))
 
 
 	/* video hardware */

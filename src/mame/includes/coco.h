@@ -36,7 +36,7 @@ INPUT_PORTS_EXTERN( coco_joystick );
 INPUT_PORTS_EXTERN( coco_rtc );
 INPUT_PORTS_EXTERN( coco_beckerport );
 
-SLOT_INTERFACE_EXTERN( coco_cart );
+void coco_cart(device_slot_interface &device);
 
 // constants
 #define JOYSTICK_DELTA          10
@@ -153,8 +153,6 @@ protected:
 	virtual void pia1_pb_changed(uint8_t data);
 
 	// accessors
-	cpu_device &maincpu() { return *m_maincpu; }
-	address_space &cpu_address_space() { return maincpu().space(); }
 	pia6821_device &pia_0() { return *m_pia_0; }
 	pia6821_device &pia_1() { return *m_pia_1; }
 	cococart_slot_device &cococart() { return *m_cococart; }
@@ -165,7 +163,7 @@ protected:
 	virtual void cart_w(bool state);
 	virtual void update_cart_base(uint8_t *cart_base) = 0;
 
-private:
+protected:
 	// timer constants
 	static const device_timer_id TIMER_HIRES_JOYSTICK_X = 0;
 	static const device_timer_id TIMER_HIRES_JOYSTICK_Y = 1;

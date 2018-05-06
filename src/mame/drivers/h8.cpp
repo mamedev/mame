@@ -69,6 +69,7 @@ public:
 		, m_uart(*this, "uart")
 		, m_cass(*this, "cassette")
 		, m_beep(*this, "beeper")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(portf0_r);
@@ -93,10 +94,12 @@ private:
 	bool m_cass_state;
 	bool m_cassold;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
+	output_finder<16> m_digits;
 };
 
 
@@ -151,7 +154,7 @@ WRITE8_MEMBER( h8_state::portf0_w )
 	// d7 = beeper enable
 
 	m_digit = data & 15;
-	if (m_digit) output().set_digit_value(m_digit, m_segment);
+	if (m_digit) m_digits[m_digit] = m_segment;
 
 	output().set_value("mon_led", !BIT(data, 5));
 	m_beep->set_state(!BIT(data, 7));
@@ -174,7 +177,7 @@ WRITE8_MEMBER( h8_state::portf1_w )
 	//d0 segment g
 
 	m_segment = 0xff ^ bitswap<8>(data, 7, 0, 6, 5, 4, 3, 2, 1);
-	if (m_digit) output().set_digit_value(m_digit, m_segment);
+	if (m_digit) m_digits[m_digit] = m_segment;
 }
 
 void h8_state::h8_mem(address_map &map)
@@ -309,29 +312,29 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_p)
 
 MACHINE_CONFIG_START(h8_state::h8)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, H8_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(h8_mem)
-	MCFG_CPU_IO_MAP(h8_io)
-	MCFG_I8085A_STATUS(WRITE8(h8_state, h8_status_callback))
-	MCFG_I8085A_INTE(WRITELINE(h8_state, h8_inte_callback))
+	MCFG_DEVICE_ADD("maincpu", I8080, H8_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(h8_mem)
+	MCFG_DEVICE_IO_MAP(h8_io)
+	MCFG_I8085A_STATUS(WRITE8(*this, h8_state, h8_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(*this, h8_state, h8_inte_callback))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_h8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, H8_BEEP_FRQ)
+	MCFG_DEVICE_ADD("beeper", BEEP, H8_BEEP_FRQ)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(h8_state, txdata_callback))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, h8_state, txdata_callback))
 
 	MCFG_DEVICE_ADD("cassette_clock", CLOCK, 4800)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)

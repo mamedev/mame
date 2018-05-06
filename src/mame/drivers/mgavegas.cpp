@@ -448,7 +448,7 @@ static INPUT_PORTS_START( mgavegas )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) //25 ptas in to play
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) //100ptas in for change with 4 25 ptas coins
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("25 ptas level")     //"hack" hopper always full
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("Door")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("Channel")
@@ -591,8 +591,8 @@ DRIVER_INIT_MEMBER(mgavegas_state,mgavegas133)
 
 MACHINE_CONFIG_START(mgavegas_state::mgavegas)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLK)
-	MCFG_CPU_PROGRAM_MAP(mgavegas_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLK)
+	MCFG_DEVICE_PROGRAM_MAP(mgavegas_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_0", mgavegas_state, int_0, attotime::from_hz(6000))  //6KHz from MSM5205 /VCK
 
@@ -603,19 +603,19 @@ MACHINE_CONFIG_START(mgavegas_state::mgavegas)
 	/* sound hardware */
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLK)
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(mgavegas_state, ay8910_a_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(mgavegas_state, ay8910_b_r))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, mgavegas_state, ay8910_a_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, mgavegas_state, ay8910_b_r))
 
-	MCFG_SOUND_ADD("5205", MSM5205, MSM_CLK)
+	MCFG_DEVICE_ADD("5205", MSM5205, MSM_CLK)
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 2.0)
 
 
-	MCFG_FILTER_RC_ADD("filter1", 0)
+	MCFG_DEVICE_ADD("filter1", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2",2.0)
-	MCFG_FILTER_RC_ADD("filter2", 0)
+	MCFG_DEVICE_ADD("filter2", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 

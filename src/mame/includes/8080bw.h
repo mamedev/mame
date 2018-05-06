@@ -102,6 +102,8 @@ public:
 	DECLARE_READ8_MEMBER(schasercv_02_r);
 	DECLARE_WRITE8_MEMBER(schasercv_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(schasercv_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(crashrd_port03_w);
+	DECLARE_WRITE8_MEMBER(crashrd_port05_w);
 	DECLARE_WRITE8_MEMBER(yosakdon_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(yosakdon_sh_port_2_w);
 	DECLARE_READ8_MEMBER(shuttlei_ff_r);
@@ -194,6 +196,7 @@ public:
 	void darthvdr(machine_config &config);
 	void ballbomb(machine_config &config);
 	void spacecom(machine_config &config);
+	void crashrd(machine_config &config);
 	void schasercv(machine_config &config);
 	void lupin3(machine_config &config);
 	void spacerng(machine_config &config);
@@ -206,6 +209,7 @@ public:
 	void cosmicmo_io_map(address_map &map);
 	void cosmo_io_map(address_map &map);
 	void cosmo_map(address_map &map);
+	void crashrd_io_map(address_map &map);
 	void darthvdr_io_map(address_map &map);
 	void darthvdr_map(address_map &map);
 	void escmars_map(address_map &map);

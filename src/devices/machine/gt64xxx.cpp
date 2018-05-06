@@ -149,14 +149,16 @@
 
 DEFINE_DEVICE_TYPE(GT64XXX, gt64xxx_device, "gt64xxx", "Galileo GT-64XXX System Controller")
 
-ADDRESS_MAP_START(gt64xxx_device::config_map)
-	AM_IMPORT_FROM(pci_device::config_map)
-ADDRESS_MAP_END
+void gt64xxx_device::config_map(address_map &map)
+{
+	pci_device::config_map(map);
+}
 
 // cpu i/f map
-ADDRESS_MAP_START(gt64xxx_device::cpu_map)
-	AM_RANGE(0x00000000, 0x00000cff) AM_READWRITE(    cpu_if_r,          cpu_if_w)
-ADDRESS_MAP_END
+void gt64xxx_device::cpu_map(address_map &map)
+{
+	map(0x00000000, 0x00000cff).rw(this, FUNC(gt64xxx_device::cpu_if_r), FUNC(gt64xxx_device::cpu_if_w));
+}
 
 gt64xxx_device::gt64xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, GT64XXX, tag, owner, clock),
@@ -252,10 +254,9 @@ void gt64xxx_device::device_start()
 	save_pointer(NAME(m_ram[2].data()), m_simm_size[2] / 4);
 	save_pointer(NAME(m_ram[3].data()), m_simm_size[3] / 4);
 	save_item(NAME(m_last_dma));
-	machine().save().register_postload(save_prepost_delegate(FUNC(gt64xxx_device::map_cpu_space), this));
 }
 
-void gt64xxx_device::postload()
+void gt64xxx_device::device_post_load()
 {
 	map_cpu_space();
 	remap_cb();

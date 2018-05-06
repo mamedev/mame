@@ -248,47 +248,48 @@ GFXDECODE_END
  ***************************************/
 
  // we use decimals here to match documentation
-ADDRESS_MAP_START(ygv608_device::regs_map)
+void ygv608_device::regs_map(address_map &map)
+{
 
 	// address pointers
-	AM_RANGE( 0,  0) AM_READWRITE(pattern_name_table_y_r,pattern_name_table_y_w)
-	AM_RANGE( 1,  1) AM_READWRITE(pattern_name_table_x_r,pattern_name_table_x_w)
+	map(0, 0).rw(this, FUNC(ygv608_device::pattern_name_table_y_r), FUNC(ygv608_device::pattern_name_table_y_w));
+	map(1, 1).rw(this, FUNC(ygv608_device::pattern_name_table_x_r), FUNC(ygv608_device::pattern_name_table_x_w));
 
-	AM_RANGE( 2,  2) AM_READWRITE(ram_access_ctrl_r,ram_access_ctrl_w)
+	map(2, 2).rw(this, FUNC(ygv608_device::ram_access_ctrl_r), FUNC(ygv608_device::ram_access_ctrl_w));
 
-	AM_RANGE( 3,  3) AM_READWRITE(sprite_address_r,sprite_address_w)
-	AM_RANGE( 4,  4) AM_READWRITE(scroll_address_r,scroll_address_w)
-	AM_RANGE( 5,  5) AM_READWRITE(palette_address_r,palette_address_w)
-	AM_RANGE( 6,  6) AM_READWRITE(sprite_bank_r,sprite_bank_w)
+	map(3, 3).rw(this, FUNC(ygv608_device::sprite_address_r), FUNC(ygv608_device::sprite_address_w));
+	map(4, 4).rw(this, FUNC(ygv608_device::scroll_address_r), FUNC(ygv608_device::scroll_address_w));
+	map(5, 5).rw(this, FUNC(ygv608_device::palette_address_r), FUNC(ygv608_device::palette_address_w));
+	map(6, 6).rw(this, FUNC(ygv608_device::sprite_bank_r), FUNC(ygv608_device::sprite_bank_w));
 
 	// screen control
-	AM_RANGE( 7,  7) AM_READWRITE(screen_ctrl_7_r,  screen_ctrl_7_w)
-	AM_RANGE( 8,  8) AM_READWRITE(screen_ctrl_8_r,  screen_ctrl_8_w)
-	AM_RANGE( 9,  9) AM_READWRITE(screen_ctrl_9_r,  screen_ctrl_9_w)
-	AM_RANGE(10, 10) AM_READWRITE(screen_ctrl_10_r, screen_ctrl_10_w)
-	AM_RANGE(11, 11) AM_READWRITE(screen_ctrl_11_r, screen_ctrl_11_w)
-	AM_RANGE(12, 12) AM_READWRITE(screen_ctrl_12_r, screen_ctrl_12_w)
+	map(7, 7).rw(this, FUNC(ygv608_device::screen_ctrl_7_r), FUNC(ygv608_device::screen_ctrl_7_w));
+	map(8, 8).rw(this, FUNC(ygv608_device::screen_ctrl_8_r), FUNC(ygv608_device::screen_ctrl_8_w));
+	map(9, 9).rw(this, FUNC(ygv608_device::screen_ctrl_9_r), FUNC(ygv608_device::screen_ctrl_9_w));
+	map(10, 10).rw(this, FUNC(ygv608_device::screen_ctrl_10_r), FUNC(ygv608_device::screen_ctrl_10_w));
+	map(11, 11).rw(this, FUNC(ygv608_device::screen_ctrl_11_r), FUNC(ygv608_device::screen_ctrl_11_w));
+	map(12, 12).rw(this, FUNC(ygv608_device::screen_ctrl_12_r), FUNC(ygv608_device::screen_ctrl_12_w));
 
-	AM_RANGE(13, 13) AM_WRITE(border_color_w)
+	map(13, 13).w(this, FUNC(ygv608_device::border_color_w));
 	// interrupt section
-	AM_RANGE(14, 14) AM_READWRITE(irq_mask_r,irq_mask_w)
-	AM_RANGE(15, 16) AM_READWRITE(irq_ctrl_r,irq_ctrl_w)
+	map(14, 14).rw(this, FUNC(ygv608_device::irq_mask_r), FUNC(ygv608_device::irq_mask_w));
+	map(15, 16).rw(this, FUNC(ygv608_device::irq_ctrl_r), FUNC(ygv608_device::irq_ctrl_w));
 	// base address
-	AM_RANGE(17, 24) AM_WRITE(base_address_w)
+	map(17, 24).w(this, FUNC(ygv608_device::base_address_w));
 
 	// ROZ parameters
-	AM_RANGE(25, 27) AM_WRITE(roz_ax_w)
-	AM_RANGE(28, 29) AM_WRITE(roz_dx_w)
-	AM_RANGE(30, 31) AM_WRITE(roz_dxy_w)
-	AM_RANGE(32, 34) AM_WRITE(roz_ay_w)
-	AM_RANGE(35, 36) AM_WRITE(roz_dy_w)
-	AM_RANGE(37, 38) AM_WRITE(roz_dyx_w)
+	map(25, 27).w(this, FUNC(ygv608_device::roz_ax_w));
+	map(28, 29).w(this, FUNC(ygv608_device::roz_dx_w));
+	map(30, 31).w(this, FUNC(ygv608_device::roz_dxy_w));
+	map(32, 34).w(this, FUNC(ygv608_device::roz_ay_w));
+	map(35, 36).w(this, FUNC(ygv608_device::roz_dy_w));
+	map(37, 38).w(this, FUNC(ygv608_device::roz_dyx_w));
 
 	// CRTC
-	AM_RANGE(39, 46) AM_WRITE(crtc_w)
+	map(39, 46).w(this, FUNC(ygv608_device::crtc_w));
 //  47-48 ROM transfer control - DMA source address
 //  49 ROM transfer control - DMA size
-ADDRESS_MAP_END
+}
 
 /***************************************
  *
@@ -296,16 +297,17 @@ ADDRESS_MAP_END
  *
  ***************************************/
 
-ADDRESS_MAP_START(ygv608_device::port_map)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(pattern_name_table_r,pattern_name_table_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(sprite_data_r,sprite_data_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(scroll_data_r,scroll_data_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(palette_data_r,palette_data_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(register_data_r,register_data_w)
-	AM_RANGE(0x05, 0x05) AM_READNOP AM_WRITE(register_select_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(status_port_r,status_port_w)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(system_control_r,system_control_w)
-ADDRESS_MAP_END
+void ygv608_device::port_map(address_map &map)
+{
+	map(0x00, 0x00).rw(this, FUNC(ygv608_device::pattern_name_table_r), FUNC(ygv608_device::pattern_name_table_w));
+	map(0x01, 0x01).rw(this, FUNC(ygv608_device::sprite_data_r), FUNC(ygv608_device::sprite_data_w));
+	map(0x02, 0x02).rw(this, FUNC(ygv608_device::scroll_data_r), FUNC(ygv608_device::scroll_data_w));
+	map(0x03, 0x03).rw(this, FUNC(ygv608_device::palette_data_r), FUNC(ygv608_device::palette_data_w));
+	map(0x04, 0x04).rw(this, FUNC(ygv608_device::register_data_r), FUNC(ygv608_device::register_data_w));
+	map(0x05, 0x05).nopr().w(this, FUNC(ygv608_device::register_select_w));
+	map(0x06, 0x06).rw(this, FUNC(ygv608_device::status_port_r), FUNC(ygv608_device::status_port_w));
+	map(0x07, 0x07).rw(this, FUNC(ygv608_device::system_control_r), FUNC(ygv608_device::system_control_w));
+}
 
 
 //-------------------------------------------------

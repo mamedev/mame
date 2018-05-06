@@ -357,7 +357,7 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, buggychl_state, pedal_in_r, nullptr)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, buggychl_state, pedal_in_r, nullptr)
 
 	PORT_START("PEDAL")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_NAME("P1 Pedal") PORT_SENSITIVITY(100) PORT_KEYDELTA(15)   /* accelerator */
@@ -437,6 +437,8 @@ void buggychl_state::machine_start()
 	save_item(NAME(m_sky_on));
 	save_item(NAME(m_sprite_color_base));
 	save_item(NAME(m_bg_scrollx));
+
+	m_led.resolve();
 }
 
 void buggychl_state::machine_reset()
@@ -451,13 +453,13 @@ void buggychl_state::machine_reset()
 MACHINE_CONFIG_START(buggychl_state::buggychl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(48'000'000)/8) /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
-	MCFG_CPU_PROGRAM_MAP(buggychl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", buggychl_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(48'000'000)/8) /* 6 MHz according to schematics, though it can be jumpered for 4MHz as well */
+	MCFG_DEVICE_PROGRAM_MAP(buggychl_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", buggychl_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* 4 MHz according to schematics */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, ((((XTAL(8'000'000)/2)/2)/256)/64)) // timer irq
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* 4 MHz according to schematics */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(buggychl_state, irq0_line_hold, ((((XTAL(8'000'000)/2)/2)/256)/64)) // timer irq
 	// schematics shows a 61.035 (x2?) Hz, similar to flstory.cpp and other Taito MSM5232 based games.
 	// apparently schematics also shows a switch for the timer irq that makes it to run at half speed, no idea where this is located.
 	/* audiocpu nmi is caused by (main->sound semaphore)&&(sound_nmi_enabled), identical to bubble bobble. */
@@ -491,7 +493,7 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -500,17 +502,17 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_SOUND_ADD("ay1", YM2149, XTAL(8'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, ta7630_volbal_ay1_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(buggychl_state, port_b_0_w))
+	MCFG_DEVICE_ADD("ay1", YM2149, XTAL(8'000'000)/4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggychl_state, ta7630_volbal_ay1_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggychl_state, port_b_0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", YM2149, XTAL(8'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, ta7630_volbal_ay2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(buggychl_state, port_b_1_w))
+	MCFG_DEVICE_ADD("ay2", YM2149, XTAL(8'000'000)/4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, buggychl_state, ta7630_volbal_ay2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, buggychl_state, port_b_1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5232, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4)
 	MCFG_MSM5232_SET_CAPACITORS(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6) /* default 0.39 uF capacitors (not verified) */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1

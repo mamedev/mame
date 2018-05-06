@@ -274,7 +274,7 @@ static INPUT_PORTS_START( mwarr )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SPECIAL ) // otherwise it doesn't boot
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM ) // otherwise it doesn't boot
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
@@ -570,9 +570,9 @@ void mwarr_state::machine_reset()
 MACHINE_CONFIG_START(mwarr_state::mwarr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(mwarr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mwarr_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(mwarr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mwarr_state,  irq4_line_hold)
 
 
 	/* video hardware */

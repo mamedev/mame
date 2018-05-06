@@ -408,17 +408,16 @@ WRITE8_MEMBER(jokrwild_state::testb_w)
 MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
-	MCFG_CPU_PROGRAM_MAP(jokrwild_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jokrwild_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(jokrwild_map)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
 	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(jokrwild_state, testa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(jokrwild_state, testb_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, jokrwild_state, testa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, jokrwild_state, testb_w))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
@@ -440,6 +439,7 @@ MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 MACHINE_CONFIG_END
 
 

@@ -3344,7 +3344,7 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   // data clear
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state, igs_hopper_r, nullptr) // hopper switch
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state, igs_hopper_r, nullptr) // hopper switch
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // stats
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -3474,7 +3474,7 @@ static INPUT_PORTS_START( nkishusp )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   // data clear
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, nullptr) // hopper switch
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, nullptr) // hopper switch
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // stats
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -3603,7 +3603,7 @@ static INPUT_PORTS_START( wlcc )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE2  ) // shown in test mode
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)   // clear coin
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL   ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, nullptr)   // hopper switch
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM   ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, nullptr)   // hopper switch
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -3732,7 +3732,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, nullptr) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, nullptr) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )   // system reset
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // stats
@@ -4033,7 +4033,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, nullptr) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, igs011_state,igs_hopper_r, nullptr) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // stats
@@ -4172,7 +4172,7 @@ GFXDECODE_END
 #endif
 
 MACHINE_CONFIG_START(igs011_state::igs011_base)
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(22'000'000)/3)
+	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(22'000'000)/3)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4203,19 +4203,19 @@ TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lev5_timer_irq_cb )
 
 MACHINE_CONFIG_START(igs011_state::drgnwrld)
 	igs011_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(drgnwrld)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(drgnwrld)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev5_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igs011_state::drgnwrld_igs012)
 	drgnwrld(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(drgnwrld_igs012)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(drgnwrld_igs012)
 MACHINE_CONFIG_END
 
 
@@ -4238,9 +4238,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lhb_timer_irq_cb )
 
 MACHINE_CONFIG_START(igs011_state::lhb)
 	igs011_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(lhb)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, lhb_vblank_irq)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(lhb)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, lhb_vblank_irq)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lhb_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
 	// irq 3 points to an apparently unneeded routine
 MACHINE_CONFIG_END
@@ -4255,9 +4255,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lev3_timer_irq_cb )
 
 MACHINE_CONFIG_START(igs011_state::wlcc)
 	igs011_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wlcc)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(wlcc)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
 MACHINE_CONFIG_END
 
@@ -4265,9 +4265,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igs011_state::xymg)
 	igs011_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(xymg)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(xymg)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
 MACHINE_CONFIG_END
 
@@ -4275,14 +4275,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igs011_state::lhb2)
 	igs011_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(lhb2)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(lhb2)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev5_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
 
 //  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -4290,16 +4290,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igs011_state::nkishusp)
 	igs011_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nkishusp)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nkishusp)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
 
 	// VSync 60.0052Hz, HSync 15.620kHz
 
 //  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -4312,27 +4312,27 @@ WRITE_LINE_MEMBER(igs011_state::sound_irq)
 
 MACHINE_CONFIG_START(igs011_state::vbowl)
 	igs011_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(vbowl)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(vbowl)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev3_timer_irq_cb, attotime::from_hz(240)) // lev3 frequency drives the music tempo
 	// irq 5 points to a debug function (all routines are clearly patched out)
 	// irq 4 points to an apparently unneeded routine
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(igs011_state, screen_vblank_vbowl))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs011_state, screen_vblank_vbowl))
 //  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
 
 	MCFG_DEVICE_REMOVE("oki")
 	MCFG_ICS2115_ADD("ics", 0)
-	MCFG_ICS2115_IRQ_CB(WRITELINE(igs011_state, sound_irq))
+	MCFG_ICS2115_IRQ_CB(WRITELINE(*this, igs011_state, sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igs011_state::vbowlhk)
 	vbowl(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(vbowlhk)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(vbowlhk)
 MACHINE_CONFIG_END
 
 

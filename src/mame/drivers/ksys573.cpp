@@ -382,7 +382,7 @@ public:
 		m_analog2(*this, "analog2" ),
 		m_analog3(*this, "analog3" ),
 		m_pads(*this, "PADS" ),
-		m_psxirq(*this, ":maincpu:irq" ),
+		m_psxirq(*this, "maincpu:irq" ),
 		m_ata(*this, "ata" ),
 		m_h8_response(*this, "h8_response"),
 		m_maincpu(*this, "maincpu" ),
@@ -517,11 +517,11 @@ public:
 	void casszi(machine_config &config);
 	void cassxzi(machine_config &config);
 
-	static void punchmania_cassette_install(device_t *device);
-	static void salarymc_cassette_install(device_t *device);
-	static void hyperbbc_cassette_install(device_t *device);
-	static void hyprbbc2_cassette_install(device_t *device);
-	static void hypbbc2p_cassette_install(device_t *device);
+	void punchmania_cassette_install(device_t *device);
+	void salarymc_cassette_install(device_t *device);
+	void hyperbbc_cassette_install(device_t *device);
+	void hyprbbc2_cassette_install(device_t *device);
+	void hypbbc2p_cassette_install(device_t *device);
 	static void cr589_config(device_t *device);
 	void fbaitbc_map(address_map &map);
 	void flashbank_map(address_map &map);
@@ -1565,9 +1565,9 @@ void ksys573_state::salarymc_cassette_install(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
-	MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER( DEVWRITELINE( ":", ksys573_state, salarymc_lamp_clk ) )
-	MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER( DEVWRITELINE( ":", ksys573_state, salarymc_lamp_rst ) )
-	MCFG_KONAMI573_CASSETTE_Y_D7_HANDLER( DEVWRITELINE( ":", ksys573_state, salarymc_lamp_d ) )
+	MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER( WRITELINE( *this, ksys573_state, salarymc_lamp_clk ) )
+	MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER( WRITELINE( *this, ksys573_state, salarymc_lamp_rst ) )
+	MCFG_KONAMI573_CASSETTE_Y_D7_HANDLER( WRITELINE( *this, ksys573_state, salarymc_lamp_d ) )
 }
 
 DRIVER_INIT_MEMBER( ksys573_state, salarymc )
@@ -1648,24 +1648,24 @@ void ksys573_state::hyperbbc_cassette_install(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
-	MCFG_KONAMI573_CASSETTE_Y_D0_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_strobe3 ) ) // line shared with x76f100 sda
-	MCFG_KONAMI573_CASSETTE_Y_D1_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_strobe2 ) ) // line shared with x76f100 scl
-	MCFG_KONAMI573_CASSETTE_Y_D3_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_strobe1 ) ) // line shared with x76f100 rst
-	MCFG_KONAMI573_CASSETTE_Y_D4_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_green ) )
-	MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_blue ) )
-	MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_red ) )
-	MCFG_KONAMI573_CASSETTE_Y_D7_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_start ) )
+	MCFG_KONAMI573_CASSETTE_Y_D0_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_strobe3 ) ) // line shared with x76f100 sda
+	MCFG_KONAMI573_CASSETTE_Y_D1_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_strobe2 ) ) // line shared with x76f100 scl
+	MCFG_KONAMI573_CASSETTE_Y_D3_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_strobe1 ) ) // line shared with x76f100 rst
+	MCFG_KONAMI573_CASSETTE_Y_D4_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_green ) )
+	MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_blue ) )
+	MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_red ) )
+	MCFG_KONAMI573_CASSETTE_Y_D7_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_start ) )
 }
 
 void ksys573_state::hypbbc2p_cassette_install(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
-	MCFG_KONAMI573_CASSETTE_Y_D0_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_strobe2 ) ) // line shared with x76f100 sda
-	MCFG_KONAMI573_CASSETTE_Y_D3_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_strobe1 ) ) // line shared with x76f100 rst
-	MCFG_KONAMI573_CASSETTE_Y_D4_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_green ) )
-	MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_blue ) )
-	MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER( DEVWRITELINE( ":", ksys573_state, hyperbbc_lamp_red ) )
+	MCFG_KONAMI573_CASSETTE_Y_D0_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_strobe2 ) ) // line shared with x76f100 sda
+	MCFG_KONAMI573_CASSETTE_Y_D3_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_strobe1 ) ) // line shared with x76f100 rst
+	MCFG_KONAMI573_CASSETTE_Y_D4_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_green ) )
+	MCFG_KONAMI573_CASSETTE_Y_D5_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_blue ) )
+	MCFG_KONAMI573_CASSETTE_Y_D6_HANDLER( WRITELINE( *this, ksys573_state, hyperbbc_lamp_red ) )
 }
 
 DRIVER_INIT_MEMBER( ksys573_state, hyperbbc )
@@ -2067,14 +2067,14 @@ ADC083X_INPUT_CB(ksys573_state::analogue_inputs_callback)
 void ksys573_state::cr589_config(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE( 0, "^^^^lspeaker", 1.0 )
-	MCFG_SOUND_ROUTE( 1, "^^^^rspeaker", 1.0 )
+	MCFG_SOUND_ROUTE( 0, "^^lspeaker", 1.0 )
+	MCFG_SOUND_ROUTE( 1, "^^rspeaker", 1.0 )
 }
 
 MACHINE_CONFIG_START(ksys573_state::konami573)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
-	MCFG_CPU_PROGRAM_MAP( konami573_map )
+	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
+	MCFG_DEVICE_PROGRAM_MAP( konami573_map )
 
 	MCFG_RAM_MODIFY( "maincpu:ram" )
 	MCFG_RAM_DEFAULT_SIZE( "4M" )
@@ -2087,7 +2087,7 @@ MACHINE_CONFIG_START(ksys573_state::konami573)
 	MCFG_DEVICE_ADD( "mb89371", MB89371, 0 )
 
 	MCFG_DEVICE_ADD( "ata", ATA_INTERFACE, 0 )
-	MCFG_ATA_INTERFACE_IRQ_HANDLER( WRITELINE( ksys573_state, ata_interrupt ) )
+	MCFG_ATA_INTERFACE_IRQ_HANDLER( WRITELINE( *this, ksys573_state, ata_interrupt ) )
 
 	MCFG_DEVICE_MODIFY( "ata:0" )
 	MCFG_SLOT_OPTION_ADD( "cr589", CR589 )
@@ -2095,7 +2095,7 @@ MACHINE_CONFIG_START(ksys573_state::konami573)
 	MCFG_SLOT_DEFAULT_OPTION( "cr589" )
 
 	MCFG_DEVICE_ADD( "cassette", KONAMI573_CASSETTE_SLOT, 0 )
-	MCFG_KONAMI573_CASSETTE_DSR_HANDLER(DEVWRITELINE( "maincpu:sio1", psxsio1_device, write_dsr ) )
+	MCFG_KONAMI573_CASSETTE_DSR_HANDLER(WRITELINE( "maincpu:sio1", psxsio1_device, write_dsr ) )
 
 	// onboard flash
 	MCFG_FUJITSU_29F016A_ADD( "29f016a.31m" )
@@ -2136,16 +2136,16 @@ MACHINE_CONFIG_END
 // Variants with additional digital sound board
 MACHINE_CONFIG_START(ksys573_state::k573d)
 	konami573(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( konami573d_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( konami573d_map )
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_ADD( "k573dio", XTAL(19'660'800) )
 MACHINE_CONFIG_END
 
 // Variants with additional analogue i/o board
 MACHINE_CONFIG_START(ksys573_state::k573a)
 	konami573(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( konami573a_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( konami573a_map )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::pccard1_16mb)
@@ -2245,7 +2245,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ksys573_state::ddr3m)
 	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
-	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( *this, ksys573_state, ddr_output_callback ) )
 
 	pccard2_32mb(config);
 	cassyyi(config);
@@ -2254,7 +2254,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ksys573_state::ddr3mp)
 	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
-	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( *this, ksys573_state, ddr_output_callback ) )
 
 	pccard2_32mb(config);
 	cassxzi(config);
@@ -2263,7 +2263,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ksys573_state::ddrusa)
 	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
-	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( *this, ksys573_state, ddr_output_callback ) )
 
 	casszi(config);
 MACHINE_CONFIG_END
@@ -2271,7 +2271,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ksys573_state::ddr5m)
 	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
-	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( *this, ksys573_state, ddr_output_callback ) )
 
 	pccard2_32mb(config);
 	casszi(config);
@@ -2293,7 +2293,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ksys573_state::dsfdr)
 	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
-	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( *this, ksys573_state, ddr_output_callback ) )
 
 	cassxzi(config);
 MACHINE_CONFIG_END
@@ -2301,7 +2301,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ksys573_state::dsem)
 	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
-	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( *this, ksys573_state, ddr_output_callback ) )
 
 	cassxi(config);
 MACHINE_CONFIG_END
@@ -2311,7 +2311,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ksys573_state::ddrsolo)
 	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
-	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddrsolo_output_callback ) )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( *this, ksys573_state, ddrsolo_output_callback ) )
 
 	cassyi(config);
 MACHINE_CONFIG_END
@@ -2319,7 +2319,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ksys573_state::ddrs2k)
 	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
-	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddrsolo_output_callback ) )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( *this, ksys573_state, ddrsolo_output_callback ) )
 
 	cassyyi(config);
 MACHINE_CONFIG_END
@@ -2327,7 +2327,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ksys573_state::ddr4ms)
 	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
-	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddrsolo_output_callback ) )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( *this, ksys573_state, ddrsolo_output_callback ) )
 
 	pccard2_32mb(config);
 	cassxzi(config);
@@ -2343,7 +2343,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ksys573_state::drmn2m)
 	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
-	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, drmn_output_callback ) )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( *this, ksys573_state, drmn_output_callback ) )
 
 	cassxzi(config);
 MACHINE_CONFIG_END
@@ -2351,7 +2351,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ksys573_state::drmn4m)
 	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
-	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, drmn_output_callback ) )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( *this, ksys573_state, drmn_output_callback ) )
 
 	casszi(config);
 
@@ -2403,8 +2403,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::fbaitbc)
 	konami573(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( fbaitbc_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( fbaitbc_map )
 
 	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
 	MCFG_UPD4701_PORTY("uPD4701_y")
@@ -2417,7 +2417,7 @@ MACHINE_CONFIG_START(ksys573_state::hyperbbc)
 	cassy(config); // The game doesn't check the security chip
 
 	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_DEVICE_CARD_MACHINE_CONFIG( "game", hyperbbc_cassette_install )
+	MCFG_SLOT_OPTION_MACHINE_CONFIG( "game", [this] (device_t *device) { hyperbbc_cassette_install(device); } )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::hypbbc2p)
@@ -2425,7 +2425,7 @@ MACHINE_CONFIG_START(ksys573_state::hypbbc2p)
 	cassy(config);
 
 	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_DEVICE_CARD_MACHINE_CONFIG( "game", hypbbc2p_cassette_install )
+	MCFG_SLOT_OPTION_MACHINE_CONFIG( "game", [this] (device_t *device) { hypbbc2p_cassette_install(device); } )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::salarymc)
@@ -2433,7 +2433,7 @@ MACHINE_CONFIG_START(ksys573_state::salarymc)
 	cassyi(config);
 
 	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_DEVICE_CARD_MACHINE_CONFIG( "game", salarymc_cassette_install )
+	MCFG_SLOT_OPTION_MACHINE_CONFIG( "game", [this] (device_t *device) { salarymc_cassette_install(device); } )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::gchgchmp)
@@ -2444,14 +2444,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::pnchmn)
 	konami573(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( konami573a_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( konami573a_map )
 
 	cassxi(config);
 	pccard1_32mb(config);
 
 	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_DEVICE_CARD_MACHINE_CONFIG( "game", punchmania_cassette_install )
+	MCFG_SLOT_OPTION_MACHINE_CONFIG( "game", [this] (device_t *device) { punchmania_cassette_install(device); } )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::pnchmn2)
@@ -2461,8 +2461,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::gunmania)
 	konami573(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( gunmania_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( gunmania_map )
 
 	MCFG_DS2401_ADD( "gunmania_id" )
 	pccard2_32mb(config);
@@ -2471,7 +2471,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ksys573_state::dmx)
 	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
-	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, dmx_output_callback ) )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( *this, ksys573_state, dmx_output_callback ) )
 
 	casszi(config);
 MACHINE_CONFIG_END
@@ -2479,7 +2479,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ksys573_state::mamboagg)
 	k573d(config);
 	MCFG_DEVICE_MODIFY( "k573dio" )
-	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, mamboagg_output_callback ) )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( *this, ksys573_state, mamboagg_output_callback ) )
 
 	casszi(config);
 MACHINE_CONFIG_END
@@ -2513,23 +2513,23 @@ static INPUT_PORTS_START( konami573 )
 	PORT_DIPNAME( 0x00000008, 0x00000000, "Start Up Device" ) PORT_DIPLOCATION( "DIP SW:4" )
 	PORT_DIPSETTING(          0x00000008, "CD-ROM Drive" )
 	PORT_DIPSETTING(          0x00000000, "Flash ROM" )
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, h8_d0_r )
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, h8_d1_r )
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, h8_d2_r )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, h8_d3_r )
-	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "cassette", konami573_cassette_slot_device, read_line_adc083x_do )
-	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "cassette", konami573_cassette_slot_device, read_line_adc083x_sars )
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, h8_d0_r )
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, h8_d1_r )
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, h8_d2_r )
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, h8_d3_r )
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "cassette", konami573_cassette_slot_device, read_line_adc083x_do )
+	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "cassette", konami573_cassette_slot_device, read_line_adc083x_sars )
 //  PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 //  PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_CONFNAME( 0x00001000, 0x00001000, "Network?" )
 	PORT_CONFSETTING(          0x00001000, DEF_STR( Off ) )
 	PORT_CONFSETTING(          0x00000000, DEF_STR( On ) )
 //  PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "cassette", konami573_cassette_slot_device, read_line_ds2401 )
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "cassette", konami573_cassette_slot_device, read_line_ds2401 )
 //  PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "adc0834", adc083x_device, do_read )
+	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "adc0834", adc083x_device, do_read )
 //  PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "cassette", konami573_cassette_slot_device, read_line_secflash_sda )
+	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "cassette", konami573_cassette_slot_device, read_line_secflash_sda )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* skip hang at startup */
 	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* skip hang at startup */
@@ -2537,8 +2537,8 @@ static INPUT_PORTS_START( konami573 )
 //  PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "pccard1", pccard_slot_device, read_line_inserted )
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "pccard2", pccard_slot_device, read_line_inserted )
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "pccard1", pccard_slot_device, read_line_inserted )
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "pccard2", pccard_slot_device, read_line_inserted )
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 //  PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 //  PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2635,7 +2635,7 @@ static INPUT_PORTS_START( ddr )
 	PORT_INCLUDE( konami573 )
 
 	PORT_MODIFY( "IN2" )
-	PORT_BIT( 0x00000f0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER( DEVICE_SELF, ksys573_state,gn845pwbb_read, nullptr )
+	PORT_BIT( 0x00000f0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER( DEVICE_SELF, ksys573_state,gn845pwbb_read, nullptr )
 
 	PORT_START( "STAGE" )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_PLAYER( 1 )
@@ -2666,7 +2666,7 @@ static INPUT_PORTS_START( ddrsolo )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER( 1 ) PORT_NAME( "P1 Up 2" ) /* P2 BUTTON1 */
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_PLAYER( 1 ) PORT_NAME( "P1 Right 2" ) /* P2 BUTTON2 */
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER( 1 ) PORT_NAME( "P1 Up-Right 2" ) /* P2 BUTTON3 */
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* P2 START */
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* P2 START */
 
 	PORT_MODIFY( "IN3" )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNUSED ) /* P1 BUTTON4 */
@@ -2795,15 +2795,15 @@ static INPUT_PORTS_START( gunmania )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER( 1 ) PORT_NAME( "Bullet Tube-1 Sensor" )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER( 1 ) PORT_NAME( "Bullet Tube-2 Sensor" )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER( 1 ) PORT_NAME( "Safety Sensor Under" )
-	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER( DEVICE_SELF,ksys573_state,gunmania_tank_shutter_sensor, nullptr )
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER( DEVICE_SELF,ksys573_state,gunmania_tank_shutter_sensor, nullptr )
 
 	PORT_MODIFY( "IN3" )
 	PORT_BIT( 0x0d000b00, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER( DEVICE_SELF,ksys573_state,gunmania_cable_holder_sensor, nullptr )
+	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER( DEVICE_SELF,ksys573_state,gunmania_cable_holder_sensor, nullptr )
 
 	PORT_START( "GUNX" )
 	PORT_BIT( 0x7f, 0x2f, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_MINMAX( 0x00,0x5f ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 15 ) PORT_PLAYER( 1 )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "gunmania_id", ds2401_device, read )
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "gunmania_id", ds2401_device, read )
 
 	PORT_START( "GUNY" )
 	PORT_BIT( 0x7f, 0x1f, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_MINMAX( 0x00,0x3f ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 15 ) PORT_PLAYER( 1 )

@@ -217,11 +217,11 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(quizo_state::quizo)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL1/2)
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_IO_MAP(portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL1/2)
+	MCFG_DEVICE_PROGRAM_MAP(memmap)
+	MCFG_DEVICE_IO_MAP(portmap)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", quizo_state,  irq0_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quizo_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -237,7 +237,7 @@ MACHINE_CONFIG_START(quizo_state::quizo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL2/16 )
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL2/16 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

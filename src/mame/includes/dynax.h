@@ -253,9 +253,9 @@ public:
 	uint32_t screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cdracula(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(sprtmtch_vblank_interrupt);
-	INTERRUPT_GEN_MEMBER(jantouki_vblank_interrupt);
-	INTERRUPT_GEN_MEMBER(jantouki_sound_vblank_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(sprtmtch_vblank_w);
+	DECLARE_WRITE_LINE_MEMBER(jantouki_vblank_w);
+	DECLARE_WRITE_LINE_MEMBER(mjfriday_vblank_w);
 
 	void tenkai_update_rombank();
 

@@ -38,12 +38,6 @@ READ8_MEMBER(suprloco_state::soundport_r)
 	return data;
 }
 
-WRITE_LINE_MEMBER(suprloco_state::pc0_w)
-{
-	// set by 8255 bit mode when no credits inserted
-	machine().output().set_lamp_value(0, state); // ???
-}
-
 void suprloco_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
@@ -179,20 +173,20 @@ GFXDECODE_END
 MACHINE_CONFIG_START(suprloco_state::suprloco)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", suprloco_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suprloco_state,  irq0_line_hold)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(suprloco_state, irq0_line_hold, 4*60)          /* NMIs are caused by the main CPU */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(suprloco_state, irq0_line_hold, 4*60)          /* NMIs are caused by the main CPU */
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(suprloco_state, control_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, suprloco_state, control_w))
 	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
-	MCFG_I8255_OUT_PORTC_CB(WRITELINE(suprloco_state, pc0_w)) MCFG_DEVCB_BIT(0)
+	MCFG_I8255_OUT_PORTC_CB(OUTPUT("lamp0")) MCFG_DEVCB_BIT(0) MCFG_DEVCB_INVERT // set by 8255 bit mode when no credits inserted
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI)) MCFG_DEVCB_BIT(7) MCFG_DEVCB_INVERT
 
 	/* video hardware */
@@ -211,10 +205,10 @@ MACHINE_CONFIG_START(suprloco_state::suprloco)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76496, 4000000)
+	MCFG_DEVICE_ADD("sn1", SN76496, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76496, 2000000)
+	MCFG_DEVICE_ADD("sn2", SN76496, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

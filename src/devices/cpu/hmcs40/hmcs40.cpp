@@ -56,27 +56,31 @@ DEFINE_DEVICE_TYPE(HD44828, hd44828_device, "hd44828", "Hitachi HD44828") // CMO
 
 
 // internal memory maps
-ADDRESS_MAP_START(hmcs40_cpu_device::program_1k)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0780, 0x07bf) AM_ROM // patterns on page 30
-ADDRESS_MAP_END
+void hmcs40_cpu_device::program_1k(address_map &map)
+{
+	map(0x0000, 0x03ff).rom();
+	map(0x0780, 0x07bf).rom(); // patterns on page 30
+}
 
-ADDRESS_MAP_START(hmcs40_cpu_device::program_2k)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0f40, 0x0fbf) AM_ROM // patterns on page 61,62
-ADDRESS_MAP_END
+void hmcs40_cpu_device::program_2k(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x0f40, 0x0fbf).rom(); // patterns on page 61,62
+}
 
 
-ADDRESS_MAP_START(hmcs40_cpu_device::data_80x4)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-	AM_RANGE(0x40, 0x4f) AM_RAM AM_MIRROR(0x30)
-ADDRESS_MAP_END
+void hmcs40_cpu_device::data_80x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+	map(0x40, 0x4f).ram().mirror(0x30);
+}
 
-ADDRESS_MAP_START(hmcs40_cpu_device::data_160x4)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-	AM_RANGE(0x80, 0x8f) AM_RAM AM_MIRROR(0x30)
-	AM_RANGE(0xc0, 0xcf) AM_RAM AM_MIRROR(0x30)
-ADDRESS_MAP_END
+void hmcs40_cpu_device::data_160x4(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+	map(0x80, 0x8f).ram().mirror(0x30);
+	map(0xc0, 0xcf).ram().mirror(0x30);
+}
 
 
 // device definitions

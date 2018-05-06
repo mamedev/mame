@@ -109,15 +109,17 @@ enum
 /****************************************************************************
  *  Internal Memory Maps
  ****************************************************************************/
-ADDRESS_MAP_START(dsp56k_device::dsp56156_program_map)
-	AM_RANGE(0x0000,0x07ff) AM_RAM AM_SHARE("dsk56k_program_ram")   /* 1-5 */
+void dsp56k_device::dsp56156_program_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("dsk56k_program_ram");   /* 1-5 */
 //  AM_RANGE(0x2f00,0x2fff) AM_ROM                              /* 1-5 PROM reserved memory.  Is this the right spot for it? */
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(dsp56k_device::dsp56156_x_data_map)
-	AM_RANGE(0x0000,0x07ff) AM_RAM                              /* 1-5 */
-	AM_RANGE(0xffc0,0xffff) AM_READWRITE(peripheral_register_r, peripheral_register_w)   /* 1-5 On-chip peripheral registers memory mapped in data space */
-ADDRESS_MAP_END
+void dsp56k_device::dsp56156_x_data_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();                              /* 1-5 */
+	map(0xffc0, 0xffff).rw(this, FUNC(dsp56k_device::peripheral_register_r), FUNC(dsp56k_device::peripheral_register_w));   /* 1-5 On-chip peripheral registers memory mapped in data space */
+}
 
 
 dsp56k_device::dsp56k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

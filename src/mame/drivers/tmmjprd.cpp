@@ -574,7 +574,7 @@ static INPUT_PORTS_START( tmmjprd )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Right Screen Coin B") // might actually be service 1
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   // CHECK!
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   // CHECK!
 
 	PORT_START("PL1_1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(1)
@@ -769,8 +769,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_state::scanline)
 }
 
 MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
-	MCFG_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
-	MCFG_CPU_PROGRAM_MAP(tmmjprd_map)
+	MCFG_DEVICE_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tmmjprd_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmmjprd_state, scanline, "lscreen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")

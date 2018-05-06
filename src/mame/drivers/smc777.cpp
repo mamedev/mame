@@ -29,6 +29,7 @@
 #include "video/mc6845.h"
 #include "screen.h"
 #include "softlist.h"
+#include "imagedev/snapquik.h"
 #include "speaker.h"
 
 
@@ -100,6 +101,8 @@ public:
 	DECLARE_WRITE8_MEMBER(floppy_select_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER(smc777);
 
 	void smc777(machine_config &config);
 	void smc777_io(address_map &map);
@@ -391,6 +394,53 @@ WRITE8_MEMBER(smc777_state::fbuf_w)
 	vram_index |= ((offset & 0xff00) >> 8);
 
 	m_gvram[vram_index] = data;
+}
+
+
+/***********************************************************
+
+    Quickload
+
+    This loads a .COM file to address 0x100 then jumps
+    there. Sometimes .COM has been renamed to .CPM to
+    prevent windows going ballistic. These can be loaded
+    as well.
+
+************************************************************/
+
+QUICKLOAD_LOAD_MEMBER( smc777_state, smc777 )
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+
+	if (quickload_size >= 0xfd00)
+		return image_init_result::FAIL;
+
+	/* The right RAM bank must be active */
+
+	/* Avoid loading a program if CP/M-80 is not in memory */
+	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
+	{
+		machine_reset();
+		return image_init_result::FAIL;
+	}
+
+	/* Load image to the TPA (Transient Program Area) */
+	for (uint16_t i = 0; i < quickload_size; i++)
+	{
+		uint8_t data;
+		if (image.fread( &data, 1) != 1)
+			return image_init_result::FAIL;
+		prog_space.write_byte(i+0x100, data);
+	}
+
+	/* clear out command tail */
+	prog_space.write_byte(0x80, 0);   prog_space.write_byte(0x81, 0);
+
+	/* Roughly set SP basing on the BDOS position */
+	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
+	m_maincpu->set_pc(0x100);       // start program
+
+	return image_init_result::PASS;
 }
 
 READ8_MEMBER( smc777_state::fdc_r )
@@ -966,17 +1016,18 @@ INTERRUPT_GEN_MEMBER(smc777_state::vblank_irq)
 }
 
 
-static SLOT_INTERFACE_START( smc777_floppies )
-	SLOT_INTERFACE("ssdd", FLOPPY_35_SSDD)
-SLOT_INTERFACE_END
+static void smc777_floppies(device_slot_interface &device)
+{
+	device.option_add("ssdd", FLOPPY_35_SSDD);
+}
 
 
 MACHINE_CONFIG_START(smc777_state::smc777)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(smc777_mem)
-	MCFG_CPU_IO_MAP(smc777_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", smc777_state, vblank_irq)
+	MCFG_DEVICE_ADD("maincpu",Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(smc777_mem)
+	MCFG_DEVICE_IO_MAP(smc777_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", smc777_state, vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -998,22 +1049,23 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 
 	// floppy controller
 	MCFG_MB8876_ADD("fdc", XTAL(1'000'000))
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(smc777_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(smc777_state, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, smc777_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, smc777_state, fdc_drq_w))
 
 	// does it really support 16 of them?
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "smc777")
+	MCFG_QUICKLOAD_ADD("quickload", smc777_state, smc777, "com,cpm", 3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
+	MCFG_DEVICE_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 300) // TODO: correct frequency
+	MCFG_DEVICE_ADD("beeper", BEEP, 300) // TODO: correct frequency
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", smc777_state, keyboard_callback, attotime::from_hz(240/32))

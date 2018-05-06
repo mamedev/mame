@@ -173,9 +173,9 @@ INPUT_PORTS_START( jsa_i_ioports )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )    // speech chip ready
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, sound_to_main_ready) // output buffer full
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, main_to_sound_ready) // input buffer full
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, sound_to_main_ready) // output buffer full
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, main_to_sound_ready) // input buffer full
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
 INPUT_PORTS_END
 
 INPUT_PORTS_START( jsa_ii_ioports )
@@ -185,9 +185,9 @@ INPUT_PORTS_START( jsa_ii_ioports )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, sound_to_main_ready) // output buffer full
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, main_to_sound_ready) // input buffer full
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, sound_to_main_ready) // output buffer full
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, main_to_sound_ready) // input buffer full
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
 INPUT_PORTS_END
 
 INPUT_PORTS_START( jsa_iii_ioports )
@@ -196,10 +196,10 @@ INPUT_PORTS_START( jsa_iii_ioports )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, sound_to_main_ready) // output buffer full
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, main_to_sound_ready) // input buffer full
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, sound_to_main_ready) // output buffer full
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, main_to_sound_ready) // input buffer full
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
 INPUT_PORTS_END
 
 
@@ -699,26 +699,26 @@ WRITE8_MEMBER( atari_jsa_i_device::pokey_w )
 MACHINE_CONFIG_START(atari_jsa_i_device::device_add_mconfig)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(atarijsa1_map)
+	MCFG_DEVICE_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(atarijsa1_map)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
 
-	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(atari_jsa_base_device, ym2151_port_w))
-	MCFG_MIXER_ROUTE(0, DEVICE_SELF_OWNER, 0.60, 0)
-	MCFG_MIXER_ROUTE(1, DEVICE_SELF_OWNER, 0.60, 1)
+	MCFG_DEVICE_ADD("ym2151", YM2151, JSA_MASTER_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, atari_jsa_base_device, ym2151_port_w))
+	MCFG_MIXER_ROUTE(0, *this, 0.60, 0)
+	MCFG_MIXER_ROUTE(1, *this, 0.60, 1)
 
-	MCFG_SOUND_ADD("pokey", POKEY, JSA_MASTER_CLOCK/2)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.40, 0)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.40, 1)
+	MCFG_DEVICE_ADD("pokey", POKEY, JSA_MASTER_CLOCK/2)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.40, 0)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.40, 1)
 
-	MCFG_SOUND_ADD("tms", TMS5220C, JSA_MASTER_CLOCK*2/11) // potentially JSA_MASTER_CLOCK/9 as well
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0, 0)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0, 1)
+	MCFG_DEVICE_ADD("tms", TMS5220C, JSA_MASTER_CLOCK*2/11) // potentially JSA_MASTER_CLOCK/9 as well
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 1.0, 0)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 1.0, 1)
 MACHINE_CONFIG_END
 
 
@@ -829,20 +829,20 @@ READ8_MEMBER( atari_jsa_ii_device::rdio_r )
 MACHINE_CONFIG_START(atari_jsa_ii_device::device_add_mconfig)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(atarijsa2_map)
+	MCFG_DEVICE_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(atarijsa2_map)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
 
-	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(atari_jsa_base_device, ym2151_port_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60, 0)
+	MCFG_DEVICE_ADD("ym2151", YM2151, JSA_MASTER_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, atari_jsa_base_device, ym2151_port_w))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.60, 0)
 
 	MCFG_OKIM6295_ADD("oki1", JSA_MASTER_CLOCK/3, PIN7_HIGH)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.75, 0)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.75, 0)
 MACHINE_CONFIG_END
 
 
@@ -911,21 +911,21 @@ READ8_MEMBER( atari_jsa_iii_device::rdio_r )
 MACHINE_CONFIG_START(atari_jsa_iii_device::device_add_mconfig)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(atarijsa3_map)
+	MCFG_DEVICE_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(atarijsa3_map)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
 
-	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(atari_jsa_base_device, ym2151_port_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60, 0)
+	MCFG_DEVICE_ADD("ym2151", YM2151, JSA_MASTER_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, atari_jsa_base_device, ym2151_port_w))
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.60, 0)
 
 	MCFG_OKIM6295_ADD("oki1", JSA_MASTER_CLOCK/3, PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, jsa3_oki1_map)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.75, 0)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.75, 0)
 MACHINE_CONFIG_END
 
 
@@ -964,12 +964,12 @@ MACHINE_CONFIG_START(atari_jsa_iiis_device::device_add_mconfig)
 
 	atari_jsa_iii_device::device_add_mconfig(config);
 
-	MCFG_SOUND_MODIFY("ym2151")
+	MCFG_DEVICE_MODIFY("ym2151")
 	MCFG_SOUND_ROUTES_RESET()
-	MCFG_MIXER_ROUTE(0, DEVICE_SELF_OWNER, 0.60, 0)
-	MCFG_MIXER_ROUTE(1, DEVICE_SELF_OWNER, 0.60, 1)
+	MCFG_MIXER_ROUTE(0, *this, 0.60, 0)
+	MCFG_MIXER_ROUTE(1, *this, 0.60, 1)
 
 	MCFG_OKIM6295_ADD("oki2", JSA_MASTER_CLOCK/3, PIN7_HIGH)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.75, 1)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.75, 1)
 	MCFG_DEVICE_ADDRESS_MAP(0, jsa3_oki2_map)
 MACHINE_CONFIG_END

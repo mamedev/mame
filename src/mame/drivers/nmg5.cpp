@@ -488,7 +488,7 @@ static INPUT_PORTS_START( nmg5 )
 	PORT_START("SYSTEM")    /* Coins */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN2 )
-	PORT_BIT( 0x0050, IP_ACTIVE_HIGH, IPT_SPECIAL )         // otherwise it doesn't boot (unneeded for 'nmg5e' - see notes)
+	PORT_BIT( 0x0050, IP_ACTIVE_HIGH, IPT_CUSTOM )         // otherwise it doesn't boot (unneeded for 'nmg5e' - see notes)
 	PORT_BIT( 0xffac, IP_ACTIVE_LOW,  IPT_UNUSED )          // tested in service mode
 
 	PORT_START("INPUTS")
@@ -992,13 +992,13 @@ void nmg5_state::machine_reset()
 MACHINE_CONFIG_START(nmg5_state::nmg5)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(nmg5_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nmg5_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(nmg5_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nmg5_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 4000000)      /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(nmg5_sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)      /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(nmg5_sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 
 	/* video hardware */
@@ -1027,7 +1027,7 @@ MACHINE_CONFIG_START(nmg5_state::nmg5)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000) /* 4MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000) /* 4MHz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -1040,11 +1040,11 @@ MACHINE_CONFIG_START(nmg5_state::garogun)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pclubys_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pclubys_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(pclubys_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(pclubys_sound_map)
 MACHINE_CONFIG_END
 
 
@@ -1053,11 +1053,11 @@ MACHINE_CONFIG_START(nmg5_state::pclubys)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pclubys_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pclubys_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(pclubys_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(pclubys_sound_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pclubys)
 MACHINE_CONFIG_END
@@ -1078,8 +1078,8 @@ MACHINE_CONFIG_START(nmg5_state::_7ordi)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(pclubys_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(pclubys_sound_map)
 MACHINE_CONFIG_END
 
 

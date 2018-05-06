@@ -69,67 +69,68 @@ DEFINE_DEVICE_TYPE(MPCB070, mpcb070_device, "mpcb070", "2400 Graphics f/1 1Mp Mo
 DEFINE_DEVICE_TYPE(MPCB071, mpcb071_device, "mpcb071", "2400 Graphics f/2 1Mp Monitors (V-76)")
 DEFINE_DEVICE_TYPE(MPCB081, mpcb081_device, "mpcb081", "2400 Graphics f/1 2Mp Monitor (V-60/76)")
 
-ADDRESS_MAP_START(gt_device_base::map)
-	AM_RANGE(0x0a0, 0x0a3) AM_READWRITE8(contrast_dac_r, contrast_dac_w, 0x000000ff) // w/o?
-	AM_RANGE(0x0b0, 0x0b3) AM_READWRITE(control_r, control_w)
+void gt_device_base::map(address_map &map)
+{
+	map(0x0a0, 0x0a0).rw(this, FUNC(gt_device_base::contrast_dac_r), FUNC(gt_device_base::contrast_dac_w)); // w/o?
+	map(0x0b0, 0x0b3).rw(this, FUNC(gt_device_base::control_r), FUNC(gt_device_base::control_w));
 
-	AM_RANGE(0x0c0, 0x0c3) AM_READWRITE(blit_src_address_r, blit_src_address_w) // w/o?
-	AM_RANGE(0x0c4, 0x0c7) AM_READWRITE(blit_dst_address_r, blit_dst_address_w) // w/o?
-	AM_RANGE(0x0c8, 0x0cb) AM_READWRITE16(blit_width_r, blit_width_w, 0x0000ffff) // w/o?
+	map(0x0c0, 0x0c3).rw(this, FUNC(gt_device_base::blit_src_address_r), FUNC(gt_device_base::blit_src_address_w)); // w/o?
+	map(0x0c4, 0x0c7).rw(this, FUNC(gt_device_base::blit_dst_address_r), FUNC(gt_device_base::blit_dst_address_w)); // w/o?
+	map(0x0c8, 0x0c9).rw(this, FUNC(gt_device_base::blit_width_r), FUNC(gt_device_base::blit_width_w)); // w/o?
 
-	AM_RANGE(0x0d0, 0x0d3) AM_WRITE(blit_control_w)
-	AM_RANGE(0x0d4, 0x0d7) AM_READWRITE8(plane_enable_r, plane_enable_w, 0x000000ff)
-	AM_RANGE(0x0d8, 0x0db) AM_READWRITE8(plane_data_r, plane_data_w, 0x000000ff)
+	map(0x0d0, 0x0d3).w(this, FUNC(gt_device_base::blit_control_w));
+	map(0x0d4, 0x0d4).rw(this, FUNC(gt_device_base::plane_enable_r), FUNC(gt_device_base::plane_enable_w));
+	map(0x0d8, 0x0d8).rw(this, FUNC(gt_device_base::plane_data_r), FUNC(gt_device_base::plane_data_w));
 
-	AM_RANGE(0x100, 0x103) AM_READWRITE16(bsga_width_r, bsga_width_w, 0x0000ffff)
-	AM_RANGE(0x100, 0x103) AM_READWRITE16(bsga_tmp_r, bsga_tmp_w, 0xffff0000)
+	map(0x100, 0x101).rw(this, FUNC(gt_device_base::bsga_width_r), FUNC(gt_device_base::bsga_width_w));
+	map(0x102, 0x103).rw(this, FUNC(gt_device_base::bsga_tmp_r), FUNC(gt_device_base::bsga_tmp_w));
 
-	AM_RANGE(0x104, 0x107) AM_WRITE16(bsga_xmin_w, 0x0000ffff)
-	AM_RANGE(0x108, 0x10b) AM_WRITE16(bsga_ymin_w, 0x0000ffff)
-	AM_RANGE(0x10c, 0x10f) AM_READWRITE16(bsga_xmin_r, bsga_xmin_w, 0x0000ffff)
-	AM_RANGE(0x10c, 0x10f) AM_READWRITE16(bsga_ymin_r, bsga_ymin_w, 0xffff0000)
+	map(0x104, 0x105).w(this, FUNC(gt_device_base::bsga_xmin_w));
+	map(0x108, 0x109).w(this, FUNC(gt_device_base::bsga_ymin_w));
+	map(0x10c, 0x10d).rw(this, FUNC(gt_device_base::bsga_xmin_r), FUNC(gt_device_base::bsga_xmin_w));
+	map(0x10e, 0x10f).rw(this, FUNC(gt_device_base::bsga_ymin_r), FUNC(gt_device_base::bsga_ymin_w));
 
-	AM_RANGE(0x110, 0x113) AM_READ16(bsga_acc0_r, 0x0000ffff)
-	AM_RANGE(0x110, 0x113) AM_READ16(bsga_acc1_r, 0xffff0000)
+	map(0x110, 0x111).r(this, FUNC(gt_device_base::bsga_acc0_r));
+	map(0x112, 0x113).r(this, FUNC(gt_device_base::bsga_acc1_r));
 
-	AM_RANGE(0x114, 0x117) AM_WRITE16(bsga_xmax_w, 0x0000ffff)
-	AM_RANGE(0x118, 0x11b) AM_WRITE16(bsga_ymax_w, 0x0000ffff)
-	AM_RANGE(0x11c, 0x11f) AM_READWRITE16(bsga_xmax_r, bsga_xmax_w, 0x0000ffff)
-	AM_RANGE(0x11c, 0x11f) AM_READWRITE16(bsga_ymax_r, bsga_ymax_w, 0xffff0000)
+	map(0x114, 0x115).w(this, FUNC(gt_device_base::bsga_xmax_w));
+	map(0x118, 0x119).w(this, FUNC(gt_device_base::bsga_ymax_w));
+	map(0x11c, 0x11d).rw(this, FUNC(gt_device_base::bsga_xmax_r), FUNC(gt_device_base::bsga_xmax_w));
+	map(0x11e, 0x11f).rw(this, FUNC(gt_device_base::bsga_ymax_r), FUNC(gt_device_base::bsga_ymax_w));
 
-	AM_RANGE(0x120, 0x123) AM_READ16(bsga_src0_r, 0x0000ffff)
-	AM_RANGE(0x120, 0x123) AM_READ16(bsga_src1_r, 0xffff0000)
+	map(0x120, 0x121).r(this, FUNC(gt_device_base::bsga_src0_r));
+	map(0x122, 0x123).r(this, FUNC(gt_device_base::bsga_src1_r));
 
-	AM_RANGE(0x124, 0x127) AM_WRITE16(bsga_xin1_w, 0x0000ffff)
-	AM_RANGE(0x128, 0x12b) AM_WRITE16(bsga_yin1_w, 0x0000ffff)
-	AM_RANGE(0x12c, 0x12f) AM_READ16(bsga_xin_r, 0x0000ffff)
-	AM_RANGE(0x12c, 0x12f) AM_READ16(bsga_yin_r, 0xffff0000)
-	AM_RANGE(0x12c, 0x12f) AM_WRITE(bsga_xin1yin1_w)
-	AM_RANGE(0x130, 0x133) AM_READ16(bsga_status_r, 0x0000ffff)
-	AM_RANGE(0x134, 0x137) AM_WRITE16(bsga_xin2_w, 0x0000ffff)
-	AM_RANGE(0x138, 0x13b) AM_WRITE16(bsga_yin2_w, 0x0000ffff)
-	AM_RANGE(0x13c, 0x13f) AM_WRITE(bsga_xin2yin2_w)
+	map(0x124, 0x125).w(this, FUNC(gt_device_base::bsga_xin1_w));
+	map(0x128, 0x129).w(this, FUNC(gt_device_base::bsga_yin1_w));
+	map(0x12c, 0x12d).r(this, FUNC(gt_device_base::bsga_xin_r));
+	map(0x12e, 0x12f).r(this, FUNC(gt_device_base::bsga_yin_r));
+	map(0x12c, 0x12f).w(this, FUNC(gt_device_base::bsga_xin1yin1_w));
+	map(0x130, 0x131).r(this, FUNC(gt_device_base::bsga_status_r));
+	map(0x134, 0x135).w(this, FUNC(gt_device_base::bsga_xin2_w));
+	map(0x138, 0x139).w(this, FUNC(gt_device_base::bsga_yin2_w));
+	map(0x13c, 0x13f).w(this, FUNC(gt_device_base::bsga_xin2yin2_w));
 
 	// FDMDISK says all the ri registers are write only?
 	// possibly also all 24 bit
-	AM_RANGE(0x140, 0x143) AM_READWRITE(ri_initial_distance_r, ri_initial_distance_w)
-	AM_RANGE(0x144, 0x147) AM_READWRITE(ri_distance_both_r, ri_distance_both_w)
-	AM_RANGE(0x148, 0x14b) AM_READWRITE(ri_distance_major_r, ri_distance_major_w)
-	AM_RANGE(0x14c, 0x14f) AM_READWRITE(ri_initial_address_r, ri_initial_address_w)
-	AM_RANGE(0x150, 0x153) AM_READWRITE(ri_address_both_r, ri_address_both_w)
-	AM_RANGE(0x154, 0x157) AM_READWRITE(ri_address_major_r, ri_address_major_w)
-	AM_RANGE(0x158, 0x15b) AM_READWRITE(ri_initial_error_r, ri_initial_error_w)
-	AM_RANGE(0x15c, 0x15f) AM_READWRITE(ri_error_both_r, ri_error_both_w)
-	AM_RANGE(0x160, 0x163) AM_READWRITE(ri_error_major_r, ri_error_major_w)
-	AM_RANGE(0x164, 0x167) AM_READWRITE(ri_stop_count_r, ri_stop_count_w) // 16 bit?
+	map(0x140, 0x143).rw(this, FUNC(gt_device_base::ri_initial_distance_r), FUNC(gt_device_base::ri_initial_distance_w));
+	map(0x144, 0x147).rw(this, FUNC(gt_device_base::ri_distance_both_r), FUNC(gt_device_base::ri_distance_both_w));
+	map(0x148, 0x14b).rw(this, FUNC(gt_device_base::ri_distance_major_r), FUNC(gt_device_base::ri_distance_major_w));
+	map(0x14c, 0x14f).rw(this, FUNC(gt_device_base::ri_initial_address_r), FUNC(gt_device_base::ri_initial_address_w));
+	map(0x150, 0x153).rw(this, FUNC(gt_device_base::ri_address_both_r), FUNC(gt_device_base::ri_address_both_w));
+	map(0x154, 0x157).rw(this, FUNC(gt_device_base::ri_address_major_r), FUNC(gt_device_base::ri_address_major_w));
+	map(0x158, 0x15b).rw(this, FUNC(gt_device_base::ri_initial_error_r), FUNC(gt_device_base::ri_initial_error_w));
+	map(0x15c, 0x15f).rw(this, FUNC(gt_device_base::ri_error_both_r), FUNC(gt_device_base::ri_error_both_w));
+	map(0x160, 0x163).rw(this, FUNC(gt_device_base::ri_error_major_r), FUNC(gt_device_base::ri_error_major_w));
+	map(0x164, 0x167).rw(this, FUNC(gt_device_base::ri_stop_count_r), FUNC(gt_device_base::ri_stop_count_w)); // 16 bit?
 
-	AM_RANGE(0x16c, 0x16f) AM_READWRITE(ri_control_r, ri_control_w) // mask 1ff?
+	map(0x16c, 0x16f).rw(this, FUNC(gt_device_base::ri_control_r), FUNC(gt_device_base::ri_control_w)); // mask 1ff?
 
 	//AM_RANGE(0x174, 0x177) AM_READWRITE(ri_xfer_r, ri_xfer_w)
 	//AM_RANGE(0x178, 0x17b) AM_READWRITE(ri_xfer_r, ri_xfer_w)
-	AM_RANGE(0x17c, 0x17f) AM_READWRITE(ri_xfer_r, ri_xfer_w)
+	map(0x17c, 0x17f).rw(this, FUNC(gt_device_base::ri_xfer_r), FUNC(gt_device_base::ri_xfer_w));
 
-	AM_RANGE(0x1a4, 0x1a7) AM_WRITE(bsga_float_w)
+	map(0x1a4, 0x1a7).w(this, FUNC(gt_device_base::bsga_float_w));
 
 	//AM_RANGE(0x1c0, 0x1c3)
 	//AM_RANGE(0x1c4, 0x1c7)
@@ -148,26 +149,28 @@ ADDRESS_MAP_START(gt_device_base::map)
     #define GT_FIFO_LW_INTR         0x40
     #define GT_FIFO_HW_INTR         0x80
  */
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(single_gt_device_base::map)
-	AM_IMPORT_FROM(gt_device_base::map)
+void single_gt_device_base::map(address_map &map)
+{
+	gt_device_base::map(map);
 
-	AM_RANGE(0x00000000, 0x0000007f) AM_READ(idprom_r)
-	AM_RANGE(0x00000080, 0x0000008f) AM_DEVICE8("ramdac0", bt459_device, map, 0x000000ff)
+	map(0x00000000, 0x0000007f).r(this, FUNC(single_gt_device_base::idprom_r));
+	map(0x00000080, 0x0000008f).m("ramdac0", FUNC(bt459_device::map)).umask32(0x000000ff);
 
-	AM_RANGE(0x00400000, 0x005fffff) AM_READWRITE(buffer_r, buffer_w)
-ADDRESS_MAP_END
+	map(0x00400000, 0x005fffff).rw(this, FUNC(single_gt_device_base::buffer_r), FUNC(single_gt_device_base::buffer_w));
+}
 
-ADDRESS_MAP_START(dual_gt_device_base::map)
-	AM_IMPORT_FROM(gt_device_base::map)
+void dual_gt_device_base::map(address_map &map)
+{
+	gt_device_base::map(map);
 
-	AM_RANGE(0x00000000, 0x0000007f) AM_READ(idprom_r)
-	AM_RANGE(0x00000080, 0x0000008f) AM_DEVICE8("ramdac0", bt459_device, map, 0x000000ff)
-	AM_RANGE(0x00000090, 0x0000009f) AM_DEVICE8("ramdac1", bt459_device, map, 0x000000ff)
+	map(0x00000000, 0x0000007f).r(this, FUNC(dual_gt_device_base::idprom_r));
+	map(0x00000080, 0x0000008f).m("ramdac0", FUNC(bt459_device::map)).umask32(0x000000ff);
+	map(0x00000090, 0x0000009f).m("ramdac1", FUNC(bt459_device::map)).umask32(0x000000ff);
 
-	AM_RANGE(0x00400000, 0x007fffff) AM_READWRITE(buffer_r, buffer_w)
-ADDRESS_MAP_END
+	map(0x00400000, 0x007fffff).rw(this, FUNC(dual_gt_device_base::buffer_r), FUNC(dual_gt_device_base::buffer_w));
+}
 
 ROM_START(mpcb963)
 	ROM_REGION(0x80, "idprom", 0)

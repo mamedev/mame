@@ -212,14 +212,14 @@ INTERRUPT_GEN_MEMBER(solomon_state::vblank_irq)
 MACHINE_CONFIG_START(solomon_state::solomon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4.0 MHz (?????) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", solomon_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4.0 MHz (?????) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", solomon_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(solomon_state, irq0_line_hold, 2*60)   /* ??? */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(solomon_state, irq0_line_hold, 2*60)   /* ??? */
 						/* NMIs are caused by the main CPU */
 
 	/* video hardware */
@@ -240,13 +240,13 @@ MACHINE_CONFIG_START(solomon_state::solomon)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay3", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 MACHINE_CONFIG_END
 

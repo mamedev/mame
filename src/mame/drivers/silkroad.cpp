@@ -186,7 +186,7 @@ static INPUT_PORTS_START( silkroad )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SERVICE2 ) /* Not mentioned in the "test mode" */
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SPECIAL )  /* See notes - Stephh*/
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_CUSTOM )  /* See notes - Stephh*/
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )  // this input makes the 020 lock up...- RB
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -253,7 +253,7 @@ static INPUT_PORTS_START( silkroad )
 	PORT_DIPSETTING(          0x80000000, DEF_STR(1C_4C))
 
 //  PORT_START("MISC")  /* Misc inputs */
-//  PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* VBLANK ? */
+//  PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* VBLANK ? */
 //  PORT_BIT( 0xff7f, IP_ACTIVE_LOW, IPT_UNUSED ) /* unknown / unused */
 INPUT_PORTS_END
 
@@ -277,9 +277,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(silkroad_state::silkroad)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", silkroad_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", silkroad_state,  irq4_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -297,7 +297,7 @@ MACHINE_CONFIG_START(silkroad_state::silkroad)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

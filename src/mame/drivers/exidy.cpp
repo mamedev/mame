@@ -384,7 +384,7 @@ static INPUT_PORTS_START( targ )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("INTSOURCE")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -404,7 +404,7 @@ static INPUT_PORTS_START( spectar )
 	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( German ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Spanish ) )
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spectarrf ) // default to Spanish since it's a Spanish bootleg
@@ -454,7 +454,7 @@ static INPUT_PORTS_START( rallys )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_MODIFY("INTSOURCE")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
@@ -523,7 +523,7 @@ static INPUT_PORTS_START( mtrap )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
 
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -585,7 +585,7 @@ static INPUT_PORTS_START( venture )
     PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -621,7 +621,7 @@ static INPUT_PORTS_START( teetert )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy_state,teetert_input_r, nullptr)
+	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy_state,teetert_input_r, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -701,7 +701,7 @@ static INPUT_PORTS_START( pepper2 )
     PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -753,7 +753,7 @@ static INPUT_PORTS_START( fax )
     PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -824,8 +824,8 @@ MACHINE_START_MEMBER(exidy_state,teetert)
 MACHINE_CONFIG_START(exidy_state::base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, EXIDY_CPU_CLOCK)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", exidy_state,  exidy_vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6502, EXIDY_CPU_CLOCK)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exidy_state,  exidy_vblank_interrupt)
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exidy)
@@ -844,8 +844,8 @@ MACHINE_CONFIG_START(exidy_state::sidetrac)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sidetrac_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sidetrac_map)
 
 	/* audio hardware */
 	spectar_audio(config);
@@ -856,8 +856,8 @@ MACHINE_CONFIG_START(exidy_state::targ)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(targ_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(targ_map)
 
 	/* audio hardware */
 	targ_audio(config);
@@ -868,8 +868,8 @@ MACHINE_CONFIG_START(exidy_state::spectar)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spectar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spectar_map)
 
 	/* audio hardware */
 	spectar_audio(config);
@@ -880,8 +880,8 @@ MACHINE_CONFIG_START(exidy_state::rallys)
 	spectar(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rallys_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rallys_map)
 MACHINE_CONFIG_END
 
 
@@ -889,8 +889,8 @@ MACHINE_CONFIG_START(exidy_state::venture)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(venture_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(venture_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -903,8 +903,8 @@ MACHINE_CONFIG_START(exidy_state::teetert)
 	venture(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PERIODIC_INT_DRIVER(exidy_state, nmi_line_pulse, 10*60)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(exidy_state, nmi_line_pulse, 10*60)
 
 	MCFG_MACHINE_START_OVERRIDE(exidy_state, teetert )
 
@@ -927,8 +927,8 @@ MACHINE_CONFIG_START(exidy_state::pepper2)
 	venture(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pepper2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pepper2_map)
 MACHINE_CONFIG_END
 
 
@@ -936,8 +936,8 @@ MACHINE_CONFIG_START(exidy_state::fax)
 	pepper2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fax_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fax_map)
 MACHINE_CONFIG_END
 
 
@@ -1348,6 +1348,11 @@ ROM_START( venture )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "11d-cpu", 0x0000, 0x0800, CRC(b4bb2503) SHA1(67303603b7c5e6301e976ef19f81c7519648b179) )
+
+	ROM_REGION( 0x140, "proms", 0 )
+	ROM_LOAD( "hrl14h 1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "vel5c 1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
+	ROM_LOAD( "hrl6d 1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
 ROM_END
 
 
@@ -1371,6 +1376,11 @@ ROM_START( venture2 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "11d-cpu",      0x0000, 0x0800, CRC(b4bb2503) SHA1(67303603b7c5e6301e976ef19f81c7519648b179) )
+
+	ROM_REGION( 0x140, "proms", 0 )
+	ROM_LOAD( "hrl14h 1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "vel5c 1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
+	ROM_LOAD( "hrl6d 1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
 ROM_END
 
 
@@ -1394,6 +1404,11 @@ ROM_START( venture4 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "vel11d-2", 0x0000, 0x0800, CRC(ea6fd981) SHA1(46b1658e1607423d5a073f14097c2a48d59057c0) )
+
+	ROM_REGION( 0x140, "proms", 0 )
+	ROM_LOAD( "hrl14h 1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "vel5c 1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
+	ROM_LOAD( "hrl6d 1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
 ROM_END
 
 

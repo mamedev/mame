@@ -363,7 +363,7 @@ static INPUT_PORTS_START( ccastles )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ccastles_state,get_vblank, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ccastles_state,get_vblank, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Jump/1P Start Upright")    PORT_CONDITION("IN1",0x20,EQUALS,0x00)  /* left Jump, non-cocktail start1 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P Jump")           PORT_CONDITION("IN1",0x20,EQUALS,0x20)  /* 1p Jump, cocktail */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Jump/2P Start Upright")   PORT_CONDITION("IN1",0x20,EQUALS,0x00)  /* right Jump, non-cocktail start2 */
@@ -457,8 +457,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(ccastles_state::ccastles)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
@@ -478,12 +478,12 @@ MACHINE_CONFIG_START(ccastles_state::ccastles)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/8)
 	/* NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference */
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK/8)
 	/* NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference */
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1) + RES_K(0.2), CAP_U(0.01), 5.0)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("IN1"))

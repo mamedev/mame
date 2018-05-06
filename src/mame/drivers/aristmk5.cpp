@@ -480,6 +480,7 @@ public:
 		, m_p1(*this, "P1")
 		, m_p2(*this, "P2")
 		, m_extra_ports(*this, "EXTRA")
+		, m_lamps(*this, "lamp%u", 0U)
 	 { }
 
 	DECLARE_WRITE32_MEMBER(Ns5w48);
@@ -543,6 +544,8 @@ private:
 	required_ioport m_p2;
 	required_ioport m_extra_ports;
 
+	output_finder<64> m_lamps;
+
 	emu_timer *     m_mk5_2KHz_timer;
 	emu_timer *     m_mk5_VSYNC_timer;
 	emu_timer *     m_spi_timer;
@@ -575,7 +578,9 @@ WRITE8_MEMBER(aristmk5_state::spi_mux_w)
 
 	case 2: // Mechanical meters
 		for(int i = 0; i < 4; i++)
-			output().set_lamp_value(32 + i, BIT(m_spi_data[m_spi_mux], 1 + i));     // Tower Lamps
+		{
+			m_lamps[32+i] = BIT(m_spi_data[m_spi_mux], 1 + i); // Tower Lamps
+		}
 		break;
 
 	case 4: // Door inputs
@@ -584,7 +589,9 @@ WRITE8_MEMBER(aristmk5_state::spi_mux_w)
 
 	case 5: // Door outputs
 		for(int i = 0; i < 32; i++)
-			output().set_lamp_value(i, BIT(m_spi_data[m_spi_mux], i));
+		{
+			m_lamps[i] = BIT(m_spi_data[m_spi_mux], i);
+		}
 		break;
 
 	case 6: // Main board slow I/O
@@ -895,19 +902,19 @@ WRITE8_MEMBER(aristmk5_state::sram_banksel_w)
 WRITE8_MEMBER(aristmk5_state::buttons_lamps_w)
 {
 	for(int i = 0; i < 8; i++)
-		output().set_lamp_value((offset >> 2) * 8 + i, BIT(data, i));
+		m_lamps[(offset >> 2) * 8 + i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(aristmk5_state::other_lamps_w)
 {
 	for(int i = 0; i < 8; i++)
-		output().set_lamp_value(16 + i, BIT(data, i));
+		m_lamps[16 + i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(aristmk5_state::bill_acceptor_lamps_w)
 {
 	for(int i = 0; i < 8; i++)
-		output().set_lamp_value(24 + i, BIT(data, i));
+		m_lamps[24 + i] = BIT(data, i);
 }
 
 void aristmk5_state::aristmk5_map(address_map &map)
@@ -1121,7 +1128,7 @@ static INPUT_PORTS_START( aristmk5_usa )
 	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_C) PORT_TOGGLE PORT_NAME("Cashbox door")
 
 	PORT_START("P4")
-	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_usa_r, nullptr)
+	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_usa_r, nullptr)
 
 	PORT_START("P5")
 	PORT_BIT(0x00000008, IP_ACTIVE_LOW,  IPT_OTHER)   // Meters
@@ -1184,7 +1191,7 @@ static INPUT_PORTS_START( aristmk5 )
 
 PORT_START("P3")
 	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, hopper_r, nullptr)
-	PORT_BIT(0x000000f8, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_r, nullptr)
+	PORT_BIT(0x000000f8, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_r, nullptr)
 
 	PORT_START("P6")
 	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_OTHER)    // Battery
@@ -1987,6 +1994,8 @@ void aristmk5_state::machine_start()
 	m_mk5_2KHz_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::mk5_2KHz_callback),this));
 	m_mk5_VSYNC_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::mk5_VSYNC_callback),this));
 	m_spi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::spi_timer), this));
+
+	m_lamps.resolve();
 }
 
 void aristmk5_state::machine_reset()
@@ -2028,8 +2037,8 @@ void aristmk5_state::machine_reset()
 
 
 MACHINE_CONFIG_START(aristmk5_state::aristmk5)
-	MCFG_CPU_ADD("maincpu", ARM, MASTER_CLOCK/6)    // 12000000
-	MCFG_CPU_PROGRAM_MAP(aristmk5_drame_map)
+	MCFG_DEVICE_ADD("maincpu", ARM, MASTER_CLOCK/6)    // 12000000
+	MCFG_DEVICE_PROGRAM_MAP(aristmk5_drame_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))  /* 1.6 - 2 seconds */
@@ -2053,76 +2062,76 @@ MACHINE_CONFIG_START(aristmk5_state::aristmk5)
 
 	// TL16C452FN U71
 	MCFG_DEVICE_ADD("uart_0a", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("uart_irq", input_merger_device, in_w<0>))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE("uart_irq", input_merger_device, in_w<0>))
 	MCFG_DEVICE_ADD("uart_0b", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("uart_irq", input_merger_device, in_w<1>))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE("uart_irq", input_merger_device, in_w<1>))
 
 	// TL16C452FN U72
 	MCFG_DEVICE_ADD("uart_1a", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("uart_irq", input_merger_device, in_w<2>))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE("uart_irq", input_merger_device, in_w<2>))
 	MCFG_DEVICE_ADD("uart_1b", NS16450, MASTER_CLOCK / 9)
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("uart_irq", input_merger_device, in_w<3>))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE("uart_irq", input_merger_device, in_w<3>))
 
 	// COMM port 4 - 5
 	MCFG_DEVICE_ADD("uart_2a", NS16450, MASTER_CLOCK / 9)
-//  MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, aristmk5_state, uart_irq_callback))
 	MCFG_DEVICE_ADD("uart_2b", NS16450, MASTER_CLOCK / 9)
-//  MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, aristmk5_state, uart_irq_callback))
 
 	// COMM port 6 - 7
 	MCFG_DEVICE_ADD("uart_3a", NS16450, MASTER_CLOCK / 9)
-//  MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, aristmk5_state, uart_irq_callback))
 	MCFG_DEVICE_ADD("uart_3b", NS16450, MASTER_CLOCK / 9)
-//  MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, aristmk5_state, uart_irq_callback))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("uart_irq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(aristmk5_state, uart_irq_callback))
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, aristmk5_state, uart_irq_callback))
 
 	MCFG_DS1302_ADD("rtc", XTAL(32'768))
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac3", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac4", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac5", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac6", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac7", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac2", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac3", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac4", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac5", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac6", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac7", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac3", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac7", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac3", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac7", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(aristmk5_state::aristmk5_touch)
 	aristmk5(config);
 	MCFG_DEVICE_MODIFY("uart_0a")
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
 
-	MCFG_MICROTOUCH_ADD("microtouch", 2400, DEVWRITELINE("uart_0a", ins8250_uart_device, rx_w))
+	MCFG_MICROTOUCH_ADD("microtouch", 2400, WRITELINE("uart_0a", ins8250_uart_device, rx_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(aristmk5_state::aristmk5_usa)
 	aristmk5(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(aristmk5_usa_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(aristmk5_usa_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(aristmk5_state::aristmk5_usa_touch)
 	aristmk5_usa(config);
 	MCFG_DEVICE_MODIFY("uart_0a")
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
 
-	MCFG_MICROTOUCH_ADD("microtouch", 2400, DEVWRITELINE("uart_0a", ins8250_uart_device, rx_w))
+	MCFG_MICROTOUCH_ADD("microtouch", 2400, WRITELINE("uart_0a", ins8250_uart_device, rx_w))
 MACHINE_CONFIG_END
 
 #define ARISTOCRAT_MK5_BIOS \

@@ -35,9 +35,10 @@ FLOPPY_FORMATS_MEMBER( p1_fdc_device::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( poisk1_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void poisk1_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 //-------------------------------------------------
 //  ROM( p1_fdc )
@@ -63,8 +64,8 @@ ROM_END
 
 MACHINE_CONFIG_START(p1_fdc_device::device_add_mconfig)
 	MCFG_FD1793_ADD("fdc", XTAL(16'000'000) / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(p1_fdc_device, p1_fdc_irq_drq))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(p1_fdc_device, p1_fdc_irq_drq))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, p1_fdc_device, p1_fdc_irq_drq))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, p1_fdc_device, p1_fdc_irq_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", poisk1_floppies, "525qd", p1_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", poisk1_floppies, "525qd", p1_fdc_device::floppy_formats)
 MACHINE_CONFIG_END

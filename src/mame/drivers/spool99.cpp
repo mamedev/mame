@@ -363,9 +363,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(spool99_state::spool99)
 
-	MCFG_CPU_ADD("maincpu", Z80, 24000000/8)
-	MCFG_CPU_PROGRAM_MAP(spool99_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spool99_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 24000000/8)
+	MCFG_DEVICE_PROGRAM_MAP(spool99_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spool99_state,  irq0_line_hold)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spool99)
 
@@ -392,8 +392,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(spool99_state::vcarn)
 	spool99(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(vcarn_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(vcarn_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1) //512x240, raw guess

@@ -141,7 +141,7 @@ protected:
 DECLARE_DEVICE_TYPE(QL_EXPANSION_SLOT, ql_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( ql_expansion_cards );
+void ql_expansion_cards(device_slot_interface &device);
 
 
 #endif // MAME_BUS_QL_EXP_H

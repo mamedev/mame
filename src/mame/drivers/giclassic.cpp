@@ -270,7 +270,7 @@ void giclassicsvr_state::server_main(address_map &map)
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
 	map(0x080000, 0x08ffff).ram();
 	map(0x090000, 0x093fff).ram();
-	map(0x100000, 0x107fff).ram().ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x100000, 0x107fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x183fff).ram();
 	map(0x280000, 0x281fff).ram().rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x300000, 0x300007).w(m_k055673, FUNC(k055673_device::k053246_word_w)); // SPRITES
@@ -297,9 +297,9 @@ void giclassicsvr_state::machine_reset()
 MACHINE_CONFIG_START(giclassic_state::giclassic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
-	MCFG_CPU_PROGRAM_MAP(satellite_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", giclassic_state, giclassic_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
+	MCFG_DEVICE_PROGRAM_MAP(satellite_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", giclassic_state, giclassic_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -323,9 +323,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // unknown speed
-	MCFG_CPU_PROGRAM_MAP(server_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", giclassicsvr_state, giclassicsvr_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // unknown speed
+	MCFG_DEVICE_PROGRAM_MAP(server_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", giclassicsvr_state, giclassicsvr_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

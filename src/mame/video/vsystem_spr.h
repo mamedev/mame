@@ -20,7 +20,7 @@ typedef device_delegate<uint32_t (uint32_t)> vsystem_tile_indirection_delegate;
 #define MCFG_VSYSTEM_SPR_SET_TRANSPEN(_transpen) \
 	downcast<vsystem_spr_device &>(*device).CG10103_set_transpen(_transpen);
 #define MCFG_VSYSTEM_SPR_GFXDECODE(_gfxtag) \
-	downcast<vsystem_spr_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<vsystem_spr_device &>(*device).set_gfxdecode_tag(_gfxtag);
 #define MCFG_VSYSTEM_SPR_SET_OFFSETS(_xoffs, _yoffs) \
 	downcast<vsystem_spr_device &>(*device).set_offsets(_xoffs,_yoffs);
 #define MCFG_VSYSTEM_SPR_SET_PDRAW(_pdraw) \

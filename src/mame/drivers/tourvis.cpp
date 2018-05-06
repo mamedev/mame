@@ -330,7 +330,7 @@ static INPUT_PORTS_START( tourvision )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) // games slot status in bits 3 to 7
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) // games slot status in bits 3 to 7
 INPUT_PORTS_END
 
 void tourvision_state::pce_mem(address_map &map)
@@ -394,13 +394,13 @@ WRITE_LINE_MEMBER(tourvision_state::tourvision_timer_out)
 
 MACHINE_CONFIG_START(tourvision_state::tourvision)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(pce_mem)
-	MCFG_CPU_IO_MAP(pce_io)
+	MCFG_DEVICE_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(pce_mem)
+	MCFG_DEVICE_IO_MAP(pce_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_CPU_ADD("subcpu", I8085A, 18000000/3 /*?*/)
-	MCFG_CPU_PROGRAM_MAP(tourvision_8085_map)
+	MCFG_DEVICE_ADD("subcpu", I8085A, 18000000/3 /*?*/)
+	MCFG_DEVICE_PROGRAM_MAP(tourvision_8085_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -409,22 +409,22 @@ MACHINE_CONFIG_START(tourvision_state::tourvision)
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
 	MCFG_DEVICE_ADD( "huc6260", HUC6260, PCE_MAIN_CLOCK )
-	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(DEVREAD16("huc6270", huc6270_device, next_pixel))
-	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(DEVREAD16("huc6270", huc6270_device, time_until_next_event))
-	MCFG_HUC6260_VSYNC_CHANGED_CB(DEVWRITELINE("huc6270", huc6270_device, vsync_changed))
-	MCFG_HUC6260_HSYNC_CHANGED_CB(DEVWRITELINE("huc6270", huc6270_device, hsync_changed))
+	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6270", huc6270_device, next_pixel))
+	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(READ16("huc6270", huc6270_device, time_until_next_event))
+	MCFG_HUC6260_VSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, vsync_changed))
+	MCFG_HUC6260_HSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, hsync_changed))
 	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
 	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("i8155", I8155, 1000000 /*?*/)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(tourvision_state, tourvision_i8155_a_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(tourvision_state, tourvision_i8155_b_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(tourvision_state, tourvision_i8155_c_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(tourvision_state, tourvision_timer_out))
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, tourvision_state, tourvision_i8155_a_w))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, tourvision_state, tourvision_i8155_b_w))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, tourvision_state, tourvision_i8155_c_w))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, tourvision_state, tourvision_timer_out))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
-	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
+	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
 	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
@@ -453,8 +453,10 @@ MACHINE_CONFIG_END
 	ROMX_LOAD( "v4-43.ic29", 0x0000, 0x8000, CRC(88da23f3) SHA1(9d24faa116129783e55c7f79a4a08902a236d5a6), ROM_BIOS(5) ) \
 	ROM_SYSTEM_BIOS( 5, "40", "V4-40" ) \
 	ROMX_LOAD( "v4-40.ic29", 0x0000, 0x8000, CRC(ba6290cc) SHA1(92b0e9f55791e892ec209de4fadd80faef370622), ROM_BIOS(6) ) \
-	ROM_SYSTEM_BIOS( 6, "12", "V1-20" ) \
-	ROMX_LOAD( "v1_2.0.bin", 0x0000, 0x8000, CRC(36012f88) SHA1(5bd42fb51aa48ff65e704ea06a9181bb87ed2137), ROM_BIOS(7) )
+	ROM_SYSTEM_BIOS( 6, "20", "VT-20" ) \
+	ROMX_LOAD( "vt_2.0.bin", 0x0000, 0x8000, CRC(36012f88) SHA1(5bd42fb51aa48ff65e704ea06a9181bb87ed2137), ROM_BIOS(7) ) \
+	ROM_SYSTEM_BIOS( 7, "11", "VT-11" ) \
+	ROMX_LOAD( "vt_1.1.bin", 0x0000, 0x8000, CRC(27abbc36) SHA1(881ea7802b9e241473bc8ced0472e0f1851c9886), ROM_BIOS(8) )
 
 
 ROM_START(tourvis)

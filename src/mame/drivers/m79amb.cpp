@@ -63,6 +63,10 @@ and two large (paddles pretending to be) guns.
 #include "screen.h"
 #include "speaker.h"
 
+void m79amb_state::machine_start()
+{
+	m_self_test.resolve();
+}
 
 WRITE8_MEMBER(m79amb_state::ramtek_videoram_w)
 {
@@ -193,9 +197,9 @@ INTERRUPT_GEN_MEMBER(m79amb_state::m79amb_interrupt)
 MACHINE_CONFIG_START(m79amb_state::m79amb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(19'660'800) / 10)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m79amb_state,  m79amb_interrupt)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(19'660'800) / 10)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m79amb_state,  m79amb_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -208,7 +212,7 @@ MACHINE_CONFIG_START(m79amb_state::m79amb)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(m79amb)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -470,9 +470,10 @@ DRIVER_INIT_MEMBER( sbrain_state, sbrain )
 	m_bank2->configure_entry(1, &main[0x8000]);
 }
 
-static SLOT_INTERFACE_START( sbrain_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void sbrain_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_RESET_MEMBER( sbrain_state, sbrain )
 {
@@ -538,14 +539,14 @@ u32 sbrain_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 MACHINE_CONFIG_START(sbrain_state::sbrain)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(sbrain_mem)
-	MCFG_CPU_IO_MAP(sbrain_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sbrain_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(sbrain_mem)
+	MCFG_DEVICE_IO_MAP(sbrain_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sbrain_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(sbrain_submem)
-	MCFG_CPU_IO_MAP(sbrain_subio)
+	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(sbrain_submem)
+	MCFG_DEVICE_IO_MAP(sbrain_subio)
 
 	MCFG_MACHINE_RESET_OVERRIDE(sbrain_state, sbrain)
 
@@ -564,27 +565,27 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 800)
+	MCFG_DEVICE_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(sbrain_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(sbrain_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(sbrain_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(sbrain_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(sbrain_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(sbrain_state, ppi_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, sbrain_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, sbrain_state, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, sbrain_state, ppi_pb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, sbrain_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, sbrain_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sbrain_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD("uart0", I8251, 0)
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 
 	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800)) // BR1941L
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("uart0", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart0", i8251_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
+	MCFG_COM8116_FR_HANDLER(WRITELINE("uart0", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart0", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("uart1", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart1", i8251_device, write_rxc))
 
 	MCFG_FD1791_ADD("fdc", XTAL(16'000'000) / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)

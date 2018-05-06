@@ -782,8 +782,8 @@ static INPUT_PORTS_START( tetrisp2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SPECIAL  ) /* ?*/
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL  ) /* ?*/
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM  ) /* ?*/
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM  ) /* ?*/
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -966,7 +966,7 @@ static INPUT_PORTS_START( nndmseal )
 	PORT_START("PRINT") // be0006.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Print 1?") // Press both to print (and alternate with ok too).
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Print 2?") // Hold them for some seconds to bring up a "caution" message.
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH,IPT_SPECIAL )  // ?
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH,IPT_CUSTOM )  // ?
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1081,7 +1081,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( rocknms )
 	PORT_START("PLAYERS")   // IN0 - $be0002.w
-	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tetrisp2_state,rocknms_main2sub_status_r, nullptr) // MAIN -> SUB Communication
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tetrisp2_state,rocknms_main2sub_status_r, nullptr) // MAIN -> SUB Communication
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -1200,8 +1200,8 @@ static INPUT_PORTS_START( stepstag )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_SERVICE1 )    // service coin
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_COIN1    )    // coin
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_SPECIAL  )    // ?
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_SPECIAL  )    // ?
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_CUSTOM  )    // ?
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_CUSTOM  )    // ?
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
@@ -1408,8 +1408,8 @@ static INPUT_PORTS_START( vjdash )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service coin
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1    ) // coin
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SPECIAL  ) // ?
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_SPECIAL ) // ?
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM  ) // ?
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_CUSTOM ) // ?
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1695,9 +1695,9 @@ DRIVER_INIT_MEMBER(stepstag_state,stepstag)
 MACHINE_CONFIG_START(tetrisp2_state::tetrisp2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(tetrisp2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(tetrisp2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1721,7 +1721,7 @@ MACHINE_CONFIG_START(tetrisp2_state::tetrisp2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1730,9 +1730,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tetrisp2_state::nndmseal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(nndmseal_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(nndmseal_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1763,9 +1763,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tetrisp2_state::rockn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(rockn1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(rockn1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1788,7 +1788,7 @@ MACHINE_CONFIG_START(tetrisp2_state::rockn)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1797,9 +1797,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tetrisp2_state::rockn2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(rockn2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(rockn2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1822,7 +1822,7 @@ MACHINE_CONFIG_START(tetrisp2_state::rockn2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1831,13 +1831,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tetrisp2_state::rocknms)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(rocknms_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", tetrisp2_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(rocknms_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", tetrisp2_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(rocknms_sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", tetrisp2_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(rocknms_sub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", tetrisp2_state,  irq2_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1872,20 +1872,20 @@ MACHINE_CONFIG_START(tetrisp2_state::rocknms)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(stepstag_state::stepstag)
-	MCFG_CPU_ADD("maincpu", M68000, 12000000 )
-	MCFG_CPU_PROGRAM_MAP(stepstag_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("mscreen", tetrisp2_state,  irq2_line_hold) // lev 4 triggered by system timer
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000 )
+	MCFG_DEVICE_PROGRAM_MAP(stepstag_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("mscreen", tetrisp2_state,  irq2_line_hold) // lev 4 triggered by system timer
 
-	MCFG_CPU_ADD("sub", M68000, 16000000 ) //??
-	MCFG_CPU_PROGRAM_MAP(stepstag_sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", tetrisp2_state,  irq4_line_hold) // lev 6 triggered by main CPU
+	MCFG_DEVICE_ADD("sub", M68000, 16000000 ) //??
+	MCFG_DEVICE_PROGRAM_MAP(stepstag_sub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", tetrisp2_state,  irq4_line_hold) // lev 6 triggered by main CPU
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1937,19 +1937,19 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(stepstag_state::vjdash)    // 4 Screens
-	MCFG_CPU_ADD("maincpu", M68000, 12000000 )
-	MCFG_CPU_PROGRAM_MAP(vjdash_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold) // lev 4 triggered by system timer
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000 )
+	MCFG_DEVICE_PROGRAM_MAP(vjdash_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold) // lev 4 triggered by system timer
 
-	MCFG_CPU_ADD("sub", M68000, 16000000 ) //??
-	MCFG_CPU_PROGRAM_MAP(stepstag_sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("mscreen", tetrisp2_state,  irq4_line_hold) // lev 6 triggered by main CPU
+	MCFG_DEVICE_ADD("sub", M68000, 16000000 ) //??
+	MCFG_DEVICE_PROGRAM_MAP(stepstag_sub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("mscreen", tetrisp2_state,  irq4_line_hold) // lev 6 triggered by main CPU
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2009,7 +2009,7 @@ MACHINE_CONFIG_START(stepstag_state::vjdash)    // 4 Screens
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

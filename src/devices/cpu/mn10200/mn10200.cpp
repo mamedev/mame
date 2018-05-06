@@ -40,9 +40,10 @@ enum mn10200_flag
 DEFINE_DEVICE_TYPE(MN1020012A, mn1020012a_device, "mn1020012a", "Panasonic MN1020012A")
 
 // internal memory maps
-ADDRESS_MAP_START(mn10200_device::mn1020012a_internal_map)
-	AM_RANGE(0x00fc00, 0x00ffff) AM_READWRITE8(io_control_r, io_control_w, 0xffff)
-ADDRESS_MAP_END
+void mn10200_device::mn1020012a_internal_map(address_map &map)
+{
+	map(0x00fc00, 0x00ffff).rw(this, FUNC(mn10200_device::io_control_r), FUNC(mn10200_device::io_control_w));
+}
 
 
 mn10200_device::mn10200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program)

@@ -863,11 +863,11 @@ static INPUT_PORTS_START( vpool )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,vpool_lives_r, (void *)0x40)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,vpool_lives_r, (void *)0x40)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,vpool_lives_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,vpool_lives_r, (void *)0x01)
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -1111,7 +1111,7 @@ static INPUT_PORTS_START( ckongg )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,ckongg_coinage_r, (void *)0x40)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,ckongg_coinage_r, (void *)0x40)
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -1122,7 +1122,7 @@ static INPUT_PORTS_START( ckongg )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,ckongg_coinage_r, (void *)0x0c)
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,ckongg_coinage_r, (void *)0x0c)
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COINAGE")
@@ -1156,10 +1156,10 @@ static INPUT_PORTS_START( ckongmc )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,ckongg_coinage_r, (void *)0xc0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,ckongg_coinage_r, (void *)0xc0)
 
 	PORT_START("DSW")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,ckongg_coinage_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,ckongg_coinage_r, (void *)0x01)
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -1427,18 +1427,18 @@ static INPUT_PORTS_START( 4in1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x40)   // See fake ports
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x80)   // See fake ports
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x40)   // See fake ports
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x80)   // See fake ports
 
 	PORT_START("DSW0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x01)   // See fake ports
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x02)   // See fake ports
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x01)   // See fake ports
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x02)   // See fake ports
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )         // 2 when continue (Scramble PT2)
 	PORT_DIPSETTING(    0x04, "5" )         // 2 when continue (Scramble PT2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x08)   // See fake ports
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x10)   // See fake ports
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x20)   // See fake ports
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x08)   // See fake ports
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x10)   // See fake ports
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,_4in1_fake_port_r, (void *)0x20)   // See fake ports
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("FAKE1")      /* The Ghost Muncher PT3 - FAKE DSW0 (bits 0 to 5) and IN1 (bits 6 and 7) */
@@ -1447,7 +1447,7 @@ static INPUT_PORTS_START( 4in1 )
 	PORT_DIPSETTING(    0x02, "15000" )
 	PORT_DIPSETTING(    0x03, "20000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   // Lives
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )   // Lives
 //  PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 //  PORT_DIPSETTING(    0x08, DEF_STR( On ) )
@@ -1470,7 +1470,7 @@ static INPUT_PORTS_START( 4in1 )
 //  PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 //  PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   // Lives
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )   // Lives
 	PORT_DIPNAME( 0x08, 0x00, "Allow Continue (S PT2)" )
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -1492,7 +1492,7 @@ static INPUT_PORTS_START( 4in1 )
 	PORT_DIPSETTING(    0x02, "5000" )
 	PORT_DIPSETTING(    0x03, "7000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   // Lives
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )   // Lives
 //  PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 //  PORT_DIPSETTING(    0x08, DEF_STR( On ) )
@@ -1515,7 +1515,7 @@ static INPUT_PORTS_START( 4in1 )
 //  PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 //  PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   // Lives
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )   // Lives
 //  PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 //  PORT_DIPSETTING(    0x08, DEF_STR( On ) )
@@ -1618,10 +1618,10 @@ static INPUT_PORTS_START( dkongjrm )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,dkongjrm_coinage_r, (void *)0xc0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,dkongjrm_coinage_r, (void *)0xc0)
 
 	PORT_START("DSW")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,dkongjrm_coinage_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxold_state,dkongjrm_coinage_r, (void *)0x01)
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -2245,16 +2245,16 @@ GFXDECODE_END
 MACHINE_CONFIG_START(galaxold_state::galaxold_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2) /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(galaxold_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, PIXEL_CLOCK/2) /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(galaxold_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,galaxold)
 
 	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(galaxold_state,galaxold_7474_9m_1_callback))
+	MCFG_7474_OUTPUT_CB(WRITELINE(*this, galaxold_state,galaxold_7474_9m_1_callback))
 
 	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(galaxold_state,galaxold_7474_9m_2_q_callback))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, galaxold_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", galaxold_state, galaxold_interrupt_timer)
 
@@ -2291,8 +2291,8 @@ MACHINE_CONFIG_START(galaxold_state::mooncrst)
 	galaxold_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mooncrst_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mooncrst_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
@@ -2311,8 +2311,8 @@ MACHINE_CONFIG_START(galaxold_state::videotron)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hustlerb3_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hustlerb3_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
@@ -2331,8 +2331,8 @@ MACHINE_CONFIG_START(galaxold_state::scramblb)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(scramblb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(scramblb_map)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -2347,8 +2347,8 @@ MACHINE_CONFIG_START(galaxold_state::scramb2)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(scramb2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(scramb2_map)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -2363,8 +2363,8 @@ MACHINE_CONFIG_START(galaxold_state::scrambler)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(scrambler_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(scrambler_map)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -2379,8 +2379,8 @@ MACHINE_CONFIG_START(galaxold_state::guttang)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(guttang_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(guttang_map)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -2396,8 +2396,8 @@ MACHINE_CONFIG_START(galaxold_state::_4in1)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(_4in1_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(_4in1_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", _4in1)
@@ -2410,8 +2410,8 @@ MACHINE_CONFIG_START(galaxold_state::bagmanmc)
 	mooncrst(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bagmanmc_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bagmanmc_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state, devilfsg )
 
@@ -2424,8 +2424,8 @@ MACHINE_CONFIG_START(galaxold_state::dkongjrm)
 	mooncrst(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dkongjrm_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dkongjrm_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,dkongjrm)
@@ -2434,8 +2434,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxold_state::dkongjrmc)
 	mooncrst(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dkongjrmc_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dkongjrmc_map)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,dkongjrmc)
 MACHINE_CONFIG_END
@@ -2445,8 +2445,8 @@ MACHINE_CONFIG_START(galaxold_state::rockclim)
 	mooncrst(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rockclim_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rockclim_map)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", rockclim)
 
 	/* video hardware */
@@ -2464,10 +2464,10 @@ MACHINE_CONFIG_START(galaxold_state::ozon1)
 	galaxold_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ozon1_map)
-	MCFG_CPU_IO_MAP(ozon1_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  nmi_line_pulse)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ozon1_map)
+	MCFG_DEVICE_IO_MAP(ozon1_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxold_state,  nmi_line_pulse)
 
 	MCFG_MACHINE_RESET_REMOVE()
 
@@ -2477,7 +2477,7 @@ MACHINE_CONFIG_START(galaxold_state::ozon1)
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ozon1)
-	MCFG_SOUND_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
+	MCFG_DEVICE_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
@@ -2485,11 +2485,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(galaxold_state::drivfrcg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(drivfrcg)
-	MCFG_CPU_IO_MAP(drivfrcg_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) // ???
+	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(drivfrcg)
+	MCFG_DEVICE_IO_MAP(drivfrcg_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) // ???
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2518,9 +2518,9 @@ MACHINE_CONFIG_START(galaxold_state::bongo)
 	galaxold_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bongo)
-	MCFG_CPU_IO_MAP(bongo_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bongo)
+	MCFG_DEVICE_IO_MAP(bongo_io)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,bongo)
@@ -2528,7 +2528,7 @@ MACHINE_CONFIG_START(galaxold_state::bongo)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
+	MCFG_DEVICE_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
@@ -2538,11 +2538,11 @@ MACHINE_CONFIG_START(galaxold_state::hunchbkg)
 	galaxold_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", S2650, PIXEL_CLOCK / 4)
+	MCFG_DEVICE_REPLACE("maincpu", S2650, PIXEL_CLOCK / 4)
 
-	MCFG_CPU_PROGRAM_MAP(hunchbkg)
-	MCFG_CPU_DATA_MAP(hunchbkg_data)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxold_state,hunchbkg_irq_callback)
+	MCFG_DEVICE_PROGRAM_MAP(hunchbkg)
+	MCFG_DEVICE_DATA_MAP(hunchbkg_data)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(galaxold_state,hunchbkg_irq_callback)
 
 	MCFG_DEVICE_MODIFY("7474_9m_1")
 	/* the nmi line seems to be inverted on the cpu plugin board */
@@ -2558,8 +2558,8 @@ MACHINE_CONFIG_START(galaxold_state::spcwarp)
 	hunchbkg(config);
 	/* hunchbkg, but with a different memory map */
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spcwarp)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spcwarp)
 MACHINE_CONFIG_END
 
 
@@ -2567,19 +2567,19 @@ MACHINE_CONFIG_START(galaxold_state::tazzmang)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tazzmang)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tazzmang)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(galaxold_state::racknrol)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(racknrol)
-	MCFG_CPU_IO_MAP(racknrol_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
+	MCFG_DEVICE_ADD("maincpu", S2650, PIXEL_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(racknrol)
+	MCFG_DEVICE_IO_MAP(racknrol_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
@@ -2595,7 +2595,7 @@ MACHINE_CONFIG_START(galaxold_state::racknrol)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("snsnd", SN76489A, PIXEL_CLOCK/2) // SN76489AN
+	MCFG_DEVICE_ADD("snsnd", SN76489A, PIXEL_CLOCK/2) // SN76489AN
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -2603,12 +2603,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(galaxold_state::hexpoola)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(racknrol)
-	MCFG_CPU_IO_MAP(hexpoola_io)
-	MCFG_CPU_DATA_MAP(hexpoola_data)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
+	MCFG_DEVICE_ADD("maincpu", S2650, PIXEL_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(racknrol)
+	MCFG_DEVICE_IO_MAP(hexpoola_io)
+	MCFG_DEVICE_DATA_MAP(hexpoola_data)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
 	MCFG_PALETTE_ADD("palette", 32)
@@ -2623,7 +2623,7 @@ MACHINE_CONFIG_START(galaxold_state::hexpoola)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("snsnd", SN76496, PIXEL_CLOCK/2)
+	MCFG_DEVICE_ADD("snsnd", SN76496, PIXEL_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -2632,8 +2632,8 @@ MACHINE_CONFIG_START(galaxold_state::ckongg)
 	galaxian(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ckongg_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ckongg_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gmgalax)
 
@@ -2645,8 +2645,8 @@ MACHINE_CONFIG_START(galaxold_state::ckongmc)
 	mooncrst(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ckongmc_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ckongmc_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gmgalax)
 
@@ -2657,8 +2657,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(galaxold_state::bullsdrtg)
 	hexpoola(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_DATA_MAP(bullsdrtg_data_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_DATA_MAP(bullsdrtg_data_map)
 MACHINE_CONFIG_END
 
 

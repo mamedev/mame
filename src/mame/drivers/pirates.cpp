@@ -130,7 +130,7 @@ CUSTOM_INPUT_MEMBER(pirates_state::prot_r)
 	   602e and 62a6 */
 	/* For Genix, see 6576 for setting values and 67c2,d3b4 and dbc2 for tests. */
 
-	pc = machine().device("main")->safe_pc();
+	pc = m_maincpu->pc();
 	if (pc == 0x6134)
 	{
 		bit = prot & 1;
@@ -201,10 +201,10 @@ static INPUT_PORTS_START( pirates )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)  // EEPROM data
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)  // EEPROM data
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )     // seems checked in "test mode"
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )     // seems checked in "test mode"
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pirates_state,prot_r, nullptr)      // protection
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pirates_state,prot_r, nullptr)      // protection
 	/* What do these bits do ? */
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -253,9 +253,9 @@ GFXDECODE_END
 /* Machine Driver + Related bits */
 
 MACHINE_CONFIG_START(pirates_state::pirates)
-	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz */
-	MCFG_CPU_PROGRAM_MAP(pirates_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000) /* 16mhz */
+	MCFG_DEVICE_PROGRAM_MAP(pirates_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

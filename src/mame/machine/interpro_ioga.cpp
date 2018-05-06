@@ -99,55 +99,58 @@ const interpro_ioga_device::interrupt_data_t interpro_ioga_device::m_interrupt_d
 	{ INT_SOFT_HI, IRQ_SOFT15,   IRQ_PENDING, "soft int 15", "soft" },
 };
 
-ADDRESS_MAP_START(interpro_ioga_device::map)
+void interpro_ioga_device::map(address_map &map)
+{
 
-	AM_RANGE(0x0c, 0x1b) AM_READWRITE(dma_plotter_r, dma_plotter_w)
-	AM_RANGE(0x1c, 0x1f) AM_READWRITE(dma_plotter_eosl_r, dma_plotter_eosl_w)
-	AM_RANGE(0x20, 0x2f) AM_READWRITE(dma_scsi_r, dma_scsi_w)
-	AM_RANGE(0x30, 0x3f) AM_READWRITE(dma_floppy_r, dma_floppy_w)
-	AM_RANGE(0x40, 0x43) AM_READWRITE(serial_dma0_addr_r, serial_dma0_addr_w)
-	AM_RANGE(0x44, 0x47) AM_READWRITE(serial_dma0_ctrl_r, serial_dma0_ctrl_w)
-	AM_RANGE(0x48, 0x4b) AM_READWRITE(serial_dma1_addr_r, serial_dma1_addr_w)
-	AM_RANGE(0x4c, 0x4f) AM_READWRITE(serial_dma1_ctrl_r, serial_dma1_ctrl_w)
-	AM_RANGE(0x50, 0x53) AM_READWRITE(serial_dma2_addr_r, serial_dma2_addr_w)
-	AM_RANGE(0x54, 0x57) AM_READWRITE(serial_dma2_ctrl_r, serial_dma2_ctrl_w)
+	map(0x0c, 0x1b).rw(this, FUNC(interpro_ioga_device::dma_plotter_r), FUNC(interpro_ioga_device::dma_plotter_w));
+	map(0x1c, 0x1f).rw(this, FUNC(interpro_ioga_device::dma_plotter_eosl_r), FUNC(interpro_ioga_device::dma_plotter_eosl_w));
+	map(0x20, 0x2f).rw(this, FUNC(interpro_ioga_device::dma_scsi_r), FUNC(interpro_ioga_device::dma_scsi_w));
+	map(0x30, 0x3f).rw(this, FUNC(interpro_ioga_device::dma_floppy_r), FUNC(interpro_ioga_device::dma_floppy_w));
+	map(0x40, 0x43).rw(this, FUNC(interpro_ioga_device::serial_dma0_addr_r), FUNC(interpro_ioga_device::serial_dma0_addr_w));
+	map(0x44, 0x47).rw(this, FUNC(interpro_ioga_device::serial_dma0_ctrl_r), FUNC(interpro_ioga_device::serial_dma0_ctrl_w));
+	map(0x48, 0x4b).rw(this, FUNC(interpro_ioga_device::serial_dma1_addr_r), FUNC(interpro_ioga_device::serial_dma1_addr_w));
+	map(0x4c, 0x4f).rw(this, FUNC(interpro_ioga_device::serial_dma1_ctrl_r), FUNC(interpro_ioga_device::serial_dma1_ctrl_w));
+	map(0x50, 0x53).rw(this, FUNC(interpro_ioga_device::serial_dma2_addr_r), FUNC(interpro_ioga_device::serial_dma2_addr_w));
+	map(0x54, 0x57).rw(this, FUNC(interpro_ioga_device::serial_dma2_ctrl_r), FUNC(interpro_ioga_device::serial_dma2_ctrl_w));
 
 	// 5a - sib control?
-	AM_RANGE(0x5c, 0x7f) AM_READWRITE16(icr_r, icr_w, 0xffffffff)
-	AM_RANGE(0x80, 0x83) AM_READWRITE16(icr18_r, icr18_w, 0x0000ffff)
-	AM_RANGE(0x80, 0x83) AM_READWRITE8(softint_r, softint_w, 0x00ff0000)
-	AM_RANGE(0x80, 0x83) AM_READWRITE8(nmictrl_r, nmictrl_w, 0xff000000)
-	AM_RANGE(0x84, 0x87) AM_READWRITE(mouse_status_r, mouse_status_w)
-	AM_RANGE(0x88, 0x8b) AM_READWRITE(prescaler_r, prescaler_w)
-	AM_RANGE(0x8c, 0x8f) AM_READWRITE(timer0_r, timer0_w)
-	AM_RANGE(0x90, 0x93) AM_READWRITE(timer1_r, timer1_w)
-	AM_RANGE(0x94, 0x97) AM_READ(error_address_r)
-	AM_RANGE(0x98, 0x9b) AM_READ(error_businfo_r)
-	AM_RANGE(0x9c, 0x9f) AM_READWRITE16(arbctl_r, arbctl_w, 0x0000ffff)
+	map(0x5c, 0x7f).rw(this, FUNC(interpro_ioga_device::icr_r), FUNC(interpro_ioga_device::icr_w));
+	map(0x80, 0x81).rw(this, FUNC(interpro_ioga_device::icr18_r), FUNC(interpro_ioga_device::icr18_w));
+	map(0x82, 0x82).rw(this, FUNC(interpro_ioga_device::softint_r), FUNC(interpro_ioga_device::softint_w));
+	map(0x83, 0x83).rw(this, FUNC(interpro_ioga_device::nmictrl_r), FUNC(interpro_ioga_device::nmictrl_w));
+	map(0x84, 0x87).rw(this, FUNC(interpro_ioga_device::mouse_status_r), FUNC(interpro_ioga_device::mouse_status_w));
+	map(0x88, 0x8b).rw(this, FUNC(interpro_ioga_device::prescaler_r), FUNC(interpro_ioga_device::prescaler_w));
+	map(0x8c, 0x8f).rw(this, FUNC(interpro_ioga_device::timer0_r), FUNC(interpro_ioga_device::timer0_w));
+	map(0x90, 0x93).rw(this, FUNC(interpro_ioga_device::timer1_r), FUNC(interpro_ioga_device::timer1_w));
+	map(0x94, 0x97).r(this, FUNC(interpro_ioga_device::error_address_r));
+	map(0x98, 0x9b).r(this, FUNC(interpro_ioga_device::error_businfo_r));
+	map(0x9c, 0x9d).rw(this, FUNC(interpro_ioga_device::arbctl_r), FUNC(interpro_ioga_device::arbctl_w));
 	//AM_RANGE(0x9c, 0x9f) AM_READWRITE16(?, ?, 0xffff0000) // ip2000 boot code writes 0x7f18
-	AM_RANGE(0xa0, 0xa3) AM_READWRITE(timer2_count_r, timer2_count_w)
-	AM_RANGE(0xa4, 0xa7) AM_READWRITE(timer2_value_r, timer2_value_w)
-	AM_RANGE(0xa8, 0xab) AM_READWRITE(timer3_r, timer3_w)
-	AM_RANGE(0xac, 0xaf) AM_READWRITE(bus_timeout_r, bus_timeout_w) // boot writes 0x64
-	AM_RANGE(0xb0, 0xbf) AM_READWRITE16(softint_vector_r, softint_vector_w, 0xffffffff)
+	map(0xa0, 0xa3).rw(this, FUNC(interpro_ioga_device::timer2_count_r), FUNC(interpro_ioga_device::timer2_count_w));
+	map(0xa4, 0xa7).rw(this, FUNC(interpro_ioga_device::timer2_value_r), FUNC(interpro_ioga_device::timer2_value_w));
+	map(0xa8, 0xab).rw(this, FUNC(interpro_ioga_device::timer3_r), FUNC(interpro_ioga_device::timer3_w));
+	map(0xac, 0xaf).rw(this, FUNC(interpro_ioga_device::bus_timeout_r), FUNC(interpro_ioga_device::bus_timeout_w)); // boot writes 0x64
+	map(0xb0, 0xbf).rw(this, FUNC(interpro_ioga_device::softint_vector_r), FUNC(interpro_ioga_device::softint_vector_w));
 
 	//c0, c4, c8 -ethernet address a,b,c?
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(turquoise_ioga_device::map)
-	AM_IMPORT_FROM(interpro_ioga_device::map)
+void turquoise_ioga_device::map(address_map &map)
+{
+	interpro_ioga_device::map(map);
 
-	AM_RANGE(0x00, 0x03) AM_READWRITE(eth_base_r, eth_base_w)
-	AM_RANGE(0x04, 0x07) AM_READWRITE16(eth_control_r, eth_control_w, 0xffff)
-ADDRESS_MAP_END
+	map(0x00, 0x03).rw(this, FUNC(turquoise_ioga_device::eth_base_r), FUNC(turquoise_ioga_device::eth_base_w));
+	map(0x04, 0x05).rw(this, FUNC(turquoise_ioga_device::eth_control_r), FUNC(turquoise_ioga_device::eth_control_w));
+}
 
-ADDRESS_MAP_START(sapphire_ioga_device::map)
-	AM_IMPORT_FROM(interpro_ioga_device::map)
+void sapphire_ioga_device::map(address_map &map)
+{
+	interpro_ioga_device::map(map);
 
-	AM_RANGE(0x00, 0x03) AM_READWRITE(eth_remap_r, eth_remap_w)
-	AM_RANGE(0x04, 0x07) AM_READWRITE(eth_mappg_r, eth_mappg_w)
-	AM_RANGE(0x08, 0x0b) AM_READWRITE(eth_control_r, eth_control_w)
-ADDRESS_MAP_END
+	map(0x00, 0x03).rw(this, FUNC(sapphire_ioga_device::eth_remap_r), FUNC(sapphire_ioga_device::eth_remap_w));
+	map(0x04, 0x07).rw(this, FUNC(sapphire_ioga_device::eth_mappg_r), FUNC(sapphire_ioga_device::eth_mappg_w));
+	map(0x08, 0x0b).rw(this, FUNC(sapphire_ioga_device::eth_control_r), FUNC(sapphire_ioga_device::eth_control_w));
+}
 
 static INPUT_PORTS_START(interpro_mouse)
 	PORT_START("mouse_buttons")

@@ -189,18 +189,18 @@ void hcastle_state::machine_reset()
 MACHINE_CONFIG_START(hcastle_state::hcastle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)    /* Derived from 24 MHz clock */
-	MCFG_CPU_PROGRAM_MAP(hcastle_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hcastle_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", KONAMI, 3000000)    /* Derived from 24 MHz clock */
+	MCFG_DEVICE_PROGRAM_MAP(hcastle_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", hcastle_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59)
@@ -227,12 +227,12 @@ MACHINE_CONFIG_START(hcastle_state::hcastle)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(hcastle_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, hcastle_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.44)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 3579545)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI)) /* from schematic; NMI handler is just a retn */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 

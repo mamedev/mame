@@ -91,6 +91,7 @@ uint8_t intv_control_port_device::read_ctrl()
 //  SLOT_INTERFACE( intv_control_port_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( intv_control_port_devices )
-	SLOT_INTERFACE("handctrl", INTV_HANDCTRL)
-SLOT_INTERFACE_END
+void intv_control_port_devices(device_slot_interface &device)
+{
+	device.option_add("handctrl", INTV_HANDCTRL);
+}

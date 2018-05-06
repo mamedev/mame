@@ -139,10 +139,10 @@ static INPUT_PORTS_START ( megaplay )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_MODIFY("PAD1") // P1 Start input processed through BIOS
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, mplay_state, start1_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, mplay_state, start1_r)
 
 	PORT_MODIFY("PAD2") // P2 Start input processed through BIOS
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, mplay_state, start2_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, mplay_state, start2_r)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x0f, 0x0f, "Coin slot 1" ) PORT_DIPLOCATION("SW1:1,2,3,4")
@@ -667,29 +667,29 @@ MACHINE_CONFIG_START(mplay_state::megaplay)
 
 	/* The Megaplay has an extra BIOS cpu which drives an SMS VDP
 	   which includes an SN76496 for sound */
-	MCFG_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
-	MCFG_CPU_PROGRAM_MAP(megaplay_bios_map)
-	MCFG_CPU_IO_MAP(megaplay_bios_io_map)
+	MCFG_DEVICE_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
+	MCFG_DEVICE_PROGRAM_MAP(megaplay_bios_map)
+	MCFG_DEVICE_IO_MAP(megaplay_bios_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_DEVICE_ADD("io1", CXD1095, 0)
 	MCFG_CXD1095_IN_PORTA_CB(IOPORT("DSW0"))
 	MCFG_CXD1095_IN_PORTB_CB(IOPORT("DSW1"))
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(mplay_state, bios_banksel_w))
-	MCFG_CXD1095_IN_PORTE_CB(READ8(mplay_state, bios_6204_r))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(mplay_state, bios_width_w))
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, mplay_state, bios_banksel_w))
+	MCFG_CXD1095_IN_PORTE_CB(READ8(*this, mplay_state, bios_6204_r))
+	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, mplay_state, bios_width_w))
 
 	MCFG_DEVICE_ADD("io2", CXD1095, 0)
 	MCFG_CXD1095_IN_PORTA_CB(IOPORT("TEST"))
 	MCFG_CXD1095_IN_PORTB_CB(IOPORT("COIN"))
-	MCFG_CXD1095_IN_PORTC_CB(READ8(mplay_state, bios_6402_r))
-	MCFG_CXD1095_OUT_PORTC_CB(WRITE8(mplay_state, bios_6402_w))
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(mplay_state, bios_gamesel_w))
-	MCFG_CXD1095_IN_PORTE_CB(READ8(mplay_state, bios_6404_r))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(mplay_state, bios_6404_w))
+	MCFG_CXD1095_IN_PORTC_CB(READ8(*this, mplay_state, bios_6402_r))
+	MCFG_CXD1095_OUT_PORTC_CB(WRITE8(*this, mplay_state, bios_6402_w))
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, mplay_state, bios_gamesel_w))
+	MCFG_CXD1095_IN_PORTE_CB(READ8(*this, mplay_state, bios_6404_r))
+	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, mplay_state, bios_6404_w))
 
-	MCFG_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
+	MCFG_DEVICE_ADD("sn2", SN76496, MASTER_CLOCK/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 

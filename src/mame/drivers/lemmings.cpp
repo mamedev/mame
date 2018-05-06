@@ -216,16 +216,16 @@ void lemmings_state::machine_start()
 MACHINE_CONFIG_START(lemmings_state::lemmings)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14000000)
-	MCFG_CPU_PROGRAM_MAP(lemmings_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lemmings_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14000000)
+	MCFG_DEVICE_PROGRAM_MAP(lemmings_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lemmings_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", M6809,32220000/8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6809,32220000/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram1")
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -233,7 +233,7 @@ MACHINE_CONFIG_START(lemmings_state::lemmings)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lemmings_state, screen_update_lemmings)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(lemmings_state, screen_vblank_lemmings))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lemmings_state, screen_vblank_lemmings))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lemmings)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -259,7 +259,7 @@ MACHINE_CONFIG_START(lemmings_state::lemmings)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)

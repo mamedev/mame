@@ -25,10 +25,12 @@ public:
 	sc2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_beep(*this, "beeper"),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_digits(*this, "digit%u", 0U),
+		m_leds(*this, "led%u", 0U)
 	{ }
 
-	required_device<beep_device> m_beep;
+
 	DECLARE_READ8_MEMBER(pio_port_a_r);
 	DECLARE_READ8_MEMBER(pio_port_b_r);
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
@@ -42,10 +44,14 @@ public:
 	void sc2_update_display();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
 	void sc2(machine_config &config);
 	void sc2_io(address_map &map);
 	void sc2_mem(address_map &map);
+
+	required_device<beep_device> m_beep;
+	required_device<cpu_device> m_maincpu;
+	output_finder<4> m_digits;
+	output_finder<2> m_leds;
 };
 
 READ8_MEMBER( sc2_state::sc2_beep )
@@ -105,6 +111,9 @@ INPUT_PORTS_END
 
 void sc2_state::machine_start()
 {
+	m_digits.resolve();
+	m_leds.resolve();
+
 	save_item(NAME(m_led_7seg_data));
 	save_item(NAME(m_kp_matrix));
 	save_item(NAME(m_led_selected));
@@ -127,29 +136,29 @@ void sc2_state::sc2_update_display()
 
 	if (!BIT(m_led_selected, 0))
 	{
-		output().set_digit_value(0, digit_data);
+		m_digits[0] = digit_data;
 		m_led_7seg_data[0] = digit_data;
 
-		output().set_led_value(0, BIT(m_digit_data, 7));
+		m_leds[0] = BIT(m_digit_data, 7);
 	}
 
 	if (!BIT(m_led_selected, 1))
 	{
-		output().set_digit_value(1, digit_data);
+		m_digits[1] = digit_data;
 		m_led_7seg_data[1] = digit_data;
 
-		output().set_led_value(1, BIT(m_digit_data, 7));
+		m_leds[1] = BIT(m_digit_data, 7);
 	}
 
 	if (!BIT(m_led_selected, 2))
 	{
-		output().set_digit_value(2, digit_data);
+		m_digits[2] = digit_data;
 		m_led_7seg_data[2] = digit_data;
 	}
 
 	if (!BIT(m_led_selected, 3))
 	{
-		output().set_digit_value(3, digit_data);
+		m_digits[3] = digit_data;
 		m_led_7seg_data[3] = digit_data;
 	}
 }
@@ -204,9 +213,9 @@ WRITE8_MEMBER( sc2_state::pio_port_b_w )
 
 MACHINE_CONFIG_START(sc2_state::sc2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(sc2_mem)
-	MCFG_CPU_IO_MAP(sc2_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sc2_mem)
+	MCFG_DEVICE_IO_MAP(sc2_io)
 
 
 	/* video hardware */
@@ -214,14 +223,14 @@ MACHINE_CONFIG_START(sc2_state::sc2)
 
 	/* devices */
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(sc2_state, pio_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(sc2_state, pio_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(sc2_state, pio_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(sc2_state, pio_port_b_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, sc2_state, pio_port_a_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, sc2_state, pio_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, sc2_state, pio_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, sc2_state, pio_port_b_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
+	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.50 )
 MACHINE_CONFIG_END
 

@@ -630,8 +630,8 @@ void ssem_state::machine_reset()
 
 MACHINE_CONFIG_START(ssem_state::ssem)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SSEMCPU, 700)
-	MCFG_CPU_PROGRAM_MAP(ssem_map)
+	MCFG_DEVICE_ADD("maincpu", SSEMCPU, 700)
+	MCFG_DEVICE_PROGRAM_MAP(ssem_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

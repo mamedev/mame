@@ -360,7 +360,7 @@ static INPUT_PORTS_START( thedealr )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_NAME("Attendant Clear?") // !ACL (reset jackpots, only if there are no credits)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // A.P (attendant payout? clears credits, port 0 = ef)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT          ) // TLT (tilt)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL       ) // HOV (hopper?)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM       ) // HOV (hopper?)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  ) // CPN (coupon, port 3 = fb)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2         ) PORT_IMPULSE(5) // CS2
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(5) // CS1 (coin1, port 3 = fd)
@@ -532,13 +532,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(thedealr_state::thedealr_interrupt)
 MACHINE_CONFIG_START(thedealr_state::thedealr)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", R65C02, XTAL(16'000'000)/8)   // 2 MHz?
-	MCFG_CPU_PROGRAM_MAP(thedealr)
+	MCFG_DEVICE_ADD("maincpu", R65C02, XTAL(16'000'000)/8)   // 2 MHz?
+	MCFG_DEVICE_PROGRAM_MAP(thedealr)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", thedealr_state, thedealr_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("subcpu", R65C02, XTAL(16'000'000)/8)    // 2 MHz?
-	MCFG_CPU_PROGRAM_MAP(thedealr_sub)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thedealr_state, nmi_line_pulse)
+	MCFG_DEVICE_ADD("subcpu", R65C02, XTAL(16'000'000)/8)    // 2 MHz?
+	MCFG_DEVICE_PROGRAM_MAP(thedealr_sub)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -557,7 +556,8 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0+30, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(thedealr_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(thedealr_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, thedealr_state, screen_vblank))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("subcpu", INPUT_LINE_NMI))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thedealr)
@@ -566,7 +566,7 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL(16'000'000)/8)   // 2 MHz?
+	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(16'000'000)/8)   // 2 MHz?
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

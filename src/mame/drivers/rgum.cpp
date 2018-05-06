@@ -121,7 +121,7 @@ static INPUT_PORTS_START( rgum )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rgum_state,rgum_heartbeat_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rgum_state,rgum_heartbeat_r, nullptr)
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -243,9 +243,8 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(rgum_state::rgum)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(rgum_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rgum_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(rgum_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -259,6 +258,7 @@ MACHINE_CONFIG_START(rgum_state::rgum)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 24000000/16)   /* unknown clock & type, hand tuned to get ~50 fps (?) */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(rgum_state::rgum)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 24000000/16) /* guessed to use the same xtal as the crtc */
+	MCFG_DEVICE_ADD("aysnd", AY8910, 24000000/16) /* guessed to use the same xtal as the crtc */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

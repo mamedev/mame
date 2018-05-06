@@ -248,12 +248,12 @@ Memory configurations:
  *************************************/
 
 /* Helps document the input ports. */
-#define IPT_SLAVEHALT   IPT_SPECIAL
+#define IPT_SLAVEHALT   IPT_CUSTOM
 
 
 static INPUT_PORTS_START( cerberus )        /* complete, verified from code */
 	PORT_START("IN0")   /* 0x80 */
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_PLAYER(1)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
@@ -265,12 +265,12 @@ static INPUT_PORTS_START( cerberus )        /* complete, verified from code */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")   /* 0x90 */
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_PLAYER(2)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
 	PORT_START("IN3")   /* 0x91 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -316,7 +316,7 @@ static INPUT_PORTS_START( mayhem )      /* complete, verified from code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 
 	PORT_START("IN3")   /* 0xD1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -349,7 +349,7 @@ static INPUT_PORTS_START( wseries )     /* complete, verified from code */
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Aim") PORT_PLAYER(1)
 
 	PORT_START("IN3")   /* 0x91 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -388,7 +388,7 @@ static INPUT_PORTS_START( alleymas )        /* complete, verified from code */
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )        /* redundant inputs */
 
 	PORT_START("IN3")   /* 0xD1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -424,7 +424,7 @@ static INPUT_PORTS_START( upyoural )        /* complete, verified from code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
 	PORT_START("IN3")   /* 0xD1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -459,7 +459,7 @@ static INPUT_PORTS_START( dangerz )     /* complete, verified from code */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")   /* 0x91 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -494,7 +494,7 @@ static INPUT_PORTS_START( basebal2 )        /* complete, verified from code */
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Run/Cutoff") PORT_PLAYER(1)
 
 	PORT_START("IN3")   /* 0x51/D1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -531,7 +531,7 @@ static INPUT_PORTS_START( redline )     /* complete, verified in code */
 	PORT_BIT( 0xe0, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(64) PORT_PLAYER(2)
 
 	PORT_START("IN3")   /* 0xD1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -569,7 +569,7 @@ static INPUT_PORTS_START( quarterb )        /* complete, verified in code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("IN3")   /* 0x91 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -611,7 +611,7 @@ static INPUT_PORTS_START( teamqb )      /* complete, verified in code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("IN3")   /* 0x91 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -669,7 +669,7 @@ static INPUT_PORTS_START( aafb2p )      /* complete, verified in code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("IN3")   /* 0x91 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -724,7 +724,7 @@ static INPUT_PORTS_START( offroad )     /* complete, verified from code */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")   /* 0xD1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
@@ -798,7 +798,7 @@ static INPUT_PORTS_START( pigout )      /* complete, verified from code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 
 	PORT_START("IN3")   /* 0x51 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -831,7 +831,7 @@ static INPUT_PORTS_START( ataxx )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")       /* 0x20 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")       /* 0x00 - analog X */
@@ -862,7 +862,7 @@ static INPUT_PORTS_START( wsf )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")       /* 0x20 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -914,7 +914,7 @@ static INPUT_PORTS_START( indyheat )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")       /* 0x20 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")       /* Analog wheel 1 */
@@ -960,7 +960,7 @@ static INPUT_PORTS_START( brutforc )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")       /* 0x20 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")        /* 0x0E */
@@ -1005,14 +1005,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(leland_state::leland)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master", Z80, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(master_map_program)
-	MCFG_CPU_IO_MAP(master_map_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", leland_state,  leland_master_interrupt)
+	MCFG_DEVICE_ADD("master", Z80, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(master_map_program)
+	MCFG_DEVICE_IO_MAP(master_map_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", leland_state,  leland_master_interrupt)
 
-	MCFG_CPU_ADD("slave", Z80, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(slave_small_map_program)
-	MCFG_CPU_IO_MAP(slave_map_io)
+	MCFG_DEVICE_ADD("slave", Z80, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(slave_small_map_program)
+	MCFG_DEVICE_IO_MAP(slave_map_io)
 
 	MCFG_MACHINE_START_OVERRIDE(leland_state,leland)
 	MCFG_MACHINE_RESET_OVERRIDE(leland_state,leland)
@@ -1026,25 +1026,25 @@ MACHINE_CONFIG_START(leland_state::leland)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	// only one of the AY sockets is populated
-	MCFG_SOUND_ADD("ay8910", AY8910, 10000000/6)
+	MCFG_DEVICE_ADD("ay8910", AY8910, 10000000/6)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(1000, 0, 0)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(leland_state, leland_sound_port_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(leland_state, leland_sound_port_w))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, leland_state, leland_sound_port_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, leland_state, leland_sound_port_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-//  MCFG_SOUND_ADD("ay8912", AY8912, 10000000/6)
+//  MCFG_DEVICE_ADD("ay8912", AY8912, 10000000/6)
 //  MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 //  MCFG_AY8910_RES_LOADS(1000, 0, 0)
-//  MCFG_AY8910_PORT_A_READ_CB(READ8(leland_state, leland_sound_port_r))
-//  MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(leland_state, leland_sound_port_w))
+//  MCFG_AY8910_PORT_A_READ_CB(READ8(*this, leland_state, leland_sound_port_r))
+//  MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, leland_state, leland_sound_port_w))
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("dac0", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u79 + r17-r23 (24k,12k,6.2k,3k,1.5k,750,390,180)
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u88 + r27-r34 (24k,12k,6.2k,3k,1.5k,750,390,180)
+	MCFG_DEVICE_ADD("dac0", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u79 + r17-r23 (24k,12k,6.2k,3k,1.5k,750,390,180)
+	MCFG_DEVICE_ADD("dac1", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u88 + r27-r34 (24k,12k,6.2k,3k,1.5k,750,390,180)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1052,13 +1052,13 @@ MACHINE_CONFIG_START(leland_state::redline)
 	leland(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("master")
-	MCFG_CPU_IO_MAP(master_redline_map_io)
+	MCFG_DEVICE_MODIFY("master")
+	MCFG_DEVICE_IO_MAP(master_redline_map_io)
 
-	MCFG_CPU_ADD("audiocpu", I80186, MCU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(leland_80186_map_program)
-	MCFG_CPU_IO_MAP(redline_80186_map_io)
-	MCFG_80186_CHIP_SELECT_CB(DEVWRITE16("custom", leland_80186_sound_device, peripheral_ctrl))
+	MCFG_DEVICE_ADD("audiocpu", I80186, MCU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(leland_80186_map_program)
+	MCFG_DEVICE_IO_MAP(redline_80186_map_io)
+	MCFG_80186_CHIP_SELECT_CB(WRITE16("custom", leland_80186_sound_device, peripheral_ctrl))
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("custom", REDLINE_80186, 0)
@@ -1069,9 +1069,9 @@ MACHINE_CONFIG_START(leland_state::quarterb)
 	redline(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_IO_MAP(leland_80186_map_io)
-	MCFG_80186_TMROUT0_HANDLER(DEVWRITELINE("custom", leland_80186_sound_device, i80186_tmr0_w))
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_IO_MAP(leland_80186_map_io)
+	MCFG_80186_TMROUT0_HANDLER(WRITELINE("custom", leland_80186_sound_device, i80186_tmr0_w))
 
 	/* sound hardware */
 	MCFG_DEVICE_REPLACE("custom", LELAND_80186, 0)
@@ -1082,27 +1082,27 @@ MACHINE_CONFIG_START(leland_state::lelandi)
 	quarterb(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("slave")
-	MCFG_CPU_PROGRAM_MAP(slave_large_map_program)
+	MCFG_DEVICE_MODIFY("slave")
+	MCFG_DEVICE_PROGRAM_MAP(slave_large_map_program)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(leland_state::ataxx)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(master_map_program_2)
-	MCFG_CPU_IO_MAP(master_map_io_2)
+	MCFG_DEVICE_ADD("master", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(master_map_program_2)
+	MCFG_DEVICE_IO_MAP(master_map_io_2)
 
-	MCFG_CPU_ADD("slave", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(slave_map_program)
-	MCFG_CPU_IO_MAP(slave_map_io_2)
+	MCFG_DEVICE_ADD("slave", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(slave_map_program)
+	MCFG_DEVICE_IO_MAP(slave_map_io_2)
 
-	MCFG_CPU_ADD("audiocpu", I80186, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(leland_80186_map_program)
-	MCFG_CPU_IO_MAP(ataxx_80186_map_io)
-	MCFG_80186_CHIP_SELECT_CB(DEVWRITE16("custom", leland_80186_sound_device, peripheral_ctrl))
-	MCFG_80186_TMROUT0_HANDLER(DEVWRITELINE("custom", leland_80186_sound_device, i80186_tmr0_w))
+	MCFG_DEVICE_ADD("audiocpu", I80186, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(leland_80186_map_program)
+	MCFG_DEVICE_IO_MAP(ataxx_80186_map_io)
+	MCFG_80186_CHIP_SELECT_CB(WRITE16("custom", leland_80186_sound_device, peripheral_ctrl))
+	MCFG_80186_TMROUT0_HANDLER(WRITELINE("custom", leland_80186_sound_device, i80186_tmr0_w))
 
 	MCFG_MACHINE_START_OVERRIDE(leland_state,ataxx)
 	MCFG_MACHINE_RESET_OVERRIDE(leland_state,ataxx)
@@ -1122,8 +1122,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(leland_state::wsf)
 	ataxx(config);
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_80186_TMROUT1_HANDLER(DEVWRITELINE("custom", leland_80186_sound_device, i80186_tmr1_w))
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_80186_TMROUT1_HANDLER(WRITELINE("custom", leland_80186_sound_device, i80186_tmr1_w))
 
 	MCFG_DEVICE_REMOVE("custom")
 	MCFG_DEVICE_ADD("custom", WSF_80186, 0)

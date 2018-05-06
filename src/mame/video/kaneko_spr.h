@@ -125,7 +125,7 @@ private:
 //extern const device_type KANEKO16_SPRITE;
 
 #define MCFG_KANEKO16_SPRITE_GFXDECODE(_gfxtag) \
-	downcast<kaneko16_sprite_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<kaneko16_sprite_device &>(*device).set_gfxdecode_tag(_gfxtag);
 #define MCFG_KANEKO16_SPRITE_PRIORITIES(_pri0, _pri1, _pri2, _pri3) \
 	downcast<kaneko16_sprite_device &>(*device).set_priorities(_pri0, _pri1, _pri2, _pri3);
 #define MCFG_KANEKO16_SPRITE_OFFSETS(_xoffs, _yoffs) \

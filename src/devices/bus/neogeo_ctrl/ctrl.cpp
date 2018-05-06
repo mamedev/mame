@@ -115,18 +115,12 @@ void neogeo_control_port_device::device_start()
 
 uint8_t neogeo_control_port_device::read_ctrl()
 {
-	uint8_t data = 0xff;
-	if (m_device)
-		data &= m_device->read_ctrl();
-	return data;
+	return m_device ? m_device->read_ctrl() : 0xff;
 }
 
 uint8_t neogeo_control_port_device::read_start_sel()
 {
-	uint8_t data = 0xff;
-	if (m_device)
-		data &= m_device->read_start_sel();
-	return data;
+	return m_device ? m_device->read_start_sel() : 0xff;
 }
 
 
@@ -170,26 +164,17 @@ void neogeo_ctrl_edge_port_device::device_start()
 
 READ8_MEMBER(neogeo_ctrl_edge_port_device::in0_r)
 {
-	uint8_t data = 0xff;
-	if (m_device)
-		data &= m_device->in0_r(space, offset, mem_mask);
-	return data;
+	return m_device ? m_device->in0_r(space, offset, mem_mask) : 0xff;
 }
 
 READ8_MEMBER(neogeo_ctrl_edge_port_device::in1_r)
 {
-	uint8_t data = 0xff;
-	if (m_device)
-		data &= m_device->in1_r(space, offset, mem_mask);
-	return data;
+	return m_device ? m_device->in1_r(space, offset, mem_mask) : 0xff;
 }
 
 uint8_t neogeo_ctrl_edge_port_device::read_start_sel()
 {
-	uint8_t data = 0xff;
-	if (m_device)
-		data &= m_device->read_start_sel();
-	return data;
+	return m_device ? m_device->read_start_sel() : 0xff;
 }
 
 void neogeo_ctrl_edge_port_device::write_ctrlsel(uint8_t data)
@@ -204,22 +189,27 @@ void neogeo_ctrl_edge_port_device::write_ctrlsel(uint8_t data)
 //  SLOT_INTERFACE( neogeo_control_port_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( neogeo_controls )
-	SLOT_INTERFACE("joy",     NEOGEO_JOY)
-	SLOT_INTERFACE("mahjong", NEOGEO_MJCTRL)
-SLOT_INTERFACE_END
+void neogeo_controls(device_slot_interface &device)
+{
+	device.option_add("joy",     NEOGEO_JOY);
+	device.option_add("mahjong", NEOGEO_MJCTRL);
+}
 
-SLOT_INTERFACE_START( neogeo_arc_edge )
-	SLOT_INTERFACE("joy",     NEOGEO_JOY_AC)
-SLOT_INTERFACE_END
+void neogeo_arc_edge(device_slot_interface &device)
+{
+	device.option_add("joy",     NEOGEO_JOY_AC);
+}
 
-SLOT_INTERFACE_START( neogeo_arc_edge_fixed )
-	SLOT_INTERFACE("joy",     NEOGEO_JOY_AC)
-	SLOT_INTERFACE("dial",    NEOGEO_DIAL)
-	SLOT_INTERFACE("irrmaze", NEOGEO_IRRMAZE)
-	SLOT_INTERFACE("kiz4p",   NEOGEO_KIZ4P)
-SLOT_INTERFACE_END
+void neogeo_arc_edge_fixed(device_slot_interface &device)
+{
+	device.option_add("joy",     NEOGEO_JOY_AC);
+	device.option_add("dial",    NEOGEO_DIAL);
+	device.option_add("irrmaze", NEOGEO_IRRMAZE);
+	device.option_add("kiz4p",   NEOGEO_KIZ4P);
+}
 
-SLOT_INTERFACE_START( neogeo_arc_pin15 )
-	SLOT_INTERFACE("mahjong", NEOGEO_MJCTRL)
-SLOT_INTERFACE_END
+void neogeo_arc_pin15(device_slot_interface &device)
+{
+	device.option_add("mahjong", NEOGEO_MJCTRL_AC);
+	device.option_add("joy",     NEOGEO_JOY);
+}

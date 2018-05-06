@@ -14,7 +14,10 @@ Atari Sky Raider driver
 #include "screen.h"
 #include "speaker.h"
 
-
+void skyraid_state::machine_start()
+{
+	m_led.resolve();
+}
 
 PALETTE_INIT_MEMBER(skyraid_state, skyraid)
 {
@@ -222,9 +225,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(skyraid_state::skyraid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 12)
-	MCFG_CPU_PROGRAM_MAP(skyraid_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", skyraid_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 12)
+	MCFG_DEVICE_PROGRAM_MAP(skyraid_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skyraid_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 4)
@@ -246,7 +249,7 @@ MACHINE_CONFIG_START(skyraid_state::skyraid)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(skyraid)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

@@ -602,17 +602,17 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sidearms_state::sidearms)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(sidearms_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(sidearms_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(sidearms_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(sidearms_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -620,7 +620,7 @@ MACHINE_CONFIG_START(sidearms_state::sidearms)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sidearms)
@@ -633,14 +633,14 @@ MACHINE_CONFIG_START(sidearms_state::sidearms)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym2", YM2203, 4000000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -651,24 +651,24 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sidearms_state::turtship)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(turtship_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(turtship_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(sidearms_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* 4 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(sidearms_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -682,14 +682,14 @@ MACHINE_CONFIG_START(sidearms_state::turtship)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym2", YM2203, 4000000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -699,21 +699,21 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sidearms_state::whizz)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(whizz_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)        /* 4 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(whizz_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(whizz_sound_map)
-	MCFG_CPU_IO_MAP(whizz_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(whizz_sound_map)
+	MCFG_DEVICE_IO_MAP(whizz_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sidearms_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -721,7 +721,7 @@ MACHINE_CONFIG_START(sidearms_state::whizz)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turtship)
@@ -734,7 +734,7 @@ MACHINE_CONFIG_START(sidearms_state::whizz)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)

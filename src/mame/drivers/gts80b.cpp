@@ -31,6 +31,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_r0_sound(*this, "r0sound")
 		, m_r1_sound(*this, "r1sound")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(gts80b);
@@ -57,9 +58,11 @@ private:
 	bool m_in_cmd_mode[2];
 	uint8_t m_digit[2];
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	optional_device<gottlieb_sound_r0_device> m_r0_sound;
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
+	output_finder<40> m_digits;
 };
 
 void gts80b_state::gts80b_map(address_map &map)
@@ -347,7 +350,7 @@ WRITE8_MEMBER( gts80b_state::port2b_w )
 			{ // display a character
 				segment = patterns[m_dispcmd & 0x7f]; // ignore blank/inverse bit
 				segment = bitswap<16>(segment, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 3, 2, 1, 0, 0);
-				output().set_digit_value(m_digit[i]+i*20, segment);
+				m_digits[m_digit[i]+i*20] = segment;
 				m_digit[i]++; // auto-increment pointer
 				if (m_digit[i] > 19) m_digit[i] = 0; // check for overflow
 			}
@@ -384,8 +387,8 @@ DRIVER_INIT_MEMBER( gts80b_state, gts80b )
 /* with Sound Board */
 MACHINE_CONFIG_START(gts80b_state::gts80b)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(3'579'545)/4)
-	MCFG_CPU_PROGRAM_MAP(gts80b_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(3'579'545)/4)
+	MCFG_DEVICE_PROGRAM_MAP(gts80b_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram") // must be 1
 
@@ -394,22 +397,22 @@ MACHINE_CONFIG_START(gts80b_state::gts80b)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("riot1", RIOT6532, XTAL(3'579'545)/4)
-	MCFG_RIOT6532_IN_PA_CB(READ8(gts80b_state, port1a_r)) // sw_r
-	//MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80b_state, port1a_w))
-	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80b_state, port1b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80b_state, port1b_w)) // sw_w
+	MCFG_RIOT6532_IN_PA_CB(READ8(*this, gts80b_state, port1a_r)) // sw_r
+	//MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, gts80b_state, port1a_w))
+	//MCFG_RIOT6532_IN_PB_CB(READ8(*this, gts80b_state, port1b_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gts80b_state, port1b_w)) // sw_w
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 	MCFG_DEVICE_ADD("riot2", RIOT6532, XTAL(3'579'545)/4)
-	MCFG_RIOT6532_IN_PA_CB(READ8(gts80b_state, port2a_r)) // pa7 - slam tilt
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80b_state, port2a_w)) // digit select
-	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80b_state, port2b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80b_state, port2b_w)) // seg
+	MCFG_RIOT6532_IN_PA_CB(READ8(*this, gts80b_state, port2a_r)) // pa7 - slam tilt
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, gts80b_state, port2a_w)) // digit select
+	//MCFG_RIOT6532_IN_PB_CB(READ8(*this, gts80b_state, port2b_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gts80b_state, port2b_w)) // seg
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 	MCFG_DEVICE_ADD("riot3", RIOT6532, XTAL(3'579'545)/4)
-	//MCFG_RIOT6532_IN_PA_CB(READ8(gts80b_state, port3a_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(gts80b_state, port3a_w)) // sol, snd
-	//MCFG_RIOT6532_IN_PB_CB(READ8(gts80b_state, port3b_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(gts80b_state, port3b_w)) // lamps
+	//MCFG_RIOT6532_IN_PA_CB(READ8(*this, gts80b_state, port3a_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, gts80b_state, port3a_w)) // sol, snd
+	//MCFG_RIOT6532_IN_PB_CB(READ8(*this, gts80b_state, port3b_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, gts80b_state, port3b_w)) // lamps
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	/* Sound */
@@ -419,14 +422,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gts80b_state::gts80b_s)
 	gts80b(config);
-	MCFG_SOUND_ADD("r0sound", GOTTLIEB_SOUND_REV0, 0)
+	MCFG_DEVICE_ADD("r0sound", GOTTLIEB_SOUND_REV0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 //static MACHINE_CONFIG_START( gts80b_ss )
 //static    gts80b(config);
-//  MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
-//  //MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)  // votrax crashes
+//  MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1)
+//  //MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX0)  // votrax crashes
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 //MACHINE_CONFIG_END
 

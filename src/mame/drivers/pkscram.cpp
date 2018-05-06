@@ -198,7 +198,7 @@ static INPUT_PORTS_START( pkscramble )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // Center
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) // Right
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_SPECIAL ) // Hopper status
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_CUSTOM ) // Hopper status
 	PORT_DIPNAME( 0x0040, 0x0000, "Coin Test" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
@@ -305,9 +305,9 @@ void pkscram_state::machine_reset()
 
 MACHINE_CONFIG_START(pkscram_state::pkscramble)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000 )
-	MCFG_CPU_PROGRAM_MAP(pkscramble_map)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", pkscram_state,  irq1_line_hold) /* only valid irq */
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000 )
+	MCFG_DEVICE_PROGRAM_MAP(pkscramble_map)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pkscram_state,  irq1_line_hold) /* only valid irq */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -331,8 +331,8 @@ MACHINE_CONFIG_START(pkscram_state::pkscramble)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000/4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(pkscram_state, irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 12000000/4)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, pkscram_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

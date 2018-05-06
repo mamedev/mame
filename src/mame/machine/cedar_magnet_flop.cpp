@@ -51,7 +51,7 @@ READ8_MEMBER(cedar_magnet_flop_device::port63_r)
 {
 	uint8_t ret = machine().rand();
 
-	// printf("%s: port63_r (DATA) (%02x)\n", machine().describe_context(), ret);
+	// printf("%s: port63_r (DATA) (%02x)\n", machine().describe_context().c_str(), ret);
 
 	if ((m_flopcmd&0xf0) == 0x90) // reading data
 	{
@@ -103,7 +103,7 @@ READ8_MEMBER(cedar_magnet_flop_device::port63_r)
 
 WRITE8_MEMBER(cedar_magnet_flop_device::port60_w)
 {
-	//printf("%s: port60_w (COMMAND) %02x\n", machine().describe_context(), data);
+	//printf("%s: port60_w (COMMAND) %02x\n", machine().describe_context().c_str(), data);
 	m_flopcmd = data;
 
 
@@ -150,7 +150,7 @@ WRITE8_MEMBER(cedar_magnet_flop_device::port60_w)
 
 WRITE8_MEMBER(cedar_magnet_flop_device::port62_w)
 {
-	//printf("%s: port62_w (SECTOR) %02x\n", machine().describe_context(), data);
+	//printf("%s: port62_w (SECTOR) %02x\n", machine().describe_context().c_str(), data);
 	m_flopsec = data;
 
 	if (m_flopsec < 200)
@@ -163,7 +163,7 @@ WRITE8_MEMBER(cedar_magnet_flop_device::port62_w)
 
 WRITE8_MEMBER(cedar_magnet_flop_device::port63_w)
 {
-	//printf("%s: port63_w (DATA) %02x\n", machine().describe_context(), data);
+	//printf("%s: port63_w (DATA) %02x\n", machine().describe_context().c_str(), data);
 	m_flopdat = data;
 
 	if ((m_flopcmd & 0xf0) == 0xb0) // writing data

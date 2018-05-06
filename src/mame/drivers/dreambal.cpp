@@ -199,7 +199,7 @@ static INPUT_PORTS_START( dreambal )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("DSW")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -310,9 +310,9 @@ void dreambal_state::machine_reset()
 MACHINE_CONFIG_START(dreambal_state::dreambal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
-	MCFG_CPU_PROGRAM_MAP(dreambal_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreambal_state,  irq6_line_hold) // 5 valid too?
+	MCFG_DEVICE_ADD("maincpu", M68000, 28000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(dreambal_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreambal_state,  irq6_line_hold) // 5 valid too?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

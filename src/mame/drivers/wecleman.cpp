@@ -755,7 +755,7 @@ static INPUT_PORTS_START( wecleman )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Right SW")  // right sw
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Left SW")  // left sw
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Thermo SW")  // thermo
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   // from sound cpu ?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   // from sound cpu ?
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSWA")  /* $140015.b */
@@ -852,8 +852,8 @@ static INPUT_PORTS_START( hotchase )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Right SW")   // right sw
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Left SW")  // left sw
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Thermo SW")  // thermo
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // from sound cpu
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wecleman_state,hotchase_sound_status_r, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // from sound cpu
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wecleman_state,hotchase_sound_status_r, nullptr)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW2")  /* $140015.b */
@@ -1030,29 +1030,34 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-
-MACHINE_RESET_MEMBER(wecleman_state,wecleman)
+MACHINE_RESET_MEMBER(wecleman_state, wecleman)
 {
 	m_k007232[0]->set_bank( 0, 1 );
+}
+
+MACHINE_START_MEMBER(wecleman_state, wecleman)
+{
+	m_led.resolve();
 }
 
 MACHINE_CONFIG_START(wecleman_state::wecleman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* Schems show 10MHz */
-	MCFG_CPU_PROGRAM_MAP(wecleman_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* Schems show 10MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wecleman_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wecleman_state, wecleman_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M68000, 10000000)   /* Schems show 10MHz */
-	MCFG_CPU_PROGRAM_MAP(wecleman_sub_map)
+	MCFG_DEVICE_ADD("sub", M68000, 10000000)   /* Schems show 10MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wecleman_sub_map)
 
 	/* Schems: can be reset, no nmi, soundlatch, 3.58MHz */
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(wecleman_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
+	MCFG_DEVICE_PROGRAM_MAP(wecleman_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state,wecleman)
+	MCFG_MACHINE_START_OVERRIDE(wecleman_state, wecleman)
+	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, wecleman)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1073,12 +1078,12 @@ MACHINE_CONFIG_START(wecleman_state::wecleman)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.85)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.85)
 
-	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(wecleman_state, wecleman_volume_callback))
+	MCFG_DEVICE_ADD("k007232_1", K007232, 3579545)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, wecleman_state, wecleman_volume_callback))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
@@ -1093,7 +1098,12 @@ INTERRUPT_GEN_MEMBER(wecleman_state::hotchase_sound_timer)
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-MACHINE_RESET_MEMBER(wecleman_state,hotchase)
+MACHINE_START_MEMBER(wecleman_state, hotchase)
+{
+	m_led.resolve();
+}
+
+MACHINE_RESET_MEMBER(wecleman_state, hotchase)
 {
 	int i;
 
@@ -1110,20 +1120,21 @@ MACHINE_RESET_MEMBER(wecleman_state,hotchase)
 MACHINE_CONFIG_START(wecleman_state::hotchase)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
-	MCFG_CPU_PROGRAM_MAP(hotchase_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
+	MCFG_DEVICE_PROGRAM_MAP(hotchase_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wecleman_state, hotchase_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
-	MCFG_CPU_PROGRAM_MAP(hotchase_sub_map)
+	MCFG_DEVICE_ADD("sub", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
+	MCFG_DEVICE_PROGRAM_MAP(hotchase_sub_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, 3579545 / 2)    /* 3.579/2 MHz - PCB is drawn in one set's readme */
-	MCFG_CPU_PROGRAM_MAP(hotchase_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(wecleman_state, hotchase_sound_timer,  496)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3579545 / 2)    /* 3.579/2 MHz - PCB is drawn in one set's readme */
+	MCFG_DEVICE_PROGRAM_MAP(hotchase_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(wecleman_state, hotchase_sound_timer,  496)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state,hotchase)
+	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, hotchase)
+	MCFG_MACHINE_START_OVERRIDE(wecleman_state, hotchase)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1155,17 +1166,17 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
+	MCFG_DEVICE_ADD("k007232_1", K007232, 3579545)
 	// SLEV not used, volume control is elsewhere
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MCFG_SOUND_ADD("k007232_2", K007232, 3579545)
+	MCFG_DEVICE_ADD("k007232_2", K007232, 3579545)
 	// SLEV not used, volume control is elsewhere
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MCFG_SOUND_ADD("k007232_3", K007232, 3579545)
+	MCFG_DEVICE_ADD("k007232_3", K007232, 3579545)
 	// SLEV not used, volume control is elsewhere
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)

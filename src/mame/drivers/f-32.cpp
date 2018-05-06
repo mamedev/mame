@@ -149,7 +149,7 @@ static INPUT_PORTS_START( mosaicf2 )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
@@ -167,10 +167,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(mosaicf2_state::mosaicf2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E132XN, XTAL(20'000'000)*4) /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(common_map)
-	MCFG_CPU_IO_MAP(mosaicf2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", E132XN, XTAL(20'000'000)*4) /* 4x internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(common_map)
+	MCFG_DEVICE_IO_MAP(mosaicf2_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq0_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
@@ -190,7 +190,7 @@ MACHINE_CONFIG_START(mosaicf2_state::mosaicf2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -209,7 +209,7 @@ static INPUT_PORTS_START( royalpk2 )
 	PORT_BIT( 0xff7fffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
@@ -245,10 +245,10 @@ void mosaicf2_state::royalpk2_io(address_map &map)
 MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", GMS30C2132, XTAL(50'000'000))
-	MCFG_CPU_PROGRAM_MAP(royalpk2_map)
-	MCFG_CPU_IO_MAP(royalpk2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", GMS30C2132, XTAL(50'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(royalpk2_map)
+	MCFG_DEVICE_IO_MAP(royalpk2_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq1_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
@@ -268,7 +268,7 @@ MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-//  MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* 3.579545 MHz */
+//  MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 //  MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -339,7 +339,7 @@ L00-L03 & U00-U03 are 29F1610ML Flash roms
 todo: royalpk2 layout (it's very different)
 */
 
-ROM_START( mosaicf2 )
+ROM_START( mosaicf2 ) /* Released October 1999 */
 	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* 0 - 0x80000 empty */
 	ROM_LOAD( "rom1.bin",            0x80000, 0x080000, CRC(fceb6f83) SHA1(b98afb477627c3b2d584c0f0fb26c4dd5b1a31e2) )

@@ -1894,10 +1894,13 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			}
 			break;
 
-		case 0x80: // ldob
+		case 0x80: { // ldob
 			m_icount -= 4;
-			m_r[(opcode>>19)&0x1f] = m_program->read_byte(get_ea(opcode));
+			u8 v = m_program->read_byte(get_ea(opcode));
+			if(!m_stalled)
+				m_r[(opcode>>19)&0x1f] = v;
 			break;
+		}
 
 		case 0x82: // stob
 			m_icount -= 2;
@@ -1921,10 +1924,13 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			do_call(t1, 0, m_r[I960_SP]);
 			break;
 
-		case 0x88: // ldos
+		case 0x88: { // ldos
 			m_icount -= 4;
-			m_r[(opcode>>19)&0x1f] = i960_read_word_unaligned(get_ea(opcode));
+			u16 v = i960_read_word_unaligned(get_ea(opcode));
+			if(!m_stalled)
+				m_r[(opcode>>19)&0x1f] = v;
 			break;
+		}
 
 		case 0x8a: // stos
 			m_icount -= 2;
@@ -1936,10 +1942,13 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			m_r[(opcode>>19)&0x1f] = get_ea(opcode);
 			break;
 
-		case 0x90: // ld
+		case 0x90: { // ld
 			m_icount -= 4;
-			m_r[(opcode>>19)&0x1f] = i960_read_dword_unaligned(get_ea(opcode));
+			u32 v = i960_read_dword_unaligned(get_ea(opcode));
+			if(!m_stalled)
+				m_r[(opcode>>19)&0x1f] = v;
 			break;
+		}
 
 		case 0x92: // st
 			m_icount -= 2;
@@ -1953,12 +1962,13 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			t2 = (opcode>>19)&0x1e;
 			m_bursting = 1;
 			for(i=0; i<2; i++) {
-				m_r[t2+i] = i960_read_dword_unaligned(t1);
+				u32 v = i960_read_dword_unaligned(t1);
 				if(m_stalled)
 				{
 					burst_stall_save(t1,t2,i,2,false);
 					return;
 				}
+				m_r[t2+i] = v;
 				if(m_bursting)
 					t1 += 4;
 			}
@@ -1991,12 +2001,13 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			t2 = (opcode>>19)&0x1c;
 			m_bursting = 1;
 			for(i=0; i<3; i++) {
-				m_r[t2+i] = i960_read_dword_unaligned(t1);
+				u32 v = i960_read_dword_unaligned(t1);
 				if(m_stalled)
 				{
 					burst_stall_save(t1,t2,i,3,false);
 					return;
 				}
+				m_r[t2+i] = v;
 				if(m_bursting)
 					t1 += 4;
 			}
@@ -2029,12 +2040,13 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			t2 = (opcode>>19)&0x1c;
 			m_bursting = 1;
 			for(i=0; i<4; i++) {
-				m_r[t2+i] = i960_read_dword_unaligned(t1);
+				u32 v = i960_read_dword_unaligned(t1);
 				if(m_stalled)
 				{
 					burst_stall_save(t1,t2,i,4,false);
 					return;
 				}
+				m_r[t2+i] = v;
 				if(m_bursting)
 					t1 += 4;
 			}
@@ -2060,20 +2072,26 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			break;
 		}
 
-		case 0xc0: // ldib
+		case 0xc0: { // ldib
 			m_icount -= 4;
-			m_r[(opcode>>19)&0x1f] = (int8_t)m_program->read_byte(get_ea(opcode));
+			s8 v = m_program->read_byte(get_ea(opcode));
+			if(!m_stalled)
+				m_r[(opcode>>19)&0x1f] = v;
 			break;
+		}
 
 		case 0xc2: // stib
 			m_icount -= 2;
 			m_program->write_byte(get_ea(opcode), m_r[(opcode>>19)&0x1f]);
 			break;
 
-		case 0xc8: // ldis
+		case 0xc8: { // ldis
 			m_icount -= 4;
-			m_r[(opcode>>19)&0x1f] = (int16_t)i960_read_word_unaligned(get_ea(opcode));
+			s16 v = i960_read_word_unaligned(get_ea(opcode));
+			if(!m_stalled)
+				m_r[(opcode>>19)&0x1f] = v;
 			break;
+		}
 
 		case 0xca: // stis
 			m_icount -= 2;

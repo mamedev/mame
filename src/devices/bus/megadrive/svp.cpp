@@ -96,7 +96,7 @@ uint32_t md_rom_svp_device::pm_io(int reg, int write, uint32_t d)
 	if (m_emu_status & SSP_PMC_HAVE_ADDR)
 		m_emu_status &= ~SSP_PMC_HAVE_ADDR;
 
-	if (reg == 4 || (m_svp->state().state_int(SSP_ST) & 0x60))
+	if (reg == 4 || (m_svp->state_int(SSP_ST) & 0x60))
 	{
 #define CADDR ((((mode<<16)&0x7f0000)|addr)<<1)
 		uint16_t *dram = (uint16_t *)m_dram;
@@ -348,9 +348,9 @@ void md_rom_svp_device::md_svp_ext_map(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(md_rom_svp_device::device_add_mconfig)
-	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
-	MCFG_CPU_PROGRAM_MAP(md_svp_ssp_map)
-	MCFG_CPU_IO_MAP(md_svp_ext_map)
+	MCFG_DEVICE_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
+	MCFG_DEVICE_PROGRAM_MAP(md_svp_ssp_map)
+	MCFG_DEVICE_IO_MAP(md_svp_ext_map)
 MACHINE_CONFIG_END
 
 ioport_constructor md_rom_svp_device::device_input_ports() const

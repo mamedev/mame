@@ -989,7 +989,7 @@ WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 	}
 	else //compatible mode
 	{
-		switch (data & 0x0300)
+		switch (offset & 0x0300)
 		{
 		case 0x0000:
 			x1_pal_b_w(space, offset & 0x00ff, data);
@@ -2194,15 +2194,16 @@ FLOPPY_FORMATS_MEMBER( x1_state::floppy_formats )
 	FLOPPY_2D_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( x1_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void x1_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(x1_state::x1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("x1_cpu", Z80, MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(x1_mem)
-	MCFG_CPU_IO_MAP(x1_io)
+	MCFG_DEVICE_ADD("x1_cpu", Z80, MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(x1_mem)
+	MCFG_DEVICE_IO_MAP(x1_io)
 	MCFG_Z80_DAISY_CHAIN(x1_daisy)
 
 	MCFG_DEVICE_ADD("iobank", ADDRESS_MAP_BANK, 0)
@@ -2214,19 +2215,19 @@ MACHINE_CONFIG_START(x1_state::x1)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc", z80ctc_device, trg2))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc", z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(x1_state, x1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(x1_state, x1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(x1_state, x1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(x1_state, x1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(x1_state, x1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(x1_state, x1_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, x1_state, x1_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, x1_state, x1_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, x1_state, x1_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, x1_state, x1_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, x1_state, x1_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, x1_state, x1_portc_w))
 
 	MCFG_MACHINE_START_OVERRIDE(x1_state,x1)
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1)
@@ -2252,7 +2253,7 @@ MACHINE_CONFIG_START(x1_state::x1)
 
 	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
 	// TODO: guesswork, try to implicitily start the motor
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(x1_state, hdl_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, x1_state, hdl_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)
@@ -2267,7 +2268,7 @@ MACHINE_CONFIG_START(x1_state::x1)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
-	MCFG_SOUND_ADD("ay", AY8910, MAIN_CLOCK/8)
+	MCFG_DEVICE_ADD("ay", AY8910, MAIN_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
@@ -2291,8 +2292,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(x1_state::x1turbo)
 	x1(config);
-	MCFG_CPU_MODIFY("x1_cpu")
-	MCFG_CPU_PROGRAM_MAP(x1turbo_mem)
+	MCFG_DEVICE_MODIFY("x1_cpu")
+	MCFG_DEVICE_PROGRAM_MAP(x1turbo_mem)
 	MCFG_Z80_DAISY_CHAIN(x1turbo_daisy)
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1turbo)
 
@@ -2305,15 +2306,15 @@ MACHINE_CONFIG_START(x1_state::x1turbo)
 	MCFG_DEVICE_ADD("dma", Z80DMA, MAIN_CLOCK/4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("x1_cpu", INPUT_LINE_HALT))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(x1_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(x1_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(x1_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(x1_state, io_write_byte))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, x1_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, x1_state, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, x1_state, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, x1_state, io_write_byte))
 
 	MCFG_DEVICE_MODIFY("fdc")
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(x1_state, fdc_drq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, x1_state, fdc_drq_w))
 
-	MCFG_YM2151_ADD("ym", MAIN_CLOCK/8) //option board
+	MCFG_DEVICE_ADD("ym", YM2151, MAIN_CLOCK/8) //option board
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker",  0.50)
 MACHINE_CONFIG_END

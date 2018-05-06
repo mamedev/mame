@@ -706,7 +706,7 @@ INPUT_PORTS_START( igrosoft_gamble )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED ) // unused?
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_DIPNAME(     0x02, 0x02, "BK Door (17 A)"  )
 	PORT_DIPSETTING(  0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00, DEF_STR( On ) )
@@ -799,7 +799,7 @@ static INPUT_PORTS_START( rollfr )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_DIPNAME(     0x02, 0x02, "BK Door (17 A)"  )
 	PORT_DIPSETTING(  0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00, DEF_STR( On ) )
@@ -1025,10 +1025,10 @@ void igrosoft_gamble_state::machine_reset()
 
 MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(igrosoft_gamble_map)
-	MCFG_CPU_IO_MAP(igrosoft_gamble_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", igrosoft_gamble_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(igrosoft_gamble_map)
+	MCFG_DEVICE_IO_MAP(igrosoft_gamble_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igrosoft_gamble_state, irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1046,7 +1046,7 @@ MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 6000000/4)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 6000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_M48T35_ADD( "m48t35" )
@@ -1055,8 +1055,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igrosoft_gamble_state::rollfr)
 	igrosoft_gamble(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(rollfr_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(rollfr_portmap)
 MACHINE_CONFIG_END
 
 

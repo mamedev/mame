@@ -25,11 +25,12 @@
 #include "xmlfile.h"
 
 #include <ctype.h>
+#include <cstring>
 #include <map>
 
 
-#define XML_ROOT                "mame"
-#define XML_TOP                 "machine"
+#define XML_ROOT    "mame"
+#define XML_TOP     "machine"
 
 
 //**************************************************************************
@@ -562,15 +563,8 @@ void info_xml_creator::output_one_device(machine_config &config, device_t &devic
 
 
 //-------------------------------------------------
-//  output_devices - print the XML info for devices
-//  with roms and for devices that can be mounted
-//  in slots
-//  The current solution works to some extent, but
-//  it is limited by the fact that devices are only
-//  acknowledged when attached to a driver (so that
-//  for instance sub-sub-devices could never appear
-//  in the xml input if they are not also attached
-//  directly to a driver as device or sub-device)
+//  output_devices - print the XML info for
+//  registered device types
 //-------------------------------------------------
 
 void info_xml_creator::output_devices(device_type_set const *filter)
@@ -581,7 +575,11 @@ void info_xml_creator::output_devices(device_type_set const *filter)
 	auto const action = [this, &config] (device_type type)
 			{
 				// add it at the root of the machine config
-				device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+				device_t *dev;
+				{
+					machine_config::token const tok(config.begin_configuration(config.root_device()));
+					dev = config.device_add("_tmp", type, 0);
+				}
 
 				// notify this device and all its subdevices that they are now configured
 				for (device_t &device : device_iterator(*dev))
@@ -590,7 +588,8 @@ void info_xml_creator::output_devices(device_type_set const *filter)
 
 				// print details and remove it
 				output_one_device(config, *dev, dev->tag());
-				config.device_remove(&config.root_device(), "_tmp");
+				machine_config::token const tok(config.begin_configuration(config.root_device()));
+				config.device_remove("_tmp");
 			};
 
 	// run through devices
@@ -1755,6 +1754,7 @@ void info_xml_creator::output_slots(machine_config &config, device_t &device, co
 
 		if (devtypes || listed)
 		{
+			machine_config::token const tok(config.begin_configuration(slot.device()));
 			std::string newtag(slot.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
@@ -1766,7 +1766,7 @@ void info_xml_creator::output_slots(machine_config &config, device_t &device, co
 			{
 				if (devtypes || (listed && option.second->selectable()))
 				{
-					device_t *const dev = config.device_add(&slot.device(), "_dummy", option.second->devtype(), option.second->clock());
+					device_t *const dev = config.device_add("_dummy", option.second->devtype(), option.second->clock());
 					if (!dev->configured())
 						dev->config_complete();
 
@@ -1782,7 +1782,7 @@ void info_xml_creator::output_slots(machine_config &config, device_t &device, co
 						fprintf(m_output, "/>\n");
 					}
 
-					config.device_remove(&slot.device(), "_dummy");
+					config.device_remove("_dummy");
 				}
 			}
 
@@ -1818,25 +1818,29 @@ void info_xml_creator::output_software_list(device_t &root)
 
 void info_xml_creator::output_ramoptions(device_t &root)
 {
-	for (const ram_device &ram : ram_device_iterator(root))
+	for (const ram_device &ram : ram_device_iterator(root, 1))
 	{
-		uint32_t const defsize(ram.default_size());
-		bool havedefault(false);
-		for (ram_device::extra_option const &option : ram.extra_options())
+		if (!std::strcmp(ram.tag(), ":" RAM_TAG))
 		{
-			if (defsize == option.second)
+			uint32_t const defsize(ram.default_size());
+			bool havedefault(false);
+			for (ram_device::extra_option const &option : ram.extra_options())
 			{
-				assert(!havedefault);
-				havedefault = true;
-				fprintf(m_output, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", util::xml::normalize_string(option.first.c_str()), option.second);
+				if (defsize == option.second)
+				{
+					assert(!havedefault);
+					havedefault = true;
+					fprintf(m_output, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", util::xml::normalize_string(option.first.c_str()), option.second);
+				}
+				else
+				{
+					fprintf(m_output, "\t\t<ramoption name=\"%s\">%u</ramoption>\n", util::xml::normalize_string(option.first.c_str()), option.second);
+				}
 			}
-			else
-			{
-				fprintf(m_output, "\t\t<ramoption name=\"%s\">%u</ramoption>\n", util::xml::normalize_string(option.first.c_str()), option.second);
-			}
+			if (!havedefault)
+				fprintf(m_output, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", ram.default_size_string(), defsize);
+			break;
 		}
-		if (!havedefault)
-			fprintf(m_output, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", ram.default_size_string(), defsize);
 	}
 }
 

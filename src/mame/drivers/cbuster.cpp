@@ -308,12 +308,12 @@ void cbuster_state::machine_reset()
 MACHINE_CONFIG_START(cbuster_state::twocrude)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* Custom chip 59 @ 12MHz Verified */
-	MCFG_CPU_PROGRAM_MAP(twocrude_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cbuster_state,  irq4_line_assert)/* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* Custom chip 59 @ 12MHz Verified */
+	MCFG_DEVICE_PROGRAM_MAP(twocrude_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cbuster_state,  irq4_line_assert)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(24'000'000)/4) /* Custom chip 45, 6MHz Verified */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(24'000'000)/4) /* Custom chip 45, 6MHz Verified */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -326,7 +326,8 @@ MACHINE_CONFIG_START(cbuster_state::twocrude)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -371,10 +372,10 @@ MACHINE_CONFIG_START(cbuster_state::twocrude)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	// YM2203_PITCH_HACK - Pitch is too low at 1.3425MHz (see also stfight.cpp)
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000)/24 * 3) /* 1.3425MHz Verified */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/24 * 3) /* 1.3425MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_YM2151_ADD("ym2", XTAL(32'220'000)/9) /* 3.58MHz Verified */
+	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000)/9) /* 3.58MHz Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 

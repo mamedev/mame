@@ -458,12 +458,11 @@ void flyball_state::machine_reset()
 MACHINE_CONFIG_START(flyball_state::flyball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(flyball_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flyball_state, nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/16)
+	MCFG_DEVICE_PROGRAM_MAP(flyball_map)
 
 	MCFG_DEVICE_ADD("outlatch", F9334, 0) // F7
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(flyball_state, lamp_w)) // 1 player lamp
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, flyball_state, lamp_w)) // 1 player lamp
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // crowd very loud
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // footstep off-on
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // crowd off-on
@@ -477,6 +476,7 @@ MACHINE_CONFIG_START(flyball_state::flyball)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(flyball_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flyball)
 	MCFG_PALETTE_ADD("palette", 4)

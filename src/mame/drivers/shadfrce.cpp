@@ -440,7 +440,7 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("MISC")  /* Fake IN5 (misc) */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )            /* guess */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )            /* guess */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* must be ACTIVE_LOW or 'shadfrcj' jumps to the end (code at 0x04902e) */
 	PORT_BIT( 0xeb, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -537,19 +537,19 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(shadfrce_state::shadfrce)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000) / 2)          /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(shadfrce_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)          /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(shadfrce_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", shadfrce_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))         /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(shadfrce_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))         /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(shadfrce_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(shadfrce_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, shadfrce_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shadfrce)
@@ -562,7 +562,7 @@ MACHINE_CONFIG_START(shadfrce_state::shadfrce)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))      /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))      /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)

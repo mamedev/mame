@@ -656,19 +656,19 @@ WRITE8_MEMBER(rbisland_state::counters_w)
 MACHINE_CONFIG_START(rbisland_state::rbisland)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rbisland_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rbisland_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbisland_state,  interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rbisland_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rbisland_sound_map)
 
 	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)) /* 12MHz OSC next to C-Chip */
 	MCFG_CCHIP_IN_PORTA_CB(IOPORT("800007"))
 	MCFG_CCHIP_IN_PORTB_CB(IOPORT("800009"))
 	MCFG_CCHIP_IN_PORTC_CB(IOPORT("80000B"))
 	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("80000D"))
-	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(rbisland_state, counters_w))
+	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(*this, rbisland_state, counters_w))
 
 	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", rbisland_state, cchip_irq_clear_cb)
 
@@ -698,9 +698,9 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(rbisland_state,bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, rbisland_state,bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
@@ -714,12 +714,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(rbisland_state::jumping)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'432'000)/2)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(jumping_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(18'432'000)/2)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(jumping_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(jumping_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(jumping_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough unless otherwise */
 
@@ -747,19 +747,19 @@ MACHINE_CONFIG_START(rbisland_state::jumping)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(24'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(24'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(24'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(24'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 /* Imnoe PCB uses 16MHz CPU crystal instead of 18.432 for CPU */
 MACHINE_CONFIG_START(rbisland_state::jumpingi)
 	jumping(config);
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(16'000'000)/2)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(jumping_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(16'000'000)/2)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(jumping_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)
 MACHINE_CONFIG_END
 
 /***************************************************************************

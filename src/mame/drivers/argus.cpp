@@ -273,10 +273,11 @@ void argus_state::sound_map_b(address_map &map)
 }
 
 #if 0
-ADDRESS_MAP_START(argus_state::sound_portmap_1)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-ADDRESS_MAP_END
+void argus_state::sound_portmap_1(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 #endif
 
 void argus_state::sound_portmap_2(address_map &map)
@@ -539,13 +540,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(argus_state::argus)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(argus_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)           /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(argus_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", argus_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 5000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map_a)
-	MCFG_CPU_IO_MAP(sound_portmap_2)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 5000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map_a)
+	MCFG_DEVICE_IO_MAP(sound_portmap_2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -570,14 +571,14 @@ MACHINE_CONFIG_START(argus_state::argus)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 6000000 / 4)
+	MCFG_DEVICE_ADD("ym1", YM2203, 6000000 / 4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 6000000 / 4)
+	MCFG_DEVICE_ADD("ym2", YM2203, 6000000 / 4)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -587,13 +588,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(argus_state::valtric)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
-	MCFG_CPU_PROGRAM_MAP(valtric_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(valtric_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", argus_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 5000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map_a)
-	MCFG_CPU_IO_MAP(sound_portmap_2)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 5000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map_a)
+	MCFG_DEVICE_IO_MAP(sound_portmap_2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -618,14 +619,14 @@ MACHINE_CONFIG_START(argus_state::valtric)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 6000000 / 4)
+	MCFG_DEVICE_ADD("ym1", YM2203, 6000000 / 4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 6000000 / 4)
+	MCFG_DEVICE_ADD("ym2", YM2203, 6000000 / 4)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -635,13 +636,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(argus_state::butasan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
-	MCFG_CPU_PROGRAM_MAP(butasan_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(butasan_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", argus_state, butasan_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 5000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map_b)
-	MCFG_CPU_IO_MAP(sound_portmap_2)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 5000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map_b)
+	MCFG_DEVICE_IO_MAP(sound_portmap_2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -666,14 +667,14 @@ MACHINE_CONFIG_START(argus_state::butasan)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 6000000 / 4)
+	MCFG_DEVICE_ADD("ym1", YM2203, 6000000 / 4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 	MCFG_SOUND_ROUTE(2, "mono", 0.30)
 	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 6000000 / 4)
+	MCFG_DEVICE_ADD("ym2", YM2203, 6000000 / 4)
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 	MCFG_SOUND_ROUTE(2, "mono", 0.30)

@@ -47,30 +47,28 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_int_ack_w)
 
 WRITE8_MEMBER(sspeedr_state::sspeedr_lamp_w)
 {
-	output().set_value("lampGO", (data >> 0) & 1);
-	output().set_value("lampEP", (data >> 1) & 1);
+	output().set_value("lampGO", BIT(data, 0));
+	output().set_value("lampEP", BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, data & 8);
 }
 
 
 /* uses a 7447A, which is equivalent to an LS47/48 */
-static const uint8_t ls48_map[16] =
+constexpr uint8_t ls48_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 WRITE8_MEMBER(sspeedr_state::sspeedr_time_w)
 {
 	data = data & 15;
-	output().set_digit_value(0x18 + offset, ls48_map[data]);
+	m_digits[24 + offset] = ls48_map[data];
 	m_led_TIME[offset] = data;
 }
 
 
 WRITE8_MEMBER(sspeedr_state::sspeedr_score_w)
 {
-	char buf[20];
-	sprintf(buf, "LED%02d", offset);
 	data = ~data & 15;
-	output().set_digit_value(offset, ls48_map[data]);
+	m_digits[offset] = ls48_map[data];
 	m_led_SCORE[offset] = data;
 }
 
@@ -195,10 +193,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sspeedr_state::sspeedr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(19'968'000)/8)
-	MCFG_CPU_PROGRAM_MAP(sspeedr_map)
-	MCFG_CPU_IO_MAP(sspeedr_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sspeedr_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(19'968'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(sspeedr_map)
+	MCFG_DEVICE_IO_MAP(sspeedr_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sspeedr_state,  irq0_line_assert)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -209,7 +207,7 @@ MACHINE_CONFIG_START(sspeedr_state::sspeedr)
 	MCFG_SCREEN_SIZE(376, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 375, 0, 247)
 	MCFG_SCREEN_UPDATE_DRIVER(sspeedr_state, screen_update_sspeedr)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sspeedr_state, screen_vblank_sspeedr))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sspeedr_state, screen_vblank_sspeedr))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sspeedr)

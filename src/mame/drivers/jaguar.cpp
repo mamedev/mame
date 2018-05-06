@@ -396,15 +396,36 @@ public:
 
 DEFINE_DEVICE_TYPE(COJAG_HARDDISK, cojag_hdd, "cojag_hdd", "HDD CoJag")
 
-SLOT_INTERFACE_START(cojag_devices)
-	SLOT_INTERFACE("hdd", COJAG_HARDDISK)
-SLOT_INTERFACE_END
+void cojag_devices(device_slot_interface &device)
+{
+	device.option_add("hdd", COJAG_HARDDISK);
+}
 
 /*************************************
  *
  *  Machine init
  *
  *************************************/
+ 
+void jaguar_state::machine_start()
+{
+	/* configure banks for gfx/sound ROMs */
+	if (m_romboard_region != nullptr)
+	{
+		uint8_t *romboard = m_romboard_region->base();
+
+		/* graphics banks */
+		if (m_maingfxbank.found())
+		{
+			m_maingfxbank->configure_entries(0, 2, romboard + 0x800000, 0x400000);
+		}
+		m_gpugfxbank->configure_entries(0, 2, romboard + 0x800000, 0x400000);
+
+		/* sound banks */
+		m_mainsndbank->configure_entries(0, 8, romboard + 0x000000, 0x200000);
+		m_dspsndbank->configure_entries(0, 8, romboard + 0x000000, 0x200000);
+	}
+}
 
 void jaguar_state::machine_reset()
 {
@@ -425,26 +446,20 @@ void jaguar_state::machine_reset()
 			m_butch_cmd_size = 1;
 		}
 	}
-
-	/* configure banks for gfx/sound ROMs */
+	
+	/* reset banks for gfx/sound ROMs */
 	if (m_romboard_region != nullptr)
 	{
-		uint8_t *romboard = m_romboard_region->base();
-
 		/* graphics banks */
-		if (m_is_r3000)
+		if (m_maingfxbank.found())
 		{
-			membank("maingfxbank")->configure_entries(0, 2, romboard + 0x800000, 0x400000);
-			membank("maingfxbank")->set_entry(0);
+			m_maingfxbank->set_entry(0);
 		}
-		membank("gpugfxbank")->configure_entries(0, 2, romboard + 0x800000, 0x400000);
-		membank("gpugfxbank")->set_entry(0);
+		m_gpugfxbank->set_entry(0);
 
 		/* sound banks */
-		membank("mainsndbank")->configure_entries(0, 8, romboard + 0x000000, 0x200000);
-		membank("mainsndbank")->set_entry(0);
-		membank("dspsndbank")->configure_entries(0, 8, romboard + 0x000000, 0x200000);
-		membank("dspsndbank")->set_entry(0);
+		m_mainsndbank->set_entry(0);
+		m_dspsndbank->set_entry(0);
 	}
 
 	/* clear any spinuntil stuff */
@@ -460,7 +475,7 @@ void jaguar_state::machine_reset()
 	m_joystick_data = 0xffffffff;
 	m_eeprom_bit_count = 0;
 
-	if ((m_using_cart) && (ioport("CONFIG")->read() & 2))
+	if ((m_using_cart) && (m_config_io->read() & 2))
 	{
 		m_cart_base[0x102] = 1;
 		m_using_cart = false;
@@ -620,8 +635,8 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
 	/* adjust banking */
 	if (m_romboard_region != nullptr)
 	{
-		membank("mainsndbank")->set_entry((data >> 1) & 7);
-		membank("dspsndbank")->set_entry((data >> 1) & 7);
+		m_mainsndbank->set_entry((data >> 1) & 7);
+		m_dspsndbank->set_entry((data >> 1) & 7);
 	}
 
 	COMBINE_DATA(&m_misc_control_data);
@@ -709,7 +724,7 @@ READ32_MEMBER(jaguar_state::joystick_r)
 	}
 
 	joystick_result |= m_eeprom->do_read();
-	joybuts_result |= (ioport("CONFIG")->read() & 0x10);
+	joybuts_result |= (m_config_io->read() & 0x10);
 
 	return (joystick_result << 16) | joybuts_result;
 }
@@ -779,11 +794,11 @@ WRITE32_MEMBER(jaguar_state::latch_w)
 	/* adjust banking */
 	if (m_romboard_region != nullptr)
 	{
-		if (m_is_r3000)
+		if (m_maingfxbank.found())
 		{
-			membank("maingfxbank")->set_entry(data & 1);
+			m_maingfxbank->set_entry(data & 1);
 		}
-		membank("gpugfxbank")->set_entry(data & 1);
+		m_gpugfxbank->set_entry(data & 1);
 	}
 }
 
@@ -1045,10 +1060,6 @@ WRITE32_MEMBER(jaguar_state::area51mx_main_speedup_w)
 }
 
 #endif
-
-
-
-
 
 
 /*************************************
@@ -1321,12 +1332,10 @@ void jaguar_state::jaguarcd_map(address_map &map)
  *  Main CPU memory handlers
  *
  *************************************/
-
+ 
 void jaguar_state::r3000_map(address_map &map)
 {
 	map(0x04000000, 0x047fffff).ram().share("sharedram");
-	map(0x04800000, 0x04bfffff).bankr("maingfxbank");
-	map(0x04c00000, 0x04dfffff).bankr("mainsndbank");
 	map(0x04e00030, 0x04e0003f).rw(m_ide, FUNC(vt83c461_device::read_config), FUNC(vt83c461_device::write_config));
 	map(0x04e001f0, 0x04e001f7).rw(m_ide, FUNC(vt83c461_device::read_cs0), FUNC(vt83c461_device::write_cs0));
 	map(0x04e003f0, 0x04e003f7).rw(m_ide, FUNC(vt83c461_device::read_cs1), FUNC(vt83c461_device::write_cs1));
@@ -1351,6 +1360,13 @@ void jaguar_state::r3000_map(address_map &map)
 	map(0x16000000, 0x16000003).w(this, FUNC(jaguar_state::eeprom_enable_w));
 	map(0x18000000, 0x18001fff).rw(this, FUNC(jaguar_state::eeprom_data_r), FUNC(jaguar_state::eeprom_data_w)).share("nvram");
 	map(0x1fc00000, 0x1fdfffff).rom().region("maincpu", 0).share("rom");
+}
+
+void jaguar_state::r3000_rom_map(address_map &map)
+{
+	r3000_map(map);
+	map(0x04800000, 0x04bfffff).bankr("maingfxbank");
+	map(0x04c00000, 0x04dfffff).bankr("mainsndbank");
 }
 
 
@@ -1383,7 +1399,6 @@ void jaguar_state::m68020_map(address_map &map)
 }
 
 
-
 /*************************************
  *
  *  GPU memory handlers
@@ -1393,8 +1408,6 @@ void jaguar_state::m68020_map(address_map &map)
 void jaguar_state::gpu_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).ram().share("sharedram");
-	map(0x800000, 0xbfffff).bankr("gpugfxbank");
-	map(0xc00000, 0xdfffff).bankr("dspsndbank");
 	map(0xe00030, 0xe0003f).rw(m_ide, FUNC(vt83c461_device::read_config), FUNC(vt83c461_device::write_config));
 	map(0xe001f0, 0xe001f7).rw(m_ide, FUNC(vt83c461_device::read_cs0), FUNC(vt83c461_device::write_cs0));
 	map(0xe003f0, 0xe003f7).rw(m_ide, FUNC(vt83c461_device::read_cs1), FUNC(vt83c461_device::write_cs1));
@@ -1406,6 +1419,12 @@ void jaguar_state::gpu_map(address_map &map)
 	map(0xf10000, 0xf103ff).rw(this, FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
 }
 
+void jaguar_state::gpu_rom_map(address_map &map)
+{
+	gpu_map(map);
+	map(0x800000, 0xbfffff).bankr("gpugfxbank");
+	map(0xc00000, 0xdfffff).bankr("dspsndbank");
+}
 
 
 /*************************************
@@ -1417,13 +1436,18 @@ void jaguar_state::gpu_map(address_map &map)
 void jaguar_state::dsp_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).ram().share("sharedram");
-	map(0x800000, 0xbfffff).bankr("gpugfxbank");
-	map(0xc00000, 0xdfffff).bankr("dspsndbank");
 	map(0xf10000, 0xf103ff).rw(this, FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
 	map(0xf1a100, 0xf1a13f).rw(this, FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
 	map(0xf1a140, 0xf1a17f).rw(this, FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
 	map(0xf1b000, 0xf1cfff).ram().share("dspram");
 	map(0xf1d000, 0xf1dfff).r(this, FUNC(jaguar_state::wave_rom_r)).share("waverom").region("waverom", 0);
+}
+
+void jaguar_state::dsp_rom_map(address_map &map)
+{
+	dsp_map(map);
+	map(0x800000, 0xbfffff).bankr("gpugfxbank");
+	map(0xc00000, 0xdfffff).bankr("dspsndbank");
 }
 
 /* ToDo, these maps SHOULD be merged with the ones above */
@@ -1532,8 +1556,8 @@ static INPUT_PORTS_START( area51 )
 	PORT_BIT( 0xfe000000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
 
 	PORT_START("FAKE0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1543,7 +1567,7 @@ static INPUT_PORTS_START( area51 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )           // s-test
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )  // vsyncneq
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM )  // vsyncneq
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("FAKE1_X")               /* fake analog X */
@@ -1559,8 +1583,8 @@ static INPUT_PORTS_START( area51 )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, (240.0 - 1)/240, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 	PORT_START("IN3")           /* gun triggers */
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_SPECIAL )  // gun data valid
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_SPECIAL )  // gun data valid
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_CUSTOM )  // gun data valid
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_CUSTOM )  // gun data valid
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xfff00000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1590,22 +1614,22 @@ static INPUT_PORTS_START( freezeat )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
 
 	PORT_START("FAKE0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )  // volume down
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )  // volume up
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM )  // volume down
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM )  // volume up
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )           // s-test
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )  // vsyncneq
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM )  // vsyncneq
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x000f0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // coin returns
+	PORT_BIT( 0x000f0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // coin returns
 	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -1634,22 +1658,22 @@ static INPUT_PORTS_START( fishfren )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
 
 	PORT_START("FAKE0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )  // volume down
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )  // volume up
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM )  // volume down
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM )  // volume up
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )           // s-test
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )  // vsyncneq
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM )  // vsyncneq
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x000f0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // coin returns
+	PORT_BIT( 0x000f0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // coin returns
 	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -1684,8 +1708,8 @@ static INPUT_PORTS_START( vcircle )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
 
 	PORT_START("FAKE0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1695,11 +1719,11 @@ static INPUT_PORTS_START( vcircle )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )           // s-test
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )  // vsyncneq
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM )  // vsyncneq
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x000f0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // coin returns
+	PORT_BIT( 0x000f0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // coin returns
 	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -1814,24 +1838,24 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(jaguar_state::cojagr3k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3041, R3000_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", R3041, R3000_CLOCK)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_CPU_PROGRAM_MAP(r3000_map)
+	MCFG_DEVICE_PROGRAM_MAP(r3000_map)
 
-	MCFG_CPU_ADD("gpu", JAGUARGPU, COJAG_CLOCK/2)
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(jaguar_state, gpu_cpu_int))
-	MCFG_CPU_PROGRAM_MAP(gpu_map)
+	MCFG_DEVICE_ADD("gpu", JAGUARGPU, COJAG_CLOCK/2)
+	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, gpu_cpu_int))
+	MCFG_DEVICE_PROGRAM_MAP(gpu_map)
 
-	MCFG_CPU_ADD("dsp", JAGUARDSP, COJAG_CLOCK/2)
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(jaguar_state, dsp_cpu_int))
-	MCFG_CPU_PROGRAM_MAP(dsp_map)
+	MCFG_DEVICE_ADD("dsp", JAGUARDSP, COJAG_CLOCK/2)
+	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, dsp_cpu_int))
+	MCFG_DEVICE_PROGRAM_MAP(dsp_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_VT83C461_ADD("ide", cojag_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(jaguar_state, external_int))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, jaguar_state, external_int))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1841,15 +1865,25 @@ MACHINE_CONFIG_START(jaguar_state::cojagr3k)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jaguar_state::cojagr3k_rom)
 	cojagr3k(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(r3000_rom_map)
+
+	MCFG_DEVICE_MODIFY("gpu")
+	MCFG_DEVICE_PROGRAM_MAP(gpu_rom_map)
+
+	MCFG_DEVICE_MODIFY("dsp")
+	MCFG_DEVICE_PROGRAM_MAP(dsp_rom_map)
+
 	MCFG_DEVICE_MODIFY("ide:0")
 	MCFG_SLOT_DEFAULT_OPTION(nullptr)
 MACHINE_CONFIG_END
@@ -1858,25 +1892,25 @@ MACHINE_CONFIG_START(jaguar_state::cojag68k)
 	cojagr3k(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M68EC020, M68K_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(m68020_map)
+	MCFG_DEVICE_REPLACE("maincpu", M68EC020, M68K_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(m68020_map)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(jaguar_state::jaguar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, JAGUAR_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(jaguar_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(jaguar_state,jaguar_irq_callback)
+	MCFG_DEVICE_ADD("maincpu", M68000, JAGUAR_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(jaguar_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(jaguar_state,jaguar_irq_callback)
 
-	MCFG_CPU_ADD("gpu", JAGUARGPU, JAGUAR_CLOCK)
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(jaguar_state, gpu_cpu_int))
-	MCFG_CPU_PROGRAM_MAP(jag_gpu_map)
+	MCFG_DEVICE_ADD("gpu", JAGUARGPU, JAGUAR_CLOCK)
+	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, gpu_cpu_int))
+	MCFG_DEVICE_PROGRAM_MAP(jag_gpu_map)
 
-	MCFG_CPU_ADD("dsp", JAGUARDSP, JAGUAR_CLOCK)
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(jaguar_state, dsp_cpu_int))
-	MCFG_CPU_PROGRAM_MAP(jag_dsp_map)
+	MCFG_DEVICE_ADD("dsp", JAGUARDSP, JAGUAR_CLOCK)
+	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, dsp_cpu_int))
+	MCFG_DEVICE_PROGRAM_MAP(jag_dsp_map)
 
 //  MCFG_NVRAM_HANDLER(jaguar)
 
@@ -1888,11 +1922,11 @@ MACHINE_CONFIG_START(jaguar_state::jaguar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", jaguar_state, jaguar, "abs,bin,cof,jag,prg", 2)
@@ -1910,16 +1944,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jaguar_state::jaguarcd)
 	jaguar(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(jaguarcd_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(jaguarcd_map)
 
-	MCFG_CPU_MODIFY("gpu")
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(jaguar_state, gpu_cpu_int))
-	MCFG_CPU_PROGRAM_MAP(jagcd_gpu_map)
+	MCFG_DEVICE_MODIFY("gpu")
+	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, gpu_cpu_int))
+	MCFG_DEVICE_PROGRAM_MAP(jagcd_gpu_map)
 
-	MCFG_CPU_MODIFY("dsp")
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(jaguar_state, dsp_cpu_int))
-	MCFG_CPU_PROGRAM_MAP(jagcd_dsp_map)
+	MCFG_DEVICE_MODIFY("dsp")
+	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, dsp_cpu_int))
+	MCFG_DEVICE_PROGRAM_MAP(jagcd_dsp_map)
 
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("jag_cdrom")

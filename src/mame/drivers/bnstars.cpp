@@ -551,7 +551,7 @@ uint32_t bnstars_state::screen_update_bnstars_right(screen_device &screen, bitma
 
 static INPUT_PORTS_START( bnstars )
 	PORT_START("P1")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bnstars_state, mahjong_ctrl_r, (void *)0)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bnstars_state, mahjong_ctrl_r, (void *)0)
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -594,7 +594,7 @@ static INPUT_PORTS_START( bnstars )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bnstars_state, mahjong_ctrl_r, (void *)1)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bnstars_state, mahjong_ctrl_r, (void *)1)
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -806,14 +806,14 @@ void bnstars_state::bnstars_sound_map(address_map &map)
 MACHINE_CONFIG_START(bnstars_state::bnstars)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V70, 20000000) // 20MHz
-	MCFG_CPU_PROGRAM_MAP(bnstars_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", V70, 20000000) // 20MHz
+	MCFG_DEVICE_PROGRAM_MAP(bnstars_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bnstars_state, ms32_interrupt, "lscreen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // Unverified; it's possibly higher than 4MHz
-	MCFG_CPU_PROGRAM_MAP(bnstars_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // Unverified; it's possibly higher than 4MHz
+	MCFG_DEVICE_PROGRAM_MAP(bnstars_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
@@ -852,13 +852,13 @@ MACHINE_CONFIG_START(bnstars_state::bnstars)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymf1", YMF271, 16934400)
+	MCFG_DEVICE_ADD("ymf1", YMF271, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 //  MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
 //  MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ymf2", YMF271, 16934400)
+	MCFG_DEVICE_ADD("ymf2", YMF271, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 //  MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?

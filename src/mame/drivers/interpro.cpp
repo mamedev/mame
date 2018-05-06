@@ -6,7 +6,7 @@
  * UNIX workstations.
  *
  * The first systems were built using the original C100 CLIPPER CPU, and used
- * an additional Intel 80186 as an I/O processor, later moving to a C300 with
+ * an additional Intel 80186 as an I/O processor, later upgraded to a C300 and
  * 80386 IOP. Around 1990, the CLIPPER became fast enough to obviate the need
  * for the separate I/O processor, and systems from that point used the main
  * CPU for both compute and I/O, along with some custom ASICs.
@@ -16,10 +16,11 @@
  *
  *   Year  Family    Models                   CPU
  *   1986  amethyst  32C/100/200              C100 (80186 IOP)
- *   1988  topaz     300/3000/4000/5000       C300/C300Plus (80386 IOP)
+ *                   300                      C100 (80386 IOP)
+ *   1988  topaz     3000/4000/5000           C300/C300Plus (80386 IOP)
  *   1990  emerald   6000/6100/6200/6500      C300/C300Plus
  *   1990  turquoise 2000                     C300
- *   1991  emerald?  6600                     C4?
+ *   1991  emerald   6600                     C4?
  *   1992  sapphire  2400/6400                C4T
  *   1993  sapphire  2500/2700/6700/6800      C4I
  *   1994  sapphire  2800                     C4I
@@ -28,12 +29,15 @@
  *
  *   Model  Year  CPU    Performance           Clock   Family       Bus
  *   6000   1990  C300   10 MIPS               40MHz   emerald      SRX
- *   6100   1990         14 MIPS                       emerald      IOI?, 6105 has 5-slot chassis
- *   6500         C300+                                emerald      IOI, QWIC bus?
+ *          1991         12 MIPS
+ *   6100   1990  C300+? 14 MIPS                       emerald      IOI, 12-slot
+            1991         15.5 MIPS
+ *   6500   1990  C300+  20 MIPS                       emerald      IOI, QWIC bus?, 12-slot
  *   6200   1990  C300+  14 MIPS               60MHz   emerald
  *          1991         18 MIPS
  *   2000   1990  C300   12.5 MIPS             50MHz?  turquoise    CBUS
- *   6600   1991  C400   40 MIPS                       emerald?     IOI, SRX bus?
+ *          1991         16 MIPS
+ *   6600   1991  C400   40 MIPS                       emerald      IOI, SRX bus?
  *   2400   1992  C4T    36 MIPS/33 SPECmarks  40MHz?  sapphire     CBUS
  *   6400   1992  C4T    36 MIPS/33 SPECmarks  40MHz   sapphire     SRX
  *   2700   1993  C400I  40.1 SPECmark89               sapphire 2   CBUS
@@ -73,10 +77,12 @@
  *   GT        1990?   360k 2D vec/s (in a 2020)
  *   EDGE-1            8 planes + 1 highlight plane, double buffered (6040)
  *   EDGE-2            24 bit, 400k 2D vec/s, 350k 3D vec/s (6280)
- *   GT+               760k 2D vec/s, 530k 3D vec/s (in a 2730)
- *   GTII              830k 2D vec/s, 640k 3D vec/s (in a 6750)
+ *   GT+               500k 2D vec/s, 300k 2D vec/s (in a 2430)
+ *                     760k 2D vec/s, 530k 3D vec/s (in a 2730)
+ *   GTII              800k 2D vec/s, 500k 3D vec/s (in a 6450)
+ *                     830k 2D vec/s, 640k 3D vec/s (in a 6750)
  *                     900k 2D vec/s, 700k 3D vec/s (in a 6850)
- *   EDGE II+          50k Gouraud-shaded poly/s (in a 6780)
+ *   EDGE II+          600k 2D vec/s, 500k 3D vec/s, 50k shaded poly/s (in a 6480)
  *
  * GT graphics are also referred to in various places as Memory Mapped Graphics
  * or MMG. EDGE stands for Extensible Display Geometry Engine.
@@ -94,7 +100,7 @@
  *   U39   Intel 82586               Ethernet controller
  *   U40   Zilog 8530 SCC            Keyboard and console serial controller
  *   U41   Zilog 8530 SCC            Serial controller for serial port 0 and 1
- *   U42   Xilinix XC3020-50         Plotter control FPGA?
+ *   U42   Xilinx XC3020-50          Plotter control FPGA?
  *   U43   (MPRGM610C)               Bitstream for XC3020?
  *   U54   4.9152 MHz crystal        Clock source for 8530s?
  *   U55   20.0 MHz crystal
@@ -111,7 +117,7 @@
  *   Ref   Part                      Function
  *   U31   Zilog Z85C30 SCC          Keyboard and console serial controller
  *   U32   Zilog Z85230 ESCC         Serial controller for serial port 0 and 1
- *   U34   Xilinix XC3020-50         Plotter control FPGA?
+ *   U34   Xilinx XC3020-50          Plotter control FPGA?
  *   U35   128 kB EPROM (MPRGW510B)  Boot ROM
  *   U43?  (MPRGM610P)               Bitstream for XC3020?
  *   U44   Intel 82596SX-20          Ethernet controller
@@ -137,7 +143,7 @@
  *   Ref   Part                      Function
  *   U31   Zilog Z85C30 SCC          Keyboard and console serial controller
  *   U32   Zilog Z85230 ESCC         Serial controller for serial port 0 and 1
- *   U34   Xilinix XC3020-70         Plotter control FPGA?
+ *   U34   Xilinx XC3020-70          Plotter control FPGA?
  *   U35   128 kB EPROM (MPRGZ530A)  Boot ROM
  *   U43?  (MPRGM610P)               Bitstream for XC3020?
  *   U44   Intel 82596SX-20          Ethernet controller
@@ -172,7 +178,7 @@
  *   SMT098B  6400 32-MHz Sapphire System Board
  *   SMT127   6700 Series System Board           MSMT1040A C4I: C4 CPU Rev 3 + C4 FPU Rev 3 + C4I CAMMU
  *   SMT128   2700 Series System Board           MSMT1040A C4I: C4 CPU Rev 3 + C4 FPU Rev 3 + C4I CAMMU
- *   SMT144   6800 Series System Board
+ *   SMT144   6800 Series System Board           integrated cpu?
  *   SMT145   2800 Series System Board
  */
 
@@ -442,13 +448,14 @@ void sapphire_state::sapphire_io_map(address_map &map)
 	map(0x00000000, 0x00001fff).m(m_mmu, FUNC(cammu_c4_device::map));
 }
 
-ADDRESS_MAP_START(interpro_state::interpro_boot_map)
+void interpro_state::interpro_boot_map(address_map &map)
+{
 	// FIXME: the real system may have some initial boot instructions in this boot
 	// memory space which jump to the start of the boot eprom code, or there may
 	// be some special address decoding logic for boot. For now, we fake it in the
 	// CPU by hard-coding the start address to point at the eprom.
-	AM_RANGE(0x00000000, 0x00001fff) AM_RAM
-ADDRESS_MAP_END
+	map(0x00000000, 0x00001fff).ram();
+}
 
 void turquoise_state::interpro_82586_map(address_map &map)
 {
@@ -464,86 +471,90 @@ FLOPPY_FORMATS_MEMBER(interpro_state::floppy_formats)
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START(interpro_floppies)
-	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
-	SLOT_INTERFACE("35hd", FLOPPY_35_HD)
-SLOT_INTERFACE_END
+static void interpro_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35hd", FLOPPY_35_HD);
+}
 
 MACHINE_CONFIG_START(interpro_state::interpro_scc1)
 	MCFG_DEVICE_MODIFY(INTERPRO_SCC1_TAG)
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(INTERPRO_SERIAL_PORT1_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(INTERPRO_SERIAL_PORT2_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_INT_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir11_w))
-	MCFG_Z80SCC_OUT_WREQA_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_serial1))
-	MCFG_Z80SCC_OUT_WREQB_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_serial2))
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(INTERPRO_SERIAL_PORT1_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(INTERPRO_SERIAL_PORT2_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir11_w))
+	MCFG_Z80SCC_OUT_WREQA_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_serial1))
+	MCFG_Z80SCC_OUT_WREQB_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_serial2))
 
-	MCFG_RS232_PORT_ADD(INTERPRO_SERIAL_PORT1_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, ctsa_w))
+	MCFG_DEVICE_ADD(INTERPRO_SERIAL_PORT1_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(INTERPRO_SCC1_TAG, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(INTERPRO_SCC1_TAG, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(INTERPRO_SCC1_TAG, z80scc_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD(INTERPRO_SERIAL_PORT2_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INTERPRO_SCC1_TAG, z80scc_device, ctsb_w))
+	MCFG_DEVICE_ADD(INTERPRO_SERIAL_PORT2_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(INTERPRO_SCC1_TAG, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(INTERPRO_SCC1_TAG, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(INTERPRO_SCC1_TAG, z80scc_device, ctsb_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(interpro_state::interpro_scc2)
 	MCFG_DEVICE_MODIFY(INTERPRO_SCC2_TAG)
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(INTERPRO_KEYBOARD_PORT_TAG, interpro_keyboard_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(INTERPRO_SERIAL_PORT0_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_INT_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir11_w))
-	MCFG_Z80SCC_OUT_WREQB_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_serial0))
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(INTERPRO_KEYBOARD_PORT_TAG, interpro_keyboard_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(INTERPRO_SERIAL_PORT0_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir11_w))
+	MCFG_Z80SCC_OUT_WREQB_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_serial0))
 
 	MCFG_INTERPRO_KEYBOARD_PORT_ADD(INTERPRO_KEYBOARD_PORT_TAG, interpro_keyboard_devices, "hle_en_us")
-	MCFG_INTERPRO_KEYBOARD_RXD_HANDLER(DEVWRITELINE(INTERPRO_SCC2_TAG, z80scc_device, rxa_w))
+	MCFG_INTERPRO_KEYBOARD_RXD_HANDLER(WRITELINE(INTERPRO_SCC2_TAG, z80scc_device, rxa_w))
 
-	MCFG_RS232_PORT_ADD(INTERPRO_SERIAL_PORT0_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INTERPRO_SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(INTERPRO_SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INTERPRO_SCC2_TAG, z80scc_device, ctsb_w))
+	MCFG_DEVICE_ADD(INTERPRO_SERIAL_PORT0_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(INTERPRO_SCC2_TAG, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(INTERPRO_SCC2_TAG, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(INTERPRO_SCC2_TAG, z80scc_device, ctsb_w))
 MACHINE_CONFIG_END
 
-static SLOT_INTERFACE_START(interpro_scsi_devices)
-	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
-	SLOT_INTERFACE("cdrom", NSCSI_CDROM)
-SLOT_INTERFACE_END
+static void interpro_scsi_devices(device_slot_interface &device)
+{
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("cdrom", NSCSI_CDROM);
+}
 
-static SLOT_INTERFACE_START(turquoise_scsi_devices)
-	SLOT_INTERFACE_INTERNAL(INTERPRO_SCSI_ADAPTER_TAG, NCR53C90A)
-SLOT_INTERFACE_END
+static void turquoise_scsi_devices(device_slot_interface &device)
+{
+	device.option_add_internal(INTERPRO_SCSI_ADAPTER_TAG, NCR53C90A);
+}
 
-static SLOT_INTERFACE_START(sapphire_scsi_devices)
-	SLOT_INTERFACE_INTERNAL(INTERPRO_SCSI_ADAPTER_TAG, NCR53C94)
-SLOT_INTERFACE_END
+static void sapphire_scsi_devices(device_slot_interface &device)
+{
+	device.option_add_internal(INTERPRO_SCSI_ADAPTER_TAG, NCR53C94);
+}
 
 void interpro_state::interpro_scsi_adapter(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
 	MCFG_DEVICE_CLOCK(XTAL(24'000'000))
-	MCFG_NCR5390_IRQ_HANDLER(DEVWRITELINE(":" INTERPRO_IOGA_TAG, interpro_ioga_device, ir0_w))
-	MCFG_NCR5390_DRQ_HANDLER(DEVWRITELINE(":" INTERPRO_IOGA_TAG, interpro_ioga_device, drq_scsi))
+	MCFG_NCR5390_IRQ_HANDLER(WRITELINE(":" INTERPRO_IOGA_TAG, interpro_ioga_device, ir0_w))
+	MCFG_NCR5390_DRQ_HANDLER(WRITELINE(":" INTERPRO_IOGA_TAG, interpro_ioga_device, drq_scsi))
 }
 
 MACHINE_CONFIG_START(interpro_state::ioga)
 	MCFG_DEVICE_MODIFY(INTERPRO_IOGA_TAG)
 	MCFG_INTERPRO_IOGA_NMI_CB(INPUTLINE(INTERPRO_CPU_TAG, INPUT_LINE_NMI))
 	MCFG_INTERPRO_IOGA_IRQ_CB(INPUTLINE(INTERPRO_CPU_TAG, INPUT_LINE_IRQ0))
-	MCFG_INTERPRO_IOGA_IVEC_CB(DEVWRITE8(INTERPRO_CPU_TAG, clipper_device, set_ivec))
+	MCFG_INTERPRO_IOGA_IVEC_CB(WRITE8(INTERPRO_CPU_TAG, clipper_device, set_ivec))
 
 	// ioga dma and serial dma channels
 	// TODO: check serial dma channels - scc2chanA (keyboard) has no dma
 	//MCFG_INTERPRO_IOGA_DMA_CB(0, unknown) // plotter
-	MCFG_INTERPRO_IOGA_DMA_CB(1, DEVREAD8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, mdma_r), DEVWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, mdma_w))
-	MCFG_INTERPRO_IOGA_DMA_CB(2, DEVREAD8(INTERPRO_FDC_TAG, upd765_family_device, mdma_r), DEVWRITE8(INTERPRO_FDC_TAG, upd765_family_device, mdma_w))
-	MCFG_INTERPRO_IOGA_SERIAL_DMA_CB(0, DEVREAD8(INTERPRO_SCC2_TAG, z80scc_device, db_r), DEVWRITE8(INTERPRO_SCC2_TAG, z80scc_device, db_w))
-	MCFG_INTERPRO_IOGA_SERIAL_DMA_CB(1, DEVREAD8(INTERPRO_SCC1_TAG, z80scc_device, da_r), DEVWRITE8(INTERPRO_SCC1_TAG, z80scc_device, da_w))
-	MCFG_INTERPRO_IOGA_SERIAL_DMA_CB(2, DEVREAD8(INTERPRO_SCC1_TAG, z80scc_device, db_r), DEVWRITE8(INTERPRO_SCC1_TAG, z80scc_device, db_w))
+	MCFG_INTERPRO_IOGA_DMA_CB(1, READ8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, mdma_r), WRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, mdma_w))
+	MCFG_INTERPRO_IOGA_DMA_CB(2, READ8(INTERPRO_FDC_TAG, upd765_family_device, mdma_r), WRITE8(INTERPRO_FDC_TAG, upd765_family_device, mdma_w))
+	MCFG_INTERPRO_IOGA_SERIAL_DMA_CB(0, READ8(INTERPRO_SCC2_TAG, z80scc_device, db_r), WRITE8(INTERPRO_SCC2_TAG, z80scc_device, db_w))
+	MCFG_INTERPRO_IOGA_SERIAL_DMA_CB(1, READ8(INTERPRO_SCC1_TAG, z80scc_device, da_r), WRITE8(INTERPRO_SCC1_TAG, z80scc_device, da_w))
+	MCFG_INTERPRO_IOGA_SERIAL_DMA_CB(2, READ8(INTERPRO_SCC1_TAG, z80scc_device, db_r), WRITE8(INTERPRO_SCC1_TAG, z80scc_device, db_w))
 
 	// ioga floppy terminal count, ethernet channel attention
-	MCFG_INTERPRO_IOGA_FDCTC_CB(DEVWRITELINE(INTERPRO_FDC_TAG, upd765_family_device, tc_line_w))
-	MCFG_INTERPRO_IOGA_ETH_CA_CB(DEVWRITELINE(INTERPRO_ETH_TAG, i82586_base_device, ca))
+	MCFG_INTERPRO_IOGA_FDCTC_CB(WRITELINE(INTERPRO_FDC_TAG, upd765_family_device, tc_line_w))
+	MCFG_INTERPRO_IOGA_ETH_CA_CB(WRITELINE(INTERPRO_ETH_TAG, i82586_base_device, ca))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START(interpro)
@@ -558,7 +569,7 @@ MACHINE_CONFIG_START(interpro_state::interpro)
 
 	// srx gate array
 	MCFG_DEVICE_ADD(INTERPRO_SGA_TAG, INTERPRO_SGA, 0)
-	MCFG_INTERPRO_SGA_BERR_CB(DEVWRITE32(INTERPRO_IOGA_TAG, interpro_ioga_device, bus_error))
+	MCFG_INTERPRO_SGA_BERR_CB(WRITE32(INTERPRO_IOGA_TAG, interpro_ioga_device, bus_error))
 
 	// floppy
 
@@ -567,7 +578,7 @@ MACHINE_CONFIG_START(interpro_state::interpro)
 	// real-time clock/non-volatile memory
 	MCFG_MC146818_ADD(INTERPRO_RTC_TAG, XTAL(32'768))
 	MCFG_MC146818_UTC(true)
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir9_w))
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir9_w))
 
 	// scsi
 	MCFG_NSCSI_BUS_ADD(INTERPRO_SCSI_TAG)
@@ -585,7 +596,7 @@ MACHINE_CONFIG_START(interpro_state::interpro)
 
 	// sr bus and slots
 	MCFG_DEVICE_ADD(INTERPRO_SRBUS_TAG, SR, 0)
-	MCFG_SR_OUT_IRQ0_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir6_w))
+	MCFG_SR_OUT_IRQ0_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir6_w))
 	MCFG_SR_SLOT_ADD(INTERPRO_SRBUS_TAG, INTERPRO_SRBUS_TAG ":0", sr_cards, "mpcb963", false)
 	MCFG_SR_SLOT_ADD(INTERPRO_SRBUS_TAG, INTERPRO_SRBUS_TAG ":1", sr_cards, nullptr, false)
 
@@ -598,17 +609,17 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(turquoise_state::turquoise)
 	interpro(config);
-	MCFG_CPU_ADD(INTERPRO_CPU_TAG, CLIPPER_C300, XTAL(12'500'000))
+	MCFG_DEVICE_ADD(INTERPRO_CPU_TAG, CLIPPER_C300, XTAL(12'500'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, turquoise_main_map)
 	MCFG_DEVICE_ADDRESS_MAP(1, turquoise_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(2, interpro_boot_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, acknowledge_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, acknowledge_interrupt)
 
 	MCFG_DEVICE_ADD(INTERPRO_MMU_TAG "_i", CAMMU_C3, 0)
-	MCFG_CAMMU_EXCEPTION_CB(DEVWRITE16(INTERPRO_CPU_TAG, clipper_device, set_exception))
+	MCFG_CAMMU_EXCEPTION_CB(WRITE16(INTERPRO_CPU_TAG, clipper_device, set_exception))
 
 	MCFG_DEVICE_ADD(INTERPRO_MMU_TAG "_d", CAMMU_C3, 0)
-	MCFG_CAMMU_EXCEPTION_CB(DEVWRITE16(INTERPRO_CPU_TAG, clipper_device, set_exception))
+	MCFG_CAMMU_EXCEPTION_CB(WRITE16(INTERPRO_CPU_TAG, clipper_device, set_exception))
 	MCFG_CAMMU_LINK(INTERPRO_MMU_TAG "_i")
 
 	// boot fails memory test without this
@@ -620,8 +631,8 @@ MACHINE_CONFIG_START(turquoise_state::turquoise)
 
 	// floppy controller
 	MCFG_I82072_ADD(INTERPRO_FDC_TAG, false)
-	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir1_w))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_floppy))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir1_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_floppy))
 
 	// connect a 3.5" drive at id 3
 	MCFG_DEVICE_ADD("fdc:0", FLOPPY_CONNECTOR, 0)
@@ -638,11 +649,11 @@ MACHINE_CONFIG_START(turquoise_state::turquoise)
 
 	// scsi controller
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":7", turquoise_scsi_devices, INTERPRO_SCSI_ADAPTER_TAG, true)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter)
 
 	// ethernet controller
 	MCFG_DEVICE_ADD(INTERPRO_ETH_TAG, I82586, 0)
-	MCFG_I82586_IRQ_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir12_w))
+	MCFG_I82586_IRQ_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir12_w))
 	MCFG_DEVICE_ADDRESS_MAP(0, interpro_82586_map)
 
 	// i/o gate array
@@ -656,23 +667,23 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sapphire_state::sapphire)
 	interpro(config);
-	MCFG_CPU_ADD(INTERPRO_CPU_TAG, CLIPPER_C400, XTAL(12'500'000))
+	MCFG_DEVICE_ADD(INTERPRO_CPU_TAG, CLIPPER_C400, XTAL(12'500'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, sapphire_main_map)
 	MCFG_DEVICE_ADDRESS_MAP(1, sapphire_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(2, interpro_boot_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, acknowledge_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, acknowledge_interrupt)
 
 	// FIXME: 2400/6400 should be C4T cammu?
 	MCFG_DEVICE_ADD(INTERPRO_MMU_TAG, CAMMU_C4I, 0)
-	MCFG_CAMMU_EXCEPTION_CB(DEVWRITE16(INTERPRO_CPU_TAG, clipper_device, set_exception))
+	MCFG_CAMMU_EXCEPTION_CB(WRITE16(INTERPRO_CPU_TAG, clipper_device, set_exception))
 
 	// memory control gate array
 	MCFG_DEVICE_ADD(INTERPRO_MCGA_TAG, INTERPRO_FMCC, 0)
 
 	// floppy controller
 	MCFG_N82077AA_ADD(INTERPRO_FDC_TAG, n82077aa_device::MODE_PS2)
-	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir1_w))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_floppy))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir1_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq_floppy))
 
 	// connect a 3.5" drive at id 1
 	MCFG_DEVICE_ADD("fdc:0", FLOPPY_CONNECTOR, 0)
@@ -690,11 +701,11 @@ MACHINE_CONFIG_START(sapphire_state::sapphire)
 
 	// scsi controller
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":7", sapphire_scsi_devices, INTERPRO_SCSI_ADAPTER_TAG, true)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter)
 
 	// ethernet controller
 	MCFG_DEVICE_ADD(INTERPRO_ETH_TAG, I82596_LE16, XTAL(20'000'000))
-	MCFG_I82586_IRQ_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir12_w))
+	MCFG_I82586_IRQ_CB(WRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir12_w))
 	MCFG_DEVICE_ADDRESS_MAP(0, interpro_82596_map)
 
 	// i/o gate array

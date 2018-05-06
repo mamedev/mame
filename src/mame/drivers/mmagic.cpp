@@ -306,9 +306,9 @@ void mmagic_state::machine_start()
 
 MACHINE_CONFIG_START(mmagic_state::mmagic)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL) // NEC D8085A
-	MCFG_CPU_PROGRAM_MAP(mmagic_mem)
-	MCFG_CPU_IO_MAP(mmagic_io)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL) // NEC D8085A
+	MCFG_DEVICE_PROGRAM_MAP(mmagic_mem)
+	MCFG_DEVICE_IO_MAP(mmagic_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(mmagic_state::mmagic)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(mmagic_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)

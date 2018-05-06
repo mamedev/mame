@@ -166,7 +166,7 @@ static INPUT_PORTS_START( battlex )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, battlex_state,battlex_in0_b4_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, battlex_state,battlex_in0_b4_r, nullptr)
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -294,10 +294,10 @@ void battlex_state::machine_reset()
 MACHINE_CONFIG_START(battlex_state::battlex)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL(10'000'000)/4 )      // ?
-	MCFG_CPU_PROGRAM_MAP(battlex_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(battlex_state, battlex_interrupt, 400) /* controls game speed? */
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(10'000'000)/4 )      // ?
+	MCFG_DEVICE_PROGRAM_MAP(battlex_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(battlex_state, battlex_interrupt, 400) /* controls game speed? */
 
 
 	/* video hardware */
@@ -314,19 +314,19 @@ MACHINE_CONFIG_START(battlex_state::battlex)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(10'000'000)/8)   // ?
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(10'000'000)/8)   // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(battlex_state::dodgeman)
 	battlex(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(dodgeman_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(dodgeman_io_map)
 
 	MCFG_VIDEO_START_OVERRIDE(battlex_state, dodgeman)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(10'000'000)/8)   // ?
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(10'000'000)/8)   // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 

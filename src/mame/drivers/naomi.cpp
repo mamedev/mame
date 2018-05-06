@@ -1999,11 +1999,6 @@ INPUT_PORTS_START( naomi_debug )
 	PORT_CONFNAME( 0x02, 0x00, "Disable Render Calls" )
 	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_CONFNAME( 0x0c, 0x00, "Master CPU Clock Rate (Cheat)") PORT_CHANGED_MEMBER(DEVICE_SELF, dc_state, mastercpu_cheat_r, nullptr)
-	PORT_CONFSETTING(    0x00, "100%" )
-	PORT_CONFSETTING(    0x04, "50%" )
-	PORT_CONFSETTING(    0x08, "25%" )
-	PORT_CONFSETTING(    0x0c, "12.5%" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( naomi_mie )
@@ -2028,7 +2023,7 @@ static INPUT_PORTS_START( naomi_mie )
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
 /* 2 players with 1 joystick and 6 buttons each */
@@ -2506,7 +2501,7 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_CHANGED_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_w, nullptr)
 
 	PORT_START("P1")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_r, "KEY1\0KEY2\0KEY3\0KEY4\0KEY5")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_r, "KEY1\0KEY2\0KEY3\0KEY4\0KEY5")
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KEY1")
@@ -2559,7 +2554,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( suchie3 )
 	PORT_INCLUDE( naomi_mp )
 	PORT_MODIFY("P1")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_r, "KEY5\0KEY2\0KEY3\0KEY4\0KEY1")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_r, "KEY5\0KEY2\0KEY3\0KEY4\0KEY1")
 INPUT_PORTS_END
 
 // Atomiswave - inputs are read as standard Dreamcast controllers.
@@ -2680,7 +2675,7 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
  // TODO: merge with Dreamcast base machine
 MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK) // SH4!!!
+	MCFG_DEVICE_ADD("maincpu", SH4LE, CPU_CLOCK) // SH4!!!
 	MCFG_SH4_MD0(1)
 	MCFG_SH4_MD1(0)
 	MCFG_SH4_MD2(1)
@@ -2694,8 +2689,8 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
-	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
+	MCFG_DEVICE_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	MCFG_DEVICE_PROGRAM_MAP(dc_audio_map)
 
 	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
 
@@ -2704,13 +2699,13 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	MCFG_SCREEN_RAW_PARAMS(13458568*2, 820, 0, 640, 532, 0, 480) /* TODO: where pclk actually comes? */
 	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_POWERVR2_ADD("powervr2", WRITE8(dc_state, pvr_irq))
+	MCFG_POWERVR2_ADD("powervr2", WRITE8(*this, dc_state, pvr_irq))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("aica", AICA, 0)
+	MCFG_DEVICE_ADD("aica", AICA, 0)
 	MCFG_AICA_MASTER
-	MCFG_AICA_IRQ_CB(WRITELINE(dc_state, aica_irq))
-	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(dc_state, sh4_aica_irq))
+	MCFG_AICA_IRQ_CB(WRITELINE(*this, dc_state, aica_irq))
+	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(*this, dc_state, sh4_aica_irq))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
@@ -2721,9 +2716,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(naomi_state::naomi_base)
 	naomi_aw_base(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(naomi_map)
-	MCFG_CPU_IO_MAP(naomi_port)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(naomi_map)
+	MCFG_DEVICE_IO_MAP(naomi_port)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("main_eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
@@ -2750,7 +2745,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi_state::naomi)
 	naomi_base(config);
-	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2759,7 +2754,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi_state::naomigd)
 	naomi_base(config);
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2768,7 +2763,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi_state::naomim1)
 	naomi_base(config);
-	MCFG_NAOMI_M1_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M1_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2777,7 +2772,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi_state::naomim2)
 	naomi_base(config);
-	MCFG_NAOMI_M2_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M2_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2786,7 +2781,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi_state::naomim4)
 	naomi_base(config);
-	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2795,9 +2790,9 @@ MACHINE_CONFIG_END
 /*
 MACHINE_CONFIG_START((naomi2_state::naomi2)
     naomi(config);
-    MCFG_CPU_MODIFY("maincpu")
-    MCFG_CPU_PROGRAM_MAP(naomi2_map)
-    MCFG_CPU_IO_MAP(naomi_port)
+    MCFG_DEVICE_MODIFY("maincpu")
+    MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
+    MCFG_DEVICE_IO_MAP(naomi_port)
 MACHINE_CONFIG_END
 */
 /*
@@ -2805,7 +2800,7 @@ MACHINE_CONFIG_END
  */
 
 MACHINE_CONFIG_START(naomi2_state::naomi2_base)
-	MCFG_POWERVR2_ADD("powervr2_slave", WRITE8(dc_state, pvr_irq))
+	MCFG_POWERVR2_ADD("powervr2_slave", WRITE8(*this, dc_state, pvr_irq))
 
 	// TODO: ELAN device
 MACHINE_CONFIG_END
@@ -2814,8 +2809,8 @@ MACHINE_CONFIG_START(naomi2_state::naomi2gd)
 	naomigd(config);
 	naomi2_base(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(naomi2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
 MACHINE_CONFIG_END
 
 /*
@@ -2826,8 +2821,8 @@ MACHINE_CONFIG_START(naomi2_state::naomi2m1)
 	naomim1(config);
 	naomi2_base(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(naomi2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
 MACHINE_CONFIG_END
 
 /*
@@ -2838,8 +2833,8 @@ MACHINE_CONFIG_START(naomi2_state::naomi2m2)
 	naomim2(config);
 	naomi2_base(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(naomi2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
 MACHINE_CONFIG_END
 
 /*
@@ -2849,11 +2844,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(atomiswave_state::aw_base)
 	naomi_aw_base(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(aw_map)
-	MCFG_CPU_IO_MAP(aw_port)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(aw_map)
+	MCFG_DEVICE_IO_MAP(aw_port)
 	MCFG_MACRONIX_29L001MC_ADD("awflash")
-	MCFG_AW_ROM_BOARD_ADD("rom_board", "rom_key", WRITE8(dc_state, g1_irq))
+	MCFG_AW_ROM_BOARD_ADD("rom_board", "rom_key", WRITE8(*this, dc_state, g1_irq))
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
 	MCFG_NVRAM_ADD_0FILL("sram")
@@ -3061,7 +3056,7 @@ OFF  OFF  ON   Australia
 	ROM_SYSTEM_BIOS( 21, "bios21", "Dev BIOS v1.10" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 21, "develop110.ic27", 0x000000, 0x200000, CRC(de7cfdb0) SHA1(da16800edc4d49f70481c124d487f544c2fa8ce7) ) \
 	ROM_SYSTEM_BIOS( 22, "bios22", "Development ROM Board" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 22, "zukinver0930.ipl", 0x000000, 0x200000, CRC(58e17c23) SHA1(19330f906accf1b859f56bbcedc2edff73747599) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 22, "zukinver0930.ic25", 0x000000, 0x200000, CRC(58e17c23) SHA1(19330f906accf1b859f56bbcedc2edff73747599) ) \
 	ROM_SYSTEM_BIOS( 23, "bios23", "epr-21576h (multi-region hack)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 23, "epr-21576h_multi.ic27", 0x000000, 0x200000, CRC(cce01f1f) SHA1(cca17119ad13e3a4ef7cb6902a37b65d6a844aee) ) \
 	ROM_REGION( 0x4000, "altera_pof", 0) \
@@ -3074,7 +3069,7 @@ OFF  OFF  ON   Australia
  This boot ROM is not designed to run cartridges or other media.
 
 
- zukinver0930.ipl comes from 837-13502-01 / 837-13663 "Development ROM Board" which contains:
+ zukinver0930.ic25 comes from 837-13502-01 / 837-13663 "Development ROM Board" which contains:
   22 empty sockets ROM0 - ROM21
   315-6187 Altera EPM7064LC68-10
   PC16550DV UART
@@ -10252,7 +10247,7 @@ ROM_END
 /* 0064    */ GAME( 2001, wrungpo,   wrungp,   naomim2, naomi,   naomi_state, naomi,   ROT0, "CRI / Sega", "Wave Runner GP (USA, Rev A)", GAME_FLAGS )
 /* 0064    */ GAME( 2001, wrungp,    naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "CRI / Sega", "Wave Runner GP", GAME_FLAGS )
 /* 0068    */ GAME( 2001, crakndj2,  naomi,    naomim2, crackndj,naomi_state, naomi,   ROT0, "Sega", "Crackin' DJ Part 2 (Japan)", GAME_FLAGS )
-/* 0073    */ GAME( 2001, inunoos,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Inu No Osanpo / Dog Walking (Japan, Export, Rev A)", GAME_FLAGS )
+/* 0073    */ GAME( 2001, inunoos,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega / Cave", "Inu No Osanpo / Dog Walking (Japan, Export, Rev A)", GAME_FLAGS )
 /* 0078    */ GAME( 2002, shors2k1,  naomi,    naomim2, naomi,   naomi_state, naomi,  ROT270,"Sega", "Star Horse 2001 (satellite, Rev B)", GAME_FLAGS )
 /* 0083    */ GAME( 2001, derbyoc2,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Derby Owners Club II Ver.2.1 (Japan, Rev B)", GAME_FLAGS )
 /* 0084    */ GAME( 2001, vtenis2c,  naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A)", GAME_FLAGS )

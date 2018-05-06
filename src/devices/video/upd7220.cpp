@@ -149,9 +149,10 @@ DEFINE_DEVICE_TYPE(UPD7220, upd7220_device, "upd7220", "NEC uPD7220")
 
 
 // default address map
-ADDRESS_MAP_START(upd7220_device::upd7220_vram)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-ADDRESS_MAP_END
+void upd7220_device::upd7220_vram(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+}
 
 
 // internal 128x14 control ROM

@@ -19,7 +19,7 @@
 ***************************************************************************/
 
 #define MCFG_K056230_CPU(_tag) \
-	downcast<k056230_device &>(*device).set_cpu_tag("^" _tag);
+	downcast<k056230_device &>(*device).set_cpu_tag(_tag);
 
 #define MCFG_K056230_HACK(_region) \
 	downcast<k056230_device &>(*device).set_thunderh_hack(_region);

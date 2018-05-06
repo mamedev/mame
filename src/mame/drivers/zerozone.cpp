@@ -173,12 +173,12 @@ void zerozone_state::machine_reset()
 MACHINE_CONFIG_START(zerozone_state::zerozone)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zerozone_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", zerozone_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 1000000)  /* 1 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 1000000)  /* 1 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 

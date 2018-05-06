@@ -417,7 +417,7 @@ static INPUT_PORTS_START( spyhunt2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* SG status */
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* SG status */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Oddly enough, if you assign this control to a key, it makes both player wheels go left to fifteen */
@@ -430,7 +430,7 @@ static INPUT_PORTS_START( spyhunt2 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME ("P1 1st Gear")/* 1st gear */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME ("P1 2nd Gear")/* 2nd gear */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME ("P1 3rd Gear")/* 3rd gear */
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )               /* TCS status */
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM )               /* TCS status */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME ("P2 L Trigger")/* Left Trigger */
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME ("P2 L Button")/* Left Button */
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME ("P2 R Trigger")/* Right Trigger */
@@ -898,8 +898,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(mcr68_state::mcr68)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 7723800)
-	MCFG_CPU_PROGRAM_MAP(mcr68_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 7723800)
+	MCFG_DEVICE_PROGRAM_MAP(mcr68_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
@@ -935,7 +935,7 @@ MACHINE_CONFIG_START(mcr68_state::xenophob)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
+	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -943,7 +943,7 @@ MACHINE_CONFIG_START(mcr68_state::intlaser)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
+	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_WATCHDOG_MODIFY("watchdog")
@@ -955,9 +955,9 @@ MACHINE_CONFIG_START(mcr68_state::spyhunt2)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
+	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
+	MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_ADC0844_ADD("adc")
@@ -972,7 +972,7 @@ MACHINE_CONFIG_START(mcr68_state::archrivl)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -981,11 +981,11 @@ MACHINE_CONFIG_START(mcr68_state::pigskin)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pigskin_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pigskin_map)
 MACHINE_CONFIG_END
 
 
@@ -993,11 +993,11 @@ MACHINE_CONFIG_START(mcr68_state::trisport)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(trisport_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(trisport_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END

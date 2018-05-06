@@ -655,13 +655,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(bbusters_state::bbusters)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(bbusters_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbusters_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(bbusters_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bbusters_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000) /* Accurate */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000) /* Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
 	MCFG_NVRAM_ADD_0FILL("eeprom")
 
@@ -671,8 +671,8 @@ MACHINE_CONFIG_START(bbusters_state::bbusters)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bbusters_state, screen_update_bbuster)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bbusters)
@@ -681,15 +681,15 @@ MACHINE_CONFIG_START(bbusters_state::bbusters)
 
 	MCFG_VIDEO_START_OVERRIDE(bbusters_state,bbuster)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
@@ -700,13 +700,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(bbusters_state::mechatt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(mechatt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbusters_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(mechatt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bbusters_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000) /* Accurate */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sounda_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000) /* Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sounda_portmap)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -714,7 +714,7 @@ MACHINE_CONFIG_START(bbusters_state::mechatt)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bbusters_state, screen_update_mechatt)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mechatt)
@@ -723,14 +723,14 @@ MACHINE_CONFIG_START(bbusters_state::mechatt)
 
 	MCFG_VIDEO_START_OVERRIDE(bbusters_state,mechatt)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2608, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2608, 8000000)
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)

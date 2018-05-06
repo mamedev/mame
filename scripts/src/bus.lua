@@ -333,6 +333,10 @@ if (BUSES["BBC_USERPORT"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/userport/userport.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/userport/userport.h",
+		MAME_DIR .. "src/devices/bus/bbc/userport/beebspch.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/userport/beebspch.h",
+		MAME_DIR .. "src/devices/bus/bbc/userport/pointer.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/userport/pointer.h",
 		MAME_DIR .. "src/devices/bus/bbc/userport/cfa3000kbd.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/userport/cfa3000kbd.h",
 	}
@@ -759,6 +763,8 @@ if (BUSES["ELECTRON_CART"]~=null) then
 		MAME_DIR .. "src/devices/bus/electron/cart/click.h",
 		MAME_DIR .. "src/devices/bus/electron/cart/cumana.cpp",
 		MAME_DIR .. "src/devices/bus/electron/cart/cumana.h",
+		MAME_DIR .. "src/devices/bus/electron/cart/mgc.cpp",
+		MAME_DIR .. "src/devices/bus/electron/cart/mgc.h",
 		MAME_DIR .. "src/devices/bus/electron/cart/peg400.cpp",
 		MAME_DIR .. "src/devices/bus/electron/cart/peg400.h",
 		MAME_DIR .. "src/devices/bus/electron/cart/sndexp.cpp",
@@ -834,8 +840,12 @@ if (BUSES["HPDIO"]~=null) then
 		MAME_DIR .. "src/devices/bus/hp_dio/hp_dio.h",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98544.cpp",
 		MAME_DIR .. "src/devices/bus/hp_dio/hp98544.h",
-		MAME_DIR .. "src/devices/bus/hp_dio/hp98603.cpp",
-		MAME_DIR .. "src/devices/bus/hp_dio/hp98603.h",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98603a.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98603a.h",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98603b.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98603b.h",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98644.cpp",
+		MAME_DIR .. "src/devices/bus/hp_dio/hp98644.h",
 	}
 end
 
@@ -868,6 +878,8 @@ if (BUSES["HEXBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/hexbus/hexbus.h",
 		MAME_DIR .. "src/devices/bus/hexbus/hx5102.cpp",
 		MAME_DIR .. "src/devices/bus/hexbus/hx5102.h",
+		MAME_DIR .. "src/devices/bus/hexbus/tp0370.cpp",
+		MAME_DIR .. "src/devices/bus/hexbus/tp0370.h",
 	}
 end
 
@@ -1126,6 +1138,10 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/myb3k_com.h",
 		MAME_DIR .. "src/devices/bus/isa/myb3k_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/isa/myb3k_fdc.h",
+		MAME_DIR .. "src/devices/bus/isa/eis_sad8852.cpp",
+		MAME_DIR .. "src/devices/bus/isa/eis_sad8852.h",
+		MAME_DIR .. "src/devices/bus/isa/lbaenhancer.cpp",
+		MAME_DIR .. "src/devices/bus/isa/lbaenhancer.h",
 	}
 end
 
@@ -1576,6 +1592,8 @@ if (BUSES["VIC10"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/vic10/exp.cpp",
 		MAME_DIR .. "src/devices/bus/vic10/exp.h",
+		MAME_DIR .. "src/devices/bus/vic10/multimax.cpp",
+		MAME_DIR .. "src/devices/bus/vic10/multimax.h",
 		MAME_DIR .. "src/devices/bus/vic10/std.cpp",
 		MAME_DIR .. "src/devices/bus/vic10/std.h",
 	}
@@ -2543,6 +2561,8 @@ end
 if (BUSES["TI99"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/ti99/ti99defs.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/992board.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/992board.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/998board.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/internal/998board.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/datamux.cpp",
@@ -3397,7 +3417,9 @@ if (BUSES["INTERPRO_KEYBOARD"]~=null) then
 		MAME_DIR .. "src/devices/bus/interpro/keyboard/keyboard.cpp",
 		MAME_DIR .. "src/devices/bus/interpro/keyboard/keyboard.h",
 		MAME_DIR .. "src/devices/bus/interpro/keyboard/hle.cpp",
-		MAME_DIR .. "src/devices/bus/interpro/keyboard/hle.h"
+		MAME_DIR .. "src/devices/bus/interpro/keyboard/hle.h",
+		MAME_DIR .. "src/devices/bus/interpro/keyboard/lle.cpp",
+		MAME_DIR .. "src/devices/bus/interpro/keyboard/lle.h"
 	}
 end
 

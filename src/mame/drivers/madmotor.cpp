@@ -268,12 +268,12 @@ uint32_t madmotor_state::screen_update_madmotor(screen_device &screen, bitmap_in
 MACHINE_CONFIG_START(madmotor_state::madmotor)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* Custom chip 59, 24 MHz crystal */
-	MCFG_CPU_PROGRAM_MAP(madmotor_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", madmotor_state,  irq6_line_hold)/* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) /* Custom chip 59, 24 MHz crystal */
+	MCFG_DEVICE_PROGRAM_MAP(madmotor_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", madmotor_state,  irq6_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", H6280, 8053000/2) /* Custom chip 45, Crystal near CPU is 8.053 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, 8053000/2) /* Custom chip 45, Crystal near CPU is 8.053 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
 	/* video hardware */
@@ -312,10 +312,10 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ym1", YM2203, 21470000/6)
+	MCFG_DEVICE_ADD("ym1", YM2203, 21470000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_YM2151_ADD("ym2", 21470000/6)
+	MCFG_DEVICE_ADD("ym2", YM2151, 21470000/6)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)

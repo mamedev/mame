@@ -143,9 +143,9 @@ void galpani2_state::machine_reset()
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); //initial mcu xchk
 }
 
-static void galpani2_write_kaneko(device_t *device)
+static void galpani2_write_kaneko(cpu_device *cpu)
 {
-	address_space &dstspace = device->memory().space(AS_PROGRAM);
+	address_space &dstspace = cpu->space(AS_PROGRAM);
 	int i,x,tpattidx;
 	unsigned char testpattern[] = {0xFF,0x55,0xAA,0xDD,0xBB,0x99};
 
@@ -519,9 +519,9 @@ static INPUT_PORTS_START( galpani2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SPECIAL )  // CARD full
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL )  // CARD full
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )  // CARD empty
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM )  // CARD full
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM )  // CARD full
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM )  // CARD empty
 
 	PORT_START("SERVICE")   /* 780006.w */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -624,13 +624,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt2)
 MACHINE_CONFIG_START(galpani2_state::galpani2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(27'000'000)/2)       /* Confirmed on galpani2i PCB */
-	MCFG_CPU_PROGRAM_MAP(galpani2_mem1)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(27'000'000)/2)       /* Confirmed on galpani2i PCB */
+	MCFG_DEVICE_PROGRAM_MAP(galpani2_mem1)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("m_scantimer", galpani2_state, galpani2_interrupt1, "screen", 0, 1)
 	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(27'000'000)/2)           /* Confirmed on galpani2i PCB */
-	MCFG_CPU_PROGRAM_MAP(galpani2_mem2)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(27'000'000)/2)           /* Confirmed on galpani2i PCB */
+	MCFG_DEVICE_PROGRAM_MAP(galpani2_mem2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", galpani2_state, galpani2_interrupt2, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")

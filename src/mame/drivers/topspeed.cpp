@@ -213,6 +213,8 @@ CUSTOM_INPUT_MEMBER(topspeed_state::pedal_r)
 	return retval[port != nullptr ? port->read() & 7 : 0];
 }
 
+// TODO: proper motorcpu hook-up
+
 READ16_MEMBER(topspeed_state::motor_r)
 {
 	switch (offset)
@@ -473,7 +475,7 @@ static INPUT_PORTS_START( topspeed )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, topspeed_state, pedal_r, "BRAKE") PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, topspeed_state, pedal_r, "BRAKE") PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch") PORT_CONDITION("DSWA", 0x03, EQUALS, 0x02)
 
 	PORT_START("IN1")
@@ -482,7 +484,7 @@ static INPUT_PORTS_START( topspeed )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Calibrate") // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, topspeed_state, pedal_r, "GAS") PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, topspeed_state, pedal_r, "GAS") PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch") PORT_CONDITION("DSWA", 0x03, EQUALS, 0x02)
 
 	PORT_START("IN2")   // Unused
@@ -576,20 +578,20 @@ void topspeed_state::machine_reset()
 MACHINE_CONFIG_START(topspeed_state::topspeed)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(cpua_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", topspeed_state, irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cpua_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", topspeed_state, irq6_line_hold)
 
-	MCFG_CPU_ADD("subcpu", M68000, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", topspeed_state, irq5_line_hold)
+	MCFG_DEVICE_ADD("subcpu", M68000, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", topspeed_state, irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(z80_prg)
-	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(z80_prg)
+	MCFG_DEVICE_IO_MAP(z80_io)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(topspeed_state, z80ctc_to0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, topspeed_state, z80ctc_to0))
 
 	MCFG_DEVICE_ADD("pc080sn_1", PC080SN, 0)
 	MCFG_PC080SN_GFX_REGION(1)
@@ -610,7 +612,7 @@ MACHINE_CONFIG_START(topspeed_state::topspeed)
 	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(topspeed_state, coins_w))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(*this, topspeed_state, coins_w))
 	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	// video hardware
@@ -629,18 +631,18 @@ MACHINE_CONFIG_START(topspeed_state::topspeed)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000) / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(topspeed_state, sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, topspeed_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "filter1l", 1.0)
 	MCFG_SOUND_ROUTE(1, "filter1r", 1.0)
 
-	MCFG_SOUND_ADD("msm1", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(topspeed_state, msm5205_1_vck)) // VCK function
+	MCFG_DEVICE_ADD("msm1", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, topspeed_state, msm5205_1_vck)) // VCK function
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      // 8 kHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2", 1.0)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, XTAL(384'000))
+	MCFG_DEVICE_ADD("msm2", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      // Slave mode, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 1.0)
 
@@ -682,6 +684,9 @@ ROM_START( topspeed )
 	ROM_REGION( 0x1c000, "audiocpu", 0 ) // Z80 sound CPU
 	ROM_LOAD( "b14-25.67", 0x00000, 0x04000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) // Banked stuff
+
+	ROM_REGION( 0x8000, "motorcpu", 0 )
+	ROM_LOAD( "27c256.ic17",   0x0000, 0x8000, CRC(e52dfee1) SHA1(6e58e18eb2de3c899b950a4307ea21cd23683657) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) // SCR tiles
 	ROM_LOAD16_BYTE( "b14-07.54",   0x00000, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )
@@ -733,6 +738,9 @@ ROM_START( topspeedu )
 	ROM_LOAD( "b14-25.67", 0x00000, 0x04000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) // Banked stuff
 
+	ROM_REGION( 0x8000, "motorcpu", 0 )
+	ROM_LOAD( "27c256.ic17",   0x0000, 0x8000, CRC(e52dfee1) SHA1(6e58e18eb2de3c899b950a4307ea21cd23683657) )
+
 	ROM_REGION( 0x40000, "gfx1", 0 ) // SCR tiles
 	ROM_LOAD16_BYTE( "b14-07.54", 0x00000, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )
 	ROM_LOAD16_BYTE( "b14-06.52", 0x00001, 0x20000, CRC(b4e2536e) SHA1(c1960ee25b37b1444ec99082521c4858edcf3484) )
@@ -767,6 +775,9 @@ ROM_START( fullthrl )
 	ROM_REGION( 0x1c000, "audiocpu", 0 ) // Z80 sound CPU
 	ROM_LOAD( "b14-25.67", 0x00000, 0x04000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) // Banked stuff
+
+	ROM_REGION( 0x8000, "motorcpu", 0 )
+	ROM_LOAD( "27c256.ic17",   0x0000, 0x8000, CRC(e52dfee1) SHA1(6e58e18eb2de3c899b950a4307ea21cd23683657) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) // SCR tiles
 	ROM_LOAD16_BYTE( "b14-07.54", 0x00000, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )

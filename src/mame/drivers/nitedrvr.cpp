@@ -110,7 +110,7 @@ static INPUT_PORTS_START( nitedrvr )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Novice Track")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Expert Track")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pro Track")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   // Alternating signal?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // Alternating signal?
 
 	PORT_START("STEER") // fake
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
@@ -143,9 +143,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(nitedrvr_state::nitedrvr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'096'000)/12) // 1 MHz
-	MCFG_CPU_PROGRAM_MAP(nitedrvr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nitedrvr_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'096'000)/12) // 1 MHz
+	MCFG_DEVICE_PROGRAM_MAP(nitedrvr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nitedrvr_state, irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 3)
@@ -168,7 +168,7 @@ MACHINE_CONFIG_START(nitedrvr_state::nitedrvr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(nitedrvr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

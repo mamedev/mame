@@ -544,12 +544,12 @@ void macrossp_state::machine_reset()
 MACHINE_CONFIG_START(macrossp_state::macrossp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, 50000000/2)   /* 25 MHz */
-	MCFG_CPU_PROGRAM_MAP(macrossp_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", macrossp_state,  irq3_line_hold) // there are others ...
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 50000000/2)   /* 25 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(macrossp_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", macrossp_state,  irq3_line_hold) // there are others ...
 
-	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)    /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(macrossp_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 32000000/2)    /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(macrossp_sound_map)
 
 
 	/* video hardware */
@@ -559,7 +559,7 @@ MACHINE_CONFIG_START(macrossp_state::macrossp)
 	MCFG_SCREEN_SIZE(32*16, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 0*16, 15*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(macrossp_state, screen_update_macrossp)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(macrossp_state, screen_vblank_macrossp))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, macrossp_state, screen_vblank_macrossp))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macrossp)
 
@@ -571,13 +571,13 @@ MACHINE_CONFIG_START(macrossp_state::macrossp)
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ensoniq", ES5506, 16000000)
+	MCFG_DEVICE_ADD("ensoniq", ES5506, 16000000)
 	MCFG_ES5506_REGION0("ensoniq.0")
 	MCFG_ES5506_REGION1("ensoniq.1")
 	MCFG_ES5506_REGION2("ensoniq.2")
 	MCFG_ES5506_REGION3("ensoniq.3")
 	MCFG_ES5506_CHANNELS(1)               /* channels */
-	MCFG_ES5506_IRQ_CB(WRITELINE(macrossp_state, irqhandler))
+	MCFG_ES5506_IRQ_CB(WRITELINE(*this, macrossp_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.1)
 MACHINE_CONFIG_END

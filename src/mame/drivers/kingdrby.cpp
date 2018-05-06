@@ -547,8 +547,8 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) //1p hopper i/o
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) //2p hopper i/o
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) //1p hopper i/o
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) //2p hopper i/o
 
 	PORT_START("IN1")   // ppi0 (5001)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //?
@@ -704,8 +704,8 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) //1p hopper i/o
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) //2p hopper i/o
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) //1p hopper i/o
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) //2p hopper i/o
 
 	PORT_START("IN0")   // ppi0 (5001)
 	PORT_DIPNAME( 0x01, 0x01, "IN0" )
@@ -958,20 +958,20 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
 }
 
 MACHINE_CONFIG_START(kingdrby_state::kingdrby)
-	MCFG_CPU_ADD("master", Z80, CLK_2)
-	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_IO_MAP(master_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("master", Z80, CLK_2)
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_IO_MAP(master_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("slave", Z80, CLK_2)
-	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_IO_MAP(slave_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("slave", Z80, CLK_2)
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_IO_MAP(slave_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kingdrby_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, CLK_2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kingdrby_state, irq0_line_hold, 1000) /* guess, controls ay8910 tempo.*/
+	MCFG_DEVICE_ADD("soundcpu", Z80, CLK_2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(kingdrby_state, irq0_line_hold, 1000) /* guess, controls ay8910 tempo.*/
 
 	MCFG_QUANTUM_PERFECT_CPU("master")
 
@@ -979,17 +979,17 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 
 	// 5000-5003 PPI group modes 0/0 - A & B as input, C (all) as output.
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(kingdrby_state, hopper_io_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, kingdrby_state, hopper_io_r))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(kingdrby_state, hopper_io_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kingdrby_state, hopper_io_w))
 
 	// 6000-6003 PPI group modes 0/0 - B & C (lower) as input, A & C (upper) as output.
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kingdrby_state, sound_cmd_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kingdrby_state, sound_cmd_w))
 	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0x7f))
-	MCFG_I8255_IN_PORTB_CB(READ8(kingdrby_state, key_matrix_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(kingdrby_state, input_mux_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(kingdrby_state, outport2_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, kingdrby_state, key_matrix_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, kingdrby_state, input_mux_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kingdrby_state, outport2_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kingdrby)
 	MCFG_PALETTE_ADD("palette", 0x200)
@@ -1008,16 +1008,16 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, CLK_1/8)    /* guess */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(kingdrby_state, sound_cmd_r))
+	MCFG_DEVICE_ADD("aysnd", AY8910, CLK_1/8)    /* guess */
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kingdrby_state, sound_cmd_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kingdrby_state::kingdrbb)
 	kingdrby(config);
 
-	MCFG_CPU_MODIFY("slave")
-	MCFG_CPU_PROGRAM_MAP(slave_1986_map)
+	MCFG_DEVICE_MODIFY("slave")
+	MCFG_DEVICE_PROGRAM_MAP(slave_1986_map)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrbb)
@@ -1027,10 +1027,10 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrbb)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	/* C as input, (all) as output */
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kingdrby_state, sound_cmd_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kingdrby_state, sound_cmd_w))
 	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0x7f))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(kingdrby_state, outportb_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, kingdrby_state, outportb_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
@@ -1040,9 +1040,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kingdrby_state::cowrace)
 	kingdrbb(config);
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(cowrace_sound_map)
-	MCFG_CPU_IO_MAP(cowrace_sound_io)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(cowrace_sound_map)
+	MCFG_DEVICE_IO_MAP(cowrace_sound_io)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cowrace)
 	MCFG_PALETTE_MODIFY("palette")
@@ -1050,10 +1050,10 @@ MACHINE_CONFIG_START(kingdrby_state::cowrace)
 	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_REPLACE("aysnd", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(kingdrby_state, sound_cmd_r))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("oki", okim6295_device, read))   // read B
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("oki", okim6295_device, write))   // write B
+	MCFG_DEVICE_REPLACE("aysnd", YM2203, 3000000)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kingdrby_state, sound_cmd_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("oki", okim6295_device, read))   // read B
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("oki", okim6295_device, write))   // write B
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

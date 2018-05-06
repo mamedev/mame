@@ -100,7 +100,7 @@ static INPUT_PORTS_START( phoenix )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, nullptr)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, nullptr)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )            PORT_DIPLOCATION( "SW1:1,2" )
@@ -183,7 +183,7 @@ static INPUT_PORTS_START( condor )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, nullptr)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, nullptr)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )            PORT_DIPLOCATION( "SW1:1,2" )
@@ -313,7 +313,7 @@ static INPUT_PORTS_START( pleiads )
 	PORT_INCLUDE( phoenix )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, nullptr)     /* Protection. See 0x0552 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, nullptr)     /* Protection. See 0x0552 */
 
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION( "SW1:7" )
@@ -336,7 +336,7 @@ static INPUT_PORTS_START( pleiadbl )
 	PORT_INCLUDE( phoenix )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, nullptr)     /* Protection. See 0x0552 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, nullptr)     /* Protection. See 0x0552 */
 
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION( "SW1:7" )
@@ -376,7 +376,7 @@ static INPUT_PORTS_START( survival )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
 
 	PORT_START("IN1")       /* IN1 */
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL )    /* comes from IN0 0-2 */
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM )    /* comes from IN0 0-2 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
@@ -443,8 +443,8 @@ MACHINE_RESET_MEMBER(phoenix_state,phoenix)
 MACHINE_CONFIG_START(phoenix_state::phoenix)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, CPU_CLOCK)  /* 2.75 MHz */
-	MCFG_CPU_PROGRAM_MAP(phoenix_memory_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, CPU_CLOCK)  /* 2.75 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(phoenix_memory_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
 
@@ -469,10 +469,10 @@ MACHINE_CONFIG_START(phoenix_state::phoenix)
 	MCFG_TMS36XX_TUNE_SPEED(0.21)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("cust", PHOENIX, 0)
+	MCFG_DEVICE_ADD("cust", PHOENIX_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 120000)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, 120000)
 	MCFG_DISCRETE_INTF(phoenix)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 MACHINE_CONFIG_END
@@ -482,8 +482,8 @@ MACHINE_CONFIG_START(phoenix_state::pleiads)
 	phoenix(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pleiads_memory_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pleiads_memory_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pleiads)
@@ -501,7 +501,7 @@ MACHINE_CONFIG_START(phoenix_state::pleiads)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_DEVICE_REMOVE("cust")
-	MCFG_SOUND_ADD("pleiads_custom", PLEIADS, 0)
+	MCFG_DEVICE_ADD("pleiads_custom", PLEIADS_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_REMOVE("discrete")
@@ -513,9 +513,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(phoenix_state::survival)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, CPU_CLOCK)  /* 5.50 MHz */
-	MCFG_I8085A_SID(READLINE(phoenix_state, survival_sid_callback))
-	MCFG_CPU_PROGRAM_MAP(survival_memory_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, CPU_CLOCK)  /* 5.50 MHz */
+	MCFG_I8085A_SID(READLINE(*this, phoenix_state, survival_sid_callback))
+	MCFG_DEVICE_PROGRAM_MAP(survival_memory_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
 
@@ -539,8 +539,8 @@ MACHINE_CONFIG_START(phoenix_state::survival)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* FIXME: check clock */
-	MCFG_SOUND_ADD("aysnd", AY8910, 11000000/4)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(phoenix_state, survival_protection_r))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 11000000/4)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, phoenix_state, survival_protection_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -551,8 +551,8 @@ MACHINE_CONFIG_START(phoenix_state::condor)
 
 	/* basic machine hardware */
 	/* FIXME: Verify clock. This is most likely 11MHz/2 */
-	MCFG_CPU_REPLACE("maincpu", Z80, 11000000/4)    /* 2.75 MHz??? */
-	MCFG_CPU_PROGRAM_MAP(phoenix_memory_map)
+	MCFG_DEVICE_REPLACE("maincpu", Z80, 11000000/4)    /* 2.75 MHz??? */
+	MCFG_DEVICE_PROGRAM_MAP(phoenix_memory_map)
 MACHINE_CONFIG_END
 
 

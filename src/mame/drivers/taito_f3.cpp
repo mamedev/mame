@@ -254,8 +254,8 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START4 )
-	PORT_BIT( 0x00ff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,eeprom_read, nullptr)
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,eeprom_read, nullptr)
+	PORT_BIT( 0x00ff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,eeprom_read, nullptr)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,eeprom_read, nullptr)
 
 	/* MSW: Coin counters/lockouts are readable, LSW: Joysticks (Player 1 & 2) */
 	PORT_START("IN.1")
@@ -268,7 +268,7 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* These must be high */
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_coin_r, (void *)0)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_coin_r, (void *)0)
 
 	/* Player 3 & 4 fire buttons (Player 2 top fire buttons in Kaiser Knuckle) */
 	PORT_START("IN.4")
@@ -294,21 +294,21 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_coin_r, (void *)1)
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_coin_r, (void *)1)
 
 	/* Analog control 1 */
 	PORT_START("IN.2")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_analog_r, (void*)0)
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_analog_r, (void*)0)
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* Analog control 2 */
 	PORT_START("IN.3")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_analog_r, (void *)1)
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taito_f3_state,f3_analog_r, (void *)1)
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* These are not read directly, but through PORT_CUSTOMs above */
 	PORT_START("EEPROMIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) /* Another service mode */
@@ -460,9 +460,9 @@ MACHINE_RESET_MEMBER(taito_f3_state,f3)
 MACHINE_CONFIG_START(taito_f3_state::f3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(f3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(f3_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
 
 	MCFG_MACHINE_RESET_OVERRIDE(taito_f3_state,f3)
 
@@ -477,7 +477,7 @@ MACHINE_CONFIG_START(taito_f3_state::f3)
 	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+232-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taito_f3_state, screen_update_f3)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taito_f3_state, screen_vblank_f3))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taito_f3_state, screen_vblank_f3))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_f3)
 	MCFG_PALETTE_ADD("palette", 0x2000)
@@ -560,9 +560,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(taito_f3_state::bubsympb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(bubsympb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state, f3_interrupt2)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(bubsympb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taito_f3_state, f3_interrupt2)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -575,7 +575,7 @@ MACHINE_CONFIG_START(taito_f3_state::bubsympb)
 	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taito_f3_state, screen_update_f3)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taito_f3_state, screen_vblank_f3))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taito_f3_state, screen_vblank_f3))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bubsympb)
 	MCFG_PALETTE_ADD("palette", 8192)

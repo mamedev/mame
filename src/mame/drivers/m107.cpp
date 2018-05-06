@@ -720,13 +720,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(m107_state::firebarr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V33, XTAL(28'000'000)/2)    /* NEC V33, 28MHz clock */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", V33, XTAL(28'000'000)/2)    /* NEC V33, 28MHz clock */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
 
-	MCFG_CPU_ADD("soundcpu", V35, XTAL(14'318'181))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", V35, XTAL(14'318'181))
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_V25_CONFIG(rtypeleo_decryption_table)
 
 	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
@@ -756,9 +756,9 @@ MACHINE_CONFIG_START(m107_state::firebarr)
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("upd71059c", pic8259_device, ir3_w))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("upd71059c", pic8259_device, ir3_w))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
@@ -772,11 +772,11 @@ MACHINE_CONFIG_START(m107_state::dsoccr94)
 	firebarr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(20000000/2)  /* NEC V33, Could be 28MHz clock? */
-	MCFG_CPU_IO_MAP(dsoccr94_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(20000000/2)  /* NEC V33, Could be 28MHz clock? */
+	MCFG_DEVICE_IO_MAP(dsoccr94_io_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(dsoccr94_decryption_table)
 
 	/* video hardware */
@@ -786,11 +786,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m107_state::wpksoc)
 	firebarr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wpksoc_map)
-	MCFG_CPU_IO_MAP(wpksoc_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(wpksoc_map)
+	MCFG_DEVICE_IO_MAP(wpksoc_io_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(leagueman_decryption_table)
 MACHINE_CONFIG_END
 
@@ -798,7 +798,7 @@ MACHINE_CONFIG_START(m107_state::airass)
 	firebarr(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", m107)
 
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(gunforce_decryption_table)
 MACHINE_CONFIG_END
 

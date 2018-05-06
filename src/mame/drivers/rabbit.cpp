@@ -752,7 +752,7 @@ void rabbit_state::rabbit_map(address_map &map)
 
 static INPUT_PORTS_START( rabbit )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // as per code at 4d932
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // as per code at 4d932
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unlabeled in input test
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
@@ -901,9 +901,9 @@ INTERRUPT_GEN_MEMBER(rabbit_state::vblank_interrupt)
 }
 
 MACHINE_CONFIG_START(rabbit_state::rabbit)
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(24'000'000))
-	MCFG_CPU_PROGRAM_MAP(rabbit_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rabbit_state,  vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(24'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(rabbit_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rabbit_state,  vblank_interrupt)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

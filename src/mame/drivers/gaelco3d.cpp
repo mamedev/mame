@@ -10,6 +10,7 @@
         * Speed Up
         * Surf Planet
         * Radikal Bikers
+        * Football Power
 
     Known bugs:
         * EEPROM interface not right
@@ -773,10 +774,10 @@ static INPUT_PORTS_START( speedup )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)   // checked after reading analog from port 1
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)   // checked after reading analog from port 2
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)   // checked after reading analog from port 3
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)0)
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)1)
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)2)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)3)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)0)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)1)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)2)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)3)
 
 	PORT_START("IN3")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )        // verified
@@ -812,10 +813,10 @@ static INPUT_PORTS_START( surfplnt )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)0)
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)1)
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)2)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)3)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)0)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)1)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)2)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)3)
 
 	PORT_START("IN3")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -849,10 +850,10 @@ static INPUT_PORTS_START( radikalb )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x08000000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)0)
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)1)
-	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)2)
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)3)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)0)
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)1)
+	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)2)
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,analog_bit_r, (void *)3)
 
 	PORT_START("IN3")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -894,8 +895,8 @@ static INPUT_PORTS_START( footbpow )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x08000000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,fp_analog_bit_r, (void *)1)
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,fp_analog_bit_r, (void *)0)
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,fp_analog_bit_r, (void *)1)
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, gaelco3d_state,fp_analog_bit_r, (void *)0)
 	PORT_BIT( 0xc0000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN3")
@@ -926,19 +927,19 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 15000000)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco3d_state,  vblank_gen)
+	MCFG_DEVICE_ADD("maincpu", M68000, 15000000)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco3d_state,  vblank_gen)
 
-	MCFG_CPU_ADD("tms", TMS32031, 60000000)
-	MCFG_CPU_PROGRAM_MAP(tms_map)
+	MCFG_DEVICE_ADD("tms", TMS32031, 60000000)
+	MCFG_DEVICE_PROGRAM_MAP(tms_map)
 	MCFG_TMS3203X_MCBL(true)
-	MCFG_TMS3203X_IACK_CB(WRITE8(gaelco3d_state, tms_iack_w))
+	MCFG_TMS3203X_IACK_CB(WRITE8(*this, gaelco3d_state, tms_iack_w))
 
-	MCFG_CPU_ADD("adsp", ADSP2115, 16000000)
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(gaelco3d_state, adsp_tx_callback))
-	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
-	MCFG_CPU_DATA_MAP(adsp_data_map)
+	MCFG_DEVICE_ADD("adsp", ADSP2115, 16000000)
+	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(*this, gaelco3d_state, adsp_tx_callback))
+	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
+	MCFG_DEVICE_DATA_MAP(adsp_data_map)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
@@ -948,26 +949,26 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 	MCFG_TIMER_DRIVER_ADD("adsp_timer", gaelco3d_state, adsp_autobuffer_irq)
 
 	MCFG_DEVICE_ADD("serial", GAELCO_SERIAL, 0)
-	MCFG_GAELCO_SERIAL_IRQ_HANDLER(WRITELINE(gaelco3d_state, ser_irq))
+	MCFG_GAELCO_SERIAL_IRQ_HANDLER(WRITELINE(*this, gaelco3d_state, ser_irq))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC5 on bottom board next to EEPROM
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("serial", gaelco_serial_device, tr_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("serial", gaelco_serial_device, rts_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(gaelco3d_state, tms_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(gaelco3d_state, tms_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(gaelco3d_state, unknown_13a_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("serial", gaelco_serial_device, tr_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("serial", gaelco_serial_device, rts_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, gaelco3d_state, tms_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, gaelco3d_state, tms_irq_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, gaelco3d_state, unknown_13a_w))
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // IC2 on top board near edge connector
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco3d_state, tms_control3_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco3d_state, radikalb_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gaelco3d_state, unknown_137_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("serial", gaelco_serial_device, irq_enable))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(gaelco3d_state, analog_port_clock_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(gaelco3d_state, analog_port_latch_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("serial", gaelco_serial_device, unknown_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco3d_state, tms_control3_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gaelco3d_state, radikalb_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gaelco3d_state, unknown_137_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("serial", gaelco_serial_device, irq_enable))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, gaelco3d_state, analog_port_clock_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, gaelco3d_state, analog_port_latch_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("serial", gaelco_serial_device, unknown_w))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("adsp", ADSP2115_IRQ2))
@@ -986,16 +987,16 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: front mono */
 
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: left rear */
 
-	MCFG_SOUND_ADD("dac3", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac3", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: right rear */
 
-	MCFG_SOUND_ADD("dac4", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac4", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: seat speaker */
 MACHINE_CONFIG_END
 
@@ -1004,12 +1005,12 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d2)
 	gaelco3d(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M68EC020, 25000000)
-	MCFG_CPU_PROGRAM_MAP(main020_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco3d_state,  vblank_gen)
+	MCFG_DEVICE_REPLACE("maincpu", M68EC020, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(main020_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco3d_state,  vblank_gen)
 
-	MCFG_CPU_MODIFY("tms")
-	MCFG_CPU_CLOCK(50000000)
+	MCFG_DEVICE_MODIFY("tms")
+	MCFG_DEVICE_CLOCK(50000000)
 
 	MCFG_MACHINE_RESET_OVERRIDE(gaelco3d_state,gaelco3d2)
 MACHINE_CONFIG_END
@@ -1017,7 +1018,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gaelco3d_state::footbpow)
 	gaelco3d2(config);
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(gaelco3d_state, fp_analog_clock_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, gaelco3d_state, fp_analog_clock_w))
 MACHINE_CONFIG_END
 
 

@@ -126,7 +126,7 @@ static INPUT_PORTS_START( flicker )
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Door Slam")     PORT_CODE(KEYCODE_HOME) PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, nullptr)
 	PORT_BIT(0x001c, IP_ACTIVE_HIGH, IPT_UNKNOWN)  // called "two coins", "three coins", "four coins" in patent, purpose unknown
-	PORT_BIT(0x07e0, IP_ACTIVE_HIGH, IPT_SPECIAL)  PORT_CUSTOM_MEMBER(DEVICE_SELF, flicker_state, coins_in, nullptr)
+	PORT_BIT(0x07e0, IP_ACTIVE_HIGH, IPT_CUSTOM)  PORT_CUSTOM_MEMBER(DEVICE_SELF, flicker_state, coins_in, nullptr)
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_TILT)
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_START)    PORT_NAME("Credit Button")                         PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, nullptr)
 	PORT_BIT(0x6000, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -398,14 +398,14 @@ void flicker_state::driver_start()
 
 MACHINE_CONFIG_START(flicker_state::flicker)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I4004, 5_MHz_XTAL / 8)
+	MCFG_DEVICE_ADD("maincpu", I4004, 5_MHz_XTAL / 8)
 	MCFG_I4004_ROM_MAP(flicker_rom)
 	MCFG_I4004_RAM_MEMORY_MAP(flicker_memory)
 	MCFG_I4004_ROM_PORTS_MAP(flicker_rom_ports)
 	MCFG_I4004_RAM_STATUS_MAP(flicker_status)
 	MCFG_I4004_RAM_PORTS_MAP(flicker_ram_ports)
-	MCFG_I4004_CM_RAM1_CB(WRITELINE(flicker_state, cm_ram1_w))
-	MCFG_I4004_CM_RAM2_CB(WRITELINE(flicker_state, cm_ram2_w))
+	MCFG_I4004_CM_RAM1_CB(WRITELINE(*this, flicker_state, cm_ram1_w))
+	MCFG_I4004_CM_RAM2_CB(WRITELINE(*this, flicker_state, cm_ram2_w))
 
 	// video
 	MCFG_DEFAULT_LAYOUT(layout_flicker)

@@ -48,6 +48,7 @@ public:
 		, m_io_x2(*this, "X2")
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(st_mp200);
@@ -101,6 +102,7 @@ private:
 	required_ioport m_io_x2;
 	required_ioport m_io_x3;
 	required_ioport m_io_x4;
+	output_finder<47> m_digits;
 };
 
 
@@ -465,11 +467,11 @@ WRITE8_MEMBER( st_mp200_state::u11_a_w )
 		if (BIT(data, 0) && (m_counter > 8))
 		{
 			static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
-			output().set_digit_value(m_digit, patterns[m_segment[0]]);
-			output().set_digit_value(10+m_digit, patterns[m_segment[1]]);
-			output().set_digit_value(20+m_digit, patterns[m_segment[2]]);
-			output().set_digit_value(30+m_digit, patterns[m_segment[3]]);
-			output().set_digit_value(40+m_digit, patterns[m_segment[4]]);
+			m_digits[m_digit] = patterns[m_segment[0]];
+			m_digits[10+m_digit] = patterns[m_segment[1]];
+			m_digits[20+m_digit] = patterns[m_segment[2]];
+			m_digits[30+m_digit] = patterns[m_segment[3]];
+			m_digits[40+m_digit] = patterns[m_segment[4]];
 		}
 	}
 }
@@ -531,6 +533,7 @@ WRITE8_MEMBER( st_mp200_state::u11_b_w )
 
 void st_mp200_state::machine_start()
 {
+	m_digits.resolve();
 }
 
 void st_mp200_state::machine_reset()
@@ -573,8 +576,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( st_mp200_state::u11_timer )
 
 MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 1000000) // no xtal, just 2 chips forming a random oscillator
-	MCFG_CPU_PROGRAM_MAP(st_mp200_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 1000000) // no xtal, just 2 chips forming a random oscillator
+	MCFG_DEVICE_PROGRAM_MAP(st_mp200_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -586,22 +589,22 @@ MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(st_mp200_state, u10_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(st_mp200_state, u10_a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(st_mp200_state, u10_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(st_mp200_state, u10_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(st_mp200_state, u10_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(st_mp200_state, u10_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, st_mp200_state, u10_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, st_mp200_state, u10_a_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, st_mp200_state, u10_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, st_mp200_state, u10_b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, st_mp200_state, u10_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, st_mp200_state, u10_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x", st_mp200_state, timer_x, attotime::from_hz(120)) // mains freq*2
 
 	MCFG_DEVICE_ADD("pia_u11", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(st_mp200_state, u11_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(st_mp200_state, u11_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(st_mp200_state, u11_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(st_mp200_state, u11_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(st_mp200_state, u11_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, st_mp200_state, u11_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, st_mp200_state, u11_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, st_mp200_state, u11_b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, st_mp200_state, u11_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, st_mp200_state, u11_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d", st_mp200_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
@@ -610,7 +613,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(st_mp200_state::st_mp201)
 	st_mp200(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speech", S14001A, S14001_CLOCK)
+	MCFG_DEVICE_ADD("speech", S14001A, S14001_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

@@ -337,7 +337,7 @@ static INPUT_PORTS_START( jankenmn )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Paa (Paper)")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) // 100 yen coin
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jankenmn_state, hopper_status_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jankenmn_state, hopper_status_r, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // 10 yen coin
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 10 yen coin
 
@@ -386,22 +386,22 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(jankenmn_state::jankenmn)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 2.5 MHz */
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)  /* 2.5 MHz */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(jankenmn_map)
-	MCFG_CPU_IO_MAP(jankenmn_port_map)
+	MCFG_DEVICE_PROGRAM_MAP(jankenmn_map)
+	MCFG_DEVICE_IO_MAP(jankenmn_port_map)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
 	/* (10-13) Mode 0 - Ports A & B set as input, high C & low C as output. */
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(jankenmn_state, lamps3_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jankenmn_state, lamps3_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
 	/* (20-23) Mode 0 - Ports A, B, high C & low C set as output. */
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(jankenmn_state, lamps1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(jankenmn_state, lamps2_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jankenmn_state, lamps1_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jankenmn_state, lamps2_w))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -411,9 +411,9 @@ MACHINE_CONFIG_START(jankenmn_state::jankenmn)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("dac", AD7523, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("dac", AD7523, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

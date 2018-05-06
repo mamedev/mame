@@ -114,19 +114,18 @@ static INPUT_PORTS_START( ondra )
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_ESC)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(ondra_state::ondra_interrupt)
+WRITE_LINE_MEMBER(ondra_state::vblank_irq)
 {
-	device.execute().set_input_line(0, HOLD_LINE);
+	if (state)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 /* Machine driver */
 MACHINE_CONFIG_START(ondra_state::ondra)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2000000)
-	MCFG_CPU_PROGRAM_MAP(ondra_mem)
-	MCFG_CPU_IO_MAP(ondra_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ondra_state,  ondra_interrupt)
-
+	MCFG_DEVICE_ADD("maincpu", Z80, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(ondra_mem)
+	MCFG_DEVICE_IO_MAP(ondra_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -136,6 +135,7 @@ MACHINE_CONFIG_START(ondra_state::ondra)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ondra_state, screen_update_ondra)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ondra_state, vblank_irq))
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 

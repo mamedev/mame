@@ -392,7 +392,7 @@ WRITE8_MEMBER(bzone_state::bzone_sounds_w)
 {
 	m_discrete->write(space, BZ_INPUT, data);
 
-	output().set_value("startled", (data >> 6) & 1);
+	m_startled = BIT(data, 6);
 	machine().sound().system_enable(data & 0x20);
 }
 
@@ -401,12 +401,12 @@ MACHINE_CONFIG_START(bzone_state::bzone_audio)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey", POKEY, BZONE_MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("pokey", POKEY, BZONE_MASTER_CLOCK / 8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("IN3"))
 	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(bzone)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

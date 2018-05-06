@@ -164,18 +164,18 @@ static INPUT_PORTS_START( amspdwy )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:1" )        /* Listed as "Unused" */
 
 	PORT_START("WHEEL1")    // Player 1 Wheel + Coins
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )   // wheel
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )   // wheel
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2) // 2-3f
 
 	PORT_START("WHEEL2")    // Player 2 Wheel + Coins
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
 
 	PORT_START("IN0")   // Player 1&2 Pedals + YM2151 Sound Status
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM )
 
 	PORT_START("AN1")   // Player 1 Analog Fake Port
 	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(20) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_PLAYER(1)
@@ -250,13 +250,13 @@ void amspdwy_state::machine_reset()
 MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3000000)
-	MCFG_CPU_PROGRAM_MAP(amspdwy_map)
-	MCFG_CPU_IO_MAP(amspdwy_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amspdwy_state, irq0_line_hold) /* IRQ: 60Hz, NMI: retn */
+	MCFG_DEVICE_ADD("maincpu", Z80, 3000000)
+	MCFG_DEVICE_PROGRAM_MAP(amspdwy_map)
+	MCFG_DEVICE_IO_MAP(amspdwy_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", amspdwy_state, irq0_line_hold) /* IRQ: 60Hz, NMI: retn */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)
-	MCFG_CPU_PROGRAM_MAP(amspdwy_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)
+	MCFG_DEVICE_PROGRAM_MAP(amspdwy_sound_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

@@ -494,7 +494,7 @@ static INPUT_PORTS_START( omegrace )
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(12) PORT_KEYDELTA(10) PORT_COCKTAIL
 
 	PORT_START("AVGDVG")    /* port 0x0b */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("dvg", dvg_device, done_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("dvg", dvg_device, done_r, nullptr)
 INPUT_PORTS_END
 
 
@@ -512,19 +512,19 @@ MACHINE_CONFIG_START(omegrace_state::omegrace)
 	/* main CPU */
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 13 = divide by 4 */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(omegrace_state, irq0_line_hold, 250)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(port_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(omegrace_state, irq0_line_hold, 250)
 
 	/* audio CPU */
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 12 = divide by 8 */
 	/* Fed to CPU as 1.5mhz though line J4-D */
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_port)
-	MCFG_CPU_PERIODIC_INT_DRIVER(omegrace_state, nmi_line_pulse, 250)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_port)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(omegrace_state, nmi_line_pulse, 250)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -548,10 +548,10 @@ MACHINE_CONFIG_START(omegrace_state::omegrace)
 
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS92, Pin 8 = divide by 12 */
-	MCFG_SOUND_ADD("ay1", AY8912, XTAL(12'000'000)/12)
+	MCFG_DEVICE_ADD("ay1", AY8912, XTAL(12'000'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8912, XTAL(12'000'000)/12)
+	MCFG_DEVICE_ADD("ay2", AY8912, XTAL(12'000'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

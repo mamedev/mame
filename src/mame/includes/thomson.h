@@ -142,7 +142,8 @@ public:
 		m_datahibank(*this, TO8_DATA_HI),
 		m_biosbank(*this, TO8_BIOS_BANK),
 		m_cartlobank(*this, MO6_CART_LO),
-		m_carthibank(*this, MO6_CART_HI)
+		m_carthibank(*this, MO6_CART_HI),
+		m_floppy(*this, "floppy")
 	{
 	}
 
@@ -416,6 +417,8 @@ protected:
 	optional_memory_bank m_biosbank;
 	optional_memory_bank m_cartlobank;
 	optional_memory_bank m_carthibank;
+
+	output_finder<> m_floppy;
 
 	/* bank logging and optimisations */
 	int m_old_cart_bank;

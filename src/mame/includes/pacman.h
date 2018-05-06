@@ -95,8 +95,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pacman_interrupt_vector_w);
 	DECLARE_WRITE8_MEMBER(piranha_interrupt_vector_w);
 	DECLARE_WRITE8_MEMBER(nmouse_interrupt_vector_w);
-	DECLARE_WRITE_LINE_MEMBER(led1_w);
-	DECLARE_WRITE_LINE_MEMBER(led2_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_global_w);
 	DECLARE_WRITE8_MEMBER(alibaba_sound_w);
@@ -183,9 +181,11 @@ public:
 	DECLARE_VIDEO_START(jrpacman);
 	uint32_t screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_s2650games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	INTERRUPT_GEN_MEMBER(vblank_nmi);
-	INTERRUPT_GEN_MEMBER(s2650_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	INTERRUPT_GEN_MEMBER(periodic_irq);
+	DECLARE_WRITE_LINE_MEMBER(rocktrv2_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_nmi);
+	DECLARE_WRITE_LINE_MEMBER(s2650_interrupt);
 
 private:
 	void init_save_state();

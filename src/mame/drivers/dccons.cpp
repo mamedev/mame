@@ -576,13 +576,13 @@ INPUT_PORTS_END
 void dc_cons_state::gdrom_config(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 }
 
 MACHINE_CONFIG_START(dc_cons_state::dc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", SH4LE, CPU_CLOCK)
 	MCFG_SH4_MD0(1)
 	MCFG_SH4_MD1(0)
 	MCFG_SH4_MD2(1)
@@ -593,13 +593,13 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	MCFG_SH4_MD7(1)
 	MCFG_SH4_MD8(0)
 	MCFG_SH4_CLOCK(CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(dc_map)
-	MCFG_CPU_IO_MAP(dc_port)
+	MCFG_DEVICE_PROGRAM_MAP(dc_map)
+	MCFG_DEVICE_IO_MAP(dc_port)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
-	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
+	MCFG_DEVICE_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	MCFG_DEVICE_PROGRAM_MAP(dc_audio_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
 
@@ -616,20 +616,20 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	MCFG_SCREEN_RAW_PARAMS(13458568*2, 857, 0, 640, 524, 0, 480) /* TODO: where pclk actually comes? */
 	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_POWERVR2_ADD("powervr2", WRITE8(dc_state, pvr_irq))
+	MCFG_POWERVR2_ADD("powervr2", WRITE8(*this, dc_state, pvr_irq))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("aica", AICA, 0)
+	MCFG_DEVICE_ADD("aica", AICA, 0)
 	MCFG_AICA_MASTER
-	MCFG_AICA_IRQ_CB(WRITELINE(dc_state, aica_irq))
-	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(dc_state, sh4_aica_irq))
+	MCFG_AICA_IRQ_CB(WRITELINE(*this, dc_state, aica_irq))
+	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(*this, dc_state, sh4_aica_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 
 	MCFG_AICARTC_ADD("aicartc", XTAL(32'768))
 
 	MCFG_DEVICE_ADD("ata", ATA_INTERFACE, 0)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(dc_cons_state, ata_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, dc_cons_state, ata_interrupt))
 
 	MCFG_DEVICE_MODIFY("ata:0")
 	MCFG_SLOT_OPTION_ADD("gdrom", GDROM)

@@ -42,6 +42,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")
 		, m_dac1(*this, "dac1")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void atari_s2(machine_config &config);
@@ -71,9 +72,11 @@ private:
 	uint8_t m_segment[7];
 	uint8_t *m_p_prom;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_4bit_binary_weighted_device> m_dac;
 	required_device<dac_3bit_binary_weighted_device> m_dac1;
+	output_finder<68> m_digits;
 };
 
 
@@ -369,7 +372,7 @@ WRITE8_MEMBER( atari_s2_state::display_w )
 	{
 		data &= 7;
 		for (uint8_t i = 0; i < 7; i++)
-			output().set_digit_value(i * 10 + data, m_segment[i]);
+			m_digits[i * 10 + data] = m_segment[i];
 	}
 }
 
@@ -479,8 +482,8 @@ void atari_s2_state::machine_reset()
 
 MACHINE_CONFIG_START(atari_s2_state::atari_s2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL(4'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(atari_s2_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(4'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(atari_s2_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -488,11 +491,11 @@ MACHINE_CONFIG_START(atari_s2_state::atari_s2)
 	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // r23-r26 (68k,33k,18k,8.2k)
-	MCFG_SOUND_ADD("dac1", DAC_3BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // r18-r20 (100k,47k,100k)
+	MCFG_DEVICE_ADD("dac", DAC_4BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // r23-r26 (68k,33k,18k,8.2k)
+	MCFG_DEVICE_ADD("dac1", DAC_3BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // r18-r20 (100k,47k,100k)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_atari_s2)
@@ -503,8 +506,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atari_s2_state::atari_s3)
 	atari_s2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(atari_s3_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(atari_s3_map)
 MACHINE_CONFIG_END
 
 

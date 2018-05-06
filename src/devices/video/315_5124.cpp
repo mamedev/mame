@@ -160,9 +160,10 @@ PALETTE_INIT_MEMBER(sega315_5378_device, sega315_5378)
 
 
 // default address map
-ADDRESS_MAP_START(sega315_5124_device::sega315_5124)
-	AM_RANGE(0x0000, VRAM_SIZE-1) AM_RAM
-ADDRESS_MAP_END
+void sega315_5124_device::sega315_5124(address_map &map)
+{
+	map(0x0000, VRAM_SIZE-1).ram();
+}
 
 
 sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

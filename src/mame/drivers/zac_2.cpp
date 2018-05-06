@@ -22,6 +22,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "ram")
 		, m_row(*this, "ROW.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(ctrl_r);
@@ -30,25 +31,22 @@ public:
 	DECLARE_WRITE8_MEMBER(data_w);
 	DECLARE_READ_LINE_MEMBER(serial_r);
 	DECLARE_WRITE_LINE_MEMBER(serial_w);
-	uint8_t m_t_c;
-	uint8_t m_out_offs;
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_ram;
-	required_ioport_array<6> m_row;
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_outtimer);
 	void zac_2(machine_config &config);
 	void zac_2_data(address_map &map);
 	void zac_2_io(address_map &map);
 	void zac_2_map(address_map &map);
-protected:
-
-	// devices
-
-	// driver_device overrides
-	virtual void machine_reset() override;
 private:
 	uint8_t m_input_line;
+	uint8_t m_t_c;
+	uint8_t m_out_offs;
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_ram;
+	required_ioport_array<6> m_row;
+	output_finder<78> m_digits;
 };
 
 
@@ -207,18 +205,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_outtimer)
 	{
 		uint8_t display = (m_out_offs >> 3) & 7;
 		uint8_t digit = m_out_offs & 7;
-		output().set_digit_value(display * 10 + digit, patterns[m_p_ram[m_out_offs]&15]);
+		m_digits[display * 10 + digit] = patterns[m_p_ram[m_out_offs]&15];
 	}
 }
 
 MACHINE_CONFIG_START(zac_2_state::zac_2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 6000000/2)
-	MCFG_CPU_PROGRAM_MAP(zac_2_map)
-	MCFG_CPU_IO_MAP(zac_2_io)
-	MCFG_CPU_DATA_MAP(zac_2_data)
-	MCFG_S2650_SENSE_INPUT(READLINE(zac_2_state, serial_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(zac_2_state, serial_w))
+	MCFG_DEVICE_ADD("maincpu", S2650, 6000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(zac_2_map)
+	MCFG_DEVICE_IO_MAP(zac_2_io)
+	MCFG_DEVICE_DATA_MAP(zac_2_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, zac_2_state, serial_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, zac_2_state, serial_w))
 	MCFG_NVRAM_ADD_0FILL("ram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_2_inttimer", zac_2_state, zac_2_inttimer, attotime::from_hz(200))

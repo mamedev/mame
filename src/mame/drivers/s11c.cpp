@@ -27,23 +27,25 @@ void s11c_state::s11c_main_map(address_map &map)
 	map(0x4000, 0xffff).rom();
 }
 
-ADDRESS_MAP_START(s11c_state::s11c_audio_map)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(bank_w)
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pias", pia6821_device, read, write)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank0")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void s11c_state::s11c_audio_map(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x0800).ram();
+	map(0x1000, 0x1fff).w(this, FUNC(s11c_state::bank_w));
+	map(0x2000, 0x2003).mirror(0x0ffc).rw("pias", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8000, 0xbfff).bankr("bank0");
+	map(0xc000, 0xffff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(s11c_state::s11c_bg_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia40", pia6821_device, read, write)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(bg_speech_digit_w)
-	AM_RANGE(0x6800, 0x6fff) AM_WRITE(bg_speech_clock_w)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(bgbank_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bgbank")
-ADDRESS_MAP_END
+void s11c_state::s11c_bg_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x2000, 0x2001).mirror(0x1ffe).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x4000, 0x4003).mirror(0x1ffc).rw("pia40", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x6000, 0x67ff).w(this, FUNC(s11c_state::bg_speech_digit_w));
+	map(0x6800, 0x6fff).w(this, FUNC(s11c_state::bg_speech_clock_w));
+	map(0x7800, 0x7fff).w(this, FUNC(s11c_state::bgbank_w));
+	map(0x8000, 0xffff).bankr("bgbank");
+}
 
 static INPUT_PORTS_START( s11c )
 	PORT_START("X0")
@@ -153,8 +155,8 @@ DRIVER_INIT_MEMBER(s11c_state,s11c)
 
 MACHINE_CONFIG_START(s11c_state::s11c)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(s11c_main_map)
+	MCFG_DEVICE_ADD("maincpu", M6808, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(s11c_main_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s11c_state, s11c)
 
 	/* Video */
@@ -165,49 +167,49 @@ MACHINE_CONFIG_START(s11c_state::s11c)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s11_state, sound_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, sound_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, sol2_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s11_state, pia21_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia21_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, s11_state, sound_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s11_state, sound_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11_state, sol2_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s11_state, pia21_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11_state, pia21_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s11_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s11_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia24", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, lamp0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, lamp1_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia24_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s11_state, lamp0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11_state, lamp1_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11_state, pia24_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s11_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s11_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia28", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s11_state, pia28_w7_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11a_state, dig0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11b_state, dig1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s11_state, pia28_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia28_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, s11_state, pia28_w7_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s11a_state, dig0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11b_state, dig1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, s11_state, pia28_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11_state, pia28_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s11_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s11_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia2c", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11b_state, pia2c_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11b_state, pia2c_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s11b_state, pia2c_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11b_state, pia2c_pb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s11_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s11_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia30", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s11_state, switch_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, switch_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia30_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, s11_state, switch_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11_state, switch_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11_state, pia30_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s11_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s11_state, pia_irq))
 
 	MCFG_DEVICE_ADD("pia34", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11b_state, pia34_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, pia34_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia34_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, s11b_state, pia34_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, s11_state, pia34_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, s11_state, pia34_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, s11_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, s11_state, pia_irq))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -215,7 +217,7 @@ MACHINE_CONFIG_START(s11c_state::s11c)
 
 	/* Add the background music card */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("bgm", S11C_BG, 0)
+	MCFG_DEVICE_ADD("bgm", S11C_BG)
 	MCFG_S11C_BG_ROM_REGION(":bgcpu")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END

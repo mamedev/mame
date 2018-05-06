@@ -23,10 +23,11 @@
 
 */
 
-ADDRESS_MAP_START(upd7810_device::upd_internal_4096_rom_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0xff00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void upd7810_device::upd_internal_4096_rom_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0xff00, 0xffff).ram();
+}
 
 DEFINE_DEVICE_TYPE(UPD7811, upd7811_device, "upd78c11", "NEC uPD78C11")
 

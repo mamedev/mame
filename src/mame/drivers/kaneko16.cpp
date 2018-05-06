@@ -309,7 +309,7 @@ void kaneko16_berlwall_state::berlwall(address_map &map)
 	map(0x680000, 0x680001).portr("P1");
 	map(0x680002, 0x680003).portr("P2");
 	map(0x680004, 0x680005).portr("SYSTEM");
-//  AM_RANGE(0x680006, 0x680007) AM_READ_PORT("UNK")
+//  map(0x680006, 0x680007) AM_READ_PORT("UNK")
 	map(0x700000, 0x700001).w(this, FUNC(kaneko16_berlwall_state::kaneko16_coin_lockout_w));  // Coin Lockout
 	map(0x780000, 0x780001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0x800000, 0x80001f).rw(this, FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_r<0>), FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_w<0>)); // Sound
@@ -376,7 +376,7 @@ void kaneko16_state::blazeon(address_map &map)
 	map(0xe00000, 0xe00001).nopr(); // Read = IRQ Ack ?
 	map(0xe00000, 0xe00000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xe40000, 0xe40001).nopr(); // IRQ Ack ?
-//  AM_RANGE(0xe80000, 0xe80001) AM_READNOP // IRQ Ack ?
+//  map(0xe80000, 0xe80001) AM_READNOP // IRQ Ack ?
 	map(0xec0000, 0xec0001).nopr(); // Lev 4 IRQ Ack ?
 }
 
@@ -583,7 +583,7 @@ void kaneko16_gtmr_state::gtmr2_map(address_map &map)
 	map(0xa00000, 0xa00001).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));   // Watchdog
 
 	map(0xb00000, 0xb00001).portr("P1");
-//  AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
+//  map(0xb00002, 0xb00003) AM_READ_PORT("P2")
 	map(0xb00002, 0xb00003).r(this, FUNC(kaneko16_gtmr_state::gtmr2_IN1_r));
 	map(0xb00004, 0xb00005).portr("SYSTEM");
 	map(0xb00006, 0xb00007).portr("EXTRA");
@@ -644,7 +644,7 @@ void kaneko16_shogwarr_state::shogwarr(address_map &map)
 	map(0x280000, 0x280001).w(m_calc3_prot, FUNC(kaneko_calc3_device::mcu_com0_w));
 	map(0x290000, 0x290001).w(m_calc3_prot, FUNC(kaneko_calc3_device::mcu_com1_w));
 	map(0x2b0000, 0x2b0001).w(m_calc3_prot, FUNC(kaneko_calc3_device::mcu_com2_w));
-	//AM_RANGE(0x2c0000, 0x2c0001) // run calc 3? or irq ack?
+	//map(0x2c0000, 0x2c0001) // run calc 3? or irq ack?
 	map(0x2d0000, 0x2d0001).w(m_calc3_prot, FUNC(kaneko_calc3_device::mcu_com3_w));
 	map(0x380000, 0x380fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x400001, 0x400001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // Samples
@@ -696,7 +696,7 @@ void kaneko16_state::blazeon_soundport(address_map &map)
 void kaneko16_state::wingforc_soundport(address_map &map)
 {
 	map.global_mask(0xff);
-//  AM_RANGE(0x00, 0x00) // 02 written at boot
+//  map(0x00, 0x00) // 02 written at boot
 	map(0x02, 0x03).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x0a, 0x0a).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -1777,8 +1777,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::kaneko16_interrupt)
 MACHINE_CONFIG_START(kaneko16_berlwall_state::berlwall)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* MC68000P12 */
-	MCFG_CPU_PROGRAM_MAP(berlwall)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* MC68000P12 */
+	MCFG_DEVICE_PROGRAM_MAP(berlwall)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -1815,12 +1815,12 @@ MACHINE_CONFIG_START(kaneko16_berlwall_state::berlwall)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ym2149_1", YM2149, 1000000)
+	MCFG_DEVICE_ADD("ym2149_1", YM2149, 1000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ym2149_2", YM2149, 1000000)
+	MCFG_DEVICE_ADD("ym2149_2", YM2149, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_OKIM6295_ADD("oki1", 12000000/6, PIN7_LOW)
@@ -1842,8 +1842,8 @@ void kaneko16_state::bakubrkr_oki1_map(address_map &map)
 MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(bakubrkr)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(bakubrkr)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,gtmr)
@@ -1887,12 +1887,12 @@ MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym2149_1", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym2149_1", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym2149_2", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(kaneko16_state, eeprom_r))    /* inputs  A:  0,EEPROM bit read */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
+	MCFG_DEVICE_ADD("ym2149_2", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kaneko16_state, eeprom_r))    /* inputs  A:  0,EEPROM bit read */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(12'000'000)/6, PIN7_HIGH) /* verified on pcb */
@@ -1918,13 +1918,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kaneko16_state::blazeon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,12000000)    /* TMP68HC000-12 */
-	MCFG_CPU_PROGRAM_MAP(blazeon)
+	MCFG_DEVICE_ADD("maincpu", M68000,12000000)    /* TMP68HC000-12 */
+	MCFG_DEVICE_PROGRAM_MAP(blazeon)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)   /* D780C-2 (6 MHz) */
-	MCFG_CPU_PROGRAM_MAP(blazeon_soundmem)
-	MCFG_CPU_IO_MAP(blazeon_soundport)
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)   /* D780C-2 (6 MHz) */
+	MCFG_DEVICE_PROGRAM_MAP(blazeon_soundmem)
+	MCFG_DEVICE_IO_MAP(blazeon_soundport)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1960,7 +1960,7 @@ MACHINE_CONFIG_START(kaneko16_state::blazeon)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1973,13 +1973,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kaneko16_state::wingforc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))    /* TMP68HC000N-16 */
-	MCFG_CPU_PROGRAM_MAP(blazeon)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))    /* TMP68HC000N-16 */
+	MCFG_DEVICE_PROGRAM_MAP(blazeon)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)   /* D780C-2 (6 MHz) */
-	MCFG_CPU_PROGRAM_MAP(blazeon_soundmem)
-	MCFG_CPU_IO_MAP(wingforc_soundport)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)   /* D780C-2 (6 MHz) */
+	MCFG_DEVICE_PROGRAM_MAP(blazeon_soundmem)
+	MCFG_DEVICE_IO_MAP(wingforc_soundport)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2015,7 +2015,7 @@ MACHINE_CONFIG_START(kaneko16_state::wingforc)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/16, PIN7_HIGH)
@@ -2038,20 +2038,22 @@ MACHINE_CONFIG_END
     VIDEO_UPDATE_AFTER_VBLANK fixes the mangled/wrong colored sprites
 */
 
-ADDRESS_MAP_START(kaneko16_state::gtmr_oki1_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank1")
-ADDRESS_MAP_END
+void kaneko16_state::gtmr_oki1_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("okibank1");
+}
 
-ADDRESS_MAP_START(kaneko16_state::gtmr_oki2_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("okibank2")
-ADDRESS_MAP_END
+void kaneko16_state::gtmr_oki2_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).bankr("okibank2");
+}
 
 MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(gtmr_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(gtmr_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state,gtmr)
@@ -2121,8 +2123,8 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr2)
 	gtmre(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gtmr2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gtmr2_map)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -2133,8 +2135,8 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::bloodwar)
 	gtmr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bloodwar)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bloodwar)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state, gtmr )
 
@@ -2155,8 +2157,8 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::bonkadv)
 	gtmr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bonkadv)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bonkadv)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state, gtmr )
 
@@ -2179,8 +2181,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb, TMP68HC000N-12 @U31 and X2 is 12MHz */
-	MCFG_CPU_PROGRAM_MAP(mgcrystl)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* verified on pcb, TMP68HC000N-12 @U31 and X2 is 12MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mgcrystl)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,mgcrystl)
@@ -2223,12 +2225,12 @@ MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym2149_1", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym2149_1", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym2149_2", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(kaneko16_state, eeprom_r))    /* inputs  A:  0,EEPROM bit read */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
+	MCFG_DEVICE_ADD("ym2149_2", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kaneko16_state, eeprom_r))    /* inputs  A:  0,EEPROM bit read */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(12'000'000)/6, PIN7_HIGH) /* verified on pcb */
@@ -2299,8 +2301,8 @@ static const uint16_t shogwarr_default_eeprom[64] = {
 MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(shogwarr)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(shogwarr)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_shogwarr_state, shogwarr_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_shogwarr_state,mgcrystl)
@@ -2376,7 +2378,7 @@ void kaneko16_shogwarr_state::brapboys_oki2_map(address_map &map)
 
 MACHINE_CONFIG_START(kaneko16_shogwarr_state::brapboys)
 	shogwarr(config);
-	MCFG_SOUND_MODIFY("oki2")
+	MCFG_DEVICE_MODIFY("oki2")
 	MCFG_DEVICE_ADDRESS_MAP(0, brapboys_oki2_map)
 
 	MCFG_DEVICE_MODIFY("kan_hit")

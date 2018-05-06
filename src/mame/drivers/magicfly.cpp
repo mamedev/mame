@@ -940,9 +940,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(magicfly_state::magicfly)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
-	MCFG_CPU_PROGRAM_MAP(magicfly_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicfly_state, nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(magicfly_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -962,12 +961,13 @@ MACHINE_CONFIG_START(magicfly_state::magicfly)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 

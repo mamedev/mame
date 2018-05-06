@@ -372,7 +372,7 @@ static INPUT_PORTS_START( dacholer )
 	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dacholer_state,snd_ack_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dacholer_state,snd_ack_r, nullptr)
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            /* table at 0x0a9c */
@@ -660,15 +660,15 @@ PALETTE_INIT_MEMBER(dacholer_state, dacholer)
 MACHINE_CONFIG_START(dacholer_state::dacholer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/4)  /* ? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dacholer_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/4)  /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dacholer_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(19'968'000)/8) /* ? */
-	MCFG_CPU_PROGRAM_MAP(snd_map)
-	MCFG_CPU_IO_MAP(snd_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dacholer_state, sound_irq)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(19'968'000)/8) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(snd_map)
+	MCFG_DEVICE_IO_MAP(snd_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dacholer_state, sound_irq)
 
 
 	/* video hardware */
@@ -691,30 +691,30 @@ MACHINE_CONFIG_START(dacholer_state::dacholer)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(19'968'000)/16)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(19'968'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(19'968'000)/16)
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(19'968'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL(19'968'000)/16)
+	MCFG_DEVICE_ADD("ay3", AY8910, XTAL(19'968'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(dacholer_state, adpcm_int))          /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dacholer_state, adpcm_int))          /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 = 3906.25Hz playback  - guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dacholer_state::itaten)
 	dacholer(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(itaten_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(itaten_main_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(itaten_snd_map)
-	MCFG_CPU_IO_MAP(itaten_snd_io_map)
-	MCFG_CPU_VBLANK_INT_REMOVE()
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(itaten_snd_map)
+	MCFG_DEVICE_IO_MAP(itaten_snd_io_map)
+	MCFG_DEVICE_VBLANK_INT_REMOVE()
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", itaten)
 

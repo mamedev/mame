@@ -269,21 +269,21 @@ WRITE8_MEMBER( hardbox_device::ppi1_pc_w )
 
 MACHINE_CONFIG_START(hardbox_device::device_add_mconfig)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(hardbox_mem)
-	MCFG_CPU_IO_MAP(hardbox_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(hardbox_mem)
+	MCFG_DEVICE_IO_MAP(hardbox_io)
 
 	// devices
 	MCFG_DEVICE_ADD(I8255_0_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(hardbox_device, ppi0_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(hardbox_device, ppi0_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(hardbox_device, ppi0_pc_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, hardbox_device, ppi0_pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, hardbox_device, ppi0_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, hardbox_device, ppi0_pc_r))
 
 	MCFG_DEVICE_ADD(I8255_1_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(hardbox_device, ppi1_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(hardbox_device, ppi1_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(hardbox_device, ppi1_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(hardbox_device, ppi1_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, hardbox_device, ppi1_pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, hardbox_device, ppi1_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, hardbox_device, ppi1_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, hardbox_device, ppi1_pc_w))
 
 	MCFG_DEVICE_ADD(CORVUS_HDC_TAG, CORVUS_HDC, 0)
 	MCFG_HARDDISK_ADD("harddisk1")

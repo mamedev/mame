@@ -990,9 +990,10 @@ void segaxbd_state::main_map(address_map &map)
 	map(0x3fc000, 0x3fffff).ram().share("backup2");
 }
 
-ADDRESS_MAP_START(segaxbd_state::decrypted_opcodes_map)
-	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
-ADDRESS_MAP_END
+void segaxbd_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
+}
 
 //**************************************************************************
 //  SUB CPU ADDRESS MAPS
@@ -1044,18 +1045,20 @@ void segaxbd_state::sound_portmap(address_map &map)
 // Sound Board
 // The extra sound is used when the cabinet is Deluxe(Air Drive), or Cockpit. The soundlatch is
 // shared with the main board sound.
-ADDRESS_MAP_START(segaxbd_state::smgp_sound2_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm2", segapcm_device, sega_pcm_r, sega_pcm_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segaxbd_state::smgp_sound2_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm2", FUNC(segapcm_device::sega_pcm_r), FUNC(segapcm_device::sega_pcm_w));
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segaxbd_state::smgp_sound2_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
-ADDRESS_MAP_END
+void segaxbd_state::smgp_sound2_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x40, 0x40).mirror(0x3f).r(this, FUNC(segaxbd_state::sound_data_r));
+}
 
 
 
@@ -1064,18 +1067,20 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // Motor Board, not yet emulated
-ADDRESS_MAP_START(segaxbd_state::smgp_airdrive_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xafff) AM_RAM
-ADDRESS_MAP_END
+void segaxbd_state::smgp_airdrive_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xafff).ram();
+}
 
-ADDRESS_MAP_START(segaxbd_state::smgp_airdrive_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READNOP
-	AM_RANGE(0x02, 0x03) AM_NOP
-ADDRESS_MAP_END
+void segaxbd_state::smgp_airdrive_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x01, 0x01).nopr();
+	map(0x02, 0x03).noprw();
+}
 
 
 
@@ -1084,17 +1089,19 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // Link Board, not yet emulated
-ADDRESS_MAP_START(segaxbd_state::smgp_comm_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM // MB8421 Dual-Port SRAM
-ADDRESS_MAP_END
+void segaxbd_state::smgp_comm_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).ram();
+	map(0x4000, 0x47ff).ram(); // MB8421 Dual-Port SRAM
+}
 
-ADDRESS_MAP_START(segaxbd_state::smgp_comm_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void segaxbd_state::smgp_comm_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 
 
@@ -1103,16 +1110,18 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // Z80, unknown function
-ADDRESS_MAP_START(segaxbd_state::rascot_z80_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xafff) AM_RAM
-ADDRESS_MAP_END
+void segaxbd_state::rascot_z80_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xafff).ram();
+}
 
-ADDRESS_MAP_START(segaxbd_state::rascot_z80_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void segaxbd_state::rascot_z80_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 
 
@@ -1123,7 +1132,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( xboard_generic )
 	PORT_START("mainpcb:IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )    // D5-D0: CN C pin 24-19 (switch state 0= open, 1= closed)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    // D6: /INTR of ADC0804
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    // D6: /INTR of ADC0804
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )     // D7: (Not connected)
 
 	// I/O port: CN C pins 17,15,13,11,9,7,5,3
@@ -1209,10 +1218,10 @@ static INPUT_PORTS_START( aburner )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(100) PORT_KEYDELTA(79)
 
 	PORT_START("mainpcb:ADC3")  // motor Y
-	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_SPECIAL )
+	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_CUSTOM )
 
 	PORT_START("mainpcb:ADC4")  // motor X
-	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_SPECIAL )
+	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -1560,7 +1569,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gprider )
 	PORT_START("mainpcb:IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    // /INTR of ADC0804
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    // /INTR of ADC0804
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:IO0PORTB")
@@ -1617,7 +1626,7 @@ static INPUT_PORTS_START( gprider_double )
 
 	PORT_START("subpcb:IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    // /INTR of ADC0804
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    // /INTR of ADC0804
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("subpcb:IO0PORTB")
@@ -1695,15 +1704,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("subcpu", M68000, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("subcpu", M68000, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
 	MCFG_NVRAM_ADD_0FILL("backup1")
 	MCFG_NVRAM_ADD_0FILL("backup2")
@@ -1718,15 +1727,15 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 
 	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_main")
 	MCFG_SEGA_315_5250_TIMER_ACK(segaxbd_state, timer_ack_callback)
-	MCFG_SEGA_315_5250_SOUND_WRITE_CALLBACK(WRITE8(segaxbd_state, sound_data_w))
+	MCFG_SEGA_315_5250_SOUND_WRITE_CALLBACK(WRITE8(*this, segaxbd_state, sound_data_w))
 
 	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_subx")
 
 	MCFG_DEVICE_ADD("iochip_0", CXD1095, 0) // IC160
 	MCFG_CXD1095_IN_PORTA_CB(IOPORT("IO0PORTA"))
 	MCFG_CXD1095_IN_PORTB_CB(IOPORT("IO0PORTB"))
-	MCFG_CXD1095_OUT_PORTC_CB(WRITE8(segaxbd_state, pc_0_w))
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(segaxbd_state, pd_0_w))
+	MCFG_CXD1095_OUT_PORTC_CB(WRITE8(*this, segaxbd_state, pc_0_w))
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, segaxbd_state, pd_0_w))
 
 	MCFG_DEVICE_ADD("iochip_1", CXD1095, 0) // IC159
 	MCFG_CXD1095_IN_PORTA_CB(IOPORT("IO1PORTA"))
@@ -1755,12 +1764,12 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
-	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/4)
+	MCFG_DEVICE_ADD("pcm", SEGAPCM, SOUND_CLOCK/4)
 	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1795,9 +1804,9 @@ MACHINE_CONFIG_START(segaxbd_fd1094_state::device_add_mconfig)
 
 	segaxbd_state::xboard_base_mconfig(config);
 
-	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -1829,8 +1838,8 @@ MACHINE_CONFIG_START(segaxbd_aburner2_state::device_add_mconfig)
 
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY("iochip_0")
-	MCFG_CXD1095_IN_PORTA_CB(READ8(segaxbd_state, aburner2_motor_r))
-	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(segaxbd_state, aburner2_motor_w))
+	MCFG_CXD1095_IN_PORTA_CB(READ8(*this, segaxbd_state, aburner2_motor_r))
+	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(*this, segaxbd_state, aburner2_motor_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segaxbd_new_state::sega_aburner2)
@@ -1849,21 +1858,21 @@ MACHINE_CONFIG_START(segaxbd_lastsurv_fd1094_state::device_add_mconfig)
 
 	segaxbd_state::xboard_base_mconfig(config);
 
-	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
 	// basic machine hardware
 	// TODO: network board
 
 	MCFG_DEVICE_MODIFY("iochip_0")
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(segaxbd_state, lastsurv_muxer_w))
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, segaxbd_state, lastsurv_muxer_w))
 
 	MCFG_DEVICE_MODIFY("iochip_1")
-	MCFG_CXD1095_IN_PORTB_CB(READ8(segaxbd_state, lastsurv_port_r))
+	MCFG_CXD1095_IN_PORTB_CB(READ8(*this, segaxbd_state, lastsurv_port_r))
 
 	// sound hardware - ym2151 stereo is reversed
-	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_DEVICE_MODIFY("ymsnd")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.43)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.43)
@@ -1889,13 +1898,13 @@ MACHINE_CONFIG_START(segaxbd_lastsurv_state::device_add_mconfig)
 	// TODO: network board
 
 	MCFG_DEVICE_MODIFY("iochip_0")
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(segaxbd_state, lastsurv_muxer_w))
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, segaxbd_state, lastsurv_muxer_w))
 
 	MCFG_DEVICE_MODIFY("iochip_1")
-	MCFG_CXD1095_IN_PORTB_CB(READ8(segaxbd_state, lastsurv_port_r))
+	MCFG_CXD1095_IN_PORTB_CB(READ8(*this, segaxbd_state, lastsurv_port_r))
 
 	// sound hardware - ym2151 stereo is reversed
-	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_DEVICE_MODIFY("ymsnd")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.43)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.43)
@@ -1916,31 +1925,31 @@ segaxbd_smgp_fd1094_state::segaxbd_smgp_fd1094_state(const machine_config &mconf
 MACHINE_CONFIG_START(segaxbd_smgp_fd1094_state::device_add_mconfig)
 	segaxbd_state::xboard_base_mconfig(config);
 
-	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("soundcpu2", Z80, SOUND_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(smgp_sound2_map)
-	MCFG_CPU_IO_MAP(smgp_sound2_portmap)
+	MCFG_DEVICE_ADD("soundcpu2", Z80, SOUND_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(smgp_sound2_map)
+	MCFG_DEVICE_IO_MAP(smgp_sound2_portmap)
 
-	MCFG_CPU_ADD("commcpu", Z80, XTAL(16'000'000)/2) // Z80E
-	MCFG_CPU_PROGRAM_MAP(smgp_comm_map)
-	MCFG_CPU_IO_MAP(smgp_comm_portmap)
+	MCFG_DEVICE_ADD("commcpu", Z80, XTAL(16'000'000)/2) // Z80E
+	MCFG_DEVICE_PROGRAM_MAP(smgp_comm_map)
+	MCFG_DEVICE_IO_MAP(smgp_comm_portmap)
 
-	MCFG_CPU_ADD("motorcpu", Z80, XTAL(16'000'000)/2) // not verified
-	MCFG_CPU_PROGRAM_MAP(smgp_airdrive_map)
-	MCFG_CPU_IO_MAP(smgp_airdrive_portmap)
+	MCFG_DEVICE_ADD("motorcpu", Z80, XTAL(16'000'000)/2) // not verified
+	MCFG_DEVICE_PROGRAM_MAP(smgp_airdrive_map)
+	MCFG_DEVICE_IO_MAP(smgp_airdrive_portmap)
 
 	MCFG_DEVICE_MODIFY("iochip_0")
-	MCFG_CXD1095_IN_PORTA_CB(READ8(segaxbd_state, smgp_motor_r))
-	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(segaxbd_state, smgp_motor_w))
+	MCFG_CXD1095_IN_PORTA_CB(READ8(*this, segaxbd_state, smgp_motor_r))
+	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(*this, segaxbd_state, smgp_motor_w))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
-	MCFG_SEGAPCM_ADD("pcm2", SOUND_CLOCK/4)
+	MCFG_DEVICE_ADD("pcm2", SEGAPCM, SOUND_CLOCK/4)
 	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
@@ -1962,26 +1971,26 @@ MACHINE_CONFIG_START(segaxbd_smgp_state::device_add_mconfig)
 	segaxbd_state::xboard_base_mconfig(config);
 
 	// basic machine hardware
-	MCFG_CPU_ADD("soundcpu2", Z80, SOUND_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(smgp_sound2_map)
-	MCFG_CPU_IO_MAP(smgp_sound2_portmap)
+	MCFG_DEVICE_ADD("soundcpu2", Z80, SOUND_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(smgp_sound2_map)
+	MCFG_DEVICE_IO_MAP(smgp_sound2_portmap)
 
-	MCFG_CPU_ADD("commcpu", Z80, XTAL(16'000'000)/2) // Z80E
-	MCFG_CPU_PROGRAM_MAP(smgp_comm_map)
-	MCFG_CPU_IO_MAP(smgp_comm_portmap)
+	MCFG_DEVICE_ADD("commcpu", Z80, XTAL(16'000'000)/2) // Z80E
+	MCFG_DEVICE_PROGRAM_MAP(smgp_comm_map)
+	MCFG_DEVICE_IO_MAP(smgp_comm_portmap)
 
-	MCFG_CPU_ADD("motorcpu", Z80, XTAL(16'000'000)/2) // not verified
-	MCFG_CPU_PROGRAM_MAP(smgp_airdrive_map)
-	MCFG_CPU_IO_MAP(smgp_airdrive_portmap)
+	MCFG_DEVICE_ADD("motorcpu", Z80, XTAL(16'000'000)/2) // not verified
+	MCFG_DEVICE_PROGRAM_MAP(smgp_airdrive_map)
+	MCFG_DEVICE_IO_MAP(smgp_airdrive_portmap)
 
 	MCFG_DEVICE_MODIFY("iochip_0")
-	MCFG_CXD1095_IN_PORTA_CB(READ8(segaxbd_state, smgp_motor_r))
-	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(segaxbd_state, smgp_motor_w))
+	MCFG_CXD1095_IN_PORTA_CB(READ8(*this, segaxbd_state, smgp_motor_r))
+	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(*this, segaxbd_state, smgp_motor_w))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
-	MCFG_SEGAPCM_ADD("pcm2", SOUND_CLOCK/4)
+	MCFG_DEVICE_ADD("pcm2", SEGAPCM, SOUND_CLOCK/4)
 	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
@@ -2003,9 +2012,9 @@ MACHINE_CONFIG_START(segaxbd_rascot_state::device_add_mconfig)
 	segaxbd_state::xboard_base_mconfig(config);
 
 	// basic machine hardware
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(rascot_z80_map)
-	MCFG_CPU_IO_MAP(rascot_z80_portmap)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(rascot_z80_map)
+	MCFG_DEVICE_IO_MAP(rascot_z80_portmap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segaxbd_new_state::sega_rascot)

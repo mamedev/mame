@@ -164,7 +164,7 @@ void iteagle_state::machine_reset()
 MACHINE_CONFIG_START(iteagle_state::iteagle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)
+	MCFG_DEVICE_ADD("maincpu", VR4310LE, 166666666)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(8192)
 	MCFG_MIPS3_SYSTEM_CLOCK(66666667)
@@ -186,7 +186,7 @@ MACHINE_CONFIG_START(iteagle_state::iteagle)
 	MCFG_VOODOO_PCI_ADD(              PCI_ID_VIDEO, TYPE_VOODOO_3, ":maincpu")
 	MCFG_VOODOO_PCI_FBMEM(16)
 	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
-	MCFG_VOODOO_VBLANK_CB(DEVWRITELINE(PCI_ID_FPGA, iteagle_fpga_device, vblank_update))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(PCI_ID_FPGA, iteagle_fpga_device, vblank_update))
 
 	MCFG_ITEAGLE_EEPROM_ADD(          PCI_ID_EEPROM)
 
@@ -291,8 +291,8 @@ MACHINE_CONFIG_START(iteagle_state::virtpool)
 	iteagle(config);
 	// Not sure what the actual value should be
 	// Setting a lower frequency helps delay the tutorial screen premature cut-out
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(99999999)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(99999999)
 	MCFG_MIPS3_SYSTEM_CLOCK(33333333)
 
 	MCFG_DEVICE_REMOVE(PCI_ID_VIDEO)

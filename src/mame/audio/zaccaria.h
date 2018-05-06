@@ -65,7 +65,7 @@ protected:
 class zac1b11107_audio_device : public zac1b111xx_melody_base
 {
 public:
-	zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	// host interface
 	DECLARE_WRITE8_MEMBER(sound_w);
@@ -86,7 +86,7 @@ class zac1b11142_audio_device : public zac1b111xx_melody_base
 public:
 	template <class Object> devcb_base &set_acs_cb(device_t &device, Object &&cb) { return m_acs_cb.set_callback(std::forward<Object>(cb)); }
 
-	zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	// host interface
 	DECLARE_WRITE8_MEMBER(hs_w);

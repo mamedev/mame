@@ -42,6 +42,7 @@ Interrupt frequency on audio CPU is not a periodical signal, but there are a lot
 
 void speedbal_state::machine_start()
 {
+	m_digits.resolve();
 	save_item(NAME(m_leds_start));
 	save_item(NAME(m_leds_shiftreg));
 }
@@ -101,9 +102,9 @@ WRITE8_MEMBER(speedbal_state::leds_output_block)
 	// The shift register is 28 bits, led block number is in the upper bits
 	// and the other 3 bytes in it go to each 7seg led of the current block.
 	int block = m_leds_shiftreg >> 24 & 7;
-	output().set_digit_value(10 * block + 0, ~m_leds_shiftreg >> 0 & 0xff);
-	output().set_digit_value(10 * block + 1, ~m_leds_shiftreg >> 8 & 0xff);
-	output().set_digit_value(10 * block + 2, ~m_leds_shiftreg >> 16 & 0xff);
+	m_digits[10 * block] = ~m_leds_shiftreg & 0xff;
+	m_digits[10 * block + 1] = ~m_leds_shiftreg >> 8 & 0xff;
+	m_digits[10 * block + 2] = ~m_leds_shiftreg >> 16 & 0xff;
 }
 
 WRITE8_MEMBER(speedbal_state::leds_start_block)
@@ -265,15 +266,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(speedbal_state::speedbal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000)) // 4 MHz
-	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
-	MCFG_CPU_IO_MAP(main_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", speedbal_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000)) // 4 MHz
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu_map)
+	MCFG_DEVICE_IO_MAP(main_cpu_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speedbal_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000)) // 4 MHz
-	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
-	MCFG_CPU_IO_MAP(sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(speedbal_state, irq0_line_hold, 1000/2) // approximate?
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000)) // 4 MHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu_map)
+	MCFG_DEVICE_IO_MAP(sound_cpu_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(speedbal_state, irq0_line_hold, 1000/2) // approximate?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -292,7 +293,7 @@ MACHINE_CONFIG_START(speedbal_state::speedbal)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000)) // 4 MHz(?)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000)) // 4 MHz(?)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

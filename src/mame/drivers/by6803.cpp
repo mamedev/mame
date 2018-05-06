@@ -44,6 +44,7 @@ public:
 		, m_io_x2(*this, "X2")
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(by6803);
@@ -78,6 +79,7 @@ private:
 	//uint8_t m_digit;
 	uint8_t m_segment;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<m6803_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
@@ -87,6 +89,7 @@ private:
 	required_ioport m_io_x2;
 	required_ioport m_io_x3;
 	required_ioport m_io_x4;
+	output_finder<40> m_digits;
 };
 
 
@@ -229,19 +232,19 @@ WRITE8_MEMBER( by6803_state::pia0_a_w )
 	switch (m_pia0_a)
 	{
 		case 0x10: // wrong
-			output().set_digit_value(m_digit, m_segment);
+			m_digits[m_digit] = m_segment;
 			break;
 		case 0x1d:
-			output().set_digit_value(8+m_digit, m_segment);
+			m_digits[8+m_digit] = m_segment;
 			break;
 		case 0x1b:
-			output().set_digit_value(16+m_digit, m_segment);
+			m_digits[16+m_digit] = m_segment;
 			break;
 		case 0x07:
-			output().set_digit_value(24+m_digit, m_segment);
+			m_digits[24+m_digit] = m_segment;
 			break;
 		case 0x0f:
-			output().set_digit_value(32+m_digit, m_segment);
+			m_digits[32+m_digit] m_segment;
 			break;
 		default:
 			break;
@@ -377,9 +380,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( by6803_state::pia0_timer )
 
 MACHINE_CONFIG_START(by6803_state::by6803)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6803, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(by6803_map)
-	MCFG_CPU_IO_MAP(by6803_io)
+	MCFG_DEVICE_ADD("maincpu", M6803, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(by6803_map)
+	MCFG_DEVICE_IO_MAP(by6803_io)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -391,24 +394,24 @@ MACHINE_CONFIG_START(by6803_state::by6803)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(by6803_state, pia0_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(by6803_state, pia0_a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(by6803_state, pia0_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by6803_state, pia0_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(by6803_state, pia0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(by6803_state, pia0_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, by6803_state, pia0_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, by6803_state, pia0_a_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, by6803_state, pia0_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, by6803_state, pia0_b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, by6803_state, pia0_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, by6803_state, pia0_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6803_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6803_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z", by6803_state, pia0_timer, attotime::from_hz(120)) // mains freq*2
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(by6803_state, pia1_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(by6803_state, pia1_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by6803_state, pia1_b_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(by6803_state, pia1_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, by6803_state, pia1_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, by6803_state, pia1_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, by6803_state, pia1_b_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, by6803_state, pia1_cb2_w))
 
 	//MCFG_SPEAKER_STANDARD_MONO("speaker")
-	//MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0) // Cheap Squeak Turbo
+	//MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK) // Cheap Squeak Turbo
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 

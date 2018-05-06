@@ -242,7 +242,7 @@ static INPUT_PORTS_START( narc )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,narc_talkback_strobe_r, nullptr)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,narc_talkback_strobe_r, nullptr)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED ) /* memory protect interlock */
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -258,7 +258,7 @@ static INPUT_PORTS_START( narc )
 */
 
 	PORT_START("IN2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,narc_talkback_data_r, nullptr)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,narc_talkback_data_r, nullptr)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
@@ -725,7 +725,7 @@ static INPUT_PORTS_START( mkla2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P2 Block 2") PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Low Punch") PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Low Kick") PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Block 2") PORT_PLAYER(1)
 
 	PORT_START("IN2")
@@ -817,7 +817,7 @@ static INPUT_PORTS_START( mkla4 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P2 Block 2") PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Low Punch") PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Low Kick") PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Block 2") PORT_PLAYER(1)
 
 	PORT_START("IN2")
@@ -909,7 +909,7 @@ static INPUT_PORTS_START( term2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
@@ -1010,7 +1010,7 @@ static INPUT_PORTS_START( totcarn )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED ) /* video freeze */
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x3c00, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midyunit_state,adpcm_irq_state_r, nullptr)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
@@ -1102,8 +1102,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(midyunit_state::zunit)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, FAST_MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, FAST_MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(MEDRES_PIXEL_CLOCK) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
@@ -1128,7 +1128,7 @@ MACHINE_CONFIG_START(midyunit_state::zunit)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("narcsnd", WILLIAMS_NARC_SOUND, 0)
+	MCFG_DEVICE_ADD("narcsnd", WILLIAMS_NARC_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1144,8 +1144,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(midyunit_state::yunit_core)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, SLOW_MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, SLOW_MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(STDRES_PIXEL_CLOCK) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
@@ -1176,7 +1176,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_slow)
 	yunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
@@ -1190,10 +1190,10 @@ MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_fast)
 	yunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(FAST_MASTER_CLOCK)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(FAST_MASTER_CLOCK)
 
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
@@ -1207,7 +1207,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_6bit_slow)
 	yunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
@@ -1221,10 +1221,10 @@ MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_fast)
 	yunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(FAST_MASTER_CLOCK)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(FAST_MASTER_CLOCK)
 
-	MCFG_SOUND_ADD("adpcm", WILLIAMS_ADPCM_SOUND, 0)
+	MCFG_DEVICE_ADD("adpcm", WILLIAMS_ADPCM_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
@@ -1238,10 +1238,10 @@ MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_faster)
 	yunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(FASTER_MASTER_CLOCK)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(FASTER_MASTER_CLOCK)
 
-	MCFG_SOUND_ADD("adpcm", WILLIAMS_ADPCM_SOUND, 0)
+	MCFG_DEVICE_ADD("adpcm", WILLIAMS_ADPCM_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
@@ -1266,8 +1266,8 @@ MACHINE_CONFIG_START(midyunit_state::mkyawdim)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(yawdim_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(yawdim_sound_map)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")

@@ -827,11 +827,11 @@ MACHINE_RESET_MEMBER(cninja_state,robocop2)
 MACHINE_CONFIG_START(cninja_state::cninja)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(cninja_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cninja_map)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
 	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
@@ -848,7 +848,7 @@ MACHINE_CONFIG_START(cninja_state::cninja)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(1)
@@ -895,12 +895,12 @@ MACHINE_CONFIG_START(cninja_state::cninja)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000) / 8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_YM2151_ADD("ym2", XTAL(32'220'000) / 9)
+	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000) / 9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(cninja_state,sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, cninja_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
@@ -915,11 +915,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cninja_state::stoneage)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(cninja_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cninja_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(stoneage_s_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
+	MCFG_DEVICE_PROGRAM_MAP(stoneage_s_map)
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
 	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
@@ -938,7 +938,7 @@ MACHINE_CONFIG_START(cninja_state::stoneage)
 
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,stoneage)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(1)
@@ -985,7 +985,7 @@ MACHINE_CONFIG_START(cninja_state::stoneage)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000) / 9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000) / 9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
@@ -996,8 +996,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cninja_state::cninjabl2)
 	stoneage(config);
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(cninjabl2_s_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(cninjabl2_s_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninjabl2)
@@ -1015,11 +1015,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cninja_state::cninjabl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(cninjabl_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cninjabl_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(cninjabl_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
+	MCFG_DEVICE_PROGRAM_MAP(cninjabl_sound_map)
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
 	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
@@ -1036,7 +1036,7 @@ MACHINE_CONFIG_START(cninja_state::cninjabl)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(1)
@@ -1074,7 +1074,7 @@ MACHINE_CONFIG_START(cninja_state::cninjabl)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000) / 9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000) / 9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
@@ -1087,11 +1087,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cninja_state::edrandy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(edrandy_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(edrandy_map)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
 	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
@@ -1108,7 +1108,7 @@ MACHINE_CONFIG_START(cninja_state::edrandy)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -1154,12 +1154,12 @@ MACHINE_CONFIG_START(cninja_state::edrandy)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000) / 8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_YM2151_ADD("ym2", XTAL(32'220'000) / 9)
+	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000) / 9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(cninja_state,sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, cninja_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
@@ -1174,11 +1174,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cninja_state::robocop2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(robocop2_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(robocop2_map)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
 	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
@@ -1198,7 +1198,7 @@ MACHINE_CONFIG_START(cninja_state::robocop2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -1247,13 +1247,13 @@ MACHINE_CONFIG_START(cninja_state::robocop2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000) / 8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
-	MCFG_YM2151_ADD("ym2", XTAL(32'220'000) / 9)
+	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000) / 9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(cninja_state,sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, cninja_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
@@ -1270,12 +1270,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cninja_state::mutantf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(mutantf_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cninja_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mutantf_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cninja_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(sound_map_mutantf)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map_mutantf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1290,8 +1290,8 @@ MACHINE_CONFIG_START(cninja_state::mutantf)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -1342,9 +1342,9 @@ MACHINE_CONFIG_START(cninja_state::mutantf)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000) / 9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000) / 9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(cninja_state,sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, cninja_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 

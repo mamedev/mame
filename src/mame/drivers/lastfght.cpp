@@ -461,9 +461,9 @@ static INPUT_PORTS_START( lastfght )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH,IPT_SPECIAL        )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH,IPT_SPECIAL        )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH,IPT_SPECIAL        )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH,IPT_CUSTOM        )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH,IPT_CUSTOM        )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH,IPT_CUSTOM        )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
@@ -553,9 +553,9 @@ void lastfght_state::machine_reset()
 MACHINE_CONFIG_START(lastfght_state::lastfght)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83044, 32000000/2)
-	MCFG_CPU_PROGRAM_MAP( lastfght_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastfght_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", H83044, 32000000/2)
+	MCFG_DEVICE_PROGRAM_MAP( lastfght_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lastfght_state, irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

@@ -47,6 +47,8 @@ WRITE8_MEMBER(rollrace_state::fake_d800_w)
 WRITE_LINE_MEMBER(rollrace_state::nmi_mask_w)
 {
 	m_nmi_mask = state;
+	if (!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(rollrace_state::sound_nmi_mask_w)
@@ -235,10 +237,10 @@ static GFXDECODE_START( rollrace )
 	GFXDECODE_ENTRY( "gfx5", 0x0000, spritelayout,  0,  32 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(rollrace_state::vblank_irq)
+WRITE_LINE_MEMBER(rollrace_state::vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(rollrace_state::sound_timer_irq)
@@ -250,22 +252,21 @@ INTERRUPT_GEN_MEMBER(rollrace_state::sound_timer_irq)
 MACHINE_CONFIG_START(rollrace_state::rollrace)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL(24'000'000)/8) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rollrace_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rollrace_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(24'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rollrace_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(24'000'000)/16) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rollrace_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(rollrace_state, sound_timer_irq, 4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(24'000'000)/16) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rollrace_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(rollrace_state, sound_timer_irq, 4*60)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(rollrace_state, flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(rollrace_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(rollrace_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(rollrace_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(rollrace_state, charbank_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(rollrace_state, charbank_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(rollrace_state, spritebank_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, rollrace_state, flipx_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, rollrace_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, rollrace_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, rollrace_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, rollrace_state, charbank_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, rollrace_state, charbank_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, rollrace_state, spritebank_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -275,6 +276,7 @@ MACHINE_CONFIG_START(rollrace_state::rollrace)
 	MCFG_SCREEN_VISIBLE_AREA(0,256-1,16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(rollrace_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rollrace_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rollrace)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -285,13 +287,13 @@ MACHINE_CONFIG_START(rollrace_state::rollrace)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
+	MCFG_DEVICE_ADD("ay1", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ay2", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
+	MCFG_DEVICE_ADD("ay2", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ay3", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
+	MCFG_DEVICE_ADD("ay3", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 MACHINE_CONFIG_END
 

@@ -203,7 +203,6 @@ GFXDECODE_END
 void badlandsbl_state::machine_reset()
 {
 //  m_pedal_value[0] = m_pedal_value[1] = 0x80;
-	atarigen_state::machine_reset();
 //  scanline_timer_reset(*m_screen, 32);
 
 //  memcpy(m_bank_base, &m_bank_source_data[0x0000], 0x1000);
@@ -221,12 +220,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(badlandsbl_state::bootleg_sound_scanline)
 MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000)/4)   /* Divisor estimated */
-	MCFG_CPU_PROGRAM_MAP(bootleg_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", badlandsbl_state,  irq1_line_hold) //vblank_int)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/4)   /* Divisor estimated */
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", badlandsbl_state,  irq1_line_hold) //vblank_int)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(20'000'000)/12)    /* Divisor estimated */
-	MCFG_CPU_PROGRAM_MAP(bootleg_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(20'000'000)/12)    /* Divisor estimated */
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_audio_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", badlandsbl_state, bootleg_sound_scanline, "screen", 0, 1)
 
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -259,7 +258,7 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(20'000'000)/8)  /* Divisor estimated */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(20'000'000)/8)  /* Divisor estimated */
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 MACHINE_CONFIG_END

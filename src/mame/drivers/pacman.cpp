@@ -408,16 +408,28 @@ MACHINE_RESET_MEMBER(pacman_state,maketrax)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(pacman_state::vblank_irq)
+WRITE_LINE_MEMBER(pacman_state::vblank_irq)
+{
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
+WRITE_LINE_MEMBER(pacman_state::rocktrv2_vblank_irq)
+{
+	if (state)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
+INTERRUPT_GEN_MEMBER(pacman_state::periodic_irq)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(pacman_state::vblank_nmi)
+WRITE_LINE_MEMBER(pacman_state::vblank_nmi)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE_LINE_MEMBER(pacman_state::irq_mask_w)
@@ -511,18 +523,6 @@ WRITE8_MEMBER(pacman_state::nmouse_interrupt_vector_w)
  *  LEDs/coin counters
  *
  *************************************/
-
-WRITE_LINE_MEMBER(pacman_state::led1_w)
-{
-	output().set_led_value(0, state);
-}
-
-
-WRITE_LINE_MEMBER(pacman_state::led2_w)
-{
-	output().set_led_value(1, state);
-}
-
 
 WRITE_LINE_MEMBER(pacman_state::coin_counter_w)
 {
@@ -726,9 +726,10 @@ READ8_MEMBER(pacman_state::bigbucks_question_r)
  *
  ************************************/
 
-INTERRUPT_GEN_MEMBER(pacman_state::s2650_interrupt)
+WRITE_LINE_MEMBER(pacman_state::s2650_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
+	if (state)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }
 
 WRITE8_MEMBER(pacman_state::porky_banking_w)
@@ -1834,7 +1835,7 @@ static INPUT_PORTS_START( crush4 )
 	PORT_INCLUDE( maketrax )
 
 	PORT_START("GAME")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) // always select 2nd part of code
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) // always select 2nd part of code
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( korosuke )
@@ -3005,7 +3006,7 @@ static INPUT_PORTS_START( numcrash )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // all ipt_unknown probably ipt_unused, game is one player only
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_SPECIAL ) // or it won't boot "I CAN NOT RUN"
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_CUSTOM ) // or it won't boot "I CAN NOT RUN"
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -3521,19 +3522,18 @@ GFXDECODE_END
 MACHINE_CONFIG_START(pacman_state::pacman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(pacman_map)
-	MCFG_CPU_IO_MAP(writeport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state, vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(pacman_map)
+	MCFG_DEVICE_IO_MAP(writeport)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 74LS259 at 8K or 4099 at 7K
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pacman_state, irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("namco", namco_device, pacman_sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(pacman_state, flipscreen_w))
-	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pacman_state, led1_w))
-	//MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pacman_state, led2_w))
-	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pacman_state, coin_lockout_global_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pacman_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, pacman_state, irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("namco", namco_device, sound_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, pacman_state, flipscreen_w))
+	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0"))
+	//MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1"))
+	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, pacman_state, coin_lockout_global_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pacman_state, coin_counter_w))
 // The Pacman code uses $5004 and $5005 for LED's and $5007 for coin lockout.  This hardware does not
 // exist on any Pacman or Puckman board I have seen.  DW
 
@@ -3550,13 +3550,14 @@ MACHINE_CONFIG_START(pacman_state::pacman)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(pacman_state, screen_update_pacman)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacman_state, vblank_irq))
 
 	MCFG_VIDEO_START_OVERRIDE(pacman_state,pacman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
+	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MCFG_NAMCO_AUDIO_VOICES(3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -3574,8 +3575,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pacman_state::pengojpm)
 	pacman(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pengojpm_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pengojpm_map)
 MACHINE_CONFIG_END
 
 
@@ -3583,18 +3584,18 @@ MACHINE_CONFIG_START(pacman_state::birdiy)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(birdiy_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(birdiy_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
 	MCFG_DEVICE_REPLACE("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(pacman_state, irq_mask_w))
-	//MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("namco", namco_device, pacman_sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(pacman_state, flipscreen_w))
-	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pacman_state, led1_w))
-	//MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pacman_state, led2_w))
-	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pacman_state, coin_lockout_global_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pacman_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, pacman_state, irq_mask_w))
+	//MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("namco", namco_device, sound_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, pacman_state, flipscreen_w))
+	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0"))
+	//MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1"))
+	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, pacman_state, coin_lockout_global_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pacman_state, coin_counter_w))
 
 	MCFG_VIDEO_START_OVERRIDE(pacman_state,birdiy)
 MACHINE_CONFIG_END
@@ -3606,8 +3607,8 @@ MACHINE_CONFIG_START(pacman_state::piranha)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(piranha_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(piranha_portmap)
 MACHINE_CONFIG_END
 
 
@@ -3615,8 +3616,8 @@ MACHINE_CONFIG_START(pacman_state::nmouse)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(nmouse_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(nmouse_portmap)
 MACHINE_CONFIG_END
 
 
@@ -3624,11 +3625,11 @@ MACHINE_CONFIG_START(pacman_state::mspacman)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mspacman_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mspacman_map)
 
 	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pacman_state, coin_lockout_global_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, pacman_state, coin_lockout_global_w))
 MACHINE_CONFIG_END
 
 
@@ -3636,16 +3637,16 @@ MACHINE_CONFIG_START(pacman_state::woodpek)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(woodpek_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(woodpek_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pacman_state::numcrash)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(numcrash_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(numcrash_map)
 
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // ???
@@ -3656,19 +3657,19 @@ MACHINE_CONFIG_START(pacman_state::alibaba)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(alibaba_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(alibaba_map)
 
 	MCFG_DEVICE_REMOVE("mainlatch")
 	MCFG_DEVICE_ADD("latch1", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pacman_state, led1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pacman_state, led2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pacman_state, coin_lockout_global_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pacman_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0"))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1"))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, pacman_state, coin_lockout_global_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pacman_state, coin_counter_w))
 	MCFG_DEVICE_ADD("latch2", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("namco", namco_device, pacman_sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(pacman_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(pacman_state, irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("namco", namco_device, sound_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, pacman_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, pacman_state, irq_mask_w))
 MACHINE_CONFIG_END
 
 
@@ -3676,14 +3677,16 @@ MACHINE_CONFIG_START(pacman_state::dremshpr)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dremshpr_map)
-	MCFG_CPU_IO_MAP(dremshpr_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  vblank_nmi)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dremshpr_map)
+	MCFG_DEVICE_IO_MAP(dremshpr_portmap)
+
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacman_state, vblank_nmi))
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("namco")
-	MCFG_SOUND_ADD("ay8910", AY8910, 14318000/8)
+	MCFG_DEVICE_ADD("ay8910", AY8910, 14318000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_MODIFY("mainlatch")
@@ -3695,9 +3698,9 @@ MACHINE_CONFIG_START(pacman_state::theglobp)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(epos_map)
-	MCFG_CPU_IO_MAP(epos_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(epos_map)
+	MCFG_DEVICE_IO_MAP(epos_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(pacman_state,theglobp)
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,theglobp)
@@ -3708,9 +3711,9 @@ MACHINE_CONFIG_START(pacman_state::acitya)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(epos_map)
-	MCFG_CPU_IO_MAP(epos_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(epos_map)
+	MCFG_DEVICE_IO_MAP(epos_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(pacman_state,acitya)
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,acitya)
@@ -3721,9 +3724,9 @@ MACHINE_CONFIG_START(pacman_state::eeekk)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(epos_map)
-	MCFG_CPU_IO_MAP(epos_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(epos_map)
+	MCFG_DEVICE_IO_MAP(epos_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(pacman_state,eeekk)
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,eeekk)
@@ -3734,21 +3737,21 @@ MACHINE_CONFIG_START(pacman_state::vanvan)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dremshpr_map)
-	MCFG_CPU_IO_MAP(vanvan_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  vblank_nmi)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dremshpr_map)
+	MCFG_DEVICE_IO_MAP(vanvan_portmap)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacman_state, vblank_nmi))
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("namco")
-	MCFG_SOUND_ADD("sn1", SN76496, 1789750)
+	MCFG_DEVICE_ADD("sn1", SN76496, 1789750)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_SOUND_ADD("sn2", SN76496, 1789750)
+	MCFG_DEVICE_ADD("sn2", SN76496, 1789750)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
@@ -3761,10 +3764,10 @@ MACHINE_CONFIG_START(pacman_state::bigbucks)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bigbucks_map)
-	MCFG_CPU_IO_MAP(bigbucks_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(pacman_state, vblank_irq, 20*60)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bigbucks_map)
+	MCFG_DEVICE_IO_MAP(bigbucks_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(pacman_state, periodic_irq, 20*60)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
@@ -3778,22 +3781,20 @@ MACHINE_CONFIG_START(pacman_state::s2650games)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6/2)    /* 2H */
-	MCFG_CPU_PROGRAM_MAP(s2650games_map)
-	MCFG_CPU_DATA_MAP(s2650games_dataport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  s2650_interrupt)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT
+	MCFG_DEVICE_REPLACE("maincpu", S2650, MASTER_CLOCK/6/2)    /* 2H */
+	MCFG_DEVICE_PROGRAM_MAP(s2650games_map)
+	MCFG_DEVICE_DATA_MAP(s2650games_dataport)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP)
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(pacman_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, pacman_state, flipscreen_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pacman_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pacman_state, coin_counter_w))
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", s2650games)
 
@@ -3802,12 +3803,13 @@ MACHINE_CONFIG_START(pacman_state::s2650games)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_UPDATE_DRIVER(pacman_state, screen_update_s2650games)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacman_state, s2650_interrupt))
 
 	MCFG_VIDEO_START_OVERRIDE(pacman_state,s2650games)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("namco")
-	MCFG_SOUND_ADD("sn1", SN76496, MASTER_CLOCK/6)    /* 1H */
+	MCFG_DEVICE_ADD("sn1", SN76496, MASTER_CLOCK/6)    /* 1H */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -3816,8 +3818,8 @@ MACHINE_CONFIG_START(pacman_state::drivfrcp)
 	s2650games(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(drivfrcp_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(drivfrcp_portmap)
 MACHINE_CONFIG_END
 
 
@@ -3825,8 +3827,8 @@ MACHINE_CONFIG_START(pacman_state::_8bpm )
 	s2650games(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(_8bpm_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(_8bpm_portmap)
 MACHINE_CONFIG_END
 
 
@@ -3834,8 +3836,8 @@ MACHINE_CONFIG_START(pacman_state::porky)
 	s2650games(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(porky_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(porky_portmap)
 MACHINE_CONFIG_END
 
 
@@ -3843,12 +3845,12 @@ MACHINE_CONFIG_START(pacman_state::rocktrv2)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rocktrv2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rocktrv2_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacman_state, rocktrv2_vblank_irq))
 MACHINE_CONFIG_END
 
 
@@ -3856,10 +3858,9 @@ MACHINE_CONFIG_START(pacman_state::mschamp)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mschamp_map)
-	MCFG_CPU_IO_MAP(mschamp_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  vblank_irq)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mschamp_map)
+	MCFG_DEVICE_IO_MAP(mschamp_portmap)
 
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,mschamp)
 MACHINE_CONFIG_END
@@ -3869,8 +3870,8 @@ MACHINE_CONFIG_START(pacman_state::superabc)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(superabc_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(superabc_map)
 
 	MCFG_NVRAM_ADD_0FILL("28c16.u17")
 
@@ -3892,12 +3893,12 @@ MACHINE_CONFIG_START(pacman_state::crushs)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(crushs_map)
-	MCFG_CPU_IO_MAP(crushs_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(crushs_map)
+	MCFG_DEVICE_IO_MAP(crushs_portmap)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ay8912", AY8912, 1789750)
+	MCFG_DEVICE_ADD("ay8912", AY8912, 1789750)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

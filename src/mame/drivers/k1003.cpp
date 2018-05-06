@@ -51,7 +51,9 @@ class k1003_state : public driver_device
 public:
 	k1003_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu") { }
+		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_READ8_MEMBER(key_r);
@@ -67,7 +69,9 @@ private:
 	uint8_t m_disp_2;
 	uint8_t bit_to_dec(uint8_t val);
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
+	output_finder<16> m_digits;
 };
 
 
@@ -117,8 +121,8 @@ uint8_t k1003_state::bit_to_dec(uint8_t val)
 
 WRITE8_MEMBER( k1003_state::disp_w )
 {
-	output().set_digit_value(bit_to_dec(data)*2,   m_disp_1);
-	output().set_digit_value(bit_to_dec(data)*2+1, m_disp_2);
+	m_digits[bit_to_dec(data)*2] = m_disp_1;
+	m_digits[bit_to_dec(data)*2+1] = m_disp_2;
 }
 
 void k1003_state::k1003_io(address_map &map)
@@ -143,9 +147,9 @@ void k1003_state::machine_reset()
 
 MACHINE_CONFIG_START(k1003_state::k1003)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8008, 800000)
-	MCFG_CPU_PROGRAM_MAP(k1003_mem)
-	MCFG_CPU_IO_MAP(k1003_io)
+	MCFG_DEVICE_ADD("maincpu",I8008, 800000)
+	MCFG_DEVICE_PROGRAM_MAP(k1003_mem)
+	MCFG_DEVICE_IO_MAP(k1003_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_k1003)

@@ -154,23 +154,25 @@ READ16_MEMBER(csplayh5_state::test_r)
 	return machine().rand();
 }
 
-ADDRESS_MAP_START(csplayh5_state::csplayh5_sub_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+void csplayh5_state::csplayh5_sub_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
 
-	AM_RANGE(0x02000a, 0x02000b) AM_READ(test_r)
-//  AM_RANGE(0x020008, 0x02000f) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0)
+	map(0x02000a, 0x02000b).r(this, FUNC(csplayh5_state::test_r));
+//  map(0x020008, 0x02000f).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
 
-	AM_RANGE(0x040018, 0x040019) AM_READ(test_r)
-	AM_RANGE(0x040028, 0x04002f) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0) // correct?
-	AM_RANGE(0x040036, 0x040037) AM_READ(test_r)
+	map(0x040018, 0x040019).r(this, FUNC(csplayh5_state::test_r));
+	map(0x040028, 0x04002f).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0)); // correct?
+	map(0x040036, 0x040037).r(this, FUNC(csplayh5_state::test_r));
 
-	AM_RANGE(0x078000, 0x07ffff) AM_MIRROR(0xf80000) AM_RAM //AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0x078000, 0x07ffff).mirror(0xf80000).ram(); //.share("nvram");
+}
 
 
-ADDRESS_MAP_START(csplayh5_state::csplayh5_sub_io_map)
-	AM_RANGE(0x0a, 0x0b) AM_READ(test_r)
-ADDRESS_MAP_END
+void csplayh5_state::csplayh5_sub_io_map(address_map &map)
+{
+	map(0x0a, 0x0b).r(this, FUNC(csplayh5_state::test_r));
+}
 #endif
 
 
@@ -361,30 +363,30 @@ WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
 MACHINE_CONFIG_START(csplayh5_state::csplayh5)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
-	MCFG_CPU_PROGRAM_MAP(csplayh5_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301", tmp68301_device, irq_callback)
+	MCFG_DEVICE_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
+	MCFG_DEVICE_PROGRAM_MAP(csplayh5_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301", tmp68301_device, irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(csplayh5_state, tmp68301_parallel_port_w))
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, csplayh5_state, tmp68301_parallel_port_w))
 
 #if USE_H8
-	MCFG_CPU_ADD("subcpu", H83002, DVD_CLOCK/2)    /* unknown divider */
-	MCFG_CPU_PROGRAM_MAP(csplayh5_sub_map)
-	MCFG_CPU_IO_MAP(csplayh5_sub_io_map)
+	MCFG_DEVICE_ADD("subcpu", H83002, DVD_CLOCK/2)    /* unknown divider */
+	MCFG_DEVICE_PROGRAM_MAP(csplayh5_sub_map)
+	MCFG_DEVICE_IO_MAP(csplayh5_sub_io_map)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true) // dvd
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(csplayh5_state, ide_irq))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, csplayh5_state, ide_irq))
 #endif
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272)) // typical 9958 clock, not verified
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(csplayh5_state, csplayh5_vdp0_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, csplayh5_state, csplayh5_vdp0_interrupt))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
 
 	/* sound hardware */

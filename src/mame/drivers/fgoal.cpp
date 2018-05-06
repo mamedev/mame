@@ -269,7 +269,7 @@ static INPUT_PORTS_START( fgoal )
 	/* extra credit score changes depending on player's performance */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fgoal_state, _80_r, nullptr) /* 128V */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fgoal_state, _80_r, nullptr) /* 128V */
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ))
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ))
@@ -368,8 +368,8 @@ void fgoal_state::machine_reset()
 MACHINE_CONFIG_START(fgoal_state::fgoal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 10065000 / 10) /* ? */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 10065000 / 10) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
 
 	/* add shifter */

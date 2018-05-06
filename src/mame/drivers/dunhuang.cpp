@@ -666,11 +666,11 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE3 )      // clear (during boot)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE2 )      // book
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE  )      // test (in game: dips, during boot: service mode)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL  )      // hopper sensor
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM  )      // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE4 )      // payout
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_IMPULSE(2) // "coin jam" otherwise
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )       // 0 = tiles block transferrer busy
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )       // 0 = tiles block transferrer busy
 
 	PORT_START("IN0")       /* IN6 - P1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
@@ -806,10 +806,10 @@ void dunhuang_state::machine_reset()
 MACHINE_CONFIG_START(dunhuang_state::dunhuang)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
-	MCFG_CPU_PROGRAM_MAP(dunhuang_map)
-	MCFG_CPU_IO_MAP(dunhuang_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dunhuang_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(dunhuang_map)
+	MCFG_DEVICE_IO_MAP(dunhuang_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dunhuang_state, irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(5))
@@ -831,12 +831,12 @@ MACHINE_CONFIG_START(dunhuang_state::dunhuang)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("ay8910", AY8910, 12000000/8)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(dunhuang_state, dsw_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(dunhuang_state, input_w))
+	MCFG_DEVICE_ADD("ay8910", AY8910, 12000000/8)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, dunhuang_state, dsw_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, dunhuang_state, input_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_OKIM6295_ADD("oki", 12000000/8, PIN7_HIGH)

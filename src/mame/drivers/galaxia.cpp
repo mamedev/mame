@@ -78,10 +78,13 @@ TODO:
 #include "speaker.h"
 
 
-INTERRUPT_GEN_MEMBER(galaxia_state::galaxia_interrupt)
+WRITE_LINE_MEMBER(galaxia_state::vblank_irq)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
-	cvs_scroll_stars();
+	if (state)
+	{
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03);
+		cvs_scroll_stars();
+	}
 }
 
 
@@ -291,13 +294,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(galaxia_state::galaxia)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL(14'318'181)/8)
-	MCFG_CPU_PROGRAM_MAP(galaxia_mem_map)
-	MCFG_CPU_IO_MAP(galaxia_io_map)
-	MCFG_CPU_DATA_MAP(galaxia_data_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxia_state, galaxia_interrupt)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cvs_state, write_s2650_flag))
+	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(14'318'181)/8)
+	MCFG_DEVICE_PROGRAM_MAP(galaxia_mem_map)
+	MCFG_DEVICE_IO_MAP(galaxia_io_map)
+	MCFG_DEVICE_DATA_MAP(galaxia_data_map)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cvs_state, write_s2650_flag))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -308,6 +310,7 @@ MACHINE_CONFIG_START(galaxia_state::galaxia)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxia_state, screen_update_galaxia)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxia_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxia)
 	MCFG_PALETTE_ADD("palette", 0x18+2)
@@ -335,13 +338,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(galaxia_state::astrowar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL(14'318'181)/8)
-	MCFG_CPU_PROGRAM_MAP(astrowar_mem_map)
-	MCFG_CPU_IO_MAP(galaxia_io_map)
-	MCFG_CPU_DATA_MAP(galaxia_data_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxia_state, galaxia_interrupt)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cvs_state, write_s2650_flag))
+	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(14'318'181)/8)
+	MCFG_DEVICE_PROGRAM_MAP(astrowar_mem_map)
+	MCFG_DEVICE_IO_MAP(galaxia_io_map)
+	MCFG_DEVICE_DATA_MAP(galaxia_data_map)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cvs_state, write_s2650_flag))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -352,6 +354,7 @@ MACHINE_CONFIG_START(galaxia_state::astrowar)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxia_state, screen_update_astrowar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxia_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrowar)
 	MCFG_PALETTE_ADD("palette", 0x18+2)

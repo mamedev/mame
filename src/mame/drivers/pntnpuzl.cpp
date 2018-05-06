@@ -334,7 +334,7 @@ static INPUT_PORTS_START( pntnpuzl )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -350,21 +350,21 @@ static INPUT_PORTS_START( pntnpuzl )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(pntnpuzl_state::pntnpuzl)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(pntnpuzl_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pntnpuzl_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(12'000'000) / 10)
 	MCFG_VIA6522_READPA_HANDLER(IOPORT("IN2"))
 	MCFG_VIA6522_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_VIA6522_WRITEPB_HANDLER(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(4)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(4)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
 	// CB2 used for serial communication with 8798
 
-	MCFG_CPU_ADD("mcu", P8098, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(mcu_map) // FIXME: this is all internal
+	MCFG_DEVICE_ADD("mcu", P8098, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map) // FIXME: this is all internal
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

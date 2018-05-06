@@ -70,27 +70,26 @@ const tiny_rom_entry *newbrain_eim_device::device_rom_region() const
 MACHINE_CONFIG_START(newbrain_eim_device::device_add_mconfig)
 	// devices
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(16'000'000)/8)
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(MC6850_TAG, acia6850_device, write_rxc))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(MC6850_TAG, acia6850_device, write_txc))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(newbrain_eim_device, ctc_z2_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(MC6850_TAG, acia6850_device, write_rxc))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(MC6850_TAG, acia6850_device, write_txc))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, newbrain_eim_device, ctc_z2_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_c2", newbrain_eim_device, ctc_c2_tick, attotime::from_hz(XTAL(16'000'000)/4/13))
-	MCFG_DEVICE_ADD(ADC0809_TAG, ADC0808, 500000)
-	MCFG_ADC0808_OUT_EOC_CB(WRITELINE(newbrain_eim_device, adc_eoc_w))
-	MCFG_ADC0808_IN_VREF_POS_CB(newbrain_eim_device, adc_vref_pos_r)
-	MCFG_ADC0808_IN_VREF_NEG_CB(newbrain_eim_device, adc_vref_neg_r)
-	MCFG_ADC0808_IN_IN_0_CB(newbrain_eim_device, adc_input_r)
-	MCFG_ADC0808_IN_IN_1_CB(newbrain_eim_device, adc_input_r)
-	MCFG_ADC0808_IN_IN_2_CB(newbrain_eim_device, adc_input_r)
-	MCFG_ADC0808_IN_IN_3_CB(newbrain_eim_device, adc_input_r)
-	MCFG_ADC0808_IN_IN_4_CB(newbrain_eim_device, adc_input_r)
-	MCFG_ADC0808_IN_IN_5_CB(newbrain_eim_device, adc_input_r)
-	MCFG_ADC0808_IN_IN_6_CB(newbrain_eim_device, adc_input_r)
-	MCFG_ADC0808_IN_IN_7_CB(newbrain_eim_device, adc_input_r)
+
+	MCFG_DEVICE_ADD(ADC0809_TAG, ADC0809, 500000)
+	MCFG_ADC0808_EOC_CB(WRITELINE(*this, newbrain_eim_device, adc_eoc_w))
+	MCFG_ADC0808_IN0_CB(GND)
+	MCFG_ADC0808_IN1_CB(GND)
+	MCFG_ADC0808_IN2_CB(GND)
+	MCFG_ADC0808_IN3_CB(GND)
+	MCFG_ADC0808_IN4_CB(GND)
+	MCFG_ADC0808_IN5_CB(GND)
+	MCFG_ADC0808_IN6_CB(GND)
+	MCFG_ADC0808_IN7_CB(GND)
 
 	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(newbrain_eim_device, acia_interrupt))
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, newbrain_eim_device, acia_interrupt))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
 
 	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL(16'000'000)/8, newbrain_expansion_cards, "fdc")
 
@@ -230,36 +229,6 @@ WRITE_LINE_MEMBER( newbrain_eim_device::adc_eoc_w )
 
 
 //-------------------------------------------------
-//  adc_vref_pos_r -
-//-------------------------------------------------
-
-ADC0808_ANALOG_READ_CB( newbrain_eim_device::adc_vref_pos_r )
-{
-	return 5.0;
-}
-
-
-//-------------------------------------------------
-//  adc_vref_neg_r -
-//-------------------------------------------------
-
-ADC0808_ANALOG_READ_CB( newbrain_eim_device::adc_vref_neg_r )
-{
-	return 0.0;
-}
-
-
-//-------------------------------------------------
-//  adc_input_r -
-//-------------------------------------------------
-
-ADC0808_ANALOG_READ_CB( newbrain_eim_device::adc_input_r )
-{
-	return 0.0;
-}
-
-
-//-------------------------------------------------
 //  acia_interrupt -
 //-------------------------------------------------
 
@@ -282,7 +251,7 @@ WRITE_LINE_MEMBER( newbrain_eim_device::ctc_z2_w )
 
 
 //-------------------------------------------------
-//  adc_input_r -
+//  ctc_c2_tick -
 //-------------------------------------------------
 
 TIMER_DEVICE_CALLBACK_MEMBER(newbrain_eim_device::ctc_c2_tick)

@@ -218,9 +218,9 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_c_w)
 MACHINE_CONFIG_START(pengadvb_state::pengadvb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635)/3)
-	MCFG_CPU_PROGRAM_MAP(program_mem)
-	MCFG_CPU_IO_MAP(io_mem)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'738'635)/3)
+	MCFG_DEVICE_PROGRAM_MAP(program_mem)
+	MCFG_DEVICE_IO_MAP(io_mem)
 
 	// -_-;
 	MCFG_DEVICE_ADD("page0", ADDRESS_MAP_BANK, 0)
@@ -252,10 +252,10 @@ MACHINE_CONFIG_START(pengadvb_state::pengadvb)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pengadvb_state, pengadvb_ppi_port_a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pengadvb_state, pengadvb_ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pengadvb_state, pengadvb_ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pengadvb_state, pengadvb_ppi_port_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pengadvb_state, pengadvb_ppi_port_a_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pengadvb_state, pengadvb_ppi_port_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pengadvb_state, pengadvb_ppi_port_b_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pengadvb_state, pengadvb_ppi_port_c_w))
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tms9128", TMS9128, XTAL(10'738'635)/2)
@@ -266,9 +266,9 @@ MACHINE_CONFIG_START(pengadvb_state::pengadvb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(10'738'635)/6)
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(10'738'635)/6)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(pengadvb_state, pengadvb_psg_port_b_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pengadvb_state, pengadvb_psg_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

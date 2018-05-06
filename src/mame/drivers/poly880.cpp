@@ -46,11 +46,10 @@ Test Paste:
 
 void poly880_state::update_display()
 {
-	int i;
-
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(m_digit, i)) output().set_digit_value(7 - i, m_segment);
+		if (BIT(m_digit, i))
+			m_digits[7 - i] = m_segment;
 	}
 }
 
@@ -191,9 +190,9 @@ READ8_MEMBER( poly880_state::pio1_pb_r )
 	{
 		if (BIT(m_digit, i))
 		{
-			if (!BIT(m_ki1->read(), i)) data &= ~0x10;
-			if (!BIT(m_ki2->read(), i)) data &= ~0x20;
-			if (!BIT(m_ki3->read(), i)) data &= ~0x80;
+			if (!BIT(m_ki[0]->read(), i)) data &= ~0x10;
+			if (!BIT(m_ki[1]->read(), i)) data &= ~0x20;
+			if (!BIT(m_ki[2]->read(), i)) data &= ~0x80;
 		}
 	}
 
@@ -237,6 +236,8 @@ static const z80_daisy_config poly880_daisy_chain[] =
 
 void poly880_state::machine_start()
 {
+	m_digits.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_digit));
 	save_item(NAME(m_segment));
@@ -246,9 +247,9 @@ void poly880_state::machine_start()
 
 MACHINE_CONFIG_START(poly880_state::poly880)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(7'372'800)/8)
-	MCFG_CPU_PROGRAM_MAP(poly880_mem)
-	MCFG_CPU_IO_MAP(poly880_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(7'372'800)/8)
+	MCFG_DEVICE_PROGRAM_MAP(poly880_mem)
+	MCFG_DEVICE_IO_MAP(poly880_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_poly880 )
@@ -256,15 +257,15 @@ MACHINE_CONFIG_START(poly880_state::poly880)
 	/* devices */
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(7'372'800)/16)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(poly880_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(poly880_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, poly880_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, poly880_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
 
 	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, XTAL(7'372'800)/16)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(poly880_state, pio1_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(poly880_state, pio1_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(poly880_state, pio1_pb_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, poly880_state, pio1_pa_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, poly880_state, pio1_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, poly880_state, pio1_pb_w))
 
 	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, XTAL(7'372'800)/16)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))

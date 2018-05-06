@@ -884,10 +884,11 @@ void norautp_state::norautx4_map(address_map &map)
 }
 
 #ifdef UNUSED_CODE
-ADDRESS_MAP_START(norautp_state::norautx8_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM /* need to be checked */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram") /* 6116 */
-ADDRESS_MAP_END
+void norautp_state::norautx8_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); /* need to be checked */
+	map(0xc000, 0xc7ff).ram().share("nvram"); /* 6116 */
+}
 #endif
 
 void norautp_state::kimble_map(address_map &map)
@@ -898,9 +899,10 @@ void norautp_state::kimble_map(address_map &map)
 }
 
 #ifdef UNUSED_CODE
-ADDRESS_MAP_START(norautp_state::norautxp_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void norautp_state::norautxp_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+}
 #endif
 
 void norautp_state::newhilop_map(address_map &map)
@@ -1241,29 +1243,29 @@ GFXDECODE_END
 MACHINE_CONFIG_START(norautp_state::noraut_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, NORAUT_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(norautp_map)
-	MCFG_CPU_IO_MAP(norautp_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, NORAUT_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(norautp_map)
+	MCFG_DEVICE_IO_MAP(norautp_portmap)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")   /* doesn't work if placed at derivative drivers */
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
 	/* (60-63) Mode 0 - Port A set as input */
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(norautp_state, mainlamps_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(norautp_state, counterlamps_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, norautp_state, mainlamps_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, norautp_state, counterlamps_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
 	/* (a0-a3) Mode 0 - Ports A & B set as input */
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(norautp_state, soundlamps_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, norautp_state, soundlamps_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
 	/* (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port)
 	 Group B Mode 0, output;  (see below for lines PC0-PC2) */
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITELINE(norautp_state, ppi2_obf_w)) MCFG_DEVCB_BIT(7)
+	MCFG_I8255_OUT_PORTC_CB(WRITELINE(*this, norautp_state, ppi2_obf_w)) MCFG_DEVCB_BIT(7)
 	/*  PPI-2 is configured as mixed mode2 and mode0 output.
 	 It means that port A should be bidirectional and port B just as output.
 	 Port C as hshk regs, and P0-P2 as input (norautp, norautjp) or output (other sets). */
@@ -1284,7 +1286,7 @@ MACHINE_CONFIG_START(norautp_state::noraut_base)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(norautp)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1294,8 +1296,8 @@ MACHINE_CONFIG_START(norautp_state::norautp)
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -1303,11 +1305,11 @@ MACHINE_CONFIG_START(norautp_state::norautpl)
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("discrete")
+	MCFG_DEVICE_MODIFY("discrete")
 	MCFG_DISCRETE_INTF(kimble)
 MACHINE_CONFIG_END
 
@@ -1316,9 +1318,9 @@ MACHINE_CONFIG_START(norautp_state::norautxp)
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(norautxp_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(norautxp_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -1326,9 +1328,9 @@ MACHINE_CONFIG_START(norautp_state::nortest1)
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nortest1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nortest1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -1336,9 +1338,9 @@ MACHINE_CONFIG_START(norautp_state::norautx4)
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(norautx4_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(norautx4_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -1347,9 +1349,9 @@ static MACHINE_CONFIG_START( norautx8 )
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(norautx8_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(norautx8_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 #endif
 
@@ -1358,12 +1360,12 @@ MACHINE_CONFIG_START(norautp_state::kimble)
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kimble_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kimble_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("discrete")
+	MCFG_DEVICE_MODIFY("discrete")
 	MCFG_DISCRETE_INTF(kimble)
 MACHINE_CONFIG_END
 
@@ -1371,10 +1373,10 @@ MACHINE_CONFIG_START(norautp_state::newhilop)
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(newhilop_map)
-//  MCFG_CPU_IO_MAP(newhilop_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(newhilop_map)
+//  MCFG_DEVICE_IO_MAP(newhilop_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", norautp_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 /********** 8080 based **********/
@@ -1384,12 +1386,12 @@ MACHINE_CONFIG_START(norautp_state::dphl)
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(dphl_map)
-	MCFG_CPU_IO_MAP(norautp_portmap)
+	MCFG_DEVICE_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(dphl_map)
+	MCFG_DEVICE_IO_MAP(norautp_portmap)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("discrete")
+	MCFG_DEVICE_MODIFY("discrete")
 	MCFG_DISCRETE_INTF(dphl)
 MACHINE_CONFIG_END
 
@@ -1398,12 +1400,12 @@ MACHINE_CONFIG_START(norautp_state::dphla)
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(dphla_map)
-	MCFG_CPU_IO_MAP(norautp_portmap)
+	MCFG_DEVICE_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(dphla_map)
+	MCFG_DEVICE_IO_MAP(norautp_portmap)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("discrete")
+	MCFG_DEVICE_MODIFY("discrete")
 	MCFG_DISCRETE_INTF(dphl)
 MACHINE_CONFIG_END
 
@@ -1412,12 +1414,12 @@ MACHINE_CONFIG_START(norautp_state::kimbldhl)
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(kimbldhl_map)
-	MCFG_CPU_IO_MAP(norautp_portmap)
+	MCFG_DEVICE_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(kimbldhl_map)
+	MCFG_DEVICE_IO_MAP(norautp_portmap)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("discrete")
+	MCFG_DEVICE_MODIFY("discrete")
 	MCFG_DISCRETE_INTF(kimble)
 MACHINE_CONFIG_END
 
@@ -1426,12 +1428,12 @@ MACHINE_CONFIG_START(norautp_state::dphltest)
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(dphltest_map)
-	MCFG_CPU_IO_MAP(norautp_portmap)
+	MCFG_DEVICE_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(dphltest_map)
+	MCFG_DEVICE_IO_MAP(norautp_portmap)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("discrete")
+	MCFG_DEVICE_MODIFY("discrete")
 	MCFG_DISCRETE_INTF(dphl)
 MACHINE_CONFIG_END
 
@@ -1440,12 +1442,12 @@ MACHINE_CONFIG_START(norautp_state::drhl)
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(drhl_map)
-	MCFG_CPU_IO_MAP(norautp_portmap)
+	MCFG_DEVICE_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(drhl_map)
+	MCFG_DEVICE_IO_MAP(norautp_portmap)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("discrete")
+	MCFG_DEVICE_MODIFY("discrete")
 	MCFG_DISCRETE_INTF(dphl)
 MACHINE_CONFIG_END
 
@@ -1454,12 +1456,12 @@ MACHINE_CONFIG_START(norautp_state::ssjkrpkr)
 	noraut_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(ssjkrpkr_map)
-	MCFG_CPU_IO_MAP(norautp_portmap)
+	MCFG_DEVICE_REPLACE("maincpu", I8080, DPHL_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(ssjkrpkr_map)
+	MCFG_DEVICE_IO_MAP(norautp_portmap)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("discrete")
+	MCFG_DEVICE_MODIFY("discrete")
 	MCFG_DISCRETE_INTF(dphl)
 MACHINE_CONFIG_END
 

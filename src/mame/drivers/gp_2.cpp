@@ -12,7 +12,7 @@ the first high score at which a free credit is awarded. Then press 9 to set the
 back to normal operation. If this setup is not done, each player will get 3 free
 games at the start of ball 1.
 
-All the Z80 "maincpu" code is copied from gp_1.c
+All the Z80 "maincpu" code is copied from gp_1.cpp
 Any bug fixes need to be applied both here and there.
 
 Sound boards: (each game has its own custom sounds)
@@ -58,6 +58,7 @@ public:
 		, m_io_x9(*this, "X9")
 		, m_io_xa(*this, "XA")
 		, m_io_xb(*this, "XB")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(gp_2);
@@ -73,6 +74,7 @@ private:
 	uint8_t m_digit;
 	uint8_t m_segment[16];
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_ioport m_io_dsw0;
@@ -84,6 +86,7 @@ private:
 	required_ioport m_io_x9;
 	required_ioport m_io_xa;
 	required_ioport m_io_xb;
+	output_finder<40> m_digits;
 };
 
 
@@ -543,11 +546,11 @@ WRITE8_MEMBER( gp_2_state::porta_w )
 	else
 	if (m_u14 == 7)
 	{
-		output().set_digit_value(m_digit, patterns[m_segment[7]]);
-		output().set_digit_value(m_digit+8, patterns[m_segment[8]]);
-		output().set_digit_value(m_digit+16, patterns[m_segment[9]]);
-		output().set_digit_value(m_digit+24, patterns[m_segment[10]]);
-		output().set_digit_value(m_digit+32, patterns[m_segment[11]]);
+		m_digits[m_digit] = patterns[m_segment[7]];
+		m_digits[m_digit+8] = patterns[m_segment[8]];
+		m_digits[m_digit+16] = patterns[m_segment[9]];
+		m_digits[m_digit+24] = patterns[m_segment[10]];
+		m_digits[m_digit+32] = patterns[m_segment[11]];
 	}
 }
 
@@ -578,9 +581,9 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(gp_2_state::gp_2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2457600)
-	MCFG_CPU_PROGRAM_MAP(gp_2_map)
-	MCFG_CPU_IO_MAP(gp_2_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2457600)
+	MCFG_DEVICE_PROGRAM_MAP(gp_2_map)
+	MCFG_DEVICE_IO_MAP(gp_2_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -593,9 +596,9 @@ MACHINE_CONFIG_START(gp_2_state::gp_2)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(gp_2_state, porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(gp_2_state, portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gp_2_state, portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, gp_2_state, porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, gp_2_state, portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gp_2_state, portc_w))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 2457600 )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) // Todo: absence of ints will cause a watchdog reset

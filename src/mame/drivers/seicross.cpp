@@ -398,13 +398,13 @@ INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
 MACHINE_CONFIG_START(seicross_state::no_nvram)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000) / 6)   /* D780C, 3.072 MHz? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seicross_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000) / 6)   /* D780C, 3.072 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seicross_state,  vblank_irq)
 
-	MCFG_CPU_ADD("mcu", NSC8105, XTAL(18'432'000) / 6)   /* ??? */
-	MCFG_CPU_PROGRAM_MAP(mcu_no_nvram_map)
+	MCFG_DEVICE_ADD("mcu", NSC8105, XTAL(18'432'000) / 6)   /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(mcu_no_nvram_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))  /* 20 CPU slices per frame - an high value to ensure proper */
 						/* synchronization of the CPUs */
@@ -427,14 +427,14 @@ MACHINE_CONFIG_START(seicross_state::no_nvram)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(18'432'000) / 12)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(seicross_state, portB_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(seicross_state, portB_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000) / 12)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, seicross_state, portB_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, seicross_state, portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -442,16 +442,16 @@ MACHINE_CONFIG_START(seicross_state::nvram)
 	no_nvram(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("mcu")
-	MCFG_CPU_PROGRAM_MAP(mcu_nvram_map)
+	MCFG_DEVICE_MODIFY("mcu")
+	MCFG_DEVICE_PROGRAM_MAP(mcu_nvram_map)
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", seicross_state, nvram_init)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seicross_state::friskytb)
 	nvram(config);
-	MCFG_CPU_MODIFY("mcu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("mcu")
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 

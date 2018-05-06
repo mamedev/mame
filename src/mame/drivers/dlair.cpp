@@ -566,8 +566,8 @@ static INPUT_PORTS_START( dlair )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_status_r, nullptr)     /* status strobe */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_command_r, nullptr)    /* command strobe */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_status_r, nullptr)     /* status strobe */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_command_r, nullptr)    /* command strobe */
 INPUT_PORTS_END
 
 
@@ -598,8 +598,8 @@ static INPUT_PORTS_START( dleuro )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_status_r, nullptr)     /* status strobe */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_command_r, nullptr)    /* command strobe */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_status_r, nullptr)     /* status strobe */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_command_r, nullptr)    /* command strobe */
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("A:1")
@@ -732,14 +732,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(dlair_state::dlair_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
-	MCFG_CPU_PROGRAM_MAP(dlus_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(dlair_state, irq0_line_hold,  (double)MASTER_CLOCK_US/8/16/16/16/16)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
+	MCFG_DEVICE_PROGRAM_MAP(dlus_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(dlair_state, irq0_line_hold,  (double)MASTER_CLOCK_US/8/16/16/16/16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK_US/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK_US/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
@@ -767,14 +767,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dlair_state::dleuro)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)
 	MCFG_Z80_DAISY_CHAIN(dleuro_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(dleuro_map)
-	MCFG_CPU_IO_MAP(dleuro_io_map)
+	MCFG_DEVICE_PROGRAM_MAP(dleuro_map)
+	MCFG_DEVICE_IO_MAP(dleuro_io_map)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(dlair_state, write_speaker))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, dlair_state, write_speaker))
 
 	MCFG_DEVICE_ADD("sio", Z80SIO, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -798,11 +798,11 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MCFG_SOUND_MODIFY("ld_22vp932")
+	MCFG_DEVICE_MODIFY("ld_22vp932")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

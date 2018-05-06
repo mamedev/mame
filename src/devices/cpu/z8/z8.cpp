@@ -165,13 +165,15 @@ DEFINE_DEVICE_TYPE(Z8681,   z8681_device,   "z8681",   "Zilog Z8681")
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(z8_device::program_2kb)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+void z8_device::program_2kb(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
 
-ADDRESS_MAP_START(z8_device::program_4kb)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void z8_device::program_4kb(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
 
 z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, address_map_constructor map)

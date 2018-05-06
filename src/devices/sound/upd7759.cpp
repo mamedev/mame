@@ -174,7 +174,6 @@ upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, 
 	, m_rom(nullptr)
 	, m_romoffset(0)
 	, m_rommask(0)
-	, m_drqcallback(*this)
 {
 }
 
@@ -188,6 +187,7 @@ upd7759_device::upd7759_device(const machine_config &mconfig, const char *tag, d
 
 upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: upd775x_device(mconfig, type, tag, owner, clock)
+	, m_drqcallback(*this)
 	, m_timer(nullptr)
 {
 }
@@ -196,7 +196,12 @@ upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, 
 DEFINE_DEVICE_TYPE(UPD7756, upd7756_device, "upd7756", "NEC uPD7756")
 
 upd7756_device::upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd775x_device(mconfig, UPD7756, tag, owner, clock)
+	: upd7756_device(mconfig, UPD7756, tag, owner, clock)
+{
+}
+
+upd7756_device::upd7756_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: upd775x_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -206,57 +211,40 @@ upd7756_device::upd7756_device(const machine_config &mconfig, const char *tag, d
 
 void upd775x_device::device_start()
 {
-}
+	// chip configuration
+	m_sample_offset_shift = 0;
 
-void upd7759_device::device_start()
-{
-	m_drqcallback.resolve_safe();
-
-	/* chip configuration */
-	m_sample_offset_shift = (type() == UPD7759) ? 1 : 0;
-
-	/* allocate a stream channel */
+	// allocate a stream channel
 	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock()/4);
 
-	/* compute the stepping rate based on the chip's clock speed */
+	// compute the stepping rate based on the chip's clock speed
 	m_step = 4 * FRAC_ONE;
 
-	/* compute the clock period */
+	// compute the clock period
 	m_clock_period = attotime::from_hz(clock());
 
-	/* set the intial state */
+	// set the intial state
 	m_state = STATE_IDLE;
 
-	/* compute the ROM base or allocate a timer */
+	// compute the ROM base or allocate a timer
 	m_romoffset = 0;
 	m_rom = m_rombase;
-	if (m_rombase != nullptr)
+	if (m_rombase)
 	{
-		uint32_t romsize = m_rombase.bytes();
+		uint32_t const romsize = m_rombase.bytes();
 		if (romsize >= 0x20000)
-		{
 			m_rommask = 0x1ffff;
-		}
 		else
-		{
 			m_rommask = romsize - 1;
-		}
-
-		m_drqcallback.set_callback(DEVCB_NOOP);
 	}
 	else
 	{
-		assert(type() == UPD7759); // other chips do not support slave mode
-		m_timer = timer_alloc(TIMER_SLAVE_UPDATE);
 		m_rommask = 0;
 	}
 
-	/* assume /RESET and /START are both high */
+	// assume /RESET and /START are both high
 	m_reset = 1;
 	m_start = 1;
-
-	/* toggle the reset line to finish the reset */
-	device_reset();
 
 	save_item(NAME(m_pos));
 	save_item(NAME(m_step));
@@ -285,86 +273,34 @@ void upd7759_device::device_start()
 	save_item(NAME(m_sample));
 
 	save_item(NAME(m_romoffset));
-	machine().save().register_postload(save_prepost_delegate(FUNC(upd7759_device::postload), this));
+}
+
+void upd7759_device::device_start()
+{
+	upd775x_device::device_start();
+
+	// chip configuration
+	m_sample_offset_shift = 1;
+
+	// alloate a timer
+	if (m_rombase)
+		m_drqcallback.reset();
+	else
+		m_timer = timer_alloc(TIMER_SLAVE_UPDATE);
+
+	m_drqcallback.resolve_safe();
+
+	// toggle the reset line to finish the reset
+	device_reset();
 }
 
 
 void upd7756_device::device_start()
 {
-	m_drqcallback.resolve_safe();
+	upd775x_device::device_start();
 
-	/* chip configuration */
-	m_sample_offset_shift = (type() == UPD7759) ? 1 : 0;
-
-	/* allocate a stream channel */
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock()/4);
-
-	/* compute the stepping rate based on the chip's clock speed */
-	m_step = 4 * FRAC_ONE;
-
-	/* compute the clock period */
-	m_clock_period = attotime::from_hz(clock());
-
-	/* set the intial state */
-	m_state = STATE_IDLE;
-
-	/* compute the ROM base or allocate a timer */
-	m_romoffset = 0;
-	m_rom = m_rombase;
-	if (m_rombase != nullptr)
-	{
-		uint32_t romsize = m_rombase.bytes();
-		if (romsize >= 0x20000)
-		{
-			m_rommask = 0x1ffff;
-		}
-		else
-		{
-			m_rommask = romsize - 1;
-		}
-
-		m_drqcallback.set_callback(DEVCB_NOOP);
-	}
-	else
-	{
-		m_rommask = 0;
-	}
-
-	/* assume /RESET and /START are both high */
-	m_reset = 1;
-	m_start = 1;
-
-	/* toggle the reset line to finish the reset */
+	// toggle the reset line to finish the reset
 	device_reset();
-
-	save_item(NAME(m_pos));
-	save_item(NAME(m_step));
-
-	save_item(NAME(m_fifo_in));
-	save_item(NAME(m_reset));
-	save_item(NAME(m_start));
-	save_item(NAME(m_drq));
-
-	save_item(NAME(m_state));
-	save_item(NAME(m_clocks_left));
-	save_item(NAME(m_nibbles_left));
-	save_item(NAME(m_repeat_count));
-	save_item(NAME(m_post_drq_state));
-	save_item(NAME(m_post_drq_clocks));
-	save_item(NAME(m_req_sample));
-	save_item(NAME(m_last_sample));
-	save_item(NAME(m_block_header));
-	save_item(NAME(m_sample_rate));
-	save_item(NAME(m_first_valid_header));
-	save_item(NAME(m_offset));
-	save_item(NAME(m_repeat_offset));
-
-	save_item(NAME(m_adpcm_state));
-	save_item(NAME(m_adpcm_data));
-	save_item(NAME(m_sample));
-
-	save_item(NAME(m_romoffset));
-	machine().save().register_postload(save_prepost_delegate(FUNC(upd7759_device::postload), this));
 }
 
 //-------------------------------------------------
@@ -373,56 +309,34 @@ void upd7756_device::device_start()
 
 void upd775x_device::device_reset()
 {
+	m_pos                = 0;
+	m_fifo_in            = 0;
+	m_drq                = 0;
+	m_state              = STATE_IDLE;
+	m_clocks_left        = 0;
+	m_nibbles_left       = 0;
+	m_repeat_count       = 0;
+	m_post_drq_state     = STATE_IDLE;
+	m_post_drq_clocks    = 0;
+	m_req_sample         = 0;
+	m_last_sample        = 0;
+	m_block_header       = 0;
+	m_sample_rate        = 0;
+	m_first_valid_header = 0;
+	m_offset             = 0;
+	m_repeat_offset      = 0;
+	m_adpcm_state        = 0;
+	m_adpcm_data         = 0;
+	m_sample             = 0;
 }
 
 void upd7759_device::device_reset()
 {
-	m_pos                = 0;
-	m_fifo_in            = 0;
-	m_drq                = 0;
-	m_state              = STATE_IDLE;
-	m_clocks_left        = 0;
-	m_nibbles_left       = 0;
-	m_repeat_count       = 0;
-	m_post_drq_state     = STATE_IDLE;
-	m_post_drq_clocks    = 0;
-	m_req_sample         = 0;
-	m_last_sample        = 0;
-	m_block_header       = 0;
-	m_sample_rate        = 0;
-	m_first_valid_header = 0;
-	m_offset             = 0;
-	m_repeat_offset      = 0;
-	m_adpcm_state        = 0;
-	m_adpcm_data         = 0;
-	m_sample             = 0;
+	upd775x_device::device_reset();
 
-	/* turn off any timer */
+	// turn off any timer
 	if (m_timer)
 		m_timer->adjust(attotime::never);
-}
-
-void upd7756_device::device_reset()
-{
-	m_pos                = 0;
-	m_fifo_in            = 0;
-	m_drq                = 0;
-	m_state              = STATE_IDLE;
-	m_clocks_left        = 0;
-	m_nibbles_left       = 0;
-	m_repeat_count       = 0;
-	m_post_drq_state     = STATE_IDLE;
-	m_post_drq_clocks    = 0;
-	m_req_sample         = 0;
-	m_last_sample        = 0;
-	m_block_header       = 0;
-	m_sample_rate        = 0;
-	m_first_valid_header = 0;
-	m_offset             = 0;
-	m_repeat_offset      = 0;
-	m_adpcm_state        = 0;
-	m_adpcm_data         = 0;
-	m_sample             = 0;
 }
 
 
@@ -728,12 +642,10 @@ void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 *************************************************************/
 
-void upd775x_device::postload()
+void upd775x_device::device_post_load()
 {
 	if (m_rombase)
-	{
 		m_rom = m_rombase + m_romoffset;
-	}
 }
 
 /************************************************************
@@ -876,14 +788,4 @@ void upd775x_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	/* flush the state back */
 	m_clocks_left = clocks_left;
 	m_pos = pos;
-}
-
-void upd7759_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	upd775x_device::sound_stream_update(stream, inputs, outputs, samples);
-}
-
-void upd7756_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	upd775x_device::sound_stream_update(stream, inputs, outputs, samples);
 }

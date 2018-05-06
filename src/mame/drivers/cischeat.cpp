@@ -1617,9 +1617,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( armchmp2 )
 	PORT_START("IN0")   // Buttons + Sensors
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL ) // left   sensor
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL ) // right  sensor
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL ) // center sensor
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) // left   sensor
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) // right  sensor
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) // center sensor
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1742,11 +1742,11 @@ static INPUT_PORTS_START( captflag )
 	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW2:8" )
 
 	PORT_START("SW01")
-	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_pos_r,  (void *)LEFT)
-	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_pos_r,  (void *)RIGHT)
+	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_pos_r,  (void *)LEFT)
+	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_pos_r,  (void *)RIGHT)
 
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_busy_r, (void *)LEFT)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_busy_r, (void *)RIGHT)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_busy_r, (void *)LEFT)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, cischeat_state, captflag_motor_busy_r, (void *)RIGHT)
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW01:1,2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
@@ -1933,21 +1933,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 MACHINE_CONFIG_START(cischeat_state::bigrun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu1", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_map)
+	MCFG_DEVICE_ADD("cpu1", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, bigrun_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("cpu2", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_map2)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("cpu2", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_map2)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("cpu3", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_map3)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("cpu3", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_map3)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", M68000, 6000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
+	MCFG_DEVICE_ADD("soundcpu", M68000, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -1976,7 +1976,7 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("ymsnd", STD_FM_CLOCK)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, STD_FM_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -1994,17 +1994,17 @@ MACHINE_CONFIG_START(cischeat_state::cischeat)
 	bigrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(cischeat_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_map)
 
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PROGRAM_MAP(cischeat_map2)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_map2)
 
-	MCFG_CPU_MODIFY("cpu3")
-	MCFG_CPU_PROGRAM_MAP(cischeat_map3)
+	MCFG_DEVICE_MODIFY("cpu3")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_map3)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(cischeat_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2032,20 +2032,20 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstar)
 	bigrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_CLOCK(12000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_CLOCK(12000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map)
 
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_CLOCK(12000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_map2)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_CLOCK(12000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map2)
 
-	MCFG_CPU_MODIFY("cpu3")
-	MCFG_CPU_CLOCK(12000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_map3)
+	MCFG_DEVICE_MODIFY("cpu3")
+	MCFG_DEVICE_CLOCK(12000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map3)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_sound_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", f1gpstar)
@@ -2070,14 +2070,14 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstr2)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(f1gpstr2_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(f1gpstr2_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_sound_map)
 
-	MCFG_CPU_ADD("cpu5", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstr2_io_map)
+	MCFG_DEVICE_ADD("cpu5", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 MACHINE_CONFIG_END
@@ -2085,8 +2085,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cischeat_state::wildplt)
 	f1gpstr2(config);
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(wildplt_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(wildplt_map)
 MACHINE_CONFIG_END
 
 
@@ -2115,8 +2115,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 MACHINE_CONFIG_START(cischeat_state::scudhamm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(scudhamm_map)
+	MCFG_DEVICE_ADD("maincpu",M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(scudhamm_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, scudhamm_scanline, "screen", 0, 1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -2171,8 +2171,8 @@ MACHINE_CONFIG_START(cischeat_state::armchmp2)
 	scudhamm(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(armchmp2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(armchmp2_map)
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(cischeat_state, armchamp2_scanline)
 MACHINE_CONFIG_END
@@ -2203,8 +2203,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
 MACHINE_CONFIG_START(cischeat_state::captflag)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(24'000'000) / 2)  // TMP68000P-12
-	MCFG_CPU_PROGRAM_MAP(captflag_map)
+	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(24'000'000) / 2)  // TMP68000P-12
+	MCFG_DEVICE_PROGRAM_MAP(captflag_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, captflag_scanline, "screen", 0, 1)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )

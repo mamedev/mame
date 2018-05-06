@@ -38,27 +38,32 @@ MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(VOODOO_PCI, voodoo_pci_device, "voodoo_pci", "Voodoo PCI")
 
-ADDRESS_MAP_START(voodoo_pci_device::config_map)
-	AM_IMPORT_FROM(pci_device::config_map)
-	AM_RANGE(0x40, 0x5f) AM_READWRITE  (pcictrl_r,  pcictrl_w)
-ADDRESS_MAP_END
+void voodoo_pci_device::config_map(address_map &map)
+{
+	pci_device::config_map(map);
+	map(0x40, 0x5f).rw(this, FUNC(voodoo_pci_device::pcictrl_r), FUNC(voodoo_pci_device::pcictrl_w));
+}
 
 // VOODOO_1 & VOODOO_2 map
-ADDRESS_MAP_START(voodoo_pci_device::voodoo_reg_map)
-	AM_RANGE(0x0, 0x00ffffff) AM_DEVREADWRITE("voodoo", voodoo_device, voodoo_r, voodoo_w)
-ADDRESS_MAP_END
+void voodoo_pci_device::voodoo_reg_map(address_map &map)
+{
+	map(0x0, 0x00ffffff).rw("voodoo", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+}
 // VOODOO_BANSHEE and VOODOO_3 maps
-ADDRESS_MAP_START(voodoo_pci_device::banshee_reg_map)
-	AM_RANGE(0x0, 0x01ffffff) AM_DEVREADWRITE("voodoo", voodoo_banshee_device, banshee_r, banshee_w)
-ADDRESS_MAP_END
+void voodoo_pci_device::banshee_reg_map(address_map &map)
+{
+	map(0x0, 0x01ffffff).rw("voodoo", FUNC(voodoo_banshee_device::banshee_r), FUNC(voodoo_banshee_device::banshee_w));
+}
 
-ADDRESS_MAP_START(voodoo_pci_device::lfb_map)
-	AM_RANGE(0x0, 0x01ffffff) AM_DEVREADWRITE("voodoo", voodoo_banshee_device, banshee_fb_r, banshee_fb_w)
-ADDRESS_MAP_END
+void voodoo_pci_device::lfb_map(address_map &map)
+{
+	map(0x0, 0x01ffffff).rw("voodoo", FUNC(voodoo_banshee_device::banshee_fb_r), FUNC(voodoo_banshee_device::banshee_fb_w));
+}
 
-ADDRESS_MAP_START(voodoo_pci_device::io_map)
-	AM_RANGE(0x000, 0x0ff) AM_DEVREADWRITE("voodoo", voodoo_banshee_device, banshee_io_r, banshee_io_w)
-ADDRESS_MAP_END
+void voodoo_pci_device::io_map(address_map &map)
+{
+	map(0x000, 0x0ff).rw("voodoo", FUNC(voodoo_banshee_device::banshee_io_r), FUNC(voodoo_banshee_device::banshee_io_w));
+}
 
 voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, VOODOO_PCI, tag, owner, clock),

@@ -55,19 +55,21 @@ DEFINE_DEVICE_TYPE(TMS32053, tms32053_device, "tms32053", "Texas Instruments TMS
  * TMS32051 Internal memory map
  **************************************************************************/
 
-ADDRESS_MAP_START(tms32051_device::tms32051_internal_pgm)
+void tms32051_device::tms32051_internal_pgm(address_map &map)
+{
 //  AM_RANGE(0x0000, 0x1fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if RAM bit = 0
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is off-chip if CNF = 0
-ADDRESS_MAP_END
+	map(0x2000, 0x23ff).ram().share("saram");       // SARAM        TODO: is off-chip if RAM bit = 0
+	map(0xfe00, 0xffff).ram().share("daram_b0");    // DARAM B0     TODO: is off-chip if CNF = 0
+}
 
-ADDRESS_MAP_START(tms32051_device::tms32051_internal_data)
-	AM_RANGE(0x0000, 0x005f) AM_READWRITE(cpuregs_r, cpuregs_w)
-	AM_RANGE(0x0060, 0x007f) AM_RAM                         // DARAM B2
-	AM_RANGE(0x0100, 0x02ff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is unconnected if CNF = 1
-	AM_RANGE(0x0300, 0x04ff) AM_RAM                         // DARAM B1
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if OVLY = 0
-ADDRESS_MAP_END
+void tms32051_device::tms32051_internal_data(address_map &map)
+{
+	map(0x0000, 0x005f).rw(this, FUNC(tms32051_device::cpuregs_r), FUNC(tms32051_device::cpuregs_w));
+	map(0x0060, 0x007f).ram();                         // DARAM B2
+	map(0x0100, 0x02ff).ram().share("daram_b0");    // DARAM B0     TODO: is unconnected if CNF = 1
+	map(0x0300, 0x04ff).ram();                         // DARAM B1
+	map(0x0800, 0x0bff).ram().share("saram");       // SARAM        TODO: is off-chip if OVLY = 0
+}
 
 
 tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_pgm, address_map_constructor internal_data)
@@ -97,19 +99,21 @@ device_memory_interface::space_config_vector tms32051_device::memory_space_confi
  * TMS32053 Internal memory map
  **************************************************************************/
 
-ADDRESS_MAP_START(tms32053_device::tms32053_internal_pgm)
+void tms32053_device::tms32053_internal_pgm(address_map &map)
+{
 //  AM_RANGE(0x0000, 0x3fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
-	AM_RANGE(0x4000, 0x4bff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if RAM bit = 0
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is off-chip if CNF = 0
-ADDRESS_MAP_END
+	map(0x4000, 0x4bff).ram().share("saram");       // SARAM        TODO: is off-chip if RAM bit = 0
+	map(0xfe00, 0xffff).ram().share("daram_b0");    // DARAM B0     TODO: is off-chip if CNF = 0
+}
 
-ADDRESS_MAP_START(tms32053_device::tms32053_internal_data)
-	AM_RANGE(0x0000, 0x005f) AM_READWRITE(cpuregs_r, cpuregs_w)
-	AM_RANGE(0x0060, 0x007f) AM_RAM                         // DARAM B2
-	AM_RANGE(0x0100, 0x02ff) AM_RAM AM_SHARE("daram_b0")    // DARAM B0     TODO: is unconnected if CNF = 1
-	AM_RANGE(0x0300, 0x04ff) AM_RAM                         // DARAM B1
-	AM_RANGE(0x0800, 0x13ff) AM_RAM AM_SHARE("saram")       // SARAM        TODO: is off-chip if OVLY = 0
-ADDRESS_MAP_END
+void tms32053_device::tms32053_internal_data(address_map &map)
+{
+	map(0x0000, 0x005f).rw(this, FUNC(tms32053_device::cpuregs_r), FUNC(tms32053_device::cpuregs_w));
+	map(0x0060, 0x007f).ram();                         // DARAM B2
+	map(0x0100, 0x02ff).ram().share("daram_b0");    // DARAM B0     TODO: is unconnected if CNF = 1
+	map(0x0300, 0x04ff).ram();                         // DARAM B1
+	map(0x0800, 0x13ff).ram().share("saram");       // SARAM        TODO: is off-chip if OVLY = 0
+}
 
 
 tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

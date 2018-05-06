@@ -126,7 +126,7 @@ uint16_t gaelco_decrypt(address_space &space, int offset, int data, int param1, 
 {
 	static int lastpc, lastoffset, lastencword, lastdecword;
 
-	int thispc = space.device().safe_pc();
+	int thispc = space.device().state().pc();
 //  int savedata = data;
 
 	/* check if 2nd half of 32 bit */

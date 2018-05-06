@@ -264,8 +264,8 @@ PALETTE_INIT_MEMBER(itgambl3_state, itgambl3)
 MACHINE_CONFIG_START(itgambl3_state::itgambl3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
-	MCFG_CPU_PROGRAM_MAP(itgambl3_map)
+	MCFG_DEVICE_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
+	MCFG_DEVICE_PROGRAM_MAP(itgambl3_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
