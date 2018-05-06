@@ -266,7 +266,7 @@ uint32_t video992_device::screen_update( screen_device &screen, bitmap_rgb32 &bi
 */
 WRITE_LINE_MEMBER( video992_device::videna )
 {
-	m_videna = (state==CLEAR_LINE);
+	m_videna = (state==ASSERT_LINE);
 }
 
 void video992_device::device_start()

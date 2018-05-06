@@ -100,7 +100,7 @@
     means that with a screen full of characters, the processing speed is
     definitely slower than with a clear screen.
 
-    To be able to temporarily get full CPU power, there is a pin VIDENA* at
+    To be able to temporarily get full CPU power, there is a pin VIDENA at
     the video controller which causes the screen to be blank when asserted,
     and to be restored as before when cleared. This is used during cassette
     transfer.
@@ -149,7 +149,7 @@
 
     TODO
     ----
-    * Implement cassette
+    * Fix cassette
     * Add Hexbus
 
     Original implementation: Raphael Nabet; December 1999, 2000
@@ -166,6 +166,7 @@
 #include "cpu/tms9900/tms9995.h"
 #include "bus/ti99/internal/992board.h"
 #include "machine/ram.h"
+#include "imagedev/cassette.h"
 
 #define TI_VDC_TAG         "vdc"
 #define TI_SCREEN_TAG      "screen"
@@ -191,6 +192,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videoctrl(*this, "vdc"),
+		m_cassette(*this, "cassette"),
 		m_ram(*this, TI992_RAM_TAG),
 		m_have_banked_ROM(true),
 		m_otherbank(false),
@@ -206,11 +208,11 @@ public:
 	DECLARE_MACHINE_RESET( ti99_2 );
 
 	DECLARE_WRITE8_MEMBER(intflag_write);
-	DECLARE_WRITE8_MEMBER(write_kbd);
-	DECLARE_WRITE8_MEMBER(write_misc_cru);
 
-	DECLARE_READ8_MEMBER(read_kbd);
-	DECLARE_READ8_MEMBER(read_misc_cru);
+	DECLARE_READ8_MEMBER(read_e00x);
+	DECLARE_READ8_MEMBER(read_e80x);
+	DECLARE_WRITE8_MEMBER(write_e00x);
+	DECLARE_WRITE8_MEMBER(write_e80x);
 
 	DECLARE_READ8_MEMBER(mem_read);
 	DECLARE_WRITE8_MEMBER(mem_write);
@@ -218,6 +220,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(hold);
 	DECLARE_WRITE_LINE_MEMBER(holda);
 	DECLARE_WRITE_LINE_MEMBER(interrupt);
+	DECLARE_WRITE_LINE_MEMBER(cassette_output);
 
 	void crumap(address_map &map);
 	void memmap(address_map &map);
@@ -229,6 +232,7 @@ public:
 private:
 	required_device<tms9995_device> m_maincpu;
 	required_device<bus::ti99::internal::video992_device> m_videoctrl;
+	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 
 	bool m_have_banked_ROM;
@@ -294,14 +298,14 @@ void ti99_2_state::crumap(address_map &map)
 	// CRU E000-E7fE: Keyboard
 	//  Read: 0000 1110 0*** **** (mirror 007f)
 	// Write: 0111 00** **** *XXX (mirror 03f8)
-	map(0x0e00, 0x0e00).mirror(0x007f).r(this, FUNC(ti99_2_state::read_kbd));
-	map(0x7000, 0x7007).mirror(0x03f8).w(this, FUNC(ti99_2_state::write_kbd));
+	map(0x0e00, 0x0e00).mirror(0x007f).r(this, FUNC(ti99_2_state::read_e00x));
+	map(0x7000, 0x7007).mirror(0x03f8).w(this, FUNC(ti99_2_state::write_e00x));
 
 	// CRU E800-EFFE: Hexbus and other functions
 	//  Read: 0000 1110 1*** **** (mirror 007f)
 	// Write: 0111 01** **** *XXX (mirror 03f8)
-	map(0x0e80, 0x0e80).mirror(0x007f).r(this, FUNC(ti99_2_state::read_misc_cru));
-	map(0x7400, 0x7407).mirror(0x03f8).w(this, FUNC(ti99_2_state::write_misc_cru));
+	map(0x0e80, 0x0e80).mirror(0x007f).r(this, FUNC(ti99_2_state::read_e80x));
+	map(0x7400, 0x7407).mirror(0x03f8).w(this, FUNC(ti99_2_state::write_e80x));
 }
 
 
@@ -310,41 +314,27 @@ void ti99_2_state::crumap(address_map &map)
     ROM bank. Suppose that means we won't be able to read the keyboard
     when processing that ROM area.
 */
-WRITE8_MEMBER(ti99_2_state::write_kbd)
+WRITE8_MEMBER(ti99_2_state::write_e00x)
 {
 	// logerror("offset=%d, data=%d\n", offset, data);
-	if (data == 0) m_keyRow = offset;
-
-	// Now, we handle ROM paging
-	if (m_have_banked_ROM && offset == 0)
-	{
-		LOGMASKED(LOG_BANK, "set bank = %d\n", data);
-		m_otherbank = (data==1);
-	}
-}
-
-WRITE8_MEMBER(ti99_2_state::write_misc_cru)
-{
 	switch (offset)
 	{
 	case 0:
+		if (m_have_banked_ROM)
+		{
+			LOGMASKED(LOG_BANK, "set bank = %d\n", data);
+			m_otherbank = (data==1);
+		}
+		// no break
 	case 1:
 	case 2:
 	case 3:
-		/* ALC I/O */
-		LOGMASKED(LOG_CRU, "Hexbus I/O (%d) = %d\n", offset, data);
-		break;
 	case 4:
-		/* ALC HSK */
-		LOGMASKED(LOG_CRU, "Hexbus HSK = %d\n", data);
-		break;
 	case 5:
-		/* ALC BAV */
-		LOGMASKED(LOG_CRU, "Hexbus BAV = %d\n", data);
+		if (data == 0) m_keyRow = offset;
 		break;
 	case 6:
-		/* cassette output */
-		LOGMASKED(LOG_CRU, "Cassette output = %d\n", data);
+		LOGMASKED(LOG_WARN, "Unmapped CRU write to address e00c\n");
 		break;
 	case 7:
 		LOGMASKED(LOG_CRU, "VIDENA = %d\n", data);
@@ -353,16 +343,55 @@ WRITE8_MEMBER(ti99_2_state::write_misc_cru)
 	}
 }
 
+WRITE8_MEMBER(ti99_2_state::write_e80x)
+{
+	switch (offset)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+		LOGMASKED(LOG_CRU, "Hexbus I/O (%d) = %d\n", offset, data);
+		break;
+	case 4:
+		LOGMASKED(LOG_CRU, "Hexbus HSK = %d\n", data);
+		break;
+	case 5:
+		LOGMASKED(LOG_CRU, "Hexbus BAV = %d\n", data);
+		break;
+	case 6:
+		LOGMASKED(LOG_CRU, "Hexbus inhibit = %d\n", data);
+		break;
+	case 7:
+		LOGMASKED(LOG_CRU, "Cassette output = %d\n", data);
+		cassette_output((data==1)? ASSERT_LINE : CLEAR_LINE);
+		break;
+	}
+}
+
 /* read keys in the current row */
-READ8_MEMBER(ti99_2_state::read_kbd)
+READ8_MEMBER(ti99_2_state::read_e00x)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 	return ioport(keynames[m_keyRow])->read();
 }
 
-READ8_MEMBER(ti99_2_state::read_misc_cru)
+READ8_MEMBER(ti99_2_state::read_e80x)
 {
-	return 0;
+	uint8_t value = 0;
+	if (m_cassette->input() > 0)
+	{
+		value |= 0x80;
+	}
+	return value;
+}
+
+/*
+    Tape output. See also ti99_4x.cpp where this is taken from.
+*/
+WRITE_LINE_MEMBER( ti99_2_state::cassette_output )
+{
+	m_cassette->output(state==ASSERT_LINE? +1 : -1);
 }
 
 /*
@@ -390,7 +419,7 @@ WRITE8_MEMBER(ti99_2_state::intflag_write)
 		if (data==0) LOGMASKED(LOG_CRU, "Clear INT4 latch\n");
 		break;
 	case 0x1eea:
-		LOGMASKED(LOG_CRU, "Setting FLAG5 to %d\n", data);
+		LOGMASKED(LOG_CRU, "Switch to bank %d\n", data);
 		break;
 
 	default:
@@ -594,6 +623,11 @@ MACHINE_CONFIG_START(ti99_2_state::ti99_2)
 	MCFG_RAM_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_2_state, ti99_2 )
+
+	// Cassette drives
+	// There is no route from the cassette to some audio output, so we don't hear it.
+	MCFG_CASSETTE_ADD( "cassette" )
+
 MACHINE_CONFIG_END
 
 /*
