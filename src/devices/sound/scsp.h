@@ -148,7 +148,6 @@ private:
 	int m_TimPris[3];
 	int m_TimCnt[3];
 
-	void UpdateClock();
 	// timers
 	emu_timer *m_timerA, *m_timerB, *m_timerC;
 
