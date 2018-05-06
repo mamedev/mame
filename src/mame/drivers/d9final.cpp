@@ -300,10 +300,10 @@ void d9final_state::machine_start()
 
 MACHINE_CONFIG_START(d9final_state::d9final)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 24000000/4)/* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(d9final_map)
-	MCFG_CPU_IO_MAP(d9final_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", d9final_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 24000000/4)/* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(d9final_map)
+	MCFG_DEVICE_IO_MAP(d9final_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", d9final_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram") // Sharp LH5116D-10 + battery
 
@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(d9final_state::d9final)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	//MCFG_DEVICE_ADD("essnd", ES8712, 24000000/3) // clock unknown

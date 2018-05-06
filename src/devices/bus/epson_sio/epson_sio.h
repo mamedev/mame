@@ -90,7 +90,7 @@ DECLARE_DEVICE_TYPE(EPSON_SIO, epson_sio_device)
 
 
 // supported devices
-SLOT_INTERFACE_EXTERN( epson_sio_devices );
+void epson_sio_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_EPSON_SIO_EPSON_SIO_H

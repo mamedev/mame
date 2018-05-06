@@ -513,21 +513,21 @@ void pturn_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(pturn_state::pturn)
-	MCFG_CPU_ADD("maincpu", Z80, 12000000/3)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pturn_state,  main_intgen)
+	MCFG_DEVICE_ADD("maincpu", Z80, 12000000/3)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pturn_state,  main_intgen)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 12000000/3)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(pturn_state, sub_intgen, 3*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/3)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(pturn_state, sub_intgen, 3*60)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pturn_state, flip_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(pturn_state, nmi_main_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(pturn_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(pturn_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pturn_state, bgbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pturn_state, fgbank_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, pturn_state, flip_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, pturn_state, nmi_main_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, pturn_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, pturn_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, pturn_state, bgbank_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, pturn_state, fgbank_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // toggles frequently during gameplay
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -547,10 +547,10 @@ MACHINE_CONFIG_START(pturn_state::pturn)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

@@ -388,17 +388,17 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(divebomb_state::divebomb)
 
-	MCFG_CPU_ADD("fgcpu", Z80,XTAL1/4) // ?
-	MCFG_CPU_PROGRAM_MAP(divebomb_fgcpu_map)
-	MCFG_CPU_IO_MAP(divebomb_fgcpu_iomap)
+	MCFG_DEVICE_ADD("fgcpu", Z80,XTAL1/4) // ?
+	MCFG_DEVICE_PROGRAM_MAP(divebomb_fgcpu_map)
+	MCFG_DEVICE_IO_MAP(divebomb_fgcpu_iomap)
 
-	MCFG_CPU_ADD("spritecpu", Z80,XTAL1/4) // ?
-	MCFG_CPU_PROGRAM_MAP(divebomb_spritecpu_map)
-	MCFG_CPU_IO_MAP(divebomb_spritecpu_iomap)
+	MCFG_DEVICE_ADD("spritecpu", Z80,XTAL1/4) // ?
+	MCFG_DEVICE_PROGRAM_MAP(divebomb_spritecpu_map)
+	MCFG_DEVICE_IO_MAP(divebomb_spritecpu_iomap)
 
-	MCFG_CPU_ADD("rozcpu", Z80,XTAL1/4) // ?
-	MCFG_CPU_PROGRAM_MAP(divebomb_rozcpu_map)
-	MCFG_CPU_IO_MAP(divebomb_rozcpu_iomap)
+	MCFG_DEVICE_ADD("rozcpu", Z80,XTAL1/4) // ?
+	MCFG_DEVICE_PROGRAM_MAP(divebomb_rozcpu_map)
+	MCFG_DEVICE_IO_MAP(divebomb_rozcpu_iomap)
 
 	MCFG_QUANTUM_PERFECT_CPU("fgcpu")
 
@@ -412,10 +412,10 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("rozcpu", INPUT_LINE_IRQ0))
 
 	MCFG_GENERIC_LATCH_8_ADD("spr2fg")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("fgcpu_irq", input_merger_any_high_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("fgcpu_irq", input_merger_any_high_device, in_w<0>))
 
 	MCFG_GENERIC_LATCH_8_ADD("roz2fg")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("fgcpu_irq", input_merger_any_high_device, in_w<1>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("fgcpu_irq", input_merger_any_high_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
@@ -457,17 +457,17 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	// All frequencies unverified
-	MCFG_SOUND_ADD("sn0", SN76489, XTAL1/8)
+	MCFG_DEVICE_ADD("sn0", SN76489, XTAL1/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_SOUND_ADD("sn1", SN76489, XTAL1/8)
+	MCFG_DEVICE_ADD("sn1", SN76489, XTAL1/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_SOUND_ADD("sn2", SN76489, XTAL1/8)
+	MCFG_DEVICE_ADD("sn2", SN76489, XTAL1/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_SOUND_ADD("sn3", SN76489, XTAL1/8)
+	MCFG_DEVICE_ADD("sn3", SN76489, XTAL1/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_SOUND_ADD("sn4", SN76489, XTAL1/8)
+	MCFG_DEVICE_ADD("sn4", SN76489, XTAL1/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_SOUND_ADD("sn5", SN76489, XTAL1/8)
+	MCFG_DEVICE_ADD("sn5", SN76489, XTAL1/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 

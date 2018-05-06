@@ -295,10 +295,10 @@ INTERRUPT_GEN_MEMBER(ettrivia_state::ettrivia_interrupt)
 }
 
 MACHINE_CONFIG_START(ettrivia_state::ettrivia)
-	MCFG_CPU_ADD("maincpu", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ettrivia_state,  ettrivia_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ettrivia_state,  ettrivia_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -318,14 +318,14 @@ MACHINE_CONFIG_START(ettrivia_state::ettrivia)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8912, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay3", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay3", AY8912, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

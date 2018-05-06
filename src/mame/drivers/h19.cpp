@@ -519,9 +519,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(h19_state::h19)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, H19_CLOCK) // From schematics
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, H19_CLOCK) // From schematics
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	// TODO: make configurable, Heath offered 3 different CRTs - White, Green, Amber.
@@ -554,13 +554,13 @@ MACHINE_CONFIG_START(h19_state::h19)
 	MCFG_MM5740_MATRIX_X7(IOPORT("X7"))
 	MCFG_MM5740_MATRIX_X8(IOPORT("X8"))
 	MCFG_MM5740_MATRIX_X9(IOPORT("X9"))
-	MCFG_MM5740_SHIFT_CB(READLINE(h19_state, mm5740_shift_r))
-	MCFG_MM5740_CONTROL_CB(READLINE(h19_state, mm5740_control_r))
-	MCFG_MM5740_DATA_READY_CB(WRITELINE(h19_state, mm5740_data_ready_w))
+	MCFG_MM5740_SHIFT_CB(READLINE(*this, h19_state, mm5740_shift_r))
+	MCFG_MM5740_CONTROL_CB(READLINE(*this, h19_state, mm5740_control_r))
+	MCFG_MM5740_DATA_READY_CB(WRITELINE(*this, h19_state, mm5740_data_ready_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, H19_BEEP_FRQ)
+	MCFG_DEVICE_ADD("beeper", BEEP, H19_BEEP_FRQ)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

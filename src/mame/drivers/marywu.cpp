@@ -183,31 +183,31 @@ void marywu_state::machine_start()
 
 MACHINE_CONFIG_START(marywu_state::marywu)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL(10'738'635)) //actual CPU is a Winbond w78c31b-24
-	MCFG_CPU_PROGRAM_MAP(program_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(10'738'635)) //actual CPU is a Winbond w78c31b-24
+	MCFG_DEVICE_PROGRAM_MAP(program_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
 
 	/* Keyboard & display interface */
 	MCFG_DEVICE_ADD("i8279", I8279, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
-	MCFG_I8279_OUT_SL_CB(WRITE8(marywu_state, multiplex_7seg_w))          // select  block of 7seg modules by multiplexing the SL scan lines
-	MCFG_I8279_IN_RL_CB(READ8(marywu_state, keyboard_r))                  // keyboard Return Lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(marywu_state, display_7seg_data_w))
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, marywu_state, multiplex_7seg_w))          // select  block of 7seg modules by multiplexing the SL scan lines
+	MCFG_I8279_IN_RL_CB(READ8(*this, marywu_state, keyboard_r))                  // keyboard Return Lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, marywu_state, display_7seg_data_w))
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_marywu)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(marywu_state, ay1_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(marywu_state, ay1_port_b_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, marywu_state, ay1_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, marywu_state, ay1_port_b_w))
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(marywu_state, ay2_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(marywu_state, ay2_port_b_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, marywu_state, ay2_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, marywu_state, ay2_port_b_w))
 MACHINE_CONFIG_END
 
 ROM_START( marywu )

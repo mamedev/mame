@@ -280,9 +280,9 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	/* basic machine hardware */
 
 	/* main CPU */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 4)        /* 2 MHz */
-	MCFG_CPU_PROGRAM_MAP(mz80k_mem)
-	MCFG_CPU_IO_MAP(mz80k_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 4)        /* 2 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mz80k_mem)
+	MCFG_DEVICE_IO_MAP(mz80k_io)
 
 
 	/* video hardware */
@@ -300,23 +300,23 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mz80_state, mz80k_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(mz80_state, mz80k_8255_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(mz80_state, mz80k_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz80_state, mz80k_8255_portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz80_state, mz80k_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz80_state, mz80k_8255_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz80_state, mz80k_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz80_state, mz80k_8255_portc_w))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(8'000'000)/4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(mz80_state, pit_out0_changed))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, mz80_state, pit_out0_changed))
 	MCFG_PIT8253_CLK1(XTAL(8'000'000)/256)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pit8253", pit8253_device, write_clk2))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk2))
 	MCFG_PIT8253_CLK2(0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mz80_state, pit_out2_changed))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mz80_state, pit_out2_changed))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tempo", mz80_state, ne555_tempo_callback, attotime::from_hz(34))
 	MCFG_CASSETTE_ADD( "cassette" )

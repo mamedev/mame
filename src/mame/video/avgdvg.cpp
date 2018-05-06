@@ -220,6 +220,8 @@ int dvg_device::handler_1() // dvg_dmald
 
 void dvg_device::dvg_draw_to(int x, int y, int intensity)
 {
+	apply_flipping(&x, &y);
+
 	if (((x | y) & 0x400) == 0)
 		vg_add_point_buf((xmin + x - 512) << 16,
 							(ymin + 512 - y) << 16,
@@ -1445,6 +1447,11 @@ void dvg_device::device_start()
 
 	xmin = visarea.min_x;
 	ymin = visarea.min_y;
+
+	xcenter = 512;
+	ycenter = 512;
+
+	flip_x = flip_y = 0;
 
 	vg_halt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device::vg_set_halt_callback),this));
 	vg_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device::run_state_machine),this));

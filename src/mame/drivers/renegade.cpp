@@ -469,12 +469,12 @@ void renegade_state::machine_reset()
 MACHINE_CONFIG_START(renegade_state::renegade)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12000000/8)  /* 1.5 MHz (measured) */
-	MCFG_CPU_PROGRAM_MAP(renegade_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12000000/8)  /* 1.5 MHz (measured) */
+	MCFG_DEVICE_PROGRAM_MAP(renegade_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", renegade_state, interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, 12000000/2) // HD68A09P
-	MCFG_CPU_PROGRAM_MAP(renegade_sound_map)    /* IRQs are caused by the main CPU */
+	MCFG_DEVICE_ADD("audiocpu", MC6809, 12000000/2) // HD68A09P
+	MCFG_DEVICE_PROGRAM_MAP(renegade_sound_map)    /* IRQs are caused by the main CPU */
 
 	MCFG_DEVICE_ADD("mcu", TAITO68705_MCU, 12000000/4) // ?
 
@@ -497,12 +497,12 @@ MACHINE_CONFIG_START(renegade_state::renegade)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, 12000000/4)
+	MCFG_DEVICE_ADD("ymsnd", YM3526, 12000000/4)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 12000000/32)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(renegade_state, adpcm_int))
+	MCFG_DEVICE_ADD("msm", MSM5205, 12000000/32)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, renegade_state, adpcm_int))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -510,8 +510,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(renegade_state::kuniokunb)
 	renegade(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(renegade_nomcu_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(renegade_nomcu_map)
 
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END

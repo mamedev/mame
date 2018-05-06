@@ -144,9 +144,10 @@ ioport_constructor nes_arcstick_device::device_input_ports() const
 
 
 
-static SLOT_INTERFACE_START( arcstick_daisy )
-	SLOT_INTERFACE("arcstick", NES_ARCSTICK)
-SLOT_INTERFACE_END
+static void arcstick_daisy(device_slot_interface &device)
+{
+	device.option_add("arcstick", NES_ARCSTICK);
+}
 
 
 //-------------------------------------------------

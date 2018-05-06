@@ -1365,9 +1365,10 @@ INPUT_PORTS_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static SLOT_INTERFACE_START( amiga_floppies )
-	SLOT_INTERFACE("35dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void amiga_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 // basic elements common to all amigas
 MACHINE_CONFIG_START(amiga_state::amiga_base)
@@ -1381,35 +1382,35 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 
 	// cia
 	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_PAL)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_0_irq))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("cia_0_port_a"))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, cia_0_port_a_write))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_MOS6526_PC_CALLBACK(DEVWRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_MOS6526_SP_CALLBACK(DEVWRITELINE("kbd", amiga_keyboard_bus_device, kdat_in_w)) MCFG_DEVCB_INVERT
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_0_port_a_write))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_MOS6526_PC_CALLBACK(WRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_MOS6526_SP_CALLBACK(WRITELINE("kbd", amiga_keyboard_bus_device, kdat_in_w)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_PAL)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_1_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(amiga_state, cia_1_port_a_read))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, cia_1_port_a_write))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8("fdc", amiga_fdc_device, ciaaprb_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, amiga_state, cia_1_port_a_read))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_1_port_a_write))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8("fdc", amiga_fdc_device, ciaaprb_w))
 
 	// audio
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_PAL)
+	MCFG_DEVICE_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_PAL)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
-	MCFG_PAULA_MEM_READ_CB(READ16(amiga_state, chip_ram_r))
-	MCFG_PAULA_INT_CB(WRITELINE(amiga_state, paula_int_w))
+	MCFG_PAULA_MEM_READ_CB(READ16(*this, amiga_state, chip_ram_r))
+	MCFG_PAULA_INT_CB(WRITELINE(*this, amiga_state, paula_int_w))
 
 	// floppy drives
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_PAL)
-	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(amiga_state, chip_ram_r))
-	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(amiga_state, chip_ram_w))
-	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(amiga_state, fdc_dskblk_w))
-	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
+	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(*this, amiga_state, chip_ram_r))
+	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(*this, amiga_state, chip_ram_w))
+	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(*this, amiga_state, fdc_dskblk_w))
+	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(*this, amiga_state, fdc_dsksyn_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amiga_floppies, "35dd", amiga_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats)
@@ -1420,26 +1421,26 @@ MACHINE_CONFIG_START(amiga_state::amiga_base)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// rs232
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(amiga_state, rs232_rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(amiga_state, rs232_dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(amiga_state, rs232_dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(amiga_state, rs232_ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(amiga_state, rs232_cts_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, amiga_state, rs232_rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, amiga_state, rs232_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(*this, amiga_state, rs232_dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE(*this, amiga_state, rs232_ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, amiga_state, rs232_cts_w))
 
 	// centronics
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(amiga_state, centronics_ack_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amiga_state, centronics_busy_w))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(amiga_state, centronics_perror_w))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(amiga_state, centronics_select_w))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, amiga_state, centronics_ack_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, amiga_state, centronics_busy_w))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, amiga_state, centronics_perror_w))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, amiga_state, centronics_select_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// keyboard
 	MCFG_AMIGA_KEYBOARD_INTERFACE_ADD("kbd", "a500_us")
-	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(DEVWRITELINE("cia_0", mos8520_device, cnt_w))
-	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(DEVWRITELINE("cia_0", mos8520_device, sp_w))
-	MCFG_AMIGA_KEYBOARD_KRST_HANDLER(WRITELINE(amiga_state, kbreset_w))
+	MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(WRITELINE("cia_0", mos8520_device, cnt_w))
+	MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(WRITELINE("cia_0", mos8520_device, sp_w))
+	MCFG_AMIGA_KEYBOARD_KRST_HANDLER(WRITELINE(*this, amiga_state, kbreset_w))
 
 	// software
 	MCFG_SOFTWARE_LIST_ADD("wb_list", "amiga_workbench")
@@ -1452,8 +1453,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a1000_state::a1000)
 	amiga_base(config);
 	// main cpu
-	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
-	MCFG_CPU_PROGRAM_MAP(a1000_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
+	MCFG_DEVICE_PROGRAM_MAP(a1000_mem)
 
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(a1000_overlay_map)
@@ -1491,8 +1492,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a2000_state::a2000)
 	amiga_base(config);
 	// main cpu
-	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
-	MCFG_CPU_PROGRAM_MAP(a2000_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
+	MCFG_DEVICE_PROGRAM_MAP(a2000_mem)
 
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
@@ -1509,8 +1510,8 @@ MACHINE_CONFIG_START(a2000_state::a2000)
 
 	// zorro slots
 	MCFG_ZORRO2_ADD("maincpu")
-	MCFG_ZORRO2_INT2_HANDLER(WRITELINE(a2000_state, zorro2_int2_w))
-	MCFG_ZORRO2_INT6_HANDLER(WRITELINE(a2000_state, zorro2_int6_w))
+	MCFG_ZORRO2_INT2_HANDLER(WRITELINE(*this, a2000_state, zorro2_int2_w))
+	MCFG_ZORRO2_INT6_HANDLER(WRITELINE(*this, a2000_state, zorro2_int6_w))
 	MCFG_ZORRO2_SLOT_ADD("zorro1", zorro2_cards, nullptr)
 	MCFG_ZORRO2_SLOT_ADD("zorro2", zorro2_cards, nullptr)
 	MCFG_ZORRO2_SLOT_ADD("zorro3", zorro2_cards, nullptr)
@@ -1537,8 +1538,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a500_state::a500)
 	amiga_base(config);
 	// main cpu
-	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
-	MCFG_CPU_PROGRAM_MAP(a500_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
+	MCFG_DEVICE_PROGRAM_MAP(a500_mem)
 
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
 	//MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
@@ -1550,8 +1551,8 @@ MACHINE_CONFIG_START(a500_state::a500)
 
 	// cpu slot
 	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
-	MCFG_EXPANSION_SLOT_INT2_HANDLER(WRITELINE(a500_state, side_int2_w))
-	MCFG_EXPANSION_SLOT_INT6_HANDLER(WRITELINE(a500_state, side_int6_w))
+	MCFG_EXPANSION_SLOT_INT2_HANDLER(WRITELINE(*this, a500_state, side_int2_w))
+	MCFG_EXPANSION_SLOT_INT6_HANDLER(WRITELINE(*this, a500_state, side_int6_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a500_state::a500n)
@@ -1573,18 +1574,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cdtv_state::cdtv)
 	amiga_base(config);
 	// main cpu
-	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
-	MCFG_CPU_PROGRAM_MAP(cdtv_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
+	MCFG_DEVICE_PROGRAM_MAP(cdtv_mem)
 
 	// remote control input converter
-	MCFG_CPU_ADD("u75", M6502, XTAL(3'000'000))
-	MCFG_CPU_PROGRAM_MAP(cdtv_rc_mem)
+	MCFG_DEVICE_ADD("u75", M6502, XTAL(3'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(cdtv_rc_mem)
 	MCFG_DEVICE_DISABLE()
 
 	// lcd controller
 #if 0
-	MCFG_CPU_ADD("u62", LC6554, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(lcd_mem)
+	MCFG_DEVICE_ADD("u62", LC6554, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(lcd_mem)
 #endif
 
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
@@ -1605,24 +1606,24 @@ MACHINE_CONFIG_START(cdtv_state::cdtv)
 
 	// cd-rom controller
 	MCFG_DMAC_ADD("u36", amiga_state::CLK_7M_PAL)
-	MCFG_DMAC_SCSI_READ_HANDLER(READ8(cdtv_state, dmac_scsi_data_read))
-	MCFG_DMAC_SCSI_WRITE_HANDLER(WRITE8(cdtv_state, dmac_scsi_data_write))
-	MCFG_DMAC_IO_READ_HANDLER(READ8(cdtv_state, dmac_io_read))
-	MCFG_DMAC_IO_WRITE_HANDLER(WRITE8(cdtv_state, dmac_io_write))
-	MCFG_DMAC_INT_HANDLER(WRITELINE(cdtv_state, dmac_int_w))
+	MCFG_DMAC_SCSI_READ_HANDLER(READ8(*this, cdtv_state, dmac_scsi_data_read))
+	MCFG_DMAC_SCSI_WRITE_HANDLER(WRITE8(*this, cdtv_state, dmac_scsi_data_write))
+	MCFG_DMAC_IO_READ_HANDLER(READ8(*this, cdtv_state, dmac_io_read))
+	MCFG_DMAC_IO_WRITE_HANDLER(WRITE8(*this, cdtv_state, dmac_io_write))
+	MCFG_DMAC_INT_HANDLER(WRITELINE(*this, cdtv_state, dmac_int_w))
 
 	MCFG_DEVICE_ADD("u32", TPI6525, 0)
-	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(cdtv_state, tpi_int_w))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(cdtv_state, tpi_port_b_write))
+	MCFG_TPI6525_OUT_IRQ_CB(WRITELINE(*this, cdtv_state, tpi_int_w))
+	MCFG_TPI6525_OUT_PB_CB(WRITE8(*this, cdtv_state, tpi_port_b_write))
 
 	// cd-rom
 	MCFG_CR511B_ADD("cdrom")
-	MCFG_CR511B_SCOR_HANDLER(DEVWRITELINE("u32", tpi6525_device, i1_w)) MCFG_DEVCB_INVERT
-	MCFG_CR511B_STCH_HANDLER(DEVWRITELINE("u32", tpi6525_device, i2_w)) MCFG_DEVCB_INVERT
-	MCFG_CR511B_STEN_HANDLER(DEVWRITELINE("u32", tpi6525_device, i3_w))
-	MCFG_CR511B_XAEN_HANDLER(DEVWRITELINE("u32", tpi6525_device, pb2_w))
-	MCFG_CR511B_DRQ_HANDLER(DEVWRITELINE("u36", amiga_dmac_device, xdreq_w))
-	MCFG_CR511B_DTEN_HANDLER(DEVWRITELINE("u36", amiga_dmac_device, xdreq_w))
+	MCFG_CR511B_SCOR_HANDLER(WRITELINE("u32", tpi6525_device, i1_w)) MCFG_DEVCB_INVERT
+	MCFG_CR511B_STCH_HANDLER(WRITELINE("u32", tpi6525_device, i2_w)) MCFG_DEVCB_INVERT
+	MCFG_CR511B_STEN_HANDLER(WRITELINE("u32", tpi6525_device, i3_w))
+	MCFG_CR511B_XAEN_HANDLER(WRITELINE("u32", tpi6525_device, pb2_w))
+	MCFG_CR511B_DRQ_HANDLER(WRITELINE("u36", amiga_dmac_device, xdreq_w))
+	MCFG_CR511B_DTEN_HANDLER(WRITELINE("u36", amiga_dmac_device, xdreq_w))
 
 	// software
 	MCFG_SOFTWARE_LIST_ADD("cd_list", "cdtv")
@@ -1649,8 +1650,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a3000_state::a3000)
 	amiga_base(config);
 	// main cpu
-	MCFG_CPU_ADD("maincpu", M68030, XTAL(32'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(a3000_mem)
+	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(32'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(a3000_mem)
 
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(overlay_1mb_map32)
@@ -1684,8 +1685,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a500p_state::a500p)
 	amiga_base(config);
 	// main cpu
-	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
-	MCFG_CPU_PROGRAM_MAP(a500p_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
+	MCFG_DEVICE_PROGRAM_MAP(a500p_mem)
 
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(overlay_1mb_map)
@@ -1723,8 +1724,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a600_state::a600)
 	amiga_base(config);
 	// main cpu
-	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
-	MCFG_CPU_PROGRAM_MAP(a600_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_PAL)
+	MCFG_DEVICE_PROGRAM_MAP(a600_mem)
 
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(overlay_2mb_map16)
@@ -1734,14 +1735,14 @@ MACHINE_CONFIG_START(a600_state::a600)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
 
 	MCFG_GAYLE_ADD("gayle", amiga_state::CLK_28M_PAL / 2, a600_state::GAYLE_ID)
-	MCFG_GAYLE_INT2_HANDLER(WRITELINE(a600_state, gayle_int2_w))
-	MCFG_GAYLE_CS0_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs0))
-	MCFG_GAYLE_CS0_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs0))
-	MCFG_GAYLE_CS1_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs1))
-	MCFG_GAYLE_CS1_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs1))
+	MCFG_GAYLE_INT2_HANDLER(WRITELINE(*this, a600_state, gayle_int2_w))
+	MCFG_GAYLE_CS0_READ_HANDLER(READ16("ata", ata_interface_device, read_cs0))
+	MCFG_GAYLE_CS0_WRITE_HANDLER(WRITE16("ata", ata_interface_device, write_cs0))
+	MCFG_GAYLE_CS1_READ_HANDLER(READ16("ata", ata_interface_device, read_cs1))
+	MCFG_GAYLE_CS1_WRITE_HANDLER(WRITE16("ata", ata_interface_device, write_cs1))
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("gayle", gayle_device, ide_interrupt_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("gayle", gayle_device, ide_interrupt_w))
 
 	// todo: pcmcia
 
@@ -1770,8 +1771,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a1200_state::a1200)
 	amiga_base(config);
 	// main cpu
-	MCFG_CPU_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
-	MCFG_CPU_PROGRAM_MAP(a1200_mem)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(a1200_mem)
 
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(overlay_2mb_map32)
@@ -1789,14 +1790,14 @@ MACHINE_CONFIG_START(a1200_state::a1200)
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
 	MCFG_GAYLE_ADD("gayle", amiga_state::CLK_28M_PAL / 2, a1200_state::GAYLE_ID)
-	MCFG_GAYLE_INT2_HANDLER(WRITELINE(a1200_state, gayle_int2_w))
-	MCFG_GAYLE_CS0_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs0))
-	MCFG_GAYLE_CS0_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs0))
-	MCFG_GAYLE_CS1_READ_HANDLER(DEVREAD16("ata", ata_interface_device, read_cs1))
-	MCFG_GAYLE_CS1_WRITE_HANDLER(DEVWRITE16("ata", ata_interface_device, write_cs1))
+	MCFG_GAYLE_INT2_HANDLER(WRITELINE(*this, a1200_state, gayle_int2_w))
+	MCFG_GAYLE_CS0_READ_HANDLER(READ16("ata", ata_interface_device, read_cs0))
+	MCFG_GAYLE_CS0_WRITE_HANDLER(WRITE16("ata", ata_interface_device, write_cs0))
+	MCFG_GAYLE_CS1_READ_HANDLER(READ16("ata", ata_interface_device, read_cs1))
+	MCFG_GAYLE_CS1_WRITE_HANDLER(WRITE16("ata", ata_interface_device, write_cs1))
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("gayle", gayle_device, ide_interrupt_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("gayle", gayle_device, ide_interrupt_w))
 
 	// keyboard
 #if 0
@@ -1835,8 +1836,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a4000_state::a4000)
 	amiga_base(config);
 	// main cpu
-	MCFG_CPU_ADD("maincpu", M68040, XTAL(50'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(a4000_mem)
+	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(50'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(a4000_mem)
 
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(overlay_2mb_map32)
@@ -1858,7 +1859,7 @@ MACHINE_CONFIG_START(a4000_state::a4000)
 
 	// ide
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(a4000_state, ide_interrupt_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, a4000_state, ide_interrupt_w))
 
 	// todo: zorro3
 
@@ -1888,8 +1889,8 @@ MACHINE_CONFIG_START(a4000_state::a400030)
 	a4000(config);
 	// main cpu
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", M68EC030, XTAL(50'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(a400030_mem)
+	MCFG_DEVICE_ADD("maincpu", M68EC030, XTAL(50'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(a400030_mem)
 
 	// todo: ide
 MACHINE_CONFIG_END
@@ -1914,8 +1915,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cd32_state::cd32)
 	amiga_base(config);
 	// main cpu
-	MCFG_CPU_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
-	MCFG_CPU_PROGRAM_MAP(cd32_mem)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, amiga_state::CLK_28M_PAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cd32_mem)
 
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(overlay_2mb_map32)
@@ -1929,12 +1930,12 @@ MACHINE_CONFIG_START(cd32_state::cd32)
 	MCFG_I2CMEM_DATA_SIZE(1024)
 
 	MCFG_AKIKO_ADD("akiko")
-	MCFG_AKIKO_MEM_READ_CB(READ16(amiga_state, chip_ram_r))
-	MCFG_AKIKO_MEM_WRITE_CB(WRITE16(amiga_state, chip_ram_w))
-	MCFG_AKIKO_INT_CB(WRITELINE(cd32_state, akiko_int_w))
-	MCFG_AKIKO_SCL_HANDLER(DEVWRITELINE("i2cmem", i2cmem_device, write_scl))
-	MCFG_AKIKO_SDA_READ_HANDLER(DEVREADLINE("i2cmem", i2cmem_device, read_sda))
-	MCFG_AKIKO_SDA_WRITE_HANDLER(DEVWRITELINE("i2cmem", i2cmem_device, write_sda))
+	MCFG_AKIKO_MEM_READ_CB(READ16(*this, amiga_state, chip_ram_r))
+	MCFG_AKIKO_MEM_WRITE_CB(WRITE16(*this, amiga_state, chip_ram_w))
+	MCFG_AKIKO_INT_CB(WRITELINE(*this, cd32_state, akiko_int_w))
+	MCFG_AKIKO_SCL_HANDLER(WRITELINE("i2cmem", i2cmem_device, write_scl))
+	MCFG_AKIKO_SDA_READ_HANDLER(READLINE("i2cmem", i2cmem_device, read_sda))
+	MCFG_AKIKO_SDA_WRITE_HANDLER(WRITELINE("i2cmem", i2cmem_device, write_sda))
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
@@ -1944,12 +1945,12 @@ MACHINE_CONFIG_START(cd32_state::cd32)
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
-	MCFG_SOUND_ADD("cdda", CDDA, 0)
+	MCFG_DEVICE_ADD("cdda", CDDA)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	MCFG_DEVICE_MODIFY("cia_0")
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(cd32_state, akiko_cia_0_port_a_write))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, cd32_state, akiko_cia_0_port_a_write))
 	MCFG_MOS6526_SP_CALLBACK(NOOP)
 
 	MCFG_CDROM_ADD("cdrom")
@@ -1981,8 +1982,8 @@ MACHINE_CONFIG_START(a4000_state::a4000t)
 	a4000(config);
 	// main cpu
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", M68040, XTAL(50'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(a4000t_mem)
+	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(50'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(a4000t_mem)
 
 	// todo: ide, zorro3, scsi, super dmac
 MACHINE_CONFIG_END

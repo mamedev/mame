@@ -267,9 +267,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(wrally_state::wrally)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL(24'000'000)/2)        /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(wrally_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wrally_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(24'000'000)/2)        /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(wrally_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wrally_state,  irq6_line_hold)
 
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
@@ -288,12 +288,12 @@ MACHINE_CONFIG_START(wrally_state::wrally)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(wrally_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(wrally_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(wrally_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(wrally_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wrally_state, coin1_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, wrally_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, wrally_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, wrally_state, coin2_counter_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP)                                                  /* Sound muting */
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wrally_state, flipscreen_w))                 /* Flip screen */
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, wrally_state, flipscreen_w))                 /* Flip screen */
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)                                                  /* ??? */
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP)                                                  /* ??? */
 

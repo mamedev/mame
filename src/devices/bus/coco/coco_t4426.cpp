@@ -150,28 +150,28 @@ namespace
 
 MACHINE_CONFIG_START(coco_t4426_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(PIA_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(coco_t4426_device, pia_A_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, coco_t4426_device, pia_A_w))
 
 	MCFG_DEVICE_ADD(UART_TAG, ACIA6850, 0)
 
-	MCFG_ACIA6850_TXD_HANDLER (DEVWRITELINE (SERIAL_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER (DEVWRITELINE (SERIAL_TAG, rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER (WRITELINE (SERIAL_TAG, rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER (WRITELINE (SERIAL_TAG, rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD (SERIAL_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (UART_TAG, acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE (UART_TAG, acia6850_device, write_cts))
+	MCFG_DEVICE_ADD (SERIAL_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (WRITELINE (UART_TAG, acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER (WRITELINE (UART_TAG, acia6850_device, write_cts))
 
 	/* Bit Rate Generator */
 	MCFG_MC14411_ADD (BRG_TAG, XTAL(1'843'200))
-	MCFG_MC14411_F1_CB(WRITELINE (coco_t4426_device, write_f1_clock))
-	MCFG_MC14411_F3_CB(WRITELINE (coco_t4426_device, write_f3_clock))
-	MCFG_MC14411_F5_CB(WRITELINE (coco_t4426_device, write_f5_clock))
-	MCFG_MC14411_F7_CB(WRITELINE (coco_t4426_device, write_f7_clock))
-	MCFG_MC14411_F8_CB(WRITELINE (coco_t4426_device, write_f8_clock))
-	MCFG_MC14411_F9_CB(WRITELINE (coco_t4426_device, write_f9_clock))
-	MCFG_MC14411_F11_CB(WRITELINE (coco_t4426_device, write_f11_clock))
-	MCFG_MC14411_F13_CB(WRITELINE (coco_t4426_device, write_f13_clock))
-	MCFG_MC14411_F15_CB(WRITELINE (coco_t4426_device, write_f15_clock))
+	MCFG_MC14411_F1_CB(WRITELINE (*this, coco_t4426_device, write_f1_clock))
+	MCFG_MC14411_F3_CB(WRITELINE (*this, coco_t4426_device, write_f3_clock))
+	MCFG_MC14411_F5_CB(WRITELINE (*this, coco_t4426_device, write_f5_clock))
+	MCFG_MC14411_F7_CB(WRITELINE (*this, coco_t4426_device, write_f7_clock))
+	MCFG_MC14411_F8_CB(WRITELINE (*this, coco_t4426_device, write_f8_clock))
+	MCFG_MC14411_F9_CB(WRITELINE (*this, coco_t4426_device, write_f9_clock))
+	MCFG_MC14411_F11_CB(WRITELINE (*this, coco_t4426_device, write_f11_clock))
+	MCFG_MC14411_F13_CB(WRITELINE (*this, coco_t4426_device, write_f13_clock))
+	MCFG_MC14411_F15_CB(WRITELINE (*this, coco_t4426_device, write_f15_clock))
 MACHINE_CONFIG_END
 
 ROM_START( coco_t4426 )

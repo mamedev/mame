@@ -218,10 +218,10 @@ void hanaawas_state::machine_reset()
 MACHINE_CONFIG_START(hanaawas_state::hanaawas)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(hanaawas_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hanaawas_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(hanaawas_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", hanaawas_state,  irq0_line_assert)
 
 
 	/* video hardware */
@@ -241,9 +241,9 @@ MACHINE_CONFIG_START(hanaawas_state::hanaawas)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 18432000/12)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 18432000/12)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(hanaawas_state, hanaawas_portB_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, hanaawas_state, hanaawas_portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

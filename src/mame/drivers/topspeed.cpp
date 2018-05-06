@@ -578,20 +578,20 @@ void topspeed_state::machine_reset()
 MACHINE_CONFIG_START(topspeed_state::topspeed)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(cpua_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", topspeed_state, irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cpua_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", topspeed_state, irq6_line_hold)
 
-	MCFG_CPU_ADD("subcpu", M68000, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", topspeed_state, irq5_line_hold)
+	MCFG_DEVICE_ADD("subcpu", M68000, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", topspeed_state, irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(z80_prg)
-	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(z80_prg)
+	MCFG_DEVICE_IO_MAP(z80_io)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(topspeed_state, z80ctc_to0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, topspeed_state, z80ctc_to0))
 
 	MCFG_DEVICE_ADD("pc080sn_1", PC080SN, 0)
 	MCFG_PC080SN_GFX_REGION(1)
@@ -612,7 +612,7 @@ MACHINE_CONFIG_START(topspeed_state::topspeed)
 	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(topspeed_state, coins_w))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(*this, topspeed_state, coins_w))
 	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	// video hardware
@@ -633,16 +633,16 @@ MACHINE_CONFIG_START(topspeed_state::topspeed)
 
 	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000) / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(topspeed_state, sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, topspeed_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "filter1l", 1.0)
 	MCFG_SOUND_ROUTE(1, "filter1r", 1.0)
 
-	MCFG_SOUND_ADD("msm1", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(topspeed_state, msm5205_1_vck)) // VCK function
+	MCFG_DEVICE_ADD("msm1", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, topspeed_state, msm5205_1_vck)) // VCK function
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      // 8 kHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2", 1.0)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, XTAL(384'000))
+	MCFG_DEVICE_ADD("msm2", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      // Slave mode, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 1.0)
 

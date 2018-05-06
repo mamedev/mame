@@ -27,7 +27,7 @@ trackfld_audio_device::trackfld_audio_device(const machine_config &mconfig, cons
 
 void trackfld_audio_device::device_start()
 {
-	m_audiocpu =machine().device<cpu_device>("audiocpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_vlm = machine().device<vlm5030_device>("vlm");
 
 	/* sound */

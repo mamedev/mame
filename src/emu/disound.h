@@ -33,21 +33,9 @@ constexpr int AUTO_ALLOC_INPUT  = 65535;
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_SOUND_ADD(_tag, _type, _clock) \
-	MCFG_DEVICE_ADD(_tag, _type, _clock)
-#define MCFG_SOUND_MODIFY(_tag) \
-	MCFG_DEVICE_MODIFY(_tag)
+#define MCFG_SOUND_ROUTE(_output, _target, ...) \
+	dynamic_cast<device_sound_interface &>(*device).add_route(_output, _target, __VA_ARGS__);
 
-#define MCFG_SOUND_CLOCK(_clock) \
-	MCFG_DEVICE_CLOCK(_clock)
-
-#define MCFG_SOUND_REPLACE(_tag, _type, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, _type, _clock)
-
-#define MCFG_SOUND_ROUTE(_output, _target, _gain) \
-	dynamic_cast<device_sound_interface &>(*device).add_route(_output, _target, _gain);
-#define MCFG_SOUND_ROUTE_EX(_output, _target, _gain, _input) \
-	dynamic_cast<device_sound_interface &>(*device).add_route(_output, _target, _gain, _input);
 #define MCFG_SOUND_ROUTES_RESET() \
 	dynamic_cast<device_sound_interface &>(*device).reset_routes();
 
@@ -86,10 +74,10 @@ public:
 	std::vector<sound_route> const &routes() const { return m_route_list; }
 
 	// configuration helpers
-	void add_route(u32 output, const char *target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
-	void add_route(u32 output, device_sound_interface &target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
-	void add_route(u32 output, speaker_device &target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
-	void reset_routes() { m_route_list.clear(); }
+	device_sound_interface &add_route(u32 output, const char *target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
+	device_sound_interface &add_route(u32 output, device_sound_interface &target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
+	device_sound_interface &add_route(u32 output, speaker_device &target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
+	device_sound_interface &reset_routes() { m_route_list.clear(); return *this; }
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;
@@ -154,4 +142,4 @@ protected:
 typedef device_interface_iterator<device_mixer_interface> mixer_interface_iterator;
 
 
-#endif  /* MAME_EMU_DISOUND_H */
+#endif // MAME_EMU_DISOUND_H

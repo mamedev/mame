@@ -218,13 +218,13 @@ DRIVER_INIT_MEMBER( minicom_state, minicom )
 
 MACHINE_CONFIG_START(minicom_state::minicom)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I87C52, XTAL(10'000'000)) /*FIX-ME: verify the correct clock frequency */
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(minicom_state, i87c52_p0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(minicom_state, i87c52_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(minicom_state, i87c52_p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(minicom_state, i87c52_p2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(minicom_state, i87c52_p2_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(minicom_state, i87c52_p3_w))
+	MCFG_DEVICE_ADD("maincpu", I87C52, XTAL(10'000'000)) /*FIX-ME: verify the correct clock frequency */
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, minicom_state, i87c52_p0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, minicom_state, i87c52_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, minicom_state, i87c52_p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, minicom_state, i87c52_p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, minicom_state, i87c52_p2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, minicom_state, i87c52_p3_w))
 
 	/* video hardware */
 	/* fluorescent 14-segment display forming a row of 20 characters */

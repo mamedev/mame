@@ -213,8 +213,8 @@ static INPUT_PORTS_START( electron64 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(electron_state::electron)
-	MCFG_CPU_ADD( "maincpu", M6502, 16_MHz_XTAL/8 )
-	MCFG_CPU_PROGRAM_MAP( electron_mem )
+	MCFG_DEVICE_ADD( "maincpu", M6502, 16_MHz_XTAL/8 )
+	MCFG_DEVICE_PROGRAM_MAP( electron_mem )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256)
@@ -227,7 +227,7 @@ MACHINE_CONFIG_START(electron_state::electron)
 	MCFG_PALETTE_INIT_OWNER(electron_state, electron)
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 300 )
+	MCFG_DEVICE_ADD( "beeper", BEEP, 300 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -268,9 +268,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(electron_state::electron64)
 	electron(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(electron_mem)
-	MCFG_CPU_OPCODES_MAP(electron64_opcodes)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(electron_mem)
+	MCFG_DEVICE_OPCODES_MAP(electron64_opcodes)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")

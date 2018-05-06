@@ -918,27 +918,27 @@ GFXDECODE_END
 MACHINE_CONFIG_START(zaxxon_state::root)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/16)
+	MCFG_DEVICE_PROGRAM_MAP(zaxxon_map)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(zaxxon_state, zaxxon_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(zaxxon_state, zaxxon_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(zaxxon_state, zaxxon_sound_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, zaxxon_state, zaxxon_sound_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, zaxxon_state, zaxxon_sound_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, zaxxon_state, zaxxon_sound_c_w))
 
 	MCFG_DEVICE_ADD("mainlatch1", LS259, 0) // U55 on Zaxxon IC Board A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(zaxxon_state, coin_enable_w)) // COIN EN A
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(zaxxon_state, coin_enable_w)) // COIN EN B
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(zaxxon_state, coin_enable_w)) // SERV EN
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(zaxxon_state, coin_counter_a_w)) // COUNT A
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(zaxxon_state, coin_counter_b_w)) // COUNT B
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(zaxxon_state, flipscreen_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, zaxxon_state, coin_enable_w)) // COIN EN A
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, zaxxon_state, coin_enable_w)) // COIN EN B
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, zaxxon_state, coin_enable_w)) // SERV EN
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, zaxxon_state, coin_counter_a_w)) // COUNT A
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, zaxxon_state, coin_counter_b_w)) // COUNT B
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, zaxxon_state, flipscreen_w)) // FLIP
 
 	MCFG_DEVICE_ADD("mainlatch2", LS259, 0) // U56 on Zaxxon IC Board A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(zaxxon_state, int_enable_w)) // INTON
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(zaxxon_state, fg_color_w)) // CREF 1
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(zaxxon_state, bg_color_w)) // CREF 3
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(zaxxon_state, bg_enable_w)) // BEN
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, zaxxon_state, int_enable_w)) // INTON
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, zaxxon_state, fg_color_w)) // CREF 1
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, zaxxon_state, bg_color_w)) // CREF 3
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, zaxxon_state, bg_enable_w)) // BEN
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zaxxon)
@@ -949,7 +949,7 @@ MACHINE_CONFIG_START(zaxxon_state::root)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_zaxxon)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(zaxxon_state, vblank_int))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, zaxxon_state, vblank_int))
 MACHINE_CONFIG_END
 
 
@@ -965,16 +965,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zaxxon_state::szaxxon)
 	zaxxon(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(zaxxon_state::szaxxone)
 	zaxxon(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
+	MCFG_DEVICE_PROGRAM_MAP(zaxxon_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
 MACHINE_CONFIG_END
@@ -983,9 +983,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zaxxon_state::futspye)
 	root(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5061, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5061, MASTER_CLOCK/16)
+	MCFG_DEVICE_PROGRAM_MAP(zaxxon_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
 
@@ -1005,9 +1005,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zaxxon_state::razmataze)
 	root(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5098,  MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(ixion_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5098,  MASTER_CLOCK/16)
+	MCFG_DEVICE_PROGRAM_MAP(ixion_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
 
@@ -1025,9 +1025,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zaxxon_state::ixion)
 	razmataze(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(ixion_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
+	MCFG_DEVICE_PROGRAM_MAP(ixion_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 	MCFG_SEGACRPT_SET_SIZE(0x6000)
 
@@ -1038,27 +1038,27 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(zaxxon_state::congo)
 	root(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(congo_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(congo_map)
 
 	MCFG_DEVICE_REPLACE("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(zaxxon_state, congo_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(zaxxon_state, congo_sound_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, zaxxon_state, congo_sound_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, zaxxon_state, congo_sound_c_w))
 
 	MCFG_DEVICE_MODIFY("mainlatch1") // U52 on Control Board
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(zaxxon_state, bg_enable_w)) // BEN
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(zaxxon_state, int_enable_w)) // INTON
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, zaxxon_state, bg_enable_w)) // BEN
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, zaxxon_state, int_enable_w)) // INTON
 
 	MCFG_DEVICE_MODIFY("mainlatch2") // U53 on Control Board
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // not used
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(zaxxon_state, bg_color_w)) // CREF 3
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(zaxxon_state, congo_fg_bank_w)) // BS
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(zaxxon_state, congo_color_bank_w)) // CBS
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, zaxxon_state, bg_color_w)) // CREF 3
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, zaxxon_state, congo_fg_bank_w)) // BS
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, zaxxon_state, congo_color_bank_w)) // CBS
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(congo_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zaxxon_state, irq0_line_hold, SOUND_CLOCK/16/16/16/4)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(congo_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(zaxxon_state, irq0_line_hold, SOUND_CLOCK/16/16/16/4)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1074,10 +1074,10 @@ MACHINE_CONFIG_START(zaxxon_state::congo)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, SOUND_CLOCK) // schematic shows sn76489A
+	MCFG_DEVICE_ADD("sn1", SN76489A, SOUND_CLOCK) // schematic shows sn76489A
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, SOUND_CLOCK/4) // schematic shows sn76489A
+	MCFG_DEVICE_ADD("sn2", SN76489A, SOUND_CLOCK/4) // schematic shows sn76489A
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	congo_samples(config);

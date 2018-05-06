@@ -161,9 +161,9 @@ WRITE_LINE_MEMBER( tim100_state::irq_w )
 
 MACHINE_CONFIG_START(tim100_state::tim100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL(4'915'200)) // divider unknown
-	MCFG_CPU_PROGRAM_MAP(tim100_mem)
-	MCFG_CPU_IO_MAP(tim100_io)
+	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(4'915'200)) // divider unknown
+	MCFG_DEVICE_PROGRAM_MAP(tim100_mem)
+	MCFG_DEVICE_IO_MAP(tim100_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -178,39 +178,39 @@ MACHINE_CONFIG_START(tim100_state::tim100)
 	MCFG_DEVICE_ADD("crtc", I8275, XTAL(4'915'200))
 	MCFG_I8275_CHARACTER_WIDTH(12)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(tim100_state, crtc_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(tim100_state, drq_w))
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE(tim100_state, irq_w))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE(*this, tim100_state, drq_w))
+	MCFG_I8275_IRQ_CALLBACK(WRITELINE(*this, tim100_state, irq_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_PALETTE_ADD("palette", 3)
 
 	MCFG_DEVICE_ADD("uart_u17", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_u17", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart_u17", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart_u17", i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", tim100 )
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart_u17", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart_u17", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart_u17", i8251_device, write_cts))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", tim100)
 
 	MCFG_DEVICE_ADD("uart_u18", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232a", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal") //"keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_u18", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart_u18", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart_u18", i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", tim100 )
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal") //"keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart_u18", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart_u18", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart_u18", i8251_device, write_cts))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", tim100)
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart_u17", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart_u17", i8251_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart_u18", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart_u18", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart_u17", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart_u17", i8251_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart_u18", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart_u18", i8251_device, write_rxc))
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -121,14 +121,15 @@ FLOPPY_FORMATS_MEMBER( coco_family_fdc_device_base::floppy_formats )
 	FLOPPY_SDF_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( coco_fdc_floppies )
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void coco_fdc_floppies(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 MACHINE_CONFIG_START(coco_fdc_device_base::device_add_mconfig)
 	MCFG_WD1773_ADD(WD_TAG, XTAL(8'000'000))
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(coco_fdc_device_base, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(coco_fdc_device_base, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, coco_fdc_device_base, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, coco_fdc_device_base, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":0", coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

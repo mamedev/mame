@@ -46,7 +46,7 @@ DEFINE_DEVICE_TYPE(MPU_PC98, mpu_pc98_device, "mpu_pc98", "Roland MPU-401 MIDI I
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(mpu_pc98_device::device_add_mconfig)
-	MCFG_MPU401_ADD(MPU_CORE_TAG, WRITELINE(mpu_pc98_device, mpu_irq_out))
+	MCFG_MPU401_ADD(MPU_CORE_TAG, WRITELINE(*this, mpu_pc98_device, mpu_irq_out))
 MACHINE_CONFIG_END
 
 

@@ -48,9 +48,10 @@ WRITE8_MEMBER(sega8_cardcatch_device::write_cart)
 		logerror("Attempt to write to MyCard\n");
 }
 
-static SLOT_INTERFACE_START(sg1000_card)
-	SLOT_INTERFACE_INTERNAL("rom",  SEGA8_ROM_STD)
-SLOT_INTERFACE_END
+static void sg1000_card(device_slot_interface &device)
+{
+	device.option_add_internal("rom",  SEGA8_ROM_STD);
+}
 
 MACHINE_CONFIG_START(sega8_cardcatch_device::device_add_mconfig)
 	MCFG_SG1000_CARD_ADD("cardslot", sg1000_card, nullptr)

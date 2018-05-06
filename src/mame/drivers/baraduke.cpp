@@ -376,12 +376,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(baraduke_state::baraduke)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(49'152'000)/32) // 68A09E
-	MCFG_CPU_PROGRAM_MAP(baraduke_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(49'152'000)/32) // 68A09E
+	MCFG_DEVICE_PROGRAM_MAP(baraduke_map)
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8)
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_IO_MAP(mcu_port_map)
+	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_IO_MAP(mcu_port_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* we need heavy synch */
 
@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(baraduke_state::baraduke)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 0, 36*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(baraduke_state, screen_update_baraduke)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(baraduke_state, screen_vblank_baraduke))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, baraduke_state, screen_vblank_baraduke))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", baraduke)
@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(baraduke_state::baraduke)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
+	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

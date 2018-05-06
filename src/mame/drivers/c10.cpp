@@ -160,9 +160,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(c10_state::c10)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(c10_mem)
-	MCFG_CPU_IO_MAP(c10_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(c10_mem)
+	MCFG_DEVICE_IO_MAP(c10_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

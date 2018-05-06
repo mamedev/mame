@@ -1377,8 +1377,8 @@ void a7800_state::machine_reset()
 
 MACHINE_CONFIG_START(a7800_state::a7800_ntsc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, A7800_NTSC_Y1/8) /* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
-	MCFG_CPU_PROGRAM_MAP(a7800_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, A7800_NTSC_Y1/8) /* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
+	MCFG_DEVICE_PROGRAM_MAP(a7800_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a7800_state, interrupt, "screen", 0, 1)
 
 	/* video hardware */
@@ -1401,9 +1401,9 @@ MACHINE_CONFIG_START(a7800_state::a7800_ntsc)
 
 	/* devices */
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, A7800_NTSC_Y1/8)
-	MCFG_MOS6530n_IN_PA_CB(READ8(a7800_state, riot_joystick_r))
-	MCFG_MOS6530n_IN_PB_CB(READ8(a7800_state, riot_console_button_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a7800_state, riot_button_pullup_w))
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, a7800_state, riot_joystick_r))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, a7800_state, riot_console_button_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, a7800_state, riot_button_pullup_w))
 
 	MCFG_A78_CARTRIDGE_ADD("cartslot", a7800_cart, nullptr)
 
@@ -1417,8 +1417,8 @@ MACHINE_CONFIG_START(a7800_pal_state::a7800_pal)
 	a7800_ntsc(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(CLK_PAL)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(CLK_PAL)
 //  MCFG_TIMER_ADD_SCANLINE("scantimer", a7800_interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_MODIFY( "screen" )
@@ -1430,9 +1430,9 @@ MACHINE_CONFIG_START(a7800_pal_state::a7800_pal)
 	/* devices */
 	MCFG_DEVICE_REMOVE("riot")
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, CLK_PAL)
-	MCFG_MOS6530n_IN_PA_CB(READ8(a7800_pal_state, riot_joystick_r))
-	MCFG_MOS6530n_IN_PB_CB(READ8(a7800_pal_state, riot_console_button_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a7800_pal_state, riot_button_pullup_w))
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, a7800_pal_state, riot_joystick_r))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, a7800_pal_state, riot_console_button_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, a7800_pal_state, riot_button_pullup_w))
 
 	/* software lists */
 	MCFG_DEVICE_REMOVE("cart_list")

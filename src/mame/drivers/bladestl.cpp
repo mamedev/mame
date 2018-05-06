@@ -305,12 +305,12 @@ void bladestl_state::machine_reset()
 MACHINE_CONFIG_START(bladestl_state::bladestl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8) // divider not verified (from 007342 custom)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD(m_maincpu, HD6309E, XTAL(24'000'000) / 8) // divider not verified (from 007342 custom)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bladestl_state, bladestl_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL(24'000'000) / 16)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD(m_audiocpu, MC6809E, XTAL(24'000'000) / 16)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -325,18 +325,18 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	MCFG_SCREEN_UPDATE_DRIVER(bladestl_state, screen_update_bladestl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bladestl)
+	MCFG_GFXDECODE_ADD(m_gfxdecode, "palette", bladestl)
 	MCFG_PALETTE_ADD("palette", 32 + 16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(bladestl_state, bladestl)
 
-	MCFG_K007342_ADD("k007342")
+	MCFG_K007342_ADD(m_k007342)
 	MCFG_K007342_GFXNUM(0)
 	MCFG_K007342_CALLBACK_OWNER(bladestl_state, bladestl_tile_callback)
 	MCFG_K007342_GFXDECODE("gfxdecode")
 
-	MCFG_K007420_ADD("k007420")
+	MCFG_K007420_ADD(m_k007420)
 	MCFG_K007420_BANK_LIMIT(0x3ff)
 	MCFG_K007420_CALLBACK_OWNER(bladestl_state, bladestl_sprite_callback)
 	MCFG_K007420_PALETTE("palette")
@@ -348,26 +348,26 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	   called at initialization time */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
+	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, M6809_IRQ_LINE))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("upd", UPD7759, XTAL(640'000))
+	MCFG_DEVICE_ADD(m_upd7759, UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(24'000'000) / 8)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("upd", upd775x_device, port_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(bladestl_state, bladestl_port_B_w))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(24'000'000) / 8)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(m_upd7759, upd775x_device, port_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, bladestl_state, bladestl_port_B_w))
 	MCFG_SOUND_ROUTE(0, "filter1", 0.45)
 	MCFG_SOUND_ROUTE(1, "filter2", 0.45)
 	MCFG_SOUND_ROUTE(2, "filter3", 0.45)
 	MCFG_SOUND_ROUTE(3, "mono", 0.45)
 
-	MCFG_FILTER_RC_ADD("filter1", 0)
+	MCFG_DEVICE_ADD(m_filter1, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter2", 0)
+	MCFG_DEVICE_ADD(m_filter2, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter3", 0)
+	MCFG_DEVICE_ADD(m_filter3, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -283,10 +283,10 @@ void midcoin24cdjuke_state::machine_reset()
 
 MACHINE_CONFIG_START(midcoin24cdjuke_state::midcoin24cdjuke)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,6000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(midcoin24cdjuke_map)
-	MCFG_CPU_IO_MAP(midcoin24cdjuke_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(midcoin24cdjuke_state, irq0_line_hold, 500)
+	MCFG_DEVICE_ADD("maincpu", Z80,6000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(midcoin24cdjuke_map)
+	MCFG_DEVICE_IO_MAP(midcoin24cdjuke_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(midcoin24cdjuke_state, irq0_line_hold, 500)
 
 	MCFG_DEFAULT_LAYOUT(layout_24cdjuke)
 
@@ -297,8 +297,8 @@ MACHINE_CONFIG_START(midcoin24cdjuke_state::midcoin24cdjuke)
 
 	MCFG_DEVICE_ADD("ic25", I8255A, 0)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("PB"))
-	MCFG_I8255_IN_PORTC_CB(READ8(midcoin24cdjuke_state, kb_row_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(midcoin24cdjuke_state, kb_col_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, midcoin24cdjuke_state, kb_row_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, midcoin24cdjuke_state, kb_col_w))
 
 	MCFG_DEVICE_ADD("ic31", I8255A, 0)
 	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))

@@ -450,8 +450,8 @@ void atari_s1_state::machine_reset()
 
 MACHINE_CONFIG_START(atari_s1_state::atari_s1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLK)
-	MCFG_CPU_PROGRAM_MAP(atari_s1_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, MASTER_CLK)
+	MCFG_DEVICE_PROGRAM_MAP(atari_s1_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -459,9 +459,9 @@ MACHINE_CONFIG_START(atari_s1_state::atari_s1)
 	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_atari_s1)
@@ -472,14 +472,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atari_s1_state::atarians)
 	atari_s1(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(atarians_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(atarians_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atari_s1_state::midearth)
 	atari_s1(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(midearth_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(midearth_map)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

@@ -699,24 +699,24 @@ WRITE8_MEMBER( atari_jsa_i_device::pokey_w )
 MACHINE_CONFIG_START(atari_jsa_i_device::device_add_mconfig)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(atarijsa1_map)
+	MCFG_DEVICE_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(atarijsa1_map)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
 
 	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(atari_jsa_base_device, ym2151_port_w))
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, atari_jsa_base_device, ym2151_port_w))
 	MCFG_MIXER_ROUTE(0, *this, 0.60, 0)
 	MCFG_MIXER_ROUTE(1, *this, 0.60, 1)
 
-	MCFG_SOUND_ADD("pokey", POKEY, JSA_MASTER_CLOCK/2)
+	MCFG_DEVICE_ADD("pokey", POKEY, JSA_MASTER_CLOCK/2)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.40, 0)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.40, 1)
 
-	MCFG_SOUND_ADD("tms", TMS5220C, JSA_MASTER_CLOCK*2/11) // potentially JSA_MASTER_CLOCK/9 as well
+	MCFG_DEVICE_ADD("tms", TMS5220C, JSA_MASTER_CLOCK*2/11) // potentially JSA_MASTER_CLOCK/9 as well
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 1.0, 0)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 1.0, 1)
 MACHINE_CONFIG_END
@@ -829,16 +829,16 @@ READ8_MEMBER( atari_jsa_ii_device::rdio_r )
 MACHINE_CONFIG_START(atari_jsa_ii_device::device_add_mconfig)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(atarijsa2_map)
+	MCFG_DEVICE_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(atarijsa2_map)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
 
 	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(atari_jsa_base_device, ym2151_port_w))
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, atari_jsa_base_device, ym2151_port_w))
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.60, 0)
 
 	MCFG_OKIM6295_ADD("oki1", JSA_MASTER_CLOCK/3, PIN7_HIGH)
@@ -911,16 +911,16 @@ READ8_MEMBER( atari_jsa_iii_device::rdio_r )
 MACHINE_CONFIG_START(atari_jsa_iii_device::device_add_mconfig)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(atarijsa3_map)
+	MCFG_DEVICE_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(atarijsa3_map)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
 
 	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(atari_jsa_base_device, ym2151_port_w))
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, atari_jsa_base_device, ym2151_port_w))
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.60, 0)
 
 	MCFG_OKIM6295_ADD("oki1", JSA_MASTER_CLOCK/3, PIN7_HIGH)
@@ -964,7 +964,7 @@ MACHINE_CONFIG_START(atari_jsa_iiis_device::device_add_mconfig)
 
 	atari_jsa_iii_device::device_add_mconfig(config);
 
-	MCFG_SOUND_MODIFY("ym2151")
+	MCFG_DEVICE_MODIFY("ym2151")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_MIXER_ROUTE(0, *this, 0.60, 0)
 	MCFG_MIXER_ROUTE(1, *this, 0.60, 1)

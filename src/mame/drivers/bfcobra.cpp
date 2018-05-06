@@ -1642,14 +1642,14 @@ INTERRUPT_GEN_MEMBER(bfcobra_state::vblank_gen)
 }
 
 MACHINE_CONFIG_START(bfcobra_state::bfcobra)
-	MCFG_CPU_ADD("maincpu", Z80, Z80_XTAL)
-	MCFG_CPU_PROGRAM_MAP(z80_prog_map)
-	MCFG_CPU_IO_MAP(z80_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bfcobra_state,  vblank_gen)
+	MCFG_DEVICE_ADD("maincpu", Z80, Z80_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(z80_prog_map)
+	MCFG_DEVICE_IO_MAP(z80_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bfcobra_state,  vblank_gen)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, M6809_XTAL) // MC6809P
-	MCFG_CPU_PROGRAM_MAP(m6809_prog_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bfcobra_state, timer_irq, 1000)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, M6809_XTAL) // MC6809P
+	MCFG_DEVICE_PROGRAM_MAP(m6809_prog_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfcobra_state, timer_irq, 1000)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1669,26 +1669,26 @@ MACHINE_CONFIG_START(bfcobra_state::bfcobra)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, M6809_XTAL / 4)
+	MCFG_DEVICE_ADD("aysnd", AY8910, M6809_XTAL / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* ACIAs */
 	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia6850_1", acia6850_device, write_rxd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bfcobra_state, z80_acia_irq))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_rxd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, bfcobra_state, z80_acia_irq))
 
 	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia6850_0", acia6850_device, write_rxd))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia6850_0", acia6850_device, write_rxd))
 
 	MCFG_DEVICE_ADD("acia6850_2", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(bfcobra_state, data_acia_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bfcobra_state, m6809_data_irq))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bfcobra_state, data_acia_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, bfcobra_state, m6809_data_irq))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) // What are the correct ACIA clocks ?
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bfcobra_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bfcobra_state, write_acia_clock))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)

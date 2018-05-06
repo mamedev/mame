@@ -308,11 +308,11 @@ MACHINE_START_MEMBER(astrafr_state,astra_2e)
 
 
 MACHINE_CONFIG_START(astrafr_state::astrafr_dual)
-	MCFG_CPU_ADD("maincpu", M68340, 16000000)
-	MCFG_CPU_PROGRAM_MAP(astrafr_master_map)
+	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(astrafr_master_map)
 
-	MCFG_CPU_ADD("slavecpu", M68340, 16000000)
-	MCFG_CPU_PROGRAM_MAP(astrafr_slave_map)
+	MCFG_DEVICE_ADD("slavecpu", M68340, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(astrafr_slave_map)
 
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 MACHINE_CONFIG_END
@@ -328,11 +328,11 @@ MACHINE_CONFIG_START(astrafr_state::astrafr_dual_37)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(astrafr_state::astrafr_dual_alt)
-	MCFG_CPU_ADD("maincpu", M68340, 16000000)
-	MCFG_CPU_PROGRAM_MAP(astrafr_master_alt_map)
+	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(astrafr_master_alt_map)
 
-	MCFG_CPU_ADD("slavecpu", M68340, 16000000)
-	MCFG_CPU_PROGRAM_MAP(astrafr_slave_map)
+	MCFG_DEVICE_ADD("slavecpu", M68340, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(astrafr_slave_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(astrafr_state::astrafr_dual_alt_37)
@@ -343,8 +343,8 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(astrafr_state::astra_single)
-	MCFG_CPU_ADD("maincpu", M68340, 16000000)
-	MCFG_CPU_PROGRAM_MAP(astra_map)
+	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(astra_map)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 MACHINE_CONFIG_END
 
@@ -368,8 +368,8 @@ MACHINE_START_MEMBER(astrafr_state,astra_57)
 
 
 MACHINE_CONFIG_START(astrafr_state::astra_single_alt)
-	MCFG_CPU_ADD("maincpu", M68340, 16000000)
-	MCFG_CPU_PROGRAM_MAP(astra_map)
+	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(astra_map)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 MACHINE_CONFIG_END
 

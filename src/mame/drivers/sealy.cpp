@@ -101,8 +101,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sealy_state::sealy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
-	MCFG_CPU_PROGRAM_MAP(sealy_map)
+	MCFG_DEVICE_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
+	MCFG_DEVICE_PROGRAM_MAP(sealy_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

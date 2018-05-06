@@ -351,10 +351,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(aquarius_state::aquarius)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545)) // ???
-	MCFG_CPU_PROGRAM_MAP(aquarius_mem)
-	MCFG_CPU_IO_MAP(aquarius_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aquarius_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545)) // ???
+	MCFG_DEVICE_PROGRAM_MAP(aquarius_mem)
+	MCFG_DEVICE_IO_MAP(aquarius_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aquarius_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -373,10 +373,10 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(3'579'545)/2) // ??? AY-3-8914
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(3'579'545)/2) // ??? AY-3-8914
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("RIGHT"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("LEFT"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

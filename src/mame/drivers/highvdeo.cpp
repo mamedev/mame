@@ -1164,10 +1164,10 @@ void highvdeo_state::ramdac_map(address_map &map)
 
 
 MACHINE_CONFIG_START(highvdeo_state::tv_vcf)
-	MCFG_CPU_ADD("maincpu", V30, XTAL(12'000'000)/2 ) // ?
-	MCFG_CPU_PROGRAM_MAP(tv_vcf_map)
-	MCFG_CPU_IO_MAP(tv_vcf_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", V30, XTAL(12'000'000)/2 ) // ?
+	MCFG_DEVICE_PROGRAM_MAP(tv_vcf_map)
+	MCFG_DEVICE_IO_MAP(tv_vcf_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1187,7 +1187,7 @@ MACHINE_CONFIG_START(highvdeo_state::tv_vcf)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	//OkiM6376
-	MCFG_SOUND_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives approx. same sample rate as previous emulation
+	MCFG_DEVICE_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives approx. same sample rate as previous emulation
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -1195,27 +1195,27 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(highvdeo_state::tv_ncf)
 	tv_vcf(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tv_ncf_map)
-	MCFG_CPU_IO_MAP(tv_ncf_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tv_ncf_map)
+	MCFG_DEVICE_IO_MAP(tv_ncf_io)
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(highvdeo_state::nyjoker)
 	tv_vcf(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nyjoker_map)
-	MCFG_CPU_IO_MAP(nyjoker_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nyjoker_map)
+	MCFG_DEVICE_IO_MAP(nyjoker_io)
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(highvdeo_state::tv_tcf)
 	tv_vcf(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tv_tcf_map)
-	MCFG_CPU_IO_MAP(tv_tcf_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tv_tcf_map)
+	MCFG_DEVICE_IO_MAP(tv_tcf_io)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
@@ -1227,9 +1227,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(highvdeo_state::newmcard)
 	tv_tcf(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(newmcard_map)
-	MCFG_CPU_IO_MAP(newmcard_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(newmcard_map)
+	MCFG_DEVICE_IO_MAP(newmcard_io)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
@@ -1240,17 +1240,17 @@ MACHINE_CONFIG_START(highvdeo_state::ciclone)
 
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", I80186, 20000000 )    // ?
-	MCFG_CPU_PROGRAM_MAP(tv_tcf_map)
-	MCFG_CPU_IO_MAP(tv_tcf_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
+	MCFG_DEVICE_ADD("maincpu", I80186, 20000000 )    // ?
+	MCFG_DEVICE_PROGRAM_MAP(tv_tcf_map)
+	MCFG_DEVICE_IO_MAP(tv_tcf_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(highvdeo_state::brasil)
-	MCFG_CPU_ADD("maincpu", I80186, 20000000 )  // fashion doesn't like 20/2 Mhz
-	MCFG_CPU_PROGRAM_MAP(brasil_map)
-	MCFG_CPU_IO_MAP(brasil_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
+	MCFG_DEVICE_ADD("maincpu", I80186, 20000000 )  // fashion doesn't like 20/2 Mhz
+	MCFG_DEVICE_PROGRAM_MAP(brasil_map)
+	MCFG_DEVICE_IO_MAP(brasil_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1268,15 +1268,15 @@ MACHINE_CONFIG_START(highvdeo_state::brasil)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives same sample rate as previous emulation
+	MCFG_DEVICE_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives same sample rate as previous emulation
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(highvdeo_state::grancapi)
-	MCFG_CPU_ADD("maincpu", I80186, 20000000 )
-	MCFG_CPU_PROGRAM_MAP(brasil_map)
-	MCFG_CPU_IO_MAP(grancapi_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
+	MCFG_DEVICE_ADD("maincpu", I80186, 20000000 )
+	MCFG_DEVICE_PROGRAM_MAP(brasil_map)
+	MCFG_DEVICE_IO_MAP(grancapi_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1294,15 +1294,15 @@ MACHINE_CONFIG_START(highvdeo_state::grancapi)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives same sample rate as previous emulation
+	MCFG_DEVICE_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives same sample rate as previous emulation
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(highvdeo_state::magicbom)
-	MCFG_CPU_ADD("maincpu", I80186, 20000000 )
-	MCFG_CPU_PROGRAM_MAP(brasil_map)
-	MCFG_CPU_IO_MAP(magicbom_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
+	MCFG_DEVICE_ADD("maincpu", I80186, 20000000 )
+	MCFG_DEVICE_PROGRAM_MAP(brasil_map)
+	MCFG_DEVICE_IO_MAP(magicbom_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1320,7 +1320,7 @@ MACHINE_CONFIG_START(highvdeo_state::magicbom)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives same sample rate as previous emulation
+	MCFG_DEVICE_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives same sample rate as previous emulation
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

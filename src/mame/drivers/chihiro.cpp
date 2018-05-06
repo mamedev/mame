@@ -1827,15 +1827,17 @@ const tiny_rom_entry *sega_network_board::device_rom_region() const
 	return ROM_NAME(seganetw);
 }
 
-static SLOT_INTERFACE_START(ide_baseboard)
-	SLOT_INTERFACE("bb", IDE_BASEBOARD)
-SLOT_INTERFACE_END
+static void ide_baseboard(device_slot_interface &device)
+{
+	device.option_add("bb", IDE_BASEBOARD);
+}
 
-SLOT_INTERFACE_START(usb_baseboard)
-	SLOT_INTERFACE("an2131qc", OHCI_HLEAN2131QC)
-	SLOT_INTERFACE("an2131sc", OHCI_HLEAN2131SC)
-	SLOT_INTERFACE("xbox_controller", OHCI_GAME_CONTROLLER)
-SLOT_INTERFACE_END
+void usb_baseboard(device_slot_interface &device)
+{
+	device.option_add("an2131qc", OHCI_HLEAN2131QC);
+	device.option_add("an2131sc", OHCI_HLEAN2131SC);
+	device.option_add("xbox_controller", OHCI_GAME_CONTROLLER);
+}
 
 void chihiro_state::an2131qc_configuration(device_t *device)
 {
@@ -1849,9 +1851,9 @@ void chihiro_state::an2131sc_configuration(device_t *device)
 
 MACHINE_CONFIG_START(chihiro_state::chihiro_base)
 	xbox_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(chihiro_map)
-	MCFG_CPU_IO_MAP(chihiro_map_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(chihiro_map)
+	MCFG_DEVICE_IO_MAP(chihiro_map_io)
 
 	//MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ide_baseboard, nullptr, "bb", true)
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")

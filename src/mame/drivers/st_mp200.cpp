@@ -576,8 +576,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( st_mp200_state::u11_timer )
 
 MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 1000000) // no xtal, just 2 chips forming a random oscillator
-	MCFG_CPU_PROGRAM_MAP(st_mp200_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 1000000) // no xtal, just 2 chips forming a random oscillator
+	MCFG_DEVICE_PROGRAM_MAP(st_mp200_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -589,22 +589,22 @@ MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(st_mp200_state, u10_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(st_mp200_state, u10_a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(st_mp200_state, u10_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(st_mp200_state, u10_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(st_mp200_state, u10_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(st_mp200_state, u10_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, st_mp200_state, u10_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, st_mp200_state, u10_a_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, st_mp200_state, u10_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, st_mp200_state, u10_b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, st_mp200_state, u10_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, st_mp200_state, u10_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x", st_mp200_state, timer_x, attotime::from_hz(120)) // mains freq*2
 
 	MCFG_DEVICE_ADD("pia_u11", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(st_mp200_state, u11_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(st_mp200_state, u11_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(st_mp200_state, u11_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(st_mp200_state, u11_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(st_mp200_state, u11_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, st_mp200_state, u11_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, st_mp200_state, u11_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, st_mp200_state, u11_b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, st_mp200_state, u11_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, st_mp200_state, u11_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d", st_mp200_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
@@ -613,7 +613,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(st_mp200_state::st_mp201)
 	st_mp200(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speech", S14001A, S14001_CLOCK)
+	MCFG_DEVICE_ADD("speech", S14001A, S14001_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

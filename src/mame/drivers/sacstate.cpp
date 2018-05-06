@@ -134,9 +134,9 @@ void sacstate_state::machine_reset()
 
 MACHINE_CONFIG_START(sacstate_state::sacstate)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8008, 800000)
-	MCFG_CPU_PROGRAM_MAP(sacstate_mem)
-	MCFG_CPU_IO_MAP(sacstate_io)
+	MCFG_DEVICE_ADD("maincpu",I8008, 800000)
+	MCFG_DEVICE_PROGRAM_MAP(sacstate_mem)
+	MCFG_DEVICE_IO_MAP(sacstate_io)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)

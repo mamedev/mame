@@ -913,55 +913,56 @@ void pasopia7_state::fdc_irq(bool state)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static SLOT_INTERFACE_START( pasopia7_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void pasopia7_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 MACHINE_CONFIG_START(pasopia7_state::p7_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(pasopia7_mem)
-	MCFG_CPU_IO_MAP(pasopia7_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pasopia7_mem)
+	MCFG_DEVICE_IO_MAP(pasopia7_io)
 	MCFG_Z80_DAISY_CHAIN(p7_daisy)
 
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
+	MCFG_DEVICE_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, 1996800) // unknown clock / divider
+	MCFG_DEVICE_ADD("sn2", SN76489A, 1996800) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2)) // beep interface
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("z80ctc", z80ctc_device, trg2)) // beep interface
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("z80ctc", z80ctc_device, trg3))
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(pasopia7_state, mux_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(pasopia7_state, keyb_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, pasopia7_state, mux_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, pasopia7_state, keyb_r))
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pasopia7_state, unk_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pasopia7_state, screen_mode_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pasopia7_state, crtc_portb_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pasopia7_state, unk_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pasopia7_state, screen_mode_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pasopia7_state, crtc_portb_r))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pasopia7_state, plane_reg_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pasopia7_state, video_attr_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pasopia7_state, video_misc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pasopia7_state, plane_reg_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pasopia7_state, video_attr_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pasopia7_state, video_misc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pasopia7_state, nmi_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pasopia7_state, nmi_mask_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pasopia7_state, nmi_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(pasopia7_state, nmi_reg_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pasopia7_state, nmi_reg_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pasopia7_state, nmi_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pasopia7_state, nmi_mask_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pasopia7_state, nmi_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pasopia7_state, nmi_reg_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pasopia7_state, nmi_reg_w))
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats)

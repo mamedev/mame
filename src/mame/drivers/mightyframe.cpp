@@ -39,8 +39,8 @@ static INPUT_PORTS_START( mightyframe )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(mightyframe_state::mightyframe)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // no idea of clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // no idea of clock
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 ROM_START( mightyframe )

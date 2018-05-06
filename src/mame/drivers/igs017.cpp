@@ -3573,9 +3573,9 @@ MACHINE_RESET_MEMBER(igs017_state,iqblocka)
 }
 
 MACHINE_CONFIG_START(igs017_state::iqblocka)
-	MCFG_CPU_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(iqblocka_map)
-	MCFG_CPU_IO_MAP(iqblocka_io)
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(iqblocka_map)
+	MCFG_DEVICE_IO_MAP(iqblocka_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
@@ -3591,7 +3591,7 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 	MCFG_IGS_BITSWAP_IN_PORTA_CB(IOPORT("PLAYER1"))
 	MCFG_IGS_BITSWAP_IN_PORTB_CB(IOPORT("PLAYER2"))
 	MCFG_IGS_BITSWAP_IN_PORTC_CB(IOPORT("COINS"))
-	MCFG_IGS_BITSWAP_OUT_PORTA_CB(WRITE8(igs017_state, iqblocka_keyin_w))
+	MCFG_IGS_BITSWAP_OUT_PORTA_CB(WRITE8(*this, igs017_state, iqblocka_keyin_w))
 	MCFG_IGS_BITSWAP_VAL_XOR(0x15d6)
 	MCFG_IGS_BITSWAP_MF_BITS(3, 5, 9, 11)
 	MCFG_IGS_BITSWAP_M3_0_BITS(~5, 8,  ~10, ~15)
@@ -3618,7 +3618,7 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 
 	// sound
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000) / 16, PIN7_HIGH)
@@ -3628,7 +3628,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(igs017_state::iqblockf)
 	iqblocka(config);
 	MCFG_DEVICE_MODIFY("igs_bitswap") // tweaked protection bitswap
-	MCFG_IGS_BITSWAP_OUT_PORTB_CB(WRITE8(igs017_state, iqblockf_keyout_w))
+	MCFG_IGS_BITSWAP_OUT_PORTB_CB(WRITE8(*this, igs017_state, iqblockf_keyout_w))
 	MCFG_IGS_BITSWAP_MF_BITS(0, 5, 9, 13)
 MACHINE_CONFIG_END
 
@@ -3645,7 +3645,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(igs017_state::starzan)
 	iqblocka(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -3671,8 +3671,8 @@ MACHINE_RESET_MEMBER(igs017_state,mgcs)
 }
 
 MACHINE_CONFIG_START(igs017_state::mgcs)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(mgcs)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mgcs)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
@@ -3680,7 +3680,7 @@ MACHINE_CONFIG_START(igs017_state::mgcs)
 	// i/o
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("COINS"))
-	MCFG_I8255_IN_PORTB_CB(READ8(igs017_state, mgcs_keys_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, igs017_state, mgcs_keys_r))
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
@@ -3710,8 +3710,8 @@ MACHINE_CONFIG_END
 // lhzb2
 
 MACHINE_CONFIG_START(igs017_state::lhzb2)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(lhzb2)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(lhzb2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
@@ -3760,8 +3760,8 @@ MACHINE_RESET_MEMBER(igs017_state,lhzb2a)
 }
 
 MACHINE_CONFIG_START(igs017_state::lhzb2a)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(lhzb2a)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(lhzb2a)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,lhzb2a)
@@ -3806,8 +3806,8 @@ MACHINE_CONFIG_END
 // slqz2
 
 MACHINE_CONFIG_START(igs017_state::slqz2)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(slqz2)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(slqz2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
@@ -3850,8 +3850,8 @@ MACHINE_CONFIG_END
 // sdmg2
 
 MACHINE_CONFIG_START(igs017_state::sdmg2)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(sdmg2)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(sdmg2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
@@ -3897,8 +3897,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgdh_interrupt)
 }
 
 MACHINE_CONFIG_START(igs017_state::mgdha)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(mgdha_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mgdha_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgdh_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
@@ -3932,9 +3932,9 @@ MACHINE_CONFIG_END
 // tjsb
 
 MACHINE_CONFIG_START(igs017_state::tjsb)
-	MCFG_CPU_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(tjsb_map)
-	MCFG_CPU_IO_MAP(tjsb_io)
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tjsb_map)
+	MCFG_DEVICE_IO_MAP(tjsb_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
@@ -3963,7 +3963,7 @@ MACHINE_CONFIG_START(igs017_state::tjsb)
 
 	// sound
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000) / 16, PIN7_HIGH)
@@ -3974,9 +3974,9 @@ MACHINE_CONFIG_END
 // spkrform
 
 MACHINE_CONFIG_START(igs017_state::spkrform)
-	MCFG_CPU_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(spkrform_map)
-	MCFG_CPU_IO_MAP(spkrform_io)
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(spkrform_map)
+	MCFG_DEVICE_IO_MAP(spkrform_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
@@ -4004,7 +4004,7 @@ MACHINE_CONFIG_START(igs017_state::spkrform)
 
 	// sound
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000) / 16, PIN7_HIGH)

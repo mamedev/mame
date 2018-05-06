@@ -1273,25 +1273,25 @@ MACHINE_CONFIG_START(tispeak_state::tms5110_route)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("tms5100")
-	MCFG_TMS5110_M0_CB(DEVWRITELINE("tms6100", tms6100_device, m0_w))
-	MCFG_TMS5110_M1_CB(DEVWRITELINE("tms6100", tms6100_device, m1_w))
-	MCFG_TMS5110_ADDR_CB(DEVWRITE8("tms6100", tms6100_device, add_w))
-	MCFG_TMS5110_DATA_CB(DEVREADLINE("tms6100", tms6100_device, data_line_r))
-	MCFG_TMS5110_ROMCLK_CB(DEVWRITELINE("tms6100", tms6100_device, clk_w))
+	MCFG_TMS5110_M0_CB(WRITELINE("tms6100", tms6100_device, m0_w))
+	MCFG_TMS5110_M1_CB(WRITELINE("tms6100", tms6100_device, m1_w))
+	MCFG_TMS5110_ADDR_CB(WRITE8("tms6100", tms6100_device, add_w))
+	MCFG_TMS5110_DATA_CB(READLINE("tms6100", tms6100_device, data_line_r))
+	MCFG_TMS5110_ROMCLK_CB(WRITELINE("tms6100", tms6100_device, clk_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tispeak_state::snmath)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0270, MASTER_CLOCK/2)
-	MCFG_TMS1XXX_READ_K_CB(READ8(tispeak_state, snspell_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snmath_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, snspell_write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS0270, MASTER_CLOCK/2)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispeak_state, snspell_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, snmath_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispeak_state, snspell_write_r))
 
-	MCFG_TMS0270_READ_CTL_CB(DEVREAD8("tms5100", tms5110_device, ctl_r))
-	MCFG_TMS0270_WRITE_CTL_CB(DEVWRITE8("tms5100", tms5110_device, ctl_w))
-	MCFG_TMS0270_WRITE_PDC_CB(DEVWRITELINE("tms5100", tms5110_device, pdc_w))
+	MCFG_TMS0270_READ_CTL_CB(READ8("tms5100", tms5110_device, ctl_r))
+	MCFG_TMS0270_WRITE_CTL_CB(WRITE8("tms5100", tms5110_device, ctl_w))
+	MCFG_TMS0270_WRITE_PDC_CB(WRITELINE("tms5100", tms5110_device, pdc_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_snmath)
@@ -1300,7 +1300,7 @@ MACHINE_CONFIG_START(tispeak_state::snmath)
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5100", CD2801, MASTER_CLOCK)
+	MCFG_DEVICE_ADD("tms5100", CD2801, MASTER_CLOCK)
 	tms5110_route(config);
 MACHINE_CONFIG_END
 
@@ -1309,8 +1309,8 @@ MACHINE_CONFIG_START(tispeak_state::sns_cd2801)
 	snmath(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspell_write_o))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, snspell_write_o))
 
 	MCFG_DEFAULT_LAYOUT(layout_snspell)
 
@@ -1333,7 +1333,7 @@ MACHINE_CONFIG_START(tispeak_state::sns_tmc0281)
 	sns_cd2801(config);
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("tms5100", TMC0281, MASTER_CLOCK)
+	MCFG_DEVICE_REPLACE("tms5100", TMC0281, MASTER_CLOCK)
 	tms5110_route(config);
 MACHINE_CONFIG_END
 
@@ -1348,7 +1348,7 @@ MACHINE_CONFIG_START(tispeak_state::sns_tmc0281d)
 	sns_cd2801(config);
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("tms5100", TMC0281D, MASTER_CLOCK)
+	MCFG_DEVICE_REPLACE("tms5100", TMC0281D, MASTER_CLOCK)
 	tms5110_route(config);
 MACHINE_CONFIG_END
 
@@ -1357,8 +1357,8 @@ MACHINE_CONFIG_START(tispeak_state::snread)
 	snmath(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspell_write_o))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, snspell_write_o))
 
 	MCFG_DEFAULT_LAYOUT(layout_snread)
 
@@ -1375,9 +1375,9 @@ MACHINE_CONFIG_START(tispeak_state::lantutor)
 	snmath(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspell_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, lantutor_write_r))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, snspell_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispeak_state, lantutor_write_r))
 
 	MCFG_DEFAULT_LAYOUT(layout_snread)
 
@@ -1394,10 +1394,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tispeak_state::snspellc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, MASTER_CLOCK/2)
-	MCFG_TMS1XXX_READ_K_CB(READ8(tispeak_state, snspellc_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspellc_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, snspellc_write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, MASTER_CLOCK/2)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispeak_state, snspellc_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, snspellc_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispeak_state, snspellc_write_r))
 
 	/* no visual feedback! */
 
@@ -1405,7 +1405,7 @@ MACHINE_CONFIG_START(tispeak_state::snspellc)
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5100", TMC0281D, MASTER_CLOCK)
+	MCFG_DEVICE_ADD("tms5100", TMC0281D, MASTER_CLOCK)
 	tms5110_route(config);
 
 	/* cartridge */
@@ -1420,7 +1420,7 @@ MACHINE_CONFIG_START(tispeak_state::snspellcuk)
 	snspellc(config);
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("tms5100", CD2801, MASTER_CLOCK) // CD2801A!
+	MCFG_DEVICE_REPLACE("tms5100", CD2801, MASTER_CLOCK) // CD2801A!
 	tms5110_route(config);
 MACHINE_CONFIG_END
 
@@ -1428,10 +1428,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tispeak_state::vocaid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, MASTER_CLOCK/2)
-	MCFG_TMS1XXX_READ_K_CB(READ8(tispeak_state, tntell_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspellc_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, snspellc_write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS1100, MASTER_CLOCK/2)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispeak_state, tntell_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, snspellc_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispeak_state, snspellc_write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ol_timer", tispeak_state, tntell_get_overlay, attotime::from_msec(50))
@@ -1441,7 +1441,7 @@ MACHINE_CONFIG_START(tispeak_state::vocaid)
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5100", CD2802, MASTER_CLOCK)
+	MCFG_DEVICE_ADD("tms5100", CD2802, MASTER_CLOCK)
 	tms5110_route(config);
 MACHINE_CONFIG_END
 
@@ -1460,10 +1460,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tispeak_state::k28m2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, MASTER_CLOCK/2)
-	MCFG_TMS1XXX_READ_K_CB(READ8(tispeak_state, k28_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, k28_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, k28_write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS1400, MASTER_CLOCK/2)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispeak_state, k28_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispeak_state, k28_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispeak_state, k28_write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_k28m2)
@@ -1472,7 +1472,7 @@ MACHINE_CONFIG_START(tispeak_state::k28m2)
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5100", TMS5110A, MASTER_CLOCK)
+	MCFG_DEVICE_ADD("tms5100", TMS5110A, MASTER_CLOCK)
 	tms5110_route(config);
 
 	/* cartridge */

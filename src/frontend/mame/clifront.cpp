@@ -860,13 +860,13 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 			if (slot.fixed()) continue;
 
 			// build a list of user-selectable options
-			std::vector<device_slot_option *> option_list;
+			std::vector<device_slot_interface::slot_option const *> option_list;
 			for (auto &option : slot.option_list())
 				if (option.second->selectable())
 					option_list.push_back(option.second.get());
 
 			// sort them by name
-			std::sort(option_list.begin(), option_list.end(), [](device_slot_option *opt1, device_slot_option *opt2) {
+			std::sort(option_list.begin(), option_list.end(), [](device_slot_interface::slot_option const *opt1, device_slot_interface::slot_option const *opt2) {
 				return strcmp(opt1->name(), opt2->name()) < 0;
 			});
 
@@ -877,7 +877,7 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 			bool first_option = true;
 
 			// get the options and print them
-			for (device_slot_option *opt : option_list)
+			for (device_slot_interface::slot_option const *opt : option_list)
 			{
 				if (first_option)
 					printf("%-16s %s\n", opt->name(), opt->devtype().fullname());

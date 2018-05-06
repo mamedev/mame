@@ -172,8 +172,8 @@ void taito_type_x_state::machine_reset()
 MACHINE_CONFIG_START(taito_type_x_state::taito_type_x)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 733333333) /* Wrong, much newer processors, much faster. */
-	MCFG_CPU_PROGRAM_MAP(taito_type_x_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 733333333) /* Wrong, much newer processors, much faster. */
+	MCFG_DEVICE_PROGRAM_MAP(taito_type_x_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

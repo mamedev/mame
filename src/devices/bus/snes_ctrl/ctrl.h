@@ -94,7 +94,7 @@ DECLARE_DEVICE_TYPE(SNES_CONTROL_PORT, snes_control_port_device)
 	downcast<snes_control_port_device &>(*device).set_gunlatch_callback(snesctrl_gunlatch_delegate(&_class::_method, #_class "::" #_method, this));
 
 
-SLOT_INTERFACE_EXTERN( snes_control_port_devices );
+void snes_control_port_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_SNES_CTRL_CTRL_H

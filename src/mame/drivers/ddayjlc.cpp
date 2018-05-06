@@ -599,11 +599,11 @@ PALETTE_INIT_MEMBER(ddayjlc_state, ddayjlc)
 MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/3)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/3)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddayjlc_state, screen_update_ddayjlc)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddayjlc_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddayjlc_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddayjlc)
 	MCFG_PALETTE_ADD("palette", 0x200+4)
@@ -625,11 +625,11 @@ MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 12000000/6)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("ay1", AY8910, 12000000/6)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 12000000/6)
+	MCFG_DEVICE_ADD("ay2", AY8910, 12000000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

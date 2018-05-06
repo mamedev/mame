@@ -207,31 +207,31 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
-	MCFG_CPU_PROGRAM_MAP(mikrosha_mem)
-	MCFG_CPU_IO_MAP(mikrosha_io)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(mikrosha_mem)
+	MCFG_DEVICE_IO_MAP(mikrosha_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mikrosha_state, mikrosha)
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, radio86_8255_portc_r2))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(radio86_state, mikrosha_8255_font_page_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, radio86_state, mikrosha_8255_font_page_w))
 
 	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'000'000) / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mikrosha_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma8257",i8257_device, dreq2_w))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(0)
 	MCFG_PIT8253_CLK1(0)
 	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mikrosha_state, mikrosha_pit_out2))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mikrosha_state, mikrosha_pit_out2))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -249,10 +249,10 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(16'000'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(radio86_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(radio86_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(radio86_state, memory_write_byte))
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, radio86_state, hrq_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, radio86_state, memory_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, radio86_state, memory_write_byte))
+	MCFG_I8257_OUT_IOW_2_CB(WRITE8("i8275", i8275_device, dack_w))
 	MCFG_I8257_REVERSE_RW_MODE(1)
 
 	MCFG_CASSETTE_ADD( "cassette" )

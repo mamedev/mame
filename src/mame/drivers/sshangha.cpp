@@ -384,12 +384,12 @@ DECO16IC_BANK_CB_MEMBER(sshangha_state::bank_callback)
 MACHINE_CONFIG_START(sshangha_state::sshangha)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
-	MCFG_CPU_PROGRAM_MAP(sshangha_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sshangha_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 28000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(sshangha_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sshangha_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)
-	MCFG_CPU_PROGRAM_MAP(sshangha_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)
+	MCFG_DEVICE_PROGRAM_MAP(sshangha_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -436,7 +436,7 @@ MACHINE_CONFIG_START(sshangha_state::sshangha)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") /* sure it's stereo? */
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 16000000/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 16000000/4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
@@ -449,8 +449,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sshangha_state::sshanghb)
 	sshangha(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sshanghb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sshanghb_map)
 MACHINE_CONFIG_END
 
 /******************************************************************************/

@@ -59,8 +59,8 @@ void hapyfish_state::video_start()
 MACHINE_CONFIG_START(hapyfish_state::hapyfish)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM9, 20000000) // ?? ARM baesd CPU
-	MCFG_CPU_PROGRAM_MAP(hapyfish_map)
+	MCFG_DEVICE_ADD("maincpu", ARM9, 20000000) // ?? ARM baesd CPU
+	MCFG_DEVICE_PROGRAM_MAP(hapyfish_map)
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */

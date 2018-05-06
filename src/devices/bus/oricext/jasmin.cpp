@@ -15,9 +15,10 @@ FLOPPY_FORMATS_MEMBER( jasmin_device::floppy_formats )
 	FLOPPY_ORIC_DSK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( jasmin_floppies )
-	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
-SLOT_INTERFACE_END
+static void jasmin_floppies(device_slot_interface &device)
+{
+	device.option_add("3dsdd", FLOPPY_3_DSDD);
+}
 
 INPUT_PORTS_START( jasmin )
 	PORT_START("JASMIN")
@@ -73,7 +74,7 @@ const tiny_rom_entry *jasmin_device::device_rom_region() const
 
 MACHINE_CONFIG_START(jasmin_device::device_add_mconfig)
 	MCFG_WD1770_ADD("fdc", XTAL(8'000'000))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(oricext_device, irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, oricext_device, irq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", jasmin_floppies, "3dsdd", jasmin_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", jasmin_floppies, nullptr,    jasmin_device::floppy_formats)

@@ -473,12 +473,12 @@ void xexex_state::machine_reset()
 MACHINE_CONFIG_START(xexex_state::xexex)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) // 16MHz
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // 16MHz
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xexex_state, xexex_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/4) // Z80E 8Mhz
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4) // Z80E 8Mhz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 

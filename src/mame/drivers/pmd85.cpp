@@ -582,9 +582,9 @@ static const struct CassetteOptions pmd85_cassette_options =
 /* machine definition */
 MACHINE_CONFIG_START(pmd85_state::pmd85)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 2000000)     /* 2.048MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(pmd85_mem)
-	MCFG_CPU_IO_MAP(pmd85_io_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)     /* 2.048MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(pmd85_mem)
+	MCFG_DEVICE_IO_MAP(pmd85_io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 
@@ -641,7 +641,7 @@ MACHINE_CONFIG_START(pmd85_state::pmd85)
 
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(pmd85_state, write_cas_tx))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, pmd85_state, write_cas_tx))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -652,93 +652,93 @@ MACHINE_CONFIG_START(pmd85_state::pmd851)
 	pmd85(config);
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_0_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_0_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, pmd85_ppi_0_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_0_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, pmd85_ppi_0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_0_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_0_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, pmd85_ppi_0_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, pmd85_ppi_0_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, pmd85_ppi_1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, pmd85_ppi_1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_1_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_1_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_1_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, pmd85_ppi_1_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_1_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, pmd85_ppi_1_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, pmd85_ppi_1_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_2_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_2_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, pmd85_ppi_2_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_2_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, pmd85_ppi_2_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_2_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_2_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_2_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, pmd85_ppi_2_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_2_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, pmd85_ppi_2_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, pmd85_ppi_2_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_3", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_3_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_3_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, pmd85_ppi_3_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_3_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, pmd85_ppi_3_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_3_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_3_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_3_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, pmd85_ppi_3_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_3_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, pmd85_ppi_3_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, pmd85_ppi_3_portc_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pmd85_state::pmd852a)
 	pmd851(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pmd852a_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pmd852a_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pmd85_state::pmd853)
 	pmd851(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pmd853_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pmd853_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pmd85_state::alfa)
 	pmd85(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(alfa_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(alfa_mem)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_0_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_0_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, pmd85_ppi_0_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_0_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, pmd85_ppi_0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_0_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_0_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, pmd85_ppi_0_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, pmd85_ppi_0_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, pmd85_ppi_1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, pmd85_ppi_1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_1_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_1_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_1_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, pmd85_ppi_1_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_1_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, pmd85_ppi_1_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, pmd85_ppi_1_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_2_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_2_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, pmd85_ppi_2_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_2_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, pmd85_ppi_2_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_2_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_2_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_2_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, pmd85_ppi_2_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_2_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, pmd85_ppi_2_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, pmd85_ppi_2_portc_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pmd85_state::mato)
 	pmd85(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mato_mem)
-	MCFG_CPU_IO_MAP(mato_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mato_mem)
+	MCFG_DEVICE_IO_MAP(mato_io_map)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_0_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pmd85_state, pmd85_ppi_0_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pmd85_state, mato_ppi_0_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pmd85_state, pmd85_ppi_0_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pmd85_state, mato_ppi_0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, mato_ppi_0_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pmd85_state, pmd85_ppi_0_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pmd85_state, mato_ppi_0_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pmd85_state, pmd85_ppi_0_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pmd85_state, mato_ppi_0_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pmd85_state, mato_ppi_0_portc_w))
 
 	/* no uart */
 	MCFG_DEVICE_REMOVE("uart")
@@ -746,8 +746,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pmd85_state::c2717)
 	pmd851(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(c2717_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(c2717_mem)
 MACHINE_CONFIG_END
 
 

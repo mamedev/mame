@@ -525,8 +525,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(cocoloco_state::cocoloco)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)   /* confirmed */
-	MCFG_CPU_PROGRAM_MAP(cocoloco_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)   /* confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(cocoloco_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -539,17 +539,17 @@ MACHINE_CONFIG_START(cocoloco_state::cocoloco)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, SND_CLOCK) /* confirmed */
+	MCFG_DEVICE_ADD("ay8910", AY8910, SND_CLOCK) /* confirmed */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
-	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 2)
+	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 2)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
-	MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, 48000)
+	MCFG_DEVICE_ADD("snd_nl", NETLIST_SOUND, 48000)
 	MCFG_NETLIST_SETUP(nl_cocoloco)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

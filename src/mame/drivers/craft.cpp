@@ -247,10 +247,10 @@ void craft_state::machine_reset()
 MACHINE_CONFIG_START(craft_state::craft)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ATMEGA88, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(craft_prg_map)
-	MCFG_CPU_DATA_MAP(craft_data_map)
-	MCFG_CPU_IO_MAP(craft_io_map)
+	MCFG_DEVICE_ADD("maincpu", ATMEGA88, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(craft_prg_map)
+	MCFG_DEVICE_DATA_MAP(craft_data_map)
+	MCFG_DEVICE_IO_MAP(craft_io_map)
 	MCFG_CPU_AVR8_EEPROM("eeprom")
 
 	/* video hardware */
@@ -264,9 +264,9 @@ MACHINE_CONFIG_START(craft_state::craft)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("avr8")
-	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "avr8", 0.25) // pd1/pd2/pd4/pd5/pd6/pd7 + 2k(x7) + 1k(x5)
+	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "avr8", 0.25) // pd1/pd2/pd4/pd5/pd6/pd7 + 2k(x7) + 1k(x5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( craft )

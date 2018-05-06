@@ -1,0 +1,59 @@
+# license:BSD-3-Clause
+# copyright-holders:David Haywood
+# xavix2000 opcodes
+
+plx_imp
+	read_pc_noinc();
+	prefetch();
+
+phx_imp
+	read_pc_noinc();
+	prefetch();
+
+ply_imp
+	read_pc_noinc();
+	prefetch();
+
+phy_imp
+	read_pc_noinc();
+	prefetch();
+
+unk1b_imp
+	read_pc_noinc();
+	prefetch();
+
+unk5b_imp
+	read_pc_noinc();
+	prefetch();
+
+unk9b_imp
+	read_pc_noinc();
+	prefetch();
+
+unka3_imp
+	read_pc_noinc();
+	prefetch();
+
+unka7_imp
+	read_pc_noinc();
+	prefetch();
+
+unk07_imp
+	read_pc_noinc();
+	prefetch();
+
+unkb2_imp
+	read_pc_noinc();
+	prefetch();
+
+unk73_imp
+	read_pc_noinc();
+	prefetch();
+
+unk87_imm
+	read_pc();
+	prefetch();
+
+unk83_imm
+	read_pc();
+	prefetch();

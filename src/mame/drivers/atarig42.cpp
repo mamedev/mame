@@ -516,8 +516,8 @@ static const atari_rle_objects_config modesc_0x400 =
 MACHINE_CONFIG_START(atarig42_state::atarig42)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz / 16)
 	MCFG_ADC0808_IN0_CB(IOPORT("A2D0"))
@@ -543,7 +543,7 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarig42_state, screen_update_atarig42)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarig42_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarig42_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(atarig42_state,atarig42)
 

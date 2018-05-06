@@ -66,10 +66,10 @@ const tiny_rom_entry *mie_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(mie_device::device_add_mconfig)
-	MCFG_CPU_ADD("mie", Z80, DERIVED_CLOCK(1,1))
-	MCFG_CPU_PROGRAM_MAP(mie_map)
-	MCFG_CPU_IO_MAP(mie_port)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, mie_device, irq_callback)
+	MCFG_DEVICE_ADD("mie", Z80, DERIVED_CLOCK(1,1))
+	MCFG_DEVICE_PROGRAM_MAP(mie_map)
+	MCFG_DEVICE_IO_MAP(mie_port)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, mie_device, irq_callback)
 MACHINE_CONFIG_END
 
 mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

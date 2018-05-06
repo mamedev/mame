@@ -1466,10 +1466,10 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 MACHINE_CONFIG_START(lucky74_state::lucky74)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, C_06B49P_CLKOUT_03)    /* 3 MHz. */
-	MCFG_CPU_PROGRAM_MAP(lucky74_map)
-	MCFG_CPU_IO_MAP(lucky74_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lucky74_state,  nmi_interrupt) /* 60 Hz. measured */
+	MCFG_DEVICE_ADD("maincpu", Z80, C_06B49P_CLKOUT_03)    /* 3 MHz. */
+	MCFG_DEVICE_PROGRAM_MAP(lucky74_map)
+	MCFG_DEVICE_IO_MAP(lucky74_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lucky74_state,  nmi_interrupt) /* 60 Hz. measured */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1491,8 +1491,8 @@ MACHINE_CONFIG_START(lucky74_state::lucky74)
 
 	MCFG_DEVICE_ADD("ppi8255_3", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW4"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lucky74_state, lamps_a_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lucky74_state, lamps_b_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lucky74_state, lamps_a_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lucky74_state, lamps_b_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1511,23 +1511,23 @@ MACHINE_CONFIG_START(lucky74_state::lucky74)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
+	MCFG_DEVICE_ADD("sn1", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("sn2", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
+	MCFG_DEVICE_ADD("sn2", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("sn3", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
+	MCFG_DEVICE_ADD("sn3", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, C_06B49P_CLKOUT_04) /* 1.5 MHz. */
+	MCFG_DEVICE_ADD("aysnd", AY8910, C_06B49P_CLKOUT_04) /* 1.5 MHz. */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN3"))
 	/* port b read is a sort of status byte */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lucky74_state, ym2149_portb_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lucky74_state, ym2149_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.00)         /* not routed to audio hardware */
 
-	MCFG_SOUND_ADD("msm", MSM5205, C_06B49P_CLKOUT_06)  /* 375 kHz. */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(lucky74_state, lucky74_adpcm_int))  /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, C_06B49P_CLKOUT_06)  /* 375 kHz. */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, lucky74_state, lucky74_adpcm_int))  /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 

@@ -193,9 +193,9 @@ void testcpu_state::ppc_mem(address_map &map)
 MACHINE_CONFIG_START(testcpu_state::testcpu)
 
 	// CPUs
-	MCFG_CPU_ADD("maincpu", PPC603E, 66000000)
+	MCFG_DEVICE_ADD("maincpu", PPC603E, 66000000)
 	MCFG_PPC_BUS_FREQUENCY(66000000)  // Multiplier 1, Bus = 66MHz, Core = 66MHz
-	MCFG_CPU_PROGRAM_MAP(ppc_mem)
+	MCFG_DEVICE_PROGRAM_MAP(ppc_mem)
 MACHINE_CONFIG_END
 
 

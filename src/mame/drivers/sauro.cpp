@@ -450,10 +450,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sauro_state::tecfri)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(20'000'000)/4)       /* verified on pcb */
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(20'000'000)/4)       /* verified on pcb */
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(sauro_state, irq_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, sauro_state, irq_reset_w))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -466,14 +466,14 @@ MACHINE_CONFIG_START(sauro_state::tecfri)
 	MCFG_SCREEN_SIZE(32 * 8, 32 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(1 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sauro_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sauro_state, vblank_irq))
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(20'000'000)/8)       /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(20'000'000)/8)       /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -481,13 +481,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sauro_state::trckydoc)
 	tecfri(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(trckydoc_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(trckydoc_map)
 
 	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sauro_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(sauro_state, coin1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(sauro_state, coin2_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, sauro_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, sauro_state, coin1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, sauro_state, coin2_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trckydoc)
 
@@ -500,21 +500,21 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sauro_state::sauro)
 	tecfri(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sauro_map)
-	MCFG_CPU_IO_MAP(sauro_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sauro_map)
+	MCFG_DEVICE_IO_MAP(sauro_io_map)
 
 	MCFG_DEVICE_MODIFY("mainlatch") // Z3
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sauro_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sauro_state, coin1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(sauro_state, coin2_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, sauro_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, sauro_state, coin1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, sauro_state, coin2_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // sound IRQ trigger?
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(sauro_state, sauro_palette_bank0_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(sauro_state, sauro_palette_bank1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, sauro_state, sauro_palette_bank0_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, sauro_state, sauro_palette_bank1_w))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(20'000'000)/5)     /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sauro_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(sauro_state, irq0_line_hold,  8*60) // ?
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(20'000'000)/5)     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sauro_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(sauro_state, irq0_line_hold,  8*60) // ?
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sauro)
 
@@ -524,10 +524,10 @@ MACHINE_CONFIG_START(sauro_state::sauro)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_DEVICE_MODIFY("ymsnd")
 	MCFG_DEVICE_CLOCK(XTAL(20'000'000)/5)     /* verified on pcb */
 
-	MCFG_SOUND_ADD("speech", SP0256, XTAL(20'000'000)/5)     /* verified on pcb */
+	MCFG_DEVICE_ADD("speech", SP0256, XTAL(20'000'000)/5)     /* verified on pcb */
 	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -535,8 +535,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sauro_state::saurob)
 	sauro(config);
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(saurob_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(saurob_sound_map)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("speech")

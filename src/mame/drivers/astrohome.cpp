@@ -179,27 +179,29 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static SLOT_INTERFACE_START(astrocade_cart)
-	SLOT_INTERFACE_INTERNAL("rom",       ASTROCADE_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("rom_256k",  ASTROCADE_ROM_256K)
-	SLOT_INTERFACE_INTERNAL("rom_512k",  ASTROCADE_ROM_512K)
-SLOT_INTERFACE_END
+static void astrocade_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom",       ASTROCADE_ROM_STD);
+	device.option_add_internal("rom_256k",  ASTROCADE_ROM_256K);
+	device.option_add_internal("rom_512k",  ASTROCADE_ROM_512K);
+}
 
-static SLOT_INTERFACE_START(astrocade_exp)
-	SLOT_INTERFACE("blue_ram_4k",   ASTROCADE_BLUERAM_4K)
-	SLOT_INTERFACE("blue_ram_16k",  ASTROCADE_BLUERAM_16K)
-	SLOT_INTERFACE("blue_ram_32k",  ASTROCADE_BLUERAM_32K)
-	SLOT_INTERFACE("viper_sys1",    ASTROCADE_VIPER_SYS1)
-	SLOT_INTERFACE("lil_white_ram", ASTROCADE_WHITERAM)
-	SLOT_INTERFACE("rl64_ram",      ASTROCADE_RL64RAM)
-SLOT_INTERFACE_END
+static void astrocade_exp(device_slot_interface &device)
+{
+	device.option_add("blue_ram_4k",   ASTROCADE_BLUERAM_4K);
+	device.option_add("blue_ram_16k",  ASTROCADE_BLUERAM_16K);
+	device.option_add("blue_ram_32k",  ASTROCADE_BLUERAM_32K);
+	device.option_add("viper_sys1",    ASTROCADE_VIPER_SYS1);
+	device.option_add("lil_white_ram", ASTROCADE_WHITERAM);
+	device.option_add("rl64_ram",      ASTROCADE_RL64RAM);
+}
 
 
 MACHINE_CONFIG_START(astrocde_mess_state::astrocde)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)        /* 1.789 MHz */
-	MCFG_CPU_PROGRAM_MAP(astrocade_mem)
-	MCFG_CPU_IO_MAP(astrocade_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)        /* 1.789 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(astrocade_mem)
+	MCFG_DEVICE_IO_MAP(astrocade_io)
 
 	MCFG_MACHINE_START_OVERRIDE(astrocde_mess_state, astrocde)
 
@@ -214,7 +216,7 @@ MACHINE_CONFIG_START(astrocde_mess_state::astrocde)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("astrocade1", ASTROCADE, ASTROCADE_CLOCK/4)
+	MCFG_DEVICE_ADD("astrocade1", ASTROCADE, ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* expansion port */

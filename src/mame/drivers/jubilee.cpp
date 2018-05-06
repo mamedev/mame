@@ -665,7 +665,7 @@ MACHINE_CONFIG_START(jubilee_state::jubileep)
 
 	// Main CPU TMS9980A, no line connections.
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, CPU_CLOCK, jubileep_map, jubileep_cru_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jubilee_state,  jubileep_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jubilee_state,  jubileep_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("videoworkram")
 

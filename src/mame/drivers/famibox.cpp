@@ -549,8 +549,8 @@ void famibox_state::machine_start()
 
 MACHINE_CONFIG_START(famibox_state::famibox)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(famibox_map)
+	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(famibox_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

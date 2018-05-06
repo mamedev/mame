@@ -42,22 +42,25 @@ device_sound_interface::~device_sound_interface()
 //  add_route - send sound output to a consumer
 //-------------------------------------------------
 
-void device_sound_interface::add_route(u32 output, const char *target, double gain, u32 input, u32 mixoutput)
+device_sound_interface &device_sound_interface::add_route(u32 output, const char *target, double gain, u32 input, u32 mixoutput)
 {
 	assert(!device().started());
 	m_route_list.emplace_back(sound_route{ output, input, mixoutput, float(gain), device().mconfig().current_device(), target });
+	return *this;
 }
 
-void device_sound_interface::add_route(u32 output, device_sound_interface &target, double gain, u32 input, u32 mixoutput)
+device_sound_interface &device_sound_interface::add_route(u32 output, device_sound_interface &target, double gain, u32 input, u32 mixoutput)
 {
 	assert(!device().started());
 	m_route_list.emplace_back(sound_route{ output, input, mixoutput, float(gain), target.device(), DEVICE_SELF });
+	return *this;
 }
 
-void device_sound_interface::add_route(u32 output, speaker_device &target, double gain, u32 input, u32 mixoutput)
+device_sound_interface &device_sound_interface::add_route(u32 output, speaker_device &target, double gain, u32 input, u32 mixoutput)
 {
 	assert(!device().started());
 	m_route_list.emplace_back(sound_route{ output, input, mixoutput, float(gain), target, DEVICE_SELF });
+	return *this;
 }
 
 

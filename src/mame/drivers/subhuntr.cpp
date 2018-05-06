@@ -144,12 +144,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(subhuntr_state::subhuntr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 14318180/4/2)
-	MCFG_CPU_PROGRAM_MAP(subhuntr_map)
-	MCFG_CPU_IO_MAP(subhuntr_io_map)
-	MCFG_CPU_DATA_MAP(subhuntr_data_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", subhuntr_state, subhuntr_interrupt)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
+	MCFG_DEVICE_ADD("maincpu", S2650, 14318180/4/2)
+	MCFG_DEVICE_PROGRAM_MAP(subhuntr_map)
+	MCFG_DEVICE_IO_MAP(subhuntr_io_map)
+	MCFG_DEVICE_DATA_MAP(subhuntr_data_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subhuntr_state, subhuntr_interrupt)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
 
 //  MCFG_DEVICE_ADD("s2636", S2636, 0)
 //  MCFG_S2636_WORKRAM_SIZE(0x100)

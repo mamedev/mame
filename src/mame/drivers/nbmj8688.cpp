@@ -2459,8 +2459,8 @@ READ8_MEMBER(nbmj8688_state::dipsw2_r)
 MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_4096)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5000000)   /* 5.00 MHz */
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nbmj8688_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)   /* 5.00 MHz */
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8688_state, irq0_line_hold)
 
 	MCFG_NB1413M3_ADD("nb1413m3")
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -2482,14 +2482,14 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_4096)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("psg", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(nbmj8688_state, dipsw1_r))     // DIPSW-A read
-	MCFG_AY8910_PORT_B_READ_CB(READ8(nbmj8688_state, dipsw2_r))     // DIPSW-B read
+	MCFG_DEVICE_ADD("psg", AY8910, 1250000)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nbmj8688_state, dipsw1_r))     // DIPSW-A read
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, nbmj8688_state, dipsw2_r))     // DIPSW-B read
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_256)
@@ -2525,9 +2525,9 @@ MACHINE_CONFIG_START(nbmj8688_state::crystalg)
 	NBMJDRV_256(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(secolove_map)
-	MCFG_CPU_IO_MAP(crystalg_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
+	MCFG_DEVICE_IO_MAP(crystalg_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_CRYSTALG )
@@ -2551,9 +2551,9 @@ MACHINE_CONFIG_START(nbmj8688_state::apparel)
 	NBMJDRV_256(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(secolove_map)
-	MCFG_CPU_IO_MAP(secolove_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
+	MCFG_DEVICE_IO_MAP(secolove_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_APPAREL )
@@ -2563,9 +2563,9 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_h12bit)
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(secolove_map)
-	MCFG_CPU_IO_MAP(secolove_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
+	MCFG_DEVICE_IO_MAP(secolove_io_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_hybrid_12bit)
@@ -2597,13 +2597,13 @@ MACHINE_CONFIG_START(nbmj8688_state::barline)
 	mbmj_h12bit(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(barline_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(barline_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_BARLINE )
 
-	MCFG_SOUND_REPLACE("psg", YM3812, 20000000/8)
+	MCFG_DEVICE_REPLACE("psg", YM3812, 20000000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
 	MCFG_DEVICE_REMOVE("dac")
@@ -2614,9 +2614,9 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit)
 	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(secolove_map)
-	MCFG_CPU_IO_MAP(secolove_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
+	MCFG_DEVICE_IO_MAP(secolove_io_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_pure_16bit)
@@ -2625,11 +2625,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5000000)   /* 5.00 MHz */
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nbmj8688_state, irq0_line_hold)
-	MCFG_CPU_PROGRAM_MAP(secolove_map)
-	MCFG_CPU_IO_MAP(secolove_io_map)
-	MCFG_CPU_IO_MAP(p16bit_LCD_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)   /* 5.00 MHz */
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8688_state, irq0_line_hold)
+	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
+	MCFG_DEVICE_IO_MAP(secolove_io_map)
+	MCFG_DEVICE_IO_MAP(p16bit_LCD_io_map)
 
 	MCFG_NB1413M3_ADD("nb1413m3")
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -2675,14 +2675,14 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("psg", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(nbmj8688_state, dipsw1_r))     // DIPSW-A read
-	MCFG_AY8910_PORT_B_READ_CB(READ8(nbmj8688_state, dipsw2_r))     // DIPSW-B read
+	MCFG_DEVICE_ADD("psg", AY8910, 1250000)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nbmj8688_state, dipsw1_r))     // DIPSW-A read
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, nbmj8688_state, dipsw2_r))     // DIPSW-B read
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8688_state::bijokkoy)
@@ -2745,9 +2745,9 @@ MACHINE_CONFIG_START(nbmj8688_state::seiha)
 	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(secolove_map)
-	MCFG_CPU_IO_MAP(seiha_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
+	MCFG_DEVICE_IO_MAP(seiha_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_SEIHA )
@@ -2765,9 +2765,9 @@ MACHINE_CONFIG_START(nbmj8688_state::mjgaiden)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ojousan_map)
-	MCFG_CPU_IO_MAP(mjgaiden_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ojousan_map)
+	MCFG_DEVICE_IO_MAP(mjgaiden_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_OJOUSAN )
@@ -2777,9 +2777,9 @@ MACHINE_CONFIG_START(nbmj8688_state::iemoto)
 	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(secolove_map)
-	MCFG_CPU_IO_MAP(iemoto_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
+	MCFG_DEVICE_IO_MAP(iemoto_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_IEMOTO )
@@ -2789,9 +2789,9 @@ MACHINE_CONFIG_START(nbmj8688_state::ojousan)
 	NBMJDRV_65536(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ojousan_map)
-	MCFG_CPU_IO_MAP(iemoto_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ojousan_map)
+	MCFG_DEVICE_IO_MAP(iemoto_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_OJOUSAN )
@@ -2807,9 +2807,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nbmj8688_state::swinggal)
 	ojousan(config);
 
-		MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(secolove_map)
-	MCFG_CPU_IO_MAP(iemoto_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
+	MCFG_DEVICE_IO_MAP(iemoto_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8688_state::iemotom)
@@ -2844,9 +2844,9 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p12bit)
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mjsikaku_map)
-	MCFG_CPU_IO_MAP(kaguya_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mjsikaku_map)
+	MCFG_DEVICE_IO_MAP(kaguya_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8688_state::kaguya)
@@ -2888,15 +2888,15 @@ MACHINE_CONFIG_START(nbmj8688_state::mjsikaku)
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mjsikaku_map)
-	MCFG_CPU_IO_MAP(mjsikaku_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mjsikaku_map)
+	MCFG_DEVICE_IO_MAP(mjsikaku_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MJSIKAKU )
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("psg", YM3812, 20000000/8)
+	MCFG_DEVICE_REPLACE("psg", YM3812, 20000000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
 MACHINE_CONFIG_END
 
@@ -2904,9 +2904,9 @@ MACHINE_CONFIG_START(nbmj8688_state::mmsikaku)
 	NBMJDRV_4096(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(secolove_map)
-	MCFG_CPU_IO_MAP(mmsikaku_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(secolove_map)
+	MCFG_DEVICE_IO_MAP(mmsikaku_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MMSIKAKU )
@@ -2916,8 +2916,8 @@ MACHINE_CONFIG_START(nbmj8688_state::otonano)
 	mjsikaku(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(otonano_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(otonano_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_OTONANO )

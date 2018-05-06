@@ -270,17 +270,18 @@ WRITE_LINE_MEMBER( v6809_state::speaker_w )
 //      m_speaker->level_w(data);
 }
 
-static SLOT_INTERFACE_START( v6809_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void v6809_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 
 // *** Machine ****
 
 MACHINE_CONFIG_START(v6809_state::v6809)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(16'000'000) / 4) // divided by 4 again internally
-	MCFG_CPU_PROGRAM_MAP(v6809_mem)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(16'000'000) / 4) // divided by 4 again internally
+	MCFG_DEVICE_PROGRAM_MAP(v6809_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(v6809_state, v6809)
 
 	/* video hardware */
@@ -295,7 +296,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
@@ -311,8 +312,8 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 // port A = drive select and 2 control lines ; port B = keyboard
 // CB2 connects to the interrupt pin of the RTC (the rtc code doesn't support it)
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(v6809_state, pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(v6809_state, pa_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, v6809_state, pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, v6809_state, pa_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
@@ -323,8 +324,8 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(16'000'000) / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(4000000/14, 4000000/14, 4000000/14/8)
-	MCFG_PTM6840_O1_CB(WRITELINE(v6809_state, speaker_w))
-	MCFG_PTM6840_O2_CB(WRITELINE(v6809_state, speaker_en_w))
+	MCFG_PTM6840_O1_CB(WRITELINE(*this, v6809_state, speaker_w))
+	MCFG_PTM6840_O2_CB(WRITELINE(*this, v6809_state, speaker_en_w))
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia0", ACIA6850, 0)
@@ -332,10 +333,10 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia0", acia6850_device, write_rxc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia0", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia0", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia1", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia1", acia6850_device, write_rxc))
 
 	MCFG_DEVICE_ADD("rtc", MM58274C, 0)
 // this is all guess
