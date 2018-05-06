@@ -100,10 +100,10 @@ ioport_constructor pcd_video_device::device_input_ports() const
 }
 
 MACHINE_CONFIG_START(pcd_video_device::device_add_mconfig)
-	MCFG_CPU_ADD("graphics", I8741, XTAL(16'000'000)/2)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(pcd_video_device, p1_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pcd_video_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(pcd_video_device, t1_r))
+	MCFG_DEVICE_ADD("graphics", I8741, XTAL(16'000'000)/2)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, pcd_video_device, p1_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, pcd_video_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, pcd_video_device, t1_r))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -142,12 +142,12 @@ void pcx_video_device::pcx_vram(address_map &map)
 }
 
 MACHINE_CONFIG_START(pcx_video_device::device_add_mconfig)
-	MCFG_CPU_ADD("graphics", I8031, XTAL(24'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(pcx_vid_map)
-	MCFG_CPU_IO_MAP(pcx_vid_io)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(pcx_video_device, p1_w))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(pcx_video_device, tx_callback))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(pcx_video_device, rx_callback))
+	MCFG_DEVICE_ADD("graphics", I8031, XTAL(24'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(pcx_vid_map)
+	MCFG_DEVICE_IO_MAP(pcx_vid_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, pcx_video_device, p1_w))
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, pcx_video_device, tx_callback))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, pcx_video_device, rx_callback))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

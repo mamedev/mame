@@ -441,27 +441,27 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(aces1_state::aces1)
 
-	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
-	MCFG_CPU_PROGRAM_MAP(aces1_map)
-	MCFG_CPU_IO_MAP(aces1_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(aces1_map)
+	MCFG_DEVICE_IO_MAP(aces1_portmap)
 
 	// 0xafb0 IC24 - lamps, 7segs
 	MCFG_DEVICE_ADD("ic24", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(aces1_state, ic24_write_a))  // 7segs
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(aces1_state, ic24_write_b))  // lamps
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(aces1_state, ic24_write_c))  // strobe
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, aces1_state, ic24_write_a))  // 7segs
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, aces1_state, ic24_write_b))  // lamps
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, aces1_state, ic24_write_c))  // strobe
 
 	// 0xafd0 IC25 - lamps, meters, reel comms (writes)
 	MCFG_DEVICE_ADD("ic25", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(aces1_state, ic25_write_a))  // extra lamps
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(aces1_state, ic25_write_b))  // meters, extra lamp select
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(aces1_state, ic25_write_c))  // reel write, extra lamp strobe
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, aces1_state, ic25_write_a))  // extra lamps
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, aces1_state, ic25_write_b))  // meters, extra lamp select
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, aces1_state, ic25_write_c))  // reel write, extra lamp strobe
 
 	// 0xafe0 IC37 - doors, coins, reel optics (reads)
 	MCFG_DEVICE_ADD("ic37", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(aces1_state, ic37_read_a)) // extra lamps
-	MCFG_I8255_IN_PORTB_CB(READ8(aces1_state, ic37_read_b)) // meters, extra lamp select
-	MCFG_I8255_IN_PORTC_CB(READ8(aces1_state, ic37_read_c)) // reel write, extra lamp strobe
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, aces1_state, ic37_read_a)) // extra lamps
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, aces1_state, ic37_read_b)) // meters, extra lamp select
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, aces1_state, ic37_read_c)) // reel write, extra lamp strobe
 
 	MCFG_DEFAULT_LAYOUT(layout_aces1)
 
@@ -469,20 +469,20 @@ MACHINE_CONFIG_START(aces1_state::aces1)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	// 0xadf0 - Dips, Sound
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000) /* ?? MHz */
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) /* ?? MHz */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* steppers */
 	MCFG_STARPOINT_48STEP_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(aces1_state, reel0_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, aces1_state, reel0_optic_cb))
 	MCFG_STARPOINT_48STEP_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(aces1_state, reel1_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, aces1_state, reel1_optic_cb))
 	MCFG_STARPOINT_48STEP_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(aces1_state, reel2_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, aces1_state, reel2_optic_cb))
 	MCFG_STARPOINT_48STEP_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(aces1_state, reel3_optic_cb))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, aces1_state, reel3_optic_cb))
 MACHINE_CONFIG_END
 
 

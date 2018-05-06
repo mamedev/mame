@@ -2758,6 +2758,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/polepos.cpp",
 	MAME_DIR .. "src/mame/includes/polepos.h",
 	MAME_DIR .. "src/mame/audio/polepos.cpp",
+	MAME_DIR .. "src/mame/audio/polepos.h",
 	MAME_DIR .. "src/mame/video/polepos.cpp",
 	MAME_DIR .. "src/mame/drivers/rallyx.cpp",
 	MAME_DIR .. "src/mame/includes/rallyx.h",
@@ -3228,6 +3229,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/segasp.cpp",
 	MAME_DIR .. "src/mame/includes/segasp.h",
 	MAME_DIR .. "src/mame/machine/dc.cpp",
+	MAME_DIR .. "src/mame/drivers/y2.cpp",
 	MAME_DIR .. "src/mame/video/powervr2.cpp",
 	MAME_DIR .. "src/mame/video/powervr2.h",
 	MAME_DIR .. "src/mame/machine/naomi.cpp",
@@ -3927,6 +3929,7 @@ files {
 	MAME_DIR .. "src/mame/includes/tx1.h",
 	MAME_DIR .. "src/mame/machine/tx1.cpp",
 	MAME_DIR .. "src/mame/audio/tx1.cpp",
+	MAME_DIR .. "src/mame/audio/tx1.h",
 	MAME_DIR .. "src/mame/video/tx1.cpp",
 }
 

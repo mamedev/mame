@@ -243,26 +243,26 @@ MACHINE_CONFIG_END
 
 template<> MACHINE_CONFIG_START(p3prg_state::prg)
 	m68705prg(config);
-	MCFG_CPU_ADD("mcu", M68705P3, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(p3prg_state, pb_w))
+	MCFG_DEVICE_ADD("mcu", M68705P3, 1_MHz_XTAL)
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, p3prg_state, pb_w))
 MACHINE_CONFIG_END
 
 template<> MACHINE_CONFIG_START(p5prg_state::prg)
 	m68705prg(config);
-	MCFG_CPU_ADD("mcu", M68705P5, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(p5prg_state, pb_w))
+	MCFG_DEVICE_ADD("mcu", M68705P5, 1_MHz_XTAL)
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, p5prg_state, pb_w))
 MACHINE_CONFIG_END
 
 template<> MACHINE_CONFIG_START(r3prg_state::prg)
 	m68705prg(config);
-	MCFG_CPU_ADD("mcu", M68705R3, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(r3prg_state, pb_w))
+	MCFG_DEVICE_ADD("mcu", M68705R3, 1_MHz_XTAL)
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, r3prg_state, pb_w))
 MACHINE_CONFIG_END
 
 template<> MACHINE_CONFIG_START(u3prg_state::prg)
 	m68705prg(config);
-	MCFG_CPU_ADD("mcu", M68705U3, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(u3prg_state, pb_w))
+	MCFG_DEVICE_ADD("mcu", M68705U3, 1_MHz_XTAL)
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, u3prg_state, pb_w))
 MACHINE_CONFIG_END
 
 

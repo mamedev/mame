@@ -696,8 +696,8 @@ ROM_END
 
 MACHINE_CONFIG_START(snug_bwg_device::device_add_mconfig)
 	MCFG_WD1773_ADD(FDC_TAG, XTAL(8'000'000))
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, snug_bwg_device, fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, snug_bwg_device, fdc_drq_w))
 
 	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // 24 hour

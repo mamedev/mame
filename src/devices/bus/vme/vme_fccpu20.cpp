@@ -245,20 +245,20 @@ void vme_fccpu20_device::cpu20_mem(address_map &map)
 
 MACHINE_CONFIG_START(vme_fccpu20_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68020, CLOCK50 / 3) /* Crytstal verified from picture HCI */
-	MCFG_CPU_PROGRAM_MAP (cpu20_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("bim", bim68153_device, iack)
+	MCFG_DEVICE_ADD ("maincpu", M68020, CLOCK50 / 3) /* Crytstal verified from picture HCI */
+	MCFG_DEVICE_PROGRAM_MAP (cpu20_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("bim", bim68153_device, iack)
 
 	/* PIT Parallel Interface and Timer device, assumed strapped for on board clock */
 	MCFG_DEVICE_ADD ("pit", PIT68230, CLOCK32 / 4) /* Crystal not verified */
-	MCFG_PIT68230_PA_INPUT_CB(READ8(vme_fccpu20_device, pita_r))
-	MCFG_PIT68230_PB_INPUT_CB(READ8(vme_fccpu20_device, pitb_r))
-	MCFG_PIT68230_PC_INPUT_CB(READ8(vme_fccpu20_device, pitc_r))
-	MCFG_PIT68230_TIMER_IRQ_CB(DEVWRITELINE("bim", bim68153_device, int2_w))
+	MCFG_PIT68230_PA_INPUT_CB(READ8(*this, vme_fccpu20_device, pita_r))
+	MCFG_PIT68230_PB_INPUT_CB(READ8(*this, vme_fccpu20_device, pitb_r))
+	MCFG_PIT68230_PC_INPUT_CB(READ8(*this, vme_fccpu20_device, pitc_r))
+	MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE("bim", bim68153_device, int2_w))
 
 	/* BIM */
 	MCFG_MC68153_ADD("bim", CLOCK32 / 8)
-	MCFG_BIM68153_OUT_INT_CB(WRITELINE(vme_fccpu20_device, bim_irq_callback))
+	MCFG_BIM68153_OUT_INT_CB(WRITELINE(*this, vme_fccpu20_device, bim_irq_callback))
 		/*INT0 - Abort switch */
 		/*INT1 - MPCC@8.064 MHz aswell */
 		/*INT2 - PI/T timer */
@@ -270,40 +270,40 @@ MACHINE_CONFIG_START(vme_fccpu20_device::device_add_mconfig)
 #define RS232P3_TAG      "rs232p3"
 	// MPCC
 	MCFG_MPCC68561_ADD ("mpcc", CLOCK32 / 4, 0, 0)
-	MCFG_MPCC_OUT_TXD_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
-	MCFG_MPCC_OUT_DTR_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
-	MCFG_MPCC_OUT_RTS_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
-	MCFG_MPCC_OUT_INT_CB(DEVWRITELINE("bim", bim68153_device, int1_w))
+	MCFG_MPCC_OUT_TXD_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
+	MCFG_MPCC_OUT_DTR_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
+	MCFG_MPCC_OUT_RTS_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
+	MCFG_MPCC_OUT_INT_CB(WRITELINE("bim", bim68153_device, int1_w))
 
 	/* Additional MPCC sits on FLME boards like SRAM-22,
 	   TODO: install MPCC2/MPCC3 in FLME slot device */
 	// MPCC2
 	MCFG_MPCC68561_ADD ("mpcc2", CLOCK32 / 4, 0, 0)
-	MCFG_MPCC_OUT_TXD_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
-	MCFG_MPCC_OUT_DTR_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
-	MCFG_MPCC_OUT_RTS_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
-	MCFG_MPCC_OUT_INT_CB(DEVWRITELINE("bim", bim68153_device, int3_w))
+	MCFG_MPCC_OUT_TXD_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
+	MCFG_MPCC_OUT_DTR_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
+	MCFG_MPCC_OUT_RTS_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
+	MCFG_MPCC_OUT_INT_CB(WRITELINE("bim", bim68153_device, int3_w))
 	// MPCC3
 	MCFG_MPCC68561_ADD ("mpcc3", CLOCK32 / 4, 0, 0)
-	MCFG_MPCC_OUT_TXD_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_txd))
-	MCFG_MPCC_OUT_DTR_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
-	MCFG_MPCC_OUT_RTS_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
-	MCFG_MPCC_OUT_INT_CB(DEVWRITELINE("bim", bim68153_device, int3_w))
+	MCFG_MPCC_OUT_TXD_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_txd))
+	MCFG_MPCC_OUT_DTR_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
+	MCFG_MPCC_OUT_RTS_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
+	MCFG_MPCC_OUT_INT_CB(WRITELINE("bim", bim68153_device, int3_w))
 
 	// MPCC - RS232
-	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("mpcc", mpcc68561_device, write_rx))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("mpcc", mpcc68561_device, cts_w))
+	MCFG_DEVICE_ADD (RS232P1_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("mpcc", mpcc68561_device, write_rx))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("mpcc", mpcc68561_device, cts_w))
 
 	// MPCC2 - RS232
-	MCFG_RS232_PORT_ADD (RS232P2_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("mpcc2", mpcc68561_device, write_rx))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("mpcc2", mpcc68561_device, cts_w))
+	MCFG_DEVICE_ADD (RS232P2_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("mpcc2", mpcc68561_device, write_rx))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("mpcc2", mpcc68561_device, cts_w))
 
 	// MPCC3 - RS232
-	MCFG_RS232_PORT_ADD (RS232P3_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("mpcc3", mpcc68561_device, write_rx))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("mpcc3", mpcc68561_device, cts_w))
+	MCFG_DEVICE_ADD (RS232P3_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("mpcc3", mpcc68561_device, write_rx))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("mpcc3", mpcc68561_device, cts_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vme_fccpu20_card_device::device_add_mconfig)

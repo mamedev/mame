@@ -305,7 +305,7 @@ static const char *const safarir_sample_names[] =
 
 MACHINE_CONFIG_START(safarir_state::safarir_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(safarir_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -406,8 +406,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(safarir_state::safarir)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'000'000)/12)  /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000)/12)  /* 1.5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 2*8)

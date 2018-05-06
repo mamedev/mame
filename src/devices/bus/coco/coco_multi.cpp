@@ -161,7 +161,7 @@ static void coco_cart_slot1_3(device_slot_interface &device)
 	device.option_add("rs232", COCO_RS232);
 	device.option_add("dcmodem", COCO_DCMODEM);
 	device.option_add("orch90", COCO_ORCH90);
-	device.option_add("ssc", COCO_SSC).clock(DERIVED_CLOCK(1, 1));
+	device.option_add("ssc", COCO_SSC);
 	device.option_add("games_master", COCO_PAK_GMC);
 	device.option_add("banked_16k", COCO_PAK_BANKED);
 	device.option_add("pak", COCO_PAK);
@@ -174,7 +174,7 @@ static void coco_cart_slot4(device_slot_interface &device)
 	device.option_add("rs232", COCO_RS232);
 	device.option_add("dcmodem", COCO_DCMODEM);
 	device.option_add("orch90", COCO_ORCH90);
-	device.option_add("ssc", COCO_SSC).clock(DERIVED_CLOCK(1, 1));
+	device.option_add("ssc", COCO_SSC);
 	device.option_add("games_master", COCO_PAK_GMC);
 	device.option_add("banked_16k", COCO_PAK_BANKED);
 	device.option_add("pak", COCO_PAK);
@@ -183,21 +183,21 @@ static void coco_cart_slot4(device_slot_interface &device)
 
 MACHINE_CONFIG_START(coco_multipak_device::device_add_mconfig)
 	MCFG_COCO_CARTRIDGE_ADD(SLOT1_TAG, coco_cart_slot1_3, nullptr)
-	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_nmi_w))
-	MCFG_COCO_CARTRIDGE_HALT_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_halt_w))
+	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_cart_w))
+	MCFG_COCO_CARTRIDGE_NMI_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_nmi_w))
+	MCFG_COCO_CARTRIDGE_HALT_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_halt_w))
 	MCFG_COCO_CARTRIDGE_ADD(SLOT2_TAG, coco_cart_slot1_3, nullptr)
-	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot2_cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot2_nmi_w))
-	MCFG_COCO_CARTRIDGE_HALT_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot2_halt_w))
+	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot2_cart_w))
+	MCFG_COCO_CARTRIDGE_NMI_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot2_nmi_w))
+	MCFG_COCO_CARTRIDGE_HALT_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot2_halt_w))
 	MCFG_COCO_CARTRIDGE_ADD(SLOT3_TAG, coco_cart_slot1_3, nullptr)
-	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot3_cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot3_nmi_w))
-	MCFG_COCO_CARTRIDGE_HALT_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot3_halt_w))
+	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot3_cart_w))
+	MCFG_COCO_CARTRIDGE_NMI_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot3_nmi_w))
+	MCFG_COCO_CARTRIDGE_HALT_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot3_halt_w))
 	MCFG_COCO_CARTRIDGE_ADD(SLOT4_TAG, coco_cart_slot4, "fdcv11")
-	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot4_cart_w))
-	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot4_nmi_w))
-	MCFG_COCO_CARTRIDGE_HALT_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot4_halt_w))
+	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot4_cart_w))
+	MCFG_COCO_CARTRIDGE_NMI_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot4_nmi_w))
+	MCFG_COCO_CARTRIDGE_HALT_CB(WRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot4_halt_w))
 MACHINE_CONFIG_END
 
 INPUT_PORTS_START( coco_multipack )

@@ -404,22 +404,22 @@ INTERRUPT_GEN_MEMBER(thedeep_state::mcu_irq)
 MACHINE_CONFIG_START(thedeep_state::thedeep)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)      /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)      /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", thedeep_state, interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M65C02, XTAL(12'000'000)/8)      /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M65C02, XTAL(12'000'000)/8)      /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 
 	/* MCU is a i8751 running at 8Mhz (8mhz xtal)*/
-	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(thedeep_state, p0_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(thedeep_state, p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(thedeep_state, from_main_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(thedeep_state, to_main_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(thedeep_state, p3_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thedeep_state, mcu_irq) // unknown source, but presumably vblank
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, thedeep_state, p0_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, thedeep_state, p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, thedeep_state, from_main_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, thedeep_state, to_main_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, thedeep_state, p3_w))
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thedeep_state, mcu_irq) // unknown source, but presumably vblank
 	MCFG_DEVICE_DISABLE()
 
 
@@ -447,7 +447,7 @@ MACHINE_CONFIG_START(thedeep_state::thedeep)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/4)  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/4)  /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

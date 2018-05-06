@@ -121,7 +121,7 @@ void m68340_cpu_device::m68340_internal_map(address_map &map)
 //-------------------------------------------------
 MACHINE_CONFIG_START(m68340_cpu_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("serial", MC68340_SERIAL_MODULE, 0)
-	MCFG_MC68340SER_IRQ_CALLBACK(DEVWRITELINE("serial", mc68340_serial_module_device, irq_w))
+	MCFG_MC68340SER_IRQ_CALLBACK(WRITELINE("serial", mc68340_serial_module_device, irq_w))
 	MCFG_DEVICE_ADD("timer1", MC68340_TIMER_MODULE, 0)
 	MCFG_DEVICE_ADD("timer2", MC68340_TIMER_MODULE, 0)
 MACHINE_CONFIG_END

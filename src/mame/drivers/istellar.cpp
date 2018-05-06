@@ -274,19 +274,19 @@ WRITE_LINE_MEMBER(istellar_state::vblank_irq)
 /* DRIVER */
 MACHINE_CONFIG_START(istellar_state::istellar)
 	/* main cpu */
-	MCFG_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(z80_0_mem)
-	MCFG_CPU_IO_MAP(z80_0_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, GUESSED_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(z80_0_mem)
+	MCFG_DEVICE_IO_MAP(z80_0_io)
 
 	/* sound cpu */
-	MCFG_CPU_ADD("audiocpu", Z80, GUESSED_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(z80_1_mem)
-	MCFG_CPU_IO_MAP(z80_1_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, GUESSED_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(z80_1_mem)
+	MCFG_DEVICE_IO_MAP(z80_1_io)
 
 	/* ldp comm cpu */
-	MCFG_CPU_ADD("sub", Z80, GUESSED_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(z80_2_mem)
-	MCFG_CPU_IO_MAP(z80_2_io)
+	MCFG_DEVICE_ADD("sub", Z80, GUESSED_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(z80_2_mem)
+	MCFG_DEVICE_IO_MAP(z80_2_io)
 
 	MCFG_GENERIC_LATCH_8_ADD("latch1")
 
@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(istellar_state::istellar)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(istellar_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, istellar_state, vblank_irq))
 
 	// Daphne says "TODO: get the real interstellar resistor values"
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
@@ -310,7 +310,7 @@ MACHINE_CONFIG_START(istellar_state::istellar)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

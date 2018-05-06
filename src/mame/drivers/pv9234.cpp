@@ -148,8 +148,8 @@ uint32_t pv9234_state::screen_update_pv9234(screen_device &screen, bitmap_ind16 
 
 MACHINE_CONFIG_START(pv9234_state::pv9234)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, 4915000) //probably a more powerful clone.
-	MCFG_CPU_PROGRAM_MAP(pv9234_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 4915000) //probably a more powerful clone.
+	MCFG_DEVICE_PROGRAM_MAP(pv9234_map)
 
 
 	/* video hardware */

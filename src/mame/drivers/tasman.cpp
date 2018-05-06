@@ -640,18 +640,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
 }
 
 MACHINE_CONFIG_START(kongambl_state::kongambl)
-	MCFG_CPU_ADD("maincpu", M68EC020, 25000000)
-	MCFG_CPU_PROGRAM_MAP(kongambl_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(kongambl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kongambl_state, kongambl_vblank, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sndcpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(kongamaud_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kongambl_state, irq2_line_hold,  480)
+	MCFG_DEVICE_ADD("sndcpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(kongamaud_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(kongambl_state, irq2_line_hold,  480)
 
 	MCFG_DEVICE_ADD("k053252", K053252, 25000000)
 	MCFG_K053252_OFFSETS(0, 16) // TBD
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(kongambl_state, vblank_irq_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(kongambl_state, hblank_irq_ack_w))
+	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, kongambl_state, vblank_irq_ack_w))
+	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, kongambl_state, hblank_irq_ack_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")

@@ -625,23 +625,23 @@ MACHINE_RESET_MEMBER(punchout_state, spnchout)
 MACHINE_CONFIG_START(punchout_state::punchout)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(punchout_map)
-	MCFG_CPU_IO_MAP(punchout_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(punchout_map)
+	MCFG_DEVICE_IO_MAP(punchout_io_map)
 
-	MCFG_CPU_ADD("audiocpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(punchout_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", N2A03, NTSC_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(punchout_sound_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2B
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(punchout_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, punchout_state, nmi_mask_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // watchdog reset, seldom used because 08 clears the watchdog as well
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // ?
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("vlm", vlm5030_device, rst))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("vlm", vlm5030_device, st))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("vlm", vlm5030_device, vcu))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("vlm", vlm5030_device, rst))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("vlm", vlm5030_device, st))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("vlm", vlm5030_device, vcu))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // enable NVRAM?
 
 	/* video hardware */
@@ -656,7 +656,7 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_punchout_top)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(punchout_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, punchout_state, vblank_irq))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SCREEN_ADD("bottom", RASTER)
@@ -673,7 +673,7 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("vlm", VLM5030, N2A03_NTSC_XTAL/6)
+	MCFG_DEVICE_ADD("vlm", VLM5030, N2A03_NTSC_XTAL/6)
 	MCFG_DEVICE_ADDRESS_MAP(0, punchout_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -683,8 +683,8 @@ MACHINE_CONFIG_START(punchout_state::spnchout)
 	punchout(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(spnchout_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(spnchout_io_map)
 
 	MCFG_DEVICE_ADD("rtc", RP5C01, 0) // OSCIN -> Vcc
 	MCFG_RP5C01_REMOVE_BATTERY()
@@ -698,8 +698,8 @@ MACHINE_CONFIG_START(punchout_state::armwrest)
 	punchout(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(armwrest_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(armwrest_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", armwrest)

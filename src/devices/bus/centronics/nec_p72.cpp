@@ -51,8 +51,8 @@ void nec_p72_device::p72_mem(address_map &map)
 
 MACHINE_CONFIG_START(nec_p72_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V33, XTAL(16'000'000)/2) /* TODO it's actually a V40 */
-	MCFG_CPU_PROGRAM_MAP(p72_mem)
+	MCFG_DEVICE_ADD("maincpu", V33, XTAL(16'000'000)/2) /* TODO it's actually a V40 */
+	MCFG_DEVICE_PROGRAM_MAP(p72_mem)
 
 MACHINE_CONFIG_END
 

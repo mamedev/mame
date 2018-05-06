@@ -548,9 +548,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(ssingles_state::ssingles)
 
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(ssingles_map)
-	MCFG_CPU_IO_MAP(ssingles_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ssingles_map)
+	MCFG_DEVICE_IO_MAP(ssingles_io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
@@ -569,10 +569,10 @@ MACHINE_CONFIG_START(ssingles_state::ssingles)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000) /* ? MHz */
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000) /* ? MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000) /* ? MHz */
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000) /* ? MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 MACHINE_CONFIG_END
@@ -584,9 +584,9 @@ WRITE_LINE_MEMBER(ssingles_state::atamanot_irq)
 
 MACHINE_CONFIG_START(ssingles_state::atamanot)
 	ssingles(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(atamanot_map)
-	MCFG_CPU_IO_MAP(atamanot_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(atamanot_map)
+	MCFG_DEVICE_IO_MAP(atamanot_io_map)
 
 	MCFG_DEVICE_REMOVE("crtc")
 
@@ -594,7 +594,7 @@ MACHINE_CONFIG_START(ssingles_state::atamanot)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(ssingles_state, atamanot_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(ssingles_state, atamanot_irq))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, ssingles_state, atamanot_irq))
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", atamanot)
 MACHINE_CONFIG_END

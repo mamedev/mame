@@ -444,12 +444,12 @@ void slapshot_state::machine_start()
 MACHINE_CONFIG_START(slapshot_state::slapshot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
-	MCFG_CPU_PROGRAM_MAP(slapshot_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapshot_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
+	MCFG_DEVICE_PROGRAM_MAP(slapshot_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", slapshot_state,  interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,32000000/8)    /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,32000000/8)    /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(opwolf3_z80_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
 	MCFG_TC0640FIO_READ_2_CB(IOPORT("BUTTONS"))
 	MCFG_TC0640FIO_READ_3_CB(IOPORT("SYSTEM"))
-	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(slapshot_state, coin_control_w))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(*this, slapshot_state, coin_control_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("JOY"))
 
 	/* video hardware */
@@ -467,7 +467,7 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(slapshot_state, screen_vblank_taito_no_buffer))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, slapshot_state, screen_vblank_taito_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
@@ -488,7 +488,7 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -505,12 +505,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(slapshot_state::opwolf3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
-	MCFG_CPU_PROGRAM_MAP(opwolf3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapshot_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
+	MCFG_DEVICE_PROGRAM_MAP(opwolf3_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", slapshot_state,  interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,32000000/8)    /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,32000000/8)    /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(opwolf3_z80_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -525,7 +525,7 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
 	MCFG_TC0640FIO_READ_2_CB(IOPORT("BUTTONS"))
 	MCFG_TC0640FIO_READ_3_CB(IOPORT("SYSTEM"))
-	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(slapshot_state, coin_control_w))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(*this, slapshot_state, coin_control_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("JOY"))
 
 	/* video hardware */
@@ -535,7 +535,7 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(slapshot_state, screen_vblank_taito_no_buffer))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, slapshot_state, screen_vblank_taito_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
@@ -556,7 +556,7 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)

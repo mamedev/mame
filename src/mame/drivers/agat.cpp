@@ -1084,9 +1084,9 @@ static void agat7_cards(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(agat7_state::agat7)
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(14'300'000) / 14)
-	MCFG_CPU_PROGRAM_MAP(agat7_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(A7_VIDEO_TAG ":a7screen", agat7_state, agat_vblank)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(14'300'000) / 14)
+	MCFG_DEVICE_PROGRAM_MAP(agat7_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER(A7_VIDEO_TAG ":a7screen", agat7_state, agat_vblank)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", agat7_state, timer_irq, A7_VIDEO_TAG ":a7screen", 0, 1)
 
@@ -1099,7 +1099,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(A7_SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD(A7_SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* /INH banking */
@@ -1120,10 +1120,10 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
 	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
 	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(agat7_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(agat7_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(agat7_state, ay3600_data_ready_w))
-	MCFG_AY3600_AKO_CB(WRITELINE(agat7_state, ay3600_ako_w))
+	MCFG_AY3600_SHIFT_CB(READLINE(*this, agat7_state, ay3600_shift_r))
+	MCFG_AY3600_CONTROL_CB(READLINE(*this, agat7_state, ay3600_control_r))
+	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, agat7_state, ay3600_data_ready_w))
+	MCFG_AY3600_AKO_CB(WRITELINE(*this, agat7_state, ay3600_ako_w))
 
 	/* repeat timer.  10 Hz per Mymrin's book */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", agat7_state, ay3600_repeat, attotime::from_hz(10))
@@ -1134,9 +1134,9 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	 */
 	MCFG_DEVICE_ADD(A7_BUS_TAG, A2BUS, 0)
 	MCFG_A2BUS_CPU(A7_CPU_TAG)
-	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(agat7_state, a2bus_irq_w))
-	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(agat7_state, a2bus_nmi_w))
-	MCFG_A2BUS_OUT_INH_CB(WRITELINE(agat7_state, a2bus_inh_w))
+	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, agat7_state, a2bus_irq_w))
+	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, agat7_state, a2bus_nmi_w))
+	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, agat7_state, a2bus_inh_w))
 	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl2", agat7_cards, "a7lang")
 	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl3", agat7_cards, "a7fdc")
 	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl4", agat7_cards, "a7ports")

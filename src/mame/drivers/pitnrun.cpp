@@ -279,22 +279,22 @@ static GFXDECODE_START( pitnrun )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(pitnrun_state::pitnrun)
-	MCFG_CPU_ADD("maincpu", Z80,XTAL(18'432'000)/6)       /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(pitnrun_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  nmi_source)
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(18'432'000)/6)       /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(pitnrun_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pitnrun_state,  nmi_source)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 7B (mislabeled LS156 on schematic)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pitnrun_state, nmi_enable_w)) // NMION
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(pitnrun_state, color_select_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, pitnrun_state, nmi_enable_w)) // NMION
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, pitnrun_state, color_select_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // COLOR SEL 2 - not used ?
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pitnrun_state, char_bank_select_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pitnrun_state, hflip_w)) // HFLIP
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pitnrun_state, vflip_w)) // VFLIP
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, pitnrun_state, char_bank_select_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, pitnrun_state, hflip_w)) // HFLIP
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pitnrun_state, vflip_w)) // VFLIP
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000)/2)          /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(pitnrun_sound_map)
-	MCFG_CPU_IO_MAP(pitnrun_sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000)/2)          /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(pitnrun_sound_map)
+	MCFG_DEVICE_IO_MAP(pitnrun_sound_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pitnrun_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -318,14 +318,14 @@ MACHINE_CONFIG_START(pitnrun_state::pitnrun)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/12)    /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)    /* verified on pcb */
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'432'000)/12)    /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'432'000)/12)    /* verified on pcb */
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("noiselatch", LS259, 0) // 1J
@@ -333,15 +333,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pitnrun_state::pitnrun_mcu)
 	pitnrun(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pitnrun_map_mcu)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pitnrun_map_mcu)
 
-	MCFG_CPU_ADD("mcu", M68705P5, XTAL(18'432'000)/6)     /* verified on pcb */
-	MCFG_M68705_PORTA_R_CB(READ8(pitnrun_state, m68705_portA_r))
-	MCFG_M68705_PORTB_R_CB(READ8(pitnrun_state, m68705_portB_r))
-	MCFG_M68705_PORTC_R_CB(READ8(pitnrun_state, m68705_portC_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(pitnrun_state, m68705_portA_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(pitnrun_state, m68705_portB_w))
+	MCFG_DEVICE_ADD("mcu", M68705P5, XTAL(18'432'000)/6)     /* verified on pcb */
+	MCFG_M68705_PORTA_R_CB(READ8(*this, pitnrun_state, m68705_portA_r))
+	MCFG_M68705_PORTB_R_CB(READ8(*this, pitnrun_state, m68705_portB_r))
+	MCFG_M68705_PORTC_R_CB(READ8(*this, pitnrun_state, m68705_portC_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, pitnrun_state, m68705_portA_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, pitnrun_state, m68705_portB_w))
 MACHINE_CONFIG_END
 
 ROM_START( pitnrun )

@@ -388,9 +388,9 @@ void _3x3puzzle_state::machine_reset()
 MACHINE_CONFIG_START(_3x3puzzle_state::_3x3puzzle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(_3x3puzzle_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _3x3puzzle_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(_3x3puzzle_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _3x3puzzle_state,  irq4_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

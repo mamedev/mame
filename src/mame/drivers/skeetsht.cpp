@@ -236,18 +236,18 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(skeetsht_state::skeetsht)
 
-	MCFG_CPU_ADD("68hc11", MC68HC11, 4000000) // ?
-	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
-	MCFG_CPU_IO_MAP(hc11_io_map)
+	MCFG_DEVICE_ADD("68hc11", MC68HC11, 4000000) // ?
+	MCFG_DEVICE_PROGRAM_MAP(hc11_pgm_map)
+	MCFG_DEVICE_IO_MAP(hc11_io_map)
 	MCFG_MC68HC11_CONFIG( 0, 0x100, 0x01 )  // And 512 bytes EEPROM? (68HC11A1)
 
-	MCFG_CPU_ADD("tms", TMS34010, 48000000)
-	MCFG_CPU_PROGRAM_MAP(tms_program_map)
+	MCFG_DEVICE_ADD("tms", TMS34010, 48000000)
+	MCFG_DEVICE_PROGRAM_MAP(tms_program_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(48000000 / 8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(skeetsht_state, scanline_update)   /* scanline updater (rgb32) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(skeetsht_state, tms_irq))
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, skeetsht_state, tms_irq))
 
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(skeetsht_state::skeetsht)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000) // ?
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

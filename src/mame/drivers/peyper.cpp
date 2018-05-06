@@ -605,10 +605,10 @@ void peyper_state::machine_reset()
 
 MACHINE_CONFIG_START(peyper_state::peyper)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2'500'000)
-	MCFG_CPU_PROGRAM_MAP(peyper_map)
-	MCFG_CPU_IO_MAP(peyper_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(peyper_state, irq0_line_hold,  1250)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2'500'000)
+	MCFG_DEVICE_PROGRAM_MAP(peyper_map)
+	MCFG_DEVICE_IO_MAP(peyper_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(peyper_state, irq0_line_hold,  1250)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -617,20 +617,20 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 	/* Sound */
 	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
-	MCFG_SOUND_ADD("ay1", AY8910, 2500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(peyper_state, p1a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(peyper_state, p1b_w))
+	MCFG_DEVICE_ADD("ay1", AY8910, 2500000)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, peyper_state, p1a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, peyper_state, p1b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
-	MCFG_SOUND_ADD("ay2", AY8910, 2500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(peyper_state, p2a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(peyper_state, p2b_w))
+	MCFG_DEVICE_ADD("ay2", AY8910, 2500000)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, peyper_state, p2a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, peyper_state, p2b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("i8279", I8279, 2500000)
-	MCFG_I8279_OUT_SL_CB(WRITE8(peyper_state, col_w))             // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(peyper_state, disp_w))          // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(peyper_state, sw_r))                // kbd RL lines
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, peyper_state, col_w))             // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, peyper_state, disp_w))          // display A&B
+	MCFG_I8279_IN_RL_CB(READ8(*this, peyper_state, sw_r))                // kbd RL lines
 	MCFG_I8279_IN_SHIFT_CB(VCC)                                   // Shift key
 	MCFG_I8279_IN_CTRL_CB(VCC)
 MACHINE_CONFIG_END

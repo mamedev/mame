@@ -129,9 +129,9 @@ static void ax20_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(ax20_state::ax20)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)
-	MCFG_CPU_PROGRAM_MAP(ax20_map)
-	MCFG_CPU_IO_MAP(ax20_io)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181)/3)
+	MCFG_DEVICE_PROGRAM_MAP(ax20_map)
+	MCFG_DEVICE_IO_MAP(ax20_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

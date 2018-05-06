@@ -91,9 +91,9 @@ void ax80_state::ax80_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(ax80_state::ax80)
-	MCFG_CPU_ADD("maincpu", UPD7810, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(ax80_map)
-	//MCFG_CPU_IO_MAP(ax80_io)
+	MCFG_DEVICE_ADD("maincpu", UPD7810, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(ax80_map)
+	//MCFG_DEVICE_IO_MAP(ax80_io)
 
 	MCFG_DEVICE_ADD(PIT0_TAG, PIT8253, 0)
 	MCFG_DEVICE_ADD(PIT1_TAG, PIT8253, 0)
@@ -107,9 +107,9 @@ MACHINE_CONFIG_START(ax80_state::ax80)
 
 	MCFG_DEVICE_ADD("kdc", I8279, 6554800 / 8) // Keyboard/Display Controller
 	//MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", UPD7810_INTF1))   // irq
-	//MCFG_I8279_OUT_SL_CB(WRITE8(ax80_state, scanlines_w))          // scan SL lines
-	//MCFG_I8279_OUT_DISP_CB(WRITE8(ax80_state, digit_w))            // display A&B
-	//MCFG_I8279_IN_RL_CB(READ8(ax80_state, kbd_r))                  // kbd RL lines
+	//MCFG_I8279_OUT_SL_CB(WRITE8(*this, ax80_state, scanlines_w))          // scan SL lines
+	//MCFG_I8279_OUT_DISP_CB(WRITE8(*this, ax80_state, digit_w))            // display A&B
+	//MCFG_I8279_IN_RL_CB(READ8(*this, ax80_state, kbd_r))                  // kbd RL lines
 	//MCFG_I8279_IN_SHIFT_CB(VCC) // not connected
 	//MCFG_I8279_IN_CTRL_CB(VCC)  // not connected
 MACHINE_CONFIG_END

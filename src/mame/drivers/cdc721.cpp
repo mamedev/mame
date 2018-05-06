@@ -234,9 +234,9 @@ static const z80_daisy_config cdc721_daisy_chain[] =
 
 MACHINE_CONFIG_START(cdc721_state::cdc721)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 6_MHz_XTAL) // Zilog Z8400B (Z80B)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 6_MHz_XTAL) // Zilog Z8400B (Z80B)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(cdc721_daisy_chain) // FIXME: vector is independently generated
 
 	MCFG_DEVICE_ADD("block0", ADDRESS_MAP_BANK, 0)
@@ -284,8 +284,8 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(cdc721_state, interrupt_mask_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(cdc721_state, misc_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, cdc721_state, interrupt_mask_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, cdc721_state, misc_w))
 
 	MCFG_DEVICE_ADD("uart1", INS8250, 1843200)
 	MCFG_DEVICE_ADD("uart2", INS8250, 1843200)

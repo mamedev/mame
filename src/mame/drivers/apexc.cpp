@@ -855,12 +855,12 @@ MACHINE_CONFIG_START(apexc_state::apexc)
 
 	/* basic machine hardware */
 	/* APEXC CPU @ 2.0 kHz (memory word clock frequency) */
-	MCFG_CPU_ADD("maincpu", APEXC, 2000)
-	MCFG_CPU_PROGRAM_MAP(apexc_mem_map)
-	MCFG_APEXC_TAPE_READ_CB(READ8(apexc_state, tape_read))
-	MCFG_APEXC_TAPE_PUNCH_CB(WRITE8(apexc_state, tape_write))
+	MCFG_DEVICE_ADD("maincpu", APEXC, 2000)
+	MCFG_DEVICE_PROGRAM_MAP(apexc_mem_map)
+	MCFG_APEXC_TAPE_READ_CB(READ8(*this, apexc_state, tape_read))
+	MCFG_APEXC_TAPE_PUNCH_CB(WRITE8(*this, apexc_state, tape_write))
 	/* dummy interrupt: handles the control panel */
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", apexc_state,  apexc_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", apexc_state,  apexc_interrupt)
 
 
 	/* video hardware does not exist, but we display a control panel and the typewriter output */

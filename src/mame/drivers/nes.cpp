@@ -57,8 +57,8 @@ void nes_state::ppu_nmi(int *ppu_regs)
 
 MACHINE_CONFIG_START(nes_state::nes)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(nes_map)
+	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(nes_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.0988)
@@ -100,9 +100,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nes_state::nespal)
 	nes(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(PAL_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(nes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(PAL_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(nes_map)
 
 	MCFG_DEVICE_REMOVE("ppu")
 	MCFG_PPU2C07_ADD("ppu")
@@ -132,9 +132,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nes_state::nespalc)
 	nespal(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_CLOCK(PALC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(nes_map)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_CLOCK(PALC_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(nes_map)
 
 	/* UMC 6538 and friends -- extends time for rendering dummy scanlines */
 	MCFG_DEVICE_REMOVE("ppu")

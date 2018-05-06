@@ -2192,27 +2192,27 @@ GFXDECODE_END
 MACHINE_CONFIG_START(segas32_state::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V60, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(system32_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas32_state,  start_of_vblank_int)
+	MCFG_DEVICE_ADD("maincpu", V60, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(system32_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas32_state,  start_of_vblank_int)
 
-	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(system32_sound_map)
-	MCFG_CPU_IO_MAP(system32_sound_portmap)
+	MCFG_DEVICE_ADD("soundcpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(system32_sound_map)
+	MCFG_DEVICE_IO_MAP(system32_sound_portmap)
 
 	MCFG_DEVICE_ADD("io_chip", SEGA_315_5296, 0) // unknown clock
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1_A"))
 	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2_A"))
 	MCFG_315_5296_IN_PORTC_CB(IOPORT("PORTC_A"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segas32_state, misc_output_0_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(6)
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segas32_state, misc_output_0_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(7)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(6)
 	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE12_A"))
 	MCFG_315_5296_IN_PORTF_CB(IOPORT("SERVICE34_A"))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(segas32_state, sw2_output_0_w))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(segas32_state, tilebank_external_w))
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(segas32_state, display_enable_0_w))
+	MCFG_315_5296_OUT_PORTG_CB(WRITE8(*this, segas32_state, sw2_output_0_w))
+	MCFG_315_5296_OUT_PORTH_CB(WRITE8(*this, segas32_state, tilebank_external_w))
+	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(*this, segas32_state, display_enable_0_w))
 	MCFG_315_5296_OUT_CNT2_CB(INPUTLINE("soundcpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -2233,12 +2233,12 @@ MACHINE_CONFIG_START(segas32_state::device_add_mconfig)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ym1", YM3438, MASTER_CLOCK/4)
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(segas32_state, ym3438_irq_handler))
+	MCFG_DEVICE_ADD("ym1", YM3438, MASTER_CLOCK/4)
+	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segas32_state, ym3438_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM3438, MASTER_CLOCK/4)
+	MCFG_DEVICE_ADD("ym2", YM3438, MASTER_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
@@ -2383,14 +2383,14 @@ void segas32_state::ga2_main_map(address_map &map)
 MACHINE_CONFIG_START(segas32_v25_state::device_add_mconfig)
 	segas32_4player_state::device_add_mconfig(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ga2_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ga2_main_map)
 
 	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 
 	/* add a V25 for protection */
-	MCFG_CPU_ADD("mcu", V25, 10000000)
-	MCFG_CPU_PROGRAM_MAP(v25_map)
+	MCFG_DEVICE_ADD("mcu", V25, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(v25_map)
 MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(SEGA_S32_V25_DEVICE, segas32_v25_state, "segas32_pcb_v25", "Sega System 32 V25 PCB")
@@ -2408,9 +2408,9 @@ MACHINE_CONFIG_START(segas32_upd7725_state::device_add_mconfig)
 	segas32_analog_state::device_add_mconfig(config);
 
 	/* add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the master pcb's rom board where an fd1149 could go */
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000) // TODO: Find real clock speed for the upd7725; this is a canned oscillator on the 837-8341 pcb
-	MCFG_CPU_PROGRAM_MAP(upd7725_prg_map)
-	MCFG_CPU_DATA_MAP(upd7725_data_map)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000) // TODO: Find real clock speed for the upd7725; this is a canned oscillator on the 837-8341 pcb
+	MCFG_DEVICE_PROGRAM_MAP(upd7725_prg_map)
+	MCFG_DEVICE_DATA_MAP(upd7725_data_map)
 	MCFG_DEVICE_DISABLE() // TODO: disable for now, needs DMA pins and interrupts implemented in upd7725 core
 	// TODO: find /INT source for upd7725
 	// TODO: figure out how the p0 and p1 lines from the upd7725 affect the mainboard; do they select one of four (or 8) latches to/from the mainboard?
@@ -2478,16 +2478,16 @@ MACHINE_CONFIG_START(segas32_cd_state::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("mb89352", MB89352A, 8000000)
 	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_MB89352A_IRQ_CB(WRITELINE(segas32_cd_state, scsi_irq_w))
-	MCFG_MB89352A_DRQ_CB(WRITELINE(segas32_cd_state, scsi_drq_w))
+	MCFG_MB89352A_IRQ_CB(WRITELINE(*this, segas32_cd_state, scsi_irq_w))
+	MCFG_MB89352A_DRQ_CB(WRITELINE(*this, segas32_cd_state, scsi_drq_w))
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_0)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
 
 	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
-	MCFG_CXD1095_OUT_PORTA_CB(WRITE8(segas32_cd_state, lamps1_w))
-	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(segas32_cd_state, lamps2_w))
+	MCFG_CXD1095_OUT_PORTA_CB(WRITE8(*this, segas32_cd_state, lamps1_w))
+	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(*this, segas32_cd_state, lamps2_w))
 	MCFG_CXD1095_IN_PORTD_CB(CONSTANT(0xff)) // Ports C-E used for IEEE-488 printer interface
 MACHINE_CONFIG_END
 
@@ -2502,38 +2502,38 @@ segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *ta
 
 MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V70, MULTI32_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(multi32_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas32_state,  start_of_vblank_int)
+	MCFG_DEVICE_ADD("maincpu", V70, MULTI32_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(multi32_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas32_state,  start_of_vblank_int)
 
-	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(multi32_sound_map)
-	MCFG_CPU_IO_MAP(multi32_sound_portmap)
+	MCFG_DEVICE_ADD("soundcpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(multi32_sound_map)
+	MCFG_DEVICE_IO_MAP(multi32_sound_portmap)
 
 	MCFG_DEVICE_ADD("io_chip_0", SEGA_315_5296, 0) // unknown clock
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1_A"))
 	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2_A"))
 	MCFG_315_5296_IN_PORTC_CB(IOPORT("PORTC_A"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segas32_state, misc_output_0_w))
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segas32_state, misc_output_0_w))
 	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE12_A"))
 	MCFG_315_5296_IN_PORTF_CB(IOPORT("SERVICE34_A"))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(segas32_state, sw2_output_0_w))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(segas32_state, tilebank_external_w))
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(segas32_state, display_enable_0_w))
+	MCFG_315_5296_OUT_PORTG_CB(WRITE8(*this, segas32_state, sw2_output_0_w))
+	MCFG_315_5296_OUT_PORTH_CB(WRITE8(*this, segas32_state, tilebank_external_w))
+	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(*this, segas32_state, display_enable_0_w))
 	MCFG_315_5296_OUT_CNT2_CB(INPUTLINE("soundcpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("io_chip_1", SEGA_315_5296, 0) // unknown clock
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1_B"))
 	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2_B"))
 	MCFG_315_5296_IN_PORTC_CB(IOPORT("PORTC_B"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segas32_state, misc_output_1_w))
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segas32_state, misc_output_1_w))
 	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE12_B"))
 	MCFG_315_5296_IN_PORTF_CB(IOPORT("SERVICE34_B"))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(segas32_state, sw2_output_1_w))
-	MCFG_315_5296_OUT_PORTH_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(6)
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(segas32_state, display_enable_1_w))
+	MCFG_315_5296_OUT_PORTG_CB(WRITE8(*this, segas32_state, sw2_output_1_w))
+	MCFG_315_5296_OUT_PORTH_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(7)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(6)
+	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(*this, segas32_state, display_enable_1_w))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2560,12 +2560,12 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3438, MASTER_CLOCK/4)
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(segas32_state, ym3438_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM3438, MASTER_CLOCK/4)
+	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segas32_state, ym3438_irq_handler))
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.40)
 
-	MCFG_SOUND_ADD("sega", MULTIPCM, MASTER_CLOCK/4)
+	MCFG_DEVICE_ADD("sega", MULTIPCM, MASTER_CLOCK/4)
 	MCFG_DEVICE_ADDRESS_MAP(0, multipcm_map)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
@@ -2754,13 +2754,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas32_new_state::sega_system32_ga2)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_V25_DEVICE, 0)
-	MCFG_CPU_MODIFY("mainpcb:mcu")
+	MCFG_DEVICE_MODIFY("mainpcb:mcu")
 	MCFG_V25_CONFIG(segas32_v25_state::ga2_opcode_table)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas32_new_state::sega_system32_arf)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_V25_DEVICE, 0)
-	MCFG_CPU_MODIFY("mainpcb:mcu")
+	MCFG_DEVICE_MODIFY("mainpcb:mcu")
 	MCFG_V25_CONFIG(segas32_v25_state::arf_opcode_table)
 MACHINE_CONFIG_END
 

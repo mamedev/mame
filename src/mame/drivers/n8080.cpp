@@ -506,11 +506,11 @@ MACHINE_RESET_MEMBER(n8080_state,helifire)
 MACHINE_CONFIG_START(n8080_state::spacefev)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
-	MCFG_I8085A_STATUS(WRITE8(n8080_state,n8080_status_callback))
-	MCFG_I8085A_INTE(WRITELINE(n8080_state,n8080_inte_callback))
-	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
-	MCFG_CPU_IO_MAP(main_io_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK / 10)
+	MCFG_I8085A_STATUS(WRITE8(*this, n8080_state,n8080_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(*this, n8080_state,n8080_inte_callback))
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(n8080_state,spacefev)
 
@@ -537,11 +537,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(n8080_state::sheriff)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
-	MCFG_I8085A_STATUS(WRITE8(n8080_state,n8080_status_callback))
-	MCFG_I8085A_INTE(WRITELINE(n8080_state,n8080_inte_callback))
-	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
-	MCFG_CPU_IO_MAP(main_io_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK / 10)
+	MCFG_I8085A_STATUS(WRITE8(*this, n8080_state,n8080_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(*this, n8080_state,n8080_inte_callback))
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(n8080_state,sheriff)
 
@@ -569,11 +569,11 @@ MACHINE_CONFIG_START(n8080_state::westgun2)
 	sheriff(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", I8080, XTAL(19'968'000) / 10)
-	MCFG_I8085A_STATUS(WRITE8(n8080_state,n8080_status_callback))
-	MCFG_I8085A_INTE(WRITELINE(n8080_state,n8080_inte_callback))
-	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
-	MCFG_CPU_IO_MAP(main_io_map)
+	MCFG_DEVICE_REPLACE("maincpu", I8080, XTAL(19'968'000) / 10)
+	MCFG_I8085A_STATUS(WRITE8(*this, n8080_state,n8080_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(*this, n8080_state,n8080_inte_callback))
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
 
 MACHINE_CONFIG_END
 
@@ -581,11 +581,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(n8080_state::helifire)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
-	MCFG_I8085A_STATUS(WRITE8(n8080_state,n8080_status_callback))
-	MCFG_I8085A_INTE(WRITELINE(n8080_state,n8080_inte_callback))
-	MCFG_CPU_PROGRAM_MAP(helifire_main_cpu_map)
-	MCFG_CPU_IO_MAP(main_io_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK / 10)
+	MCFG_I8085A_STATUS(WRITE8(*this, n8080_state,n8080_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(*this, n8080_state,n8080_inte_callback))
+	MCFG_DEVICE_PROGRAM_MAP(helifire_main_cpu_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(n8080_state,helifire)
 
@@ -595,7 +595,7 @@ MACHINE_CONFIG_START(n8080_state::helifire)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(n8080_state, screen_update_helifire)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(n8080_state, screen_vblank_helifire))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, n8080_state, screen_vblank_helifire))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8 + 0x400)

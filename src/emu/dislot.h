@@ -110,8 +110,6 @@ public:
 		std::function<void (device_t *)> m_machine_config;
 		input_device_default const *m_input_device_defaults;
 		u32 m_clock;
-
-		friend class device_slot_interface;
 	};
 
 	// construction/destruction
@@ -123,9 +121,9 @@ public:
 	void option_reset() { m_options.clear(); }
 	slot_option &option_add(const char *option, const device_type &devtype);
 	slot_option &option_add_internal(const char *option, const device_type &devtype);
-	void set_option_default_bios(const char *option, const char *default_bios) { config_option(option)->m_default_bios = default_bios; }
-	void set_option_machine_config(const char *option, std::function<void (device_t *)> machine_config) { config_option(option)->m_machine_config = machine_config; }
-	void set_option_device_input_defaults(const char *option, const input_device_default *default_input) { config_option(option)->m_input_device_defaults = default_input; }
+	void set_option_default_bios(const char *option, const char *default_bios) { config_option(option)->default_bios(default_bios); }
+	template <typename T> void set_option_machine_config(const char *option, T &&machine_config) { config_option(option)->machine_config(std::forward<T>(machine_config)); }
+	void set_option_device_input_defaults(const char *option, const input_device_default *default_input) { config_option(option)->input_device_defaults(default_input); }
 	bool fixed() const { return m_fixed; }
 	bool has_selectable_options() const;
 	const char *default_option() const { return m_default_option; }
@@ -136,9 +134,13 @@ public:
 	void set_card_device(device_t *dev) { m_card_device = dev; }
 	const char *slot_name() const { return device().tag() + 1; }
 
+protected:
+	void set_default_clock(u32 clock) { m_default_clock = clock; }
+
 private:
 	// internal state
 	std::unordered_map<std::string,std::unique_ptr<slot_option>> m_options;
+	u32 m_default_clock;
 	const char *m_default_option;
 	bool m_fixed;
 	device_t *m_card_device;

@@ -490,9 +490,9 @@ WRITE_LINE_MEMBER(champbwl_state::screen_vblank_champbwl)
 MACHINE_CONFIG_START(champbwl_state::champbwl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 16000000/4) /* 4MHz */
-	MCFG_CPU_PROGRAM_MAP(champbwl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbwl_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16000000/4) /* 4MHz */
+	MCFG_DEVICE_PROGRAM_MAP(champbwl_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", champbwl_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -509,7 +509,7 @@ MACHINE_CONFIG_START(champbwl_state::champbwl)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_champbwl)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(champbwl_state, screen_vblank_champbwl))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, champbwl_state, screen_vblank_champbwl))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)
@@ -520,7 +520,7 @@ MACHINE_CONFIG_START(champbwl_state::champbwl)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -555,9 +555,9 @@ MACHINE_START_MEMBER(champbwl_state,doraemon)
 MACHINE_CONFIG_START(champbwl_state::doraemon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(14'318'181)/4)
-	MCFG_CPU_PROGRAM_MAP(doraemon)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbwl_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(14'318'181)/4)
+	MCFG_DEVICE_PROGRAM_MAP(doraemon)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", champbwl_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -573,7 +573,7 @@ MACHINE_CONFIG_START(champbwl_state::doraemon)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_doraemon)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(champbwl_state, screen_vblank_doraemon))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, champbwl_state, screen_vblank_doraemon))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)
@@ -583,7 +583,7 @@ MACHINE_CONFIG_START(champbwl_state::doraemon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("x1snd", X1_010, XTAL(14'318'181))
+	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(14'318'181))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

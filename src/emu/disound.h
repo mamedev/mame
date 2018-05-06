@@ -33,19 +33,9 @@ constexpr int AUTO_ALLOC_INPUT  = 65535;
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_SOUND_ADD(_tag, _type, _clock) \
-	MCFG_DEVICE_ADD(_tag, _type, _clock)
-#define MCFG_SOUND_MODIFY(_tag) \
-	MCFG_DEVICE_MODIFY(_tag)
-
-#define MCFG_SOUND_CLOCK(_clock) \
-	MCFG_DEVICE_CLOCK(_clock)
-
-#define MCFG_SOUND_REPLACE(_tag, _type, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, _type, _clock)
-
 #define MCFG_SOUND_ROUTE(_output, _target, ...) \
 	dynamic_cast<device_sound_interface &>(*device).add_route(_output, _target, __VA_ARGS__);
+
 #define MCFG_SOUND_ROUTES_RESET() \
 	dynamic_cast<device_sound_interface &>(*device).reset_routes();
 

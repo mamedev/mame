@@ -505,15 +505,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a2600_state::a2600)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_NTSC / 3)
+	MCFG_DEVICE_ADD("maincpu", M6507, MASTER_CLOCK_NTSC / 3)
 	MCFG_M6502_DISABLE_DIRECT()
-	MCFG_CPU_PROGRAM_MAP(a2600_mem)
+	MCFG_DEVICE_PROGRAM_MAP(a2600_mem)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
-	MCFG_TIA_READ_INPUT_PORT_CB(READ16(a2600_state, a2600_read_input_port))
-	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(a2600_state, a2600_get_databus_contents))
-	MCFG_TIA_VSYNC_CB(WRITE16(a2600_state, a2600_tia_vsync_callback))
+	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, a2600_state, a2600_read_input_port))
+	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, a2600_state, a2600_get_databus_contents))
+	MCFG_TIA_VSYNC_CB(WRITE16(*this, a2600_state, a2600_tia_vsync_callback))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31 )
@@ -528,18 +528,18 @@ MACHINE_CONFIG_START(a2600_state::a2600)
 	/* devices */
 #if USE_NEW_RIOT
 	MCFG_DEVICE_ADD("riot", MOS6532n, MASTER_CLOCK_NTSC / 3)
-	MCFG_MOS6530n_IN_PA_CB(READ8(a2600_state, switch_A_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
-	MCFG_MOS6530n_IRQ_CB(WRITELINE(a2600_state, irq_callback))
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, a2600_state, switch_A_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, a2600_state, switch_A_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, a2600_state, riot_input_port_8_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, a2600_state, switch_B_w))
+	MCFG_MOS6530n_IRQ_CB(WRITELINE(*this, a2600_state, irq_callback))
 #else
 	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_NTSC / 3)
-	MCFG_RIOT6532_IN_PA_CB(READ8(a2600_state, switch_A_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE(a2600_state, irq_callback))
+	MCFG_RIOT6532_IN_PA_CB(READ8(*this, a2600_state, switch_A_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, a2600_state, switch_A_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(*this, a2600_state, riot_input_port_8_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, a2600_state, switch_B_w))
+	MCFG_RIOT6532_IRQ_CB(WRITELINE(*this, a2600_state, irq_callback))
 #endif
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
@@ -552,15 +552,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a2600_state::a2600p)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
-	MCFG_CPU_PROGRAM_MAP(a2600_mem)
+	MCFG_DEVICE_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
+	MCFG_DEVICE_PROGRAM_MAP(a2600_mem)
 	MCFG_M6502_DISABLE_DIRECT()
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
-	MCFG_TIA_READ_INPUT_PORT_CB(READ16(a2600_state, a2600_read_input_port))
-	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(a2600_state, a2600_get_databus_contents))
-	MCFG_TIA_VSYNC_CB(WRITE16(a2600_state, a2600_tia_vsync_callback_pal))
+	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, a2600_state, a2600_read_input_port))
+	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, a2600_state, a2600_get_databus_contents))
+	MCFG_TIA_VSYNC_CB(WRITE16(*this, a2600_state, a2600_tia_vsync_callback_pal))
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -576,18 +576,18 @@ MACHINE_CONFIG_START(a2600_state::a2600p)
 	/* devices */
 #if USE_NEW_RIOT
 	MCFG_DEVICE_ADD("riot", MOS6532n, MASTER_CLOCK_PAL / 3)
-	MCFG_MOS6530n_IN_PA_CB(READ8(a2600_state, switch_A_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
-	MCFG_MOS6530n_IRQ_CB(WRITELINE(a2600_state, irq_callback))
+	MCFG_MOS6530n_IN_PA_CB(READ8(*this, a2600_state, switch_A_r))
+	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, a2600_state, switch_A_w))
+	MCFG_MOS6530n_IN_PB_CB(READ8(*this, a2600_state, riot_input_port_8_r))
+	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, a2600_state, switch_B_w))
+	MCFG_MOS6530n_IRQ_CB(WRITELINE(*this, a2600_state, irq_callback))
 #else
 	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK_PAL / 3)
-	MCFG_RIOT6532_IN_PA_CB(READ8(a2600_state, switch_A_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(a2600_state, switch_A_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(a2600_state, riot_input_port_8_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(a2600_state, switch_B_w))
-	MCFG_RIOT6532_IRQ_CB(WRITELINE(a2600_state, irq_callback))
+	MCFG_RIOT6532_IN_PA_CB(READ8(*this, a2600_state, switch_A_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, a2600_state, switch_A_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(*this, a2600_state, riot_input_port_8_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, a2600_state, switch_B_w))
+	MCFG_RIOT6532_IRQ_CB(WRITELINE(*this, a2600_state, irq_callback))
 #endif
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")

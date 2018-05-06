@@ -55,7 +55,7 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(a2bus_thunderclock_device::device_add_mconfig)
-	MCFG_UPD1990A_ADD(THUNDERCLOCK_UPD1990_TAG, 1021800, DEVWRITELINE(DEVICE_SELF, a2bus_thunderclock_device, upd_dataout_w), NOOP)
+	MCFG_UPD1990A_ADD(THUNDERCLOCK_UPD1990_TAG, 1021800, WRITELINE(DEVICE_SELF, a2bus_thunderclock_device, upd_dataout_w), NOOP)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

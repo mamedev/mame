@@ -267,9 +267,9 @@ void orbit_state::machine_reset()
 MACHINE_CONFIG_START(orbit_state::orbit)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLOCK / 16)
-	MCFG_CPU_PROGRAM_MAP(orbit_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", orbit_state,  orbit_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6800, MASTER_CLOCK / 16)
+	MCFG_DEVICE_PROGRAM_MAP(orbit_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", orbit_state,  orbit_interrupt)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", orbit_state, nmi_32v, "screen", 0, 32)
 
@@ -282,10 +282,10 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 	/* BIT5 => PANEL STROBE */
 	/* BIT6 => HYPER LED    */
 	/* BIT7 => WARNING SND  */
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(orbit_state, coin_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, orbit_state, coin_lockout_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0"))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led1"))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ORBIT_WARNING_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ORBIT_WARNING_EN>))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -302,7 +302,7 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(orbit)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

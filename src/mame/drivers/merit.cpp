@@ -1397,9 +1397,9 @@ MACHINE_START_MEMBER(merit_state,casino5)
 }
 
 MACHINE_CONFIG_START(merit_state::pitboss)
-	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(pitboss_map)
-	MCFG_CPU_IO_MAP(trvwhiz_io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(pitboss_map)
+	MCFG_DEVICE_IO_MAP(trvwhiz_io_map)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -1408,8 +1408,8 @@ MACHINE_CONFIG_START(merit_state::pitboss)
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(merit_state, led1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(merit_state, misc_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, merit_state, led1_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, merit_state, misc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1421,22 +1421,22 @@ MACHINE_CONFIG_START(merit_state::pitboss)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_BEGIN_UPDATE_CB(merit_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(merit_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(merit_state, hsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, merit_state, hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, CRTC_CLOCK)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(merit_state, led2_w))
+	MCFG_DEVICE_ADD("aysnd", AY8912, CRTC_CLOCK)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, merit_state, led2_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::casino5)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(casino5_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(casino5_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1446,9 +1446,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(merit_state::bigappg)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bigappg_map)
-	MCFG_CPU_IO_MAP(tictac_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bigappg_map)
+	MCFG_DEVICE_IO_MAP(tictac_io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
@@ -1456,8 +1456,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(merit_state::misdraw)
 	bigappg(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(misdraw_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(misdraw_map)
 
 	MCFG_NVRAM_ADD_0FILL("cpunvram")
 MACHINE_CONFIG_END
@@ -1465,9 +1465,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(merit_state::dodge)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dodge_map)
-	MCFG_CPU_IO_MAP(tictac_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dodge_map)
+	MCFG_DEVICE_IO_MAP(tictac_io_map)
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", merit_state, dodge_nvram_init)
 MACHINE_CONFIG_END
@@ -1475,55 +1475,55 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(merit_state::tictac)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tictac_map)
-	MCFG_CPU_IO_MAP(tictac_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tictac_map)
+	MCFG_DEVICE_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::trvwhiz)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(trvwhiz_map)
-	MCFG_CPU_IO_MAP(trvwhiz_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(trvwhiz_map)
+	MCFG_DEVICE_IO_MAP(trvwhiz_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::dtrvwz5)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dtrvwz5_map)
-	MCFG_CPU_IO_MAP(tictac_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dtrvwz5_map)
+	MCFG_DEVICE_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::phrcraze)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(phrcraze_map)
-	MCFG_CPU_IO_MAP(phrcraze_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(phrcraze_map)
+	MCFG_DEVICE_IO_MAP(phrcraze_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::trvwhziv)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(trvwhziv_map)
-	MCFG_CPU_IO_MAP(tictac_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(trvwhziv_map)
+	MCFG_DEVICE_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(merit_state::couple)
 	pitboss(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(couple_map)
-	MCFG_CPU_IO_MAP(tictac_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(couple_map)
+	MCFG_DEVICE_IO_MAP(tictac_io_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255_1")
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(merit_state, led1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(merit_state, misc_couple_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, merit_state, led1_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, merit_state, misc_couple_w))
 MACHINE_CONFIG_END
 
 

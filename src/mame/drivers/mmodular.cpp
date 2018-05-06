@@ -251,9 +251,9 @@ DRIVER_INIT_MEMBER(mmodular_state, gen32)
 }
 
 MACHINE_CONFIG_START(mmodular_state::alm16)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(alm16_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 600)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(alm16_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 600)
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
 	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
@@ -263,15 +263,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mmodular_state::van16)
 	alm16(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(van16_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(van16_mem)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(mmodular_state::alm32)
-	MCFG_CPU_ADD("maincpu", M68020, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(alm32_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq6_line_hold, 750)
+	MCFG_DEVICE_ADD("maincpu", M68020, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(alm32_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq6_line_hold, 750)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -283,15 +283,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mmodular_state::van32)
 	alm32(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(van32_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(van32_mem)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(mmodular_state::gen32)
-	MCFG_CPU_ADD("maincpu", M68030, XTAL(33'333'000))
-	MCFG_CPU_PROGRAM_MAP(gen32_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 375)
+	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(33'333'000))
+	MCFG_DEVICE_PROGRAM_MAP(gen32_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 375)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -302,9 +302,9 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(berlinp_state::berlinp)
-	MCFG_CPU_ADD("maincpu", M68020, XTAL(24'576'000))
-	MCFG_CPU_PROGRAM_MAP(berlinp_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(berlinp_state, irq2_line_hold, 750)
+	MCFG_DEVICE_ADD("maincpu", M68020, XTAL(24'576'000))
+	MCFG_DEVICE_PROGRAM_MAP(berlinp_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(berlinp_state, irq2_line_hold, 750)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

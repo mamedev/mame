@@ -113,9 +113,9 @@ void cavepc_state::machine_reset()
 
 MACHINE_CONFIG_START(cavepc_state::cavepc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 200000000) /*  AMD Athlon 64 X2 5050e Brisbane 2.60GHz, 1024KB L2 Cache ! */
-	MCFG_CPU_PROGRAM_MAP(cavepc_map)
-	MCFG_CPU_IO_MAP(cavepc_io)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 200000000) /*  AMD Athlon 64 X2 5050e Brisbane 2.60GHz, 1024KB L2 Cache ! */
+	MCFG_DEVICE_PROGRAM_MAP(cavepc_map)
+	MCFG_DEVICE_IO_MAP(cavepc_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

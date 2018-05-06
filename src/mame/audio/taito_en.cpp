@@ -199,30 +199,30 @@ WRITE8_MEMBER(taito_en_device::duart_output)
 MACHINE_CONFIG_START(taito_en_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL(30'476'100) / 2)
-	MCFG_CPU_PROGRAM_MAP(en_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(30'476'100) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(en_sound_map)
 
-	MCFG_CPU_ADD("esp", ES5510, XTAL(10'000'000)) // from Gun Buster schematics
+	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000)) // from Gun Buster schematics
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_ADD("duart68681", MC68681, XTAL(16'000'000) / 4)
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL(16'000'000)/2/8, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/8)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(taito_en_device, duart_irq_handler))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(taito_en_device, duart_output))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, taito_en_device, duart_irq_handler))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, taito_en_device, duart_output))
 
 	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
-	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(taito_en_device, mb87078_gain_changed))
+	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(*this, taito_en_device, mb87078_gain_changed))
 
 	MCFG_DEVICE_ADD("dpram", MB8421, 0) // host accesses this from the other side
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(30'476'100) / (2 * 16 * 32))
+	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(30'476'100) / (2 * 16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL(30'476'100) / 2)
+	MCFG_DEVICE_ADD("ensoniq", ES5505, XTAL(30'476'100) / 2)
 	MCFG_ES5505_REGION0("ensoniq.0")
 	MCFG_ES5505_REGION1("ensoniq.0")
 	MCFG_ES5505_CHANNELS(4)
