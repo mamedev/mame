@@ -244,7 +244,7 @@ private:
 	uint8_t m_interlace;
 	uint16_t m_wina, m_winb;
 	uint8_t m_shift256, m_dw, m_8bit_640;
-	uint8_t m_crtc_regs[0x31];
+	uint8_t m_crtc_regs[0x32];
 };
 
 DEFINE_DEVICE_TYPE(VIS_VGA, vis_vga_device, "vis_vga", "vis_vga")

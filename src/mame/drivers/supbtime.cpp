@@ -60,54 +60,9 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
-#include "machine/decocrpt.h"
-#include "machine/gen_latch.h"
-#include "video/decospr.h"
-#include "video/deco16ic.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
-#include "screen.h"
-#include "speaker.h"
-
+#include "includes/supbtime.h"
 
 #define TUMBLEP_HACK 0
-
-
-class supbtime_state : public driver_device
-{
-public:
-	supbtime_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_spriteram(*this, "spriteram")
-		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1U)
-		, m_maincpu(*this, "maincpu")
-		, m_deco_tilegen(*this, "tilegen")
-		, m_sprgen(*this, "spritegen")
-	{ }
-
-	DECLARE_DRIVER_INIT(tumblep);
-
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
-	DECLARE_READ16_MEMBER(vblank_ack_r);
-	uint32_t screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void chinatwn(machine_config &config);
-	void supbtime(machine_config &config);
-	void tumblep(machine_config &config);
-	void chinatwn_map(address_map &map);
-	void sound_map(address_map &map);
-	void supbtime_map(address_map &map);
-	void tumblep_map(address_map &map);
-private:
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
-	required_device<cpu_device> m_maincpu;
-	required_device<deco16ic_device> m_deco_tilegen;
-	required_device<decospr_device> m_sprgen;
-};
 
 
 //**************************************************************************
@@ -207,62 +162,6 @@ READ16_MEMBER( supbtime_state::vblank_ack_r )
 	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 	return 0xffff;
 }
-
-// End sequence uses rowscroll '98 c0' on pf1 (jmp to 1d61a on supbtimj)
-uint32_t supbtime_state::screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	address_space &space = machine().dummy_space();
-	uint16_t flip = m_deco_tilegen->pf_control_r(space, 0, 0xffff);
-
-	flip_screen_set(BIT(flip, 7));
-	m_sprgen->set_flip_screen(BIT(flip, 7));
-	m_deco_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
-
-	bitmap.fill(768, cliprect);
-
-	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
-
-	return 0;
-}
-
-// Tumblepop is one of few games to take advantage of the playfields ability
-// to switch between 8*8 tiles and 16*16 tiles.
-uint32_t supbtime_state::screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	address_space &space = machine().dummy_space();
-	uint16_t flip = m_deco_tilegen->pf_control_r(space, 0, 0xffff);
-
-	flip_screen_set(BIT(flip, 7));
-	m_sprgen->set_flip_screen(BIT(flip, 7));
-	m_deco_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
-
-	bitmap.fill(256+512, cliprect); // not verified
-
-	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-
-	return 0;
-}
-
-
-//**************************************************************************
-//  MACHINE
-//**************************************************************************
-
-DRIVER_INIT_MEMBER( supbtime_state, tumblep )
-{
-	deco56_decrypt_gfx(machine(), "tiles");
-
-#if TUMBLEP_HACK
-	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
-	RAM[(offset + 0)/2] = 0x0240;
-	RAM[(offset + 2)/2] = 0xffff;   // andi.w  #$f3ff, D0
-#endif
-}
-
 
 //**************************************************************************
 //  INPUT DEFINITIONS
@@ -634,10 +533,24 @@ ROM_END
 
 
 //**************************************************************************
+//  MACHINE
+//**************************************************************************
+
+DRIVER_INIT_MEMBER( supbtime_state, tumblep )
+{
+	deco56_decrypt_gfx(machine(), "tiles");
+
+#if TUMBLEP_HACK
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
+	RAM[(offset + 0)/2] = 0x0240;
+	RAM[(offset + 2)/2] = 0xffff;   // andi.w  #$f3ff, D0
+#endif
+}
+
+//**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT     ROT   COMPANY                  FULLNAME                            FLAGS
 GAME( 1990, supbtime,  0,        supbtime, supbtime, supbtime_state,       0, ROT0, "Data East Corporation", "Super Burger Time (World, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, supbtimea, supbtime, supbtime, supbtime, supbtime_state,       0, ROT0, "Data East Corporation", "Super Burger Time (World, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, supbtimej, supbtime, supbtime, supbtime, supbtime_state,       0, ROT0, "Data East Corporation", "Super Burger Time (Japan)",        MACHINE_SUPPORTS_SAVE )
