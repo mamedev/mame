@@ -2401,10 +2401,10 @@ MACHINE_CONFIG_START(model2_state::model2_scsp)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DEVICE_ADD("scsp", SCSP)
+	MCFG_DEVICE_ADD("scsp", SCSP, 22.5792_MHz_XTAL) // TODO : verify clock; guessed // verified from Model 2A Video board
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, model2_state,scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 
 	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
 //  MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, model2_state, sound_ready_w))

@@ -2702,7 +2702,7 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	MCFG_POWERVR2_ADD("powervr2", WRITE8(*this, dc_state, pvr_irq))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_DEVICE_ADD("aica", AICA, 0)
+	MCFG_DEVICE_ADD("aica", AICA, 33.8688_MHz_XTAL)
 	MCFG_AICA_MASTER
 	MCFG_AICA_IRQ_CB(WRITELINE(*this, dc_state, aica_irq))
 	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(*this, dc_state, sh4_aica_irq))

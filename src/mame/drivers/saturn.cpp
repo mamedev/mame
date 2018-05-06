@@ -838,7 +838,7 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DEVICE_ADD("scsp", SCSP)
+	MCFG_DEVICE_ADD("scsp", SCSP, 22.5792_MHz_XTAL) // TODO : verify clock; guessed
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, saturn_state, scsp_irq))
 	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE("scu", sega_scu_device, sound_req_w))
 	MCFG_SCSP_EXTS_CB(READ16("stvcd", stvcd_device, channel_volume_r))

@@ -3310,16 +3310,16 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_DEVICE_ADD("scsp1", SCSP)
+	MCFG_DEVICE_ADD("scsp1", SCSP, 22.5792_MHz_XTAL) // TODO : verify clock; guessed
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, coolridr_state, scsp_irq))
 	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(*this, coolridr_state, scsp1_to_sh1_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("scsp2", SCSP)
+	MCFG_DEVICE_ADD("scsp2", SCSP, 22.5792_MHz_XTAL) // TODO : verify clock; guessed
 	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(*this, coolridr_state, scsp2_to_sh1_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coolridr_state::aquastge)
