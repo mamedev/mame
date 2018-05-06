@@ -1147,27 +1147,27 @@ GFXDECODE_END
 MACHINE_CONFIG_START(segaorun_state::outrun_base)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(outrun_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(outrun_map)
 
-	MCFG_CPU_ADD("subcpu", M68000, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("subcpu", M68000, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(segaorun_state, bankmotor_limit_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(segaorun_state, unknown_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(segaorun_state, unknown_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(segaorun_state, bankmotor_control_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(segaorun_state, unknown_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(segaorun_state, video_control_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, segaorun_state, bankmotor_limit_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, segaorun_state, unknown_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, segaorun_state, unknown_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, segaorun_state, bankmotor_control_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, segaorun_state, unknown_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segaorun_state, video_control_w))
 
 	MCFG_DEVICE_ADD("mapper", SEGA_315_5195_MEM_MAPPER, MASTER_CLOCK/4)
 	MCFG_SEGA_315_5195_CPU("maincpu")
@@ -1190,11 +1190,11 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
-	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/4)
+	MCFG_DEVICE_ADD("pcm", SEGAPCM, SOUND_CLOCK/4)
 	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1227,17 +1227,17 @@ MACHINE_CONFIG_START(segaorun_state::outrun_fd1094)
 	outrun(config);
 
 	// basic machine hardware
-	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(outrun_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(outrun_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segaorun_state::outrun_fd1089a)
 	outrun(config);
 
 	// basic machine hardware
-	MCFG_CPU_REPLACE("maincpu", FD1089A, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(outrun_map)
+	MCFG_DEVICE_REPLACE("maincpu", FD1089A, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(outrun_map)
 MACHINE_CONFIG_END
 
 
@@ -1247,12 +1247,12 @@ MACHINE_CONFIG_START(segaorun_state::shangon)
 	// basic machine hardware
 	MCFG_DEVICE_REMOVE("i8255")
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(segaorun_state, unknown_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(segaorun_state, unknown_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(segaorun_state, unknown_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(segaorun_state, unknown_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(segaorun_state, unknown_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(segaorun_state, video_control_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, segaorun_state, unknown_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, segaorun_state, unknown_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, segaorun_state, unknown_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, segaorun_state, unknown_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, segaorun_state, unknown_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segaorun_state, video_control_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1268,8 +1268,8 @@ MACHINE_CONFIG_START(segaorun_state::shangon_fd1089b)
 	shangon(config);
 
 	// basic machine hardware
-	MCFG_CPU_REPLACE("maincpu", FD1089B, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(outrun_map)
+	MCFG_DEVICE_REPLACE("maincpu", FD1089B, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(outrun_map)
 MACHINE_CONFIG_END
 
 

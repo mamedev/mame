@@ -18,9 +18,10 @@ FLOPPY_FORMATS_MEMBER( tvc_hbf_device::floppy_formats )
 	FLOPPY_TVC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( tvc_hbf_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void tvc_hbf_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 ROM_START( tvc_hbf )
 	ROM_REGION(0x4000, "hbf", 0)

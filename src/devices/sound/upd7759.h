@@ -13,19 +13,16 @@
    software.
 */
 
-#define UPD7759_STANDARD_CLOCK      XTAL(640'000)
-
 class upd775x_device : public device_t, public device_sound_interface
 {
 public:
-	template <class Object> devcb_base &set_drq_callback(Object &&cb) { return m_drqcallback.set_callback(std::forward<Object>(cb)); }
+	enum : u32 { STANDARD_CLOCK = 640'000 };
 
 	void set_bank_base(offs_t base);
 
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 	DECLARE_READ_LINE_MEMBER( busy_r );
 	virtual DECLARE_WRITE8_MEMBER( port_w );
-	void postload();
 
 protected:
 	// chip states
@@ -51,6 +48,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -100,14 +98,14 @@ protected:
 	uint8_t *     m_rom;                        /* pointer to ROM data or nullptr for slave mode */
 	uint32_t      m_romoffset;                  /* ROM offset to make save/restore easier */
 	uint32_t      m_rommask;                    /* maximum address offset */
-
-	devcb_write_line m_drqcallback;
 };
 
 class upd7759_device : public upd775x_device
 {
 public:
-	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <class Object> devcb_base &set_drq_callback(Object &&cb) { return m_drqcallback.set_callback(std::forward<Object>(cb)); }
+
+	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = STANDARD_CLOCK);
 
 	DECLARE_WRITE_LINE_MEMBER( start_w );
 
@@ -122,22 +120,22 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
+	devcb_write_line m_drqcallback;
 	emu_timer *m_timer;
 };
 
 class upd7756_device : public upd775x_device
 {
 public:
-	upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = STANDARD_CLOCK);
 
 	DECLARE_WRITE_LINE_MEMBER( start_w );
 
 protected:
+	upd7756_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 };
 
 DECLARE_DEVICE_TYPE(UPD7759, upd7759_device)
@@ -145,8 +143,5 @@ DECLARE_DEVICE_TYPE(UPD7756, upd7756_device)
 
 #define MCFG_UPD7759_DRQ_CALLBACK(_write) \
 	devcb = &downcast<upd7759_device &>(*device).set_drq_callback(DEVCB_##_write);
-
-#define MCFG_UPD7756_DRQ_CALLBACK(_write) \
-	devcb = &downcast<upd7756_device &>(*device).set_drq_callback(DEVCB_##_write);
 
 #endif // MAME_SOUND_UPD7759_H

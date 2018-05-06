@@ -460,14 +460,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(rpunch_state::rpunch)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
@@ -485,19 +485,19 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2) // verified from rpunch schematics
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(rpunch_state, rpunch_gga_data_w))
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, rpunch_state, rpunch_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", MASTER_CLOCK/4)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, MASTER_CLOCK/4)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<1>))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -511,14 +511,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(rpunch_state::svolleybl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
@@ -536,7 +536,7 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2)
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(rpunch_state, rpunch_gga_data_w))
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, rpunch_state, rpunch_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
 
@@ -544,12 +544,12 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", MASTER_CLOCK/4)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, MASTER_CLOCK/4)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<1>))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

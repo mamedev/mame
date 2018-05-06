@@ -161,14 +161,13 @@ Remaining Video issues
  - is the use of the 'scroll' registers 100% correct? (related to above?)
  - Sometimes the 'sprites' in mushisam lag by a frame vs the 'backgrounds' is this a timing problem, does the real game do it?
 
-Speedups
- - Blitter is already tightly optimized
- - Need SH3 recompiler?
-
 Blitter Timing
  - Correct slowdown emulation and flags (depends on blit mode, and speed of RAM) - could do with the recompiler or alt idle skips on the busy flag wait loops
  - End of Blit IRQ? (one game has a valid irq routine that looks like it was used for profiling, but nothing depends on it)
 
+Common game codes:
+ - During boot hold P1 Right+A+B+C and P2 Left+A+B+C - Forcibly initialise non-volatile data (EEPROM or NAND settings area)
+ - During boot hold P1 A and P2 A - Reset random numbers generator at each game start. Probably was used during testing or/and competition events.
 */
 
 #include "emu.h"
@@ -460,7 +459,7 @@ void cv1k_state::machine_reset()
 MACHINE_CONFIG_START(cv1k_state::cv1k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH3BE, 12.8_MHz_XTAL*8) // 102.4MHz
+	MCFG_DEVICE_ADD("maincpu", SH3BE, 12.8_MHz_XTAL*8) // 102.4MHz
 	MCFG_SH4_MD0(0)  // none of this is verified
 	MCFG_SH4_MD1(0)  // (the sh3 is different to the sh4 anyway, should be changed)
 	MCFG_SH4_MD2(0)
@@ -471,9 +470,9 @@ MACHINE_CONFIG_START(cv1k_state::cv1k)
 	MCFG_SH4_MD7(1)
 	MCFG_SH4_MD8(0)
 	MCFG_SH4_CLOCK(12.8_MHz_XTAL*8) // 102.4MHz
-	MCFG_CPU_PROGRAM_MAP(cv1k_map)
-	MCFG_CPU_IO_MAP(cv1k_port)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
+	MCFG_DEVICE_PROGRAM_MAP(cv1k_map)
+	MCFG_DEVICE_IO_MAP(cv1k_port)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
 
 	MCFG_RTC9701_ADD("eeprom")
 	MCFG_SERFLASH_ADD("game")
@@ -489,7 +488,7 @@ MACHINE_CONFIG_START(cv1k_state::cv1k)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_YMZ770_ADD("ymz770", 16.384_MHz_XTAL)
+	MCFG_DEVICE_ADD("ymz770", YMZ770, 16.384_MHz_XTAL)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0) // only Right output used, Left is not connected
 
 	MCFG_EPIC12_ADD("blitter")
@@ -502,7 +501,7 @@ MACHINE_CONFIG_START(cv1k_state::cv1k_d)
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", SH3BE, 12.8_MHz_XTAL*8) // 102.4MHz
+	MCFG_DEVICE_ADD("maincpu", SH3BE, 12.8_MHz_XTAL*8) // 102.4MHz
 	MCFG_SH4_MD0(0)  // none of this is verified
 	MCFG_SH4_MD1(0)  // (the sh3 is different to the sh4 anyway, should be changed)
 	MCFG_SH4_MD2(0)
@@ -513,9 +512,9 @@ MACHINE_CONFIG_START(cv1k_state::cv1k_d)
 	MCFG_SH4_MD7(1)
 	MCFG_SH4_MD8(0)
 	MCFG_SH4_CLOCK(12.8_MHz_XTAL*8) // 102.4MHz
-	MCFG_CPU_PROGRAM_MAP(cv1k_d_map)
-	MCFG_CPU_IO_MAP(cv1k_port)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
+	MCFG_DEVICE_PROGRAM_MAP(cv1k_d_map)
+	MCFG_DEVICE_IO_MAP(cv1k_port)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
 
 	MCFG_DEVICE_MODIFY("blitter")
 	MCFG_EPIC12_SET_MAINRAMSIZE(0x1000000)

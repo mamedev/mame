@@ -25,7 +25,7 @@
 	MCFG_DEVICE_ADD(_tag, SGI_IOC2_FULL_HOUSE, 0)
 
 #define MCFG_IOC2_CPU(cpu_tag) \
-	downcast<ioc2_device &>(*device).set_cpu_tag(("^" cpu_tag));
+	downcast<ioc2_device &>(*device).set_cpu_tag(cpu_tag);
 
 class ioc2_device : public device_t
 {

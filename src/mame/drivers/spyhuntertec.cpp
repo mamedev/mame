@@ -673,10 +673,10 @@ MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 // 2 XTALs: one 20MHz, other one near maincpu ?MHz
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000 ) // NEC D780C-2 (rated 6MHz)
-	MCFG_CPU_PROGRAM_MAP(spyhuntertec_map)
-	MCFG_CPU_IO_MAP(spyhuntertec_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spyhuntertec_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000 ) // NEC D780C-2 (rated 6MHz)
+	MCFG_DEVICE_PROGRAM_MAP(spyhuntertec_map)
+	MCFG_DEVICE_IO_MAP(spyhuntertec_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spyhuntertec_state, irq0_line_hold)
 	MCFG_TIMER_DRIVER_ADD("analog_timer", spyhuntertec_state, analog_count_callback)
 
 	/* video hardware */
@@ -695,27 +695,27 @@ MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 //  MCFG_PALETTE_INIT_OWNER(spyhuntertec_state,spyhunt)
 
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000 ) // SGS Z8400B1 (rated 2.5MHz?)
-	MCFG_CPU_PROGRAM_MAP(spyhuntertec_sound_map)
-	MCFG_CPU_IO_MAP(spyhuntertec_sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(spyhuntertec_state, irq0_line_assert, 1000)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000 ) // SGS Z8400B1 (rated 2.5MHz?)
+	MCFG_DEVICE_PROGRAM_MAP(spyhuntertec_sound_map)
+	MCFG_DEVICE_IO_MAP(spyhuntertec_sound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(spyhuntertec_state, irq0_line_assert, 1000)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8912, 3000000/2) // AY-3-8912
+	MCFG_DEVICE_ADD("ay1", AY8912, 3000000/2) // AY-3-8912
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(spyhuntertec_state, ay1_porta_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(spyhuntertec_state, ay1_porta_w))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spyhuntertec_state, ay1_porta_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, spyhuntertec_state, ay1_porta_w))
 
-	MCFG_SOUND_ADD("ay2", AY8912, 3000000/2) // "
+	MCFG_DEVICE_ADD("ay2", AY8912, 3000000/2) // "
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(spyhuntertec_state, ay2_porta_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(spyhuntertec_state, ay2_porta_w))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spyhuntertec_state, ay2_porta_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, spyhuntertec_state, ay2_porta_w))
 
-	MCFG_SOUND_ADD("ay3", AY8912, 3000000/2) // "
+	MCFG_DEVICE_ADD("ay3", AY8912, 3000000/2) // "
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END

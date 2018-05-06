@@ -780,9 +780,9 @@ void psikyosh_state::machine_start()
 MACHINE_CONFIG_START(psikyosh_state::psikyo3v1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(ps3v1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", psikyosh_state,  psikyosh_interrupt)
+	MCFG_DEVICE_ADD("maincpu", SH2, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(ps3v1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", psikyosh_state,  psikyosh_interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -790,14 +790,14 @@ MACHINE_CONFIG_START(psikyosh_state::psikyo3v1)
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram") /* If using alpha */
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32) /* If using alpha */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(psikyosh_state, screen_update_psikyosh)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram32_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram32_device, vblank_copy_rising))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyosh)
 	MCFG_PALETTE_ADD("palette", 0x5000/4)
@@ -807,7 +807,7 @@ MACHINE_CONFIG_START(psikyosh_state::psikyo3v1)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymf", YMF278B, MASTER_CLOCK/2)
+	MCFG_DEVICE_ADD("ymf", YMF278B, MASTER_CLOCK/2)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 12))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -817,8 +817,8 @@ MACHINE_CONFIG_START(psikyosh_state::psikyo5)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ps5_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ps5_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psikyosh_state::psikyo5_240)
@@ -826,8 +826,8 @@ MACHINE_CONFIG_START(psikyosh_state::psikyo5_240)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ps5_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ps5_map)
 
 	/* Measured Hsync 16.165 KHz, Vsync 61.68 Hz */
 	/* Ideally this would be driven off the video register. However, it doesn't changeat runtime and MAME will pick a better screen resolution if it knows upfront */

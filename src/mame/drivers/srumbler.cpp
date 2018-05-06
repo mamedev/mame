@@ -248,17 +248,17 @@ GFXDECODE_END
 MACHINE_CONFIG_START(srumbler_state::srumbler)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, 6000000)        /* HD68B09P at 6 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(srumbler_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809, 6000000)        /* HD68B09P at 6 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(srumbler_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", srumbler_state, interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)        /* 3 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(srumbler_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(srumbler_state, irq0_line_hold, 4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)        /* 3 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(srumbler_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(srumbler_state, irq0_line_hold, 4*60)
 
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -266,7 +266,7 @@ MACHINE_CONFIG_START(srumbler_state::srumbler)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(10*8, (64-10)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(srumbler_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srumbler)
@@ -279,13 +279,13 @@ MACHINE_CONFIG_START(srumbler_state::srumbler)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 4000000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym2", YM2203, 4000000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)

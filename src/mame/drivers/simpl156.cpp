@@ -404,9 +404,9 @@ DECOSPR_PRIORITY_CB_MEMBER(simpl156_state::pri_callback)
 MACHINE_CONFIG_START(simpl156_state::chainrec)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, 28000000 /* /4 */) /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
-	MCFG_CPU_PROGRAM_MAP(chainrec_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", simpl156_state,  simpl156_vbl_interrupt)
+	MCFG_DEVICE_ADD("maincpu", ARM, 28000000 /* /4 */) /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
+	MCFG_DEVICE_PROGRAM_MAP(chainrec_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", simpl156_state,  simpl156_vbl_interrupt)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93C45
 
@@ -461,32 +461,32 @@ MACHINE_CONFIG_START(simpl156_state::magdrop)
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(magdrop_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(magdrop_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(simpl156_state::magdropp)
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(magdropp_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(magdropp_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(simpl156_state::joemacr)
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(joemacr_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(joemacr_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(simpl156_state::mitchell156)
 	chainrec(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mitchell156_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mitchell156_map)
 
 	MCFG_OKIM6295_REPLACE("okimusic", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)

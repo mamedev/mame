@@ -406,10 +406,10 @@ void cultures_state::machine_reset()
 MACHINE_CONFIG_START(cultures_state::cultures)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
-	MCFG_CPU_PROGRAM_MAP(cultures_map)
-	MCFG_CPU_IO_MAP(cultures_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cultures_state,  cultures_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cultures_map)
+	MCFG_DEVICE_IO_MAP(cultures_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cultures_state,  cultures_interrupt)
 
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)

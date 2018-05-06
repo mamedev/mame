@@ -202,21 +202,6 @@ WRITE8_MEMBER(warpwarp_state::geebee_out6_w)
 	}
 }
 
-WRITE_LINE_MEMBER(warpwarp_state::lamp_1_w)
-{
-	output().set_led_value(0, state);
-}
-
-WRITE_LINE_MEMBER(warpwarp_state::lamp_2_w)
-{
-	output().set_led_value(1, state);
-}
-
-WRITE_LINE_MEMBER(warpwarp_state::lamp_3_w)
-{
-	output().set_led_value(2, state);
-}
-
 WRITE_LINE_MEMBER(warpwarp_state::counter_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -731,26 +716,26 @@ GFXDECODE_END
 MACHINE_CONFIG_START(warpwarp_state::geebee)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(geebee_map)
-	MCFG_CPU_IO_MAP(geebee_port_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK/9) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(geebee_map)
+	MCFG_DEVICE_IO_MAP(geebee_port_map)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // 5N
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(warpwarp_state, lamp_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(warpwarp_state, lamp_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(warpwarp_state, lamp_3_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(warpwarp_state, counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(warpwarp_state, lock_out_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(warpwarp_state, geebee_bgw_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(warpwarp_state, ball_on_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(warpwarp_state, inv_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // LAMP 1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) // LAMP 2
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led2")) // LAMP 3
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, warpwarp_state, counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, warpwarp_state, lock_out_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, warpwarp_state, geebee_bgw_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, warpwarp_state, ball_on_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, warpwarp_state, inv_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(warpwarp_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, warpwarp_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1k)
 	MCFG_PALETTE_ADD("palette", 4*2)
@@ -761,7 +746,7 @@ MACHINE_CONFIG_START(warpwarp_state::geebee)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("geebee_custom", GEEBEE, 0)
+	MCFG_DEVICE_ADD("geebee_custom", GEEBEE_SOUND, MASTER_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -798,18 +783,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(warpwarp_state::bombbee)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)
-	MCFG_CPU_PROGRAM_MAP(bombbee_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK/9)
+	MCFG_DEVICE_PROGRAM_MAP(bombbee_map)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // 6L on Warp Warp
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(warpwarp_state, lamp_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(warpwarp_state, lamp_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(warpwarp_state, lamp_3_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // LAMP 1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) // LAMP 2
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led2")) // LAMP 3
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // n.c.
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(warpwarp_state, lock_out_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(warpwarp_state, counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(warpwarp_state, ball_on_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(warpwarp_state, inv_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, warpwarp_state, lock_out_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, warpwarp_state, counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, warpwarp_state, ball_on_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, warpwarp_state, inv_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -818,7 +803,7 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(warpwarp_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, warpwarp_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", color)
 
@@ -829,7 +814,7 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("warpwarp_custom", WARPWARP, 0)
+	MCFG_DEVICE_ADD("warpwarp_custom", WARPWARP_SOUND, MASTER_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -837,8 +822,8 @@ MACHINE_CONFIG_START(warpwarp_state::warpwarp)
 	bombbee(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(warpwarp_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(warpwarp_map)
 MACHINE_CONFIG_END
 
 

@@ -410,16 +410,16 @@ uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rg
 
 MACHINE_CONFIG_START(speglsht_state::speglsht)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",ST0016_CPU, 8000000) /* 8 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(st0016_mem)
-	MCFG_CPU_IO_MAP(st0016_io)
+	MCFG_DEVICE_ADD("maincpu",ST0016_CPU, 8000000) /* 8 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)
+	MCFG_DEVICE_IO_MAP(st0016_io)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", speglsht_state,  irq0_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speglsht_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", R3051, 25000000)
+	MCFG_DEVICE_ADD("sub", R3051, 25000000)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_CPU_PROGRAM_MAP(speglsht_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", speglsht_state,  irq4_line_assert)
+	MCFG_DEVICE_PROGRAM_MAP(speglsht_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speglsht_state,  irq4_line_assert)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 	MCFG_MACHINE_RESET_OVERRIDE(speglsht_state,speglsht)

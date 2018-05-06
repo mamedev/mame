@@ -1274,18 +1274,18 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(segaybd_state::yboard)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("subx", M68000, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(subx_map)
+	MCFG_DEVICE_ADD("subx", M68000, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(subx_map)
 
-	MCFG_CPU_ADD("suby", M68000, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(suby_map)
+	MCFG_DEVICE_ADD("suby", M68000, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(suby_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
 	MCFG_NVRAM_ADD_0FILL("backupram")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -1296,11 +1296,11 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
 	MCFG_315_5296_IN_PORTB_CB(IOPORT("GENERAL"))
 	MCFG_315_5296_IN_PORTC_CB(IOPORT("LIMITSW"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segaybd_state, output1_w))
-	MCFG_315_5296_OUT_PORTE_CB(WRITE8(segaybd_state, misc_output_w))
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segaybd_state, output1_w))
+	MCFG_315_5296_OUT_PORTE_CB(WRITE8(*this, segaybd_state, misc_output_w))
 	MCFG_315_5296_IN_PORTF_CB(IOPORT("DSW"))
 	MCFG_315_5296_IN_PORTG_CB(IOPORT("COINAGE"))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(segaybd_state, output2_w))
+	MCFG_315_5296_OUT_PORTH_CB(WRITE8(*this, segaybd_state, output2_w))
 	// FMCS and CKOT connect to CS and OSC IN on MSM6253 below
 
 	MCFG_DEVICE_ADD("adc", MSM6253, 0)
@@ -1339,12 +1339,12 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/8)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
-	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/8)
+	MCFG_DEVICE_ADD("pcm", SEGAPCM, SOUND_CLOCK/8)
 	MCFG_SEGAPCM_BANK_MASK(BANK_12M, BANK_MASKF8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1356,25 +1356,25 @@ MACHINE_CONFIG_START(segaybd_state::yboard_link)
 	yboard(config);
 
 	// basic machine hardware
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(main_map_link)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(main_map_link)
 
-	MCFG_CPU_ADD("linkcpu", Z80, XTAL(16'000'000)/2 ) // 8 Mhz
-	MCFG_CPU_PROGRAM_MAP(link_map)
-	MCFG_CPU_IO_MAP(link_portmap)
+	MCFG_DEVICE_ADD("linkcpu", Z80, XTAL(16'000'000)/2 ) // 8 Mhz
+	MCFG_DEVICE_PROGRAM_MAP(link_map)
+	MCFG_DEVICE_IO_MAP(link_portmap)
 
 	MCFG_DEVICE_ADD("mb8421", MB8421, 0)
-	MCFG_MB8421_INTL_HANDLER(WRITELINE(segaybd_state, mb8421_intl))
-	MCFG_MB8421_INTR_HANDLER(WRITELINE(segaybd_state, mb8421_intr))
+	MCFG_MB8421_INTL_HANDLER(WRITELINE(*this, segaybd_state, mb8421_intl))
+	MCFG_MB8421_INTR_HANDLER(WRITELINE(*this, segaybd_state, mb8421_intr))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segaybd_state::yboard_deluxe)
 	yboard(config);
 
 	// basic machine hardware
-	MCFG_CPU_ADD("motorcpu", Z80, XTAL(16'000'000)/2 ) // 8 Mhz(guessed)
-	MCFG_CPU_PROGRAM_MAP(motor_map)
-//  MCFG_CPU_IO_MAP(motor_portmap)
+	MCFG_DEVICE_ADD("motorcpu", Z80, XTAL(16'000'000)/2 ) // 8 Mhz(guessed)
+	MCFG_DEVICE_PROGRAM_MAP(motor_map)
+//  MCFG_DEVICE_IO_MAP(motor_portmap)
 
 MACHINE_CONFIG_END
 

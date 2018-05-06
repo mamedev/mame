@@ -143,6 +143,7 @@ void novagbase_state::machine_start()
 	m_led_select = 0;
 	m_led_data = 0;
 	m_lcd_control = 0;
+	m_lcd_data = 0;
 
 	// register for savestates
 	save_item(NAME(m_display_maxy));
@@ -157,6 +158,7 @@ void novagbase_state::machine_start()
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_lcd_control));
+	save_item(NAME(m_lcd_data));
 }
 
 void novagbase_state::machine_reset()
@@ -401,14 +403,15 @@ WRITE8_MEMBER(novag6502_state::sexpert_lcd_control_w)
 	// d0: HD44780 RS
 	// d1: HD44780 R/W
 	// d2: HD44780 E
+	if (m_lcd_control & ~data & 4 && ~data & 2)
+		m_lcd->write(space, m_lcd_control & 1, m_lcd_data);
 	m_lcd_control = data & 7;
 }
 
 WRITE8_MEMBER(novag6502_state::sexpert_lcd_data_w)
 {
 	// d0-d7: HD44780 data
-	if (m_lcd_control & 4 && ~m_lcd_control & 2)
-		m_lcd->write(space, m_lcd_control & 1, data);
+	m_lcd_data = data;
 }
 
 WRITE8_MEMBER(novag6502_state::sexpert_leds_w)
@@ -865,9 +868,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(novag6502_state::supercon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 8_MHz_XTAL/2)
-	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 600) // guessed
-	MCFG_CPU_PROGRAM_MAP(supercon_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 8_MHz_XTAL/2)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 600) // guessed
+	MCFG_DEVICE_PROGRAM_MAP(supercon_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -876,15 +879,15 @@ MACHINE_CONFIG_START(novag6502_state::supercon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1024) // guessed
+	MCFG_DEVICE_ADD("beeper", BEEP, 1024) // guessed
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(novag6502_state::cforte)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 10_MHz_XTAL/2)
-	MCFG_CPU_PROGRAM_MAP(cforte_map)
+	MCFG_DEVICE_ADD("maincpu", R65C02, 10_MHz_XTAL/2)
+	MCFG_DEVICE_PROGRAM_MAP(cforte_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(32.768_kHz_XTAL/128)) // 256Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)) // active for 11us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
@@ -893,22 +896,22 @@ MACHINE_CONFIG_START(novag6502_state::cforte)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("hlcd0538", HLCD0538, 0)
-	MCFG_HLCD0538_WRITE_COLS_CB(WRITE64(novag6502_state, cforte_lcd_output_w))
+	MCFG_HLCD0538_WRITE_COLS_CB(WRITE64(*this, novag6502_state, cforte_lcd_output_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_novag_cforte)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
+	MCFG_DEVICE_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(novag6502_state::sexpert)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, 10_MHz_XTAL/2) // or 12_MHz_XTAL/2
-	MCFG_CPU_PROGRAM_MAP(sexpert_map)
+	MCFG_DEVICE_ADD("maincpu", M65C02, 10_MHz_XTAL/2) // or 12_MHz_XTAL/2
+	MCFG_DEVICE_PROGRAM_MAP(sexpert_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(32.768_kHz_XTAL/128)) // 256Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(21500)) // active for 21.5us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
@@ -916,12 +919,12 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	MCFG_DEVICE_ADD("acia", MOS6551, 0) // R65C51P2 - RTS to CTS, DCD to GND
 	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
 	MCFG_MOS6551_IRQ_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
-	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("acia", mos6551_device, write_cts))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))
+	MCFG_MOS6551_RTS_HANDLER(WRITELINE("acia", mos6551_device, write_cts))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MOS6551_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", mos6551_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia", mos6551_device, write_dsr))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -947,7 +950,7 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
+	MCFG_DEVICE_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -955,8 +958,8 @@ MACHINE_CONFIG_START(novag6502_state::sforte)
 	sexpert(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sforte_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sforte_map)
 	MCFG_TIMER_MODIFY("irq_on")
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)) // active for ?us (assume same as cforte)
 

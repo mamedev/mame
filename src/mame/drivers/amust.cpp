@@ -198,9 +198,10 @@ void amust_state::io_map(address_map &map)
 	map(0x14, 0x17).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 }
 
-static SLOT_INTERFACE_START( amust_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void amust_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( amust )
@@ -377,10 +378,10 @@ DRIVER_INIT_MEMBER( amust_state, amust )
 
 MACHINE_CONFIG_START(amust_state::amust)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amust_state, irq_vs)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", amust_state, irq_vs)
 	MCFG_MACHINE_RESET_OVERRIDE(amust_state, amust)
 
 	/* video hardware */
@@ -395,7 +396,7 @@ MACHINE_CONFIG_START(amust_state::amust)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 800)
+	MCFG_DEVICE_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -411,39 +412,39 @@ MACHINE_CONFIG_START(amust_state::amust)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart1", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart1", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1", i8251_device, write_dsr))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart1", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart1", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart1", i8251_device, write_dsr))
 
 	MCFG_DEVICE_ADD("uart2", I8251, 0)
-	//MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	//MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	//MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	//MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	//MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 
 	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(amust_state, port04_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(amust_state, port04_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(amust_state, port05_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(amust_state, port06_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(amust_state, port06_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, amust_state, port04_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amust_state, port04_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, amust_state, port05_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, amust_state, port06_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amust_state, port06_w))
 
 	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(amust_state, port08_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(amust_state, port08_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(amust_state, port09_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(amust_state, port0a_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(amust_state, port0a_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, amust_state, port08_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amust_state, port08_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, amust_state, port09_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, amust_state, port0a_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amust_state, port0a_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -418,9 +418,9 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, ES_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(sorcerer_mem)
-	MCFG_CPU_IO_MAP(sorcerer_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, ES_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(sorcerer_mem)
+	MCFG_DEVICE_IO_MAP(sorcerer_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -446,15 +446,15 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_AY31015_RX_CLOCK(ES_UART_CLOCK)
 	MCFG_AY31015_AUTO_RDAV(true)
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "covox")
 
 	/* The use of the parallel port as a general purpose port is not emulated.
 	Currently the only use is to read the printer status in the Centronics CENDRV bios routine. */
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
 
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
@@ -488,8 +488,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 	sorcerer(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sorcererd_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sorcererd_mem)
 
 	MCFG_MACHINE_START_OVERRIDE(sorcerer_state, sorcererd )
 

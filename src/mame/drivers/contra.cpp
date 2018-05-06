@@ -209,12 +209,12 @@ void contra_state::machine_reset()
 MACHINE_CONFIG_START(contra_state::contra)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8) /* 3000000? (HD63C09EP) */
-	MCFG_CPU_PROGRAM_MAP(contra_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", contra_state,  contra_interrupt)
+	MCFG_DEVICE_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8) /* 3000000? (HD63C09EP) */
+	MCFG_DEVICE_PROGRAM_MAP(contra_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", contra_state,  contra_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL(24'000'000)/8) /* 3000000? (HD68B09EP) */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(24'000'000)/8) /* 3000000? (HD68B09EP) */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* enough for the sound CPU to read all commands */
 
@@ -246,7 +246,7 @@ MACHINE_CONFIG_START(contra_state::contra)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END

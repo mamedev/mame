@@ -455,16 +455,16 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(terracre_state::ym3526)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
-	MCFG_CPU_PROGRAM_MAP(terracre_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", terracre_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
+	MCFG_DEVICE_PROGRAM_MAP(terracre_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", terracre_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)     // 4.0mhz when compared to sound recordings, should be derived from XTAL(22'000'000)? how?
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_3526_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(terracre_state, irq0_line_hold,  XTAL(16'000'000)/4/512) // ?
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)     // 4.0mhz when compared to sound recordings, should be derived from XTAL(22'000'000)? how?
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_3526_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(terracre_state, irq0_line_hold,  XTAL(16'000'000)/4/512) // ?
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
@@ -472,7 +472,7 @@ MACHINE_CONFIG_START(terracre_state::ym3526)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(terracre_state, screen_update_amazon)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", terracre)
@@ -484,24 +484,24 @@ MACHINE_CONFIG_START(terracre_state::ym3526)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(terracre_state::ym2203)
 	ym3526(config);
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_IO_MAP(sound_2203_io_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_IO_MAP(sound_2203_io_map)
 
 	MCFG_DEVICE_REMOVE("ymsnd")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(0, "speaker", 0.2)
 	MCFG_SOUND_ROUTE(1, "speaker", 0.2)
 	MCFG_SOUND_ROUTE(2, "speaker", 0.2)
@@ -510,14 +510,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(terracre_state::amazon_base)
 	ym3526(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(amazon_base_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(amazon_base_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amazon_state::amazon_1412m2)
 	amazon_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(amazon_1412m2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(amazon_1412m2_map)
 
 	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(16'000'000)) // divided by 4 maybe
 MACHINE_CONFIG_END

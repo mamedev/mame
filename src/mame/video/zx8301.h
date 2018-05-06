@@ -42,7 +42,7 @@
 ///*************************************************************************
 
 #define MCFG_ZX8301_CPU(_tag) \
-	downcast<zx8301_device &>(*device).set_cpu_tag("^" _tag);
+	downcast<zx8301_device &>(*device).set_cpu_tag(_tag);
 
 #define MCFG_ZX8301_VSYNC_CALLBACK(_write) \
 	devcb = &downcast<zx8301_device &>(*device).set_vsync_wr_callback(DEVCB_##_write);

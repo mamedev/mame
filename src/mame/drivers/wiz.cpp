@@ -793,13 +793,13 @@ INTERRUPT_GEN_MEMBER(wiz_state::wiz_sound_interrupt)
 MACHINE_CONFIG_START(wiz_state::kungfut)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6) /* 3.072 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(kungfut_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wiz_state, wiz_vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6) /* 3.072 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(kungfut_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wiz_state, wiz_vblank_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 18432000/6) /* 3.072 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(kungfut_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(wiz_state, wiz_sound_interrupt, 4*60) /* ??? */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 18432000/6) /* 3.072 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(kungfut_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(wiz_state, wiz_sound_interrupt, 4*60) /* ??? */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -819,13 +819,13 @@ MACHINE_CONFIG_START(wiz_state::kungfut)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("8910.1", AY8910, 18432000/12)
+	MCFG_DEVICE_ADD("8910.1", AY8910, 18432000/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("8910.2", AY8910, 18432000/12)
+	MCFG_DEVICE_ADD("8910.2", AY8910, 18432000/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("8910.3", AY8910, 18432000/12)
+	MCFG_DEVICE_ADD("8910.3", AY8910, 18432000/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
@@ -833,8 +833,8 @@ MACHINE_CONFIG_START(wiz_state::wiz)
 	kungfut(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wiz_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(wiz_main_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", wiz)
@@ -847,13 +847,13 @@ MACHINE_CONFIG_START(wiz_state::stinger)
 	kungfut(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(stinger_main_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(stinger_main_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(stinger_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(stinger_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -864,7 +864,7 @@ MACHINE_CONFIG_START(wiz_state::stinger)
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("8910.3")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(stinger)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
@@ -872,7 +872,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(wiz_state::scion)
 	stinger(config);
 
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 
 	/* video hardware */

@@ -130,6 +130,6 @@ DECLARE_DEVICE_TYPE(TC0480SCP, tc0480scp_device)
 	downcast<tc0480scp_device &>(*device).set_col_base(_col);
 
 #define MCFG_TC0480SCP_GFXDECODE(_gfxtag) \
-	downcast<tc0480scp_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<tc0480scp_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_TC0480SCP_H

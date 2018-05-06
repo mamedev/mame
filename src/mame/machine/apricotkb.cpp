@@ -70,8 +70,8 @@ void apricot_keyboard_device::apricot_keyboard_io(address_map &map)
 
 MACHINE_CONFIG_START(apricot_keyboard_device::device_add_mconfig)
 #ifdef UPD7507_EMULATED
-	MCFG_CPU_ADD(UPD7507C_TAG, UPD7507, XTAL(32'768))
-	MCFG_CPU_IO_MAP(apricot_keyboard_io)
+	MCFG_DEVICE_ADD(UPD7507C_TAG, UPD7507, XTAL(32'768))
+	MCFG_DEVICE_IO_MAP(apricot_keyboard_io)
 #endif
 MACHINE_CONFIG_END
 

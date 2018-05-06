@@ -290,13 +290,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(aquarium_state::aquarium)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) // clock not verified on pcb
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aquarium_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // clock not verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aquarium_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/6) // clock not verified on pcb
-	MCFG_CPU_PROGRAM_MAP(snd_map)
-	MCFG_CPU_IO_MAP(snd_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/6) // clock not verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(snd_map)
+	MCFG_DEVICE_IO_MAP(snd_portmap)
 
 	// Is this the actual IC type? Some other Excellent games from this period use a MAX693.
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
@@ -323,7 +323,7 @@ MACHINE_CONFIG_START(aquarium_state::aquarium)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) // clock not verified on pcb
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) // clock not verified on pcb
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)

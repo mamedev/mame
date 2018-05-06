@@ -646,31 +646,31 @@ WRITE_LINE_MEMBER(playch10_state::vblank_irq)
 
 MACHINE_CONFIG_START(playch10_state::playch10)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 8000000/2) // 4 MHz
-	MCFG_CPU_PROGRAM_MAP(bios_map)
-	MCFG_CPU_IO_MAP(bios_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8000000/2) // 4 MHz
+	MCFG_DEVICE_PROGRAM_MAP(bios_map)
+	MCFG_DEVICE_IO_MAP(bios_io_map)
 
-	MCFG_CPU_ADD("cart", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cart_map)
+	MCFG_DEVICE_ADD("cart", N2A03, NTSC_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(cart_map)
 
 	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // 7D
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(playch10_state, sdcs_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(playch10_state, cntrl_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(playch10_state, disp_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(playch10_state, sound_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, playch10_state, sdcs_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, playch10_state, cntrl_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, playch10_state, disp_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, playch10_state, sound_mask_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("cart", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // GAMERES
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("cart", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT // GAMESTOP
 
 	MCFG_DEVICE_ADD("outlatch2", LS259, 0) // 7E
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(playch10_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(playch10_state, dog_di_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(playch10_state, ppu_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(playch10_state, up8w_w))
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(playch10_state, cart_sel_w)) MCFG_DEVCB_MASK(0x78) MCFG_DEVCB_RSHIFT(-3)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, playch10_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, playch10_state, dog_di_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, playch10_state, ppu_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, playch10_state, up8w_w))
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, playch10_state, cart_sel_w)) MCFG_DEVCB_MASK(0x78) MCFG_DEVCB_RSHIFT(-3)
 
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", playch10)
-	MCFG_PALETTE_ADD("palette", 256+8*4*16)
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(playch10_state, playch10)
 	MCFG_DEFAULT_LAYOUT(layout_playch10)
 
@@ -679,21 +679,19 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_top)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(playch10_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, playch10_state, vblank_irq))
 
 	MCFG_SCREEN_ADD("bottom", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_bottom)
-	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PPU2C03B_ADD("ppu")
 	MCFG_PPU2C0X_SET_SCREEN("bottom")
 	MCFG_PPU2C0X_CPU("cart")
-	MCFG_PPU2C0X_COLORBASE(256)
-	MCFG_PPU2C0X_SET_NMI(playch10_state, ppu_irq)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("cart", INPUT_LINE_NMI))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, playch10_state, int_detect_w))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -754,7 +752,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "pch1-c-6f.82s129an.6f",    0x0000, 0x0100, CRC(e5414ca3) SHA1(d2878411cda84ffe0afb2e538a67457f51bebffb) )    \
 	ROM_LOAD( "pch1-c-6e.82s129an.6e",    0x0100, 0x0100, CRC(a2625c6e) SHA1(a448b47c9289902e26a3d3c4c7d5a7968c385e81) )    \
 	ROM_LOAD( "pch1-c-6d.82s129an.6d",    0x0200, 0x0100, CRC(1213ebd4) SHA1(0ad386fc3eab5e53c0288ad1de33639a9e461b7c) )    \
-	ROM_REGION( 0xc0, "palette", 0 )                        \
+	ROM_REGION( 0xc0, "ppu:palette", 0 )                    \
 	ROM_LOAD( "rp2c0x.pal", 0x00, 0xc0, CRC(48de65dc) SHA1(d10acafc8da9ff479c270ec01180cca61efe62f5) )
 
 

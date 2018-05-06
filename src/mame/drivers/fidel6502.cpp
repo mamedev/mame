@@ -21,6 +21,9 @@
     - EAG missing bankswitch? where is the 2nd half of the 32KB ROM used, if at all?
     - granits gives error beeps at start, need to press clear to play
     - finish fphantom emulation
+	- PC reset button maps where?
+	- PC has 14KB RAM. 0000-0fff and 8000-9fff is certain, where does the remaining map to?
+	- PC add its own internal layout(panel is on the right side instead of bottom)
 
 ******************************************************************************
 
@@ -208,6 +211,10 @@ A condensator keeps RAM contents alive for a few hours when powered off.
 
 Elite Avant Garde (models 6081,6088,6089) is on the same hardware.
 
+Prestige Challenger (PC) hardware is very similar. They stripped the 8255 PPI,
+and added more RAM(7*TMM2016P). Some were released at 3.6MHz instead of 4MHz,
+perhaps due to hardware instability?
+
 
 ******************************************************************************
 
@@ -219,7 +226,7 @@ with magnet sensors and came with CB9 and CB16.
 
 8*(8+1) buttons, 8*8+1 LEDs
 36-pin edge connector, assume same as SC12
-4KB RAM(TMM2016P), 2*8KB ROM(HN48364P)
+2KB RAM(TMM2016P), 2*8KB ROM(HN48364P)
 R6502-13, 1.4MHz from resonator, another pcb with the same resonator was measured 1.49MHz*
 PCB label 510-1046C01 2-1-82
 
@@ -502,7 +509,7 @@ public:
 	void su9(machine_config &config);
 	void rsc(machine_config &config);
 
-	// EAS, EAG
+	// EAS, EAG, PC
 	void eas_prepare_display();
 	DECLARE_WRITE8_MEMBER(eas_segment_w);
 	DECLARE_WRITE8_MEMBER(eas_led_w);
@@ -512,8 +519,10 @@ public:
 	DECLARE_WRITE8_MEMBER(eas_ppi_portc_w);
 	void eas_map(address_map &map);
 	void eag_map(address_map &map);
+	void pc_map(address_map &map);
 	void eas(machine_config &config);
 	void eag(machine_config &config);
+	void pc(machine_config &config);
 
 	// SC9
 	void sc9_prepare_display();
@@ -725,7 +734,7 @@ WRITE_LINE_MEMBER(fidel6502_state::csc_pia1_ca2_w)
 
 
 /******************************************************************************
-    EAS, EAG
+    EAS, EAG, PC
 ******************************************************************************/
 
 // TTL/generic
@@ -759,7 +768,7 @@ READ8_MEMBER(fidel6502_state::eas_input_r)
 }
 
 
-// 8255 PPI
+// 8255 PPI (PC: done with TTL instead)
 
 WRITE8_MEMBER(fidel6502_state::eas_ppi_porta_w)
 {
@@ -1182,7 +1191,7 @@ void fidel6502_state::rsc_map(address_map &map)
 }
 
 
-// EAS, EAG
+// EAS, EAG, PC
 
 void fidel6502_state::eas_map(address_map &map)
 {
@@ -1206,7 +1215,22 @@ void fidel6502_state::eag_map(address_map &map)
 	map(0x7020, 0x7027).w(this, FUNC(fidel6502_state::eas_segment_w)).nopr();
 	map(0x7030, 0x7037).w(this, FUNC(fidel6502_state::eas_led_w)).nopr();
 	map(0x7050, 0x7050).r(this, FUNC(fidel6502_state::eas_input_r));
-	map(0x8000, 0xffff).rom(); //AM_WRITENOP
+	map(0x8000, 0xffff).rom(); //.nopw()
+}
+
+void fidel6502_state::pc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
+	map(0x7000, 0x7000).w(this, FUNC(fidel6502_state::eas_ppi_porta_w));
+	map(0x7010, 0x7010).r(this, FUNC(fidel6502_state::eas_ppi_portb_r));
+	map(0x7020, 0x7027).w(this, FUNC(fidel6502_state::eas_segment_w)).nopr();
+	map(0x7030, 0x7037).w(this, FUNC(fidel6502_state::eas_led_w)).nopr();
+	map(0x7040, 0x7040).w(this, FUNC(fidel6502_state::eas_ppi_portc_w));
+	map(0x7050, 0x7050).r(this, FUNC(fidel6502_state::eas_input_r));
+	map(0x8000, 0x9fff).ram();
+	map(0xb000, 0xffff).rom();
 }
 
 
@@ -1256,7 +1280,7 @@ void fidel6502_state::fexcel_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x3800).ram();
 	map(0x4000, 0x4007).mirror(0x3ff8).rw(this, FUNC(fidel6502_state::fexcel_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
-	//AM_RANGE(0x8000, 0x8000) AM_READNOP // checks for opening book module, but hw doesn't have a module slot
+	//map(0x8000, 0x8000).nopr(); // checks for opening book module, but hw doesn't have a module slot
 	map(0xc000, 0xffff).rom();
 }
 
@@ -1667,73 +1691,73 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(fidel6502_state::rsc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1800000) // measured approx 1.81MHz
-	MCFG_CPU_PROGRAM_MAP(rsc_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1800000) // measured approx 1.81MHz
+	MCFG_DEVICE_PROGRAM_MAP(rsc_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(546)) // from 555 timer, measured
 	MCFG_TIMER_START_DELAY(attotime::from_hz(546) - attotime::from_usec(38)) // active for 38us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(546))
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0) // MOS 6520
-	MCFG_PIA_READPA_HANDLER(READ8(fidel6502_state, csc_pia1_pa_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(fidel6502_state, csc_pia1_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(fidel6502_state, csc_pia1_cb1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(fidel6502_state, csc_pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(fidel6502_state, csc_pia1_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(fidel6502_state, csc_pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(fidel6502_state, csc_pia1_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, fidel6502_state, csc_pia1_pa_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_ca1_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_cb1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_cb2_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_rsc_v2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::csc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 3.9_MHz_XTAL/2) // from 3.9MHz resonator
-	MCFG_CPU_PROGRAM_MAP(csc_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // 38400kHz/64
+	MCFG_DEVICE_ADD("maincpu", M6502, 3.9_MHz_XTAL/2) // from 3.9MHz resonator
+	MCFG_DEVICE_PROGRAM_MAP(csc_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // 38400Hz/64
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(fidel6502_state, csc_pia0_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(fidel6502_state, csc_pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(fidel6502_state, csc_pia0_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(fidel6502_state, csc_pia0_ca2_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, fidel6502_state, csc_pia0_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, fidel6502_state, csc_pia0_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, fidel6502_state, csc_pia0_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia0_ca2_w))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(fidel6502_state, csc_pia1_pa_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(fidel6502_state, csc_pia1_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(fidel6502_state, csc_pia1_cb1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(fidel6502_state, csc_pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(fidel6502_state, csc_pia1_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(fidel6502_state, csc_pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(fidel6502_state, csc_pia1_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, fidel6502_state, csc_pia1_pa_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_ca1_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_cb1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_cb2_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_csc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, csc_speech_r))
+	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidel6502_state, csc_speech_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::su9)
 	csc(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(su9_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(su9_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, su9)
 
@@ -1743,15 +1767,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::eas)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 3_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(eas_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
+	MCFG_DEVICE_ADD("maincpu", R65C02, 3_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(eas_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0) // port B: input, port A & C: output
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(fidel6502_state, eas_ppi_porta_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fidel6502_state, eas_ppi_porta_w))
 	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0))
-	MCFG_I8255_IN_PORTB_CB(READ8(fidel6502_state, eas_ppi_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidel6502_state, eas_ppi_portc_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, fidel6502_state, eas_ppi_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fidel6502_state, eas_ppi_portc_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1760,13 +1784,40 @@ MACHINE_CONFIG_START(fidel6502_state::eas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, csc_speech_r))
+	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidel6502_state, csc_speech_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
+	MCFG_GENERIC_EXTENSIONS("bin,dat")
+	MCFG_GENERIC_LOAD(fidelbase_state, scc_cartridge)
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(fidel6502_state::pc)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", R65C02, 4_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(pc_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_fidel_eas)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidel6502_state, csc_speech_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
+
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
@@ -1779,9 +1830,9 @@ MACHINE_CONFIG_START(fidel6502_state::eag)
 	eas(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
-	MCFG_CPU_PROGRAM_MAP(eag_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
+	MCFG_DEVICE_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
+	MCFG_DEVICE_PROGRAM_MAP(eag_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eag)
 MACHINE_CONFIG_END
@@ -1789,8 +1840,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::sc9d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 3.9_MHz_XTAL/2) // R6502AP, 3.9MHz resonator
-	MCFG_CPU_PROGRAM_MAP(sc9d_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 3.9_MHz_XTAL/2) // R6502AP, 3.9MHz resonator
+	MCFG_DEVICE_PROGRAM_MAP(sc9d_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(610)) // from 555 timer (22nF, 102K, 2.7K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(610) - attotime::from_usec(41)) // active for 41us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(610))
@@ -1800,9 +1851,9 @@ MACHINE_CONFIG_START(fidel6502_state::sc9d)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
@@ -1815,8 +1866,8 @@ MACHINE_CONFIG_START(fidel6502_state::sc9b)
 	sc9d(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M6502, 1500000) // from ceramic resonator "681 JSA", measured
-	MCFG_CPU_PROGRAM_MAP(sc9_map)
+	MCFG_DEVICE_REPLACE("maincpu", M6502, 1500000) // from ceramic resonator "681 JSA", measured
+	MCFG_DEVICE_PROGRAM_MAP(sc9_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::sc9c)
@@ -1830,7 +1881,7 @@ MACHINE_CONFIG_START(fidel6502_state::playmatic)
 	sc9b(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(3100000) // approximation
 
 	MCFG_DEFAULT_LAYOUT(layout_fidel_playmatic)
@@ -1839,8 +1890,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::sc12)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 3_MHz_XTAL) // R65C02P3
-	MCFG_CPU_PROGRAM_MAP(sc12_trampoline)
+	MCFG_DEVICE_ADD("maincpu", R65C02, 3_MHz_XTAL) // R65C02P3
+	MCFG_DEVICE_PROGRAM_MAP(sc12_trampoline)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nF, 102K, 1K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
@@ -1858,9 +1909,9 @@ MACHINE_CONFIG_START(fidel6502_state::sc12)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
@@ -1873,7 +1924,7 @@ MACHINE_CONFIG_START(fidel6502_state::sc12b)
 	sc12(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(4_MHz_XTAL) // R65C02P4
 
 	// change irq timer frequency
@@ -1890,8 +1941,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::fexcel)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, 12_MHz_XTAL/4) // G65SC102P-3, 12.0M ceramic resonator
-	MCFG_CPU_PROGRAM_MAP(fexcel_map)
+	MCFG_DEVICE_ADD("maincpu", M65SC02, 12_MHz_XTAL/4) // G65SC102P-3, 12.0M ceramic resonator
+	MCFG_DEVICE_PROGRAM_MAP(fexcel_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nF, 102K, 1K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
@@ -1901,40 +1952,40 @@ MACHINE_CONFIG_START(fidel6502_state::fexcel)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fexcel4)
 	fexcel(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, 4_MHz_XTAL) // R65C02P4
-	MCFG_CPU_PROGRAM_MAP(fexcel_map)
+	MCFG_DEVICE_REPLACE("maincpu", R65C02, 4_MHz_XTAL) // R65C02P4
+	MCFG_DEVICE_PROGRAM_MAP(fexcel_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fexcelb)
 	fexcel(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fexcelb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fexcelb_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fexcelp)
 	fexcel(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
-	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
+	MCFG_DEVICE_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
+	MCFG_DEVICE_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::granits)
 	fexcelp(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(8_MHz_XTAL) // overclocked
 MACHINE_CONFIG_END
 
@@ -1942,8 +1993,8 @@ MACHINE_CONFIG_START(fidel6502_state::fdes2100)
 	fexcel(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M65C02, 5_MHz_XTAL) // WDC 65C02
-	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
+	MCFG_DEVICE_REPLACE("maincpu", M65C02, 5_MHz_XTAL) // WDC 65C02
+	MCFG_DEVICE_PROGRAM_MAP(fexcelp_map)
 
 	// change irq timer frequency
 	MCFG_DEVICE_REMOVE("irq_on")
@@ -1959,16 +2010,16 @@ MACHINE_CONFIG_START(fidel6502_state::fdes2000)
 	fdes2100(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, 3_MHz_XTAL) // RP65C02G
-	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
+	MCFG_DEVICE_REPLACE("maincpu", R65C02, 3_MHz_XTAL) // RP65C02G
+	MCFG_DEVICE_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fexcelv)
 	fexcelb(config);
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, fexcelv_speech_r))
+	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidel6502_state, fexcelv_speech_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
 
@@ -1982,8 +2033,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::fdes2100d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, 6_MHz_XTAL) // W65C02P-6
-	MCFG_CPU_PROGRAM_MAP(fdesdis_map)
+	MCFG_DEVICE_ADD("maincpu", M65C02, 6_MHz_XTAL) // W65C02P-6
+	MCFG_DEVICE_PROGRAM_MAP(fdesdis_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nF, 102K, 1K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
@@ -1993,25 +2044,25 @@ MACHINE_CONFIG_START(fidel6502_state::fdes2100d)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fdes2000d)
 	fdes2100d(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, 3_MHz_XTAL) // R65C02P3
-	MCFG_CPU_PROGRAM_MAP(fdesdis_map)
+	MCFG_DEVICE_REPLACE("maincpu", R65C02, 3_MHz_XTAL) // R65C02P3
+	MCFG_DEVICE_PROGRAM_MAP(fdesdis_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fphantom)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 4.9152_MHz_XTAL) // R65C02P4
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
-	MCFG_CPU_PROGRAM_MAP(fphantom_map)
+	MCFG_DEVICE_ADD("maincpu", R65C02, 4.9152_MHz_XTAL) // R65C02P4
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
+	MCFG_DEVICE_PROGRAM_MAP(fphantom_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, fphantom)
 
@@ -2020,16 +2071,16 @@ MACHINE_CONFIG_START(fidel6502_state::fphantom)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::chesster)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 5_MHz_XTAL) // RP65C02G
-	MCFG_CPU_PROGRAM_MAP(chesster_map)
+	MCFG_DEVICE_ADD("maincpu", R65C02, 5_MHz_XTAL) // RP65C02G
+	MCFG_DEVICE_PROGRAM_MAP(chesster_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(9615)) // R/C circuit, measured
 	MCFG_TIMER_START_DELAY(attotime::from_hz(9615) - attotime::from_nsec(2600)) // active for 2.6us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(9615))
@@ -2039,19 +2090,19 @@ MACHINE_CONFIG_START(fidel6502_state::chesster)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac8", DAC_8BIT_R2R, 0) // m74hc374b1.ic1 + 8l513_02.z2
+	MCFG_DEVICE_ADD("dac8", DAC_8BIT_R2R, 0) // m74hc374b1.ic1 + 8l513_02.z2
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac8", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac8", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac8", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac8", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::kishon)
 	chesster(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(3.579545_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(kishon_map)
+	MCFG_DEVICE_PROGRAM_MAP(kishon_map)
 MACHINE_CONFIG_END
 
 
@@ -2293,6 +2344,105 @@ ROM_START( feasglafr )
 ROM_END
 
 
+ROM_START( fpres )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) )
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(5d049d5e) SHA1(c7359bead92729e8a92d6cf1789d87ae43d23cbf) )
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) )
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(6f18115f) SHA1(a08b3a66bfdc23f3400e03fe253a8b9a4967d14f) )
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(dea8091d) SHA1(1d94a90ae076215c2c009e78ec4919dbd8467ef8) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-32107", 0x0000, 0x1000, BAD_DUMP CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // taken from csc, assume correct
+	ROM_RELOAD(           0x1000, 0x1000)
+ROM_END
+
+ROM_START( fpressp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) )
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(5d049d5e) SHA1(c7359bead92729e8a92d6cf1789d87ae43d23cbf) )
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) )
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(6f18115f) SHA1(a08b3a66bfdc23f3400e03fe253a8b9a4967d14f) )
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(dea8091d) SHA1(1d94a90ae076215c2c009e78ec4919dbd8467ef8) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-64106", 0x0000, 0x2000, BAD_DUMP CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // taken from vcc/fexcelv, assume correct
+ROM_END
+
+ROM_START( fpresg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) )
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(5d049d5e) SHA1(c7359bead92729e8a92d6cf1789d87ae43d23cbf) )
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) )
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(6f18115f) SHA1(a08b3a66bfdc23f3400e03fe253a8b9a4967d14f) )
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(dea8091d) SHA1(1d94a90ae076215c2c009e78ec4919dbd8467ef8) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-64101", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
+ROM_END
+
+ROM_START( fpresfr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) )
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(5d049d5e) SHA1(c7359bead92729e8a92d6cf1789d87ae43d23cbf) )
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) )
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(6f18115f) SHA1(a08b3a66bfdc23f3400e03fe253a8b9a4967d14f) )
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(dea8091d) SHA1(1d94a90ae076215c2c009e78ec4919dbd8467ef8) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-64105", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv, assume correct
+ROM_END
+
+ROM_START( fpresbu )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(bb1cb486) SHA1(b83f50a3ef361d254b88eefaa5aac657aaa72375) )
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(af0aec0e) SHA1(8293d00a12efa1c142b9e37bc7786012250536d9) )
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(214a91cc) SHA1(aab07ecdd66ac208874f4053fc4b0b0659b017aa) )
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(dae4d8e4) SHA1(f06dbb643f0324c0bddaaae9537d5829768bda22) )
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(5fb67708) SHA1(1e9ee724c2be38daf39d5cf37b0ae587e408777c) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-32107", 0x0000, 0x1000, BAD_DUMP CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // taken from csc, assume correct
+	ROM_RELOAD(           0x1000, 0x1000)
+ROM_END
+
+ROM_START( fpresbusp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(bb1cb486) SHA1(b83f50a3ef361d254b88eefaa5aac657aaa72375) )
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(af0aec0e) SHA1(8293d00a12efa1c142b9e37bc7786012250536d9) )
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(214a91cc) SHA1(aab07ecdd66ac208874f4053fc4b0b0659b017aa) )
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(dae4d8e4) SHA1(f06dbb643f0324c0bddaaae9537d5829768bda22) )
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(5fb67708) SHA1(1e9ee724c2be38daf39d5cf37b0ae587e408777c) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-64106", 0x0000, 0x2000, BAD_DUMP CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // taken from vcc/fexcelv, assume correct
+ROM_END
+
+ROM_START( fpresbug )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(bb1cb486) SHA1(b83f50a3ef361d254b88eefaa5aac657aaa72375) )
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(af0aec0e) SHA1(8293d00a12efa1c142b9e37bc7786012250536d9) )
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(214a91cc) SHA1(aab07ecdd66ac208874f4053fc4b0b0659b017aa) )
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(dae4d8e4) SHA1(f06dbb643f0324c0bddaaae9537d5829768bda22) )
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(5fb67708) SHA1(1e9ee724c2be38daf39d5cf37b0ae587e408777c) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-64101", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
+ROM_END
+
+ROM_START( fpresbufr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(bb1cb486) SHA1(b83f50a3ef361d254b88eefaa5aac657aaa72375) )
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(af0aec0e) SHA1(8293d00a12efa1c142b9e37bc7786012250536d9) )
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(214a91cc) SHA1(aab07ecdd66ac208874f4053fc4b0b0659b017aa) )
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(dae4d8e4) SHA1(f06dbb643f0324c0bddaaae9537d5829768bda22) )
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(5fb67708) SHA1(1e9ee724c2be38daf39d5cf37b0ae587e408777c) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-64105", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv, assume correct
+ROM_END
+
+
 ROM_START( feag2100 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("el2100.1", 0x8000, 0x8000, CRC(9b62b7d5) SHA1(cfcaea2e36c2d52fe4a85c77dbc7fa135893860c) )
@@ -2300,8 +2450,8 @@ ROM_START( feag2100 )
 	ROM_LOAD("el2100.3", 0xe000, 0x2000, CRC(2079a506) SHA1(a7bb83138c7b6eff6ea96702d453a214697f4890) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
-	ROM_LOAD("vcc-english.bin", 0x0000, 0x1000, BAD_DUMP CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // taken from csc, assume correct
-	ROM_RELOAD(                 0x1000, 0x1000)
+	ROM_LOAD("101-32107", 0x0000, 0x1000, BAD_DUMP CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // taken from csc, assume correct
+	ROM_RELOAD(           0x1000, 0x1000)
 ROM_END
 
 ROM_START( feag2100sp )
@@ -2511,6 +2661,15 @@ CONS( 1984, feasgla,    feasbu,   0, eas,       eas,       fidel6502_state, 0,  
 CONS( 1984, feasglasp,  feasbu,   0, eas,       eassp,     fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1984, feasglag,   feasbu,   0, eas,       easg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1984, feasglafr,  feasbu,   0, eas,       easfr,     fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+
+CONS( 1982, fpres,      0,        0, pc,        eas,       fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (original program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1982, fpressp,    fpres,    0, pc,        eassp,     fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (original program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1982, fpresg,     fpres,    0, pc,        easg,      fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (original program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1982, fpresfr,    fpres,    0, pc,        easfr,     fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (original program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fpresbu,    fpres,    0, pc,        eas,       fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (Budapest program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fpresbusp,  fpres,    0, pc,        eassp,     fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (Budapest program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fpresbug,   fpres,    0, pc,        easg,      fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (Budapest program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fpresbufr,  fpres,    0, pc,        easfr,     fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (Budapest program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1986, feag2100,   0,        0, eag,       eag,       fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1986, feag2100sp, feag2100, 0, eag,       eagsp,     fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

@@ -319,8 +319,8 @@ READ8_MEMBER(foodf_state::pot_r)
 MACHINE_CONFIG_START(foodf_state::foodf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK/16)
 	MCFG_ADC0808_IN0_CB(IOPORT("STICK1_Y"))
@@ -345,26 +345,26 @@ MACHINE_CONFIG_START(foodf_state::foodf)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 256, 259, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(foodf_state, screen_update_foodf)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(foodf_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, foodf_state, video_int_write_line))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK/2/10)
-	MCFG_POKEY_POT0_R_CB(READ8(foodf_state, pot_r))
-	MCFG_POKEY_POT1_R_CB(READ8(foodf_state, pot_r))
-	MCFG_POKEY_POT2_R_CB(READ8(foodf_state, pot_r))
-	MCFG_POKEY_POT3_R_CB(READ8(foodf_state, pot_r))
-	MCFG_POKEY_POT4_R_CB(READ8(foodf_state, pot_r))
-	MCFG_POKEY_POT5_R_CB(READ8(foodf_state, pot_r))
-	MCFG_POKEY_POT6_R_CB(READ8(foodf_state, pot_r))
-	MCFG_POKEY_POT7_R_CB(READ8(foodf_state, pot_r))
+	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/2/10)
+	MCFG_POKEY_POT0_R_CB(READ8(*this, foodf_state, pot_r))
+	MCFG_POKEY_POT1_R_CB(READ8(*this, foodf_state, pot_r))
+	MCFG_POKEY_POT2_R_CB(READ8(*this, foodf_state, pot_r))
+	MCFG_POKEY_POT3_R_CB(READ8(*this, foodf_state, pot_r))
+	MCFG_POKEY_POT4_R_CB(READ8(*this, foodf_state, pot_r))
+	MCFG_POKEY_POT5_R_CB(READ8(*this, foodf_state, pot_r))
+	MCFG_POKEY_POT6_R_CB(READ8(*this, foodf_state, pot_r))
+	MCFG_POKEY_POT7_R_CB(READ8(*this, foodf_state, pot_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/2/10)
+	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK/2/10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_ADD("pokey3", POKEY, MASTER_CLOCK/2/10)
+	MCFG_DEVICE_ADD("pokey3", POKEY, MASTER_CLOCK/2/10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 

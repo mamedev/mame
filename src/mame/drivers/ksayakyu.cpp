@@ -261,12 +261,12 @@ void ksayakyu_state::machine_reset()
 MACHINE_CONFIG_START(ksayakyu_state::ksayakyu)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8) //divider is guessed
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,MAIN_CLOCK/8) //divider is guessed
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK/8) //divider is guessed, controls DAC tempo
-	MCFG_CPU_PROGRAM_MAP(soundcpu_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ksayakyu_state, irq0_line_hold, 60) //guess, controls music tempo
+	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_CLOCK/8) //divider is guessed, controls DAC tempo
+	MCFG_DEVICE_PROGRAM_MAP(soundcpu_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(ksayakyu_state, irq0_line_hold, 60) //guess, controls music tempo
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
@@ -290,19 +290,19 @@ MACHINE_CONFIG_START(ksayakyu_state::ksayakyu)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/16) //unknown clock
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ksayakyu_state, dummy1_w))
+	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/16) //unknown clock
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ksayakyu_state, dummy1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/16) //unknown clock
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ksayakyu_state, dummy2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ksayakyu_state, dummy3_w))
+	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/16) //unknown clock
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ksayakyu_state, dummy2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ksayakyu_state, dummy3_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( ksayakyu )

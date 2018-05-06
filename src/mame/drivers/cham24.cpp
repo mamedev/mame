@@ -91,10 +91,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(cham24);
-	uint32_t screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cham24_set_mirroring( int mirroring );
-	void ppu_irq(int *ppu_regs);
 	void cham24(machine_config &config);
 	void cham24_map(address_map &map);
 };
@@ -254,25 +251,8 @@ static INPUT_PORTS_START( cham24 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(cham24_state, cham24)
-{
-	m_ppu->init_palette(palette, 0);
-}
-
-void cham24_state::ppu_irq(int *ppu_regs)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 void cham24_state::video_start()
 {
-}
-
-uint32_t cham24_state::screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	/* render the ppu */
-	m_ppu->render(bitmap, 0, 0, 0, 0);
-	return 0;
 }
 
 
@@ -308,30 +288,21 @@ DRIVER_INIT_MEMBER(cham24_state,cham24)
 {
 }
 
-static GFXDECODE_START( cham24 )
-	/* none, the ppu generates one */
-GFXDECODE_END
-
 MACHINE_CONFIG_START(cham24_state::cham24)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cham24_map)
+	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(cham24_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cham24_state, screen_update_cham24)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DEVICE("ppu", ppu2c0x_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cham24)
-	MCFG_PALETTE_ADD("palette", 8*4*16)
-	MCFG_PALETTE_INIT_OWNER(cham24_state, cham24)
-
-	MCFG_PPU2C04_ADD("ppu")
+	MCFG_PPU2C02_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(cham24_state, ppu_irq)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

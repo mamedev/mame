@@ -254,18 +254,6 @@ WRITE_LINE_MEMBER(rallyx_state::flip_screen_w)
 }
 
 
-WRITE_LINE_MEMBER(rallyx_state::led_0_w)
-{
-	output().set_led_value(0, state);
-}
-
-
-WRITE_LINE_MEMBER(rallyx_state::led_1_w)
-{
-	output().set_led_value(1, state);
-}
-
-
 WRITE_LINE_MEMBER(rallyx_state::coin_lockout_w)
 {
 	machine().bookkeeping().coin_lockout_w(0, !state);
@@ -829,19 +817,19 @@ WRITE_LINE_MEMBER(rallyx_state::jungler_vblank_irq)
 MACHINE_CONFIG_START(rallyx_state::rallyx)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(rallyx_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(rallyx_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 259 at 12M or 4099 at 11M on Logic Board I
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(rallyx_state, bang_w)) // BANG
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(rallyx_state, irq_mask_w)) // INT ON
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(rallyx_state, sound_on_w)) // SOUND ON
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(rallyx_state, flip_screen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(rallyx_state, led_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(rallyx_state, led_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(rallyx_state, coin_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(rallyx_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, rallyx_state, bang_w)) // BANG
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, rallyx_state, irq_mask_w)) // INT ON
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, rallyx_state, sound_on_w)) // SOUND ON
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, rallyx_state, flip_screen_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0"))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1"))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, rallyx_state, coin_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, rallyx_state, coin_counter_1_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -855,7 +843,7 @@ MACHINE_CONFIG_START(rallyx_state::rallyx)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_rallyx)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(rallyx_state, rallyx_vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rallyx_state, rallyx_vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rallyx)
 
@@ -868,11 +856,11 @@ MACHINE_CONFIG_START(rallyx_state::rallyx)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32) /* 96 KHz */
+	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32) /* 96 KHz */
 	MCFG_NAMCO_AUDIO_VOICES(3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(rallyx_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -882,18 +870,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(rallyx_state::jungler)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(jungler_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(jungler_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 1C on Loco-Motion
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w)) // SOUNDON
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(rallyx_state, nmi_mask_w)) // INTST
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, mute_w)) // MUT
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(rallyx_state, flip_screen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(rallyx_state, coin_counter_1_w)) // OUT1
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w)) // SOUNDON
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, rallyx_state, nmi_mask_w)) // INTST
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, mute_w)) // MUT
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, rallyx_state, flip_screen_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, rallyx_state, coin_counter_1_w)) // OUT1
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // OUT2
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(rallyx_state, coin_counter_2_w)) // OUT3
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(rallyx_state, stars_enable_w)) // STARSON
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, rallyx_state, coin_counter_2_w)) // OUT3
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, rallyx_state, stars_enable_w)) // STARSON
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -907,7 +895,7 @@ MACHINE_CONFIG_START(rallyx_state::jungler)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_jungler)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(rallyx_state, jungler_vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rallyx_state, jungler_vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jungler)
 
@@ -918,8 +906,7 @@ MACHINE_CONFIG_START(rallyx_state::jungler)
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,jungler)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
-	downcast<timeplt_audio_device *>(device)->locomotn_sound(config);
+	MCFG_DEVICE_ADD("timeplt_audio", LOCOMOTN_AUDIO)
 MACHINE_CONFIG_END
 
 

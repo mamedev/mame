@@ -815,13 +815,13 @@ static const char *const m10_sample_names[] =
 MACHINE_CONFIG_START(m10_state::m10)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,IREMM10_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(m10_main)
+	MCFG_DEVICE_ADD("maincpu", M6502,IREMM10_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(m10_main)
 
 	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
 	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
 
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", m10_state,  m10_interrupt)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m10_state,  m10_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -844,7 +844,7 @@ MACHINE_CONFIG_START(m10_state::m10)
 	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(m10_state, ic8j1_output_changed))
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, m10_state, ic8j1_output_changed))
 	MCFG_DEVICE_ADD("ic8j2", TTL74123, 0)
 	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_DIODE)    /* the hook up type */
 	/* 10k + 20k variable resistor */
@@ -853,12 +853,12 @@ MACHINE_CONFIG_START(m10_state::m10)
 	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(m10_state, ic8j2_output_changed))
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, m10_state, ic8j2_output_changed))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(m10_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -869,9 +869,9 @@ MACHINE_CONFIG_START(m10_state::m11)
 	m10(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(m11_main)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", m10_state,  m11_interrupt)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(m11_main)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m10_state,  m11_interrupt)
 
 	/* sound hardware */
 MACHINE_CONFIG_END
@@ -879,13 +879,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(m10_state::m15)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,IREMM15_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(m15_main)
+	MCFG_DEVICE_ADD("maincpu", M6502,IREMM15_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(m15_main)
 
 	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
 	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m10_state,  m15_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m10_state,  m15_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -902,7 +902,7 @@ MACHINE_CONFIG_START(m10_state::m15)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(m10_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -912,8 +912,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m10_state::headoni)
 	m15(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(11730000/16)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(11730000/16)
 MACHINE_CONFIG_END
 
 /*************************************

@@ -785,25 +785,25 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gsword_state::gsword)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'000'000)/6) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_IO_MAP(cpu1_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gsword_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'000'000)/6) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_IO_MAP(cpu1_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gsword_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(18'000'000)/6) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_IO_MAP(cpu2_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(gsword_state, sound_interrupt, 4*60)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(18'000'000)/6) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_IO_MAP(cpu2_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(gsword_state, sound_interrupt, 4*60)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'000'000)/6) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu3_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'000'000)/6) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu3_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000)) /* Allow time for 2nd cpu to interleave*/
 
 	MCFG_TAITO8741_ADD("taito8741")
 	MCFG_TAITO8741_MODES(TAITO8741_MASTER,TAITO8741_SLAVE,TAITO8741_PORT,TAITO8741_PORT)
 	MCFG_TAITO8741_CONNECT(1,0,0,0)
-	MCFG_TAITO8741_PORT_HANDLERS(IOPORT("DSW2"),IOPORT("DSW1"),READ8(gsword_state,i8741_2_r),READ8(gsword_state,i8741_3_r))
+	MCFG_TAITO8741_PORT_HANDLERS(IOPORT("DSW2"),IOPORT("DSW1"),READ8(*this, gsword_state,i8741_2_r),READ8(*this, gsword_state,i8741_3_r))
 #if 1
 	/* to MCU timeout champbbj */
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -828,14 +828,14 @@ MACHINE_CONFIG_START(gsword_state::gsword)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'000'000)/12) /* verified on pcb */
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'000'000)/12) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(gsword_state, nmi_set_w)) /* portA write */
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, gsword_state, nmi_set_w)) /* portA write */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
@@ -843,30 +843,30 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(josvolly_state::josvolly)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18000000/4) /* ? */
-	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_IO_MAP(josvolly_cpu1_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(josvolly_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_ADD("maincpu", Z80, 18000000/4) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_IO_MAP(josvolly_cpu1_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(josvolly_state, irq0_line_hold, 2*60)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4) /* ? */
-	MCFG_CPU_PROGRAM_MAP(josvolly_cpu2_map)
-	MCFG_CPU_IO_MAP(josvolly_cpu2_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", josvolly_state, irq0_line_assert)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/4) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(josvolly_cpu2_map)
+	MCFG_DEVICE_IO_MAP(josvolly_cpu2_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", josvolly_state, irq0_line_assert)
 
 	MCFG_DEVICE_ADD("mcu1", I8741, 18000000/2) /* ? */
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(josvolly_state, mcu1_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(josvolly_state, mcu1_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(josvolly_state, mcu1_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(josvolly_state, mcu1_p2_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, josvolly_state, mcu1_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, josvolly_state, mcu1_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, josvolly_state, mcu1_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, josvolly_state, mcu1_p2_w))
 
 	MCFG_DEVICE_ADD("mcu2", I8741, 12000000/2) /* ? */
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(josvolly_state, mcu2_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(josvolly_state, mcu2_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(josvolly_state, mcu2_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(josvolly_state, mcu2_p2_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, josvolly_state, mcu2_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, josvolly_state, mcu2_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, josvolly_state, mcu2_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, josvolly_state, mcu2_p2_w))
 	// TEST0 and TEST1 are driven by P20 and P21 on the other MCU
-	MCFG_MCS48_PORT_T0_IN_CB(DEVREAD8("mcu1", i8741_device, p2_r)) MCFG_DEVCB_RSHIFT(0)
-	MCFG_MCS48_PORT_T1_IN_CB(DEVREAD8("mcu1", i8741_device, p2_r)) MCFG_DEVCB_RSHIFT(1)
+	MCFG_MCS48_PORT_T0_IN_CB(READ8("mcu1", i8741_device, p2_r)) MCFG_DEVCB_RSHIFT(0)
+	MCFG_MCS48_PORT_T1_IN_CB(READ8("mcu1", i8741_device, p2_r)) MCFG_DEVCB_RSHIFT(1)
 
 	MCFG_DEVICE_ADD("aa_007", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))   // 1PL
@@ -894,14 +894,14 @@ MACHINE_CONFIG_START(josvolly_state::josvolly)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 #if 0
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 #endif
 MACHINE_CONFIG_END

@@ -1031,27 +1031,27 @@ GFXDECODE_END
 MACHINE_CONFIG_START(namcos1_state::ns1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(49'152'000)/32)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(49'152'000)/32)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("subcpu", MC6809E, XTAL(49'152'000)/32)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("subcpu", MC6809E, XTAL(49'152'000)/32)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL(49'152'000)/32)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(49'152'000)/32)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8)
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_IO_MAP(mcu_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_IO_MAP(mcu_port_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
 	MCFG_DEVICE_ADD("c117", NAMCO_C117, 0)
 	MCFG_DEVICE_PROGRAM_MAP(virtual_map)
 	MCFG_CUS117_CPUS("maincpu", "subcpu")
-	MCFG_CUS117_SUBRES_CB(WRITELINE(namcos1_state, subres_w))
+	MCFG_CUS117_SUBRES_CB(WRITELINE(*this, namcos1_state, subres_w))
 
 	// heavy sync required to prevent CPUs from fighting for video RAM access and going into deadlocks
 	MCFG_QUANTUM_TIME(attotime::from_hz(38400))
@@ -1064,7 +1064,7 @@ MACHINE_CONFIG_START(namcos1_state::ns1)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 9+8*8, 9+44*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos1_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos1_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos1_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos1)
@@ -1078,22 +1078,22 @@ MACHINE_CONFIG_START(namcos1_state::ns1)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 3579580)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048/2)
+	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048/2)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_NAMCO_AUDIO_STEREO(1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dac0", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // 10-pin 1Kx8R SIP with HC374 latch
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // 10-pin 1Kx8R SIP with HC374 latch
+	MCFG_DEVICE_ADD("dac0", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // 10-pin 1Kx8R SIP with HC374 latch
+	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // 10-pin 1Kx8R SIP with HC374 latch
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

@@ -567,15 +567,15 @@ INTERRUPT_GEN_MEMBER(rbmk_state::mcu_irq)
 }
 
 MACHINE_CONFIG_START(rbmk_state::rbmk)
-	MCFG_CPU_ADD("maincpu", M68000, 22000000 /2)
-	MCFG_CPU_PROGRAM_MAP(rbmk_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 22000000 /2)
+	MCFG_DEVICE_PROGRAM_MAP(rbmk_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbmk_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("mcu", AT89C4051, 22000000 / 4) // frequency isn't right
-	MCFG_CPU_PROGRAM_MAP(mcu_mem)
-	MCFG_CPU_IO_MAP(mcu_io)
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(rbmk_state, mcu_io_mux_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  mcu_irq)
+	MCFG_DEVICE_ADD("mcu", AT89C4051, 22000000 / 4) // frequency isn't right
+	MCFG_DEVICE_PROGRAM_MAP(mcu_mem)
+	MCFG_DEVICE_IO_MAP(mcu_io)
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, rbmk_state, mcu_io_mux_w))
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbmk_state,  mcu_irq)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rbmk)
 
@@ -599,17 +599,17 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 
-	MCFG_YM2151_ADD("ymsnd", 22000000 / 8)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 22000000 / 8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rbmk_state::rbspm)
 	rbmk(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rbspm_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rbspm_mem)
 
-	MCFG_CPU_MODIFY("mcu")
+	MCFG_DEVICE_MODIFY("mcu")
 	MCFG_DEVICE_DISABLE() // until decapped
 
 	// PIC16F84 but no CPU core available

@@ -278,12 +278,12 @@ WRITE16_MEMBER( dcon_state::layer_scroll_w )
 MACHINE_CONFIG_START(dcon_state::dcon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(dcon_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dcon_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(dcon_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dcon_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* Perhaps 14318180/4? */
-	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* Perhaps 14318180/4? */
+	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -295,8 +295,8 @@ MACHINE_CONFIG_START(dcon_state::dcon)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(dcon_state, layer_en_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(dcon_state, layer_scroll_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, dcon_state, layer_en_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, dcon_state, layer_scroll_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dcon)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -305,8 +305,8 @@ MACHINE_CONFIG_START(dcon_state::dcon)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
-	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
@@ -315,19 +315,19 @@ MACHINE_CONFIG_START(dcon_state::dcon)
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(sdgndmps_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dcon_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(sdgndmps_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dcon_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
-	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
+	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -339,8 +339,8 @@ MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(dcon_state, layer_en_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(dcon_state, layer_scroll_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, dcon_state, layer_en_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, dcon_state, layer_scroll_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dcon)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -349,8 +349,8 @@ MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
@@ -360,8 +360,8 @@ MACHINE_CONFIG_START(dcon_state::sdgndmps) /* PCB number is PB91008 */
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
 /***************************************************************************/

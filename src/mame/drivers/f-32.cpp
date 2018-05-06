@@ -167,10 +167,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(mosaicf2_state::mosaicf2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E132XN, XTAL(20'000'000)*4) /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(common_map)
-	MCFG_CPU_IO_MAP(mosaicf2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", E132XN, XTAL(20'000'000)*4) /* 4x internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(common_map)
+	MCFG_DEVICE_IO_MAP(mosaicf2_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq0_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
@@ -190,7 +190,7 @@ MACHINE_CONFIG_START(mosaicf2_state::mosaicf2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -245,10 +245,10 @@ void mosaicf2_state::royalpk2_io(address_map &map)
 MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", GMS30C2132, XTAL(50'000'000))
-	MCFG_CPU_PROGRAM_MAP(royalpk2_map)
-	MCFG_CPU_IO_MAP(royalpk2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", GMS30C2132, XTAL(50'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(royalpk2_map)
+	MCFG_DEVICE_IO_MAP(royalpk2_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq1_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
@@ -268,7 +268,7 @@ MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-//  MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* 3.579545 MHz */
+//  MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 //  MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

@@ -438,19 +438,19 @@ void warriorb_state::machine_reset()
 MACHINE_CONFIG_START(warriorb_state::darius2d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? (Might well be 16!) */
-	MCFG_CPU_PROGRAM_MAP(darius2d_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", warriorb_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? (Might well be 16!) */
+	MCFG_DEVICE_PROGRAM_MAP(darius2d_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", warriorb_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
 	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
 	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(warriorb_state, coin_control_w))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, warriorb_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -500,7 +500,7 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -527,19 +527,19 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(warriorb_state::warriorb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(warriorb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", warriorb_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(warriorb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", warriorb_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(warriorb_state, coin_control_w))
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, warriorb_state, coin_control_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -590,7 +590,7 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)

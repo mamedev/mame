@@ -2203,10 +2203,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(nbmj8891_state::gionbana)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(gionbana_map)
-	MCFG_CPU_IO_MAP(gionbana_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nbmj8891_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(gionbana_map)
+	MCFG_DEVICE_IO_MAP(gionbana_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8891_state, irq0_line_hold)
 
 	MCFG_NB1413M3_ADD("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_GIONBANA )
@@ -2226,21 +2226,21 @@ MACHINE_CONFIG_START(nbmj8891_state::gionbana)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("fmsnd", YM3812, 2500000)
+	MCFG_DEVICE_ADD("fmsnd", YM3812, 2500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.37) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.37) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::mgion)
 	gionbana(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mgion_map)
-	MCFG_CPU_IO_MAP(mgion_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mgion_map)
+	MCFG_DEVICE_IO_MAP(mgion_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MGION )
@@ -2252,9 +2252,9 @@ MACHINE_CONFIG_START(nbmj8891_state::omotesnd)
 	gionbana(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(omotesnd_map)
-	MCFG_CPU_IO_MAP(omotesnd_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(omotesnd_map)
+	MCFG_DEVICE_IO_MAP(omotesnd_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_OMOTESND )
@@ -2262,7 +2262,7 @@ MACHINE_CONFIG_START(nbmj8891_state::omotesnd)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("fmsnd", AY8910, 1250000)
+	MCFG_DEVICE_REPLACE("fmsnd", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
@@ -2280,8 +2280,8 @@ MACHINE_CONFIG_START(nbmj8891_state::mjcamerb)
 	gionbana(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(hanamomo_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(hanamomo_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MJCAMERB )
@@ -2298,8 +2298,8 @@ MACHINE_CONFIG_START(nbmj8891_state::mmcamera)
 	gionbana(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(hanamomo_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(hanamomo_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MMCAMERA )
@@ -2316,9 +2316,9 @@ MACHINE_CONFIG_START(nbmj8891_state::hanamomo)
 	gionbana(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hanamomo_map)
-	MCFG_CPU_IO_MAP(hanamomo_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hanamomo_map)
+	MCFG_DEVICE_IO_MAP(hanamomo_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_HANAMOMO )
@@ -2333,9 +2333,9 @@ MACHINE_CONFIG_START(nbmj8891_state::msjiken)
 	hanamomo(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gionbana_map)
-	MCFG_CPU_IO_MAP(msjiken_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gionbana_map)
+	MCFG_DEVICE_IO_MAP(msjiken_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MSJIKEN )
@@ -2392,8 +2392,8 @@ MACHINE_CONFIG_START(nbmj8891_state::mjnanpas)
 	gionbana(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(club90s_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(club90s_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MJNANPAS )
@@ -2403,9 +2403,9 @@ MACHINE_CONFIG_START(nbmj8891_state::maiko)
 	mjnanpas(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(maiko_map)
-	MCFG_CPU_IO_MAP(maiko_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(maiko_map)
+	MCFG_DEVICE_IO_MAP(maiko_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MAIKO )
@@ -2415,8 +2415,8 @@ MACHINE_CONFIG_START(nbmj8891_state::mmaiko)
 	maiko(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mmaiko_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mmaiko_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MMAIKO )
@@ -2428,9 +2428,9 @@ MACHINE_CONFIG_START(nbmj8891_state::lovehous)
 	mjnanpas(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(lovehous_map)
-	MCFG_CPU_IO_MAP(lovehous_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(lovehous_map)
+	MCFG_DEVICE_IO_MAP(lovehous_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_LOVEHOUS )
@@ -2442,8 +2442,8 @@ MACHINE_CONFIG_START(nbmj8891_state::hanaoji)
 	maiko(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hanaoji_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hanaoji_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_HANAOJI )
@@ -2455,27 +2455,27 @@ MACHINE_CONFIG_START(nbmj8891_state::hnxmasev)
 	maiko(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hnxmasev_map)
-	MCFG_CPU_IO_MAP(maiko_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hnxmasev_map)
+	MCFG_DEVICE_IO_MAP(maiko_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::hnageman)
 	maiko(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hnageman_map)
-	MCFG_CPU_IO_MAP(maiko_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hnageman_map)
+	MCFG_DEVICE_IO_MAP(maiko_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::scandal)
 	hanamomo(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(scandalm_map)
-	MCFG_CPU_IO_MAP(scandal_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(scandalm_map)
+	MCFG_DEVICE_IO_MAP(scandal_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_SCANDAL )
@@ -2485,9 +2485,9 @@ MACHINE_CONFIG_START(nbmj8891_state::bananadr)
 	mjnanpas(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(scandalm_map)
-	MCFG_CPU_IO_MAP(bananadr_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(scandalm_map)
+	MCFG_DEVICE_IO_MAP(bananadr_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_BANANADR )
@@ -2521,9 +2521,9 @@ MACHINE_CONFIG_START(nbmj8891_state::mjfocusm)
 	gionbana(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(scandalm_map)
-	MCFG_CPU_IO_MAP(scandalm_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(scandalm_map)
+	MCFG_DEVICE_IO_MAP(scandalm_io_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MJFOCUSM )
@@ -2536,7 +2536,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mjfocusm)
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("fmsnd", AY8910, 1250000)
+	MCFG_DEVICE_REPLACE("fmsnd", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
@@ -2553,10 +2553,10 @@ MACHINE_CONFIG_START(nbmj8891_state::taiwanmb)
 	gionbana(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(taiwanmb_map)
-	MCFG_CPU_IO_MAP(taiwanmb_io_map)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", nbmj8891_state, irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(taiwanmb_map)
+	MCFG_DEVICE_IO_MAP(taiwanmb_io_map)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8891_state, irq0_line_hold)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_TAIWANMB )
@@ -2569,7 +2569,7 @@ MACHINE_CONFIG_START(nbmj8891_state::taiwanmb)
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("fmsnd", AY8910, 1250000)
+	MCFG_DEVICE_REPLACE("fmsnd", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)

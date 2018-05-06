@@ -1752,15 +1752,15 @@ static const char *const twotiger_sample_names[] =
 MACHINE_CONFIG_START(mcr_state::mcr_90009)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_OSC_MCR_I/8)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_OSC_MCR_I/8)
 	MCFG_Z80_DAISY_CHAIN(mcr_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(cpu_90009_map)
-	MCFG_CPU_IO_MAP(cpu_90009_portmap)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_90009_map)
+	MCFG_DEVICE_IO_MAP(cpu_90009_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr_state, mcr_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_OSC_MCR_I/8 /* same as "maincpu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc", z80ctc_device, trg1))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
@@ -1783,7 +1783,7 @@ MACHINE_CONFIG_START(mcr_state::mcr_90009)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ssio", MIDWAY_SSIO, 0)
+	MCFG_DEVICE_ADD("ssio", MIDWAY_SSIO)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1804,9 +1804,9 @@ MACHINE_CONFIG_START(mcr_state::mcr_90010)
 	mcr_90009(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(cpu_90010_map)
-	MCFG_CPU_IO_MAP(cpu_90010_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(cpu_90010_map)
+	MCFG_DEVICE_IO_MAP(cpu_90010_portmap)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1820,7 +1820,7 @@ MACHINE_CONFIG_START(mcr_state::mcr_90010_tt)
 	mcr_90010(config);
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(2)
 	MCFG_SAMPLES_NAMES(twotiger_sample_names)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
@@ -1838,7 +1838,7 @@ MACHINE_CONFIG_START(mcr_state::mcr_91475)
 	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(journey_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
@@ -1851,10 +1851,10 @@ MACHINE_CONFIG_START(mcr_state::mcr_91490)
 	mcr_90010(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(5000000)
-	MCFG_CPU_PROGRAM_MAP(cpu_91490_map)
-	MCFG_CPU_IO_MAP(cpu_91490_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(5000000)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_91490_map)
+	MCFG_DEVICE_IO_MAP(cpu_91490_portmap)
 
 	MCFG_DEVICE_MODIFY("ctc")
 	MCFG_DEVICE_CLOCK(5000000 /* same as "maincpu" */)
@@ -1866,7 +1866,7 @@ MACHINE_CONFIG_START(mcr_state::mcr_91490_snt)
 	mcr_91490(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("snt", MIDWAY_SQUAWK_N_TALK, 0)
+	MCFG_DEVICE_ADD("snt", MIDWAY_SQUAWK_N_TALK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1877,10 +1877,10 @@ MACHINE_CONFIG_START(mcr_nflfoot_state::mcr_91490_ipu)
 	mcr_91490_snt(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("ipu", Z80, 7372800/2)
+	MCFG_DEVICE_ADD("ipu", Z80, 7372800/2)
 	MCFG_Z80_DAISY_CHAIN(mcr_ipu_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(ipu_91695_map)
-	MCFG_CPU_IO_MAP(ipu_91695_portmap)
+	MCFG_DEVICE_PROGRAM_MAP(ipu_91695_map)
+	MCFG_DEVICE_IO_MAP(ipu_91695_portmap)
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(mcr_nflfoot_state, ipu_interrupt)
 
@@ -1895,8 +1895,8 @@ MACHINE_CONFIG_START(mcr_nflfoot_state::mcr_91490_ipu)
 
 	MCFG_DEVICE_ADD("ipu_sio", Z80SIO0, 7372800/2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(mcr_nflfoot_state, sio_txda_w))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(mcr_nflfoot_state, sio_txdb_w))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(*this, mcr_nflfoot_state, sio_txda_w))
+	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(*this, mcr_nflfoot_state, sio_txdb_w))
 MACHINE_CONFIG_END
 
 
@@ -1905,7 +1905,7 @@ MACHINE_CONFIG_START(mcr_state::mcr_91490_tcs)
 	mcr_91490(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
+	MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

@@ -586,8 +586,8 @@ MACHINE_RESET_MEMBER(piratesh_state,piratesh)
 MACHINE_CONFIG_START(piratesh_state::piratesh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(piratesh_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(piratesh_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", piratesh_state, piratesh_interrupt, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -646,7 +646,7 @@ MACHINE_CONFIG_START(piratesh_state::piratesh)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(piratesh_state, k054539_nmi_gen))
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, piratesh_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.2)
 MACHINE_CONFIG_END

@@ -251,11 +251,11 @@ void rockrage_state::machine_reset()
 MACHINE_CONFIG_START(rockrage_state::rockrage)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(rockrage_map)
+	MCFG_DEVICE_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(rockrage_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL(24'000'000) / 16)
-	MCFG_CPU_PROGRAM_MAP(rockrage_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(24'000'000) / 16)
+	MCFG_DEVICE_PROGRAM_MAP(rockrage_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rockrage_state, screen_update_rockrage)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(rockrage_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rockrage_state, vblank_irq))
 
 	MCFG_K007342_ADD("k007342")
 	MCFG_K007342_GFXNUM(0)
@@ -291,11 +291,11 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
+	MCFG_DEVICE_ADD("vlm", VLM5030, 3579545)
 	MCFG_DEVICE_ADDRESS_MAP(0, rockrage_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)

@@ -405,13 +405,13 @@ void crshrace_state::machine_reset()
 MACHINE_CONFIG_START(crshrace_state::crshrace)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,16000000)    /* 16 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(crshrace_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", crshrace_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,16000000)    /* 16 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(crshrace_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crshrace_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)   /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)   /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 
 	/* video hardware */
@@ -420,8 +420,8 @@ MACHINE_CONFIG_START(crshrace_state::crshrace)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(crshrace_state, screen_update_crshrace)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crshrace)
@@ -433,8 +433,8 @@ MACHINE_CONFIG_START(crshrace_state::crshrace)
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
 	MCFG_K053936_WRAP(1)
@@ -447,7 +447,7 @@ MACHINE_CONFIG_START(crshrace_state::crshrace)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)

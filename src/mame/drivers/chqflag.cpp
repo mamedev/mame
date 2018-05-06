@@ -319,11 +319,11 @@ WRITE_LINE_MEMBER(chqflag_state::background_brt_w)
 MACHINE_CONFIG_START(chqflag_state::chqflag)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)    /* 052001 (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(chqflag_map)
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)    /* 052001 (verified on pcb) */
+	MCFG_DEVICE_PROGRAM_MAP(chqflag_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(chqflag_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(chqflag_sound_map)
 
 	MCFG_DEVICE_ADD("bank1000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank1000_map)
@@ -354,7 +354,7 @@ MACHINE_CONFIG_START(chqflag_state::chqflag)
 	MCFG_K051960_CB(chqflag_state, sprite_callback)
 	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
 	MCFG_K051960_NMI_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_K051960_VREG_CONTRAST_HANDLER(WRITELINE(chqflag_state,background_brt_w))
+	MCFG_K051960_VREG_CONTRAST_HANDLER(WRITELINE(*this, chqflag_state,background_brt_w))
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
@@ -377,18 +377,18 @@ MACHINE_CONFIG_START(chqflag_state::chqflag)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_SOUND_ADD("k007232_1", K007232, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(chqflag_state, volume_callback0))
+	MCFG_DEVICE_ADD("k007232_1", K007232, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, chqflag_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MCFG_SOUND_ADD("k007232_2", K007232, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(chqflag_state, volume_callback1))
+	MCFG_DEVICE_ADD("k007232_2", K007232, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, chqflag_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.20)

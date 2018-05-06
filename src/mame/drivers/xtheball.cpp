@@ -298,28 +298,28 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(xtheball_state::xtheball)
 
-	MCFG_CPU_ADD("maincpu", TMS34010, 40000000)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, 40000000)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(10000000) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(xtheball_state, scanline_update)     /* scanline updater (rgb32) */
 	MCFG_TMS340X0_TO_SHIFTREG_CB(xtheball_state, to_shiftreg)  /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(xtheball_state, from_shiftreg) /* read from shiftreg function */
-	MCFG_CPU_PERIODIC_INT_DRIVER(xtheball_state, irq1_line_hold,  15000)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(xtheball_state, irq1_line_hold,  15000)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_DEVICE_ADD("latch1", LS259, 0) // exact type uncertain
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("ticket", ticket_dispenser_device, motor_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("ticket", ticket_dispenser_device, motor_w))
 	// Q4 = meter, Q6 = tickets, Q7 = tickets?
 
 	MCFG_DEVICE_ADD("latch2", LS259, 0) // exact type uncertain
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(xtheball_state, start_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, xtheball_state, start_lamp_w))
 	// Q0 = start lamp, Q1-Q7 = more lamps?
 
 	MCFG_DEVICE_ADD("latch3", LS259, 0) // exact type uncertain
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(xtheball_state, foreground_mode_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, xtheball_state, foreground_mode_w))
 	// Q3 = video foreground control?
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -336,9 +336,9 @@ MACHINE_CONFIG_START(xtheball_state::xtheball)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

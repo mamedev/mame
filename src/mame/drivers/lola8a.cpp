@@ -264,16 +264,16 @@ WRITE_LINE_MEMBER(lola8a_state::crtc_vsync)
 
 MACHINE_CONFIG_START(lola8a_state::lola8a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(4'915'200))
-	MCFG_CPU_PROGRAM_MAP(lola8a_mem)
-	MCFG_CPU_IO_MAP(lola8a_io)
-	MCFG_I8085A_SID(READLINE(lola8a_state, cass_r))
-	MCFG_I8085A_SOD(WRITELINE(lola8a_state, cass_w))
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(4'915'200))
+	MCFG_DEVICE_PROGRAM_MAP(lola8a_mem)
+	MCFG_DEVICE_IO_MAP(lola8a_io)
+	MCFG_I8085A_SID(READLINE(*this, lola8a_state, cass_r))
+	MCFG_I8085A_SOD(WRITELINE(*this, lola8a_state, cass_w))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(AY8910_TAG, AY8910, XTAL(4'915'200) / 4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(lola8a_state, lola8a_port_a_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lola8a_state, lola8a_port_b_w))
+	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(4'915'200) / 4)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, lola8a_state, lola8a_port_a_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lola8a_state, lola8a_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
 
 	/* video hardware */
@@ -288,7 +288,7 @@ MACHINE_CONFIG_START(lola8a_state::lola8a)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(lola8a_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(lola8a_state, crtc_vsync))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, lola8a_state, crtc_vsync))
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 

@@ -360,11 +360,11 @@ void jackal_state::machine_reset()
 MACHINE_CONFIG_START(jackal_state::jackal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master", MC6809E, MASTER_CLOCK/12) // verified on pcb
-	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_ADD("master", MC6809E, MASTER_CLOCK/12) // verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
 
-	MCFG_CPU_ADD("slave", MC6809E, MASTER_CLOCK/12) // verified on pcb
-	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_ADD("slave", MC6809E, MASTER_CLOCK/12) // verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -378,7 +378,7 @@ MACHINE_CONFIG_START(jackal_state::jackal)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jackal_state, screen_update_jackal)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(jackal_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jackal_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jackal)
 	MCFG_PALETTE_ADD("palette", 0x300)
@@ -390,7 +390,7 @@ MACHINE_CONFIG_START(jackal_state::jackal)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK) // verified on pcb
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK) // verified on pcb
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END

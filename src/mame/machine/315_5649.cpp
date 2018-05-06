@@ -104,8 +104,10 @@ READ8_MEMBER( sega_315_5649_device::read )
 
 	// analog input, auto-increments
 	case 0x0f:
-		data = m_an_port_cb[m_analog_channel++](0);
-		m_analog_channel &= 0x07;
+		data = m_an_port_cb[m_analog_channel](0);
+		if (!machine().side_effects_disabled())
+			m_analog_channel = (m_analog_channel + 1) & 0x07;
+		break;
 	}
 
 	LOG("RD %02x = %02x\n", offset, data);

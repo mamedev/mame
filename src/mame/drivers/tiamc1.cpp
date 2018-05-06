@@ -329,15 +329,15 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(tiamc1_state::tiamc1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(tiamc1_map)
-	MCFG_CPU_IO_MAP(tiamc1_io_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(tiamc1_map)
+	MCFG_DEVICE_IO_MAP(tiamc1_io_map)
 
 	MCFG_DEVICE_ADD("kr580vv55a", I8255A, 0)  /* soviet clone of i8255 */
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(tiamc1_state, tiamc1_control_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tiamc1_state, tiamc1_control_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -352,15 +352,15 @@ MACHINE_CONFIG_START(tiamc1_state::tiamc1)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("2x8253", TIAMC1, SND_CLOCK)
+	MCFG_DEVICE_ADD("2x8253", TIAMC1, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tiamc1_state::kot)
 	tiamc1(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kotrybolov_map)
-	MCFG_CPU_IO_MAP(kotrybolov_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kotrybolov_map)
+	MCFG_DEVICE_IO_MAP(kotrybolov_io_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_VIDEO_START_OVERRIDE(tiamc1_state, kot)
@@ -369,13 +369,13 @@ MACHINE_CONFIG_START(tiamc1_state::kot)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", kot)
 
 	MCFG_DEVICE_REMOVE("2x8253")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(PIXEL_CLOCK / 4)
 	MCFG_PIT8253_CLK2(SND_CLOCK)                // guess
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(tiamc1_state, pit8253_2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, tiamc1_state, pit8253_2_w))
 MACHINE_CONFIG_END
 
 

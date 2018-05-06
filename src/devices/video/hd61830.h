@@ -119,6 +119,6 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(HD61830, hd61830_device)
-extern const device_type HD61830B;
+DECLARE_DEVICE_TYPE(HD61830B, hd61830_device)
 
 #endif // MAME_VIDEO_HD61830_H

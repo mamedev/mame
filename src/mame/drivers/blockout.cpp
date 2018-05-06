@@ -307,12 +307,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(blockout_state::blockout_scanline)
 MACHINE_CONFIG_START(blockout_state::blockout)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MAIN_CLOCK)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", blockout_state, blockout_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, AUDIO_CLOCK)  /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, AUDIO_CLOCK)  /* 3.579545 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 
 	/* video hardware */
@@ -331,8 +331,8 @@ MACHINE_CONFIG_START(blockout_state::blockout)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", AUDIO_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(blockout_state,irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, AUDIO_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, blockout_state,irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
@@ -343,8 +343,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(blockout_state::agress)
 	blockout(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(agress_map)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(agress_map)
 MACHINE_CONFIG_END
 
 /*************************************

@@ -543,17 +543,17 @@ void sf_state::machine_reset()
 MACHINE_CONFIG_START(sf_state::sfan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(sfan_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sf_state, irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sfan_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sf_state, irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))  /* ? xtal is 3.579545MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))  /* ? xtal is 3.579545MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_CPU_ADD("audio2", Z80, XTAL(3'579'545))    /* ? xtal is 3.579545MHz */
-	MCFG_CPU_PROGRAM_MAP(sound2_map)
-	MCFG_CPU_IO_MAP(sound2_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(sf_state, irq0_line_hold, 8000) // ?
+	MCFG_DEVICE_ADD("audio2", Z80, XTAL(3'579'545))    /* ? xtal is 3.579545MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound2_map)
+	MCFG_DEVICE_IO_MAP(sound2_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(sf_state, irq0_line_hold, 8000) // ?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -574,17 +574,17 @@ MACHINE_CONFIG_START(sf_state::sfan)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
+	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* 8KHz playback ?    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
+	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* 8KHz playback ?    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -595,8 +595,8 @@ MACHINE_CONFIG_START(sf_state::sfus)
 	sfan(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sfus_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sfus_map)
 MACHINE_CONFIG_END
 
 
@@ -604,8 +604,8 @@ MACHINE_CONFIG_START(sf_state::sfjp)
 	sfan(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sfjp_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sfjp_map)
 MACHINE_CONFIG_END
 
 
@@ -613,8 +613,8 @@ MACHINE_CONFIG_START(sf_state::sfp)
 	sfan(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sf_state, irq6_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sf_state, irq6_line_hold)
 MACHINE_CONFIG_END
 
 

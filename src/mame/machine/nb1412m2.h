@@ -20,6 +20,9 @@ Nichibutsu 1412M2 device emulation
 #define MCFG_NB1412M2_ADD(tag, freq) \
 		MCFG_DEVICE_ADD((tag), NB1412M2, (freq))
 
+#define MCFG_NB1412M2_DAC_CB(_devcb) \
+	devcb = &downcast<nb1412m2_device &>(*device).set_dac_callback(DEVCB_##_devcb);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -47,8 +50,13 @@ public:
 	DECLARE_WRITE8_MEMBER( timer_ack_w );
 	DECLARE_READ8_MEMBER( const90_r );
 	DECLARE_WRITE8_MEMBER( const90_w );
+	DECLARE_WRITE8_MEMBER( dac_address_w );
+	DECLARE_WRITE8_MEMBER( dac_timer_w );
 
-	
+	template <class Object> devcb_base &set_dac_callback(Object &&cb)
+	{ return m_dac_cb.set_callback(std::forward<Object>(cb)); }
+
+
 	void nb1412m2_map(address_map &map);
 protected:
 	// device-level overrides
@@ -63,15 +71,21 @@ private:
 	uint8_t m_command;
 	uint16_t m_rom_address;
 	uint16_t m_adj_address;
+	uint16_t m_dac_start_address, m_dac_current_address;
+	int m_dac_frequency;
 	uint8_t m_rom_op;
+	uint8_t m_const90;
 	bool m_timer_reg;
+	bool m_dac_playback;
 	const address_space_config m_space_config;
 	emu_timer *m_timer;
-	uint8_t m_const90;
+	emu_timer *m_dac_timer;
 
 	required_region_ptr<uint8_t> m_data;
-	
+	devcb_write8 m_dac_cb;
+
 	static const device_timer_id TIMER_MAIN = 1;
+	static const device_timer_id TIMER_DAC = 2;
 };
 
 

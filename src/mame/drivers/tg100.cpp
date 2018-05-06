@@ -73,13 +73,13 @@ void tg100_state::ymw258_map(address_map &map)
 
 MACHINE_CONFIG_START(tg100_state::tg100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",  H83002, XTAL(20'000'000)) /* TODO: correct CPU type (H8/520) */
-	MCFG_CPU_PROGRAM_MAP( tg100_map )
-	MCFG_CPU_IO_MAP( tg100_io_map )
+	MCFG_DEVICE_ADD("maincpu",  H83002, XTAL(20'000'000)) /* TODO: correct CPU type (H8/520) */
+	MCFG_DEVICE_PROGRAM_MAP( tg100_map )
+	MCFG_DEVICE_IO_MAP( tg100_io_map )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymw258", MULTIPCM, 9400000)
+	MCFG_DEVICE_ADD("ymw258", MULTIPCM, 9400000)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymw258_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

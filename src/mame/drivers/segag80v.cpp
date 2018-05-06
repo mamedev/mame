@@ -896,11 +896,11 @@ static const char *const zektor_sample_names[] =
 MACHINE_CONFIG_START(segag80v_state::g80v_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_OPCODES_MAP(opcodes_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80v_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, VIDEO_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_OPCODES_MAP(opcodes_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segag80v_state,  irq0_line_hold)
 
 
 	/* video hardware */
@@ -922,7 +922,7 @@ MACHINE_CONFIG_START(segag80v_state::elim2)
 	g80v_base(config);
 
 	/* custom sound board */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(8)
 	MCFG_SAMPLES_NAMES(elim_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
@@ -933,7 +933,7 @@ MACHINE_CONFIG_START(segag80v_state::spacfury)
 	g80v_base(config);
 
 	/* custom sound board */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(8)
 	MCFG_SAMPLES_NAMES(spacfury_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
@@ -947,12 +947,12 @@ MACHINE_CONFIG_START(segag80v_state::zektor)
 	g80v_base(config);
 
 	/* custom sound board */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(8)
 	MCFG_SAMPLES_NAMES(zektor_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
-	MCFG_SOUND_ADD("aysnd", AY8912, VIDEO_CLOCK/4/2)
+	MCFG_DEVICE_ADD("aysnd", AY8912, VIDEO_CLOCK/4/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
 
 	/* speech board */

@@ -106,7 +106,7 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_JOYPORT_SLOT, bbc_joyport_slot_device)
 
-SLOT_INTERFACE_EXTERN( bbc_joyport_devices );
+void bbc_joyport_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_BBC_JOYPORT_JOYPORT_H

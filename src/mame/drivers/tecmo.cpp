@@ -717,12 +717,12 @@ void tecmo_state::machine_reset()
 MACHINE_CONFIG_START(tecmo_state::rygar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rygar_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rygar_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tecmo_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(4'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rygar_sound_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(4'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rygar_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -746,12 +746,12 @@ MACHINE_CONFIG_START(tecmo_state::rygar)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL(4'000'000)) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(4'000'000)) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb, even if schematics shows a 384khz resonator */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(tecmo_state, adpcm_int))    /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb, even if schematics shows a 384khz resonator */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tecmo_state, adpcm_int))    /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -761,15 +761,15 @@ MACHINE_CONFIG_START(tecmo_state::gemini)
 	rygar(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	// xtal found on bootleg, to be confirmed on a real board
-	MCFG_CPU_CLOCK(XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(gemini_map)
+	MCFG_DEVICE_CLOCK(XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(gemini_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(tecmo_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(tecmo_sound_map)
 
-	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL(4'000'000))
+	MCFG_DEVICE_REPLACE("ymsnd", YM3812, XTAL(4'000'000))
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -785,9 +785,9 @@ MACHINE_CONFIG_START(tecmo_state::silkworm)
 	gemini(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000)
-	MCFG_CPU_PROGRAM_MAP(silkworm_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(6000000)
+	MCFG_DEVICE_PROGRAM_MAP(silkworm_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tecmo_state::backfirt)
@@ -802,8 +802,8 @@ MACHINE_CONFIG_START(tecmo_state::silkwormp)
 
 	/* bootleg pcb doesn't have the MSM5205 populated */
 	MCFG_DEVICE_REMOVE("msm")
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(silkwormp_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(silkwormp_sound_map)
 MACHINE_CONFIG_END
 
 

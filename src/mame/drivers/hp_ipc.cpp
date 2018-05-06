@@ -371,6 +371,8 @@ Software to look for
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "video/hp1ll3.h"
+#include "machine/tms9914.h"
+#include "bus/ieee488/ieee488.h"
 
 #include "rendlay.h"
 
@@ -496,7 +498,7 @@ void hp_ipc_state::hp_ipc_mem_inner_base(address_map &map)
 	map(0x0610000, 0x0610007).rw(this, FUNC(hp_ipc_state::floppy_id_r), FUNC(hp_ipc_state::floppy_id_w)).umask16(0x00ff);
 	map(0x0610008, 0x061000F).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
 	map(0x0620000, 0x062000F).rw("gpu", FUNC(hp1ll3_device::read), FUNC(hp1ll3_device::write)).umask16(0x00ff);
-	map(0x0630000, 0x063FFFF).noprw();       // AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
+	map(0x0630000, 0x063FFFF).mask(0xf).rw("hpib" , FUNC(tms9914_device::reg8_r) , FUNC(tms9914_device::reg8_w)).umask16(0x00ff);
 	map(0x0640000, 0x064002F).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 	map(0x0660000, 0x06600FF).rw("mlc", FUNC(hp_hil_mlc_device::read), FUNC(hp_hil_mlc_device::write)).umask16(0x00ff);  // 'caravan', scrn/caravan.h
 	map(0x0670000, 0x067FFFF).noprw();       // Speaker (NatSemi COP 452)
@@ -614,7 +616,8 @@ READ8_MEMBER(hp_ipc_state::floppy_id_r)
 {
 	uint8_t data = 0;
 
-	data = (m_fdc->intrq_r() << 6);
+	// TODO: fix sys controller switch
+	data = (m_fdc->intrq_r() << 6) | 0x80;
 
 	if (m_floppy)
 	{
@@ -717,9 +720,10 @@ FLOPPY_FORMATS_MEMBER( hp_ipc_state::floppy_formats )
 	FLOPPY_HP_IPC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( hp_ipc_floppies )
-	SLOT_INTERFACE( "35dd", SONY_OA_D32W )
-SLOT_INTERFACE_END
+static void hp_ipc_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", SONY_OA_D32W);
+}
 
 /*
  *  IRQ levels (page 5-4)
@@ -733,29 +737,51 @@ SLOT_INTERFACE_END
  *  1   Real-time clock
  */
 MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(15'920'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(hp_ipc_mem_outer)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(15'920'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_outer)
 
 	MCFG_HP1LL3_ADD("gpu")
-//  MCFG_HP1LL3_IRQ_CALLBACK(WRITELINE(hp_ipc_state, irq_4))
+//  MCFG_HP1LL3_IRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_4))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// XXX actual clock is 1MHz; remove this workaround (and change 2000 to 100 in hp_ipc_dsk.cpp)
 	// XXX when floppy code correctly handles 600 rpm drives.
 	MCFG_WD2797_ADD("fdc", XTAL(2'000'000))
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(hp_ipc_state, irq_5))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_5))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", hp_ipc_floppies, "35dd", hp_ipc_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","hp_ipc")
 
 	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
-	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(hp_ipc_state, irq_1))
-//  MCFG_MM58167_STANDBY_IRQ_CALLBACK(WRITELINE(hp_ipc_state, irq_6))
+	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_1))
+//  MCFG_MM58167_STANDBY_IRQ_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_6))
 
 	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, XTAL(15'920'000)/2)
-	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(hp_ipc_state, irq_2))
-	MCFG_HP_HIL_NMI_CALLBACK(WRITELINE(hp_ipc_state, irq_7))
+	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_2))
+	MCFG_HP_HIL_NMI_CALLBACK(WRITELINE(*this, hp_ipc_state, irq_7))
 	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")
+
+	MCFG_DEVICE_ADD("hpib" , TMS9914 , XTAL(4000000))
+	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(*this, hp_ipc_state, irq_3))
+	MCFG_TMS9914_DIO_READWRITE_CB(READ8(IEEE488_TAG , ieee488_device , dio_r) , WRITE8(IEEE488_TAG , ieee488_device , dio_w))
+	MCFG_TMS9914_EOI_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , eoi_w))
+	MCFG_TMS9914_DAV_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , dav_w))
+	MCFG_TMS9914_NRFD_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , nrfd_w))
+	MCFG_TMS9914_NDAC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , ndac_w))
+	MCFG_TMS9914_IFC_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , ifc_w))
+	MCFG_TMS9914_SRQ_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , srq_w))
+	MCFG_TMS9914_ATN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , atn_w))
+	MCFG_TMS9914_REN_WRITE_CB(WRITELINE(IEEE488_TAG , ieee488_device , ren_w))
+	MCFG_IEEE488_BUS_ADD()
+	MCFG_IEEE488_EOI_CALLBACK(WRITELINE("hpib" , tms9914_device , eoi_w))
+	MCFG_IEEE488_DAV_CALLBACK(WRITELINE("hpib" , tms9914_device , dav_w))
+	MCFG_IEEE488_NRFD_CALLBACK(WRITELINE("hpib" , tms9914_device , nrfd_w))
+	MCFG_IEEE488_NDAC_CALLBACK(WRITELINE("hpib" , tms9914_device , ndac_w))
+	MCFG_IEEE488_IFC_CALLBACK(WRITELINE("hpib" , tms9914_device , ifc_w))
+	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE("hpib" , tms9914_device , srq_w))
+	MCFG_IEEE488_ATN_CALLBACK(WRITELINE("hpib" , tms9914_device , atn_w))
+	MCFG_IEEE488_REN_CALLBACK(WRITELINE("hpib" , tms9914_device , ren_w))
+	MCFG_IEEE488_SLOT_ADD("ieee_rem" , 0 , remote488_devices , nullptr)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
@@ -778,7 +804,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(6'000'000) * 2, 720, 0, 512, 278, 0, 256)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("mlc", hp_hil_mlc_device, ap_w)) // XXX actually it's driven by 555 (U59)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("mlc", hp_hil_mlc_device, ap_w)) // XXX actually it's driven by 555 (U59)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_SCREEN_PALETTE("palette")
@@ -798,7 +824,7 @@ MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(6'000'000) * 2, 720, 0, 640, 480, 0, 400)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("mlc", hp_hil_mlc_device, ap_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("mlc", hp_hil_mlc_device, ap_w))
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_SCREEN_PALETTE("palette")

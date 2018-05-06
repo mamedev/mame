@@ -59,8 +59,8 @@ void clowndwn_state::machine_reset()
 MACHINE_CONFIG_START(clowndwn_state::clowndwn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, 8000000) // unknown type and clock
-	MCFG_CPU_PROGRAM_MAP(clowndwn_map)
+	MCFG_DEVICE_ADD("maincpu", M6802, 8000000) // unknown type and clock
+	MCFG_DEVICE_PROGRAM_MAP(clowndwn_map)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)

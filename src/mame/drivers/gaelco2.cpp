@@ -179,12 +179,12 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(26'000'000) / 2)     /* 13 MHz? */
-	MCFG_CPU_PROGRAM_MAP(maniacsq_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(26'000'000) / 2)     /* 13 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(maniacsq_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -192,7 +192,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0080000)
@@ -606,15 +606,15 @@ ROM_END
 
 MACHINE_CONFIG_START(gaelco2_state::play2000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(11'059'200))     /* or from the 34MHz? (34MHz drives the CG-1V-149 PLD?) */
-	MCFG_CPU_PROGRAM_MAP(play2000_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(11'059'200))     /* or from the 34MHz? (34MHz drives the CG-1V-149 PLD?) */
+	MCFG_DEVICE_PROGRAM_MAP(play2000_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	// MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(11'059'200)) /* 11.0592MHz */
 	// MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -622,7 +622,7 @@ MACHINE_CONFIG_START(gaelco2_state::play2000)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0200000)
@@ -704,21 +704,21 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(bang_state::bang)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(30'000'000) / 2) /* 15 MHz */
-	MCFG_CPU_PROGRAM_MAP(bang_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(30'000'000) / 2) /* 15 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bang_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bang_state, bang_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -726,7 +726,7 @@ MACHINE_CONFIG_START(bang_state::bang)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0200000)
@@ -950,12 +950,12 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)         /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(alighunt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)         /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(alighunt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -963,7 +963,7 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0400000)
@@ -1248,18 +1248,18 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000) / 2)         /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(touchgo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000) / 2) /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(touchgo_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC6
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco2_state, coin3_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gaelco2_state, coin4_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gaelco2_state, coin3_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gaelco2_state, coin4_counter_w))
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0400000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
@@ -1278,7 +1278,7 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2_right)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2_dual)
@@ -1297,7 +1297,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaelco2_state::touchgo_d5002fp)
 	touchgo(config);
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(40'000'000) / 4) /* 10MHz? - Not verified */
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(32'000'000) / 2) /* 16 MHz */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
 
@@ -1306,17 +1306,16 @@ PCB Layout:
 
 REF: 950510-1
 ------------------------------------------------------------------------------
-|                POT1                        KM428C256J-6 (x4)               |
-|                POT2                                                        |
-|                                            ----------------------------    |
-|                                            | (Plug-In Daughterboard)  |    |
-|                                            |                          |    |
-|---                                         |     IC66        IC67     |    |
-   |                                         |                          |    |
-   |                                         |                          |    |
-|---                                         |     IC65        IC69     |    |
-|                                            |                          |    |
-|                                            ----------------------------    |
+|                POT1          PAL20L8       KM428C256J-6 (x4)               |
+|                POT2                          +--------------------------+  |
+|                                              | (Plug-In Daughterboard)  |  |
+|                                              |                          |  |
+|---                                           |     IC66        IC67     |  |
+   |                                           |                          |  |
+   |                                           |                          |  |
+|---                                           |     IC65        IC69     |  |
+|                                              |                          |  |
+|                                              +--------------------------+  |
 |                                                                            |
 |                                            |----------|                    |
 | J                                          |          |                    |
@@ -1326,19 +1325,18 @@ REF: 950510-1
 | M                                          |----------|                    |
 |                                                                            |
 | M                       |-------------------------|                        |
-|                         |                         |  40.000MHz     62256   |
-| A                       |  62256  DS5002  BATT_3V |                62256   |
+|                         |                         |  40.000MHz    CY7C199  |
+| A                       |  62256  DS5002  BATT_3V |               CY7C199  |
 |                         |                         |                        |
 |                         |-------------------------|                        |
 |                                                                            |
-|---                                    62256                                |
-   |                                    62256                                |
-   |  DSW1                                                                   |
-|---  DSW2                                                                   |
-|                                                                            |
-| J J                            26.000MHz      MC68000P12      TG57         |
-| P P                                                           TG56         |
-| 1 4                                                                        |
+|---                                                                         |
+   |                                   CY7C199-20PC                          |
+   |  DSW1                             CY7C199-20PC                          |
+|---  DSW2             PAL16L8                                               |
+| J J                                                                        |
+| P P                            32.000MHz      MC68000P16        1.IC63     |
+| 1 4                                                             2.IC64     |
 |      JP2   JP3                                                             |
 -----------------------------------------------------------------------------|
 
@@ -1361,7 +1359,7 @@ REF: 950906
 | A                       |                         |                        |
 |                         |-------------------------|                        |
 |                                                                            |
-|                                       62256                       62256    |
+|   IC1* IC7*                           62256                       62256    |
 |---                                    62256                       62256    |
    |  DSW1                                            40.000MHz              |
 |---  DSW2                         |-----------|                             |
@@ -1373,8 +1371,9 @@ REF: 950906
 
 Notes
 -----
-IC68 - 42 pin 32M socket - not populated
-JP6: 50 pin connector for duaghter card - Not populated
+IC1, IC7 - 8 pin sockets marked "TLC548" - Not populated
+IC68 - 42 pin 32M socket - Not populated
+JP6: 50 pin connector for daughter card - Not populated
 POT1: Volume adjust for cabinet 1
 POT2: Volume adjust for cabinet 2
 
@@ -1427,10 +1426,10 @@ ROM_START( touchgo ) /* REF: 950906 */
 	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
 ROM_END
 
-ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America Notice */
+ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America Notice, also found on REF: 950510-1 with daughterboard */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "tg56.bin", 0x000000, 0x080000, CRC(fd3b4642) SHA1(3cab42aecad5ee641711763c6047b56784c2bcf3) )
-	ROM_LOAD16_BYTE( "tg57.bin", 0x000001, 0x080000, CRC(ee891835) SHA1(9f8c60e5e3696b70f756c3521e10313005053cc7) )
+	ROM_LOAD16_BYTE( "1.ic63", 0x000000, 0x080000, CRC(fd3b4642) SHA1(3cab42aecad5ee641711763c6047b56784c2bcf3) ) /* IC63 for REF: 950510-1, IC56 for REF: 950906 */
+	ROM_LOAD16_BYTE( "2.ic64", 0x000001, 0x080000, CRC(ee891835) SHA1(9f8c60e5e3696b70f756c3521e10313005053cc7) ) /* IC64 for REF: 950510-1, IC57 for REF: 950906 */
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
@@ -1456,8 +1455,8 @@ ROM_END
 
 ROM_START( touchgoe ) /* REF: 950510-1 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "tg56", 0x000000, 0x080000, CRC(6d0f5c65) SHA1(00db7a7da3ec1676169aa78fe4f08a7746c3accf) )
-	ROM_LOAD16_BYTE( "tg57", 0x000001, 0x080000, CRC(845787b5) SHA1(27c9910cd9f38328326ecb5cd093dfeb6d4f6244) )
+	ROM_LOAD16_BYTE( "tg56.ic63", 0x000000, 0x080000, CRC(6d0f5c65) SHA1(00db7a7da3ec1676169aa78fe4f08a7746c3accf) ) /* IC63 for REF: 950510-1, IC56 for REF: 950906 */
+	ROM_LOAD16_BYTE( "tg57.ic64", 0x000001, 0x080000, CRC(845787b5) SHA1(27c9910cd9f38328326ecb5cd093dfeb6d4f6244) ) /* IC64 for REF: 950510-1, IC57 for REF: 950906 */
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
@@ -1483,8 +1482,8 @@ ROM_END
 
 ROM_START( touchgok ) /* REF: 950510-1 - ds5002fp unpopulated, game is unprotected */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "56.ic56", 0x000000, 0x080000, CRC(cbb87505) SHA1(f19832af60fb6273c3263ebdd93bb7705ab61e20) )
-	ROM_LOAD16_BYTE( "57.ic57", 0x000001, 0x080000, CRC(36bcc7e7) SHA1(2fff881ba0a99ebcfe3c03fdc61f4bf40e152c7f))
+	ROM_LOAD16_BYTE( "56.ic56", 0x000000, 0x080000, CRC(cbb87505) SHA1(f19832af60fb6273c3263ebdd93bb7705ab61e20) ) /* IC63 for REF: 950510-1, IC56 for REF: 950906 */
+	ROM_LOAD16_BYTE( "57.ic57", 0x000001, 0x080000, CRC(36bcc7e7) SHA1(2fff881ba0a99ebcfe3c03fdc61f4bf40e152c7f) ) /* IC64 for REF: 950510-1, IC57 for REF: 950906 */
 
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
@@ -1552,21 +1551,21 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(30'000'000) / 2)         /* 15 MHz */
-	MCFG_CPU_PROGRAM_MAP(snowboar_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(30'000'000) / 2)         /* 15 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(snowboar_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -1574,7 +1573,7 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0400000)
@@ -1594,21 +1593,21 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)         /* 12 MHz - see PCB layout above with ROM set */
-	MCFG_CPU_PROGRAM_MAP(snowboar_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)         /* 12 MHz - see PCB layout above with ROM set */
+	MCFG_DEVICE_PROGRAM_MAP(snowboar_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -1616,7 +1615,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0080000)
@@ -1839,23 +1838,21 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(wrally2_state::wrally2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(26'000'000) / 2) /* 13 MHz */
-	MCFG_CPU_PROGRAM_MAP(wrally2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(26'000'000) / 2) /* 13 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wrally2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(34'000'000) / 4) /* 8.5MHz? (or 13MHz - 26MHz/2) - Not verified */
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(26'000'000) / 2) /* 13 MHz */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wrally2_state, wrally2_adc_clk))                             /* ADCs clock-in line */
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(wrally2_state, wrally2_adc_cs))                              /* ADCs chip select line */
-
-	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, wrally2_state, wrally2_adc_clk))                             /* ADCs clock-in line */
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, wrally2_state, wrally2_adc_cs))                              /* ADCs chip select line */
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0200000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
@@ -1874,7 +1871,7 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	MCFG_SCREEN_SIZE(384, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2_right)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 
@@ -1897,7 +1894,7 @@ PCB Layout:
 
 REF: 950510
 ------------------------------------------------------------------------------
-|                POT1                        KM428C256J-6 (x4)               |
+|                POT1          PAL20L8       KM428C256J-6 (x4)               |
 |                POT1                        ------------------------------  |
 |                                            | (Plug-In Daughterboard)  | |  |
 |                                            | WR2.1   WR2.9    WR2.16  | |  |
@@ -1925,17 +1922,17 @@ REF: 950510
    |                                    62256                                |
    |  DSW1                                                                   |
 |---  DSW2                                                                   |
-|                                                                            |
-| J J                            26.000MHz      MC68000P12      WR2 63.IC63  |
-| P P                                                           WR2 64.IC64  |
-| 1 4                                                                        |
+|                       PAL16L8                                              |
+| J J                                                                        |
+| P P                            26.000MHz      MC68000P12      WR2 63.IC63  |
+| 1 4                                                           WR2 64.IC64  |
 |      JP2   JP3                                                             |
 -----------------------------------------------------------------------------|
 
 
 Notes
 -----
-JP1 on duaghter card connects through the 50 pin connector JP6 on main PCB
+JP1 on daughter card connects through the 50 pin connector JP6 on main PCB
 All ROMs are type 27C040
 
 POT1: Volume adjust for cabinet 1
@@ -2016,7 +2013,7 @@ PCB Layout:
 
 REF: 950510-1
 ------------------------------------------------------------------------------
-|         POT1              TI F20LB         KM428C256J-6                    |
+|         POT1                 PAL20L8       KM428C256J-6                    |
 |         POT2                                                               |
 |                                            KM428C256J-6                  |-|
 |                                                                          | |
@@ -2039,15 +2036,15 @@ REF: 950510-1
 | A                       |  62256  DS5002  BATT_3V |                62256   |
 |                         |                         |                        |
 |                         |-------------------------|                        |
-|    TLC569   TLC569                                                         |
+|    TLC549   TLC549                                                         |
 |---                                    62256                                |
    |                                    62256                                |
    |  DSW1                                                                   |
 |---  DSW2                                                                   |
-|                                                                            |
-| J J                            26.000MHz      MC68000P12      WR2 63.IC63  |
-| P P                                                           WR2 64.IC64  |
-| 1 4                                                                        |
+|                        PAL16L8                                             |
+| J J                                                                        |
+| P P                            26.000MHz      MC68000P12      WR2 63.IC63  |
+| 1 4                                                           WR2 64.IC64  |
 |      JP2   JP3                                                             |
 -----------------------------------------------------------------------------|
 
@@ -2059,10 +2056,10 @@ Gaelco's mask ROMs:
  WR2 IC69 42pin 32Mbit mask read as 27C332 (Graphics & Sound)
  WR2 IC68 32pin  8Mbit mask read as 27C801 (Graphics)
 
-JP6: 50 pin connector for duaghter card - Not populated
+JP6: 50 pin connector for daughter card - Not populated
 
 TI F20L8 is a Texas Ins. DIP24 (may be a PAL). Is marked as F 406 XF 21869 F20L8-25CNT
-TLC569 (IC2 and IC7) is a 8-bit serial ADC
+TLC549 (IC2 and IC7) is a 8-bit serial ADC
 
 Also known to come with a GAE1 with various production codes including 449, 501 & 506
 

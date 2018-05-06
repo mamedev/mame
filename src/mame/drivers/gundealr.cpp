@@ -441,9 +441,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::scanline)
 MACHINE_CONFIG_START(gundealr_state::gundealr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)   /* 6 MHz verified for Yam! Yam!? */
-	MCFG_CPU_PROGRAM_MAP(gundealr_main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)   /* 6 MHz verified for Yam! Yam!? */
+	MCFG_DEVICE_PROGRAM_MAP(gundealr_main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gundealr_state, scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -461,7 +461,7 @@ MACHINE_CONFIG_START(gundealr_state::gundealr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* 1.5Mhz verified for Yam! Yam!? */
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* 1.5Mhz verified for Yam! Yam!? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -531,8 +531,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::yamyam_mcu_sim)
 
 MACHINE_CONFIG_START(gundealr_state::yamyam)
 	gundealr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(yamyam_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(yamyam_main_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", gundealr_state, yamyam_mcu_sim, attotime::from_hz(6000000/60)) /* 6mhz confirmed */
 MACHINE_CONFIG_END

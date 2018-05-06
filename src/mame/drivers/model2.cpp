@@ -94,6 +94,7 @@
 #include "machine/clock.h"
 #include "machine/cxd1095.h"
 #include "machine/eepromser.h"
+#include "machine/mb8421.h"
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
@@ -1190,18 +1191,21 @@ void model2_state::model2_5881_mem(address_map &map)
 // Interface board ID: 837-12079
 // ALTERA FLEX + Sega 315-5338A
 
-READ8_MEMBER( model2_state::lightgun_r )
+READ8_MEMBER( model2_state::lightgun_data_r )
+{
+	uint16_t data = m_lightgun_ports[offset >> 1].read_safe(0);
+	return BIT(offset, 0) ? (data >> 8) : data;
+}
+
+READ8_MEMBER( model2_state::lightgun_mux_r )
 {
 	if (m_lightgun_mux < 8)
-	{
-		uint16_t data = m_lightgun_ports[m_lightgun_mux >> 1].read_safe(0);
-		return m_lightgun_mux & 1 ? (data >> 8) : data;
-	}
+		return lightgun_data_r(space, m_lightgun_mux);
 	else
 		return lightgun_offscreen_r(space, 0);
 }
 
-WRITE8_MEMBER( model2_state::lightgun_w )
+WRITE8_MEMBER( model2_state::lightgun_mux_w )
 {
 	m_lightgun_mux = data;
 }
@@ -1289,70 +1293,9 @@ WRITE8_MEMBER( model2o_state::vcop_output_w )
 //  I/O BOARD
 //**************************************************************************
 
-READ32_MEMBER( model2o_state::dpram_r )
-{
-	uint32_t data = m_dpram[offset] & mem_mask;
-
-	// intercept reads for the lightgun ports
-	// needs to be done because the vcop ioboard isn't emulated
-	// can be removed once that's done (837-11130 + 837-11131)
-
-	if (offset >= 0x100/4 && offset <= 0x10f/4)
-	{
-		if (ACCESSING_BITS_16_31)
-		{
-			data &= 0x0000ffff;
-			data |= (m_lightgun_ports[offset & 0x03].read_safe(0) >> 8) << 16;
-		}
-		if (ACCESSING_BITS_0_15)
-		{
-			data &= 0xffff0000;
-			data |= m_lightgun_ports[offset & 0x03].read_safe(0) & 0xff;
-		}
-	}
-
-	if (offset >= 0x110/4 && offset <= 0x113/4)
-	{
-		if (ACCESSING_BITS_0_15)
-		{
-			data &= 0xffff0000;
-			data |= lightgun_offscreen_r(space, 0);
-		}
-	}
-
-	return data;
-}
-
-WRITE32_MEMBER( model2o_state::dpram_w )
-{
-	COMBINE_DATA(&m_dpram[offset]);
-}
-
 // On the real system, another 315-5338A is acting as slave
 // and writes the data to the dual port RAM. This isn't
 // emulated yet, data just gets written to RAM.
-
-READ8_MEMBER( model2o_state::io_r )
-{
-	if ((offset & 1) == 0)
-		return m_dpram[offset >> 1];
-	else
-		return m_dpram[offset >> 1] >> 16;
-}
-
-WRITE8_MEMBER( model2o_state::io_w )
-{
-	if ((offset & 1) == 0)
-	{
-		m_dpram[offset >> 1] &= 0x00ff0000;
-		m_dpram[offset >> 1] |= data;
-	}
-	else
-	{
-		m_dpram[offset >> 1] &= 0x000000ff;
-		m_dpram[offset >> 1] |= data << 16;
-	}
-}
 
 /* model 2/2a common memory map */
 void model2_tgp_state::model2_tgp_mem(address_map &map)
@@ -1379,7 +1322,13 @@ void model2o_state::model2o_mem(address_map &map)
 	map(0x00200000, 0x0021ffff).ram();
 	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000);
 	map(0x00980004, 0x00980007).r(this, FUNC(model2o_state::fifo_control_2o_r));
-	map(0x01c00000, 0x01c007ff).rw(this, FUNC(model2o_state::dpram_r), FUNC(model2o_state::dpram_w)).share("dpram"); // 2k*8-bit dual port ram
+	map(0x01c00000, 0x01c00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask32(0x00ff00ff); // 2k*8-bit dual port ram
+	// intercept reads for the lightgun ports
+	// needs to be done because the vcop ioboard isn't emulated
+	// can be removed once that's done (837-11130 + 837-11131)
+	map(0x01c00100, 0x01c0010f).r(this, FUNC(model2o_state::lightgun_data_r)).umask32(0x00ff00ff);
+	map(0x01c00110, 0x01c00110).r(this, FUNC(model2o_state::lightgun_offscreen_r));
+
 	map(0x01c80000, 0x01c80003).rw(this, FUNC(model2o_state::model2_serial_r), FUNC(model2o_state::model2_serial_w));
 }
 
@@ -1669,7 +1618,7 @@ READ8_MEMBER( model2_state::in0_r )
 	uint8_t data = m_in0->read();
 
 	if (m_ctrlmode)
-		return (data & 0xc0) | (m_eeprom->do_read() << 5) | (data & 0x1f);
+		return (0xc0) | (m_eeprom->do_read() << 5) | (0x10) | (data & 0x0f);
 	else
 		return data;
 }
@@ -1716,7 +1665,8 @@ static INPUT_PORTS_START( model2 )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1)
@@ -2201,7 +2151,6 @@ static INPUT_PORTS_START( waverunr )
 	PORT_MODIFY("IN0")
 	PORT_BIT(0x32, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("View")
@@ -2262,7 +2211,6 @@ static INPUT_PORTS_START( segawski )
 	PORT_MODIFY("IN0")
 	PORT_BIT(0x32, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Select (Down)")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Set")
@@ -2435,8 +2383,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(model2_state::model2_screen)
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_PALETTE("palette")
-	MCFG_S24TILE_XHOUT_CALLBACK(WRITE16(model2_state, horizontal_sync_w))
-	MCFG_S24TILE_XVOUT_CALLBACK(WRITE16(model2_state, vertical_sync_w))
+	MCFG_S24TILE_XHOUT_CALLBACK(WRITE16(*this, model2_state, horizontal_sync_w))
+	MCFG_S24TILE_XVOUT_CALLBACK(WRITE16(*this, model2_state, vertical_sync_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -2448,35 +2396,35 @@ MACHINE_CONFIG_START(model2_state::model2_screen)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2_state::model2_scsp)
-	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(model2_snd)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(model2_snd)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("scsp", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(model2_state,scsp_irq))
+	MCFG_DEVICE_ADD("scsp", SCSP)
+	MCFG_SCSP_IRQ_CB(WRITE8(*this, model2_state,scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
 	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-//  MCFG_I8251_RXRDY_HANDLER(WRITELINE(model2_state, sound_ready_w))
-//  MCFG_I8251_TXRDY_HANDLER(WRITELINE(model2_state, sound_ready_w))
+//  MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, model2_state, sound_ready_w))
+//  MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, model2_state, sound_ready_w))
 
 	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 MACHINE_CONFIG_END
 
 /* original Model 2 */
 MACHINE_CONFIG_START(model2o_state::model2o)
-	MCFG_CPU_ADD("maincpu", I960, 25000000)
-	MCFG_CPU_PROGRAM_MAP(model2o_mem)
+	MCFG_DEVICE_ADD("maincpu", I960, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(model2o_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("copro_tgp", MB86234, 16000000)
-	MCFG_CPU_PROGRAM_MAP(copro_tgp_prog_map)
-	MCFG_CPU_DATA_MAP(copro_tgp_data_map)
-	MCFG_CPU_IO_MAP(copro_tgp_io_map)
+	MCFG_DEVICE_ADD("copro_tgp", MB86234, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(copro_tgp_prog_map)
+	MCFG_DEVICE_DATA_MAP(copro_tgp_data_map)
+	MCFG_DEVICE_IO_MAP(copro_tgp_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(mb86233_device::AS_RF, copro_tgp_rf_map)
 
 	MCFG_DEVICE_ADD("copro_tgp_bank", ADDRESS_MAP_BANK, 0)
@@ -2497,23 +2445,25 @@ MACHINE_CONFIG_START(model2o_state::model2o)
 
 	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO, 0)
 	MCFG_DEVICE_BIOS("epr14869c");
-	MCFG_MODEL1IO_READ_CB(READ8(model2o_state, io_r))
-	MCFG_MODEL1IO_WRITE_CB(WRITE8(model2o_state, io_w))
+	MCFG_MODEL1IO_READ_CB(READ8("dpram", mb8421_device, left_r))
+	MCFG_MODEL1IO_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
 	MCFG_MODEL1IO_IN0_CB(IOPORT("IN0"))
 	MCFG_MODEL1IO_IN1_CB(IOPORT("IN1"))
+
+	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 
 	model2_timers(config);
 	model2_screen(config);
 
 	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
-	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
+	MCFG_SEGAM1AUDIO_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
 
 	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_M2COMM_ADD("m2comm")
 MACHINE_CONFIG_END
@@ -2550,15 +2500,15 @@ void model2_state::drive_io_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(model2_state::sj25_0207_01)
-	MCFG_CPU_ADD("drivecpu", Z80, XTAL(8'000'000)/2) // confirmed
-	MCFG_CPU_PROGRAM_MAP(drive_map)
-	MCFG_CPU_IO_MAP(drive_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", model2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("drivecpu", Z80, XTAL(8'000'000)/2) // confirmed
+	MCFG_DEVICE_PROGRAM_MAP(drive_map)
+	MCFG_DEVICE_IO_MAP(drive_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", model2_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("driveio1", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(model2_state, driveio_port_w))
-	MCFG_315_5296_IN_PORTG_CB(READ8(model2_state, driveio_portg_r))
-	MCFG_315_5296_IN_PORTH_CB(READ8(model2_state, driveio_porth_r))
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, model2_state, driveio_port_w))
+	MCFG_315_5296_IN_PORTG_CB(READ8(*this, model2_state, driveio_portg_r))
+	MCFG_315_5296_IN_PORTH_CB(READ8(*this, model2_state, driveio_porth_r))
 
 	MCFG_DEVICE_ADD("driveio2", SEGA_315_5296, 0) // unknown clock
 
@@ -2570,25 +2520,25 @@ MACHINE_CONFIG_START(model2o_state::daytona)
 	sj25_0207_01(config);
 
 	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_MODEL1IO_DRIVE_WRITE_CB(WRITE8(model2o_state, drive_board_w))
+	MCFG_MODEL1IO_DRIVE_WRITE_CB(WRITE8(*this, model2o_state, drive_board_w))
 	MCFG_MODEL1IO_AN0_CB(IOPORT("STEER"))
 	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
 	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model2o_state, daytona_output_w))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model2o_state, daytona_output_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2o_maxx_state::daytona_maxx)
 	daytona(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(model2o_maxx_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model2o_maxx_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2o_gtx_state::daytona_gtx)
 	daytona(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(model2o_gtx_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model2o_gtx_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2o_state::desert)
@@ -2598,7 +2548,7 @@ MACHINE_CONFIG_START(model2o_state::desert)
 	MCFG_MODEL1IO_AN0_CB(IOPORT("STEER"))
 	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
 	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model2o_state, desert_output_w))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model2o_state, desert_output_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2o_state::vcop)
@@ -2606,19 +2556,19 @@ MACHINE_CONFIG_START(model2o_state::vcop)
 
 	MCFG_DEVICE_MODIFY("ioboard")
 	MCFG_MODEL1IO_IN2_CB(IOPORT("IN2"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model2o_state, vcop_output_w))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model2o_state, vcop_output_w))
 MACHINE_CONFIG_END
 
 /* 2A-CRX */
 MACHINE_CONFIG_START(model2a_state::model2a)
-	MCFG_CPU_ADD("maincpu", I960, 25000000)
-	MCFG_CPU_PROGRAM_MAP(model2a_crx_mem)
+	MCFG_DEVICE_ADD("maincpu", I960, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(model2a_crx_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("copro_tgp", MB86234, 16000000)
-	MCFG_CPU_PROGRAM_MAP(copro_tgp_prog_map)
-	MCFG_CPU_DATA_MAP(copro_tgp_data_map)
-	MCFG_CPU_IO_MAP(copro_tgp_io_map)
+	MCFG_DEVICE_ADD("copro_tgp", MB86234, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(copro_tgp_prog_map)
+	MCFG_DEVICE_DATA_MAP(copro_tgp_data_map)
+	MCFG_DEVICE_IO_MAP(copro_tgp_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(mb86233_device::AS_RF, copro_tgp_rf_map)
 
 	MCFG_DEVICE_ADD("copro_tgp_bank", ADDRESS_MAP_BANK, 0)
@@ -2639,8 +2589,8 @@ MACHINE_CONFIG_START(model2a_state::model2a)
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
 	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)
-	MCFG_315_5649_OUT_PA_CB(WRITE8(model2a_state, eeprom_w))
-	MCFG_315_5649_IN_PB_CB(READ8(model2a_state, in0_r))
+	MCFG_315_5649_OUT_PA_CB(WRITE8(*this, model2a_state, eeprom_w))
+	MCFG_315_5649_IN_PB_CB(READ8(*this, model2a_state, in0_r))
 	MCFG_315_5649_IN_PC_CB(IOPORT("IN1"))
 	MCFG_315_5649_IN_PD_CB(IOPORT("IN2"))
 
@@ -2664,10 +2614,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(model2a_state::manxttdx)
 	manxtt(config);
 	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
-	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
+	MCFG_SEGAM1AUDIO_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
 
 	MCFG_DEVICE_MODIFY("uart")
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START( model2a_state::srallyc )
@@ -2675,7 +2625,7 @@ MACHINE_CONFIG_START( model2a_state::srallyc )
 	sj25_0207_01(config);
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_OUT_PE_CB(WRITE8(model2a_state, drive_board_w))
+	MCFG_315_5649_OUT_PE_CB(WRITE8(*this, model2a_state, drive_board_w))
 	MCFG_315_5649_AN0_CB(IOPORT("STEER"))
 	MCFG_315_5649_AN1_CB(IOPORT("ACCEL"))
 	MCFG_315_5649_AN2_CB(IOPORT("BRAKE"))
@@ -2685,8 +2635,8 @@ MACHINE_CONFIG_START( model2a_state::vcop2 )
 	model2a(config);
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_SERIAL_CH2_READ_CB(READ8(model2a_state, lightgun_r))
-	MCFG_315_5649_SERIAL_CH2_WRITE_CB(WRITE8(model2a_state, lightgun_w))
+	MCFG_315_5649_SERIAL_CH2_READ_CB(READ8(*this, model2a_state, lightgun_mux_r))
+	MCFG_315_5649_SERIAL_CH2_WRITE_CB(WRITE8(*this, model2a_state, lightgun_mux_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START( model2a_state::skytargt )
@@ -2706,8 +2656,8 @@ uint16_t model2_state::crypt_read_callback(uint32_t addr)
 MACHINE_CONFIG_START(model2a_state::model2a_5881)
 	model2a(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(model2a_5881_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model2a_5881_mem)
 
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
@@ -2728,17 +2678,17 @@ MACHINE_CONFIG_END
 
 /* 2B-CRX */
 MACHINE_CONFIG_START(model2b_state::model2b)
-	MCFG_CPU_ADD("maincpu", I960, 25000000)
-	MCFG_CPU_PROGRAM_MAP(model2b_crx_mem)
+	MCFG_DEVICE_ADD("maincpu", I960, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(model2b_crx_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2_state, model2_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("copro_adsp", ADSP21062, 40000000)
+	MCFG_DEVICE_ADD("copro_adsp", ADSP21062, 40000000)
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_HOST)
-	MCFG_CPU_DATA_MAP(copro_sharc_map)
+	MCFG_DEVICE_DATA_MAP(copro_sharc_map)
 
-	//MCFG_CPU_ADD("dsp2", ADSP21062, 40000000)
+	//MCFG_DEVICE_ADD("dsp2", ADSP21062, 40000000)
 	//MCFG_SHARC_BOOT_MODE(BOOT_MODE_HOST)
-	//MCFG_CPU_DATA_MAP(geo_sharc_map)
+	//MCFG_DEVICE_DATA_MAP(geo_sharc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(18000))
 
@@ -2752,8 +2702,8 @@ MACHINE_CONFIG_START(model2b_state::model2b)
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
 	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)
-	MCFG_315_5649_OUT_PA_CB(WRITE8(model2b_state, eeprom_w))
-	MCFG_315_5649_IN_PB_CB(READ8(model2b_state, in0_r))
+	MCFG_315_5649_OUT_PA_CB(WRITE8(*this, model2b_state, eeprom_w))
+	MCFG_315_5649_IN_PB_CB(READ8(*this, model2b_state, in0_r))
 	MCFG_315_5649_IN_PC_CB(IOPORT("IN1"))
 	MCFG_315_5649_IN_PD_CB(IOPORT("IN2"))
 
@@ -2767,8 +2717,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(model2b_state::model2b_5881)
 	model2b(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(model2b_5881_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model2b_5881_mem)
 
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
@@ -2805,15 +2755,15 @@ void model2b_state::rchase2_ioport_map(address_map &map)
 MACHINE_CONFIG_START( model2b_state::rchase2 )
 	model2b(config);
 
-	MCFG_CPU_ADD("iocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(rchase2_iocpu_map)
-	MCFG_CPU_IO_MAP(rchase2_ioport_map)
+	MCFG_DEVICE_ADD("iocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(rchase2_iocpu_map)
+	MCFG_DEVICE_IO_MAP(rchase2_ioport_map)
 
 	MCFG_DEVICE_ADD("ioexp", CXD1095, 0)
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_IN_PD_CB(READ8(model2b_state, rchase2_drive_board_r))
-	MCFG_315_5649_OUT_PE_CB(WRITE8(model2b_state, rchase2_drive_board_w))
+	MCFG_315_5649_IN_PD_CB(READ8(*this, model2b_state, rchase2_drive_board_r))
+	MCFG_315_5649_OUT_PE_CB(WRITE8(*this, model2b_state, rchase2_drive_board_w))
 	MCFG_315_5649_AN0_CB(IOPORT("P2_X"))
 	MCFG_315_5649_AN1_CB(IOPORT("P1_X"))
 	MCFG_315_5649_AN2_CB(IOPORT("P2_Y"))
@@ -2847,15 +2797,15 @@ MACHINE_CONFIG_END
 
 /* 2C-CRX */
 MACHINE_CONFIG_START(model2c_state::model2c)
-	MCFG_CPU_ADD("maincpu", I960, 25000000)
-	MCFG_CPU_PROGRAM_MAP(model2c_crx_mem)
+	MCFG_DEVICE_ADD("maincpu", I960, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(model2c_crx_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model2c_state, model2c_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("copro_tgpx4", MB86235, 40000000)
-	MCFG_CPU_PROGRAM_MAP(copro_tgpx4_map)
-	MCFG_CPU_DATA_MAP(copro_tgpx4_data_map)
-	MCFG_MB86235_FIFOIN(":copro_fifo_in")
-	MCFG_MB86235_FIFOOUT0(":copro_fifo_out")
+	MCFG_DEVICE_ADD("copro_tgpx4", MB86235, 40000000)
+	MCFG_DEVICE_PROGRAM_MAP(copro_tgpx4_map)
+	MCFG_DEVICE_DATA_MAP(copro_tgpx4_data_map)
+	MCFG_MB86235_FIFOIN("copro_fifo_in")
+	MCFG_MB86235_FIFOOUT0("copro_fifo_out")
 
 	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
 	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
@@ -2867,8 +2817,8 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
 	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)
-	MCFG_315_5649_OUT_PA_CB(WRITE8(model2c_state, eeprom_w))
-	MCFG_315_5649_IN_PB_CB(READ8(model2c_state, in0_r))
+	MCFG_315_5649_OUT_PA_CB(WRITE8(*this, model2c_state, eeprom_w))
+	MCFG_315_5649_IN_PB_CB(READ8(*this, model2c_state, in0_r))
 	MCFG_315_5649_IN_PC_CB(IOPORT("IN1"))
 	MCFG_315_5649_IN_PD_CB(IOPORT("IN2"))
 
@@ -2900,7 +2850,7 @@ MACHINE_CONFIG_START( model2c_state::stcc )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_MODIFY("uart")
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START( model2c_state::waverunr )
@@ -2927,15 +2877,15 @@ MACHINE_CONFIG_START( model2c_state::hotd )
 	model2c(config);
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_SERIAL_CH2_READ_CB(READ8(model2c_state, lightgun_r))
-	MCFG_315_5649_SERIAL_CH2_WRITE_CB(WRITE8(model2c_state, lightgun_w))
+	MCFG_315_5649_SERIAL_CH2_READ_CB(READ8(*this, model2c_state, lightgun_mux_r))
+	MCFG_315_5649_SERIAL_CH2_WRITE_CB(WRITE8(*this, model2c_state, lightgun_mux_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2c_state::model2c_5881)
 	model2c(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(model2c_5881_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model2c_5881_mem)
 
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)

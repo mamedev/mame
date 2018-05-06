@@ -776,8 +776,8 @@ WRITE8_MEMBER( cdi_state::slave_io_w )
 
 // CD-i Mono-I system base
 MACHINE_CONFIG_START(cdi_state::cdimono1_base)
-	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
-	MCFG_CPU_PROGRAM_MAP(cdimono1_mem)
+	MCFG_DEVICE_ADD("maincpu", SCC68070, CLOCK_A/2)
+	MCFG_DEVICE_PROGRAM_MAP(cdimono1_mem)
 
 	MCFG_MCD212_ADD("mcd212")
 	MCFG_MCD212_SET_SCREEN("screen")
@@ -807,13 +807,13 @@ MACHINE_CONFIG_START(cdi_state::cdimono1_base)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD( "dac1", DMADAC, 0 )
+	MCFG_DEVICE_ADD( "dac1", DMADAC )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
 
-	MCFG_SOUND_ADD( "dac2", DMADAC, 0 )
+	MCFG_DEVICE_ADD( "dac2", DMADAC )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_DEVICE_ADD( "cdda", CDDA )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
@@ -822,8 +822,8 @@ MACHINE_CONFIG_END
 
 // CD-i model 220 (Mono-II, NTSC)
 MACHINE_CONFIG_START(cdi_state::cdimono2)
-	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
-	MCFG_CPU_PROGRAM_MAP(cdimono2_mem)
+	MCFG_DEVICE_ADD("maincpu", SCC68070, CLOCK_A/2)
+	MCFG_DEVICE_PROGRAM_MAP(cdimono2_mem)
 
 	MCFG_MCD212_ADD("mcd212")
 	MCFG_MCD212_SET_SCREEN("screen")
@@ -849,10 +849,10 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
 	MCFG_CDI68070_ADD("scc68070")
-	MCFG_CPU_ADD("servo", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
-	MCFG_CPU_PROGRAM_MAP(cdimono2_servo_mem)
-	MCFG_CPU_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
-	MCFG_CPU_PROGRAM_MAP(cdimono2_slave_mem)
+	MCFG_DEVICE_ADD("servo", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
+	MCFG_DEVICE_PROGRAM_MAP(cdimono2_servo_mem)
+	MCFG_DEVICE_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
+	MCFG_DEVICE_PROGRAM_MAP(cdimono2_slave_mem)
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("cdi_cdrom")
@@ -862,13 +862,13 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD( "dac1", DMADAC, 0 )
+	MCFG_DEVICE_ADD( "dac1", DMADAC )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
 
-	MCFG_SOUND_ADD( "dac2", DMADAC, 0 )
+	MCFG_DEVICE_ADD( "dac2", DMADAC )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_DEVICE_ADD( "cdda", CDDA )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
@@ -876,8 +876,8 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cdi_state::cdi910)
-	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
-	MCFG_CPU_PROGRAM_MAP(cdi910_mem)
+	MCFG_DEVICE_ADD("maincpu", SCC68070, CLOCK_A/2)
+	MCFG_DEVICE_PROGRAM_MAP(cdi910_mem)
 
 	MCFG_MCD212_ADD("mcd212")
 	MCFG_MCD212_SET_SCREEN("screen")
@@ -903,10 +903,10 @@ MACHINE_CONFIG_START(cdi_state::cdi910)
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
 	MCFG_CDI68070_ADD("scc68070")
-	MCFG_CPU_ADD("servo", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
-	MCFG_CPU_PROGRAM_MAP(cdimono2_servo_mem)
-	MCFG_CPU_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
-	MCFG_CPU_PROGRAM_MAP(cdimono2_slave_mem)
+	MCFG_DEVICE_ADD("servo", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
+	MCFG_DEVICE_PROGRAM_MAP(cdimono2_servo_mem)
+	MCFG_DEVICE_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
+	MCFG_DEVICE_PROGRAM_MAP(cdimono2_slave_mem)
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("cdi_cdrom")
@@ -916,13 +916,13 @@ MACHINE_CONFIG_START(cdi_state::cdi910)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD( "dac1", DMADAC, 0 )
+	MCFG_DEVICE_ADD( "dac1", DMADAC )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
 
-	MCFG_SOUND_ADD( "dac2", DMADAC, 0 )
+	MCFG_DEVICE_ADD( "dac2", DMADAC )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_DEVICE_ADD( "cdda", CDDA )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
@@ -942,9 +942,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cdi_state::quizard)
 	cdimono1_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(cdimono1_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cdi_state, mcu_frame)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(cdimono1_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, mcu_frame)
 MACHINE_CONFIG_END
 
 
@@ -957,8 +957,8 @@ MACHINE_CONFIG_START(cdi_state::quizard1)
 	quizard(config);
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard1 )
 
-	MCFG_CPU_ADD("mcu", I8751, 8000000)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(cdi_state, quizard_mcu_p1_r))
+	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, cdi_state, quizard_mcu_p1_r))
 //  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
 
 MACHINE_CONFIG_END
@@ -977,8 +977,8 @@ MACHINE_CONFIG_START(cdi_state::quizard4)
 	quizard(config);
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4 )
 
-	MCFG_CPU_ADD("mcu", I8751, 8000000)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(cdi_state, quizard_mcu_p1_r))
+	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, cdi_state, quizard_mcu_p1_r))
 //  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
 
 MACHINE_CONFIG_END

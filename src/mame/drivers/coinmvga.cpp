@@ -638,10 +638,10 @@ void coinmvga_state::ramdac2_map(address_map &map)
 MACHINE_CONFIG_START(coinmvga_state::coinmvga)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83007, CPU_CLOCK)  /* xtal */
-	MCFG_CPU_PROGRAM_MAP(coinmvga_map)
-	MCFG_CPU_IO_MAP(coinmvga_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", coinmvga_state,  vblank_irq)   /* wrong, fix me */
+	MCFG_DEVICE_ADD("maincpu", H83007, CPU_CLOCK)  /* xtal */
+	MCFG_DEVICE_PROGRAM_MAP(coinmvga_map)
+	MCFG_DEVICE_IO_MAP(coinmvga_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", coinmvga_state,  vblank_irq)   /* wrong, fix me */
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -666,7 +666,7 @@ MACHINE_CONFIG_START(coinmvga_state::coinmvga)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, SND_CLOCK)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, SND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

@@ -824,8 +824,8 @@ MACHINE_START_MEMBER(exidy_state,teetert)
 MACHINE_CONFIG_START(exidy_state::base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, EXIDY_CPU_CLOCK)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", exidy_state,  exidy_vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6502, EXIDY_CPU_CLOCK)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exidy_state,  exidy_vblank_interrupt)
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exidy)
@@ -844,8 +844,8 @@ MACHINE_CONFIG_START(exidy_state::sidetrac)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sidetrac_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sidetrac_map)
 
 	/* audio hardware */
 	spectar_audio(config);
@@ -856,8 +856,8 @@ MACHINE_CONFIG_START(exidy_state::targ)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(targ_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(targ_map)
 
 	/* audio hardware */
 	targ_audio(config);
@@ -868,8 +868,8 @@ MACHINE_CONFIG_START(exidy_state::spectar)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spectar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spectar_map)
 
 	/* audio hardware */
 	spectar_audio(config);
@@ -880,8 +880,8 @@ MACHINE_CONFIG_START(exidy_state::rallys)
 	spectar(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rallys_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rallys_map)
 MACHINE_CONFIG_END
 
 
@@ -889,8 +889,8 @@ MACHINE_CONFIG_START(exidy_state::venture)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(venture_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(venture_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -903,8 +903,8 @@ MACHINE_CONFIG_START(exidy_state::teetert)
 	venture(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PERIODIC_INT_DRIVER(exidy_state, nmi_line_pulse, 10*60)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(exidy_state, nmi_line_pulse, 10*60)
 
 	MCFG_MACHINE_START_OVERRIDE(exidy_state, teetert )
 
@@ -927,8 +927,8 @@ MACHINE_CONFIG_START(exidy_state::pepper2)
 	venture(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pepper2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pepper2_map)
 MACHINE_CONFIG_END
 
 
@@ -936,8 +936,8 @@ MACHINE_CONFIG_START(exidy_state::fax)
 	pepper2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fax_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fax_map)
 MACHINE_CONFIG_END
 
 

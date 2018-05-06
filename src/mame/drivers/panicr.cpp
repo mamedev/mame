@@ -610,8 +610,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::scanline)
 }
 
 MACHINE_CONFIG_START(panicr_state::panicr)
-	MCFG_CPU_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
-	MCFG_CPU_PROGRAM_MAP(panicr_map)
+	MCFG_DEVICE_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
+	MCFG_DEVICE_PROGRAM_MAP(panicr_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", panicr_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
@@ -634,8 +634,8 @@ MACHINE_CONFIG_START(panicr_state::panicr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4) /* 3.579545 MHz */
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("t5182", t5182_device, ym2151_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4) /* 3.579545 MHz */
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("t5182", t5182_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 

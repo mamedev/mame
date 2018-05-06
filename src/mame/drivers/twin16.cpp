@@ -651,26 +651,26 @@ void twin16_state::machine_start()
 
 MACHINE_CONFIG_START(twin16_state::twin16)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'432'000)/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(18'432'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(18'432'000)/2)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(18'432'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	// video hardware
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(twin16_state, screen_update_twin16)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(twin16_state, screen_vblank_twin16))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, twin16_state, screen_vblank_twin16))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twin16)
@@ -685,18 +685,18 @@ MACHINE_CONFIG_START(twin16_state::twin16)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(twin16_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, twin16_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.12) // estimated with gradius2 OST
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.12)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.12)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.12)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
@@ -708,23 +708,23 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fround_state::fround)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'432'000)/2)
-	MCFG_CPU_PROGRAM_MAP(fround_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(18'432'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(fround_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(twin16_state, screen_update_twin16)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(twin16_state, screen_vblank_twin16))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, twin16_state, screen_vblank_twin16))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fround)
@@ -739,18 +739,18 @@ MACHINE_CONFIG_START(fround_state::fround)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(twin16_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, twin16_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.12)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.12)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.12)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.12)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END

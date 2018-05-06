@@ -322,9 +322,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(buster_state::buster)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL(3'579'545))        /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(mainmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", buster_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(3'579'545))        /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mainmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", buster_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -345,7 +345,7 @@ MACHINE_CONFIG_START(buster_state::buster)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000/2)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

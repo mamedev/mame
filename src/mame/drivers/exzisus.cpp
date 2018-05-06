@@ -232,20 +232,20 @@ GFXDECODE_END
 MACHINE_CONFIG_START(exzisus_state::exzisus)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpua", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(cpua_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("cpua", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(cpua_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("cpub", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("cpub", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("cpuc", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(cpuc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("cpuc", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(cpuc_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(exzisus_state::exzisus)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)

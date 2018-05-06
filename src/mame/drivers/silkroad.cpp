@@ -277,9 +277,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(silkroad_state::silkroad)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", silkroad_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", silkroad_state,  irq4_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -297,7 +297,7 @@ MACHINE_CONFIG_START(silkroad_state::silkroad)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

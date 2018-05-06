@@ -286,8 +286,8 @@ void circus_state::machine_reset()
 MACHINE_CONFIG_START(circus_state::circus)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
-	MCFG_CPU_PROGRAM_MAP(circus_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
+	MCFG_DEVICE_PROGRAM_MAP(circus_map)
 
 
 	/* video hardware */
@@ -307,12 +307,12 @@ MACHINE_CONFIG_START(circus_state::circus)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(3)
 	MCFG_SAMPLES_NAMES(circus_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(circus)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -321,8 +321,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(circus_state::robotbwl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
-	MCFG_CPU_PROGRAM_MAP(circus_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
+	MCFG_DEVICE_PROGRAM_MAP(circus_map)
 	// does not generate irq!
 
 
@@ -342,12 +342,12 @@ MACHINE_CONFIG_START(circus_state::robotbwl)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(5)
 	MCFG_SAMPLES_NAMES(robotbwl_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(robotbwl)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -363,8 +363,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(circus_state::crash_scanline)
 MACHINE_CONFIG_START(circus_state::crash)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
-	MCFG_CPU_PROGRAM_MAP(circus_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
+	MCFG_DEVICE_PROGRAM_MAP(circus_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", circus_state, crash_scanline, "screen", 0, 1)
 
 
@@ -384,12 +384,12 @@ MACHINE_CONFIG_START(circus_state::crash)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(crash_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(crash)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -397,8 +397,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(circus_state::ripcord)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
-	MCFG_CPU_PROGRAM_MAP(circus_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
+	MCFG_DEVICE_PROGRAM_MAP(circus_map)
 
 
 	/* video hardware */
@@ -418,12 +418,12 @@ MACHINE_CONFIG_START(circus_state::ripcord)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(ripcord_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(circus)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

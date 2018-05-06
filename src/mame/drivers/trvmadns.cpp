@@ -385,9 +385,9 @@ void trvmadns_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(trvmadns_state::trvmadns)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/4) // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/4) // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 
 	/* video hardware */
@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(trvmadns_state::trvmadns)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(10'000'000)/2/4) //?
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(10'000'000)/2/4) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

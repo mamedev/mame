@@ -1534,10 +1534,10 @@ void hng64_state::machine_reset()
 
 MACHINE_CONFIG_START(hng64_state::hng64)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", VR4300BE, HNG64_MASTER_CLOCK)     // actually R4300
+	MCFG_DEVICE_ADD("maincpu", VR4300BE, HNG64_MASTER_CLOCK)     // actually R4300
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_CPU_PROGRAM_MAP(hng_map)
+	MCFG_DEVICE_PROGRAM_MAP(hng_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hng64_state, hng64_irq, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1549,7 +1549,7 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(hng64_state, screen_update_hng64)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hng64_state, screen_vblank_hng64))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hng64_state, screen_vblank_hng64))
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(XRGB)
@@ -1557,7 +1557,7 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 	hng64_audio(config);
 	hng64_network(config);
 
-	MCFG_CPU_ADD("iomcu", TMP87PH40AN, 8000000)
+	MCFG_DEVICE_ADD("iomcu", TMP87PH40AN, 8000000)
 	MCFG_DEVICE_DISABLE() // work in progress
 
 MACHINE_CONFIG_END

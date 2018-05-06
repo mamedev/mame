@@ -49,16 +49,10 @@ static INPUT_PORTS_START( famicom )
 INPUT_PORTS_END
 
 
-void nes_state::ppu_nmi(int *ppu_regs)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-
 MACHINE_CONFIG_START(nes_state::nes)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(nes_map)
+	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(nes_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.0988)
@@ -70,14 +64,10 @@ MACHINE_CONFIG_START(nes_state::nes)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nes_state, screen_update_nes)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 4*16*8)
-	MCFG_PALETTE_INIT_OWNER(nes_state, nes)
 
 	MCFG_PPU2C02_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -100,14 +90,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nes_state::nespal)
 	nes(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(PAL_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(nes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(PAL_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(nes_map)
 
 	MCFG_DEVICE_REMOVE("ppu")
 	MCFG_PPU2C07_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -132,15 +122,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nes_state::nespalc)
 	nespal(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_CLOCK(PALC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(nes_map)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_CLOCK(PALC_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(nes_map)
 
 	/* UMC 6538 and friends -- extends time for rendering dummy scanlines */
 	MCFG_DEVICE_REMOVE("ppu")
 	MCFG_PPUPALC_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

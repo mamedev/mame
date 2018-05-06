@@ -175,9 +175,9 @@ void pro80_state::machine_reset()
 
 MACHINE_CONFIG_START(pro80_state::pro80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(pro80_mem)
-	MCFG_CPU_IO_MAP(pro80_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(pro80_mem)
+	MCFG_DEVICE_IO_MAP(pro80_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_pro80)

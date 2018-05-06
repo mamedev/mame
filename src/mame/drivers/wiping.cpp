@@ -288,18 +288,18 @@ INTERRUPT_GEN_MEMBER(wiping_state::sound_timer_irq)
 MACHINE_CONFIG_START(wiping_state::wiping)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wiping_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wiping_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80,18432000/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(wiping_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
+	MCFG_DEVICE_ADD("audiocpu", Z80,18432000/6)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(wiping_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(wiping_state, main_irq_mask_w)) // INT1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(wiping_state, sound_irq_mask_w)) // INT2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(wiping_state, flipscreen_w)) // INV
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wiping_state, main_irq_mask_w)) // INT1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, wiping_state, sound_irq_mask_w)) // INT2
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, wiping_state, flipscreen_w)) // INV
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // CP2RE
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -321,7 +321,7 @@ MACHINE_CONFIG_START(wiping_state::wiping)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("wiping", WIPING_CUSTOM, 96000)
+	MCFG_DEVICE_ADD("wiping", WIPING_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

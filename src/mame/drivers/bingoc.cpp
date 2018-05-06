@@ -177,15 +177,15 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(bingoc_state::bingoc)
 
-	MCFG_CPU_ADD("maincpu", M68000,8000000)      /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bingoc_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,8000000)      /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bingoc_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80,4000000)        /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io)
+	MCFG_DEVICE_ADD("soundcpu", Z80,4000000)        /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io)
 #if SOUND_TEST
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bingoc_state,  nmi_line_pulse)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bingoc_state,  nmi_line_pulse)
 #endif
 
 	MCFG_DEVICE_ADD("uart1", I8251, 4000000) // unknown
@@ -215,11 +215,11 @@ MACHINE_CONFIG_START(bingoc_state::bingoc)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 7159160/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 7159160/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

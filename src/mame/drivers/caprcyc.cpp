@@ -66,8 +66,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(caprcyc_state::caprcyc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", VR4300BE, 100000000) // cpu configuration is unknown
-	MCFG_CPU_PROGRAM_MAP(caprcyc_map)
+	MCFG_DEVICE_ADD("maincpu", VR4300BE, 100000000) // cpu configuration is unknown
+	MCFG_DEVICE_PROGRAM_MAP(caprcyc_map)
 
 	/* no video! */
 

@@ -1104,28 +1104,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_end_tick)
 }
 
 MACHINE_CONFIG_START(meritm_state::meritm_crt250)
-	MCFG_CPU_ADD("maincpu", Z80, SYSTEM_CLK/6)
-	MCFG_CPU_PROGRAM_MAP(meritm_crt250_map)
-	MCFG_CPU_IO_MAP(meritm_crt250_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, SYSTEM_CLK/6)
+	MCFG_DEVICE_PROGRAM_MAP(meritm_crt250_map)
+	MCFG_DEVICE_IO_MAP(meritm_crt250_io_map)
 	MCFG_Z80_DAISY_CHAIN(meritm_daisy_chain)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(meritm_state, meritm_crt250_port_b_w))   // used LMP x DRIVE
-	MCFG_I8255_IN_PORTC_CB(READ8(meritm_state, meritm_8255_port_c_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, meritm_state, meritm_crt250_port_b_w))   // used LMP x DRIVE
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, meritm_state, meritm_8255_port_c_r))
 
 	MCFG_DEVICE_ADD("z80pio_0", Z80PIO, SYSTEM_CLK/6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(meritm_state, meritm_audio_pio_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(meritm_state, meritm_audio_pio_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(meritm_state, meritm_audio_pio_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(meritm_state, meritm_audio_pio_port_b_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, meritm_state, meritm_audio_pio_port_a_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, meritm_state, meritm_audio_pio_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, meritm_state, meritm_audio_pio_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, meritm_state, meritm_audio_pio_port_b_w))
 
 	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, SYSTEM_CLK/6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(IOPORT("PIO1_PORTA"))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(meritm_state, meritm_io_pio_port_a_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, meritm_state, meritm_io_pio_port_a_w))
 	MCFG_Z80PIO_IN_PB_CB(IOPORT("PIO1_PORTB"))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(meritm_state, meritm_io_pio_port_b_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, meritm_state, meritm_io_pio_port_b_w))
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_start", meritm_state, vblank_start_tick, "screen", 259, 262)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_end", meritm_state, vblank_end_tick, "screen", 262, 262)
@@ -1135,58 +1135,58 @@ MACHINE_CONFIG_START(meritm_state::meritm_crt250)
 	MCFG_DS1204_ADD("ds1204")
 
 	MCFG_V9938_ADD("v9938_0", "screen", 0x20000, SYSTEM_CLK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(meritm_state,meritm_vdp0_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, meritm_state,meritm_vdp0_interrupt))
 
 	MCFG_V9938_ADD("v9938_1", "screen", 0x20000, SYSTEM_CLK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(meritm_state,meritm_vdp1_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, meritm_state,meritm_vdp1_interrupt))
 
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938_0", SYSTEM_CLK)
 	MCFG_SCREEN_UPDATE_DRIVER(meritm_state, screen_update_meritm)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8930, SYSTEM_CLK/12)
+	MCFG_DEVICE_ADD("aysnd", AY8930, SYSTEM_CLK/12)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW")) /* Port A read */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(meritm_state, meritm_ay8930_port_b_w))  /* Port B write */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, meritm_state, meritm_ay8930_port_b_w))  /* Port B write */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(meritm_state::meritm_crt250_questions)
 	meritm_crt250(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(meritm_crt250_questions_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(meritm_crt250_questions_map)
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_questions)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(meritm_state::meritm_crt250_crt252_crt258)
 	meritm_crt250_questions(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(meritm_crt250_crt258_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(meritm_crt250_crt258_io_map)
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_crt252_crt258)
 
 	MCFG_DEVICE_ADD("ns16550", NS16550, UART_CLK)
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
-	MCFG_MICROTOUCH_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
+	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE("ns16550", ins8250_uart_device, rx_w))
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, meritm_touch_coord_transform)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(meritm_state::meritm_crt260)
 	meritm_crt250(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(meritm_map)
-	MCFG_CPU_IO_MAP(meritm_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(meritm_map)
+	MCFG_DEVICE_IO_MAP(meritm_io_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTC_CB(READ8(meritm_state, meritm_8255_port_c_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, meritm_state, meritm_8255_port_c_r))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))  // DS1232, TD connected to VCC
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt260)
 
 	MCFG_DEVICE_ADD("ns16550", NS16550, UART_CLK)
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
-	MCFG_MICROTOUCH_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
+	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE("ns16550", ins8250_uart_device, rx_w))
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, meritm_touch_coord_transform)
 MACHINE_CONFIG_END
 
@@ -1339,6 +1339,25 @@ ROM_START( pbss330 ) /* Dallas DS1204V security key attached to CRT-254 connecte
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
 	ROM_LOAD( "9233-01_u1-r01_c1993_mii", 0x000000, 0x000022, BAD_DUMP CRC(93459659) SHA1(73ad4c3a7c52d3db3acb43662c535f8c2ed2376a) )
+
+	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
+	ROM_LOAD( "qs9233-01_u7-r0",  0x00000, 0x40000, CRC(176dd688) SHA1(306cf78101219ef1122023a01d16dff5e9f2aecf) ) /* These 3 roms are on CRT-256 sattalite PCB */
+	ROM_LOAD( "qs9233-01_u6-r0",  0x40000, 0x40000, CRC(59c85a0a) SHA1(ef7f45c4e032d9dd14c4f5237f5b3c487be0cb2f) )
+	ROM_LOAD( "qs9233-01_u5-r0",  0x80000, 0x40000, CRC(740b1274) SHA1(14eab68fc137b905a5a2739c7081900a48cba562) )
+ROM_END
+
+ROM_START( pbss330ca ) /* Dallas DS1204V security key attached to CRT-254 connected to J2 connector labeled 9233-06 U1-RO C1993 MII - California version */
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9233-00-06_u9-r0a",  0x00000, 0x10000, CRC(0aaa94e3) SHA1(915a0d4643a781b39730c64dfcaa7599e5a0c447) ) /* 9233-00-06  081293 */
+	ROM_LOAD( "9233-00-06_u10-r0a", 0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) ) // matches pbss330
+	ROM_LOAD( "9233-00-06_u11-r0a", 0x20000, 0x10000, CRC(94cfb8b1) SHA1(bf2baf1fe9bd87abec353ec8402370e12809030a) )
+	ROM_LOAD( "9233-00-06_u12-r0a", 0x30000, 0x10000, CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) ) // matches pbss330
+	ROM_LOAD( "9233-00-06_u13-r0a", 0x40000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) // matches pbss330
+	ROM_LOAD( "9233-00-06_u14-r0a", 0x50000, 0x10000, CRC(2aa38f55) SHA1(c1d80b619b7b6506d457ceb6aa267e5ef7c3bdf2) )
+	ROM_LOAD( "9233-00-06_u15-r0a", 0x60000, 0x10000, CRC(e3ce9cde) SHA1(54b25e0f2715e2b112916b80b918a0191bf87a48) )
+
+	ROM_REGION( 0x000022, "ds1204", 0 )
+	ROM_LOAD( "9233-06_u1-r0_c1993_mii", 0x000000, 0x000022, BAD_DUMP CRC(93459659) SHA1(73ad4c3a7c52d3db3acb43662c535f8c2ed2376a) )
 
 	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
 	ROM_LOAD( "qs9233-01_u7-r0",  0x00000, 0x40000, CRC(176dd688) SHA1(306cf78101219ef1122023a01d16dff5e9f2aecf) ) /* These 3 roms are on CRT-256 sattalite PCB */
@@ -2342,7 +2361,8 @@ GAME( 1994, pbst30,    0,        meritm_crt250_crt252_crt258, pbst30,     meritm
 GAME( 1993, pbst30a,   pbst30,   meritm_crt250_crt252_crt258, pbst30,     meritm_state, 0,  ROT0, "Merit", "Pit Boss Supertouch 30 (9234-00-01)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* CRT-250 + CRT-254 + CRT-256 */
-GAME( 1993, pbss330,   0,        meritm_crt250_questions, pbss330,  meritm_state, 0, ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-01)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, pbss330,   0,        meritm_crt250_questions, pbss330,  meritm_state, 0, ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-01, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, pbss330ca, pbss330,  meritm_crt250_questions, pbss330,  meritm_state, 0, ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-06, California version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, pitbossm,  0,        meritm_crt250_questions, pitbossm, meritm_state, 0, ROT0, "Merit", "Pit Boss Megastar (9244-00-01)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, pitbossma, pitbossm, meritm_crt250_questions, pitbossa, meritm_state, 0, ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", MACHINE_IMPERFECT_GRAPHICS )
 

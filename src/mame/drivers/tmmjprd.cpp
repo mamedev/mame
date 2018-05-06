@@ -769,8 +769,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_state::scanline)
 }
 
 MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
-	MCFG_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
-	MCFG_CPU_PROGRAM_MAP(tmmjprd_map)
+	MCFG_DEVICE_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tmmjprd_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmmjprd_state, scanline, "lscreen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")

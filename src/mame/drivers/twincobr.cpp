@@ -654,36 +654,36 @@ GFXDECODE_END
 MACHINE_CONFIG_START(twincobr_state::twincobr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000)/4)       /* 7MHz - Main board Crystal is 28MHz */
-	MCFG_CPU_PROGRAM_MAP(main_program_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/4)       /* 7MHz - Main board Crystal is 28MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_program_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)         /* 3.5MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_program_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)         /* 3.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_program_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
-	MCFG_CPU_ADD("dsp", TMS32010, XTAL(28'000'000)/2)         /* 14MHz CLKin */
-	MCFG_CPU_PROGRAM_MAP(DSP_program_map)
+	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(28'000'000)/2)         /* 14MHz CLKin */
+	MCFG_DEVICE_PROGRAM_MAP(DSP_program_map)
 	/* Data Map is internal to the CPU */
-	MCFG_CPU_IO_MAP(DSP_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(twincobr_state, twincobr_BIO_r))
+	MCFG_DEVICE_IO_MAP(DSP_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, twincobr_state, twincobr_BIO_r))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET_OVERRIDE(twincobr_state,twincobr)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(twincobr_state, int_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(twincobr_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(twincobr_state, bg_ram_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(twincobr_state, fg_rom_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(twincobr_state, dsp_int_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(twincobr_state, display_on_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, twincobr_state, int_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, twincobr_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, twincobr_state, bg_ram_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, twincobr_state, fg_rom_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, twincobr_state, dsp_int_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, twincobr_state, display_on_w))
 
 	MCFG_DEVICE_ADD("coinlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(twincobr_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(twincobr_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(twincobr_state, coin_lockout_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(twincobr_state, coin_lockout_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, twincobr_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, twincobr_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, twincobr_state, coin_lockout_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, twincobr_state, coin_lockout_2_w))
 
 	/* video hardware */
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(28'000'000)/8) /* 3.5MHz measured on CLKin */
@@ -692,14 +692,14 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 
 	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 31, 15)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram16")
+	MCFG_DEVICE_ADD("spriteram16", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000)/4, 446, 0, 320, 286, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(twincobr_state, screen_update_toaplan0)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram16", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(twincobr_state, twincobr_vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram16", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, twincobr_state, twincobr_vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twincobr)
@@ -711,7 +711,7 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -723,7 +723,7 @@ MACHINE_CONFIG_START(twincobr_state::fshark)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
 
 	MCFG_DEVICE_MODIFY("coinlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(twincobr_state, dsp_int_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, twincobr_state, dsp_int_w))
 
 	MCFG_DEVICE_MODIFY("scu")
 	MCFG_TOAPLAN_SCU_SET_XOFFSETS(32, 14)
@@ -733,7 +733,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(twincobr_state::fsharkbt)
 	fshark(config);
 
-	MCFG_CPU_ADD("mcu", I8741, XTAL(28'000'000)/16)
+	MCFG_DEVICE_ADD("mcu", I8741, XTAL(28'000'000)/16)
 	/* Program Map is internal to the CPU */
 	MCFG_DEVICE_DISABLE()       /* Internal program code is not dumped */
 MACHINE_CONFIG_END

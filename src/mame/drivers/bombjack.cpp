@@ -352,12 +352,12 @@ WRITE_LINE_MEMBER(bombjack_state::vblank_irq)
 MACHINE_CONFIG_START(bombjack_state::bombjack)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))     /* Confirmed from PCB */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))     /* Confirmed from PCB */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* Confirmed from PCB */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_IO_MAP(audio_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* Confirmed from PCB */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_IO_MAP(audio_io_map)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -369,7 +369,7 @@ MACHINE_CONFIG_START(bombjack_state::bombjack)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bombjack_state, screen_update_bombjack)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bombjack_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bombjack_state, vblank_irq))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bombjack)
@@ -380,13 +380,13 @@ MACHINE_CONFIG_START(bombjack_state::bombjack)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8) /* Confirmed from PCB */
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) /* Confirmed from PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ay3", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
 MACHINE_CONFIG_END
 

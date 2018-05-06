@@ -381,9 +381,9 @@ void konmedal_state::machine_reset()
 
 MACHINE_CONFIG_START(konmedal_state::tsukande)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
-	MCFG_CPU_PROGRAM_MAP(medal_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	MCFG_DEVICE_PROGRAM_MAP(medal_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -414,9 +414,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konmedal_state::ddboy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
-	MCFG_CPU_PROGRAM_MAP(ddboy_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	MCFG_DEVICE_PROGRAM_MAP(ddboy_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -541,8 +541,8 @@ WRITE8_MEMBER(konmedal_state::shuri_vrom_bank_w)
 
 MACHINE_CONFIG_START(konmedal_state::shuriboy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000) / 3) // divisor unknown
-	MCFG_CPU_PROGRAM_MAP(shuriboy_main)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000) / 3) // divisor unknown
+	MCFG_DEVICE_PROGRAM_MAP(shuriboy_main)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konmedal_state, scanline, "screen", 0, 1)
 
 	/* video hardware */

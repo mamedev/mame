@@ -253,7 +253,7 @@ void vicdual_state::machine_start()
 MACHINE_CONFIG_START(vicdual_state::vicdual_root)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, VICDUAL_MAIN_CPU_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", Z80, VICDUAL_MAIN_CPU_CLOCK)
 
 	MCFG_TIMER_DRIVER_ADD("coinstate", vicdual_state, clear_coin_status)
 
@@ -333,9 +333,9 @@ MACHINE_CONFIG_START(vicdual_state::depthch)
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", I8080, VICDUAL_MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(depthch_map)
-	MCFG_CPU_IO_MAP(depthch_io_map)
+	MCFG_DEVICE_REPLACE("maincpu", I8080, VICDUAL_MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(depthch_map)
+	MCFG_DEVICE_IO_MAP(depthch_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -423,9 +423,9 @@ MACHINE_CONFIG_START(vicdual_state::safari)
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(safari_map)
-	MCFG_CPU_IO_MAP(safari_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(safari_map)
+	MCFG_DEVICE_IO_MAP(safari_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -530,9 +530,9 @@ MACHINE_CONFIG_START(vicdual_state::frogs)
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(frogs_map)
-	MCFG_CPU_IO_MAP(frogs_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(frogs_map)
+	MCFG_DEVICE_IO_MAP(frogs_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(vicdual_state,frogs_audio)
 
@@ -778,9 +778,9 @@ MACHINE_CONFIG_START(vicdual_state::headon)
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(headon_map)
-	MCFG_CPU_IO_MAP(headon_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(headon_map)
+	MCFG_DEVICE_IO_MAP(headon_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -804,9 +804,9 @@ MACHINE_CONFIG_START(vicdual_state::sspaceat)
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(headon_map)
-	MCFG_CPU_IO_MAP(sspaceat_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(headon_map)
+	MCFG_DEVICE_IO_MAP(sspaceat_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1001,9 +1001,9 @@ MACHINE_CONFIG_START(vicdual_state::headon2)
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(headon2_map)
-	MCFG_CPU_IO_MAP(headon2_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(headon2_map)
+	MCFG_DEVICE_IO_MAP(headon2_io_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(vicdual_state, headon2)
 
@@ -1030,9 +1030,9 @@ MACHINE_CONFIG_START(vicdual_state::digger)
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(headon2_map)
-	MCFG_CPU_IO_MAP(digger_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(headon2_map)
+	MCFG_DEVICE_IO_MAP(digger_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2076,8 +2076,8 @@ MACHINE_CONFIG_START(vicdual_state::vicdual_dualgame_root)
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(vicdual_dualgame_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(vicdual_dualgame_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2090,8 +2090,8 @@ MACHINE_CONFIG_START(vicdual_state::invho2)
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(invho2_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(invho2_io_map)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2105,8 +2105,8 @@ MACHINE_CONFIG_START(vicdual_state::invds)
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(invds_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(invds_io_map)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2117,9 +2117,9 @@ MACHINE_CONFIG_START(vicdual_state::carhntds)
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(carhntds_dualgame_map)
-	MCFG_CPU_IO_MAP(carhntds_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(carhntds_dualgame_map)
+	MCFG_DEVICE_IO_MAP(carhntds_io_map)
 MACHINE_CONFIG_END
 
 
@@ -2127,8 +2127,8 @@ MACHINE_CONFIG_START(vicdual_state::sspacaho)
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(sspacaho_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(sspacaho_io_map)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2140,8 +2140,8 @@ MACHINE_CONFIG_START(vicdual_state::spacetrk)
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(spacetrk_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(spacetrk_io_map)
 MACHINE_CONFIG_END
 
 
@@ -2149,8 +2149,8 @@ MACHINE_CONFIG_START(vicdual_state::carnival)
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(carnival_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(carnival_io_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -2163,8 +2163,8 @@ MACHINE_CONFIG_START(vicdual_state::carnivalh)
 	carnival(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(headon_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(headon_io_map)
 MACHINE_CONFIG_END
 
 
@@ -2172,8 +2172,8 @@ MACHINE_CONFIG_START(vicdual_state::tranqgun)
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(tranqgun_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(tranqgun_io_map)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2185,8 +2185,8 @@ MACHINE_CONFIG_START(vicdual_state::brdrline)
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(brdrline_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(brdrline_io_map)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2198,8 +2198,8 @@ MACHINE_CONFIG_START(vicdual_state::pulsar)
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(pulsar_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(pulsar_io_map)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2211,8 +2211,8 @@ MACHINE_CONFIG_START(vicdual_state::heiankyo)
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(heiankyo_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(heiankyo_io_map)
 MACHINE_CONFIG_END
 
 
@@ -2220,8 +2220,8 @@ MACHINE_CONFIG_START(vicdual_state::alphaho)
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(alphaho_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(alphaho_io_map)
 MACHINE_CONFIG_END
 
 
@@ -2229,8 +2229,8 @@ MACHINE_CONFIG_START(vicdual_state::headonn)
 	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(headonn_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(headonn_io_map)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2360,9 +2360,9 @@ MACHINE_CONFIG_START(vicdual_state::samurai)
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(samurai_map)
-	MCFG_CPU_IO_MAP(samurai_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(samurai_map)
+	MCFG_DEVICE_IO_MAP(samurai_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(vicdual_state,samurai)
 
@@ -2546,9 +2546,9 @@ MACHINE_RESET_MEMBER(nsub_state, nsub)
 
 MACHINE_CONFIG_START(nsub_state::nsub)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, VICDUAL_MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(nsub_map)
-	MCFG_CPU_IO_MAP(nsub_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, VICDUAL_MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(nsub_map)
+	MCFG_DEVICE_IO_MAP(nsub_io_map)
 
 	MCFG_TIMER_DRIVER_ADD("coinstate", nsub_state, clear_coin_status)
 	MCFG_TIMER_DRIVER_ADD("nsub_coin", nsub_state, nsub_coin_pulse)
@@ -2658,9 +2658,9 @@ MACHINE_CONFIG_START(vicdual_state::invinco)
 	vicdual_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(invinco_map)
-	MCFG_CPU_IO_MAP(invinco_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(invinco_map)
+	MCFG_DEVICE_IO_MAP(invinco_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

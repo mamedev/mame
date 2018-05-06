@@ -129,22 +129,22 @@ const tiny_rom_entry *model1io_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START( model1io_device::device_add_mconfig )
-	MCFG_CPU_ADD("iocpu", Z80, 32_MHz_XTAL/8)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("iocpu", Z80, 32_MHz_XTAL/8)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") // 93C45
 
 	MCFG_DEVICE_ADD("io", SEGA_315_5338A, 0)
-	MCFG_315_5338A_READ_CB(READ8(model1io_device, io_r))
-	MCFG_315_5338A_WRITE_CB(WRITE8(model1io_device, io_w))
-	MCFG_315_5338A_OUT0_CB(WRITE8(model1io_device, out0_w))
-	MCFG_315_5338A_IN1_CB(READ8(model1io_device, in1_r))
-	MCFG_315_5338A_IN2_CB(READ8(model1io_device, in2_r))
-	MCFG_315_5338A_IN3_CB(READ8(model1io_device, in3_r))
-	MCFG_315_5338A_IN4_CB(READ8(model1io_device, in4_r))
-	MCFG_315_5338A_OUT4_CB(WRITE8(model1io_device, out4_w))
-	MCFG_315_5338A_OUT5_CB(WRITE8(model1io_device, out5_w))
-	MCFG_315_5338A_IN6_CB(READ8(model1io_device, in6_r))
+	MCFG_315_5338A_READ_CB(READ8(*this, model1io_device, io_r))
+	MCFG_315_5338A_WRITE_CB(WRITE8(*this, model1io_device, io_w))
+	MCFG_315_5338A_OUT0_CB(WRITE8(*this, model1io_device, out0_w))
+	MCFG_315_5338A_IN1_CB(READ8(*this, model1io_device, in1_r))
+	MCFG_315_5338A_IN2_CB(READ8(*this, model1io_device, in2_r))
+	MCFG_315_5338A_IN3_CB(READ8(*this, model1io_device, in3_r))
+	MCFG_315_5338A_IN4_CB(READ8(*this, model1io_device, in4_r))
+	MCFG_315_5338A_OUT4_CB(WRITE8(*this, model1io_device, out4_w))
+	MCFG_315_5338A_OUT5_CB(WRITE8(*this, model1io_device, out5_w))
+	MCFG_315_5338A_IN6_CB(READ8(*this, model1io_device, in6_r))
 
 	MCFG_DEVICE_ADD("adc", MSM6253, 0)
 	MCFG_MSM6253_IN0_ANALOG_READ(model1io_device, analog0_r)
@@ -167,7 +167,7 @@ model1io_device::model1io_device(const machine_config &mconfig, const char *tag,
 	m_eeprom(*this, "eeprom"),
 	m_buttons(*this, "buttons"),
 	m_read_cb(*this), m_write_cb(*this),
-	m_in_cb{ {*this}, {*this}, {*this}, {*this} },
+	m_in_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
 	m_drive_read_cb(*this), m_drive_write_cb(*this),
 	m_an_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
 	m_output_cb(*this),
@@ -185,7 +185,7 @@ void model1io_device::device_start()
 	m_read_cb.resolve_safe(0xff);
 	m_write_cb.resolve_safe();
 
-	for (unsigned i = 0; i < 4; i++)
+	for (unsigned i = 0; i < 6; i++)
 		m_in_cb[i].resolve_safe(0xff);
 
 	m_drive_read_cb.resolve_safe(0xff);

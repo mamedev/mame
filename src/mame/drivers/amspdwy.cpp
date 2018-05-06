@@ -250,13 +250,13 @@ void amspdwy_state::machine_reset()
 MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3000000)
-	MCFG_CPU_PROGRAM_MAP(amspdwy_map)
-	MCFG_CPU_IO_MAP(amspdwy_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amspdwy_state, irq0_line_hold) /* IRQ: 60Hz, NMI: retn */
+	MCFG_DEVICE_ADD("maincpu", Z80, 3000000)
+	MCFG_DEVICE_PROGRAM_MAP(amspdwy_map)
+	MCFG_DEVICE_IO_MAP(amspdwy_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", amspdwy_state, irq0_line_hold) /* IRQ: 60Hz, NMI: retn */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)
-	MCFG_CPU_PROGRAM_MAP(amspdwy_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)
+	MCFG_DEVICE_PROGRAM_MAP(amspdwy_sound_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

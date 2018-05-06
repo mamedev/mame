@@ -1295,13 +1295,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(balsente_state::balsente)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(20'000'000)/16) /* xtal verified but not speed */
-	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", balsente_state,  balsente_update_analog_inputs)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(20'000'000)/16) /* xtal verified but not speed */
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", balsente_state,  balsente_update_analog_inputs)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* xtal verified but not speed */
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_IO_MAP(cpu2_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* xtal verified but not speed */
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_IO_MAP(cpu2_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -1316,15 +1316,15 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // U9H
 	// these outputs are generally used to control the various lamps
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(balsente_state, out0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(balsente_state, out1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(balsente_state, out2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(balsente_state, out3_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(balsente_state, out4_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(balsente_state, out5_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(balsente_state, out6_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, balsente_state, out0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, balsente_state, out1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, balsente_state, out2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, balsente_state, out3_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, balsente_state, out4_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, balsente_state, out5_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, balsente_state, out6_w))
 	// special case is output 7, which recalls the NVRAM data
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(balsente_state, nvrecall_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, balsente_state, nvrecall_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1382,8 +1382,8 @@ MACHINE_CONFIG_START(balsente_state::shrike)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("68k", M68000, 8000000)
-	MCFG_CPU_PROGRAM_MAP(shrike68k_map)
+	MCFG_DEVICE_ADD("68k", M68000, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(shrike68k_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 MACHINE_CONFIG_END

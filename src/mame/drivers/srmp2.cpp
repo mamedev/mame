@@ -1144,10 +1144,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(srmp2_state::srmp2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(srmp2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp2_state, irq4_line_assert)
-	MCFG_CPU_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)      /* Interrupt times is not understood */
+	MCFG_DEVICE_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(srmp2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp2_state, irq4_line_assert)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)      /* Interrupt times is not understood */
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp2)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1173,13 +1173,13 @@ MACHINE_CONFIG_START(srmp2_state::srmp2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 20000000/16)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 20000000/16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, adpcm_int))            /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, srmp2_state, adpcm_int))            /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
@@ -1189,11 +1189,11 @@ MACHINE_CONFIG_START(srmp2_state::srmp3)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("maincpu", Z80, 3500000)       /* 3.50 MHz ? */
+	MCFG_DEVICE_ADD("maincpu", Z80, 3500000)       /* 3.50 MHz ? */
 	//      4000000,                /* 4.00 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(srmp3_map)
-	MCFG_CPU_IO_MAP(srmp3_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp2_state,  irq0_line_assert)
+	MCFG_DEVICE_PROGRAM_MAP(srmp3_map)
+	MCFG_DEVICE_IO_MAP(srmp3_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp2_state,  irq0_line_assert)
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp3)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1220,13 +1220,13 @@ MACHINE_CONFIG_START(srmp2_state::srmp3)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 16000000/16)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 16000000/16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, adpcm_int))            /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, srmp2_state, adpcm_int))            /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
@@ -1234,9 +1234,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(srmp2_state::rmgoldyh)
 	srmp3(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rmgoldyh_map)
-	MCFG_CPU_IO_MAP(rmgoldyh_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rmgoldyh_map)
+	MCFG_DEVICE_IO_MAP(rmgoldyh_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,rmgoldyh)
 MACHINE_CONFIG_END
@@ -1244,10 +1244,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(srmp2_state::mjyuugi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(mjyuugi_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp2_state, irq4_line_assert)
-	MCFG_CPU_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)      /* Interrupt times is not understood */
+	MCFG_DEVICE_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mjyuugi_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp2_state, irq4_line_assert)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)      /* Interrupt times is not understood */
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,mjyuugi)
 
@@ -1273,13 +1273,13 @@ MACHINE_CONFIG_START(srmp2_state::mjyuugi)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 16000000/16)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 16000000/16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, adpcm_int))            /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, srmp2_state, adpcm_int))            /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END

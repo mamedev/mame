@@ -18,6 +18,7 @@
 class xavix_device : public m6502_device {
 public:
 	xavix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;
@@ -71,7 +72,7 @@ protected:
 	virtual void device_reset() override;
 	virtual offs_t pc_to_external(u16 pc) override;
 
-private:
+protected:
 	xavix_interrupt_vector_delegate m_vector_callback;
 
 	void set_codebank(uint8_t bank);

@@ -257,9 +257,10 @@ void mbc200_state::machine_reset()
 	memcpy(main, roms, 0x1000);
 }
 
-static SLOT_INTERFACE_START( mbc200_floppies )
-	SLOT_INTERFACE("qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void mbc200_floppies(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 MC6845_UPDATE_ROW( mbc200_state::update_row )
 {
@@ -301,13 +302,13 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(mbc200_state::mbc200)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000)/2) // NEC D780C-1
-	MCFG_CPU_PROGRAM_MAP(mbc200_mem)
-	MCFG_CPU_IO_MAP(mbc200_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000)/2) // NEC D780C-1
+	MCFG_DEVICE_PROGRAM_MAP(mbc200_mem)
+	MCFG_DEVICE_IO_MAP(mbc200_io)
 
-	MCFG_CPU_ADD("subcpu",Z80, XTAL(8'000'000)/2) // NEC D780C-1
-	MCFG_CPU_PROGRAM_MAP(mbc200_sub_mem)
-	MCFG_CPU_IO_MAP(mbc200_sub_io)
+	MCFG_DEVICE_ADD("subcpu",Z80, XTAL(8'000'000)/2) // NEC D780C-1
+	MCFG_DEVICE_PROGRAM_MAP(mbc200_sub_mem)
+	MCFG_DEVICE_IO_MAP(mbc200_sub_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -326,20 +327,20 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 
 	// sound
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1000) // frequency unknown
+	MCFG_DEVICE_ADD("beeper", BEEP, 1000) // frequency unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("ppi_1", I8255, 0)
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mbc200_state, p1_portc_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mbc200_state, p1_portc_w))
 
 	MCFG_DEVICE_ADD("ppi_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mbc200_state, p2_porta_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, mbc200_state, p2_porta_r))
 
 	MCFG_DEVICE_ADD("ppi_m", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mbc200_state, pm_porta_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mbc200_state, pm_portb_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mbc200_state, pm_porta_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mbc200_state, pm_portb_w))
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0) // INS8251N
 

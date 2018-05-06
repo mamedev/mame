@@ -1042,25 +1042,25 @@ static const char *const alphamc07_sample_names[] =
 // the sound board is the same in all games
 MACHINE_CONFIG_START(equites_state::common_sound)
 
-	MCFG_CPU_ADD("audiocpu", I8085A, 6.144_MHz_XTAL) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", I8085A, 6.144_MHz_XTAL) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_I8085A_CLK_OUT_DEVICE("audio8155")
 
 	MCFG_DEVICE_ADD("audio8155", I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(equites_state, equites_8155_porta_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(equites_state, equites_8155_portb_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(equites_state, equites_8155_portc_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(equites_state, equites_8155_timer_pulse))
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, equites_state, equites_8155_porta_w))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, equites_state, equites_8155_portb_w))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, equites_state, equites_8155_portc_w))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, equites_state, equites_8155_timer_pulse))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("msm", MSM5232, MSM5232_MAX_CLOCK)   // will be adjusted at runtime through PORT_ADJUSTER
+	MCFG_DEVICE_ADD("msm", MSM5232, MSM5232_MAX_CLOCK)   // will be adjusted at runtime through PORT_ADJUSTER
 	MCFG_MSM5232_SET_CAPACITORS(0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6) // verified
-	MCFG_MSM5232_GATE_HANDLER_CB(WRITELINE(equites_state, equites_msm5232_gate))
+	MCFG_MSM5232_GATE_HANDLER_CB(WRITELINE(*this, equites_state, equites_msm5232_gate))
 	MCFG_SOUND_ROUTE(0, "speaker", MSM5232_BASE_VOLUME/2.2)    // pin 28  2'-1 : 22k resistor
 	MCFG_SOUND_ROUTE(1, "speaker", MSM5232_BASE_VOLUME/1.5)    // pin 29  4'-1 : 15k resistor
 	MCFG_SOUND_ROUTE(2, "speaker", MSM5232_BASE_VOLUME)        // pin 30  8'-1 : 10k resistor
@@ -1073,18 +1073,18 @@ MACHINE_CONFIG_START(equites_state::common_sound)
 	MCFG_SOUND_ROUTE(9, "speaker", 1.0)        // pin 2 SOLO 16' (this actually feeds an analog section)
 	MCFG_SOUND_ROUTE(10,"speaker", 0.12)       // pin 22 Noise Output (this actually feeds an analog section)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 6.144_MHz_XTAL/4) /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(equites_state, equites_8910porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(equites_state, equites_8910portb_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 6.144_MHz_XTAL/4) /* verified on pcb */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, equites_state, equites_8910porta_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, equites_state, equites_8910portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
 
-	MCFG_SOUND_ADD("dac1", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac1", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac2", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(3)
 	MCFG_SAMPLES_NAMES(alphamc07_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
@@ -1156,14 +1156,14 @@ void equites_state::machine_reset()
 MACHINE_CONFIG_START(equites_state::equites)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12_MHz_XTAL/4) /* 68000P8 running at 3mhz! verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(equites_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL/4) /* 68000P8 running at 3mhz! verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(equites_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, equites_scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(equites_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(equites_state, mcu_start_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(equites_state, mcu_switch_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, equites_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, equites_state, mcu_start_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, equites_state, mcu_switch_w))
 
 	common_sound(config);
 
@@ -1192,12 +1192,12 @@ MACHINE_CONFIG_START(gekisou_state::gekisou)
 	equites(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gekisou_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gekisou_map)
 
 	// mcu not dumped, so add simulated mcu
-	MCFG_CPU_ADD("mcu", ALPHA8301L, 4000000/8)
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_ADD("mcu", ALPHA8301L, 4000000/8)
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
 
 	// gekisou has battery-backed RAM to store settings
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1207,15 +1207,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(splndrbt_state::splndrbt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 24_MHz_XTAL/4) /* 68000P8 running at 6mhz, verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(splndrbt_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL/4) /* 68000P8 running at 6mhz, verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(splndrbt_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", splndrbt_state, splndrbt_scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(equites_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(equites_state, mcu_start_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(equites_state, mcu_switch_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(splndrbt_state, splndrbt_selchar_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, equites_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, equites_state, mcu_start_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, equites_state, mcu_switch_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, splndrbt_state, splndrbt_selchar_w))
 
 	common_sound(config);
 
@@ -1242,8 +1242,8 @@ MACHINE_CONFIG_START(splndrbt_state::hvoltage)
 	splndrbt(config);
 
 	// mcu not dumped, so add simulated mcu
-	MCFG_CPU_ADD("mcu", ALPHA8301L, 4000000/8)
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_ADD("mcu", ALPHA8301L, 4000000/8)
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
 MACHINE_CONFIG_END
 
 

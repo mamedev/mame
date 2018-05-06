@@ -45,9 +45,10 @@ const tiny_rom_entry *vtech_floppy_controller_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( laser_floppies )
-	SLOT_INTERFACE("525", FLOPPY_525_SSSD)
-SLOT_INTERFACE_END
+static void laser_floppies(device_slot_interface &device)
+{
+	device.option_add("525", FLOPPY_525_SSSD);
+}
 
 MACHINE_CONFIG_START(vtech_floppy_controller_device::device_add_mconfig)
 	MCFG_MEMEXP_SLOT_ADD("mem")

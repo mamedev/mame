@@ -124,13 +124,13 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(gomoku_state::gomoku)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/12)      /* 1.536 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(gomoku_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gomoku_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/12)      /* 1.536 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(gomoku_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gomoku_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // 7J
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gomoku_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gomoku_state, bg_dispsw_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gomoku_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gomoku_state, bg_dispsw_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // start LED?
 
 	/* video hardware */
@@ -149,7 +149,7 @@ MACHINE_CONFIG_START(gomoku_state::gomoku)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("gomoku", GOMOKU, 0)
+	MCFG_DEVICE_ADD("gomoku", GOMOKU_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

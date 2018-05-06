@@ -204,15 +204,16 @@ WRITE_LINE_MEMBER( vip_expansion_slot_device::run_w ) { if (m_card != nullptr) m
 #include "vp595.h"
 #include "vp700.h"
 
-SLOT_INTERFACE_START( vip_expansion_cards )
-	SLOT_INTERFACE("super", VP550)
-	//SLOT_INTERFACE("eprom", VP560)
-	//SLOT_INTERFACE("eprommer", VP565)
-	SLOT_INTERFACE("ram", VP570)
-	SLOT_INTERFACE("exp", VP575)
-	//SLOT_INTERFACE("exp2", VP576_EXP)
-	SLOT_INTERFACE("keypad", VP585)
-	SLOT_INTERFACE("color", VP590)
-	SLOT_INTERFACE("simple", VP595)
-	SLOT_INTERFACE("basic", VP700)
-SLOT_INTERFACE_END
+void vip_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("super", VP550);
+	//device.option_add("eprom", VP560);
+	//device.option_add("eprommer", VP565);
+	device.option_add("ram", VP570);
+	device.option_add("exp", VP575);
+	//device.option_add("exp2", VP576_EXP);
+	device.option_add("keypad", VP585);
+	device.option_add("color", VP590);
+	device.option_add("simple", VP595);
+	device.option_add("basic", VP700);
+}

@@ -23,13 +23,13 @@
 //**************************************************************************
 
 
-class a2bus_diskiing_device:
+class diskiing_device:
 	public device_t,
 	public device_a2bus_card_interface
 {
 public:
 	// construction/destruction
-	a2bus_diskiing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	diskiing_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -52,7 +52,27 @@ private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
+class a2bus_diskiing_device: public diskiing_device
+{
+public:
+	a2bus_diskiing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class a2bus_diskiing13_device: public diskiing_device
+{
+public:
+	a2bus_diskiing13_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(A2BUS_DISKIING, a2bus_diskiing_device)
+DECLARE_DEVICE_TYPE(A2BUS_DISKIING13, a2bus_diskiing13_device)
 
 #endif  // MAME_BUS_A2BUS_A2DISKIING_H

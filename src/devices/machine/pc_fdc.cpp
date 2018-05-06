@@ -66,8 +66,8 @@ void pc_fdc_family_device::dma_w(uint8_t data)
 
 MACHINE_CONFIG_START(pc_fdc_family_device::device_add_mconfig)
 	MCFG_UPD765A_ADD("upd765", false, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc_fdc_family_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(pc_fdc_family_device, drq_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc_fdc_family_device, irq_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, pc_fdc_family_device, drq_w))
 MACHINE_CONFIG_END
 
 void pc_fdc_family_device::device_start()

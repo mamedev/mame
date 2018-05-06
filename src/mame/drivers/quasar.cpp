@@ -301,18 +301,18 @@ MACHINE_RESET_MEMBER(quasar_state,quasar)
 MACHINE_CONFIG_START(quasar_state::quasar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 14318000/4)  /* 14 mhz crystal divide by 4 on board */
-	MCFG_CPU_PROGRAM_MAP(quasar)
-	MCFG_CPU_IO_MAP(quasar_io)
-	MCFG_CPU_DATA_MAP(quasar_data)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", quasar_state,  quasar_interrupt)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
+	MCFG_DEVICE_ADD("maincpu", S2650, 14318000/4)  /* 14 mhz crystal divide by 4 on board */
+	MCFG_DEVICE_PROGRAM_MAP(quasar)
+	MCFG_DEVICE_IO_MAP(quasar_io)
+	MCFG_DEVICE_DATA_MAP(quasar_data)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quasar_state,  quasar_interrupt)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
 
-	MCFG_CPU_ADD("soundcpu",I8035,6000000)          /* 6MHz crystal divide by 15 in CPU */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(quasar_state, audio_t1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_DEVICE_ADD("soundcpu",I8035,6000000)          /* 6MHz crystal divide by 15 in CPU */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, quasar_state, audio_t1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
 
 	MCFG_MACHINE_START_OVERRIDE(quasar_state,quasar)
 	MCFG_MACHINE_RESET_OVERRIDE(quasar_state,quasar)
@@ -348,9 +348,9 @@ MACHINE_CONFIG_START(quasar_state::quasar)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( quasar )

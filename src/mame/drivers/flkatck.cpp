@@ -213,12 +213,12 @@ void flkatck_state::machine_reset()
 MACHINE_CONFIG_START(flkatck_state::flkatck)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
-	MCFG_CPU_PROGRAM_MAP(flkatck_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flkatck_state,  flkatck_interrupt)
+	MCFG_DEVICE_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(flkatck_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flkatck_state,  flkatck_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,3579545)   /* NEC D780C-1, 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(flkatck_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,3579545)   /* NEC D780C-1, 3.579545 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(flkatck_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -246,12 +246,12 @@ MACHINE_CONFIG_START(flkatck_state::flkatck)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(flkatck_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, flkatck_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)

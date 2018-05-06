@@ -296,14 +296,14 @@ WRITE8_MEMBER( g627_state::lamp_w )
 
 MACHINE_CONFIG_START(g627_state::g627)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 14138000/8)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 14138000/8)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("i8156", I8156, 14138000/8)
-	MCFG_I8155_IN_PORTA_CB(READ8(g627_state, porta_r))
-	MCFG_I8155_IN_PORTB_CB(READ8(g627_state, portb_r))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(g627_state, portc_w))
+	MCFG_I8155_IN_PORTA_CB(READ8(*this, g627_state, porta_r))
+	MCFG_I8155_IN_PORTB_CB(READ8(*this, g627_state, portb_r))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, g627_state, portc_w))
 	MCFG_I8155_OUT_TIMEROUT_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(g627_state::g627)
 	/* Sound */
 	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("astrocade",  ASTROCADE, 14138000/8) // 0066-117XX audio chip
+	MCFG_DEVICE_ADD("astrocade",  ASTROCADE, 14138000/8) // 0066-117XX audio chip
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Video */

@@ -389,8 +389,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(exterm_state::exterm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, 40000000)
-	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, 40000000)
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(40000000/8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
@@ -398,19 +398,19 @@ MACHINE_CONFIG_START(exterm_state::exterm)
 	MCFG_TMS340X0_TO_SHIFTREG_CB(exterm_state, to_shiftreg_master)  /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(exterm_state, from_shiftreg_master) /* read from shiftreg function */
 
-	MCFG_CPU_ADD("slave", TMS34010, 40000000)
-	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_ADD("slave", TMS34010, 40000000)
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(40000000/8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_TO_SHIFTREG_CB(exterm_state, to_shiftreg_slave)   /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(exterm_state, from_shiftreg_slave)  /* read from shiftreg function */
 
-	MCFG_CPU_ADD("audiocpu", M6502, 2000000)
-	MCFG_CPU_PROGRAM_MAP(sound_master_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_master_map)
 
-	MCFG_CPU_ADD("audioslave", M6502, 2000000)
-	MCFG_CPU_PROGRAM_MAP(sound_slave_map)
+	MCFG_DEVICE_ADD("audioslave", M6502, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_slave_map)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6502_IRQ_LINE))
@@ -440,13 +440,13 @@ MACHINE_CONFIG_START(exterm_state::exterm)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("dac", AD7528, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ad7528j.e2
-	MCFG_SOUND_ADD("dacvol", AD7528, 0) // ad7528j.e2
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_DEVICE_ADD("dac", AD7528, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ad7528j.e2
+	MCFG_DEVICE_ADD("dacvol", AD7528, 0) // ad7528j.e2
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 

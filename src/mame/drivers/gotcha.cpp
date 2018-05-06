@@ -262,11 +262,11 @@ void gotcha_state::machine_reset()
 MACHINE_CONFIG_START(gotcha_state::gotcha)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,14318180)    /* 14.31818 MHz */
-	MCFG_CPU_PROGRAM_MAP(gotcha_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,14318180)    /* 14.31818 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(gotcha_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80,6000000)   /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,6000000)   /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -295,7 +295,7 @@ MACHINE_CONFIG_START(gotcha_state::gotcha)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 14318180/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.80)
 	MCFG_SOUND_ROUTE(1, "mono", 0.80)

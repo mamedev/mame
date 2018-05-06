@@ -231,13 +231,13 @@ WRITE8_MEMBER( parodius_state::banking_callback )
 MACHINE_CONFIG_START(parodius_state::parodius)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)        /* 053248 */
-	MCFG_CPU_PROGRAM_MAP(parodius_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", parodius_state,  parodius_interrupt)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(parodius_state, banking_callback))
+	MCFG_DEVICE_ADD("maincpu", KONAMI, 3000000)        /* 053248 */
+	MCFG_DEVICE_PROGRAM_MAP(parodius_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", parodius_state,  parodius_interrupt)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, parodius_state, banking_callback))
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(parodius_sound_map)    /* NMIs are triggered by the 053260 */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
+	MCFG_DEVICE_PROGRAM_MAP(parodius_sound_map)    /* NMIs are triggered by the 053260 */
 
 	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
@@ -282,7 +282,7 @@ MACHINE_CONFIG_START(parodius_state::parodius)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

@@ -280,18 +280,18 @@ void gradius3_state::machine_reset()
 MACHINE_CONFIG_START(gradius3_state::gradius3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(gradius3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gradius3_state,  cpuA_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(gradius3_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gradius3_state,  cpuA_interrupt)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(gradius3_map2)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(gradius3_map2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gradius3_state, gradius3_sub_scanline, "screen", 0, 1)
 																				/* 4 is triggered by cpu A, the others are unknown but */
 																				/* required for the game to run. */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(gradius3_s_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
+	MCFG_DEVICE_PROGRAM_MAP(gradius3_s_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -326,12 +326,12 @@ MACHINE_CONFIG_START(gradius3_state::gradius3)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(gradius3_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, 3579545)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, gradius3_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.20)

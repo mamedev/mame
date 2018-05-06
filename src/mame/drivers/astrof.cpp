@@ -916,7 +916,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(astrof_state::base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank", astrof_state, irq_callback, "screen", VBSTART, 0)
 
 	/* video hardware */
@@ -930,8 +930,8 @@ MACHINE_CONFIG_START(astrof_state::astrof)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(astrof_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(astrof_map)
 
 	MCFG_MACHINE_START_OVERRIDE(astrof_state,astrof)
 
@@ -958,8 +958,8 @@ MACHINE_CONFIG_START(astrof_state::spfghmk2)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spfghmk2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spfghmk2_map)
 
 	MCFG_MACHINE_START_OVERRIDE(astrof_state,spfghmk2)
 
@@ -976,8 +976,8 @@ MACHINE_CONFIG_START(astrof_state::tomahawk)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tomahawk_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tomahawk_map)
 
 	MCFG_MACHINE_START_OVERRIDE(astrof_state,tomahawk)
 

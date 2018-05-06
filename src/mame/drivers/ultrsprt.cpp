@@ -236,12 +236,12 @@ void ultrsprt_state::machine_reset()
 
 MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, 25000000)
-	MCFG_CPU_PROGRAM_MAP(ultrsprt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ultrsprt_state, irq1_line_assert)
+	MCFG_DEVICE_ADD("maincpu", PPC403GA, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(ultrsprt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ultrsprt_state, irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 8000000) // Unconfirmed
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 8000000) // Unconfirmed
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

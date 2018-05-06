@@ -961,12 +961,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::interrupt)
 MACHINE_CONFIG_START(namcona1_state::namcona1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(namcona1_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(namcona1_main_map)
 
-	MCFG_CPU_ADD("mcu", NAMCO_C69, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(namcona1_mcu_map)
-	MCFG_CPU_IO_MAP( namcona1_mcu_io_map)
+	MCFG_DEVICE_ADD("mcu", NAMCO_C69, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(namcona1_mcu_map)
+	MCFG_DEVICE_IO_MAP( namcona1_mcu_io_map)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_main", namcona1_state, interrupt, "screen", 0, 1)
 
@@ -1000,18 +1000,18 @@ MACHINE_CONFIG_START(namcona2_state::namcona2)
 	namcona1(config);
 
 	/* basic machine hardware */
-//  MCFG_CPU_MODIFY("maincpu")
-//  MCFG_CPU_PROGRAM_MAP(namcona2_main_map)
+//  MCFG_DEVICE_MODIFY("maincpu")
+//  MCFG_DEVICE_PROGRAM_MAP(namcona2_main_map)
 
-	MCFG_CPU_REPLACE("mcu", NAMCO_C70, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(namcona1_mcu_map)
-	MCFG_CPU_IO_MAP( namcona1_mcu_io_map)
+	MCFG_DEVICE_REPLACE("mcu", NAMCO_C70, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(namcona1_mcu_map)
+	MCFG_DEVICE_IO_MAP( namcona1_mcu_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xday2_namcona2_state::xday2)
 	namcona2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(xday2_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(xday2_main_map)
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_2864_ADD("eeprom")

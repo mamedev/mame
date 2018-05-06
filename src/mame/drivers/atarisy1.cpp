@@ -406,18 +406,6 @@ READ8_MEMBER(atarisy1_state::via_pb_r)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(atarisy1_state::led_1_w)
-{
-	machine().output().set_led_value(0, !state);
-}
-
-
-WRITE_LINE_MEMBER(atarisy1_state::led_2_w)
-{
-	machine().output().set_led_value(1, !state);
-}
-
-
 WRITE_LINE_MEMBER(atarisy1_state::coin_counter_right_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -722,17 +710,17 @@ GFXDECODE_END
 MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy1_state,atarisy1)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy1_state,atarisy1)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
-	MCFG_ADC0808_EOC_CB(DEVWRITELINE("ajsint", input_merger_device, in_w<1>))
+	MCFG_ADC0808_EOC_CB(WRITELINE("ajsint", input_merger_device, in_w<1>))
 	// IN7 = J102 pin 2
 	// IN6 = J102 pin 3
 	// IN5 = J102 pin 4
@@ -743,17 +731,17 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	// IN0 = J102 pin 5
 
 	MCFG_INPUT_MERGER_ALL_HIGH("ajsint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(atarisy1_state, joystick_int))
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, atarisy1_state, joystick_int))
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 15H (TTL) or 14F (LSI)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("ymsnd", ym2151_device, reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(atarisy1_state, led_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(atarisy1_state, led_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(atarisy1_state, coin_counter_right_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(atarisy1_state, coin_counter_left_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("ymsnd", ym2151_device, reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // J106 pin 4
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // J106 pin 3
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, atarisy1_state, coin_counter_right_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, atarisy1_state, coin_counter_left_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -780,7 +768,7 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarisy1_state, screen_update_atarisy1)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarisy1_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarisy1_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(atarisy1_state,atarisy1)
 
@@ -788,25 +776,25 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_SOUND_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
+	MCFG_DEVICE_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_SOUND_ADD("tms", TMS5220C, ATARI_CLOCK_14MHz/2/11)
+	MCFG_DEVICE_ADD("tms", TMS5220C, ATARI_CLOCK_14MHz/2/11)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, ATARI_CLOCK_14MHz/8)
-	MCFG_VIA6522_READPA_HANDLER(READ8(atarisy1_state, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(atarisy1_state, via_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(atarisy1_state, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(atarisy1_state, via_pb_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, atarisy1_state, via_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, atarisy1_state, via_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, atarisy1_state, via_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, atarisy1_state, via_pb_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::marble)
@@ -824,10 +812,10 @@ MACHINE_CONFIG_START(atarisy1_state::peterpak)
 
 	// Digital joystick read through ADC
 	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0808_IN0_CB(READ8(atarisy1_state, digital_joystick_r<0>))
-	MCFG_ADC0808_IN1_CB(READ8(atarisy1_state, digital_joystick_r<1>))
-	MCFG_ADC0808_IN2_CB(READ8(atarisy1_state, digital_joystick_r<2>))
-	MCFG_ADC0808_IN3_CB(READ8(atarisy1_state, digital_joystick_r<3>))
+	MCFG_ADC0808_IN0_CB(READ8(*this, atarisy1_state, digital_joystick_r<0>))
+	MCFG_ADC0808_IN1_CB(READ8(*this, atarisy1_state, digital_joystick_r<1>))
+	MCFG_ADC0808_IN2_CB(READ8(*this, atarisy1_state, digital_joystick_r<2>))
+	MCFG_ADC0808_IN3_CB(READ8(*this, atarisy1_state, digital_joystick_r<3>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::indytemp)
@@ -836,10 +824,10 @@ MACHINE_CONFIG_START(atarisy1_state::indytemp)
 
 	// Digital joystick read through ADC
 	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0808_IN0_CB(READ8(atarisy1_state, digital_joystick_r<0>))
-	MCFG_ADC0808_IN1_CB(READ8(atarisy1_state, digital_joystick_r<1>))
-	MCFG_ADC0808_IN2_CB(READ8(atarisy1_state, digital_joystick_r<2>))
-	MCFG_ADC0808_IN3_CB(READ8(atarisy1_state, digital_joystick_r<3>))
+	MCFG_ADC0808_IN0_CB(READ8(*this, atarisy1_state, digital_joystick_r<0>))
+	MCFG_ADC0808_IN1_CB(READ8(*this, atarisy1_state, digital_joystick_r<1>))
+	MCFG_ADC0808_IN2_CB(READ8(*this, atarisy1_state, digital_joystick_r<2>))
+	MCFG_ADC0808_IN3_CB(READ8(*this, atarisy1_state, digital_joystick_r<3>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::roadrunn)

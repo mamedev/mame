@@ -68,9 +68,9 @@ private:
 
 } } } // end namespace bus::ti99::joyport
 
-SLOT_INTERFACE_EXTERN(ti99_joystick_port);
-SLOT_INTERFACE_EXTERN(ti99_joystick_port_994);
-SLOT_INTERFACE_EXTERN(ti99_joystick_port_gen);
+void ti99_joystick_port(device_slot_interface &device);
+void ti99_joystick_port_994(device_slot_interface &device);
+void ti99_joystick_port_gen(device_slot_interface &device);
 
 DECLARE_DEVICE_TYPE_NS(TI99_JOYPORT, bus::ti99::joyport, joyport_device)
 

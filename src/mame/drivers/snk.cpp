@@ -3650,18 +3650,18 @@ GFXDECODE_END
 MACHINE_CONFIG_START(snk_state::marvins)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3360000)   /* 3.36 MHz */
-	MCFG_CPU_PROGRAM_MAP(marvins_cpuA_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3360000)   /* 3.36 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(marvins_cpuA_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, 3360000)   /* 3.36 MHz */
-	MCFG_CPU_PROGRAM_MAP(marvins_cpuB_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, 3360000)   /* 3.36 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(marvins_cpuB_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* verified on schematics */
-	MCFG_CPU_PROGRAM_MAP(marvins_sound_map)
-	MCFG_CPU_IO_MAP(marvins_sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(snk_state, nmi_line_assert,  244)  // schematics show a separate 244Hz timer
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* verified on schematics */
+	MCFG_DEVICE_PROGRAM_MAP(marvins_sound_map)
+	MCFG_DEVICE_IO_MAP(marvins_sound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(snk_state, nmi_line_assert,  244)  // schematics show a separate 244Hz timer
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -3686,13 +3686,13 @@ MACHINE_CONFIG_START(snk_state::marvins)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000)  /* verified on schematics */
+	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)  /* verified on schematics */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000)  /* verified on schematics */
+	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)  /* verified on schematics */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MCFG_SNKWAVE_ADD("wave", 8000000)   /* verified on schematics */
+	MCFG_DEVICE_ADD("wave", SNKWAVE, 8000000)   /* verified on schematics */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -3701,11 +3701,11 @@ MACHINE_CONFIG_START(snk_state::vangrd2)
 	marvins(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(madcrash_cpuA_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(madcrash_cpuA_map)
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(madcrash_cpuB_map)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(madcrash_cpuB_map)
 MACHINE_CONFIG_END
 
 
@@ -3713,29 +3713,29 @@ MACHINE_CONFIG_START(snk_state::madcrush)
 	marvins(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(madcrush_cpuA_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(madcrush_cpuA_map)
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(madcrush_cpuB_map)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(madcrush_cpuB_map)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(snk_state::jcross)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3350000) /* NOT verified */
-	MCFG_CPU_PROGRAM_MAP(jcross_cpuA_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3350000) /* NOT verified */
+	MCFG_DEVICE_PROGRAM_MAP(jcross_cpuA_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, 3350000) /* NOT verified */
-	MCFG_CPU_PROGRAM_MAP(jcross_cpuB_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, 3350000) /* NOT verified */
+	MCFG_DEVICE_PROGRAM_MAP(jcross_cpuB_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* NOT verified */
-	MCFG_CPU_PROGRAM_MAP(jcross_sound_map)
-	MCFG_CPU_IO_MAP(jcross_sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(snk_state, irq0_line_assert,  244) // Marvin's frequency, sounds ok
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* NOT verified */
+	MCFG_DEVICE_PROGRAM_MAP(jcross_sound_map)
+	MCFG_DEVICE_IO_MAP(jcross_sound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(snk_state, irq0_line_assert,  244) // Marvin's frequency, sounds ok
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -3760,10 +3760,10 @@ MACHINE_CONFIG_START(snk_state::jcross)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000)  /* NOT verified */
+	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)  /* NOT verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000)  /* NOT verified */
+	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)  /* NOT verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
@@ -3772,11 +3772,11 @@ MACHINE_CONFIG_START(snk_state::sgladiat)
 	jcross(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sgladiat_cpuA_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sgladiat_cpuA_map)
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(sgladiat_cpuB_map)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(sgladiat_cpuB_map)
 
 	/* video hardware */
 	/* visible area is correct. Debug info is shown in the black bars at the sides
@@ -3790,16 +3790,16 @@ MACHINE_CONFIG_START(snk_state::hal21)
 	jcross(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hal21_cpuA_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hal21_cpuA_map)
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(hal21_cpuB_map)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(hal21_cpuB_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(hal21_sound_map)
-	MCFG_CPU_IO_MAP(hal21_sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(snk_state, irq0_line_hold,  220) // music tempo, hand tuned
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(hal21_sound_map)
+	MCFG_DEVICE_IO_MAP(hal21_sound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(snk_state, irq0_line_hold,  220) // music tempo, hand tuned
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(snk_state,hal21)
@@ -3809,16 +3809,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snk_state::tnk3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(13'400'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(tnk3_cpuA_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(13'400'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(tnk3_cpuA_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(13'400'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(tnk3_cpuB_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(13'400'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(tnk3_cpuB_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(tnk3_YM3526_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(tnk3_YM3526_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -3843,8 +3843,8 @@ MACHINE_CONFIG_START(snk_state::tnk3)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
+	MCFG_DEVICE_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -3853,14 +3853,14 @@ MACHINE_CONFIG_START(snk_state::aso)
 	tnk3(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(aso_cpuA_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(aso_cpuA_map)
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(aso_cpuB_map)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(aso_cpuB_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(aso_YM3526_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(aso_YM3526_sound_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(snk_state,aso)
@@ -3871,12 +3871,12 @@ MACHINE_CONFIG_START(snk_state::athena)
 	tnk3(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(YM3526_YM3526_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(YM3526_YM3526_sound_map)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ym2", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_2))
+	MCFG_DEVICE_ADD("ym2", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -3885,13 +3885,13 @@ MACHINE_CONFIG_START(snk_state::fitegolf)
 	tnk3(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_DEVICE_MODIFY("audiocpu")
 	// xtal is 4MHz instead of 8MHz/2 but the end result is the same
-	MCFG_CPU_PROGRAM_MAP(YM3812_sound_map)
+	MCFG_DEVICE_PROGRAM_MAP(YM3812_sound_map)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ym1", YM3812, XTAL(4'000'000)) /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
+	MCFG_DEVICE_REPLACE("ym1", YM3812, XTAL(4'000'000)) /* verified on pcb */
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -3905,16 +3905,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snk_state::ikari)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(13'400'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(ikari_cpuA_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(13'400'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(ikari_cpuA_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(13'400'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(ikari_cpuB_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(13'400'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(ikari_cpuB_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(YM3526_YM3526_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(YM3526_YM3526_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -3938,12 +3938,12 @@ MACHINE_CONFIG_START(snk_state::ikari)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
+	MCFG_DEVICE_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
-	MCFG_SOUND_ADD("ym2", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_2))
+	MCFG_DEVICE_ADD("ym2", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -3952,12 +3952,12 @@ MACHINE_CONFIG_START(snk_state::victroad)
 	ikari(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(YM3526_Y8950_sound_map)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ym2", Y8950, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_Y8950_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_2))
+	MCFG_DEVICE_REPLACE("ym2", Y8950, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_Y8950_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -3965,16 +3965,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snk_state::bermudat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(bermudat_cpuA_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(bermudat_cpuA_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(bermudat_cpuB_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(bermudat_cpuB_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(YM3526_Y8950_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(24000))
 
@@ -3996,12 +3996,12 @@ MACHINE_CONFIG_START(snk_state::bermudat)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
+	MCFG_DEVICE_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
-	MCFG_SOUND_ADD("ym2", Y8950, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_Y8950_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_2))
+	MCFG_DEVICE_ADD("ym2", Y8950, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_Y8950_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -4018,11 +4018,11 @@ MACHINE_CONFIG_START(snk_state::gwar)
 	bermudat(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gwar_cpuA_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gwar_cpuA_map)
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(gwar_cpuB_map)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(gwar_cpuB_map)
 
 MACHINE_CONFIG_END
 
@@ -4031,11 +4031,11 @@ MACHINE_CONFIG_START(snk_state::gwara)
 	bermudat(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gwara_cpuA_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gwara_cpuA_map)
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(gwara_cpuB_map)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(gwara_cpuB_map)
 MACHINE_CONFIG_END
 
 
@@ -4043,15 +4043,15 @@ MACHINE_CONFIG_START(snk_state::chopper1)
 	bermudat(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(gwar_cpuB_map)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(gwar_cpuB_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(YM3812_Y8950_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(YM3812_Y8950_sound_map)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ym1", YM3812, 4000000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
+	MCFG_DEVICE_REPLACE("ym1", YM3812, 4000000)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4060,24 +4060,24 @@ MACHINE_CONFIG_START(snk_state::choppera)
 	chopper1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gwar_cpuA_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gwar_cpuA_map)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(snk_state::tdfever)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(tdfever_cpuA_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(tdfever_cpuA_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(tdfever_cpuB_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(tdfever_cpuB_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(YM3526_Y8950_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -4101,12 +4101,12 @@ MACHINE_CONFIG_START(snk_state::tdfever)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM3526, 4000000)
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
+	MCFG_DEVICE_ADD("ym1", YM3526, 4000000)
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym2", Y8950, 4000000)
-	MCFG_Y8950_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_2))
+	MCFG_DEVICE_ADD("ym2", Y8950, 4000000)
+	MCFG_Y8950_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4115,8 +4115,8 @@ MACHINE_CONFIG_START(snk_state::tdfever2)
 	tdfever(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(Y8950_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(Y8950_sound_map)
 
 	/* sound hardware */
 

@@ -490,11 +490,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -519,31 +519,31 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(gauntlet_state, screen_update_gauntlet)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(gauntlet_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gauntlet_state, video_int_write_line))
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.48)
 
-	MCFG_SOUND_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
+	MCFG_DEVICE_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.32)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.32)
 
-	MCFG_SOUND_ADD("tms", TMS5220C, ATARI_CLOCK_14MHz/2/11) /* potentially ATARI_CLOCK_14MHz/2/9 as well */
+	MCFG_DEVICE_ADD("tms", TMS5220C, ATARI_CLOCK_14MHz/2/11) /* potentially ATARI_CLOCK_14MHz/2/9 as well */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
 	MCFG_DEVICE_ADD("soundctl", LS259, 0) // 16T/U
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("ymsnd", ym2151_device, reset_w)) // music reset, low reset
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("tms", tms5220_device, wsq_w)) // speech write, active low
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("tms", tms5220_device, rsq_w)) // speech reset, active low
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gauntlet_state, speech_squeak_w)) // speech squeak, low = 650 Hz
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(gauntlet_state, coin_counter_right_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(gauntlet_state, coin_counter_left_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("ymsnd", ym2151_device, reset_w)) // music reset, low reset
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("tms", tms5220_device, wsq_w)) // speech write, active low
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("tms", tms5220_device, rsq_w)) // speech reset, active low
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gauntlet_state, speech_squeak_w)) // speech squeak, low = 650 Hz
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, gauntlet_state, coin_counter_right_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, gauntlet_state, coin_counter_left_w))
 MACHINE_CONFIG_END
 
 

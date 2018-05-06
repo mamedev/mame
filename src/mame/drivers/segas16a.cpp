@@ -1972,32 +1972,32 @@ GFXDECODE_END
 MACHINE_CONFIG_START(segas16a_state::system16a)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(system16a_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(system16a_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	MCFG_CPU_ADD("n7751", N7751, 6000000)
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(segas16a_state, n7751_rom_r))
+	MCFG_DEVICE_ADD("n7751", N7751, 6000000)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, segas16a_state, n7751_rom_r))
 	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
-	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(segas16a_state, n7751_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(segas16a_state, n7751_p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("n7751_8243", i8243_device, prog_w))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, segas16a_state, n7751_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, segas16a_state, n7751_p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("n7751_8243", i8243_device, prog_w))
 
-	MCFG_I8243_ADD("n7751_8243", NOOP, WRITE8(segas16a_state,n7751_rom_offset_w))
+	MCFG_I8243_ADD("n7751_8243", NOOP, WRITE8(*this, segas16a_state,n7751_rom_offset_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(segas16a_state, misc_control_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(segas16a_state, tilemap_sound_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, segas16a_state, misc_control_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segas16a_state, tilemap_sound_w))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2019,36 +2019,36 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(segas16a_state, n7751_control_w))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, segas16a_state, n7751_control_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.43)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(segas16a_state::system16a_fd1089a)
 	system16a(config);
-	MCFG_CPU_REPLACE("maincpu", FD1089A, 10000000)
-	MCFG_CPU_PROGRAM_MAP(system16a_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", FD1089A, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(system16a_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::system16a_fd1089b)
 	system16a(config);
-	MCFG_CPU_REPLACE("maincpu", FD1089B, 10000000)
-	MCFG_CPU_PROGRAM_MAP(system16a_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", FD1089B, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(system16a_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::system16a_fd1094)
 	system16a(config);
-	MCFG_CPU_REPLACE("maincpu", FD1094, 10000000)
-	MCFG_CPU_PROGRAM_MAP(system16a_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", FD1094, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(system16a_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::aceattaca_fd1094)
@@ -2059,35 +2059,35 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::system16a_i8751)
 	system16a(config);
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, i8751_main_cpu_vblank)
 
-	MCFG_CPU_ADD("mcu", I8751, 8000000)
-	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(segas16a_state, mcu_control_w))
+	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
+	MCFG_DEVICE_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, segas16a_state, mcu_control_w))
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, mcu_irq_assert)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(segas16a_state::system16a_no7751)
 	system16a(config);
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_IO_MAP(sound_no7751_portmap)
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 	MCFG_DEVICE_REMOVE("vref")
 
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::system16a_no7751p)
 	system16a_no7751(config);
-	MCFG_CPU_REPLACE("soundcpu", SEGA_315_5177, 4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_no7751_portmap)
-	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("soundcpu", SEGA_315_5177, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_no7751_portmap)
+	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":sound_decrypted_opcodes")
 MACHINE_CONFIG_END
 
@@ -2098,47 +2098,47 @@ static MACHINE_CONFIG_START( system16a_i8751_no7751 )
     MCFG_DEVICE_REMOVE("dac")
     MCFG_DEVICE_REMOVE("vref")
 
-    MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+    MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 */
 
 MACHINE_CONFIG_START(segas16a_state::system16a_fd1089a_no7751)
 	system16a_fd1089a(config);
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_IO_MAP(sound_no7751_portmap)
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 	MCFG_DEVICE_REMOVE("vref")
 
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::system16a_fd1089b_no7751)
 	system16a_fd1089b(config);
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_IO_MAP(sound_no7751_portmap)
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 	MCFG_DEVICE_REMOVE("vref")
 
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16a_state::system16a_fd1094_no7751)
 	system16a_fd1094(config);
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_IO_MAP(sound_no7751_portmap)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_IO_MAP(sound_no7751_portmap)
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
 	MCFG_DEVICE_REMOVE("vref")
 
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
