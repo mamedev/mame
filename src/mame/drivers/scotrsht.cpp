@@ -190,12 +190,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(scotrsht_state::scotrsht)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(scotrsht_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(scotrsht_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 18432000/6)        /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(scotrsht_sound_map)
-	MCFG_CPU_IO_MAP(scotrsht_sound_port)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 18432000/6)        /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(scotrsht_sound_map)
+	MCFG_DEVICE_IO_MAP(scotrsht_sound_port)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -207,7 +207,7 @@ MACHINE_CONFIG_START(scotrsht_state::scotrsht)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(scotrsht_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(scotrsht_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, scotrsht_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scotrsht)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
@@ -219,7 +219,7 @@ MACHINE_CONFIG_START(scotrsht_state::scotrsht)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 18432000/6)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 

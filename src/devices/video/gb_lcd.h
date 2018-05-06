@@ -295,19 +295,19 @@ DECLARE_DEVICE_TYPE(CGB_PPU, cgb_ppu_device)
 
 #define MCFG_DMG_PPU_ADD(_tag, _cpu_tag ) \
 		MCFG_DEVICE_ADD( _tag, DMG_PPU, 0 ) \
-		downcast<dmg_ppu_device &>(*device).set_lr35902_tag("^" _cpu_tag);
+		downcast<dmg_ppu_device &>(*device).set_lr35902_tag(_cpu_tag);
 
 #define MCFG_MGB_PPU_ADD(_tag, _cpu_tag ) \
 		MCFG_DEVICE_ADD( _tag, MGB_PPU, 0 ) \
-		downcast<dmg_ppu_device &>(*device).set_lr35902_tag("^" _cpu_tag);
+		downcast<dmg_ppu_device &>(*device).set_lr35902_tag(_cpu_tag);
 
 #define MCFG_SGB_PPU_ADD(_tag, _cpu_tag ) \
 		MCFG_DEVICE_ADD( _tag, SGB_PPU, 0 ) \
-		downcast<dmg_ppu_device &>(*device).set_lr35902_tag("^" _cpu_tag);
+		downcast<dmg_ppu_device &>(*device).set_lr35902_tag(_cpu_tag);
 
 #define MCFG_CGB_PPU_ADD(_tag, _cpu_tag ) \
 		MCFG_DEVICE_ADD( _tag, CGB_PPU, 0 ) \
-		downcast<dmg_ppu_device &>(*device).set_lr35902_tag("^" _cpu_tag);
+		downcast<dmg_ppu_device &>(*device).set_lr35902_tag(_cpu_tag);
 
 
 #endif // MAME_VIDEO_GB_LCD_H

@@ -105,6 +105,6 @@ protected:
 DECLARE_DEVICE_TYPE(PET_DATASSETTE_PORT, pet_datassette_port_device)
 
 
-SLOT_INTERFACE_EXTERN( cbm_datassette_devices );
+void cbm_datassette_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_PET_CASS_H

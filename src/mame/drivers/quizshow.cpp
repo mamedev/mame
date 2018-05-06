@@ -388,10 +388,10 @@ void quizshow_state::machine_reset()
 MACHINE_CONFIG_START(quizshow_state::quizshow)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK / 16) // divider guessed
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_S2650_SENSE_INPUT(READLINE(quizshow_state, tape_signal_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(quizshow_state, flag_output_w))
+	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK / 16) // divider guessed
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, quizshow_state, tape_signal_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, quizshow_state, flag_output_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("clock_timer", quizshow_state, clock_timer_cb, attotime::from_hz(PIXEL_CLOCK / (HTOTAL * 8))) // 8V
 
 	/* video hardware */
@@ -409,9 +409,9 @@ MACHINE_CONFIG_START(quizshow_state::quizshow)
 	/* sound hardware (discrete) */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 

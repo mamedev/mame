@@ -10,23 +10,29 @@ sata_device::sata_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-ADDRESS_MAP_START(sata_device::primary_command_map)
-ADDRESS_MAP_END
+void sata_device::primary_command_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(sata_device::primary_control_map)
-ADDRESS_MAP_END
+void sata_device::primary_control_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(sata_device::secondary_command_map)
-ADDRESS_MAP_END
+void sata_device::secondary_command_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(sata_device::secondary_control_map)
-ADDRESS_MAP_END
+void sata_device::secondary_control_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(sata_device::bus_master_map)
-ADDRESS_MAP_END
+void sata_device::bus_master_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(sata_device::ide_command_posting_map)
-ADDRESS_MAP_END
+void sata_device::ide_command_posting_map(address_map &map)
+{
+}
 
 
 void sata_device::device_start()

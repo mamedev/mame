@@ -141,7 +141,7 @@ public:
 	int next_y;
 
 	powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template<class _cb> void set_irq_cb(_cb cb) { irq_cb.set_callback(cb); }
+	template <class Object> void set_irq_cb(Object &&cb) { irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ32_MEMBER(  id_r );
 	DECLARE_READ32_MEMBER(  revision_r );

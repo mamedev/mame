@@ -17,17 +17,17 @@
 
     banking:
     - 0x1c = 0
-    AM_RANGE(0x0000,0x1fff) ROM
-    AM_RANGE(0x2000,0xdfff) NOP
-    AM_RANGE(0xe000,0xffff) RAM
+    map(0x0000,0x1fff).rom()
+    map(0x2000,0xdfff).noprw()
+    map(0xe000,0xffff).ram()
     - 0x1c = 1 0x20 = 1
-    AM_RANGE(0x0000,0x7fff) RAM (0x18 selects bank)
-    AM_RANGE(0x8000,0x87ff) CMOS
-    AM_RANGE(0x8800,0xdfff) NOP or previous bank?
-    AM_RANGE(0xe000,0xffff) RAM
+    map(0x0000,0x7fff).ram() (0x18 selects bank)
+    map(0x8000,0x87ff) CMOS
+    map(0x8800,0xdfff).noprw() or previous bank?
+    map(0xe000,0xffff).ram()
     - 0x1c = 1 0x20 = 0
-    AM_RANGE(0x0000,0xdfff) RAM (0x18 selects bank)
-    AM_RANGE(0xe000,0xffff) RAM
+    map(0x0000,0xdfff).ram() (0x18 selects bank)
+    map(0xe000,0xffff).ram()
 ****************************************************************************/
 
 
@@ -381,9 +381,10 @@ QUICKLOAD_LOAD_MEMBER( qx10_state, qx10 )
     FDD
 */
 
-static SLOT_INTERFACE_START( qx10_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void qx10_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 WRITE_LINE_MEMBER( qx10_state::qx10_upd765_interrupt )
 {
@@ -568,12 +569,12 @@ void qx10_state::qx10_io(address_map &map)
 	map(0x30, 0x33).rw(this, FUNC(qx10_state::qx10_30_r), FUNC(qx10_state::fdd_motor_w));
 	map(0x34, 0x35).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x38, 0x39).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
-//  AM_RANGE(0x3a, 0x3a) GDC zoom
-//  AM_RANGE(0x3b, 0x3b) GDC light pen req
+//  map(0x3a, 0x3a) GDC zoom
+//  map(0x3b, 0x3b) GDC light pen req
 	map(0x3c, 0x3d).rw(this, FUNC(qx10_state::mc146818_r), FUNC(qx10_state::mc146818_w));
 	map(0x40, 0x4f).rw(m_dma_1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x50, 0x5f).rw(m_dma_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-//  AM_RANGE(0xfc, 0xfd) Multi-Font comms
+//  map(0xfc, 0xfd) Multi-Font comms
 }
 
 /* Input ports */
@@ -721,16 +722,17 @@ void qx10_state::upd7220_map(address_map &map)
 	map(0x00000, 0x3ffff).rw(this, FUNC(qx10_state::vram_r), FUNC(qx10_state::vram_w));
 }
 
-static SLOT_INTERFACE_START(keyboard)
-	SLOT_INTERFACE("qx10", QX10_KEYBOARD)
-SLOT_INTERFACE_END
+static void keyboard(device_slot_interface &device)
+{
+	device.option_add("qx10", QX10_KEYBOARD);
+}
 
 MACHINE_CONFIG_START(qx10_state::qx10)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, MAIN_CLK / 4)
-	MCFG_CPU_PROGRAM_MAP(qx10_mem)
-	MCFG_CPU_IO_MAP(qx10_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu",Z80, MAIN_CLK / 4)
+	MCFG_DEVICE_PROGRAM_MAP(qx10_mem)
+	MCFG_DEVICE_IO_MAP(qx10_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -768,39 +770,39 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	MCFG_DEVICE_ADD("pit8253_2", PIT8253, 0)
 	MCFG_PIT8253_CLK0(MAIN_CLK / 8)
 	MCFG_PIT8253_CLK1(MAIN_CLK / 8)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(qx10_state, keyboard_clk))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, qx10_state, keyboard_clk))
 	MCFG_PIT8253_CLK2(MAIN_CLK / 8)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("upd7201", z80dart_device, rxtxcb_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("upd7201", z80dart_device, rxtxcb_w))
 
 	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(qx10_state, get_slave_ack))
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, qx10_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir7_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("upd7201", UPD7201, MAIN_CLK/4) // channel b clock set by pit2 channel 2
 	// Channel A: Keyboard
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("kbd", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("kbd", rs232_port_device, write_txd))
 	// Channel B: RS232
-	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(WRITELINE(qx10_state, keyboard_irq))
+	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_INT_CB(WRITELINE(*this, qx10_state, keyboard_irq))
 
 	MCFG_DEVICE_ADD("8237dma_1", AM9517A, MAIN_CLK/4)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(qx10_state, dma_hrq_changed))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(qx10_state, tc_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(qx10_state, memory_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(qx10_state, memory_write_byte))
-	MCFG_I8237_IN_IOR_0_CB(READ8(qx10_state, fdc_dma_r))
-	MCFG_I8237_IN_IOR_1_CB(READ8(qx10_state, gdc_dack_r))
-	//MCFG_I8237_IN_IOR_2_CB(DEVREAD8("upd7220", upd7220_device, dack_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(qx10_state, fdc_dma_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(qx10_state, gdc_dack_w))
-	//MCFG_I8237_OUT_IOW_2_CB(DEVWRITE8("upd7220", upd7220_device, dack_w))
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, qx10_state, dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, qx10_state, tc_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, qx10_state, memory_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, qx10_state, memory_write_byte))
+	MCFG_I8237_IN_IOR_0_CB(READ8(*this, qx10_state, fdc_dma_r))
+	MCFG_I8237_IN_IOR_1_CB(READ8(*this, qx10_state, gdc_dack_r))
+	//MCFG_I8237_IN_IOR_2_CB(READ8("upd7220", upd7220_device, dack_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(*this, qx10_state, fdc_dma_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, qx10_state, gdc_dack_w))
+	//MCFG_I8237_OUT_IOW_2_CB(WRITE8("upd7220", upd7220_device, dack_w))
 	MCFG_DEVICE_ADD("8237dma_2", AM9517A, MAIN_CLK/4)
 
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
@@ -812,18 +814,18 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir2_w))
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir2_w))
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(qx10_state, qx10_upd765_interrupt))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("8237dma_1", am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, qx10_state, qx10_upd765_interrupt))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("8237dma_1", am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_device, rxb_w))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("upd7201", upd7201_device, rxb_w))
 
-	MCFG_RS232_PORT_ADD("kbd", keyboard, "qx10")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", z80dart_device, rxa_w))
+	MCFG_DEVICE_ADD("kbd", RS232_PORT, keyboard, "qx10")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("upd7201", z80dart_device, rxa_w))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

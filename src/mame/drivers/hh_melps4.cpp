@@ -298,13 +298,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(cfrogger_state::cfrogger)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M58846, 600_kHz_XTAL)
-	MCFG_MELPS4_READ_K_CB(READ16(cfrogger_state, input_r))
-	MCFG_MELPS4_WRITE_S_CB(WRITE8(cfrogger_state, plate_w))
-	MCFG_MELPS4_WRITE_F_CB(WRITE8(cfrogger_state, plate_w))
-	MCFG_MELPS4_WRITE_G_CB(WRITE8(cfrogger_state, plate_w))
-	MCFG_MELPS4_WRITE_D_CB(WRITE16(cfrogger_state, grid_w))
-	MCFG_MELPS4_WRITE_T_CB(WRITELINE(cfrogger_state, speaker_w))
+	MCFG_DEVICE_ADD("maincpu", M58846, 600_kHz_XTAL)
+	MCFG_MELPS4_READ_K_CB(READ16(*this, cfrogger_state, input_r))
+	MCFG_MELPS4_WRITE_S_CB(WRITE8(*this, cfrogger_state, plate_w))
+	MCFG_MELPS4_WRITE_F_CB(WRITE8(*this, cfrogger_state, plate_w))
+	MCFG_MELPS4_WRITE_G_CB(WRITE8(*this, cfrogger_state, plate_w))
+	MCFG_MELPS4_WRITE_D_CB(WRITE16(*this, cfrogger_state, grid_w))
+	MCFG_MELPS4_WRITE_T_CB(WRITELINE(*this, cfrogger_state, speaker_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -316,7 +316,7 @@ MACHINE_CONFIG_START(cfrogger_state::cfrogger)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -414,14 +414,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gjungler_state::gjungler)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M58846, 600_kHz_XTAL)
-	MCFG_MELPS4_READ_K_CB(READ16(gjungler_state, input_r))
-	MCFG_MELPS4_WRITE_S_CB(WRITE8(gjungler_state, plate_w))
-	MCFG_MELPS4_WRITE_F_CB(WRITE8(gjungler_state, plate_w))
-	MCFG_MELPS4_WRITE_G_CB(WRITE8(gjungler_state, plate_w))
-	MCFG_MELPS4_WRITE_U_CB(WRITE8(gjungler_state, plate_w))
-	MCFG_MELPS4_WRITE_D_CB(WRITE16(gjungler_state, grid_w))
-	MCFG_MELPS4_WRITE_T_CB(WRITELINE(gjungler_state, speaker_w))
+	MCFG_DEVICE_ADD("maincpu", M58846, 600_kHz_XTAL)
+	MCFG_MELPS4_READ_K_CB(READ16(*this, gjungler_state, input_r))
+	MCFG_MELPS4_WRITE_S_CB(WRITE8(*this, gjungler_state, plate_w))
+	MCFG_MELPS4_WRITE_F_CB(WRITE8(*this, gjungler_state, plate_w))
+	MCFG_MELPS4_WRITE_G_CB(WRITE8(*this, gjungler_state, plate_w))
+	MCFG_MELPS4_WRITE_U_CB(WRITE8(*this, gjungler_state, plate_w))
+	MCFG_MELPS4_WRITE_D_CB(WRITE16(*this, gjungler_state, grid_w))
+	MCFG_MELPS4_WRITE_T_CB(WRITELINE(*this, gjungler_state, speaker_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -433,7 +433,7 @@ MACHINE_CONFIG_START(gjungler_state::gjungler)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

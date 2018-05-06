@@ -627,20 +627,20 @@ void gaelco_state::machine_start()
 MACHINE_CONFIG_START(gaelco_state::bigkarnk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* MC68000P10, 10 MHz */
-	MCFG_CPU_PROGRAM_MAP(bigkarnk_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* MC68000P10, 10 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bigkarnk_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, 8867000/4)  /* 68B09EP, 2.21675 MHz? */
-	MCFG_CPU_PROGRAM_MAP(bigkarnk_snd_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, 8867000/4)  /* 68B09EP, 2.21675 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(bigkarnk_snd_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco_state, coin1_lockout_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco_state, coin2_lockout_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gaelco_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco_state, coin1_lockout_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco_state, coin2_lockout_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gaelco_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gaelco_state, coin2_counter_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(gaelco_state::bigkarnk)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3580000)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 3580000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -673,9 +673,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gaelco_state::maniacsq)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2 ) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(maniacsq_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2 ) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(maniacsq_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -703,17 +703,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gaelco_state::squash)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2 ) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(squash_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2 ) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(squash_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // B8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco_state, coin1_lockout_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco_state, coin2_lockout_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gaelco_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco_state, coin1_lockout_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco_state, coin2_lockout_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gaelco_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gaelco_state, coin2_counter_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // used
 
 	/* video hardware */
@@ -742,17 +742,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gaelco_state::thoop)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2 ) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(thoop_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2 ) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(thoop_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // B8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco_state, coin1_lockout_w)) // not inverted
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco_state, coin2_lockout_w)) // not inverted
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gaelco_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco_state, coin1_lockout_w)) // not inverted
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco_state, coin2_lockout_w)) // not inverted
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gaelco_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gaelco_state, coin2_counter_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // used
 
 	/* video hardware */

@@ -38,6 +38,6 @@ DECLARE_DEVICE_TYPE(TC0110PCR, tc0110pcr_device)
 #define MCFG_TC0110PCR_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, TC0110PCR, 0)
 #define MCFG_TC0110PCR_PALETTE(_palette_tag) \
-	downcast<tc0110pcr_device &>(*device).set_palette_tag("^" _palette_tag);
+	downcast<tc0110pcr_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_VIDEO_TC0110PCR_H

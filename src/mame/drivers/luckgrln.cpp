@@ -975,10 +975,10 @@ INTERRUPT_GEN_MEMBER(luckgrln_state::luckgrln_irq)
 }
 
 MACHINE_CONFIG_START(luckgrln_state::luckgrln)
-	MCFG_CPU_ADD("maincpu", Z180,8000000)
-	MCFG_CPU_PROGRAM_MAP(mainmap)
-	MCFG_CPU_IO_MAP(luckgrln_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", luckgrln_state,  luckgrln_irq)
+	MCFG_DEVICE_ADD("maincpu", Z180,8000000)
+	MCFG_DEVICE_PROGRAM_MAP(mainmap)
+	MCFG_DEVICE_IO_MAP(luckgrln_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", luckgrln_state,  luckgrln_irq)
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 6000000/4) /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -1003,9 +1003,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(luckgrln_state::_7smash)
 	luckgrln(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(_7smash_map)
-	MCFG_CPU_IO_MAP(_7smash_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(_7smash_map)
+	MCFG_DEVICE_IO_MAP(_7smash_io)
 
 	MCFG_DEVICE_REMOVE("rtc")
 MACHINE_CONFIG_END

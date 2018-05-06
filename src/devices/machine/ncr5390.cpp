@@ -10,32 +10,35 @@ DEFINE_DEVICE_TYPE(NCR5390, ncr5390_device, "ncr5390", "NCR 5390 SCSI")
 DEFINE_DEVICE_TYPE(NCR53C90A, ncr53c90a_device, "ncr53c90a", "NCR 53C90A SCSI")
 DEFINE_DEVICE_TYPE(NCR53C94, ncr53c94_device, "ncr53c94", "NCR 53C94 SCSI")
 
-ADDRESS_MAP_START(ncr5390_device::map)
-	AM_RANGE(0x0, 0x0) AM_READWRITE(tcounter_lo_r, tcount_lo_w)
-	AM_RANGE(0x1, 0x1) AM_READWRITE(tcounter_hi_r, tcount_hi_w)
-	AM_RANGE(0x2, 0x2) AM_READWRITE(fifo_r, fifo_w)
-	AM_RANGE(0x3, 0x3) AM_READWRITE(command_r, command_w)
-	AM_RANGE(0x4, 0x4) AM_READWRITE(status_r, bus_id_w)
-	AM_RANGE(0x5, 0x5) AM_READWRITE(istatus_r, timeout_w)
-	AM_RANGE(0x6, 0x6) AM_READWRITE(seq_step_r, sync_period_w)
-	AM_RANGE(0x7, 0x7) AM_READWRITE(fifo_flags_r, sync_offset_w)
-	AM_RANGE(0x8, 0x8) AM_READWRITE(conf_r, conf_w)
-	AM_RANGE(0xa, 0xa) AM_WRITE(test_w)
-	AM_RANGE(0x9, 0x9) AM_WRITE(clock_w)
-ADDRESS_MAP_END
+void ncr5390_device::map(address_map &map)
+{
+	map(0x0, 0x0).rw(this, FUNC(ncr5390_device::tcounter_lo_r), FUNC(ncr5390_device::tcount_lo_w));
+	map(0x1, 0x1).rw(this, FUNC(ncr5390_device::tcounter_hi_r), FUNC(ncr5390_device::tcount_hi_w));
+	map(0x2, 0x2).rw(this, FUNC(ncr5390_device::fifo_r), FUNC(ncr5390_device::fifo_w));
+	map(0x3, 0x3).rw(this, FUNC(ncr5390_device::command_r), FUNC(ncr5390_device::command_w));
+	map(0x4, 0x4).rw(this, FUNC(ncr5390_device::status_r), FUNC(ncr5390_device::bus_id_w));
+	map(0x5, 0x5).rw(this, FUNC(ncr5390_device::istatus_r), FUNC(ncr5390_device::timeout_w));
+	map(0x6, 0x6).rw(this, FUNC(ncr5390_device::seq_step_r), FUNC(ncr5390_device::sync_period_w));
+	map(0x7, 0x7).rw(this, FUNC(ncr5390_device::fifo_flags_r), FUNC(ncr5390_device::sync_offset_w));
+	map(0x8, 0x8).rw(this, FUNC(ncr5390_device::conf_r), FUNC(ncr5390_device::conf_w));
+	map(0xa, 0xa).w(this, FUNC(ncr5390_device::test_w));
+	map(0x9, 0x9).w(this, FUNC(ncr5390_device::clock_w));
+}
 
-ADDRESS_MAP_START(ncr53c90a_device::map)
-	AM_IMPORT_FROM(ncr5390_device::map)
+void ncr53c90a_device::map(address_map &map)
+{
+	ncr5390_device::map(map);
 
-	AM_RANGE(0xb, 0xb) AM_READWRITE(conf2_r, conf2_w)
-ADDRESS_MAP_END
+	map(0xb, 0xb).rw(this, FUNC(ncr53c90a_device::conf2_r), FUNC(ncr53c90a_device::conf2_w));
+}
 
-ADDRESS_MAP_START(ncr53c94_device::map)
-	AM_IMPORT_FROM(ncr53c90a_device::map)
+void ncr53c94_device::map(address_map &map)
+{
+	ncr53c90a_device::map(map);
 
-	AM_RANGE(0xc, 0xc) AM_READWRITE(conf3_r, conf3_w)
-	AM_RANGE(0xf, 0xf) AM_WRITE(fifo_align_w)
-ADDRESS_MAP_END
+	map(0xc, 0xc).rw(this, FUNC(ncr53c94_device::conf3_r), FUNC(ncr53c94_device::conf3_w));
+	map(0xf, 0xf).w(this, FUNC(ncr53c94_device::fifo_align_w));
+}
 
 ncr5390_device::ncr5390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: nscsi_device(mconfig, type, tag, owner, clock)

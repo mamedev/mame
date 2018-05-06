@@ -93,12 +93,12 @@ ioport_constructor electron_plus1_device::device_input_ports() const
 MACHINE_CONFIG_START(electron_plus1_device::device_add_mconfig)
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(electron_plus1_device, busy_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, electron_plus1_device, busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* adc */
 	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_INTR_CB(WRITELINE(electron_plus1_device, ready_w))
+	MCFG_ADC0844_INTR_CB(WRITELINE(*this, electron_plus1_device, ready_w))
 	MCFG_ADC0844_CH1_CB(IOPORT("JOY1"))
 	MCFG_ADC0844_CH2_CB(IOPORT("JOY2"))
 	MCFG_ADC0844_CH3_CB(IOPORT("JOY3"))
@@ -106,11 +106,11 @@ MACHINE_CONFIG_START(electron_plus1_device::device_add_mconfig)
 
 	/* cartridges */
 	MCFG_ELECTRON_CARTSLOT_ADD("cart_sk1", electron_cart, nullptr)
-	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(electron_plus1_device, irq_w))
-	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(electron_plus1_device, nmi_w))
+	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(*this, electron_plus1_device, irq_w))
+	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(*this, electron_plus1_device, nmi_w))
 	MCFG_ELECTRON_CARTSLOT_ADD("cart_sk2", electron_cart, nullptr)
-	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(electron_plus1_device, irq_w))
-	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(electron_plus1_device, nmi_w))
+	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(*this, electron_plus1_device, irq_w))
+	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(*this, electron_plus1_device, nmi_w))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

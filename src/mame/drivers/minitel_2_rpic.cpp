@@ -399,13 +399,13 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(minitel_state::minitel2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C32, XTAL(14'318'181)) //verified on pcb
-	MCFG_CPU_PROGRAM_MAP(mem_prg)
-	MCFG_CPU_IO_MAP(mem_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(minitel_state, port1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(minitel_state, port1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(minitel_state, port3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(minitel_state, port3_w))
+	MCFG_DEVICE_ADD("maincpu", I80C32, XTAL(14'318'181)) //verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(mem_prg)
+	MCFG_DEVICE_IO_MAP(mem_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, minitel_state, port1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, minitel_state, port1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, minitel_state, port3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, minitel_state, port3_w))
 
 	MCFG_DEVICE_ADD("ts9347", TS9347, 0)
 	MCFG_EF9345_PALETTE("palette")

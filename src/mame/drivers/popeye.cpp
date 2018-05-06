@@ -310,7 +310,7 @@ public:
 	virtual void config(machine_config &config) override
 	{
 		T::config(config);
-		config.device_add(this, "eeprom", EEPROM_SERIAL_93C46_8BIT, 0);
+		config.device_add("eeprom", EEPROM_SERIAL_93C46_8BIT, 0);
 	}
 
 protected:
@@ -588,10 +588,10 @@ WRITE8_MEMBER(tnx1_state::popeye_portB_w)
 
 MACHINE_CONFIG_START(tnx1_state::config)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)   /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(maincpu_program_map)
-	MCFG_CPU_IO_MAP(maincpu_io_map)
-	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(tnx1_state, refresh_w))
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2)   /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_program_map)
+	MCFG_DEVICE_IO_MAP(maincpu_io_map)
+	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(*this, tnx1_state, refresh_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -601,7 +601,7 @@ MACHINE_CONFIG_START(tnx1_state::config)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 2*16, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tnx1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tnx1_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tnx1_state, screen_vblank))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popeye)
 	MCFG_PALETTE_ADD("palette", 16+16*2+8*4)
@@ -610,25 +610,25 @@ MACHINE_CONFIG_START(tnx1_state::config)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(8'000'000)/4)
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(8'000'000)/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tnx1_state, popeye_portB_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tnx1_state, popeye_portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tpp2_state::config)
 	tpp1_state::config(config);
-	MCFG_SOUND_MODIFY("aysnd")
+	MCFG_DEVICE_MODIFY("aysnd")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT) /* Does tnx1, tpp1 & popeyebl have the same filtering? */
 	MCFG_AY8910_RES_LOADS(2000.0, 2000.0, 2000.0)
-	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 2)
+	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 2)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
-	MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, 48000)
+	MCFG_DEVICE_ADD("snd_nl", NETLIST_SOUND, 48000)
 	MCFG_NETLIST_SETUP(nl_popeye)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -776,6 +776,39 @@ ROM_END
 
 ROM_START( popeyebl )
 	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "app_exe.3j.2764", 0x0000, 0x2000, CRC(6e267c48) SHA1(d4984eedb12d15867f0fdef4b525e8288d656962) )
+	ROM_LOAD( "2.3l.2764",       0x2000, 0x2000, CRC(995475ff) SHA1(5cd5ac23a73722e32c80cd6ffc435584750a46c9) )
+	ROM_LOAD( "3.3m.2764",       0x4000, 0x2000, CRC(99d6a04a) SHA1(b683a5bb1ac4f6bec7478760c8ad0ff7c00bc652) )
+	ROM_LOAD( "4.3p.2764",       0x6000, 0x2000, CRC(548a6514) SHA1(006e076781a3e5c3afa084c723247365358e3187) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "5.10gh.2732",  0x0000, 0x0800, CRC(ce6c9f8e) SHA1(d52058c71c1769d9b9c4e713ac347096ac97bf1e) )    /* first and second half identical */
+	ROM_CONTINUE(             0x0000, 0x0800 )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "6.6n.2764",    0x0000, 0x2000, CRC(0f2cd853) SHA1(426c9b4f6579bfcebe72b976bfe4f05147d53f96) )
+	ROM_LOAD( "7.6r.2764",    0x2000, 0x2000, CRC(888f3474) SHA1(ddee56b2b49bd50aaf9c98d8ef6e905e3f6ab859) )
+	ROM_LOAD( "8.6s.2764",    0x4000, 0x2000, CRC(7e864668) SHA1(8e275dbb1c586f4ebca7548db05246ef0f56d7b1) )
+	ROM_LOAD( "9.6u.2764",    0x6000, 0x2000, CRC(49e1d170) SHA1(bd51a4e34ce8109f26954760156e3cf05fb9db57) )
+
+	ROM_REGION( 0x40, "proms", ROMREGION_INVERT )
+	ROM_LOAD( "6.2u.18s030",  0x0000, 0x0020, CRC(d138e8a4) SHA1(eba7f870ccab72105593007f5cd7e0b863912402) ) /* background palette */
+	ROM_LOAD( "5.2t.18s030",  0x0020, 0x0020, CRC(0f364007) SHA1(b77d71df391a9ac9e778e84475627e72de2b8507) ) /* char palette */
+
+	ROM_REGION( 0x0100, "sprpal", ROMREGION_INVERT )
+	ROM_LOAD_NIB_LOW(  "3.2r.24s10", 0x0000, 0x0100, BAD_DUMP CRC(ca4d7b6a) SHA1(ec979fffea9db5a327a5270241e376c21516e343) ) /* sprite palette - low 4 bits */
+	ROM_LOAD_NIB_HIGH( "4.2s.24s10", 0x0000, 0x0100, CRC(cab9bc53) SHA1(e63ba8856190187996e405f6fcee254c8ca6e81f) ) /* sprite palette - high 4 bits */
+
+	ROM_REGION( 0x0100, "blprot", 0 )
+	ROM_LOAD_NIB_LOW(  "1.1d.24s10", 0x0000, 0x0100, BAD_DUMP CRC(bb63b2a6) SHA1(0201cf37161b9b0cbf48f1d1248afee91276eb2a) )
+	ROM_LOAD_NIB_HIGH( "2.1e.24s10", 0x0000, 0x0100, BAD_DUMP CRC(29d7bd87) SHA1(0f139a7c1c747cc0bd99792851c5c46c01142e62) )
+
+	ROM_REGION(0x0100, "timing", 0)
+	ROM_LOAD( "7.11s.24s10",  0x0000, 0x0100, CRC(1c5c8dea) SHA1(5738303b2a9c79b7d06bcf20fdb4d9b29f6e2d96) ) /* video timing prom */
+ROM_END
+
+ROM_START( popeyeb2 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "po1",          0x0000, 0x2000, CRC(b14a07ca) SHA1(b8666a4c6b833f60905692774e30e73f0795df11) )
 	ROM_LOAD( "po2",          0x2000, 0x2000, CRC(995475ff) SHA1(5cd5ac23a73722e32c80cd6ffc435584750a46c9) )
 	ROM_LOAD( "po3",          0x4000, 0x2000, CRC(99d6a04a) SHA1(b683a5bb1ac4f6bec7478760c8ad0ff7c00bc652) )
@@ -799,44 +832,9 @@ ROM_START( popeyebl )
 	ROM_LOAD_NIB_LOW(  "popeye.pr3", 0x0000, 0x0100, CRC(ca4d7b6a) SHA1(ec979fffea9db5a327a5270241e376c21516e343) ) /* sprite palette - low 4 bits */
 	ROM_LOAD_NIB_HIGH( "popeye.pr4", 0x0000, 0x0100, CRC(cab9bc53) SHA1(e63ba8856190187996e405f6fcee254c8ca6e81f) ) /* sprite palette - high 4 bits */
 
-	ROM_REGION( 0x0020, "blprot", 0 )
-	ROM_LOAD( "po_d1-e1.bin", 0x0000, 0x0020, CRC(8de22998) SHA1(e3a232ff85fb207afbe23049a65e828420589342) ) /* protection PROM */
-ROM_END
-
-ROM_START( popeyeb2 )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "app_exe.3j.2764", 0x0000, 0x2000, CRC(6e267c48) SHA1(d4984eedb12d15867f0fdef4b525e8288d656962) )
-	ROM_LOAD( "2.3l.2764",       0x2000, 0x2000, CRC(995475ff) SHA1(5cd5ac23a73722e32c80cd6ffc435584750a46c9) )
-	ROM_LOAD( "3.3m.2764",       0x4000, 0x2000, CRC(99d6a04a) SHA1(b683a5bb1ac4f6bec7478760c8ad0ff7c00bc652) )
-	ROM_LOAD( "4.3p.2764",       0x6000, 0x2000, CRC(548a6514) SHA1(006e076781a3e5c3afa084c723247365358e3187) )
-
-	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_LOAD( "5.10gh.2732",  0x0000, 0x0800, CRC(ce6c9f8e) SHA1(d52058c71c1769d9b9c4e713ac347096ac97bf1e) )    /* first and second half identical */
-	ROM_CONTINUE(             0x0000, 0x0800 )
-
-	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "6.6n.2764",    0x0000, 0x2000, CRC(0f2cd853) SHA1(426c9b4f6579bfcebe72b976bfe4f05147d53f96) )
-	ROM_LOAD( "7.6r.2764",    0x2000, 0x2000, CRC(888f3474) SHA1(ddee56b2b49bd50aaf9c98d8ef6e905e3f6ab859) )
-	ROM_LOAD( "8.6s.2764",    0x4000, 0x2000, CRC(7e864668) SHA1(8e275dbb1c586f4ebca7548db05246ef0f56d7b1) )
-	ROM_LOAD( "9.6u.2764",    0x6000, 0x2000, CRC(49e1d170) SHA1(bd51a4e34ce8109f26954760156e3cf05fb9db57) )
-
-	ROM_REGION( 0x40, "proms", ROMREGION_INVERT )
-	ROM_LOAD( "6.2u.18s030",  0x0000, 0x0020, CRC(d138e8a4) SHA1(eba7f870ccab72105593007f5cd7e0b863912402) ) /* background palette */
-	ROM_LOAD( "5.2t.18s030",  0x0020, 0x0020, CRC(0f364007) SHA1(b77d71df391a9ac9e778e84475627e72de2b8507) ) /* char palette */
-
-	ROM_REGION( 0x0100, "sprpal", ROMREGION_INVERT )
-	ROM_LOAD_NIB_LOW(  "3.2r.24s10", 0x0000, 0x0100, CRC(3d7aa7b1) SHA1(aea11f558487ccfa6f0218fdf4020ddaa2f635f8) ) /* sprite palette - low 4 bits */
-	ROM_LOAD_NIB_HIGH( "4.2s.24s10", 0x0000, 0x0100, CRC(cab9bc53) SHA1(e63ba8856190187996e405f6fcee254c8ca6e81f) ) /* sprite palette - high 4 bits */
-
-	ROM_REGION( 0x0020, "blprot", 0 )
-	ROM_LOAD( "po_d1-e1.bin", 0x0000, 0x0020, BAD_DUMP CRC(8de22998) SHA1(e3a232ff85fb207afbe23049a65e828420589342) ) /* protection PROM */
-
-	ROM_REGION(0x0100, "timing", 0)
-	ROM_LOAD( "7.11s.24s10",  0x0000, 0x0100, CRC(1c5c8dea) SHA1(5738303b2a9c79b7d06bcf20fdb4d9b29f6e2d96) ) /* video timing prom */
-
-	ROM_REGION(0x0200, "unknown", 0)
-	ROM_LOAD( "1.1d.24s10",   0x0000, 0x0100, CRC(2e1b143a) SHA1(7e0fd19328ccd6f2b2148739ef64703ade585060) )
-	ROM_LOAD( "2.1e.24s10",   0x0100, 0x0100, CRC(978b1c63) SHA1(ae67a4ac554e84c970c0acc82f4bc6a490f9d6ef) )
+	ROM_REGION( 0x0100, "blprot", 0 )
+	ROM_LOAD_NIB_LOW(  "popeye.d1",  0x0000, 0x0100, BAD_DUMP CRC(bb63b2a6) SHA1(0201cf37161b9b0cbf48f1d1248afee91276eb2a) )
+	ROM_LOAD_NIB_HIGH( "popeye.e1",  0x0000, 0x0100, BAD_DUMP CRC(29d7bd87) SHA1(0f139a7c1c747cc0bd99792851c5c46c01142e62) )
 ROM_END
 
 ROM_START( popeyeb3 )

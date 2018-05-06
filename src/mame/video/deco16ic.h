@@ -212,7 +212,7 @@ DECLARE_DEVICE_TYPE(DECO16IC, deco16ic_device)
 	downcast<deco16ic_device &>(*device).set_pf12_16x16_bank(_bank);
 
 #define MCFG_DECO16IC_GFXDECODE(_gfxtag) \
-	downcast<deco16ic_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<deco16ic_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 // function definition for a callback
 #define DECO16IC_BANK_CB_MEMBER(_name)     int _name(int bank)

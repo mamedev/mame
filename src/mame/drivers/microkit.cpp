@@ -120,16 +120,16 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(microkit_state::microkit)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", CDP1802, 1750000)
-	MCFG_CPU_PROGRAM_MAP(microkit_mem)
-	MCFG_CPU_IO_MAP(microkit_io)
+	MCFG_DEVICE_ADD("maincpu", CDP1802, 1750000)
+	MCFG_DEVICE_PROGRAM_MAP(microkit_mem)
+	MCFG_DEVICE_IO_MAP(microkit_io)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(microkit_state, clear_r))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, microkit_state, clear_r))
 
 	/* video hardware */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(INPUTLINE("maincpu", COSMAC_INPUT_LINE_EF4))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", serial_keyb)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", serial_keyb)
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 MACHINE_CONFIG_END
 

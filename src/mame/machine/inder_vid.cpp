@@ -106,13 +106,13 @@ void inder_vid_device::ramdac_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(inder_vid_device::device_add_mconfig)
-	MCFG_CPU_ADD("tms", TMS34010, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(megaphx_tms_map)
+	MCFG_DEVICE_ADD("tms", TMS34010, XTAL(40'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(megaphx_tms_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(XTAL(40'000'000)/12) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(inder_vid_device, scanline)     /* scanline updater (RGB32) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(inder_vid_device, m68k_gen_int))
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, inder_vid_device, m68k_gen_int))
 	MCFG_TMS340X0_TO_SHIFTREG_CB(inder_vid_device, to_shiftreg)  /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(inder_vid_device, from_shiftreg) /* read from shiftreg function */
 

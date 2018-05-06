@@ -55,7 +55,7 @@ private:
 
 	uint8_t m_joy_sel, m_mask, m_pcm_mode, m_vol[7], m_pcm_ctrl, m_pcm_mute;
 	uint16_t m_head, m_tail, m_count, m_irq_rate;
-	bool m_pcmirq, m_fmirq;
+	bool m_pcmirq, m_fmirq, m_pcm_clk, m_init;
 	required_device<ym2608_device>  m_opna;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;

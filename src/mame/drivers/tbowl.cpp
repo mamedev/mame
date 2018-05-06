@@ -433,18 +433,18 @@ void tbowl_state::machine_reset()
 MACHINE_CONFIG_START(tbowl_state::tbowl)
 
 	/* CPU on Board '6206B' */
-	MCFG_CPU_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MCFG_CPU_PROGRAM_MAP(_6206B_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
+	MCFG_DEVICE_PROGRAM_MAP(_6206B_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
 
 	/* CPU on Board '6206C' */
-	MCFG_CPU_ADD("sub", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MCFG_CPU_PROGRAM_MAP(_6206C_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
+	MCFG_DEVICE_PROGRAM_MAP(_6206C_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
 
 	/* CPU on Board '6206A' */
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* Actual Z80 */
-	MCFG_CPU_PROGRAM_MAP(_6206A_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* Actual Z80 */
+	MCFG_DEVICE_PROGRAM_MAP(_6206A_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -481,21 +481,21 @@ MACHINE_CONFIG_START(tbowl_state::tbowl)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ym1", YM3812, 4000000)
+	MCFG_DEVICE_ADD("ym1", YM3812, 4000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 4000000)
+	MCFG_DEVICE_ADD("ym2", YM3812, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* something for the samples? */
-	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(tbowl_state, adpcm_int_1))    /* interrupt function */
+	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tbowl_state, adpcm_int_1))    /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(tbowl_state, adpcm_int_2))    /* interrupt function */
+	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tbowl_state, adpcm_int_2))    /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

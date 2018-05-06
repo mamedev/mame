@@ -39,9 +39,9 @@ WRITE8_MEMBER(gaelco_ds5002fp_device::hostmem_w)
 }
 
 MACHINE_CONFIG_START(gaelco_ds5002fp_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", DS5002FP, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(dallas_rom)
-	MCFG_CPU_IO_MAP(dallas_ram)
+	MCFG_DEVICE_ADD("mcu", DS5002FP, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_PROGRAM_MAP(dallas_rom)
+	MCFG_DEVICE_IO_MAP(dallas_ram)
 
 	MCFG_QUANTUM_PERFECT_CPU("mcu")
 

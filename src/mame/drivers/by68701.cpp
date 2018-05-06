@@ -48,8 +48,8 @@ DRIVER_INIT_MEMBER(by68701_state,by68701)
 
 MACHINE_CONFIG_START(by68701_state::by68701)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6803, 3579545/4)
-	MCFG_CPU_PROGRAM_MAP(by68701_map)
+	MCFG_DEVICE_ADD("maincpu", M6803, 3579545/4)
+	MCFG_DEVICE_PROGRAM_MAP(by68701_map)
 MACHINE_CONFIG_END
 
 /*------------------

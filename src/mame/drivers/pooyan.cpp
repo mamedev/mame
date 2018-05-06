@@ -196,17 +196,17 @@ void pooyan_state::machine_start()
 MACHINE_CONFIG_START(pooyan_state::pooyan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B2
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pooyan_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(pooyan_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pooyan_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, pooyan_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, pooyan_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, pooyan_state, coin_counter_2_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // PAY OUT - not used
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pooyan_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pooyan_state, flipscreen_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -217,7 +217,7 @@ MACHINE_CONFIG_START(pooyan_state::pooyan)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pooyan_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pooyan_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pooyan_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pooyan)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
@@ -226,8 +226,7 @@ MACHINE_CONFIG_START(pooyan_state::pooyan)
 
 	/* sound hardware */
 
-	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
-	downcast<timeplt_audio_device *>(device)->timeplt_sound(config);
+	MCFG_DEVICE_ADD("timeplt_audio", TIMEPLT_AUDIO)
 MACHINE_CONFIG_END
 
 

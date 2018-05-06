@@ -697,13 +697,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(snesb_state::kinstb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
-	MCFG_CPU_PROGRAM_MAP(snesb_map)
+	MCFG_DEVICE_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(snesb_map)
 
 	/* audio CPU */
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	MCFG_CPU_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
-	MCFG_CPU_PROGRAM_MAP(spc_mem)
+	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
+	MCFG_DEVICE_PROGRAM_MAP(spc_mem)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -713,12 +713,12 @@ MACHINE_CONFIG_START(snesb_state::kinstb)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 
 	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(snes_state, snes_open_bus_r))
+	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snes_state, snes_open_bus_r))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("spc700", SNES, 0)
+	MCFG_DEVICE_ADD("spc700", SNES_SOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
@@ -731,8 +731,8 @@ void snesb_state::mcu_io_map(address_map &map)
 MACHINE_CONFIG_START(snesb_state::mk3snes)
 	kinstb(config);
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
+	MCFG_DEVICE_IO_MAP(mcu_io_map)
 MACHINE_CONFIG_END
 
 

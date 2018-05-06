@@ -332,18 +332,18 @@ void gmaster_state::machine_start()
 
 
 MACHINE_CONFIG_START(gmaster_state::gmaster)
-	MCFG_CPU_ADD("maincpu", UPD7810, XTAL(12'000'000)/2/*?*/)  // upd78c11 in the unit
-	MCFG_CPU_PROGRAM_MAP(gmaster_mem)
+	MCFG_DEVICE_ADD("maincpu", UPD7810, XTAL(12'000'000)/2/*?*/)  // upd78c11 in the unit
+	MCFG_DEVICE_PROGRAM_MAP(gmaster_mem)
 	MCFG_UPD7810_PORTA_READ_CB(IOPORT("JOY"))
-	MCFG_UPD7810_PORTB_READ_CB(READ8(gmaster_state, gmaster_portb_r))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(gmaster_state, gmaster_portc_r))
-	MCFG_UPD7810_PORTD_READ_CB(READ8(gmaster_state, gmaster_portd_r))
-	MCFG_UPD7810_PORTF_READ_CB(READ8(gmaster_state, gmaster_portf_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(gmaster_state, gmaster_porta_w))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(gmaster_state, gmaster_portb_w))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(gmaster_state, gmaster_portc_w))
-	MCFG_UPD7810_PORTD_WRITE_CB(WRITE8(gmaster_state, gmaster_portd_w))
-	MCFG_UPD7810_PORTF_WRITE_CB(WRITE8(gmaster_state, gmaster_portf_w))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(*this, gmaster_state, gmaster_portb_r))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(*this, gmaster_state, gmaster_portc_r))
+	MCFG_UPD7810_PORTD_READ_CB(READ8(*this, gmaster_state, gmaster_portd_r))
+	MCFG_UPD7810_PORTF_READ_CB(READ8(*this, gmaster_state, gmaster_portf_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, gmaster_state, gmaster_porta_w))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(*this, gmaster_state, gmaster_portb_w))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, gmaster_state, gmaster_portc_w))
+	MCFG_UPD7810_PORTD_WRITE_CB(WRITE8(*this, gmaster_state, gmaster_portd_w))
+	MCFG_UPD7810_PORTF_WRITE_CB(WRITE8(*this, gmaster_state, gmaster_portf_w))
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -356,7 +356,7 @@ MACHINE_CONFIG_START(gmaster_state::gmaster)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "gmaster_cart")

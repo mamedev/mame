@@ -100,9 +100,9 @@ uint32_t tvgame_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 MACHINE_CONFIG_START(tvgame_state::tvgame)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -116,13 +116,13 @@ MACHINE_CONFIG_START(tvgame_state::tvgame)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// Devices
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("LINE0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(tvgame_state, speaker_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tvgame_state, speaker_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */

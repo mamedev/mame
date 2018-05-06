@@ -4,8 +4,8 @@
 
     Philips SAA1043 Universal Sync Generator
 
-	TOOD:
-	- Everything.
+    TOOD:
+    - Everything.
 
 ***********************************************************************/
 
@@ -19,8 +19,8 @@ DEFINE_DEVICE_TYPE(SAA1043, saa1043_device, "saa1043", "Philips SAA1043")
 saa1043_device::saa1043_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SAA1043, tag, owner, clock)
 	, m_outputs{ *this, *this, *this, *this, *this, *this,
-	             *this, *this, *this, *this, *this, *this,
-	             *this, *this, *this, *this, *this, *this }
+				 *this, *this, *this, *this, *this, *this,
+				 *this, *this, *this, *this, *this, *this }
 {
 	memset(m_outputs_hooked, 0, sizeof(bool) * OUT_COUNT);
 }

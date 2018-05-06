@@ -229,14 +229,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 
 MACHINE_CONFIG_START(spectra_state::spectra)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(3'579'545)/4)  // actually a M6503
-	MCFG_CPU_PROGRAM_MAP(spectra_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(3'579'545)/4)  // actually a M6503
+	MCFG_DEVICE_PROGRAM_MAP(spectra_map)
 
 	MCFG_DEVICE_ADD("riot", RIOT6532, XTAL(3'579'545)/4)
-	MCFG_RIOT6532_IN_PA_CB(READ8(spectra_state, porta_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(spectra_state, porta_w))
-	MCFG_RIOT6532_IN_PB_CB(READ8(spectra_state, portb_r))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(spectra_state, portb_w))
+	MCFG_RIOT6532_IN_PA_CB(READ8(*this, spectra_state, porta_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, spectra_state, porta_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(*this, spectra_state, portb_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, spectra_state, portb_w))
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -251,7 +251,7 @@ MACHINE_CONFIG_START(spectra_state::spectra)
 	genpin_audio(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_M(1000), RES_M(1000), CAP_N(0)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_K(470))                    // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_N(1), RES_K(22))       // attack_decay_cap + attack_res

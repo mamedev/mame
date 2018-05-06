@@ -737,9 +737,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(bwidow_state::bwidow)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(bwidow_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bwidow_state, irq0_line_assert, CLOCK_3KHZ / 12)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(bwidow_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bwidow_state, irq0_line_assert, CLOCK_3KHZ / 12)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
@@ -761,8 +761,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bwidow_state::bwidowp)
 	bwidow(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bwidowp_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bwidowp_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 MACHINE_CONFIG_END
@@ -785,8 +785,8 @@ MACHINE_CONFIG_START(bwidow_state::lunarbat)
 	gravitar(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spacduel_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spacduel_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -798,8 +798,8 @@ MACHINE_CONFIG_START(bwidow_state::spacduel)
 	gravitar(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spacduel_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spacduel_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

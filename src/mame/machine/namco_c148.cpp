@@ -75,25 +75,26 @@ namco_c148_device::namco_c148_device(const machine_config &mconfig, const char *
 }
 
 // (*) denotes master CPU only
-ADDRESS_MAP_START(namco_c148_device::map)
-	AM_RANGE(0x04000, 0x05fff) AM_READWRITE8(bus_ctrl_r, bus_ctrl_w, 0x00ff)
-	AM_RANGE(0x06000, 0x07fff) AM_READWRITE8(cpu_irq_level_r,cpu_irq_level_w,0x00ff) // CPUIRQ lv
-	AM_RANGE(0x08000, 0x09fff) AM_READWRITE8(ex_irq_level_r,ex_irq_level_w,0x00ff) // EXIRQ lv
-	AM_RANGE(0x0a000, 0x0bfff) AM_READWRITE8(pos_irq_level_r,pos_irq_level_w,0x00ff) // POSIRQ lv
-	AM_RANGE(0x0c000, 0x0dfff) AM_READWRITE8(sci_irq_level_r,sci_irq_level_w,0x00ff) // SCIRQ lv
-	AM_RANGE(0x0e000, 0x0ffff) AM_READWRITE8(vblank_irq_level_r,vblank_irq_level_w,0x00ff) // VBlank IRQ lv
+void namco_c148_device::map(address_map &map)
+{
+	map(0x04000, 0x05fff).rw(this, FUNC(namco_c148_device::bus_ctrl_r), FUNC(namco_c148_device::bus_ctrl_w)).umask16(0x00ff);
+	map(0x06000, 0x07fff).rw(this, FUNC(namco_c148_device::cpu_irq_level_r), FUNC(namco_c148_device::cpu_irq_level_w)).umask16(0x00ff); // CPUIRQ lv
+	map(0x08000, 0x09fff).rw(this, FUNC(namco_c148_device::ex_irq_level_r), FUNC(namco_c148_device::ex_irq_level_w)).umask16(0x00ff); // EXIRQ lv
+	map(0x0a000, 0x0bfff).rw(this, FUNC(namco_c148_device::pos_irq_level_r), FUNC(namco_c148_device::pos_irq_level_w)).umask16(0x00ff); // POSIRQ lv
+	map(0x0c000, 0x0dfff).rw(this, FUNC(namco_c148_device::sci_irq_level_r), FUNC(namco_c148_device::sci_irq_level_w)).umask16(0x00ff); // SCIRQ lv
+	map(0x0e000, 0x0ffff).rw(this, FUNC(namco_c148_device::vblank_irq_level_r), FUNC(namco_c148_device::vblank_irq_level_w)).umask16(0x00ff); // VBlank IRQ lv
 
-	AM_RANGE(0x10000, 0x11fff) AM_WRITE(cpu_irq_assert_w)
-	AM_RANGE(0x16000, 0x17fff) AM_READWRITE(cpu_irq_ack_r, cpu_irq_ack_w) // CPUIRQ ack
-	AM_RANGE(0x18000, 0x19fff) AM_READWRITE(ex_irq_ack_r, ex_irq_ack_w) // EXIRQ ack
-	AM_RANGE(0x1a000, 0x1bfff) AM_READWRITE(pos_irq_ack_r, pos_irq_ack_w) // POSIRQ ack
-	AM_RANGE(0x1c000, 0x1dfff) AM_READWRITE(sci_irq_ack_r, sci_irq_ack_w) // SCIRQ ack
-	AM_RANGE(0x1e000, 0x1ffff) AM_READWRITE(vblank_irq_ack_r, vblank_irq_ack_w) // VBlank IRQ ack
-	AM_RANGE(0x20000, 0x21fff) AM_READ8(ext_r,0x00ff) // EEPROM ready status (*)
-	AM_RANGE(0x22000, 0x23fff) AM_READNOP AM_WRITE8(ext1_w,0x00ff) // sound CPU reset (*)
-	AM_RANGE(0x24000, 0x25fff) AM_WRITE8(ext2_w,0x00ff) // slave & i/o reset (*)
-	AM_RANGE(0x26000, 0x27fff) AM_NOP // watchdog
-ADDRESS_MAP_END
+	map(0x10000, 0x11fff).w(this, FUNC(namco_c148_device::cpu_irq_assert_w));
+	map(0x16000, 0x17fff).rw(this, FUNC(namco_c148_device::cpu_irq_ack_r), FUNC(namco_c148_device::cpu_irq_ack_w)); // CPUIRQ ack
+	map(0x18000, 0x19fff).rw(this, FUNC(namco_c148_device::ex_irq_ack_r), FUNC(namco_c148_device::ex_irq_ack_w)); // EXIRQ ack
+	map(0x1a000, 0x1bfff).rw(this, FUNC(namco_c148_device::pos_irq_ack_r), FUNC(namco_c148_device::pos_irq_ack_w)); // POSIRQ ack
+	map(0x1c000, 0x1dfff).rw(this, FUNC(namco_c148_device::sci_irq_ack_r), FUNC(namco_c148_device::sci_irq_ack_w)); // SCIRQ ack
+	map(0x1e000, 0x1ffff).rw(this, FUNC(namco_c148_device::vblank_irq_ack_r), FUNC(namco_c148_device::vblank_irq_ack_w)); // VBlank IRQ ack
+	map(0x20000, 0x21fff).r(this, FUNC(namco_c148_device::ext_r)).umask16(0x00ff); // EEPROM ready status (*)
+	map(0x22000, 0x23fff).nopr().w(this, FUNC(namco_c148_device::ext1_w)).umask16(0x00ff); // sound CPU reset (*)
+	map(0x24000, 0x25fff).w(this, FUNC(namco_c148_device::ext2_w)).umask16(0x00ff); // slave & i/o reset (*)
+	map(0x26000, 0x27fff).noprw(); // watchdog
+}
 
 
 

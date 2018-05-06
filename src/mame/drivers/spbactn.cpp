@@ -409,12 +409,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(spbactn_state::spbactn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(spbactn_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spbactn_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(spbactn_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spbactn_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -450,7 +450,7 @@ MACHINE_CONFIG_START(spbactn_state::spbactn)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000)) /* Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000)) /* Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -462,18 +462,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(spbactn_state::spbactnp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(spbactnp_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spbactnp_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(spbactn_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spbactn_sound_map)
 
 	// yes another cpu..
-	MCFG_CPU_ADD("extracpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(spbactnp_extra_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq0_line_hold)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("extracpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spbactnp_extra_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spbactn_state,  irq0_line_hold)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spbactn_state,  nmi_line_pulse)
 
 
 	/* video hardware */
@@ -504,7 +504,7 @@ MACHINE_CONFIG_START(spbactn_state::spbactnp)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000))
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

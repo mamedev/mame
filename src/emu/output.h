@@ -27,6 +27,9 @@ typedef void (*output_notifier_func)(const char *outname, s32 value, void *param
 
 class output_manager
 {
+	friend class devcb_base;
+	friend class devcb_write_base;
+
 private:
 	class output_notify
 	{
@@ -190,6 +193,7 @@ private:
 
 	output_item *find_item(const char *string);
 	output_item &create_new_item(const char *outname, s32 value);
+	output_item &find_or_create_item(const char *outname, s32 value);
 
 	// internal state
 	running_machine &m_machine;                  // reference to our machine

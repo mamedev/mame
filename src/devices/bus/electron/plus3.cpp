@@ -36,10 +36,11 @@ FLOPPY_FORMATS_MEMBER(electron_plus3_device::floppy_formats)
 	FLOPPY_ACORN_ADFS_OLD_FORMAT
 FLOPPY_FORMATS_END0
 
-SLOT_INTERFACE_START(electron_floppies)
-	SLOT_INTERFACE("35dd",    FLOPPY_35_DD)
-	SLOT_INTERFACE("525qd",   FLOPPY_525_QD)
-SLOT_INTERFACE_END
+void electron_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd",    FLOPPY_35_DD);
+	device.option_add("525qd",   FLOPPY_525_QD);
+}
 
 
 ROM_START( plus3 )

@@ -46,16 +46,18 @@ static INPUT_PORTS_START( neogeo_mj_ac )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("START_SELECT")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( neogeo_mj )
 	PORT_INCLUDE( neogeo_mj_ac )
 
-	PORT_START("START_SELECT")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
+	PORT_MODIFY("START_SELECT")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SELECT )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -87,6 +89,7 @@ neogeo_mjctrl_ac_device::neogeo_mjctrl_ac_device(const machine_config &mconfig, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_neogeo_control_port_interface(mconfig, *this)
 	, m_ctrl_sel(0x00)
+	, m_ss(*this, "START_SELECT")
 	, m_mjpanel(*this, "MJ.%u", 0)
 {
 }
@@ -98,7 +101,6 @@ neogeo_mjctrl_ac_device::neogeo_mjctrl_ac_device(const machine_config &mconfig, 
 
 neogeo_mjctrl_device::neogeo_mjctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: neogeo_mjctrl_ac_device(mconfig, NEOGEO_MJCTRL, tag, owner, clock)
-	, m_ss(*this, "START_SELECT")
 {
 }
 
@@ -129,6 +131,15 @@ uint8_t neogeo_mjctrl_ac_device::read_ctrl()
 		res &= m_mjpanel[2]->read();
 
 	return res;
+}
+
+//-------------------------------------------------
+//  read_start_sel
+//-------------------------------------------------
+
+uint8_t neogeo_mjctrl_ac_device::read_start_sel()
+{
+	return m_ss->read();
 }
 
 //-------------------------------------------------

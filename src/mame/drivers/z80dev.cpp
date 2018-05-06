@@ -126,9 +126,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(z80dev_state::z80dev)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_z80dev)

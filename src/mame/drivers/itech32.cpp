@@ -1685,11 +1685,11 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(itech32_state::timekill)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(timekill_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(timekill_map)
 
-	MCFG_CPU_ADD("soundcpu", MC6809, SOUND_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", MC6809, SOUND_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", itech32_state, nvram_init)
 
@@ -1707,12 +1707,12 @@ MACHINE_CONFIG_START(itech32_state::timekill)
 //  MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 286, 0, 256) // sftm, wcbowl and shufshot configure it this way
 	MCFG_SCREEN_UPDATE_DRIVER(itech32_state, screen_update_itech32)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(itech32_state, generate_int1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, itech32_state, generate_int1))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ensoniq", ES5506, SOUND_CLOCK)
+	MCFG_DEVICE_ADD("ensoniq", ES5506, SOUND_CLOCK)
 	MCFG_ES5506_REGION0("ensoniq.0")
 	MCFG_ES5506_REGION1("ensoniq.1")
 	MCFG_ES5506_REGION2("ensoniq.2")
@@ -1723,7 +1723,7 @@ MACHINE_CONFIG_START(itech32_state::timekill)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, SOUND_CLOCK/8)
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(itech32_state,pia_portb_out))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, itech32_state,pia_portb_out))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
 MACHINE_CONFIG_END
 
@@ -1733,8 +1733,8 @@ MACHINE_CONFIG_START(itech32_state::bloodstm)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bloodstm_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bloodstm_map)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1749,24 +1749,24 @@ MACHINE_CONFIG_START(itech32_state::drivedge)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(drivedge_map)
+	MCFG_DEVICE_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(drivedge_map)
 
-	MCFG_CPU_ADD("dsp1", TMS32031, TMS_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(drivedge_tms1_map)
+	MCFG_DEVICE_ADD("dsp1", TMS32031, TMS_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(drivedge_tms1_map)
 
-	MCFG_CPU_ADD("dsp2", TMS32031, TMS_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(drivedge_tms2_map)
+	MCFG_DEVICE_ADD("dsp2", TMS32031, TMS_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(drivedge_tms2_map)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32768)
 	MCFG_PALETTE_FORMAT(XBGR)
 
 	MCFG_DEVICE_MODIFY("via6522_0")
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(itech32_state,drivedge_portb_out))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(itech32_state,drivedge_turbo_light))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, itech32_state,drivedge_portb_out))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, itech32_state,drivedge_turbo_light))
 
-//  MCFG_CPU_ADD("comm", M6803, 8000000/4) -- network CPU
+//  MCFG_DEVICE_ADD("comm", M6803, 8000000/4) -- network CPU
 
 	MCFG_MACHINE_RESET_OVERRIDE(itech32_state,drivedge)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -1776,7 +1776,7 @@ MACHINE_CONFIG_START(itech32_state::drivedge)
 
 	MCFG_SPEAKER_STANDARD_STEREO("left_back", "right_back")
 
-	MCFG_SOUND_MODIFY("ensoniq")
+	MCFG_DEVICE_MODIFY("ensoniq")
 	MCFG_ES5506_CHANNELS(2)               /* channels */
 	MCFG_SOUND_ROUTE(2, "right_back", 0.1)  /* swapped stereo */
 	MCFG_SOUND_ROUTE(3, "left_back", 0.1)
@@ -1788,12 +1788,12 @@ MACHINE_CONFIG_START(itech32_state::sftm)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(itech020_map)
+	MCFG_DEVICE_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(itech020_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(sound_020_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(itech32_state, irq1_line_assert, 4*60)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(sound_020_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(itech32_state, irq1_line_assert, 4*60)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32768)
@@ -1937,7 +1937,7 @@ ROM_START( timekill121 ) /* Version 1.21 (3-tier board set: P/N 1050 Rev 1, P/N 
 	ROM_LOAD16_BYTE( "tksrom02_u26.u26", 0x200000, 0x80000, CRC(051ced3e) SHA1(6b63c4837e709806ffea9a37d93933635d356a6e) ) /* Labeled TKSROM02 (U26) */
 ROM_END
 
-ROM_START( timekill121a ) /* Version 1.32 (3-tier board set: P/N 1050 Rev 1, P/N 1049 Rev 1 &  P/N 1052 Rev 2) */
+ROM_START( timekill121a ) /* Version 1.21 (3-tier board set: P/N 1050 Rev 1, P/N 1049 Rev 1 &  P/N 1052 Rev 2) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "tk00_v1.21_u54.u54", 0x00000, 0x40000, CRC(4938a940) SHA1(c42c5067ba0536ab22071c80a50434905acd93c2) ) /* Labeled TK00 V1.21 (U54) */
 	ROM_LOAD16_BYTE( "tk01_v1.21_u53.u53", 0x00001, 0x40000, CRC(0bb75c40) SHA1(99829ecb0692ea8b313bd8c2e982258c97599b06) ) /* Labeled TK01 V1.21 (U53) */

@@ -595,13 +595,13 @@ void snk68_state::tile_callback_notpow(int &tile, int& fx, int& fy, int& region)
 MACHINE_CONFIG_START(snk68_state::pow)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(pow_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk68_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(18'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(pow_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk68_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -626,11 +626,11 @@ MACHINE_CONFIG_START(snk68_state::pow)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(8'000'000)/2) /* verified on pcb  */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(8'000'000)/2) /* verified on pcb  */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -643,8 +643,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snk68_state::searchar)
 	streetsm(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(searchar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(searchar_map)
 
 	MCFG_VIDEO_START_OVERRIDE(snk68_state,searchar)
 MACHINE_CONFIG_END

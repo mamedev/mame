@@ -12,6 +12,7 @@
 #define MAME_BUS_LPCI_PCI_H
 
 #pragma once
+#include <forward_list>
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -29,8 +30,14 @@ public:
 	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) = 0;
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask) = 0;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) {}
+
+	void set_pci_bus(pci_bus_device *bus) { m_pci_bus = bus; }
+
 protected:
 	pci_device_interface(const machine_config &mconfig, device_t &device);
+
+	pci_bus_device *m_pci_bus;
 };
 
 class pci_connector_device : public device_t,
@@ -69,6 +76,8 @@ public:
 
 	pci_bus_device *pci_search_bustree(int busnum, int devicenum, pci_bus_device *pcibus);
 	void add_sibling(pci_bus_device *sibling, int busnum);
+
+	void remap(int space_id, offs_t start, offs_t end);
 
 protected:
 	// device-level overrides

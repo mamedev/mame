@@ -122,8 +122,8 @@ ioport_constructor a2bus_transwarp_device::device_input_ports() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(a2bus_transwarp_device::device_add_mconfig)
-	MCFG_CPU_ADD(CPU_TAG, M65C02, A2BUS_7M_CLOCK / 2)
-	MCFG_CPU_PROGRAM_MAP(m65c02_mem)
+	MCFG_DEVICE_ADD(CPU_TAG, M65C02, A2BUS_7M_CLOCK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(m65c02_mem)
 MACHINE_CONFIG_END
 
 //**************************************************************************

@@ -77,6 +77,6 @@ private:
 
 
 DECLARE_DEVICE_TYPE(K053244, k05324x_device)
-extern device_type const K053245;
+DECLARE_DEVICE_TYPE(K053245, k05324x_device)
 
 #endif // MAME_VIDEO_K053244_K053245_H

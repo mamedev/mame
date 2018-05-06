@@ -48,8 +48,8 @@ DRIVER_INIT_MEMBER(bingo_state,bingo)
 
 MACHINE_CONFIG_START(bingo_state::bingo)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 1000000)
-	MCFG_CPU_PROGRAM_MAP(bingo_map)
+	MCFG_DEVICE_ADD("maincpu", S2650, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(bingo_map)
 MACHINE_CONFIG_END
 
 class seeben_state : public driver_device
@@ -91,8 +91,8 @@ DRIVER_INIT_MEMBER(seeben_state,seeben)
 
 MACHINE_CONFIG_START(seeben_state::seeben)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, 1000000)
-	MCFG_CPU_PROGRAM_MAP(seeben_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(seeben_map)
 MACHINE_CONFIG_END
 
 class splin_state : public driver_device
@@ -136,8 +136,8 @@ DRIVER_INIT_MEMBER(splin_state,splin)
 
 MACHINE_CONFIG_START(splin_state::splin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80186, 16000000)
-	MCFG_CPU_PROGRAM_MAP(splin_map)
+	MCFG_DEVICE_ADD("maincpu", I80186, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(splin_map)
 MACHINE_CONFIG_END
 
 ROM_START(cntinntl)

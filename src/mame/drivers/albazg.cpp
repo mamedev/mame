@@ -362,10 +362,10 @@ void albazg_state::machine_reset()
 MACHINE_CONFIG_START(albazg_state::yumefuda)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80 , MASTER_CLOCK/2) /* xtal is 12 Mhz, unknown divider*/
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", albazg_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80 , MASTER_CLOCK/2) /* xtal is 12 Mhz, unknown divider*/
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(port_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", albazg_state,  irq0_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -373,9 +373,9 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8) // timing is unknown
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(albazg_state, mux_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, albazg_state, mux_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_I8255_IN_PORTC_CB(READ8(albazg_state, mux_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, albazg_state, mux_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -398,10 +398,10 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/16) /* guessed to use the same xtal as the crtc */
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/16) /* guessed to use the same xtal as the crtc */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(albazg_state, yumefuda_output_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, albazg_state, yumefuda_output_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

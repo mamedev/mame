@@ -46,6 +46,6 @@ private:
 
 
 // device type definition
-extern const device_type O2_ROM_VOICE;
+DECLARE_DEVICE_TYPE(O2_ROM_VOICE, o2_voice_device)
 
 #endif // MAME_BUS_ODYSSEY2_VOICE_H

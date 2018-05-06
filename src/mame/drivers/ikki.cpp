@@ -243,13 +243,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(ikki_state::ikki_irq)
 MACHINE_CONFIG_START(ikki_state::ikki)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
-	MCFG_CPU_PROGRAM_MAP(ikki_cpu1)
+	MCFG_DEVICE_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu1)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ikki_state, ikki_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", Z80,8000000/2) /* 4.000MHz */
-	MCFG_CPU_PROGRAM_MAP(ikki_cpu2)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ikki_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_ADD("sub", Z80,8000000/2) /* 4.000MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu2)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(ikki_state, irq0_line_hold, 2*60)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -272,10 +272,10 @@ MACHINE_CONFIG_START(ikki_state::ikki)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76496, 8000000/4)
+	MCFG_DEVICE_ADD("sn1", SN76496, 8000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_SOUND_ADD("sn2", SN76496, 8000000/2)
+	MCFG_DEVICE_ADD("sn2", SN76496, 8000000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

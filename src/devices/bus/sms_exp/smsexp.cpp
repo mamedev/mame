@@ -86,6 +86,7 @@ void sms_expansion_slot_device::device_start()
 //  SLOT_INTERFACE( sms_expansion_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( sms_expansion_devices )
-	SLOT_INTERFACE("genderadp", SMS_GENDER_ADAPTER)
-SLOT_INTERFACE_END
+void sms_expansion_devices(device_slot_interface &device)
+{
+	device.option_add("genderadp", SMS_GENDER_ADAPTER);
+}

@@ -376,11 +376,11 @@ WRITE_LINE_MEMBER(brkthru_state::vblank_irq)
 MACHINE_CONFIG_START(brkthru_state::brkthru)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/8)        /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(brkthru_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/8)        /* 1.5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(brkthru_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, MASTER_CLOCK/2)     /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, MASTER_CLOCK/2)     /* 1.5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
 	/* video hardware */
@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(brkthru_state::brkthru)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(brkthru_state, screen_update_brkthru)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(brkthru_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, brkthru_state, vblank_irq))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -402,13 +402,13 @@ MACHINE_CONFIG_START(brkthru_state::brkthru)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM3526, MASTER_CLOCK/4)
+	MCFG_DEVICE_ADD("ym2", YM3526, MASTER_CLOCK/4)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -417,11 +417,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(brkthru_state::darwin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(darwin_map)
+	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(darwin_map)
 
-	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/8)     /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6809, MASTER_CLOCK/8)     /* 1.5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
 	/* video hardware */
@@ -446,7 +446,7 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 	    tuned by Shingo SUZUKI(VSyncMAME Project) 2000/10/19 */
 	MCFG_SCREEN_UPDATE_DRIVER(brkthru_state, screen_update_brkthru)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(brkthru_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, brkthru_state, vblank_irq))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -454,13 +454,13 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM3526, MASTER_CLOCK/4)
+	MCFG_DEVICE_ADD("ym2", YM3526, MASTER_CLOCK/4)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

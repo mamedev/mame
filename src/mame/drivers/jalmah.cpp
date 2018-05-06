@@ -1425,9 +1425,9 @@ void jalmah_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(jalmah_state::jalmah)
-	MCFG_CPU_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
-	MCFG_CPU_PROGRAM_MAP(jalmah)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jalmah_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
+	MCFG_DEVICE_PROGRAM_MAP(jalmah)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jalmah_state,  irq2_line_hold)
 
 	//M50747 MCU
 
@@ -1454,8 +1454,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(jalmah_state::urashima)
 	jalmah(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(urashima)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(urashima)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", urashima)
 

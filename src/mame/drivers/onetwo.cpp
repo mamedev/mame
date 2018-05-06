@@ -360,14 +360,14 @@ void onetwo_state::machine_start()
 MACHINE_CONFIG_START(onetwo_state::onetwo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK)   /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_cpu)
-	MCFG_CPU_IO_MAP(main_cpu_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", onetwo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK)   /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu)
+	MCFG_DEVICE_IO_MAP(main_cpu_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", onetwo_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,MASTER_CLOCK)  /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_cpu)
-	MCFG_CPU_IO_MAP(sound_cpu_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80,MASTER_CLOCK)  /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
+	MCFG_DEVICE_IO_MAP(sound_cpu_io)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(onetwo_state::onetwo)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, MASTER_CLOCK)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, MASTER_CLOCK)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

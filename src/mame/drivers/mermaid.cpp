@@ -423,21 +423,21 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 MACHINE_CONFIG_START(mermaid_state::mermaid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   // ???
-	MCFG_CPU_PROGRAM_MAP(mermaid_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   // ???
+	MCFG_DEVICE_PROGRAM_MAP(mermaid_map)
 
 	MCFG_DEVICE_ADD("latch1", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mermaid_state, ay1_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mermaid_state, ay2_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mermaid_state, ay1_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mermaid_state, ay2_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // ???
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(mermaid_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mermaid_state, flip_screen_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mermaid_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, mermaid_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mermaid_state, flip_screen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mermaid_state, nmi_mask_w))
 
 	MCFG_DEVICE_ADD("latch2", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // ???
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(mermaid_state, rougien_gfxbankswitch1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(mermaid_state, rougien_gfxbankswitch2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, mermaid_state, rougien_gfxbankswitch1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, mermaid_state, rougien_gfxbankswitch2_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // very frequent
 
 	/* video hardware */
@@ -447,7 +447,7 @@ MACHINE_CONFIG_START(mermaid_state::mermaid)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mermaid_state, screen_update_mermaid)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mermaid_state, screen_vblank_mermaid))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mermaid_state, screen_vblank_mermaid))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mermaid)
@@ -458,10 +458,10 @@ MACHINE_CONFIG_START(mermaid_state::mermaid)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
@@ -470,24 +470,24 @@ MACHINE_CONFIG_START(mermaid_state::rougien)
 	mermaid(config);
 
 	MCFG_DEVICE_MODIFY("latch1")
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mermaid_state, rougien_sample_playback_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mermaid_state, rougien_sample_playback_w))
 
 	MCFG_DEVICE_MODIFY("latch2")
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mermaid_state, rougien_sample_rom_hi_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(mermaid_state, rougien_sample_rom_lo_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mermaid_state, rougien_sample_rom_hi_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, mermaid_state, rougien_sample_rom_lo_w))
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(mermaid_state,rougien)
 
-	MCFG_SOUND_ADD("adpcm", MSM5205, 384000)
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(mermaid_state, rougien_adpcm_int))
+	MCFG_DEVICE_ADD("adpcm", MSM5205, 384000)
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, mermaid_state, rougien_adpcm_int))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD("adpcm_counter", RIPPLE_COUNTER, 0)
 	MCFG_DEVICE_ROM("adpcm")
 	MCFG_RIPPLE_COUNTER_STAGES(12)
-	MCFG_RIPPLE_COUNTER_ROM_OUT_CB(WRITE8(mermaid_state, adpcm_data_w))
+	MCFG_RIPPLE_COUNTER_ROM_OUT_CB(WRITE8(*this, mermaid_state, adpcm_data_w))
 MACHINE_CONFIG_END
 
 /* ROMs */

@@ -5,8 +5,9 @@
 
 DEFINE_DEVICE_TYPE(SB0400, sb0400_device, "sb0400", "Creative Labs SB0400 Audigy2 Value")
 
-ADDRESS_MAP_START(sb0400_device::map)
-ADDRESS_MAP_END
+void sb0400_device::map(address_map &map)
+{
+}
 
 sb0400_device::sb0400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, SB0400, tag, owner, clock)

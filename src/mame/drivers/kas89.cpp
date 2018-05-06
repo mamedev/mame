@@ -765,14 +765,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kas89_state::kas89)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* Confirmed */
-	MCFG_CPU_PROGRAM_MAP(kas89_map)
-	MCFG_CPU_IO_MAP(kas89_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(kas89_map)
+	MCFG_DEVICE_IO_MAP(kas89_io)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kas89_nmi", kas89_state, kas89_nmi_cb, attotime::from_hz(138))
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/6)   /* Confirmed */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_IO_MAP(audio_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/6)   /* Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_IO_MAP(audio_io)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kas89_snmi", kas89_state, kas89_sound_nmi_cb, attotime::from_hz(138))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -787,7 +787,7 @@ MACHINE_CONFIG_START(kas89_state::kas89)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* Confirmed */
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* Confirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

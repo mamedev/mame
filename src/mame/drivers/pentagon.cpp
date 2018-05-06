@@ -275,12 +275,12 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(pentagon_state::pentagon)
 	spectrum_128(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL(14'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(pentagon_mem)
-	MCFG_CPU_IO_MAP(pentagon_io)
-	MCFG_CPU_OPCODES_MAP(pentagon_switch)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pentagon_state,  pentagon_interrupt)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(14'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(pentagon_mem)
+	MCFG_DEVICE_IO_MAP(pentagon_io)
+	MCFG_DEVICE_OPCODES_MAP(pentagon_switch)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pentagon_state,  pentagon_interrupt)
 	MCFG_MACHINE_RESET_OVERRIDE(pentagon_state, pentagon )
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(pentagon_state::pentagon)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_REPLACE("ay8912", AY8912, XTAL(14'000'000) / 8)
+	MCFG_DEVICE_REPLACE("ay8912", AY8912, XTAL(14'000'000) / 8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)

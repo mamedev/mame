@@ -253,9 +253,9 @@ GFXDECODE_END
 /* Machine Driver + Related bits */
 
 MACHINE_CONFIG_START(pirates_state::pirates)
-	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz */
-	MCFG_CPU_PROGRAM_MAP(pirates_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000) /* 16mhz */
+	MCFG_DEVICE_PROGRAM_MAP(pirates_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

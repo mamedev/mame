@@ -35,7 +35,7 @@
 	downcast<esrip_device &>(*device).lbrm_prom(_tag);
 
 #define MCFG_ESRIP_SCREEN(screen_tag) \
-	downcast<esrip_device &>(*device).set_screen_tag(("^" screen_tag));
+	downcast<esrip_device &>(*device).set_screen_tag(screen_tag);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

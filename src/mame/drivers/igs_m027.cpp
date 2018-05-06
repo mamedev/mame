@@ -327,8 +327,8 @@ WRITE_LINE_MEMBER(igs_m027_state::vblank_irq)
 
 
 MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
-	MCFG_CPU_ADD("maincpu", ARM7, 20000000)
-	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
+	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
 
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -340,14 +340,14 @@ MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_igs_majhong)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(igs_m027_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs_m027_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 //  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
+	MCFG_IGS017_IGS031_REVERSE_TEXT_BITS
 	MCFG_GFX_PALETTE("palette")
-	MCFG_REVERSE_TEXT_BITS
 
 	// 82C55? (accessed through igs017/igs031 area like igs017.c?)
 
@@ -360,8 +360,8 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(igs_m027_state::amazonia)
-	MCFG_CPU_ADD("maincpu", ARM7, 20000000)
-	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
+	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
 
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -374,14 +374,14 @@ MACHINE_CONFIG_START(igs_m027_state::amazonia)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_igs_majhong)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(igs_m027_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs_m027_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 //  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
+	MCFG_IGS017_IGS031_REVERSE_TEXT_BITS
 	MCFG_GFX_PALETTE("palette")
-	MCFG_REVERSE_TEXT_BITS
 
 	// 82C55? (accessed through igs017/igs031 area like igs017.c?)
 

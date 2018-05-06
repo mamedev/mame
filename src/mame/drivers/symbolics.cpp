@@ -321,8 +321,8 @@ MACHINE_CONFIG_START(symbolics_state::symbolics)
 	//XTALS: 16MHz @H11 (68k CPU clock)
 	//       4.9152MHz @J5 (driving the two MPSCs serial clocks)
 	//       66.67MHz @J10 (main lispcpu/system clock)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
-	MCFG_CPU_PROGRAM_MAP(m68k_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
+	MCFG_DEVICE_PROGRAM_MAP(m68k_mem)
 
 	//ADD ME:
 	// Framebuffer
@@ -358,7 +358,7 @@ ROM_START( s3670 )
 	ROM_REGION16_BE( 0x20,"fep_prom", 0)
 	ROM_LOAD("fep-3973.d5", 0x0000, 0x0020, CRC(29910aa0) SHA1(433ea99b8e21055abb80bebc1d7dfc9e3aacd097)) // nFEP S/N 3973
 	// note: load all the PLAs, PALs and PROMs here
-	
+
 	// picture is at https://4310b1a9-a-11c96037-s-sites.googlegroups.com/a/ricomputermuseum.org/home/Home/equipment/symbolics-3645/Symbolics_3645_FEP.jpg
 	/*
 	    LBBUFA.4 mb7124   @A6 <- 4887235 page 630 has LBBUFC.UCODE rev27 \

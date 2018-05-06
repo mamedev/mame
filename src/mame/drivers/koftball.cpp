@@ -235,8 +235,8 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(koftball_state::koftball)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(21'477'272) / 2)
-	MCFG_CPU_PROGRAM_MAP(koftball_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(21'477'272) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(koftball_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", koftball_state, bmc_interrupt, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -254,7 +254,7 @@ MACHINE_CONFIG_START(koftball_state::koftball)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))  // guessed chip type, clock not verified
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))  // guessed chip type, clock not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 

@@ -532,12 +532,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(thedealr_state::thedealr_interrupt)
 MACHINE_CONFIG_START(thedealr_state::thedealr)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", R65C02, XTAL(16'000'000)/8)   // 2 MHz?
-	MCFG_CPU_PROGRAM_MAP(thedealr)
+	MCFG_DEVICE_ADD("maincpu", R65C02, XTAL(16'000'000)/8)   // 2 MHz?
+	MCFG_DEVICE_PROGRAM_MAP(thedealr)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", thedealr_state, thedealr_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("subcpu", R65C02, XTAL(16'000'000)/8)    // 2 MHz?
-	MCFG_CPU_PROGRAM_MAP(thedealr_sub)
+	MCFG_DEVICE_ADD("subcpu", R65C02, XTAL(16'000'000)/8)    // 2 MHz?
+	MCFG_DEVICE_PROGRAM_MAP(thedealr_sub)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -556,7 +556,7 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0+30, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(thedealr_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(thedealr_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, thedealr_state, screen_vblank))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("subcpu", INPUT_LINE_NMI))
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -566,7 +566,7 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL(16'000'000)/8)   // 2 MHz?
+	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(16'000'000)/8)   // 2 MHz?
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

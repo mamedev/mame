@@ -3472,10 +3472,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(royalmah_state::royalmah)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)        /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(royalmah_map)
-	MCFG_CPU_IO_MAP(royalmah_iomap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)        /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(royalmah_map)
+	MCFG_DEVICE_IO_MAP(royalmah_iomap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3494,97 +3494,97 @@ MACHINE_CONFIG_START(royalmah_state::royalmah)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(royalmah_state, player_1_port_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(royalmah_state, player_2_port_r))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 18432000/12)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, royalmah_state, player_1_port_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, royalmah_state, player_2_port_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(royalmah_state::janoh)
 	royalmah(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(8000000/2)   /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(janoh_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(8000000/2)   /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(janoh_map)
 
-	MCFG_CPU_ADD("sub", Z80, 4000000)        /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(janoh_sub_map)
-	MCFG_CPU_IO_MAP(janoh_sub_iomap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, 4000000)        /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(janoh_sub_map)
+	MCFG_DEVICE_IO_MAP(janoh_sub_iomap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", royalmah_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::jansou)
 	royalmah(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(jansou_map)
-	MCFG_CPU_IO_MAP(royalmah_iomap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(jansou_map)
+	MCFG_DEVICE_IO_MAP(royalmah_iomap)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4.000 MHz */
-	MCFG_CPU_PROGRAM_MAP(jansou_sub_map)
-	MCFG_CPU_IO_MAP(jansou_sub_iomap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(royalmah_state, irq0_line_hold, 4000000/512)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* 4.000 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(jansou_sub_map)
+	MCFG_DEVICE_IO_MAP(jansou_sub_iomap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(royalmah_state, irq0_line_hold, 4000000/512)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::dondenmj)
 	royalmah(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(8000000/2)   /* 4 MHz ? */
-	MCFG_CPU_IO_MAP(dondenmj_iomap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(8000000/2)   /* 4 MHz ? */
+	MCFG_DEVICE_IO_MAP(dondenmj_iomap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::tahjong)
 	royalmah(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(8000000/2)   /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(tahjong_map)
-	MCFG_CPU_IO_MAP(tahjong_iomap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(8000000/2)   /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(tahjong_map)
+	MCFG_DEVICE_IO_MAP(tahjong_iomap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::makaijan)
 	royalmah(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(8000000/2)   /* 4 MHz ? */
-	MCFG_CPU_IO_MAP(makaijan_iomap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(8000000/2)   /* 4 MHz ? */
+	MCFG_DEVICE_IO_MAP(makaijan_iomap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::daisyari)
 	royalmah(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(8000000/2)   /* 4 MHz ? */
-	MCFG_CPU_IO_MAP(daisyari_iomap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(8000000/2)   /* 4 MHz ? */
+	MCFG_DEVICE_IO_MAP(daisyari_iomap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::mjclub)
 	royalmah(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(8000000/2)   /* 4 MHz ? */
-	MCFG_CPU_IO_MAP(mjclub_iomap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(8000000/2)   /* 4 MHz ? */
+	MCFG_DEVICE_IO_MAP(mjclub_iomap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::mjyarou)
 	royalmah(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(mjyarou_iomap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(mjyarou_iomap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::ippatsu)
 	dondenmj(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(ippatsu_iomap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(ippatsu_iomap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::janyoup2)
 	ippatsu(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL(18'432'000)/4) // unknown divider
-	MCFG_CPU_IO_MAP(janyoup2_iomap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(18'432'000)/4) // unknown divider
+	MCFG_DEVICE_IO_MAP(janyoup2_iomap)
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(18'432'000)/12) // unknown divider
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -3593,9 +3593,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::seljan)
 	janyoup2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(seljan_map)
-	MCFG_CPU_IO_MAP(seljan_iomap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(seljan_map)
+	MCFG_DEVICE_IO_MAP(seljan_iomap)
 MACHINE_CONFIG_END
 
 INTERRUPT_GEN_MEMBER(royalmah_state::suzume_irq)
@@ -3606,40 +3606,40 @@ INTERRUPT_GEN_MEMBER(royalmah_state::suzume_irq)
 
 MACHINE_CONFIG_START(royalmah_state::suzume)
 	dondenmj(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(suzume_iomap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", royalmah_state,  suzume_irq)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(suzume_iomap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", royalmah_state,  suzume_irq)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::tontonb)
 	dondenmj(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(tontonb_iomap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(tontonb_iomap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::mjdiplob)
 	dondenmj(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(mjdiplob_iomap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(mjdiplob_iomap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::majs101b)
 	dondenmj(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(majs101b_iomap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(majs101b_iomap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::mjapinky)
 	dondenmj(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mjapinky_map)
-	MCFG_CPU_IO_MAP(mjapinky_iomap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mjapinky_map)
+	MCFG_DEVICE_IO_MAP(mjapinky_iomap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::mjderngr)
 	dondenmj(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(mjderngr_iomap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(mjderngr_iomap)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -3651,35 +3651,35 @@ MACHINE_CONFIG_START(royalmah_state::janptr96)
 	mjderngr(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL(16'000'000)/2)    /* 8 MHz? */
-	MCFG_CPU_PROGRAM_MAP(janptr96_map)
-	MCFG_CPU_IO_MAP(janptr96_iomap)
-	MCFG_TMPZ84C015_IN_PA_CB(READ8(royalmah_state, janptr96_dsw_r))
-	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(royalmah_state, janptr96_dswsel_w))
+	MCFG_DEVICE_ADD("maincpu", TMPZ84C015, XTAL(16'000'000)/2)    /* 8 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(janptr96_map)
+	MCFG_DEVICE_IO_MAP(janptr96_iomap)
+	MCFG_TMPZ84C015_IN_PA_CB(READ8(*this, royalmah_state, janptr96_dsw_r))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, royalmah_state, janptr96_dswsel_w))
 	// internal CTC channels 0 & 1 have falling edge triggers
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, trg1)) MCFG_DEVCB_INVERT
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, trg1)) MCFG_DEVCB_INVERT
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(royalmah_state::mjifb)
 	mjderngr(config);
-	MCFG_CPU_REPLACE("maincpu",TMP90841, 8000000)   /* ? */
-	MCFG_CPU_PROGRAM_MAP(mjifb_map)
-	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjifb_p3_r))
-	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, mjifb_p3_w))
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, mjifb_p4_w))
-	MCFG_TLCS90_PORT_P5_READ_CB(READ8(royalmah_state, mjifb_p5_r))
-	MCFG_TLCS90_PORT_P6_READ_CB(READ8(royalmah_state, mjifb_p6_r))
-	MCFG_TLCS90_PORT_P7_READ_CB(READ8(royalmah_state, mjifb_p7_r))
-	MCFG_TLCS90_PORT_P8_READ_CB(READ8(royalmah_state, mjifb_p8_r))
-	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(royalmah_state, mjifb_p8_w))
+	MCFG_DEVICE_REPLACE("maincpu",TMP90841, 8000000)   /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(mjifb_map)
+	MCFG_TLCS90_PORT_P3_READ_CB(READ8(*this, royalmah_state, mjifb_p3_r))
+	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(*this, royalmah_state, mjifb_p3_w))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, royalmah_state, mjifb_p4_w))
+	MCFG_TLCS90_PORT_P5_READ_CB(READ8(*this, royalmah_state, mjifb_p5_r))
+	MCFG_TLCS90_PORT_P6_READ_CB(READ8(*this, royalmah_state, mjifb_p6_r))
+	MCFG_TLCS90_PORT_P7_READ_CB(READ8(*this, royalmah_state, mjifb_p7_r))
+	MCFG_TLCS90_PORT_P8_READ_CB(READ8(*this, royalmah_state, mjifb_p8_r))
+	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(*this, royalmah_state, mjifb_p8_w))
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3689,16 +3689,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::mjdejavu)
 	mjderngr(config);
-	MCFG_CPU_REPLACE("maincpu",TMP90841, 8000000)   /* ? */
-	MCFG_CPU_PROGRAM_MAP(mjdejavu_map)
-	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjifb_p3_r))
-	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, mjifb_p3_w))
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, mjifb_p4_w))
-	MCFG_TLCS90_PORT_P5_READ_CB(READ8(royalmah_state, mjifb_p5_r))
-	MCFG_TLCS90_PORT_P6_READ_CB(READ8(royalmah_state, mjifb_p6_r))
-	MCFG_TLCS90_PORT_P7_READ_CB(READ8(royalmah_state, mjifb_p7_r))
-	MCFG_TLCS90_PORT_P8_READ_CB(READ8(royalmah_state, mjifb_p8_r))
-	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(royalmah_state, mjifb_p8_w))
+	MCFG_DEVICE_REPLACE("maincpu",TMP90841, 8000000)   /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(mjdejavu_map)
+	MCFG_TLCS90_PORT_P3_READ_CB(READ8(*this, royalmah_state, mjifb_p3_r))
+	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(*this, royalmah_state, mjifb_p3_w))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, royalmah_state, mjifb_p4_w))
+	MCFG_TLCS90_PORT_P5_READ_CB(READ8(*this, royalmah_state, mjifb_p5_r))
+	MCFG_TLCS90_PORT_P6_READ_CB(READ8(*this, royalmah_state, mjifb_p6_r))
+	MCFG_TLCS90_PORT_P7_READ_CB(READ8(*this, royalmah_state, mjifb_p7_r))
+	MCFG_TLCS90_PORT_P8_READ_CB(READ8(*this, royalmah_state, mjifb_p8_r))
+	MCFG_TLCS90_PORT_P8_WRITE_CB(WRITE8(*this, royalmah_state, mjifb_p8_w))
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3708,10 +3708,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::mjtensin)
 	mjderngr(config);
-	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)  /* ? */
-	MCFG_CPU_PROGRAM_MAP(mjtensin_map)
-	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjtensin_p3_r))
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, mjtensin_p4_w))
+	MCFG_DEVICE_REPLACE("maincpu",TMP90841, 12000000)  /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(mjtensin_map)
+	MCFG_TLCS90_PORT_P3_READ_CB(READ8(*this, royalmah_state, mjtensin_p3_r))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, royalmah_state, mjtensin_p4_w))
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3724,10 +3724,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::cafetime)
 	mjderngr(config);
-	MCFG_CPU_REPLACE("maincpu",TMP90841, 12000000)  /* ? */
-	MCFG_CPU_PROGRAM_MAP(cafetime_map)
-	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, cafetime_p3_w))
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, cafetime_p4_w))
+	MCFG_DEVICE_REPLACE("maincpu",TMP90841, 12000000)  /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(cafetime_map)
+	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(*this, royalmah_state, cafetime_p3_w))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, royalmah_state, cafetime_p4_w))
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3740,11 +3740,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(royalmah_state::mjvegasa)
 	mjderngr(config);
-	MCFG_CPU_REPLACE("maincpu",TMP90841, XTAL(8'000'000)) /* ? */
-	MCFG_CPU_PROGRAM_MAP(mjvegasa_map)
-	MCFG_TLCS90_PORT_P3_READ_CB(READ8(royalmah_state, mjtensin_p3_r))
-	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(royalmah_state, mjvegasa_p3_w))
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(royalmah_state, mjvegasa_p4_w))
+	MCFG_DEVICE_REPLACE("maincpu",TMP90841, XTAL(8'000'000)) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(mjvegasa_map)
+	MCFG_TLCS90_PORT_P3_READ_CB(READ8(*this, royalmah_state, mjtensin_p3_r))
+	MCFG_TLCS90_PORT_P3_WRITE_CB(WRITE8(*this, royalmah_state, mjvegasa_p3_w))
+	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, royalmah_state, mjvegasa_p4_w))
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)

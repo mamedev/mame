@@ -27,9 +27,10 @@ DEFINE_DEVICE_TYPE(TMS1670, tms1670_cpu_device, "tms1670", "Texas Instruments TM
 
 
 // internal memory maps
-ADDRESS_MAP_START(tms1400_cpu_device::program_12bit_8)
-	AM_RANGE(0x000, 0xfff) AM_ROM
-ADDRESS_MAP_END
+void tms1400_cpu_device::program_12bit_8(address_map &map)
+{
+	map(0x000, 0xfff).rom();
+}
 
 
 // device definitions

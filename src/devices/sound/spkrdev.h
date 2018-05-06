@@ -20,7 +20,7 @@ class speaker_sound_device : public device_t,
 								public device_sound_interface
 {
 public:
-	speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~speaker_sound_device() {}
 
 	// configuration

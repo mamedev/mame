@@ -50,9 +50,9 @@ static INPUT_PORTS_START( vectrix )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(vectrix_state::vectrix)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)  // no idea of clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181)/3)  // no idea of clock
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 MACHINE_CONFIG_END

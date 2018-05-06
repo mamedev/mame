@@ -103,7 +103,7 @@ public:
 	enum proc_addr_bank {ADDR_RAS1_0, ADDR_RAS3_2, ADDR_CS2_0, ADDR_CS3_BCS, ADDR_PCI_IO, ADDR_PCI_MEM0, ADDR_PCI_MEM1, ADDR_NUM};
 
 	void set_map(int id, const address_map_constructor &map, device_t *device);
-	virtual void device_post_load(void) override;
+	virtual void device_post_load() override;
 
 protected:
 	address_space *m_cpu_space;

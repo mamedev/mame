@@ -885,9 +885,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(rex6000_state::rex6000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000)) //Toshiba microprocessor Z80 compatible at 4.3MHz
-	MCFG_CPU_PROGRAM_MAP(rex6000_mem)
-	MCFG_CPU_IO_MAP(rex6000_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) //Toshiba microprocessor Z80 compatible at 4.3MHz
+	MCFG_DEVICE_PROGRAM_MAP(rex6000_mem)
+	MCFG_DEVICE_IO_MAP(rex6000_io)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sec_timer", rex6000_state, sec_timer, attotime::from_hz(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer1", rex6000_state, irq_timer1, attotime::from_hz(32))
@@ -920,23 +920,23 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
 	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(rex6000_state, serial_irq))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, rex6000_state, serial_irq))
 
-	MCFG_RS232_PORT_ADD( "serport", default_rs232_devices, nullptr )
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, cts_w))
+	MCFG_DEVICE_ADD( "serport", RS232_PORT, default_rs232_devices, nullptr )
+	MCFG_RS232_RXD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("ns16550", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("ns16550", ins8250_uart_device, cts_w))
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2", 0)
 
 	MCFG_DEVICE_ADD(TC8521_TAG, TC8521, XTAL(32'768))
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(rex6000_state, alarm_irq))
+	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, rex6000_state, alarm_irq))
 
 	/*
 	Fujitsu 29DL16X have feature which is capability of reading data from one
@@ -956,32 +956,32 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(oz750_state::oz750)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(9'830'400)) //Toshiba microprocessor Z80 compatible at 9.8MHz
-	MCFG_CPU_PROGRAM_MAP(rex6000_mem)
-	MCFG_CPU_IO_MAP(oz750_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(9'830'400)) //Toshiba microprocessor Z80 compatible at 9.8MHz
+	MCFG_DEVICE_PROGRAM_MAP(rex6000_mem)
+	MCFG_DEVICE_IO_MAP(oz750_io)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sec_timer", rex6000_state, sec_timer, attotime::from_hz(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer1", rex6000_state, irq_timer1, attotime::from_hz(64))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer2", rex6000_state, irq_timer2, attotime::from_hz(8192))
 
 	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(9'830'400) / 4 )
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(rex6000_state, serial_irq))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, rex6000_state, serial_irq))
 
-	MCFG_RS232_PORT_ADD( "serport", default_rs232_devices, nullptr )
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, ri_w))
-	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, cts_w))
+	MCFG_DEVICE_ADD( "serport", RS232_PORT, default_rs232_devices, nullptr )
+	MCFG_RS232_RXD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("ns16550", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("ns16550", ins8250_uart_device, ri_w))
+	//MCFG_RS232_CTS_HANDLER(WRITELINE("ns16550", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -1012,7 +1012,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	MCFG_QUICKLOAD_ADD("quickload", oz750_state, oz750, "wzd", 0)
 
 	MCFG_DEVICE_ADD(TC8521_TAG, TC8521, XTAL(32'768))
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(rex6000_state, alarm_irq))
+	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, rex6000_state, alarm_irq))
 
 	MCFG_SHARP_LH28F016S_ADD("flash0a")
 	MCFG_SHARP_LH28F016S_ADD("flash1a")
@@ -1023,7 +1023,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 

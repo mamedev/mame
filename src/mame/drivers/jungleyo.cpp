@@ -120,9 +120,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(jungleyo_state::jungleyo)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(jungleyo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jungleyo_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(jungleyo_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jungleyo_state,  irq1_line_hold)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jungleyo)
 
