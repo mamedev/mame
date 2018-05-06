@@ -44,8 +44,8 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bbc_tube_65c102_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(tube_6502_mem)
+	MCFG_DEVICE_ADD("maincpu", M65C02, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(tube_6502_mem)
 
 	MCFG_TUBE_ADD("ula")
 	MCFG_TUBE_PNMI_HANDLER(INPUTLINE("maincpu", M65C02_NMI_LINE))

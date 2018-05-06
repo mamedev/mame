@@ -760,16 +760,17 @@ QUICKLOAD_LOAD_MEMBER( tvc_state, tvc64)
 }
 
 
-extern SLOT_INTERFACE_START(tvc_exp)
-	SLOT_INTERFACE("hbf", TVC_HBF)          // Videoton HBF floppy interface
-SLOT_INTERFACE_END
+void tvc_exp(device_slot_interface &device)
+{
+	device.option_add("hbf", TVC_HBF);      // Videoton HBF floppy interface
+}
 
 
 MACHINE_CONFIG_START(tvc_state::tvc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, 3125000)
-	MCFG_CPU_PROGRAM_MAP(tvc_mem)
-	MCFG_CPU_IO_MAP(tvc_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, 3125000)
+	MCFG_DEVICE_PROGRAM_MAP(tvc_mem)
+	MCFG_DEVICE_IO_MAP(tvc_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -786,7 +787,7 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
 	MCFG_MC6845_UPDATE_ROW_CB(tvc_state, crtc_update_row)
-	MCFG_MC6845_OUT_CUR_CB(WRITELINE(tvc_state, int_ff_set))
+	MCFG_MC6845_OUT_CUR_CB(WRITELINE(*this, tvc_state, int_ff_set))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -795,12 +796,12 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", TVC_SOUND, 0)
-	MCFG_TVC_SOUND_SNDINT_CALLBACK(WRITELINE(tvc_state, int_ff_set))
+	MCFG_DEVICE_ADD("custom", TVC_SOUND, 0)
+	MCFG_TVC_SOUND_SNDINT_CALLBACK(WRITELINE(*this, tvc_state, int_ff_set))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(tvc_state, centronics_ack))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, tvc_state, centronics_ack))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 

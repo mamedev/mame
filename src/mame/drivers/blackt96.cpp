@@ -477,16 +477,16 @@ void blackt96_state::tile_callback(int &tile, int& fx, int& fy, int& region)
 
 
 MACHINE_CONFIG_START(blackt96_state::blackt96)
-	MCFG_CPU_ADD("maincpu", M68000, 18000000 /2)
-	MCFG_CPU_PROGRAM_MAP(blackt96_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blackt96_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 18000000 /2)
+	MCFG_DEVICE_PROGRAM_MAP(blackt96_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blackt96_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, 8000000) /* ? */
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(blackt96_state, blackt96_soundio_port_a_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(blackt96_state, blackt96_soundio_port_b_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(blackt96_state, blackt96_soundio_port_b_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(blackt96_state, blackt96_soundio_port_c_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(blackt96_state, blackt96_soundio_port_c_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 8000000) /* ? */
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_a_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, blackt96_state, blackt96_soundio_port_b_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_b_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, blackt96_state, blackt96_soundio_port_c_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_c_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blackt96)
 

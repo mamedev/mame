@@ -417,11 +417,11 @@ PALETTE_INIT_MEMBER(progolf_state, progolf)
 
 MACHINE_CONFIG_START(progolf_state::progolf)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO_222, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
-	MCFG_CPU_PROGRAM_MAP(main_cpu)
+	MCFG_DEVICE_ADD("maincpu", DECO_222, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 500000)
-	MCFG_CPU_PROGRAM_MAP(sound_cpu)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 500000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -449,18 +449,18 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 12000000/8)
+	MCFG_DEVICE_ADD("ay1", AY8910, 12000000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, 12000000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(progolf_state::progolfa)
 	progolf(config);
 	MCFG_DEVICE_REMOVE("maincpu") /* different encrypted cpu to progolf */
-	MCFG_CPU_ADD("maincpu", DECO_CPU6, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
-	MCFG_CPU_PROGRAM_MAP(main_cpu)
+	MCFG_DEVICE_ADD("maincpu", DECO_CPU6, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu)
 MACHINE_CONFIG_END
 
 

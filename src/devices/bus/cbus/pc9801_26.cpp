@@ -53,12 +53,12 @@ WRITE_LINE_MEMBER(pc9801_26_device::pc9801_sound_irq)
 
 MACHINE_CONFIG_START(pc9801_26_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("opn", YM2203, MAIN_CLOCK_X1*2) // unknown clock / divider
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(pc9801_26_device, pc9801_sound_irq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(pc9801_26_device, opn_porta_r))
-	//MCFG_AY8910_PORT_B_READ_CB(READ8(pc9801_state, opn_portb_r))
-	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(pc9801_state, opn_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(pc9801_26_device, opn_portb_w))
+	MCFG_DEVICE_ADD("opn", YM2203, MAIN_CLOCK_X1*2) // unknown clock / divider
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, pc9801_26_device, pc9801_sound_irq))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc9801_26_device, opn_porta_r))
+	//MCFG_AY8910_PORT_B_READ_CB(READ8(*this, pc9801_state, opn_portb_r))
+	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, pc9801_state, opn_porta_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pc9801_26_device, opn_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

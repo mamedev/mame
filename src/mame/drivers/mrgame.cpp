@@ -475,18 +475,18 @@ uint32_t mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 
 
 MACHINE_CONFIG_START(mrgame_state::mrgame)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mrgame_state, irq1_line_hold, 183)
-	MCFG_CPU_ADD("videocpu", Z80, XTAL(18'432'000)/6)
-	MCFG_CPU_PROGRAM_MAP(video_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mrgame_state, nmi_line_pulse)
-	MCFG_CPU_ADD("audiocpu1", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(audio1_map)
-	MCFG_CPU_IO_MAP(audio1_io)
-	MCFG_CPU_ADD("audiocpu2", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(audio2_map)
-	MCFG_CPU_IO_MAP(audio2_io)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(6'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mrgame_state, irq1_line_hold, 183)
+	MCFG_DEVICE_ADD("videocpu", Z80, XTAL(18'432'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(video_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mrgame_state, nmi_line_pulse)
+	MCFG_DEVICE_ADD("audiocpu1", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(audio1_map)
+	MCFG_DEVICE_IO_MAP(audio1_io)
+	MCFG_DEVICE_ADD("audiocpu2", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(audio2_map)
+	MCFG_DEVICE_IO_MAP(audio2_io)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -504,15 +504,15 @@ MACHINE_CONFIG_START(mrgame_state::mrgame)
 
 	/* Sound */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_DEVICE_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dacvol", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dacvol", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dacvol", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dacvol", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("tms", TMS5220, 672000) // uses a RC combination. 672k copied from jedi.h
+	MCFG_DEVICE_ADD("tms", TMS5220, 672000) // uses a RC combination. 672k copied from jedi.h
 	MCFG_TMS52XX_READYQ_HANDLER(INPUTLINE("audiocpu2", Z80_INPUT_LINE_BOGUSWAIT))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -520,9 +520,9 @@ MACHINE_CONFIG_START(mrgame_state::mrgame)
 	/* Devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", mrgame_state, irq_timer, attotime::from_hz(16000)) //ugh
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mrgame_state, porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mrgame_state, portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(mrgame_state, portc_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, mrgame_state, porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mrgame_state, portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, mrgame_state, portc_r))
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

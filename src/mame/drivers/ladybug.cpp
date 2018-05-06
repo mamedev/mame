@@ -724,8 +724,8 @@ void sraider_state::machine_reset()
 MACHINE_CONFIG_START(ladybug_state::ladybug)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(ladybug_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ladybug_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -745,36 +745,36 @@ MACHINE_CONFIG_START(ladybug_state::ladybug)
 	MCFG_LADYBUG_VIDEO_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("videolatch", LS259, 0) // L5 on video board or H3 on single board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ladybug_state, flipscreen_w)) // no other outputs used
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, ladybug_state, flipscreen_w)) // no other outputs used
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489, 4000000)
+	MCFG_DEVICE_ADD("sn1", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76489, 4000000)
+	MCFG_DEVICE_ADD("sn2", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dorodon_state::dorodon)
 	ladybug(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sraider_state::sraider)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(sraider_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sraider_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sraider_cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sraider_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, 4000000)   /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(sraider_cpu2_map)
-	MCFG_CPU_IO_MAP(sraider_cpu2_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sraider_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, 4000000)   /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sraider_cpu2_map)
+	MCFG_DEVICE_IO_MAP(sraider_cpu2_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sraider_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -783,7 +783,7 @@ MACHINE_CONFIG_START(sraider_state::sraider)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sraider_state, screen_update_sraider)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sraider_state, screen_vblank_sraider))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sraider_state, screen_vblank_sraider))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sraider)
@@ -799,19 +799,19 @@ MACHINE_CONFIG_START(sraider_state::sraider)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489, 4000000)
+	MCFG_DEVICE_ADD("sn1", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76489, 4000000)
+	MCFG_DEVICE_ADD("sn2", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn3", SN76489, 4000000)
+	MCFG_DEVICE_ADD("sn3", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn4", SN76489, 4000000)
+	MCFG_DEVICE_ADD("sn4", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn5", SN76489, 4000000)
+	MCFG_DEVICE_ADD("sn5", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

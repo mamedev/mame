@@ -27,9 +27,10 @@ DEFINE_DEVICE_TYPE(HUC6271, huc6271_device, "huc6271", "Hudson HuC6271 \"Rainbow
 //  huc6271_device - constructor
 //-------------------------------------------------
 
-ADDRESS_MAP_START(huc6271_device::data_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM
-ADDRESS_MAP_END
+void huc6271_device::data_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram();
+}
 
 huc6271_device::huc6271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HUC6271, tag, owner, clock)

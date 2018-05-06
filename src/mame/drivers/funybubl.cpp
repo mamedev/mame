@@ -222,13 +222,13 @@ void funybubl_state::machine_start()
 MACHINE_CONFIG_START(funybubl_state::funybubl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)      /* 6 MHz?? */
-	MCFG_CPU_PROGRAM_MAP(funybubl_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funybubl_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)      /* 6 MHz?? */
+	MCFG_DEVICE_PROGRAM_MAP(funybubl_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", funybubl_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)      /* 4 MHz?? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2)      /* 4 MHz?? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
 	/* video hardware */

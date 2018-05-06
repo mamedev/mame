@@ -340,9 +340,9 @@ MC6845_ON_UPDATE_ADDR_CHANGED(i7000_state::crtc_addr)
 MACHINE_CONFIG_START(i7000_state::i7000)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NSC800, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(i7000_mem)
-	MCFG_CPU_IO_MAP(i7000_io)
+	MCFG_DEVICE_ADD("maincpu", NSC800, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(i7000_mem)
+	MCFG_DEVICE_IO_MAP(i7000_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -364,22 +364,22 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Programmable timer */
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 //  MCFG_PIT8253_CLK0(XTAL(4'000'000) / 2) /* TODO: verify on PCB */
-//  MCFG_PIT8253_OUT0_HANDLER(WRITELINE(i7000_state,i7000_pit_out0))
+//  MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, i7000_state,i7000_pit_out0))
 //  MCFG_PIT8253_CLK1(XTAL(4'000'000) / 2) /* TODO: verify on PCB */
-//  MCFG_PIT8253_OUT1_HANDLER(WRITELINE(i7000_state,i7000_pit_out1))
+//  MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, i7000_state,i7000_pit_out1))
 	MCFG_PIT8253_CLK2(XTAL(4'000'000) / 2) /* TODO: verify on PCB */
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	/* Keyboard interface */
 	MCFG_DEVICE_ADD("i8279", I8279, 4000000) /* guessed value. TODO: verify on PCB */
-	MCFG_I8279_OUT_SL_CB(WRITE8(i7000_state, i7000_scanlines_w))          // scan SL lines
-	MCFG_I8279_IN_RL_CB(READ8(i7000_state, i7000_kbd_r))                  // kbd RL lines
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, i7000_state, i7000_scanlines_w))          // scan SL lines
+	MCFG_I8279_IN_RL_CB(READ8(*this, i7000_state, i7000_kbd_r))                  // kbd RL lines
 	MCFG_I8279_IN_SHIFT_CB(VCC) // TODO: Shift key
 	MCFG_I8279_IN_CTRL_CB(VCC) // TODO: Ctrl key
 

@@ -618,16 +618,16 @@ void firetrap_state::machine_reset()
 MACHINE_CONFIG_START(firetrap_state::firetrap)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)       // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(firetrap_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", firetrap_state, firetrap_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, FIRETRAP_XTAL/2)       // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(firetrap_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", firetrap_state, firetrap_irq)
 
-	MCFG_CPU_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)    // 1.5 MHz
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)    // 1.5 MHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
@@ -651,14 +651,14 @@ MACHINE_CONFIG_START(firetrap_state::firetrap)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)    // 3 MHz
+	MCFG_DEVICE_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)    // 3 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
 
-	MCFG_SOUND_ADD("msm", MSM5205, FIRETRAP_XTAL/32)    // 375 kHz
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(firetrap_state, firetrap_adpcm_int))
+	MCFG_DEVICE_ADD("msm", MSM5205, FIRETRAP_XTAL/32)    // 375 kHz
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, firetrap_state, firetrap_adpcm_int))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 7.8125kHz          */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -666,12 +666,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(firetrap_state::firetrapbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)       // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(firetrap_bootleg_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", firetrap_state,  firetrap_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, FIRETRAP_XTAL/2)       // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(firetrap_bootleg_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", firetrap_state,  firetrap_irq)
 
-	MCFG_CPU_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)    // 1.5 MHz
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)    // 1.5 MHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 
@@ -696,14 +696,14 @@ MACHINE_CONFIG_START(firetrap_state::firetrapbl)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)    // 3 MHz
+	MCFG_DEVICE_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)    // 3 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
 
-	MCFG_SOUND_ADD("msm", MSM5205, FIRETRAP_XTAL/32)    // 375 kHz
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(firetrap_state, firetrap_adpcm_int))
+	MCFG_DEVICE_ADD("msm", MSM5205, FIRETRAP_XTAL/32)    // 375 kHz
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, firetrap_state, firetrap_adpcm_int))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 7.8125kHz          */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END

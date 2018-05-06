@@ -60,10 +60,10 @@
 
 #define MCFG_PLUS4_PASSTHRU_EXPANSION_SLOT_ADD() \
 	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, 0, plus4_expansion_cards, nullptr) \
-	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, irq_w)) \
-	MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(DEVREAD8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_r)) \
-	MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(DEVWRITE8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_w)) \
-	MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, aec_w))
+	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, irq_w)) \
+	MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_r)) \
+	MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_w)) \
+	MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, aec_w))
 
 
 #define MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
@@ -179,6 +179,6 @@ protected:
 DECLARE_DEVICE_TYPE(PLUS4_EXPANSION_SLOT, plus4_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( plus4_expansion_cards );
+void plus4_expansion_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_PLUS4_EXP_H

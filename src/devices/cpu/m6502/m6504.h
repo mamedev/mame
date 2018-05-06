@@ -44,6 +44,6 @@ enum {
 	M6504_SET_OVERFLOW = m6502_device::V_LINE
 };
 
-extern const device_type M6504;
+DECLARE_DEVICE_TYPE(M6504, m6504_device);
 
 #endif // MAME_CPU_M6502_M6504_H

@@ -977,8 +977,8 @@ DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
 
 MACHINE_CONFIG_START(pockstat_state::pockstat)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, DEFAULT_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(pockstat_mem)
+	MCFG_DEVICE_ADD("maincpu", ARM7, DEFAULT_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(pockstat_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -991,9 +991,9 @@ MACHINE_CONFIG_START(pockstat_state::pockstat)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pockstat_cart")

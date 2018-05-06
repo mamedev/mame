@@ -1829,13 +1829,13 @@ void device_debug::suspend(bool suspend)
 	assert(m_exec != nullptr);
 
 	if (suspend) {
-        m_flags |= DEBUG_FLAG_SUSPENDED;
-        m_exec->suspend(SUSPEND_REASON_HALT, 1);
-    }
+		m_flags |= DEBUG_FLAG_SUSPENDED;
+		m_exec->suspend(SUSPEND_REASON_HALT, 1);
+	}
 	else {
-        m_flags &= ~DEBUG_FLAG_SUSPENDED;
-        m_exec->resume(SUSPEND_REASON_HALT);
-    }
+		m_flags &= ~DEBUG_FLAG_SUSPENDED;
+		m_exec->resume(SUSPEND_REASON_HALT);
+	}
 
 	if (&m_device == m_device.machine().debugger().cpu().live_cpu() && suspend)
 	{

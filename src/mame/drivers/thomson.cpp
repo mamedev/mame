@@ -608,12 +608,13 @@ FLOPPY_FORMATS_MEMBER( thomson_state::cd90_640_formats )
 	FLOPPY_CD90_640_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( cd90_640_floppies )
-	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
-	SLOT_INTERFACE("sd",   FLOPPY_525_SD)
-	SLOT_INTERFACE("ssdd", FLOPPY_525_SSDD)
-	SLOT_INTERFACE("dd",   FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void cd90_640_floppies(device_slot_interface &device)
+{
+	device.option_add("sssd", FLOPPY_525_SSSD);
+	device.option_add("sd",   FLOPPY_525_SD);
+	device.option_add("ssdd", FLOPPY_525_SSDD);
+	device.option_add("dd",   FLOPPY_525_DD);
+}
 
 
 /* ------------ driver ------------ */
@@ -624,8 +625,8 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to7 )
 
 /* cpu */
-	MCFG_CPU_ADD("maincpu", MC6809E, 1000000)
-	MCFG_CPU_PROGRAM_MAP(to7)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(to7)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
@@ -640,7 +641,7 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_SCREEN_VISIBLE_AREA ( 0, THOM_TOTAL_WIDTH * 2 - 1,
 				0, THOM_TOTAL_HEIGHT - 1 )
 	MCFG_SCREEN_UPDATE_DRIVER( thomson_state, screen_update_thom )
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(thomson_state, thom_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, thomson_state, thom_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD ( "palette", 4097 ) /* 12-bit color + transparency */
@@ -649,14 +650,14 @@ MACHINE_CONFIG_START(thomson_state::to7)
 
 /* sound */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("buzzer", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC (6-bit game extension DAC)
+	MCFG_DEVICE_ADD("buzzer", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC (6-bit game extension DAC)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "buzzer", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "buzzer", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 /* speech synthesis */
-	MCFG_SOUND_ADD("mea8000", MEA8000, 3840000)
+	MCFG_DEVICE_ADD("mea8000", MEA8000, 3840000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 /* cassette */
@@ -667,27 +668,27 @@ MACHINE_CONFIG_START(thomson_state::to7)
 
 /* timer */
 	MCFG_DEVICE_ADD("mc6846", MC6846, 0)
-	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to7_timer_port_out))
-	MCFG_MC6846_OUT_CP2_CB(DEVWRITELINE("buzzer", dac_bit_interface, write))
-	MCFG_MC6846_IN_PORT_CB(READ8(thomson_state, to7_timer_port_in))
-	MCFG_MC6846_OUT_CTO_CB(WRITELINE(thomson_state, to7_set_cassette))
-	MCFG_MC6846_IRQ_CB(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
+	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to7_timer_port_out))
+	MCFG_MC6846_OUT_CP2_CB(WRITELINE("buzzer", dac_bit_interface, write))
+	MCFG_MC6846_IN_PORT_CB(READ8(*this, thomson_state, to7_timer_port_in))
+	MCFG_MC6846_OUT_CTO_CB(WRITELINE(*this, thomson_state, to7_set_cassette))
+	MCFG_MC6846_IRQ_CB(WRITELINE("mainirq", input_merger_device, in_w<0>))
 
 /* floppy */
 	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
 
 	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(thomson_state, fdc_index_0_w))
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_0_w))
 	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(thomson_state, fdc_index_1_w))
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_1_w))
 	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(thomson_state, fdc_index_2_w))
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_2_w))
 	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(thomson_state, fdc_index_3_w))
+	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, thomson_state, fdc_index_3_w))
 
 		MCFG_WD2793_ADD("wd2793", XTAL(1'000'000))
 		MCFG_FLOPPY_DRIVE_ADD("wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
@@ -701,33 +702,33 @@ MACHINE_CONFIG_START(thomson_state::to7)
 
 /* pia */
 	MCFG_DEVICE_ADD(THOM_PIA_SYS, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, to7_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, to7_sys_portb_in))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to7_sys_portb_out))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, to7_set_cassette_motor))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, to7_sys_cb2_out))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("mainfirq", input_merger_device, in_w<1>))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainfirq", input_merger_device, in_w<1>))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to7_sys_porta_in))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, thomson_state, to7_sys_portb_in))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to7_sys_portb_out))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, thomson_state, to7_set_cassette_motor))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, to7_sys_cb2_out))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE("mainfirq", input_merger_device, in_w<1>))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainfirq", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD(THOM_PIA_GAME, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, to7_game_porta_in))
-	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, to7_game_portb_in))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to7_game_portb_out))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, to7_game_cb2_out))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to7_game_porta_in))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, thomson_state, to7_game_portb_in))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to7_game_portb_out))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, to7_game_cb2_out))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (RF 57-932) */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
 
 	/// 2400 7N2
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", mos6551_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("acia", mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", mos6551_device, write_cts))
 
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (CC 90-232) */
@@ -738,11 +739,11 @@ MACHINE_CONFIG_START(thomson_state::to7)
 	MCFG_DEVICE_ADD(THOM_PIA_MODEM, PIA6821, 0)
 
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(thomson_state, to7_modem_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(thomson_state, to7_modem_cb))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, thomson_state, to7_modem_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, thomson_state, to7_modem_cb))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1200) /* 1200 bauds, might be divided by 16 */
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(thomson_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, thomson_state, write_acia_clock))
 
 
 /* cartridge */
@@ -931,17 +932,17 @@ MACHINE_CONFIG_START(thomson_state::to770)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to770 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to770 )
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP ( to770)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP ( to770)
 
 	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, to770_sys_porta_in))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to770_sys_porta_in))
 	MCFG_PIA_READPB_HANDLER(NOOP)
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to770_sys_portb_out))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, to770_sys_cb2_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to770_sys_portb_out))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, to770_sys_cb2_out))
 
 	MCFG_DEVICE_MODIFY("mc6846")
-	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to770_timer_port_out))
+	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to770_timer_port_out))
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1124,8 +1125,8 @@ MACHINE_CONFIG_START(thomson_state::mo5)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5 )
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP ( mo5)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP ( mo5)
 
 	MCFG_CASSETTE_MODIFY( "cassette" )
 	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
@@ -1137,13 +1138,13 @@ MACHINE_CONFIG_START(thomson_state::mo5)
 	MCFG_PALETTE_INIT_OWNER(thomson_state, mo5)
 
 	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, mo5_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, mo5_sys_portb_in))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo5_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("buzzer", dac_bit_interface, write))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, mo5_sys_porta_in))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, thomson_state, mo5_sys_portb_in))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo5_sys_porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("buzzer", dac_bit_interface, write))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, thomson_state, mo5_set_cassette_motor))
 	MCFG_PIA_CB2_HANDLER(NOOP)
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>)) // WARNING: differs from TO7 !
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>)) // WARNING: differs from TO7 !
 
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mo_cart")
@@ -1487,22 +1488,22 @@ MACHINE_CONFIG_START(thomson_state::to9)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9 )
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP ( to9)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP ( to9)
 
 	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, to9_sys_porta_in))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to9_sys_porta_in))
 	MCFG_PIA_READPB_HANDLER(NOOP)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, to9_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to9_sys_portb_out))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, to9_sys_porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to9_sys_portb_out))
 	MCFG_PIA_CB2_HANDLER(NOOP)
 	MCFG_PIA_IRQA_HANDLER(NOOP)
 
 	MCFG_DEVICE_MODIFY("mc6846")
-	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to9_timer_port_out))
+	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to9_timer_port_out))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1711,24 +1712,24 @@ MACHINE_CONFIG_START(thomson_state::to8)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to8 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to8 )
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP ( to8)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP ( to8)
 
 	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, to8_sys_porta_in))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to8_sys_porta_in))
 	MCFG_PIA_READPB_HANDLER(NOOP)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, to9_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to8_sys_portb_out))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, to9_sys_porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to8_sys_portb_out))
 	MCFG_PIA_CB2_HANDLER(NOOP)
 	MCFG_PIA_IRQA_HANDLER(NOOP)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
 
 	MCFG_DEVICE_MODIFY("mc6846")
-	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to8_timer_port_out))
-	MCFG_MC6846_OUT_CP2_CB(WRITELINE(thomson_state, to8_timer_cp2_out))
-	MCFG_MC6846_IN_PORT_CB(READ8(thomson_state, to8_timer_port_in))
+	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to8_timer_port_out))
+	MCFG_MC6846_OUT_CP2_CB(WRITELINE(*this, thomson_state, to8_timer_cp2_out))
+	MCFG_MC6846_IN_PORT_CB(READ8(*this, thomson_state, to8_timer_port_in))
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1877,25 +1878,25 @@ MACHINE_CONFIG_START(thomson_state::to9p)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9p )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9p )
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP ( to9p)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP ( to9p)
 
 	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, to9_sys_porta_in))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, to9_sys_porta_in))
 	MCFG_PIA_READPB_HANDLER(NOOP)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, to9_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to8_sys_portb_out))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, to9_sys_porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, thomson_state, to8_sys_portb_out))
 	MCFG_PIA_CB2_HANDLER(NOOP)
 	MCFG_PIA_IRQA_HANDLER(NOOP)
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainfirq", input_merger_device, in_w<1>))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainfirq", input_merger_device, in_w<1>))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
 
 	MCFG_DEVICE_MODIFY("mc6846")
-	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to9p_timer_port_out))
-	MCFG_MC6846_OUT_CP2_CB(WRITELINE(thomson_state, to8_timer_cp2_out))
-	MCFG_MC6846_IN_PORT_CB(READ8(thomson_state, to9p_timer_port_in))
+	MCFG_MC6846_OUT_PORT_CB(WRITE8(*this, thomson_state, to9p_timer_port_out))
+	MCFG_MC6846_OUT_CP2_CB(WRITELINE(*this, thomson_state, to8_timer_cp2_out))
+	MCFG_MC6846_IN_PORT_CB(READ8(*this, thomson_state, to9p_timer_port_in))
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -2226,8 +2227,8 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo6 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo6 )
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP ( mo6)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP ( mo6)
 
 	MCFG_CASSETTE_MODIFY( "cassette" )
 	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
@@ -2236,20 +2237,20 @@ MACHINE_CONFIG_START(thomson_state::mo6)
 	MCFG_DEVICE_REMOVE( "mc6846" )
 
 	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, mo6_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, mo6_sys_portb_in))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("buzzer", dac_bit_interface, write))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_sys_cb2_out))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>)) // differs from TO
+	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, mo6_sys_porta_in))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, thomson_state, mo6_sys_portb_in))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo6_sys_porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("buzzer", dac_bit_interface, write))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, thomson_state, mo5_set_cassette_motor))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, mo6_sys_cb2_out))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>)) // differs from TO
 
 	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_game_porta_out))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_game_cb2_out))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo6_game_porta_out))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, mo6_game_cb2_out))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -2496,8 +2497,8 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5nr )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5nr )
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP ( mo5nr)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP ( mo5nr)
 
 	MCFG_CASSETTE_MODIFY( "cassette" )
 	MCFG_CASSETTE_FORMATS(mo5_cassette_formats)
@@ -2506,20 +2507,20 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	MCFG_DEVICE_REMOVE( "mc6846" )
 
 	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
-	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, mo6_sys_porta_in))
-	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, mo5nr_sys_portb_in))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo5nr_sys_porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("buzzer", dac_bit_interface, write))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_sys_cb2_out))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>)) // differs from TO
+	MCFG_PIA_READPA_HANDLER(READ8(*this, thomson_state, mo6_sys_porta_in))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, thomson_state, mo5nr_sys_portb_in))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo5nr_sys_porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("buzzer", dac_bit_interface, write))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, thomson_state, mo5_set_cassette_motor))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, thomson_state, mo6_sys_cb2_out))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>)) // differs from TO
 
 	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_game_porta_out))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, thomson_state, mo6_game_porta_out))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, thomson_state, write_centronics_busy))
 
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

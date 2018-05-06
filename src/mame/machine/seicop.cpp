@@ -249,7 +249,7 @@ void seibu_cop_bootleg_device::seibucopbl_map(address_map &map)
 seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEIBU_COP_BOOTLEG, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
-		m_space_config("regs", ENDIANNESS_LITTLE, 16, 9, 0, address_map_constructor(), address_map_constructor(FUNC(seibu_cop_bootleg_device::seibucopbl_map), this))
+		m_space_config("regs", ENDIANNESS_BIG, 16, 9, 0, address_map_constructor(), address_map_constructor(FUNC(seibu_cop_bootleg_device::seibucopbl_map), this))
 {
 }
 

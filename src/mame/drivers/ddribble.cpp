@@ -260,14 +260,14 @@ void ddribble_state::machine_reset()
 MACHINE_CONFIG_START(ddribble_state::ddribble)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu0_map)
+	MCFG_DEVICE_ADD(m_maincpu, MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu0_map)
 
-	MCFG_CPU_ADD("cpu1", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_ADD(m_cpu1, MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
 
-	MCFG_CPU_ADD("cpu2", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_ADD("cpu2", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synch */
 
@@ -283,9 +283,9 @@ MACHINE_CONFIG_START(ddribble_state::ddribble)
     MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1) */
 	MCFG_SCREEN_UPDATE_DRIVER(ddribble_state, screen_update_ddribble)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddribble_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddribble_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddribble)
+	MCFG_GFXDECODE_ADD(m_gfxdecode, "palette", ddribble)
 	MCFG_PALETTE_ADD("palette", 64 + 256)
 	MCFG_PALETTE_INDIRECT_ENTRIES(64)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -294,23 +294,23 @@ MACHINE_CONFIG_START(ddribble_state::ddribble)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(ddribble_state, ddribble_vlm5030_busy_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ddribble_state, ddribble_vlm5030_ctrl_w))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, ddribble_state, ddribble_vlm5030_busy_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ddribble_state, ddribble_vlm5030_ctrl_w))
 	MCFG_SOUND_ROUTE(0, "filter1", 0.25)
 	MCFG_SOUND_ROUTE(1, "filter2", 0.25)
 	MCFG_SOUND_ROUTE(2, "filter3", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.25)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD(m_vlm, VLM5030, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 
-	MCFG_FILTER_RC_ADD("filter1", 0)
+	MCFG_DEVICE_ADD(m_filter1, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter2", 0)
+	MCFG_DEVICE_ADD(m_filter2, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter3", 0)
+	MCFG_DEVICE_ADD(m_filter3, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

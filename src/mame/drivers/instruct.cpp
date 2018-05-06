@@ -420,13 +420,13 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 
 MACHINE_CONFIG_START(instruct_state::instruct)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL(3'579'545) / 4)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_DATA_MAP(data_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 120)
-	MCFG_S2650_SENSE_INPUT(READLINE(instruct_state, sense_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(instruct_state, flag_w))
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(3'579'545) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_DATA_MAP(data_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 120)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, instruct_state, sense_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, instruct_state, flag_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_instruct)

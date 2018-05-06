@@ -81,7 +81,7 @@ void tr606_state::machine_start()
 MACHINE_CONFIG_START(tr606_state::tr606)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D650, TP2_HZ)
+	MCFG_DEVICE_ADD("maincpu", NEC_D650, TP2_HZ)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp3_clock", tr606_state, tp3_clock, TP3_PERIOD)
 	MCFG_TIMER_START_DELAY(TP3_PERIOD - TP3_LOW)

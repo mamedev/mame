@@ -55,7 +55,7 @@ DECLARE_DEVICE_TYPE(ATA_SLOT, ata_slot_device)
 #define MCFG_ATA_INTERFACE_DASP_HANDLER(_devcb) \
 	devcb = &downcast<abstract_ata_interface_device &>(*device).set_dasp_handler(DEVCB_##_devcb);
 
-SLOT_INTERFACE_EXTERN(ata_devices);
+void ata_devices(device_slot_interface &device);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

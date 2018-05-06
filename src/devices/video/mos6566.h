@@ -90,7 +90,7 @@
 //***************************************************************************
 
 #define MCFG_MOS6566_CPU(_tag) \
-	downcast<mos6566_device &>(*device).set_cpu_tag("^" _tag);
+	downcast<mos6566_device &>(*device).set_cpu_tag(_tag);
 
 #define MCFG_MOS6566_IRQ_CALLBACK(_write) \
 	devcb = &downcast<mos6566_device &>(*device).set_irq_wr_callback(DEVCB_##_write);

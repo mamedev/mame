@@ -36,7 +36,7 @@ INPUT_PORTS_EXTERN( coco_joystick );
 INPUT_PORTS_EXTERN( coco_rtc );
 INPUT_PORTS_EXTERN( coco_beckerport );
 
-SLOT_INTERFACE_EXTERN( coco_cart );
+void coco_cart(device_slot_interface &device);
 
 // constants
 #define JOYSTICK_DELTA          10

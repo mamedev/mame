@@ -242,23 +242,27 @@ DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "Dallas DS5002FP")
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(mcs51_cpu_device::program_12bit)
-	AM_RANGE(0x00, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void mcs51_cpu_device::program_12bit(address_map &map)
+{
+	map(0x00, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(mcs51_cpu_device::program_13bit)
-	AM_RANGE(0x00, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void mcs51_cpu_device::program_13bit(address_map &map)
+{
+	map(0x00, 0x1fff).rom();
+}
 
-ADDRESS_MAP_START(mcs51_cpu_device::data_7bit)
-	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE("scratchpad")
-	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("sfr_ram") /* SFR */
-ADDRESS_MAP_END
+void mcs51_cpu_device::data_7bit(address_map &map)
+{
+	map(0x0000, 0x007f).ram().share("scratchpad");
+	map(0x0100, 0x01ff).ram().share("sfr_ram"); /* SFR */
+}
 
-ADDRESS_MAP_START(mcs51_cpu_device::data_8bit)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("scratchpad")
-	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("sfr_ram") /* SFR */
-ADDRESS_MAP_END
+void mcs51_cpu_device::data_8bit(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().share("scratchpad");
+	map(0x0100, 0x01ff).ram().share("sfr_ram"); /* SFR */
+}
 
 
 
@@ -2070,8 +2074,8 @@ uint8_t mcs51_cpu_device::sfr_read(size_t offset)
 		case ADDR_P1:   return RWM ? P1 : (P1 | m_forced_inputs[1]) & m_port_in_cb[1]();
 		case ADDR_P2:   return RWM ? P2 : (P2 | m_forced_inputs[2]) & m_port_in_cb[2]();
 		case ADDR_P3:   return RWM ? P3 : (P3 | m_forced_inputs[3]) & m_port_in_cb[3]()
-		                    & ~(GET_BIT(m_last_line_state, MCS51_INT0_LINE) ? 4 : 0)
-		                    & ~(GET_BIT(m_last_line_state, MCS51_INT1_LINE) ? 8 : 0);
+							& ~(GET_BIT(m_last_line_state, MCS51_INT0_LINE) ? 4 : 0)
+							& ~(GET_BIT(m_last_line_state, MCS51_INT1_LINE) ? 8 : 0);
 
 		case ADDR_PSW:
 		case ADDR_ACC:
@@ -2148,6 +2152,7 @@ void mcs51_cpu_device::device_start()
 	state_add( MCS51_DPH, "DPH", DPH).noshow();
 	state_add( MCS51_DPL, "DPL", DPL).noshow();
 	state_add( MCS51_IE,  "IE", IE).formatstr("%02X");
+	state_add( MCS51_IP,  "IP", IP).formatstr("%02X");
 	state_add<uint8_t>( MCS51_P0,  "P0", [this](){ return P0; }, [this](uint8_t p){ SET_P0(p); }).formatstr("%02X");
 	state_add<uint8_t>( MCS51_P1,  "P1", [this](){ return P1; }, [this](uint8_t p){ SET_P1(p); }).formatstr("%02X");
 	state_add<uint8_t>( MCS51_P2,  "P2", [this](){ return P2; }, [this](uint8_t p){ SET_P2(p); }).formatstr("%02X");
@@ -2161,6 +2166,12 @@ void mcs51_cpu_device::device_start()
 	state_add<uint8_t>( MCS51_R6,  "R6", [this](){ return R_REG(6); }, [this](uint8_t r){ SET_REG(6, r); }).formatstr("%02X");
 	state_add<uint8_t>( MCS51_R7,  "R7", [this](){ return R_REG(7); }, [this](uint8_t r){ SET_REG(7, r); }).formatstr("%02X");
 	state_add<uint8_t>( MCS51_RB,  "RB", [this](){ return (PSW & 0x18)>>3; }, [this](uint8_t rb){ SET_RS(rb); }).mask(0x03).formatstr("%02X");
+	state_add( MCS51_TCON, "TCON", TCON).formatstr("%02X");
+	state_add( MCS51_TMOD, "TMOD", TMOD).formatstr("%02X");
+	state_add( MCS51_TL0,  "TL0",  TL0).formatstr("%02X");
+	state_add( MCS51_TH0,  "TH0",  TH0).formatstr("%02X");
+	state_add( MCS51_TL1,  "TL1",  TL1).formatstr("%02X");
+	state_add( MCS51_TH1,  "TH1",  TH1).formatstr("%02X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();

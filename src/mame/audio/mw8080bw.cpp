@@ -148,7 +148,7 @@ MACHINE_CONFIG_START(mw8080bw_state::seawolf_audio)
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(5)
 	MCFG_SAMPLES_NAMES(seawolf_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
@@ -203,12 +203,12 @@ MACHINE_CONFIG_START(mw8080bw_state::gunfight_audio)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("samples1", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples1", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(gunfight_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MCFG_SOUND_ADD("samples2", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples2", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(gunfight_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
@@ -309,7 +309,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::tornbase_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(tornbase)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
 MACHINE_CONFIG_END
@@ -555,7 +555,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::maze_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(maze)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -802,7 +802,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::boothill_audio)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(boothill)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1032,7 +1032,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::checkmat_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(checkmat)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_CONFIG_END
@@ -1243,7 +1243,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::desertgu_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(desertgu)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
@@ -1508,7 +1508,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::dplay_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(dplay)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
@@ -1552,12 +1552,12 @@ MACHINE_CONFIG_START(mw8080bw_state::gmissile_audio)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("samples1", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples1", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(gmissile_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.9)
 
-	MCFG_SOUND_ADD("samples2", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples2", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(gmissile_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.9)
@@ -1645,12 +1645,12 @@ MACHINE_CONFIG_START(mw8080bw_state::m4_audio)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("samples1", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples1", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(2)
 	MCFG_SAMPLES_NAMES(m4_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1)
 
-	MCFG_SOUND_ADD("samples2", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples2", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(2)
 	MCFG_SAMPLES_NAMES(m4_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1)
@@ -1900,12 +1900,12 @@ MACHINE_CONFIG_START(mw8080bw_state::clowns_audio)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(clowns_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(clowns)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2271,7 +2271,7 @@ DISCRETE_SOUND_END
 MACHINE_CONFIG_START(mw8080bw_state::spacwalk_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(spacwalk)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2500,7 +2500,7 @@ DISCRETE_SOUND_END
 MACHINE_CONFIG_START(mw8080bw_state::shuffle_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(shuffle)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2679,7 +2679,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::dogpatch_audio)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(dogpatch)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -3185,7 +3185,7 @@ DISCRETE_SOUND_END
 MACHINE_CONFIG_START(mw8080bw_state::spcenctr_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
 	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
@@ -3201,7 +3201,7 @@ MACHINE_CONFIG_START(mw8080bw_state::spcenctr_audio)
 	MCFG_SN76477_ENABLE(1)                              // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(spcenctr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
@@ -3272,7 +3272,7 @@ MACHINE_CONFIG_START(mw8080bw_state::phantom2_audio)
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(2)
 	MCFG_SAMPLES_NAMES(phantom2_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
@@ -3401,7 +3401,7 @@ DISCRETE_SOUND_END
 MACHINE_CONFIG_START(mw8080bw_state::bowler_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(bowler)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
 MACHINE_CONFIG_END
@@ -3518,7 +3518,7 @@ MACHINE_CONFIG_START(mw8080bw_state::invaders_samples_audio)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
 	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
@@ -3534,7 +3534,7 @@ MACHINE_CONFIG_START(mw8080bw_state::invaders_samples_audio)
 	MCFG_SN76477_ENABLE(1)                              // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(invaders_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -4098,7 +4098,7 @@ DISCRETE_SOUND_END
 MACHINE_CONFIG_START(mw8080bw_state::invaders_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
 	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
@@ -4114,7 +4114,7 @@ MACHINE_CONFIG_START(mw8080bw_state::invaders_audio)
 	MCFG_SN76477_ENABLE(1)                              // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(invaders)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
@@ -4515,7 +4515,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::blueshrk_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(blueshrk)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -4678,12 +4678,12 @@ DISCRETE_SOUND_END
 MACHINE_CONFIG_START(mw8080bw_state::invad2ct_audio)
 	MCFG_SPEAKER_STANDARD_STEREO("spk1", "spk2")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(invad2ct)
 	MCFG_SOUND_ROUTE(0, "spk1", 0.5)
 	MCFG_SOUND_ROUTE(1, "spk2", 0.5)
 
-	MCFG_SOUND_ADD("sn1", SN76477, 0)
+	MCFG_DEVICE_ADD("sn1", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
 	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
@@ -4699,7 +4699,7 @@ MACHINE_CONFIG_START(mw8080bw_state::invad2ct_audio)
 	MCFG_SN76477_ENABLE(1)                              // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spk1", 0.3)
 
-	MCFG_SOUND_ADD("sn2", SN76477, 0)
+	MCFG_DEVICE_ADD("sn2", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
 	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res

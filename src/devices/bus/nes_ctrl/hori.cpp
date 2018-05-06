@@ -49,9 +49,10 @@ ioport_constructor nes_hori4p_device::device_input_ports() const
 }
 
 
-static SLOT_INTERFACE_START( hori_adapter )
-	SLOT_INTERFACE("joypad", NES_JOYPAD)
-SLOT_INTERFACE_END
+static void hori_adapter(device_slot_interface &device)
+{
+	device.option_add("joypad", NES_JOYPAD);
+}
 
 
 //-------------------------------------------------

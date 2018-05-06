@@ -413,8 +413,8 @@ uint32_t hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb3
 
 MACHINE_CONFIG_START(hp16500_state::hp1650)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(hp1650_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(hp1650_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180 )
@@ -424,7 +424,7 @@ MACHINE_CONFIG_START(hp16500_state::hp1650)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row_1650)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(hp16500_state, vsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hp16500_state, vsync_changed))
 
 	MCFG_DEVICE_ADD("epci", MC2661, 5000000)
 
@@ -433,8 +433,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp16500_state::hp1651)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(hp1651_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(hp1651_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180 )
@@ -444,7 +444,7 @@ MACHINE_CONFIG_START(hp16500_state::hp1651)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row_1650)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(hp16500_state, vsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hp16500_state, vsync_changed))
 
 	MCFG_DEVICE_ADD("epci", MC2661, 5000000)
 
@@ -453,8 +453,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp16500_state::hp16500a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(hp16500a_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(hp16500a_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 0x320, 0, 0x240, 0x19c, 0, 0x170 )
@@ -464,28 +464,28 @@ MACHINE_CONFIG_START(hp16500_state::hp16500a)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(hp16500_state, vsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hp16500_state, vsync_changed))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp16500_state::hp16500)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC030, 25000000)
-	MCFG_CPU_PROGRAM_MAP(hp16500_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC030, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(hp16500_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(hp16500_state, screen_update_hp16500)
 	MCFG_SCREEN_SIZE(576,384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 0, 384-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hp16500_state, vsync_changed))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp16500_state, vsync_changed))
 	// FIXME: Where is the AP line connected to? The MLC documentation recommends
 	// connecting it to VBLANK
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mlc", hp_hil_mlc_device, ap_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("mlc", hp_hil_mlc_device, ap_w))
 
 	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, XTAL(15'920'000)/2)
-	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(hp16500_state, irq_2))
+	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(*this, hp16500_state, irq_2))
 
 	// TODO: for now hook up the ipc hil keyboard - this might be replaced
 	// later with a 16500b specific keyboard implementation

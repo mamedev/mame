@@ -214,9 +214,9 @@ void cchance_state::machine_reset()
 
 MACHINE_CONFIG_START(cchance_state::cchance)
 
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cchance_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cchance_state,  irq0_line_hold)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cchance)
 
@@ -230,7 +230,7 @@ MACHINE_CONFIG_START(cchance_state::cchance)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cchance_state, screen_update_tnzs)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cchance_state, screen_vblank_tnzs))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cchance_state, screen_vblank_tnzs))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
@@ -238,7 +238,7 @@ MACHINE_CONFIG_START(cchance_state::cchance)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", YM2149, 1500000/2)
+	MCFG_DEVICE_ADD("aysnd", YM2149, 1500000/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

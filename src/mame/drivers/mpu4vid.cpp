@@ -1275,8 +1275,8 @@ void mpu4_state::mpu4_6809_map(address_map &map)
 
 
 MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
-	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
-	MCFG_CPU_PROGRAM_MAP(mpu4_6809_map)
+	MCFG_DEVICE_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
+	MCFG_DEVICE_PROGRAM_MAP(mpu4_6809_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")               /* confirm */
 
@@ -1299,8 +1299,8 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	MCFG_DEVICE_ADDRESS_MAP(0, mpu4_vram)
 
 
-	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
-	MCFG_CPU_PROGRAM_MAP(mpu4_68k_map)
+	MCFG_DEVICE_ADD("video", M68000, VIDEO_MASTER_CLOCK )
+	MCFG_DEVICE_PROGRAM_MAP(mpu4_68k_map)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(960))
 
@@ -1315,10 +1315,10 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 
 	MCFG_DEVICE_ADD("6840ptm_68k", PTM6840, VIDEO_MASTER_CLOCK / 10) /* 68k E clock */
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(mpu4vid_state, vid_o1_callback))
-	MCFG_PTM6840_O2_CB(WRITELINE(mpu4vid_state, vid_o2_callback))
-	MCFG_PTM6840_O3_CB(WRITELINE(mpu4vid_state, vid_o3_callback))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(mpu4vid_state, cpu1_ptm_irq))
+	MCFG_PTM6840_O1_CB(WRITELINE(*this, mpu4vid_state, vid_o1_callback))
+	MCFG_PTM6840_O2_CB(WRITELINE(*this, mpu4vid_state, vid_o2_callback))
+	MCFG_PTM6840_O3_CB(WRITELINE(*this, mpu4vid_state, vid_o3_callback))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, mpu4vid_state, cpu1_ptm_irq))
 	/* Present on all video cards */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SAA1099_ADD("saa", 8000000)
@@ -1326,50 +1326,50 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
 	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia6850_1", acia6850_device, write_rxd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("acia6850_1", acia6850_device, write_dcd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(mpu4vid_state, m6809_acia_irq))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_rxd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("acia6850_1", acia6850_device, write_dcd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, mpu4vid_state, m6809_acia_irq))
 
 	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia6850_0", acia6850_device, write_rxd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("acia6850_0", acia6850_device, write_dcd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(mpu4vid_state, m68k_acia_irq))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia6850_0", acia6850_device, write_rxd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("acia6850_0", acia6850_device, write_dcd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, mpu4vid_state, m68k_acia_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4vid_state::crmaze)
 	mpu4_vid(config);
 	MCFG_DEVICE_MODIFY("pia_ic5")
-	MCFG_PIA_READPA_HANDLER(READ8(mpu4vid_state, pia_ic5_porta_track_r))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, mpu4vid_state, pia_ic5_porta_track_r))
 	MCFG_PIA_WRITEPA_HANDLER(NOOP)
 	MCFG_PIA_WRITEPB_HANDLER(NOOP)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4vid_state::mating)
 	crmaze(config);
-	MCFG_CPU_MODIFY("video")
-	MCFG_CPU_PROGRAM_MAP(mpu4oki_68k_map)
+	MCFG_DEVICE_MODIFY("video")
+	MCFG_DEVICE_PROGRAM_MAP(mpu4oki_68k_map)
 
 	mpu4_common2(config);
 
-	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000) //?
+	MCFG_DEVICE_ADD("msm6376", OKIM6376, 128000) //?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4vid_state::bwbvid)
 	mpu4_vid(config);
-	MCFG_CPU_MODIFY("video")
-	MCFG_CPU_PROGRAM_MAP(bwbvid_68k_map)
+	MCFG_DEVICE_MODIFY("video")
+	MCFG_DEVICE_PROGRAM_MAP(bwbvid_68k_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4vid_state::bwbvid5)
 	bwbvid(config);
-	MCFG_CPU_MODIFY("video")
-	MCFG_CPU_PROGRAM_MAP(bwbvid5_68k_map)
+	MCFG_DEVICE_MODIFY("video")
+	MCFG_DEVICE_PROGRAM_MAP(bwbvid5_68k_map)
 
 	mpu4_common2(config);
 
-	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000) //?
+	MCFG_DEVICE_ADD("msm6376", OKIM6376, 128000) //?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 MACHINE_CONFIG_END

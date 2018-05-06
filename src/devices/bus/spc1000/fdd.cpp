@@ -71,9 +71,10 @@ void spc1000_fdd_exp_device::sd725_io(address_map &map)
 	map(0xfc, 0xff).rw("d8255_master", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
-static SLOT_INTERFACE_START( sd725_floppies )
-	SLOT_INTERFACE("sd320", EPSON_SD_320)
-SLOT_INTERFACE_END
+static void sd725_floppies(device_slot_interface &device)
+{
+	device.option_add("sd320", EPSON_SD_320);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig
@@ -82,16 +83,16 @@ SLOT_INTERFACE_END
 MACHINE_CONFIG_START(spc1000_fdd_exp_device::device_add_mconfig)
 
 	// sub CPU (5 inch floppy drive)
-	MCFG_CPU_ADD("fdccpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(sd725_mem)
-	MCFG_CPU_IO_MAP(sd725_io)
+	MCFG_DEVICE_ADD("fdccpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sd725_mem)
+	MCFG_DEVICE_IO_MAP(sd725_io)
 
 	MCFG_DEVICE_ADD("d8255_master", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(DEVREAD8("d8255_master", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(DEVREAD8("d8255_master", i8255_device, pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(spc1000_fdd_exp_device, i8255_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(spc1000_fdd_exp_device, i8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(spc1000_fdd_exp_device, i8255_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8("d8255_master", i8255_device, pb_r))
+	MCFG_I8255_IN_PORTB_CB(READ8("d8255_master", i8255_device, pa_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spc1000_fdd_exp_device, i8255_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, spc1000_fdd_exp_device, i8255_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spc1000_fdd_exp_device, i8255_c_w))
 
 	// floppy disk controller
 	MCFG_UPD765A_ADD("upd765", true, true)

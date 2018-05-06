@@ -19,9 +19,10 @@ FLOPPY_FORMATS_MEMBER( iq151_disc2_device::floppy_formats )
 	FLOPPY_IQ151_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( iq151_disc2_floppies )
-	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
-SLOT_INTERFACE_END
+static void iq151_disc2_floppies(device_slot_interface &device)
+{
+	device.option_add("8sssd", FLOPPY_8_SSSD);
+}
 
 ROM_START( iq151_disc2 )
 	ROM_REGION(0x0800, "disc2", 0)

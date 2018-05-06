@@ -587,11 +587,11 @@ READ_LINE_MEMBER( fp200_state::sid_r )
 MACHINE_CONFIG_START(fp200_state::fp200)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A,MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(fp200_map)
-	MCFG_CPU_IO_MAP(fp200_io)
-	MCFG_I8085A_SID(READLINE(fp200_state, sid_r))
-	MCFG_I8085A_SOD(WRITELINE(fp200_state, sod_w))
+	MCFG_DEVICE_ADD("maincpu",I8085A,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(fp200_map)
+	MCFG_DEVICE_IO_MAP(fp200_io)
+	MCFG_I8085A_SID(READLINE(*this, fp200_state, sid_r))
+	MCFG_I8085A_SOD(WRITELINE(*this, fp200_state, sod_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -609,7 +609,7 @@ MACHINE_CONFIG_START(fp200_state::fp200)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

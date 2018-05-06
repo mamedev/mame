@@ -869,9 +869,10 @@ void hp9895_device::z80_io_map(address_map &map)
 	map(0x67, 0x67).r(this, FUNC(hp9895_device::switches2_r));
 }
 
-static SLOT_INTERFACE_START(hp9895_floppies)
-	SLOT_INTERFACE("8dsdd" , FLOPPY_8_DSDD)
-SLOT_INTERFACE_END
+static void hp9895_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd" , FLOPPY_8_DSDD);
+}
 
 static const floppy_format_type hp9895_floppy_formats[] = {
 	FLOPPY_MFI_FORMAT,
@@ -885,22 +886,22 @@ const tiny_rom_entry *hp9895_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(hp9895_device::device_add_mconfig)
-	MCFG_CPU_ADD("cpu" , Z80 , 4000000)
-	MCFG_CPU_PROGRAM_MAP(z80_program_map)
-	MCFG_CPU_IO_MAP(z80_io_map)
-	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(hp9895_device , z80_m1_w))
+	MCFG_DEVICE_ADD("cpu" , Z80 , 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(z80_program_map)
+	MCFG_DEVICE_IO_MAP(z80_io_map)
+	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(*this, hp9895_device , z80_m1_w))
 
 	MCFG_DEVICE_ADD("phi" , PHI , 0)
-	MCFG_PHI_EOI_WRITE_CB(WRITELINE(hp9895_device , phi_eoi_w))
-	MCFG_PHI_DAV_WRITE_CB(WRITELINE(hp9895_device , phi_dav_w))
-	MCFG_PHI_NRFD_WRITE_CB(WRITELINE(hp9895_device , phi_nrfd_w))
-	MCFG_PHI_NDAC_WRITE_CB(WRITELINE(hp9895_device , phi_ndac_w))
-	MCFG_PHI_IFC_WRITE_CB(WRITELINE(hp9895_device , phi_ifc_w))
-	MCFG_PHI_SRQ_WRITE_CB(WRITELINE(hp9895_device , phi_srq_w))
-	MCFG_PHI_ATN_WRITE_CB(WRITELINE(hp9895_device , phi_atn_w))
-	MCFG_PHI_REN_WRITE_CB(WRITELINE(hp9895_device , phi_ren_w))
-	MCFG_PHI_DIO_READWRITE_CB(READ8(hp9895_device , phi_dio_r) , WRITE8(hp9895_device , phi_dio_w))
-	MCFG_PHI_INT_WRITE_CB(WRITELINE(hp9895_device , phi_int_w))
+	MCFG_PHI_EOI_WRITE_CB(WRITELINE(*this, hp9895_device , phi_eoi_w))
+	MCFG_PHI_DAV_WRITE_CB(WRITELINE(*this, hp9895_device , phi_dav_w))
+	MCFG_PHI_NRFD_WRITE_CB(WRITELINE(*this, hp9895_device , phi_nrfd_w))
+	MCFG_PHI_NDAC_WRITE_CB(WRITELINE(*this, hp9895_device , phi_ndac_w))
+	MCFG_PHI_IFC_WRITE_CB(WRITELINE(*this, hp9895_device , phi_ifc_w))
+	MCFG_PHI_SRQ_WRITE_CB(WRITELINE(*this, hp9895_device , phi_srq_w))
+	MCFG_PHI_ATN_WRITE_CB(WRITELINE(*this, hp9895_device , phi_atn_w))
+	MCFG_PHI_REN_WRITE_CB(WRITELINE(*this, hp9895_device , phi_ren_w))
+	MCFG_PHI_DIO_READWRITE_CB(READ8(*this, hp9895_device , phi_dio_r) , WRITE8(*this, hp9895_device , phi_dio_w))
+	MCFG_PHI_INT_WRITE_CB(WRITELINE(*this, hp9895_device , phi_int_w))
 	MCFG_PHI_SYS_CNTRL_READ_CB(GND)
 
 	MCFG_FLOPPY_DRIVE_ADD("floppy0" , hp9895_floppies , "8dsdd" , hp9895_floppy_formats)

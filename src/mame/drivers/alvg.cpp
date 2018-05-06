@@ -46,8 +46,8 @@ DRIVER_INIT_MEMBER(alvg_state,alvg)
 
 MACHINE_CONFIG_START(alvg_state::alvg)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
-	MCFG_CPU_PROGRAM_MAP(alvg_map)
+	MCFG_DEVICE_ADD("maincpu", M65C02, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(alvg_map)
 MACHINE_CONFIG_END
 
 /*----------------------------------------------------------------------------

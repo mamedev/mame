@@ -22,14 +22,16 @@
 // device type definition
 DEFINE_DEVICE_TYPE(HUC6272, huc6272_device, "huc6272", "Hudson HuC6272 \"King\"")
 
-ADDRESS_MAP_START(huc6272_device::microprg_map)
-	AM_RANGE(0x00, 0x0f) AM_RAM AM_SHARE("microprg_ram")
-ADDRESS_MAP_END
+void huc6272_device::microprg_map(address_map &map)
+{
+	map(0x00, 0x0f).ram().share("microprg_ram");
+}
 
-ADDRESS_MAP_START(huc6272_device::kram_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("kram_page0")
-	AM_RANGE(0x100000, 0x1fffff) AM_RAM AM_SHARE("kram_page1")
-ADDRESS_MAP_END
+void huc6272_device::kram_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("kram_page0");
+	map(0x100000, 0x1fffff).ram().share("kram_page1");
+}
 
 
 //**************************************************************************
@@ -383,13 +385,13 @@ WRITE32_MEMBER( huc6272_device::write )
 
 MACHINE_CONFIG_START(huc6272_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSI_RST_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit7))
-	MCFG_SCSI_BSY_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit6))
-	MCFG_SCSI_REQ_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit5))
-	MCFG_SCSI_MSG_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit4))
-	MCFG_SCSI_CD_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit3))
-	MCFG_SCSI_IO_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit2))
-	MCFG_SCSI_SEL_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit1))
+	MCFG_SCSI_RST_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit7))
+	MCFG_SCSI_BSY_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit6))
+	MCFG_SCSI_REQ_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit5))
+	MCFG_SCSI_MSG_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit4))
+	MCFG_SCSI_CD_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit3))
+	MCFG_SCSI_IO_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit2))
+	MCFG_SCSI_SEL_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit1))
 
 	MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
 

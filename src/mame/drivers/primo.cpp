@@ -247,9 +247,9 @@ static const struct CassetteOptions primo_cassette_options = {
 
 MACHINE_CONFIG_START(primo_state::primoa32)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", Z80, 2500000 )
-	MCFG_CPU_PROGRAM_MAP( primo32_mem)
-	MCFG_CPU_IO_MAP( primoa_port)
+	MCFG_DEVICE_ADD( "maincpu", Z80, 2500000 )
+	MCFG_DEVICE_PROGRAM_MAP( primo32_mem)
+	MCFG_DEVICE_IO_MAP( primoa_port)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -259,7 +259,7 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 256-1, 0, 192-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(primo_state, screen_update_primo)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(primo_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, primo_state, vblank_irq))
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* snapshot/quickload */
@@ -291,44 +291,44 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(primo_state::primoa48)
 	primoa32(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(primo48_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(primo48_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(primo_state::primoa64)
 	primoa32(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(primo64_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(primo64_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(primo_state::primob32)
 	primoa32(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(primob_port)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(primo_state::primob48)
 	primoa48(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(primob_port)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(primo_state::primob64)
 	primoa64(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(primob_port)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(primo_state::primoc64)
 	primoa64(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(primob_port)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END

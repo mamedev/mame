@@ -232,8 +232,8 @@ bool cammu_device::memory_translate(const u32 ssw, const int spacenum, const int
 {
 	// translate the address
 	translated_t translated = translate_address(ssw, address, BYTE,
-		(intention & TRANSLATE_TYPE_MASK) == TRANSLATE_READ ? READ : 
-		(intention & TRANSLATE_TYPE_MASK) == TRANSLATE_WRITE ? WRITE : 
+		(intention & TRANSLATE_TYPE_MASK) == TRANSLATE_READ ? READ :
+		(intention & TRANSLATE_TYPE_MASK) == TRANSLATE_WRITE ? WRITE :
 		EXECUTE);
 
 	// check that the requested space number matches the mapped space

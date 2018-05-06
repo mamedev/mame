@@ -846,39 +846,39 @@ GFXDECODE_END
 MACHINE_CONFIG_START(turbo_state::turbo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(turbo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(turbo_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(turbo_state, turbo_ppi0a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(turbo_state, turbo_ppi0b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, turbo_ppi0c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, turbo_ppi0a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, turbo_state, turbo_ppi0b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, turbo_ppi0c_w))
 
 	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(turbo_state, turbo_ppi1a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(turbo_state, turbo_ppi1b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, turbo_ppi1c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, turbo_ppi1a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, turbo_state, turbo_ppi1b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, turbo_ppi1c_w))
 
 	MCFG_DEVICE_ADD("i8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(turbo_state, turbo_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(turbo_state, turbo_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, turbo_sound_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, turbo_sound_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, turbo_state, turbo_sound_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, turbo_sound_c_w))
 
 	MCFG_DEVICE_ADD("i8255_3", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(turbo_state, turbo_analog_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, turbo_state, turbo_analog_r))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, turbo_ppi3c_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, turbo_ppi3c_w))
 
 	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
-	MCFG_I8279_OUT_SL_CB(WRITE8(turbo_state, scanlines_w))    // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(turbo_state, digit_w))      // display A&B
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, turbo_state, scanlines_w))    // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, turbo_state, digit_w))      // display A&B
 	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // IC125 - outputs passed through CN5
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(turbo_state, coin_meter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(turbo_state, coin_meter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(turbo_state, start_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, turbo_state, coin_meter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, turbo_state, coin_meter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, turbo_state, start_lamp_w))
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
@@ -901,23 +901,23 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(turbo_state::subroc3d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(subroc3d_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(subroc3d_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(turbo_state, subroc3d_ppi0a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(turbo_state, subroc3d_ppi0b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, subroc3d_ppi0c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, subroc3d_ppi0a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, turbo_state, subroc3d_ppi0b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, subroc3d_ppi0c_w))
 
 	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(turbo_state, subroc3d_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(turbo_state, subroc3d_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, subroc3d_sound_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, subroc3d_sound_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, turbo_state, subroc3d_sound_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, subroc3d_sound_c_w))
 
 	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
-	MCFG_I8279_OUT_SL_CB(WRITE8(turbo_state, scanlines_w))    // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(turbo_state, digit_w))      // display A&B
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, turbo_state, scanlines_w))    // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, turbo_state, digit_w))      // display A&B
 	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
 
 	/* video hardware */
@@ -941,31 +941,31 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(turbo_state::buckrog)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(buckrog_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(buckrog_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(buckrog_cpu2_map)
-	MCFG_CPU_IO_MAP(buckrog_cpu2_portmap)
+	MCFG_DEVICE_ADD("subcpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(buckrog_cpu2_map)
+	MCFG_DEVICE_IO_MAP(buckrog_cpu2_portmap)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 	MCFG_MACHINE_RESET_OVERRIDE(turbo_state,buckrog)
 
 	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(turbo_state, buckrog_ppi0a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(turbo_state, buckrog_ppi0b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, buckrog_ppi0c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, buckrog_ppi0a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, turbo_state, buckrog_ppi0b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, buckrog_ppi0c_w))
 
 	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(turbo_state, buckrog_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(turbo_state, buckrog_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, buckrog_ppi1c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, buckrog_sound_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, turbo_state, buckrog_sound_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, turbo_state, buckrog_ppi1c_w))
 
 	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
-	MCFG_I8279_OUT_SL_CB(WRITE8(turbo_state, scanlines_w))    // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(turbo_state, digit_w))      // display A&B
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, turbo_state, scanlines_w))    // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, turbo_state, digit_w))      // display A&B
 	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
 
 	/* video hardware */
@@ -987,7 +987,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(turbo_state::buckrogu)
 	buckrog(config);
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 MACHINE_CONFIG_END
 
@@ -996,10 +996,10 @@ MACHINE_CONFIG_START(turbo_state::buckroge)
 	buckrog(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5014, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(buckrog_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5014, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(buckrog_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 

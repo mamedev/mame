@@ -2097,9 +2097,9 @@ MACHINE_RESET_MEMBER(cave_state,cave)
 MACHINE_CONFIG_START(cave_state::dfeveron)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(dfeveron_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(dfeveron_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -2124,8 +2124,8 @@ MACHINE_CONFIG_START(cave_state::dfeveron)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2138,9 +2138,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::ddonpach)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(ddonpach_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(ddonpach_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -2165,8 +2165,8 @@ MACHINE_CONFIG_START(cave_state::ddonpach)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2178,9 +2178,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::donpachi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(donpachi_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(donpachi_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -2225,9 +2225,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::esprade)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(esprade_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(esprade_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -2252,8 +2252,8 @@ MACHINE_CONFIG_START(cave_state::esprade)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2265,9 +2265,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::gaia)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(gaia_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(gaia_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -2293,8 +2293,8 @@ MACHINE_CONFIG_START(cave_state::gaia)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2306,9 +2306,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::guwange)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(guwange_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(guwange_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -2333,8 +2333,8 @@ MACHINE_CONFIG_START(cave_state::guwange)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2345,13 +2345,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::hotdogst)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL/2)
-	MCFG_CPU_PROGRAM_MAP(hotdogst_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2)
+	MCFG_DEVICE_PROGRAM_MAP(hotdogst_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 32_MHz_XTAL/8)
-	MCFG_CPU_PROGRAM_MAP(hotdogst_sound_map)
-	MCFG_CPU_IO_MAP(hotdogst_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 32_MHz_XTAL/8)
+	MCFG_DEVICE_PROGRAM_MAP(hotdogst_sound_map)
+	MCFG_DEVICE_IO_MAP(hotdogst_sound_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -2379,7 +2379,7 @@ MACHINE_CONFIG_START(cave_state::hotdogst)
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 32_MHz_XTAL/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 32_MHz_XTAL/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
@@ -2399,9 +2399,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::korokoro)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(korokoro_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(korokoro_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -2426,15 +2426,15 @@ MACHINE_CONFIG_START(cave_state::korokoro)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cave_state::crusherm)
 	korokoro(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(crusherm_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(crusherm_map)
 MACHINE_CONFIG_END
 
 
@@ -2445,13 +2445,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::mazinger)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(mazinger_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mazinger_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4_MHz_XTAL) // Bidirectional communication
-	MCFG_CPU_PROGRAM_MAP(mazinger_sound_map)
-	MCFG_CPU_IO_MAP(mazinger_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4_MHz_XTAL) // Bidirectional communication
+	MCFG_DEVICE_PROGRAM_MAP(mazinger_sound_map)
+	MCFG_DEVICE_IO_MAP(mazinger_sound_portmap)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
@@ -2482,7 +2482,7 @@ MACHINE_CONFIG_START(cave_state::mazinger)
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 4_MHz_XTAL)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 4_MHz_XTAL)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
@@ -2502,13 +2502,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::metmqstr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(metmqstr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(metmqstr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 32_MHz_XTAL / 4)
-	MCFG_CPU_PROGRAM_MAP(metmqstr_sound_map)
-	MCFG_CPU_IO_MAP(metmqstr_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 32_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(metmqstr_sound_map)
+	MCFG_DEVICE_IO_MAP(metmqstr_sound_portmap)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
@@ -2562,9 +2562,9 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(pacslot_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(pacslot_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
@@ -2606,8 +2606,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cave_state::paceight)
 	pacslot(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(paceight_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(paceight_map)
 MACHINE_CONFIG_END
 /***************************************************************************
                                Poka Poka Satan
@@ -2621,9 +2621,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( cave_state::timer_lev2_cb )
 MACHINE_CONFIG_START(cave_state::ppsatan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(ppsatan_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt_ppsatan)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(ppsatan_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt_ppsatan)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1))  /* a guess, and certainly wrong */
@@ -2684,13 +2684,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::pwrinst2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL) /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(pwrinst2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL) /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(pwrinst2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL / 2)    /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(pwrinst2_sound_map)
-	MCFG_CPU_IO_MAP(pwrinst2_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 2)    /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(pwrinst2_sound_map)
+	MCFG_DEVICE_IO_MAP(pwrinst2_sound_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
@@ -2718,7 +2718,7 @@ MACHINE_CONFIG_START(cave_state::pwrinst2)
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
@@ -2756,16 +2756,16 @@ MACHINE_RESET_MEMBER(cave_state,sailormn)
 MACHINE_CONFIG_START(cave_state::sailormn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(sailormn_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(sailormn_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	// could be a wachdog, but if it is then our watchdog address is incorrect as there are periods where the game doesn't write it.
 	MCFG_TIMER_DRIVER_ADD("startup", cave_state, sailormn_startup)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8_MHz_XTAL) // Bidirectional Communication
-	MCFG_CPU_PROGRAM_MAP(sailormn_sound_map)
-	MCFG_CPU_IO_MAP(sailormn_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL) // Bidirectional Communication
+	MCFG_DEVICE_PROGRAM_MAP(sailormn_sound_map)
+	MCFG_DEVICE_IO_MAP(sailormn_sound_portmap)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -2820,9 +2820,9 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(tekkencw_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tekkencw_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
@@ -2861,8 +2861,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cave_state::tekkenbs)
 	tekkencw(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tekkenbs_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tekkenbs_map)
 MACHINE_CONFIG_END
 
 
@@ -2875,9 +2875,9 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(tjumpman_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tjumpman_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
@@ -2922,9 +2922,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::uopoko)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(uopoko_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(uopoko_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -2948,8 +2948,8 @@ MACHINE_CONFIG_START(cave_state::uopoko)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

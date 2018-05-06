@@ -604,7 +604,7 @@ void ghosteo_state::machine_reset()
 MACHINE_CONFIG_START(ghosteo_state::ghosteo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM9, 200000000)
+	MCFG_DEVICE_ADD("maincpu", ARM9, 200000000)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -619,20 +619,20 @@ MACHINE_CONFIG_START(ghosteo_state::ghosteo)
 	MCFG_DEVICE_ADD("s3c2410", S3C2410, 12000000)
 	MCFG_S3C2410_PALETTE("palette")
 	MCFG_S3C2410_SCREEN("screen")
-	MCFG_S3C2410_CORE_PIN_R_CB(READ32(ghosteo_state, s3c2410_core_pin_r))
-	MCFG_S3C2410_GPIO_PORT_R_CB(READ32(ghosteo_state, s3c2410_gpio_port_r))
-	MCFG_S3C2410_GPIO_PORT_W_CB(WRITE32(ghosteo_state, s3c2410_gpio_port_w))
-	MCFG_S3C2410_I2C_SCL_W_CB(WRITELINE(ghosteo_state, s3c2410_i2c_scl_w))
-	MCFG_S3C2410_I2C_SDA_R_CB(READLINE(ghosteo_state, s3c2410_i2c_sda_r))
-	MCFG_S3C2410_I2C_SDA_W_CB(WRITELINE(ghosteo_state, s3c2410_i2c_sda_w))
-	MCFG_S3C2410_NAND_COMMAND_W_CB(WRITE8(ghosteo_state, s3c2410_nand_command_w))
-	MCFG_S3C2410_NAND_ADDRESS_W_CB(WRITE8(ghosteo_state, s3c2410_nand_address_w))
-	MCFG_S3C2410_NAND_DATA_R_CB(READ8(ghosteo_state, s3c2410_nand_data_r))
-	MCFG_S3C2410_NAND_DATA_W_CB(WRITE8(ghosteo_state, s3c2410_nand_data_w))
+	MCFG_S3C2410_CORE_PIN_R_CB(READ32(*this, ghosteo_state, s3c2410_core_pin_r))
+	MCFG_S3C2410_GPIO_PORT_R_CB(READ32(*this, ghosteo_state, s3c2410_gpio_port_r))
+	MCFG_S3C2410_GPIO_PORT_W_CB(WRITE32(*this, ghosteo_state, s3c2410_gpio_port_w))
+	MCFG_S3C2410_I2C_SCL_W_CB(WRITELINE(*this, ghosteo_state, s3c2410_i2c_scl_w))
+	MCFG_S3C2410_I2C_SDA_R_CB(READLINE(*this, ghosteo_state, s3c2410_i2c_sda_r))
+	MCFG_S3C2410_I2C_SDA_W_CB(WRITELINE(*this, ghosteo_state, s3c2410_i2c_sda_w))
+	MCFG_S3C2410_NAND_COMMAND_W_CB(WRITE8(*this, ghosteo_state, s3c2410_nand_command_w))
+	MCFG_S3C2410_NAND_ADDRESS_W_CB(WRITE8(*this, ghosteo_state, s3c2410_nand_address_w))
+	MCFG_S3C2410_NAND_DATA_R_CB(READ8(*this, ghosteo_state, s3c2410_nand_data_r))
+	MCFG_S3C2410_NAND_DATA_W_CB(WRITE8(*this, ghosteo_state, s3c2410_nand_data_w))
 
 //  MCFG_DEVICE_ADD("nand", NAND, 0)
 //  MCFG_NAND_TYPE(NAND_CHIP_K9F5608U0D)    // or another variant with ID 0xEC 0x75 ?
-//  MCFG_NAND_RNB_CALLBACK(DEVWRITELINE("s3c2410", s3c2410_device, s3c24xx_pin_frnb_w))
+//  MCFG_NAND_RNB_CALLBACK(WRITELINE("s3c2410", s3c2410_device, s3c24xx_pin_frnb_w))
 
 //  MCFG_I2CMEM_ADD("i2cmem", 0xA0, 0, 0x100, nullptr)
 
@@ -640,31 +640,31 @@ MACHINE_CONFIG_START(ghosteo_state::ghosteo)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("qs1000", qs1000_device, set_irq))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("qs1000", QS1000, XTAL(24'000'000))
+	MCFG_DEVICE_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_QS1000_OUT_P1_CB(WRITE8(ghosteo_state, qs1000_p1_w))
-	MCFG_QS1000_OUT_P2_CB(WRITE8(ghosteo_state, qs1000_p2_w))
-	MCFG_QS1000_OUT_P3_CB(WRITE8(ghosteo_state, qs1000_p3_w))
+	MCFG_QS1000_IN_P1_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_QS1000_OUT_P1_CB(WRITE8(*this, ghosteo_state, qs1000_p1_w))
+	MCFG_QS1000_OUT_P2_CB(WRITE8(*this, ghosteo_state, qs1000_p2_w))
+	MCFG_QS1000_OUT_P3_CB(WRITE8(*this, ghosteo_state, qs1000_p3_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ghosteo_state::bballoon)
 	ghosteo(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bballoon_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bballoon_map)
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_DATA_SIZE(256)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ghosteo_state::touryuu)
 	ghosteo(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(touryuu_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(touryuu_map)
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_DATA_SIZE(1024)
 MACHINE_CONFIG_END

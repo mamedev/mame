@@ -353,20 +353,20 @@ WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_11_w)
 }
 
 MACHINE_CONFIG_START(isbc_215g_device::device_add_mconfig)
-	MCFG_CPU_ADD("u84", I8089, XTAL(15'000'000) / 3)
-	MCFG_CPU_PROGRAM_MAP(isbc_215g_mem)
-	MCFG_CPU_IO_MAP(isbc_215g_io)
+	MCFG_DEVICE_ADD("u84", I8089, XTAL(15'000'000) / 3)
+	MCFG_DEVICE_PROGRAM_MAP(isbc_215g_mem)
+	MCFG_DEVICE_IO_MAP(isbc_215g_io)
 	MCFG_I8089_DATA_WIDTH(16)
 
 	MCFG_HARDDISK_ADD("drive0")
 	MCFG_HARDDISK_ADD("drive1")
 
 	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE(isbc_215g_device, isbx_irq_00_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(isbc_215g_device, isbx_irq_01_w))
+	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE(*this, isbc_215g_device, isbx_irq_00_w))
+	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(*this, isbc_215g_device, isbx_irq_01_w))
 	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, "fdc_218a")
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE(isbc_215g_device, isbx_irq_10_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(isbc_215g_device, isbx_irq_11_w))
+	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE(*this, isbc_215g_device, isbx_irq_10_w))
+	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(*this, isbc_215g_device, isbx_irq_11_w))
 MACHINE_CONFIG_END
 
 

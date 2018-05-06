@@ -242,12 +242,12 @@ void dogfgt_state::machine_reset()
 MACHINE_CONFIG_START(dogfgt_state::dogfgt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(dogfgt_state, irq0_line_hold, 16*60)   /* ? controls music tempo */
+	MCFG_DEVICE_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(dogfgt_state, irq0_line_hold, 16*60)   /* ? controls music tempo */
 
-	MCFG_CPU_ADD("sub", M6502, 1500000) /* 1.5 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("sub", M6502, 1500000) /* 1.5 MHz ???? */
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -268,10 +268,10 @@ MACHINE_CONFIG_START(dogfgt_state::dogfgt)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

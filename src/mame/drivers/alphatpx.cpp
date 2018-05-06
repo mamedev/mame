@@ -1169,17 +1169,20 @@ WRITE8_MEMBER(alphatp_34_state::fdc_cmd_w)
 //  FLOPPY - Drive definitions
 //**************************************************************************
 
-static SLOT_INTERFACE_START( alphatp2_floppies ) // two BASF 2471 drives
-	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD)
-SLOT_INTERFACE_END
+static void alphatp2_floppies(device_slot_interface &device) // two BASF 2471 drives
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
 
-static SLOT_INTERFACE_START( alphatp2su_floppies )
-	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void alphatp2su_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
-static SLOT_INTERFACE_START( alphatp3_floppies ) // P3:  two BASF 6106 drives
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)       // P30: two Shugart SA465-3AA drives
-SLOT_INTERFACE_END
+static void alphatp3_floppies(device_slot_interface &device) // P3:  two BASF 6106 drives
+{
+	device.option_add("525qd", FLOPPY_525_QD);       // P30: two Shugart SA465-3AA drives
+}
 
 //**************************************************************************
 //  MACHINE - Alphatronic P1, P2, P2S, P2U and Hell 2069
@@ -1202,17 +1205,17 @@ void alphatp_12_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(alphatp2_mem)
-	MCFG_CPU_IO_MAP(alphatp2_io)
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(6'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(alphatp2_mem)
+	MCFG_DEVICE_IO_MAP(alphatp2_io)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("kbdmcu", I8041, XTAL(12'854'400)/2)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(alphatp_12_state, kbd_matrix_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(alphatp_12_state, kbd_matrix_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(alphatp_12_state, kbd_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(alphatp_12_state, kbd_port2_w))
+	MCFG_DEVICE_ADD("kbdmcu", I8041, XTAL(12'854'400)/2)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, alphatp_12_state, kbd_matrix_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, alphatp_12_state, kbd_matrix_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, alphatp_12_state, kbd_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, alphatp_12_state, kbd_port2_w))
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(alphatp2_map)
@@ -1238,16 +1241,16 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 1060 )
+	MCFG_DEVICE_ADD( "beeper", BEEP, 1060 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	// XTAL(4'915'200) serial clock
 
 	MCFG_FD1791_ADD("fdc", XTAL(4'000'000) / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(alphatp_12_state, fdcirq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(alphatp_12_state, fdcdrq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(alphatp_12_state, fdchld_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, alphatp_12_state, fdcirq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, alphatp_12_state, fdcdrq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, alphatp_12_state, fdchld_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
@@ -1284,17 +1287,17 @@ void alphatp_34_state::machine_reset()
 	m_88_da = m_85_da = m_88_started = false;
 }
 MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(alphatp3_mem)
-	MCFG_CPU_IO_MAP(alphatp3_io)
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(6'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(alphatp3_mem)
+	MCFG_DEVICE_IO_MAP(alphatp3_io)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("kbdmcu", I8041, XTAL(12'854'400)/2)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(alphatp_34_state, kbd_matrix_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(alphatp_34_state, kbd_matrix_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(alphatp_34_state, kbd_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(alphatp_34_state, kbd_port2_w))
+	MCFG_DEVICE_ADD("kbdmcu", I8041, XTAL(12'854'400)/2)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, alphatp_34_state, kbd_matrix_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, alphatp_34_state, kbd_matrix_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, alphatp_34_state, kbd_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, alphatp_34_state, kbd_port2_w))
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(alphatp3_map)
@@ -1319,26 +1322,26 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 1060 )
+	MCFG_DEVICE_ADD( "beeper", BEEP, 1060 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	// XTAL(4'915'200) serial clock
 
 	MCFG_FD1791_ADD("fdc", XTAL(4'000'000) / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(alphatp_34_state, fdcirq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(alphatp_34_state, fdcdrq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(alphatp_34_state, fdchld_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, alphatp_34_state, fdcirq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, alphatp_34_state, fdcdrq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, alphatp_34_state, fdchld_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alphatp_34_state::alphatp30)
 	alphatp3(config);
-	MCFG_CPU_ADD("i8088", I8088, 6000000) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(alphatp30_8088_map)
-	MCFG_CPU_IO_MAP(alphatp30_8088_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("i8088", I8088, 6000000) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(alphatp30_8088_map)
+	MCFG_DEVICE_IO_MAP(alphatp30_8088_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
@@ -1349,7 +1352,7 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp30)
 	MCFG_PIT8253_CLK0(100000)  // 15Mhz osc with unknown divisor
 	MCFG_PIT8253_CLK1(100000)
 	MCFG_PIT8253_CLK2(100000)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
 MACHINE_CONFIG_END
 
 //**************************************************************************

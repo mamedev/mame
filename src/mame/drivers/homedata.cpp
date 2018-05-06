@@ -1221,13 +1221,13 @@ MACHINE_RESET_MEMBER(homedata_state,reikaids)
 MACHINE_CONFIG_START(homedata_state::mrokumei)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 16000000/4)  /* 4MHz ? */
-	MCFG_CPU_PROGRAM_MAP(mrokumei_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 16000000/4)  /* 4MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(mrokumei_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)   /* 4MHz ? */
-	MCFG_CPU_PROGRAM_MAP(mrokumei_sound_map)
-	MCFG_CPU_IO_MAP(mrokumei_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)   /* 4MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(mrokumei_sound_map)
+	MCFG_DEVICE_IO_MAP(mrokumei_sound_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(homedata_state,homedata)
 	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,homedata)
@@ -1240,7 +1240,7 @@ MACHINE_CONFIG_START(homedata_state::mrokumei)
 	// visible area can be changed at runtime
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_mrokumei)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(homedata_state, screen_vblank_homedata))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, homedata_state, screen_vblank_homedata))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrokumei)
@@ -1254,12 +1254,12 @@ MACHINE_CONFIG_START(homedata_state::mrokumei)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
+	MCFG_DEVICE_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1268,18 +1268,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(homedata_state::reikaids)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 16000000/4)  /* 4MHz ? */
-	MCFG_CPU_PROGRAM_MAP(reikaids_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 16000000/4)  /* 4MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(reikaids_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
-	MCFG_CPU_ADD("audiocpu", UPD7807, 8000000)  /* ??? MHz (max speed for the 7807 is 12MHz) */
-	MCFG_CPU_PROGRAM_MAP(reikaids_upd7807_map)
-	MCFG_UPD7807_PORTA_READ_CB(READ8(homedata_state, reikaids_upd7807_porta_r))
-	MCFG_UPD7807_PORTA_WRITE_CB(WRITE8(homedata_state, reikaids_upd7807_porta_w))
-	MCFG_UPD7807_PORTB_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_UPD7807_PORTC_WRITE_CB(WRITE8(homedata_state, reikaids_upd7807_portc_w))
-	MCFG_UPD7807_PORTT_READ_CB(READ8(homedata_state, reikaids_snd_command_r))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
+	MCFG_DEVICE_ADD("audiocpu", UPD7807, 8000000)  /* ??? MHz (max speed for the 7807 is 12MHz) */
+	MCFG_DEVICE_PROGRAM_MAP(reikaids_upd7807_map)
+	MCFG_UPD7807_PORTA_READ_CB(READ8(*this, homedata_state, reikaids_upd7807_porta_r))
+	MCFG_UPD7807_PORTA_WRITE_CB(WRITE8(*this, homedata_state, reikaids_upd7807_porta_w))
+	MCFG_UPD7807_PORTB_WRITE_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_UPD7807_PORTC_WRITE_CB(WRITE8(*this, homedata_state, reikaids_upd7807_portc_w))
+	MCFG_UPD7807_PORTT_READ_CB(READ8(*this, homedata_state, reikaids_snd_command_r))
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) // very high interleave required to sync for startup tests
 
@@ -1293,7 +1293,7 @@ MACHINE_CONFIG_START(homedata_state::reikaids)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_reikaids)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(homedata_state, screen_vblank_homedata))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, homedata_state, screen_vblank_homedata))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", reikaids)
@@ -1305,7 +1305,7 @@ MACHINE_CONFIG_START(homedata_state::reikaids)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
@@ -1313,9 +1313,9 @@ MACHINE_CONFIG_START(homedata_state::reikaids)
 	MCFG_SOUND_ROUTE(2, "speaker", 0.25)
 	MCFG_SOUND_ROUTE(3, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1324,19 +1324,19 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(homedata_state::pteacher)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 16000000/4)  /* 4MHz ? */
-	MCFG_CPU_PROGRAM_MAP(pteacher_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 16000000/4)  /* 4MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(pteacher_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
-	MCFG_CPU_ADD("audiocpu", UPD7807, 9000000)  /* 9MHz ? */
-	MCFG_CPU_PROGRAM_MAP(pteacher_upd7807_map)
-	MCFG_UPD7807_PORTA_READ_CB(READ8(homedata_state, pteacher_upd7807_porta_r))
-	MCFG_UPD7807_PORTA_WRITE_CB(WRITE8(homedata_state, pteacher_upd7807_porta_w))
-	MCFG_UPD7807_PORTB_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_DEVICE_ADD("audiocpu", UPD7807, 9000000)  /* 9MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(pteacher_upd7807_map)
+	MCFG_UPD7807_PORTA_READ_CB(READ8(*this, homedata_state, pteacher_upd7807_porta_r))
+	MCFG_UPD7807_PORTA_WRITE_CB(WRITE8(*this, homedata_state, pteacher_upd7807_porta_w))
+	MCFG_UPD7807_PORTB_WRITE_CB(WRITE8("dac", dac_byte_interface, write))
 	MCFG_UPD7807_PORTC_READ_CB(IOPORT("COIN"))
-	MCFG_UPD7807_PORTC_WRITE_CB(WRITE8(homedata_state, pteacher_upd7807_portc_w))
-	MCFG_UPD7807_PORTT_READ_CB(READ8(homedata_state, pteacher_keyboard_r))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
+	MCFG_UPD7807_PORTC_WRITE_CB(WRITE8(*this, homedata_state, pteacher_upd7807_portc_w))
+	MCFG_UPD7807_PORTT_READ_CB(READ8(*this, homedata_state, pteacher_keyboard_r))
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  // should be enough
 
@@ -1351,7 +1351,7 @@ MACHINE_CONFIG_START(homedata_state::pteacher)
 	// visible area can be changed at runtime
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_pteacher)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(homedata_state, screen_vblank_homedata))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, homedata_state, screen_vblank_homedata))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pteacher)
@@ -1363,19 +1363,19 @@ MACHINE_CONFIG_START(homedata_state::pteacher)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
+	MCFG_DEVICE_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homedata_state::mjkinjas)
 	pteacher(config);
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_CLOCK(11000000)    /* 11MHz ? */
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_CLOCK(11000000)    /* 11MHz ? */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homedata_state::lemnangl)
@@ -1497,17 +1497,17 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(homedata_state::mirderby)
 
-	MCFG_CPU_ADD("maincpu", MC6809E, 16000000/8)  /* 2 Mhz */
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 16000000/8)  /* 2 Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
 
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu0", Z80, 16000000/4)   /* 4 Mhz */
+	MCFG_DEVICE_ADD("cpu0", Z80, 16000000/4)   /* 4 Mhz */
 	MCFG_DEVICE_DISABLE()
-	MCFG_CPU_PROGRAM_MAP(cpu0_map)
+	MCFG_DEVICE_PROGRAM_MAP(cpu0_map)
 
-	MCFG_CPU_ADD("cpu1", MC6809E, 16000000/8) /* 2 Mhz */
-	MCFG_CPU_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_ADD("cpu1", MC6809E, 16000000/8) /* 2 Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
 	MCFG_DEVICE_DISABLE()
 	//MCFG_CPU_VBLANK_INT("screen", mirderby_irq)
 
@@ -1532,7 +1532,7 @@ MACHINE_CONFIG_START(homedata_state::mirderby)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 2000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 2000000)
 	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "speaker", 0.25)
 	MCFG_SOUND_ROUTE(2, "speaker", 0.25)

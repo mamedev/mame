@@ -445,19 +445,19 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I8039, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(drw80pkr_map)
-	MCFG_CPU_IO_MAP(drw80pkr_io_map)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(drw80pkr_state, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(drw80pkr_state, t1_r))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(drw80pkr_state, p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(drw80pkr_state, p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(drw80pkr_state, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(drw80pkr_state, p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(drw80pkr_state, prog_w))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(drw80pkr_state, bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(drw80pkr_state, bus_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", drw80pkr_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", I8039, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(drw80pkr_map)
+	MCFG_DEVICE_IO_MAP(drw80pkr_io_map)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, drw80pkr_state, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, drw80pkr_state, t1_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, drw80pkr_state, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, drw80pkr_state, p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, drw80pkr_state, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, drw80pkr_state, p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(*this, drw80pkr_state, prog_w))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, drw80pkr_state, bus_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, drw80pkr_state, bus_w))
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drw80pkr_state,  irq0_line_hold)
 
 
 	// video hardware
@@ -479,7 +479,7 @@ MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, 20000000/12)
+	MCFG_DEVICE_ADD("aysnd", AY8912, 20000000/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

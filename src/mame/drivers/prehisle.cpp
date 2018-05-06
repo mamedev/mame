@@ -202,13 +202,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(prehisle_state::prehisle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'000'000)/2)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(prehisle_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", prehisle_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(18'000'000)/2)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(prehisle_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", prehisle_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000))    /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(prehisle_sound_map)
-	MCFG_CPU_IO_MAP(prehisle_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000))    /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(prehisle_sound_map)
+	MCFG_DEVICE_IO_MAP(prehisle_sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -229,11 +229,11 @@ MACHINE_CONFIG_START(prehisle_state::prehisle)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000))  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000))  /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 

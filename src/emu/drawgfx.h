@@ -449,16 +449,16 @@ constexpr u32 alpha_blend_r32(u32 d, u32 s, u8 level)
 // ======================> gfxdecode_device
 
 // device type definition
-extern const device_type GFXDECODE;
+DECLARE_DEVICE_TYPE(GFXDECODE, gfxdecode_device)
 
 class gfxdecode_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
-	gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	virtual void device_start() override {};
+	virtual void device_start() override {}
 };
 
 GFXDECODE_EXTERN(empty);

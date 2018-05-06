@@ -212,9 +212,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(microtan_state::microtan)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(6'000'000) / 8)  // 750 kHz
-	MCFG_CPU_PROGRAM_MAP(microtan_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", microtan_state,  microtan_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(6'000'000) / 8)  // 750 kHz
+	MCFG_DEVICE_PROGRAM_MAP(microtan_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", microtan_state,  microtan_interrupt)
 
 
 	/* video hardware - include overscan */
@@ -234,9 +234,9 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_ADD("ay8910.1", AY8910, 1000000)
+	MCFG_DEVICE_ADD("ay8910.1", AY8910, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_SOUND_ADD("ay8910.2", AY8910, 1000000)
+	MCFG_DEVICE_ADD("ay8910.2", AY8910, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	/* snapshot/quickload */
@@ -252,19 +252,19 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL(6'000'000) / 8)
-	MCFG_VIA6522_READPA_HANDLER(READ8(microtan_state, via_0_in_a))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(microtan_state, via_0_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(microtan_state, via_0_out_b))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(microtan_state, via_0_out_ca2))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(microtan_state, via_0_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(microtan_state, via_0_irq))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, microtan_state, via_0_in_a))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, microtan_state, via_0_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, microtan_state, via_0_out_b))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, microtan_state, via_0_out_ca2))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, microtan_state, via_0_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, microtan_state, via_0_irq))
 
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL(6'000'000) / 8)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(microtan_state, via_1_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(microtan_state, via_1_out_b))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(microtan_state, via_1_out_ca2))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(microtan_state, via_1_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(microtan_state, via_1_irq))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, microtan_state, via_1_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, microtan_state, via_1_out_b))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, microtan_state, via_1_out_ca2))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, microtan_state, via_1_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, microtan_state, via_1_irq))
 MACHINE_CONFIG_END
 
 ROM_START( microtan )

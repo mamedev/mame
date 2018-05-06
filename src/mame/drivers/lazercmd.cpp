@@ -629,13 +629,13 @@ void lazercmd_state::machine_reset()
 MACHINE_CONFIG_START(lazercmd_state::lazercmd)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz? */
+	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz? */
 /*  Main Clock is 8MHz divided by 12
     but memory and IO access is only possible
     within the line and frame blanking period
     thus requiring an extra loading of approx 3-5 */
-	MCFG_CPU_PROGRAM_MAP(lazercmd_map)
-	MCFG_CPU_DATA_MAP(lazercmd_portmap)
+	MCFG_DEVICE_PROGRAM_MAP(lazercmd_map)
+	MCFG_DEVICE_DATA_MAP(lazercmd_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lazercmd_state, lazercmd_timer, "screen", 0, 1)
 
 	/* video hardware */
@@ -653,28 +653,28 @@ MACHINE_CONFIG_START(lazercmd_state::lazercmd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac0", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_SOUND_ADD("dac1", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_SOUND_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_SOUND_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac0", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac1", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(lazercmd_state::medlanes)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz */
+	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz */
 /*  Main Clock is 8MHz divided by 12
     but memory and IO access is only possible
     within the line and frame blanking period
     thus requiring an extra loading of approx 3-5 */
-	MCFG_CPU_PROGRAM_MAP(medlanes_map)
-	MCFG_CPU_DATA_MAP(lazercmd_portmap)
+	MCFG_DEVICE_PROGRAM_MAP(medlanes_map)
+	MCFG_DEVICE_DATA_MAP(lazercmd_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lazercmd_state, lazercmd_timer, "screen", 0, 1)
 
 	/* video hardware */
@@ -692,24 +692,24 @@ MACHINE_CONFIG_START(lazercmd_state::medlanes)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_SOUND_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(lazercmd_state::bbonk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz */
+	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz */
 /*  Main Clock is 8MHz divided by 12
     but memory and IO access is only possible
     within the line and frame blanking period
     thus requiring an extra loading of approx 3-5 */
-	MCFG_CPU_PROGRAM_MAP(bbonk_map)
-	MCFG_CPU_DATA_MAP(lazercmd_portmap)
+	MCFG_DEVICE_PROGRAM_MAP(bbonk_map)
+	MCFG_DEVICE_DATA_MAP(lazercmd_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lazercmd_state, bbonk_timer, "screen", 0, 1)
 
 	/* video hardware */
@@ -727,11 +727,11 @@ MACHINE_CONFIG_START(lazercmd_state::bbonk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_SOUND_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 /***************************************************************************

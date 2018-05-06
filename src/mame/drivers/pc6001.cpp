@@ -1486,13 +1486,13 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(pc6001_state::pc6001)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, PC6001_MAIN_CLOCK / 2) // PD 780C-1, ~4 Mhz
-	MCFG_CPU_PROGRAM_MAP(pc6001_map)
-	MCFG_CPU_IO_MAP(pc6001_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc6001_state, vrtc_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
+	MCFG_DEVICE_ADD("maincpu",Z80, PC6001_MAIN_CLOCK / 2) // PD 780C-1, ~4 Mhz
+	MCFG_DEVICE_PROGRAM_MAP(pc6001_map)
+	MCFG_DEVICE_IO_MAP(pc6001_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc6001_state, vrtc_irq)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
 
-//  MCFG_CPU_ADD("subcpu", I8049, 7987200)
+//  MCFG_DEVICE_ADD("subcpu", I8049, 7987200)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc6001m2)
 
@@ -1508,12 +1508,12 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 	MCFG_PALETTE_INIT_OWNER(pc6001_state, pc6001)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pc6001_state, ppi_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pc6001_state, ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pc6001_state, ppi_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pc6001_state, ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pc6001_state, ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc6001_state, ppi_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pc6001_state, ppi_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pc6001_state, ppi_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pc6001_state, ppi_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pc6001_state, ppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc6001_state, ppi_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc6001_state, ppi_portc_w))
 
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
@@ -1525,7 +1525,7 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 	MCFG_GENERIC_EXTENSIONS("cas,p6")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, PC6001_MAIN_CLOCK/4)
+	MCFG_DEVICE_ADD("ay8910", AY8910, PC6001_MAIN_CLOCK/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1542,9 +1542,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pc6001mk2_state::pc6001mk2)
 	pc6001(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pc6001mk2_map)
-	MCFG_CPU_IO_MAP(pc6001mk2_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pc6001mk2_map)
+	MCFG_DEVICE_IO_MAP(pc6001mk2_io)
 
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2_state,pc6001mk2)
 
@@ -1557,7 +1557,7 @@ MACHINE_CONFIG_START(pc6001mk2_state::pc6001mk2)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pc6001m2)
 
-	MCFG_SOUND_ADD("upd7752", UPD7752, PC6001_MAIN_CLOCK/4)
+	MCFG_DEVICE_ADD("upd7752", UPD7752, PC6001_MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 MACHINE_CONFIG_END
@@ -1566,11 +1566,11 @@ MACHINE_CONFIG_START(pc6601_state::pc6601)
 	pc6001mk2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", Z80, PC6001_MAIN_CLOCK / 2)
-	MCFG_CPU_PROGRAM_MAP(pc6001mk2_map)
-	MCFG_CPU_IO_MAP(pc6601_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc6001_state, vrtc_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
+	MCFG_DEVICE_REPLACE("maincpu", Z80, PC6001_MAIN_CLOCK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(pc6001mk2_map)
+	MCFG_DEVICE_IO_MAP(pc6601_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc6001_state, vrtc_irq)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc6001sr_state::pc6001sr)
@@ -1578,11 +1578,11 @@ MACHINE_CONFIG_START(pc6001sr_state::pc6001sr)
 
 	/* basic machine hardware */
 	//*Yes*, PC-6001 SR Z80 CPU is actually slower than older models (better waitstates tho?)
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(pc6001sr_map)
-	MCFG_CPU_IO_MAP(pc6001sr_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc6001sr_state,  sr_vrtc_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
+	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(pc6001sr_map)
+	MCFG_DEVICE_IO_MAP(pc6001sr_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc6001sr_state,  sr_vrtc_irq)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
 
 //  MCFG_MACHINE_RESET_OVERRIDE(pc6001sr_state,pc6001sr)
 

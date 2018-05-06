@@ -172,8 +172,8 @@ INPUT_PORTS_END
 /* Machine driver */
 MACHINE_CONFIG_START(orao_state::orao)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1000000)
-	MCFG_CPU_PROGRAM_MAP(orao_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(orao_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -189,7 +189,7 @@ MACHINE_CONFIG_START(orao_state::orao)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

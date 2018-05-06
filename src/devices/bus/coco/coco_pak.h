@@ -66,8 +66,7 @@ private:
 
 
 // device type definitions
-extern const device_type COCO_PAK;
-extern const device_type COCO_PAK_BANKED;
-extern const device_type COCO_PAK_GMC;
+DECLARE_DEVICE_TYPE(COCO_PAK, coco_pak_device)
+DECLARE_DEVICE_TYPE(COCO_PAK_BANKED, coco_pak_banked_device)
 
 #endif // MAME_BUS_COCO_COCO_PAK_H

@@ -492,17 +492,17 @@ INTERRUPT_GEN_MEMBER(flower_state::slave_vblank_irq)
 
 
 MACHINE_CONFIG_START(flower_state::flower)
-	MCFG_CPU_ADD("mastercpu",Z80,MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(shared_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flower_state, master_vblank_irq)
+	MCFG_DEVICE_ADD("mastercpu",Z80,MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(shared_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flower_state, master_vblank_irq)
 
-	MCFG_CPU_ADD("slavecpu",Z80,MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(shared_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flower_state, slave_vblank_irq)
+	MCFG_DEVICE_ADD("slavecpu",Z80,MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(shared_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flower_state, slave_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu",Z80,MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(flower_state, irq0_line_hold, 90)
+	MCFG_DEVICE_ADD("audiocpu",Z80,MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(flower_state, irq0_line_hold, 90)
 
 	MCFG_QUANTUM_PERFECT_CPU("mastercpu")
 
@@ -518,7 +518,7 @@ MACHINE_CONFIG_START(flower_state::flower)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("flower", FLOWER_CUSTOM, 96000)
+	MCFG_DEVICE_ADD("flower", FLOWER_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

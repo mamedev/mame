@@ -254,11 +254,12 @@ const m6800_cpu_device::op_func m6801_cpu_device::hd63701_insn[0x100] = {
 };
 
 
-ADDRESS_MAP_START(m6801_cpu_device::m6803_mem)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0020, 0x007f) AM_NOP        /* unused */
-	AM_RANGE(0x0080, 0x00ff) AM_RAM        /* 6803 internal RAM */
-ADDRESS_MAP_END
+void m6801_cpu_device::m6803_mem(address_map &map)
+{
+	map(0x0000, 0x001f).rw(this, FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
+	map(0x0020, 0x007f).noprw();        /* unused */
+	map(0x0080, 0x00ff).ram();        /* 6803 internal RAM */
+}
 
 
 DEFINE_DEVICE_TYPE(M6801, m6801_cpu_device, "m6801", "Motorola M6801")

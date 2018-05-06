@@ -248,9 +248,10 @@ WRITE8_MEMBER( c1581_device::cia_pb_w )
 //  SLOT_INTERFACE( c1581_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( c1581_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD ) // Chinon F-354-E
-SLOT_INTERFACE_END
+static void c1581_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD); // Chinon F-354-E
+}
 
 
 //-------------------------------------------------
@@ -267,17 +268,17 @@ FLOPPY_FORMATS_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c1581_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL(16'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(c1581_mem)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(16'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(c1581_mem)
 
 	MCFG_DEVICE_ADD(M8520_TAG, MOS8520, XTAL(16'000'000)/8)
 	MCFG_MOS6526_IRQ_CALLBACK(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
-	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(c1581_device, cnt_w))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE(c1581_device, sp_w))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c1581_device, cia_pa_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c1581_device, cia_pa_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c1581_device, cia_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c1581_device, cia_pb_w))
+	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(*this, c1581_device, cnt_w))
+	MCFG_MOS6526_SP_CALLBACK(WRITELINE(*this, c1581_device, sp_w))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c1581_device, cia_pa_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c1581_device, cia_pa_w))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c1581_device, cia_pb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c1581_device, cia_pb_w))
 
 	MCFG_WD1772_ADD(WD1772_TAG, XTAL(16'000'000)/2)
 	MCFG_FLOPPY_DRIVE_ADD_FIXED(WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats)

@@ -898,8 +898,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(mcr68_state::mcr68)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 7723800)
-	MCFG_CPU_PROGRAM_MAP(mcr68_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 7723800)
+	MCFG_DEVICE_PROGRAM_MAP(mcr68_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
@@ -935,7 +935,7 @@ MACHINE_CONFIG_START(mcr68_state::xenophob)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
+	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -943,7 +943,7 @@ MACHINE_CONFIG_START(mcr68_state::intlaser)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
+	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_WATCHDOG_MODIFY("watchdog")
@@ -955,9 +955,9 @@ MACHINE_CONFIG_START(mcr68_state::spyhunt2)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
+	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
+	MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_ADC0844_ADD("adc")
@@ -972,7 +972,7 @@ MACHINE_CONFIG_START(mcr68_state::archrivl)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -981,11 +981,11 @@ MACHINE_CONFIG_START(mcr68_state::pigskin)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pigskin_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pigskin_map)
 MACHINE_CONFIG_END
 
 
@@ -993,11 +993,11 @@ MACHINE_CONFIG_START(mcr68_state::trisport)
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(trisport_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(trisport_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END

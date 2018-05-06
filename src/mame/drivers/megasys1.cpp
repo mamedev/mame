@@ -1684,12 +1684,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(megasys1_state::system_A)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
-	MCFG_CPU_PROGRAM_MAP(megasys1A_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
+	MCFG_DEVICE_PROGRAM_MAP(megasys1A_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
-	MCFG_CPU_PROGRAM_MAP(megasys1A_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
+	MCFG_DEVICE_PROGRAM_MAP(megasys1A_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120000))
 
@@ -1701,7 +1701,7 @@ MACHINE_CONFIG_START(megasys1_state::system_A)
 	MCFG_SCREEN_RAW_PARAMS(SYS_A_CPU_CLOCK,406,0,256,263,16,240)
 
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(megasys1_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, megasys1_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
@@ -1722,7 +1722,7 @@ MACHINE_CONFIG_START(megasys1_state::system_A)
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(megasys1_state,sound_irq))
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, megasys1_state,sound_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
@@ -1742,7 +1742,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megasys1_state::system_A_iganinju)
 	system_A(config);
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE("scantimer")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_iganinju_scanline, "screen", 0, 1)
 MACHINE_CONFIG_END
@@ -1755,14 +1755,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megasys1_state::kickoffb)
 	system_A(config);
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(kickoffb_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(kickoffb_sound_map)
 
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("oki2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, SOUND_CPU_CLOCK / 2)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(megasys1_state, sound_irq)) // TODO: needs to be checked
+	MCFG_DEVICE_ADD("ymsnd", YM2203, SOUND_CPU_CLOCK / 2)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, megasys1_state, sound_irq)) // TODO: needs to be checked
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -1772,28 +1772,28 @@ MACHINE_CONFIG_START(megasys1_state::system_B)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(SYS_B_CPU_CLOCK) /* 8MHz */
-	MCFG_CPU_PROGRAM_MAP(megasys1B_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(SYS_B_CPU_CLOCK) /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(megasys1B_map)
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(megasys1_state, megasys1B_scanline)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(megasys1B_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(megasys1B_sound_map)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(megasys1_state::system_B_monkelf)
 	system_B(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(megasys1B_monkelf_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(megasys1B_monkelf_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megasys1_state::system_Bbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(megasys1B_edfbl_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(megasys1B_edfbl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1B_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
@@ -1805,7 +1805,7 @@ MACHINE_CONFIG_START(megasys1_state::system_Bbl)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(megasys1_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, megasys1_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
@@ -1847,14 +1847,14 @@ MACHINE_CONFIG_START(megasys1_state::system_C)
 	system_A(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(SYS_C_CPU_CLOCK) /* 12MHz */
-	MCFG_CPU_PROGRAM_MAP(megasys1C_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(SYS_C_CPU_CLOCK) /* 12MHz */
+	MCFG_DEVICE_PROGRAM_MAP(megasys1C_map)
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(megasys1_state, megasys1B_scanline)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(megasys1B_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(megasys1B_sound_map)
 MACHINE_CONFIG_END
 
 
@@ -1872,9 +1872,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(megasys1_state::system_D)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, SYS_D_CPU_CLOCK)    /* 8MHz */
-	MCFG_CPU_PROGRAM_MAP(megasys1D_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", megasys1_state,  megasys1D_irq)
+	MCFG_DEVICE_ADD("maincpu", M68000, SYS_D_CPU_CLOCK)    /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(megasys1D_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", megasys1_state,  megasys1D_irq)
 
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 
@@ -1885,7 +1885,7 @@ MACHINE_CONFIG_START(megasys1_state::system_D)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(megasys1_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, megasys1_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ABC)
@@ -1922,13 +1922,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(megasys1_state::system_Z)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
-	MCFG_CPU_PROGRAM_MAP(megasys1Z_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
+	MCFG_DEVICE_PROGRAM_MAP(megasys1Z_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
-	MCFG_CPU_IO_MAP(z80_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_IO_MAP(z80_sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1953,7 +1953,7 @@ MACHINE_CONFIG_START(megasys1_state::system_Z)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch_z")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

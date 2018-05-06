@@ -428,17 +428,17 @@ WRITE_LINE_MEMBER(bagman_state::vblank_irq)
 MACHINE_CONFIG_START(bagman_state::bagman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, BAGMAN_H0)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 8H
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(bagman_state, irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(bagman_state, flipscreen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(bagman_state, flipscreen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, bagman_state, irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, bagman_state, flipscreen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, bagman_state, flipscreen_y_w))
 	// video enable register not available on earlier hardware revision(s)
 	// Bagman is supposed to have glitches during screen transitions
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(bagman_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, bagman_state, coin_counter_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP)    // ????
 
 	/* video hardware */
@@ -446,7 +446,7 @@ MACHINE_CONFIG_START(bagman_state::bagman)
 	MCFG_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bagman_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bagman_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bagman)
 	MCFG_PALETTE_ADD("palette", 64)
@@ -464,35 +464,35 @@ MACHINE_CONFIG_START(bagman_state::bagman)
 	MCFG_TMSPROM_CTL8_BIT(2)        /* bit # of ctl8 line */
 	MCFG_TMSPROM_RESET_BIT(6)       /* bit # of rom reset */
 	MCFG_TMSPROM_STOP_BIT(7)        /* bit # of stop */
-	MCFG_TMSPROM_PDC_CB(DEVWRITELINE("tms", tms5110_device, pdc_w))        /* tms pdc func */
-	MCFG_TMSPROM_CTL_CB(DEVWRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
+	MCFG_TMSPROM_PDC_CB(WRITELINE("tms", tms5110_device, pdc_w))        /* tms pdc func */
+	MCFG_TMSPROM_CTL_CB(WRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, BAGMAN_H0 / 2)
+	MCFG_DEVICE_ADD("aysnd", AY8910, BAGMAN_H0 / 2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("tms", TMS5110A, 640000)
-	MCFG_TMS5110_M0_CB(DEVWRITELINE("tmsprom", tmsprom_device, m0_w))
-	MCFG_TMS5110_DATA_CB(DEVREADLINE("tmsprom", tmsprom_device, data_r))
+	MCFG_DEVICE_ADD("tms", TMS5110A, 640000)
+	MCFG_TMS5110_M0_CB(WRITELINE("tmsprom", tmsprom_device, m0_w))
+	MCFG_TMS5110_DATA_CB(READLINE("tmsprom", tmsprom_device, data_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("tmslatch", LS259, 0) // 7H
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(bagman_state, tmsprom_bit_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(bagman_state, tmsprom_bit_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(bagman_state, tmsprom_bit_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("tmsprom", tmsprom_device, enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(bagman_state, tmsprom_csq0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(bagman_state, tmsprom_csq1_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, bagman_state, tmsprom_bit_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, bagman_state, tmsprom_bit_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, bagman_state, tmsprom_bit_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("tmsprom", tmsprom_device, enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, bagman_state, tmsprom_csq0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, bagman_state, tmsprom_csq1_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bagman_state::sbagman)
 	bagman(config);
 	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(bagman_state, video_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, bagman_state, video_enable_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bagman_state::sbagmani)
@@ -507,16 +507,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(bagman_state::pickin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
-	MCFG_CPU_PROGRAM_MAP(pickin_map)
-	MCFG_CPU_IO_MAP(main_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, BAGMAN_H0)
+	MCFG_DEVICE_PROGRAM_MAP(pickin_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(bagman_state, irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(bagman_state, flipscreen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(bagman_state, flipscreen_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(bagman_state, video_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(bagman_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, bagman_state, irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, bagman_state, flipscreen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, bagman_state, flipscreen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, bagman_state, video_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, bagman_state, coin_counter_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)    // ????
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)    // ????
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP)    // ????
@@ -526,7 +526,7 @@ MACHINE_CONFIG_START(bagman_state::pickin)
 	MCFG_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bagman_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bagman_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pickin)
 	MCFG_PALETTE_ADD("palette", 64)
@@ -536,13 +536,13 @@ MACHINE_CONFIG_START(bagman_state::pickin)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* maybe */
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -567,16 +567,16 @@ z80
 MACHINE_CONFIG_START(bagman_state::botanic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
-	MCFG_CPU_PROGRAM_MAP(pickin_map)
-	MCFG_CPU_IO_MAP(main_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, BAGMAN_H0)
+	MCFG_DEVICE_PROGRAM_MAP(pickin_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(bagman_state, irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(bagman_state, flipscreen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(bagman_state, flipscreen_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(bagman_state, video_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(bagman_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, bagman_state, irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, bagman_state, flipscreen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, bagman_state, flipscreen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, bagman_state, video_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, bagman_state, coin_counter_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)    // ????
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)    // ????
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP)    // ????
@@ -586,7 +586,7 @@ MACHINE_CONFIG_START(bagman_state::botanic)
 	MCFG_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bagman_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bagman_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bagman)
 	MCFG_PALETTE_ADD("palette", 64)
@@ -596,12 +596,12 @@ MACHINE_CONFIG_START(bagman_state::botanic)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 

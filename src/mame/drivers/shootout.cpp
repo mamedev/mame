@@ -279,11 +279,11 @@ void shootout_state::machine_reset ()
 MACHINE_CONFIG_START(shootout_state::shootout)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz?
-	MCFG_CPU_PROGRAM_MAP(shootout_map)
+	MCFG_DEVICE_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz?
+	MCFG_DEVICE_PROGRAM_MAP(shootout_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, XTAL(12'000'000) / 8) // 1.5 MHz
-	MCFG_CPU_PROGRAM_MAP(shootout_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, XTAL(12'000'000) / 8) // 1.5 MHz
+	MCFG_DEVICE_PROGRAM_MAP(shootout_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -303,7 +303,7 @@ MACHINE_CONFIG_START(shootout_state::shootout)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -312,8 +312,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(shootout_state::shootouj)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
-	MCFG_CPU_PROGRAM_MAP(shootouj_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
+	MCFG_DEVICE_PROGRAM_MAP(shootouj_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -333,10 +333,10 @@ MACHINE_CONFIG_START(shootout_state::shootouj)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz (Assuming the same XTAL as DE-0219 pcb)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz (Assuming the same XTAL as DE-0219 pcb)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(shootout_state, bankswitch_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(shootout_state, flipscreen_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, shootout_state, bankswitch_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, shootout_state, flipscreen_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -344,8 +344,8 @@ MACHINE_CONFIG_START(shootout_state::shootouk)
 	shootouj(config);
 	/* the Korean 'bootleg' has the usual DECO222 style encryption */
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
-	MCFG_CPU_PROGRAM_MAP(shootouj_map)
+	MCFG_DEVICE_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
+	MCFG_DEVICE_PROGRAM_MAP(shootouj_map)
 MACHINE_CONFIG_END
 
 

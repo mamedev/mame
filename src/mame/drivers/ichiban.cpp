@@ -123,9 +123,9 @@ void ichibanjyan_state::machine_reset()
 MACHINE_CONFIG_START(ichibanjyan_state::ichibanjyan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(ichibanjyan_map)
-	MCFG_CPU_IO_MAP(ichibanjyan_io)
+	MCFG_DEVICE_ADD("maincpu",Z80,MAIN_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(ichibanjyan_map)
+	MCFG_DEVICE_IO_MAP(ichibanjyan_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -142,10 +142,10 @@ MACHINE_CONFIG_START(ichibanjyan_state::ichibanjyan)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", YM2149, MAIN_CLOCK/12)
+	MCFG_DEVICE_ADD("aysnd", YM2149, MAIN_CLOCK/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, MAIN_CLOCK/6)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, MAIN_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 

@@ -197,11 +197,11 @@ WRITE_LINE_MEMBER( inderp_state::clock_tick )
 
 MACHINE_CONFIG_START(inderp_state::inderp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6504, 434000) // possible calculation of frequency-derived time constant 100k res and 10pf cap
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6504, 434000) // possible calculation of frequency-derived time constant 100k res and 10pf cap
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
 
 	MCFG_DEVICE_ADD("cpoint_clock", CLOCK, 200) // crosspoint detector
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(inderp_state, clock_tick))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, inderp_state, clock_tick))
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT()

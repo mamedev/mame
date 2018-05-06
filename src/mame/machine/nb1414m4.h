@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese
-#ifndef MAME_INCLUDES_NB1414M4_H
-#define MAME_INCLUDES_NB1414M4_H
+#ifndef MAME_MACHINE_NB1414M4_H
+#define MAME_MACHINE_NB1414M4_H
 
 #pragma once
 
@@ -33,4 +33,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NB1414M4, nb1414m4_device)
 
-#endif // MAME_INCLUDES_NB1414M4_H
+#endif // MAME_MACHINE_NB1414M4_H

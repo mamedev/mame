@@ -1910,13 +1910,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(igspoker_state::igspoker)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(igspoker_prg_map)
-	MCFG_CPU_IO_MAP(igspoker_io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, 3579545)
+	MCFG_DEVICE_PROGRAM_MAP(igspoker_prg_map)
+	MCFG_DEVICE_IO_MAP(igspoker_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igspoker_state, igs_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(igspoker_state, igs_nmi_and_coins_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, igspoker_state, igs_nmi_and_coins_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
 
@@ -1935,7 +1935,7 @@ MACHINE_CONFIG_START(igspoker_state::igspoker)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -1957,8 +1957,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igspoker_state::number10)
 	igspoker(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(number10_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(number10_io_map)
 
 	MCFG_DEVICE_REMOVE("ppi")
 
@@ -1972,8 +1972,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igspoker_state::cpokerpk)
 	number10(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(cpokerpk_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(cpokerpk_io_map)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cpokerpk)
 MACHINE_CONFIG_END
 

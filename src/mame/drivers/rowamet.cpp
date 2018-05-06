@@ -222,11 +222,11 @@ TIMER_DEVICE_CALLBACK_MEMBER( rowamet_state::timer_a )
 
 MACHINE_CONFIG_START(rowamet_state::rowamet)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 1888888)
-	MCFG_CPU_PROGRAM_MAP(rowamet_map)
-	MCFG_CPU_ADD("cpu2", Z80, 1888888)
-	MCFG_CPU_PROGRAM_MAP(rowamet_sub_map)
-	MCFG_CPU_IO_MAP(rowamet_sub_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 1888888)
+	MCFG_DEVICE_PROGRAM_MAP(rowamet_map)
+	MCFG_DEVICE_ADD("cpu2", Z80, 1888888)
+	MCFG_DEVICE_PROGRAM_MAP(rowamet_sub_map)
+	MCFG_DEVICE_IO_MAP(rowamet_sub_io)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", rowamet_state, timer_a, attotime::from_hz(200))
 
 	/* Video */
@@ -234,9 +234,9 @@ MACHINE_CONFIG_START(rowamet_state::rowamet)
 
 	/* Sound */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

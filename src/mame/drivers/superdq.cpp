@@ -333,10 +333,10 @@ void superdq_state::machine_start()
 MACHINE_CONFIG_START(superdq_state::superdq)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(superdq_map)
-	MCFG_CPU_IO_MAP(superdq_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superdq_state,  superdq_vblank)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(superdq_map)
+	MCFG_DEVICE_IO_MAP(superdq_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superdq_state,  superdq_vblank)
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
@@ -353,10 +353,10 @@ MACHINE_CONFIG_START(superdq_state::superdq)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("snsnd", SN76496, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.8)
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

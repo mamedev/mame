@@ -113,7 +113,7 @@ MACHINE_CONFIG_START(a2bus_videx160_device::device_add_mconfig)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(a2bus_videx160_device, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(a2bus_videx160_device, vsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, a2bus_videx160_device, vsync_changed))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

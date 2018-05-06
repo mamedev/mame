@@ -60,7 +60,7 @@ uint32_t rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &b
 		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 		break;
 	case 2:
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0/*TILEMAP_DRAW_OPAQUE*/, 1);
 		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
 		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 		break;

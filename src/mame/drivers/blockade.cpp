@@ -467,9 +467,9 @@ void blockade_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //**************************************************************************
 
 MACHINE_CONFIG_START(blockade_state::blockade)
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(20'790'000) / 10)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(20'790'000) / 10)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -484,12 +484,12 @@ MACHINE_CONFIG_START(blockade_state::blockade)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(blockade_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(blockade)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

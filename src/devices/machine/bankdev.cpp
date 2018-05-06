@@ -26,21 +26,25 @@ device_memory_interface::space_config_vector address_map_bank_device::memory_spa
 	};
 }
 
-ADDRESS_MAP_START(address_map_bank_device::amap8)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read8, write8)
-ADDRESS_MAP_END
+void address_map_bank_device::amap8(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(this, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+}
 
-ADDRESS_MAP_START(address_map_bank_device::amap16)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read16, write16)
-ADDRESS_MAP_END
+void address_map_bank_device::amap16(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(this, FUNC(address_map_bank_device::read16), FUNC(address_map_bank_device::write16));
+}
 
-ADDRESS_MAP_START(address_map_bank_device::amap32)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read32, write32)
-ADDRESS_MAP_END
+void address_map_bank_device::amap32(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(this, FUNC(address_map_bank_device::read32), FUNC(address_map_bank_device::write32));
+}
 
-ADDRESS_MAP_START(address_map_bank_device::amap64)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read64, write64)
-ADDRESS_MAP_END
+void address_map_bank_device::amap64(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(this, FUNC(address_map_bank_device::read64), FUNC(address_map_bank_device::write64));
+}
 
 WRITE8_MEMBER(address_map_bank_device::write8)
 {

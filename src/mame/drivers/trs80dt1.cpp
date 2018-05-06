@@ -309,11 +309,11 @@ I8275_DRAW_CHARACTER_MEMBER( trs80dt1_state::crtc_update_row )
 
 MACHINE_CONFIG_START(trs80dt1_state::trs80dt1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8051, 7372800)
-	MCFG_CPU_PROGRAM_MAP(prg_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(trs80dt1_state, port1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(trs80dt1_state, port3_w))
+	MCFG_DEVICE_ADD("maincpu", I8051, 7372800)
+	MCFG_DEVICE_PROGRAM_MAP(prg_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, trs80dt1_state, port1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, trs80dt1_state, port3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -328,9 +328,9 @@ MACHINE_CONFIG_START(trs80dt1_state::trs80dt1)
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(trs80dt1_state, crtc_update_row)
 	MCFG_I8275_DRQ_CALLBACK(INPUTLINE("maincpu", MCS51_INT0_LINE)) // BRDY pin goes through inverter to /INT0, so we don't invert
-	MCFG_I8275_IRQ_CALLBACK(DEVWRITELINE("7474", ttl7474_device, clear_w)) // INT pin
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("7474", ttl7474_device, d_w))
-	MCFG_I8275_VRTC_CALLBACK(DEVWRITELINE("7474", ttl7474_device, clock_w))
+	MCFG_I8275_IRQ_CALLBACK(WRITELINE("7474", ttl7474_device, clear_w)) // INT pin
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("7474", ttl7474_device, d_w))
+	MCFG_I8275_VRTC_CALLBACK(WRITELINE("7474", ttl7474_device, clock_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 	MCFG_PALETTE_ADD("palette", 3)
 
@@ -341,7 +341,7 @@ MACHINE_CONFIG_START(trs80dt1_state::trs80dt1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 2000)
+	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

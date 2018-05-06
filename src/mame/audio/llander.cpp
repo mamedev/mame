@@ -101,7 +101,7 @@ WRITE8_MEMBER(asteroid_state::llander_sounds_w)
 MACHINE_CONFIG_START(asteroid_state::llander_sound)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(llander)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

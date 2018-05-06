@@ -39,11 +39,13 @@ void dave_device::z80_io_map(address_map &map)
 }
 
 
-ADDRESS_MAP_START(dave_device::program_map)
-ADDRESS_MAP_END
+void dave_device::program_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(dave_device::io_map)
-ADDRESS_MAP_END
+void dave_device::io_map(address_map &map)
+{
+}
 
 
 

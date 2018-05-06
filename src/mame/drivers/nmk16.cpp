@@ -3847,13 +3847,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 MACHINE_CONFIG_START(nmk16_state::tharrier)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz */
-	MCFG_CPU_PROGRAM_MAP(tharrier_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000) /* 10 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tharrier_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)
-	MCFG_CPU_PROGRAM_MAP(tharrier_sound_map)
-	MCFG_CPU_IO_MAP(tharrier_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)
+	MCFG_DEVICE_PROGRAM_MAP(tharrier_sound_map)
+	MCFG_DEVICE_IO_MAP(tharrier_sound_io_map)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
@@ -3871,7 +3871,7 @@ MACHINE_CONFIG_START(nmk16_state::tharrier)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
@@ -3890,8 +3890,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::mustang)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(mustang_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(mustang_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
 	/* video hardware */
@@ -3911,8 +3911,8 @@ MACHINE_CONFIG_START(nmk16_state::mustang)
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -3930,12 +3930,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::mustangb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(mustangb_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(mustangb_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
@@ -3951,8 +3951,8 @@ MACHINE_CONFIG_START(nmk16_state::mustangb)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 14318180/4)
-	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
@@ -3961,8 +3961,8 @@ MACHINE_CONFIG_START(nmk16_state::mustangb)
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 #define BIOSHIP_CRYSTAL1 10000000
@@ -3971,8 +3971,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::bioship)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
-	MCFG_CPU_PROGRAM_MAP(bioship_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
+	MCFG_DEVICE_PROGRAM_MAP(bioship_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
 	/* video hardware */
@@ -3992,8 +3992,8 @@ MACHINE_CONFIG_START(nmk16_state::bioship)
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, BIOSHIP_CRYSTAL2 / 8) /* 1.5 Mhz (verified) */
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, BIOSHIP_CRYSTAL2 / 8) /* 1.5 Mhz (verified) */
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -4011,8 +4011,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::vandyke)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000)) /* 68000p12 running at 10Mhz, verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(vandyke_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000)) /* 68000p12 running at 10Mhz, verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(vandyke_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
 	/* video hardware */
@@ -4032,8 +4032,8 @@ MACHINE_CONFIG_START(nmk16_state::vandyke)
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -4051,11 +4051,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::vandykeb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(vandykeb_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(vandykeb_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
-	MCFG_CPU_ADD("mcu", PIC16C57, 12000000) /* 3MHz */
+	MCFG_DEVICE_ADD("mcu", PIC16C57, 12000000) /* 3MHz */
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
@@ -4080,8 +4080,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::acrobatm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(acrobatm_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000) /* 10 MHz (verified on pcb) */
+	MCFG_DEVICE_PROGRAM_MAP(acrobatm_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
 	/* video hardware */
@@ -4101,8 +4101,8 @@ MACHINE_CONFIG_START(nmk16_state::acrobatm)
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000) /* (verified on pcb) */
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000) /* (verified on pcb) */
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -4121,12 +4121,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::tdragonb)    /* bootleg using Raiden sound hardware */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(tdragonb_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(tdragonb_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
@@ -4142,8 +4142,8 @@ MACHINE_CONFIG_START(nmk16_state::tdragonb)    /* bootleg using Raiden sound har
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 14318180/4)
-	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
@@ -4152,15 +4152,15 @@ MACHINE_CONFIG_START(nmk16_state::tdragonb)    /* bootleg using Raiden sound har
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nmk16_state::tdragon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(tdragon_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(tdragon_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
 	/* video hardware */
@@ -4180,8 +4180,8 @@ MACHINE_CONFIG_START(nmk16_state::tdragon)
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -4204,12 +4204,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::ssmissin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz */
-	MCFG_CPU_PROGRAM_MAP(ssmissin_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000) /* 8 Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(ssmissin_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000/2) /* 4 Mhz */
-	MCFG_CPU_PROGRAM_MAP(ssmissin_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000/2) /* 4 Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(ssmissin_sound_map)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
@@ -4237,8 +4237,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::strahl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(strahl_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) /* 12 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(strahl_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
 	/* video hardware */
@@ -4257,8 +4257,8 @@ MACHINE_CONFIG_START(nmk16_state::strahl)
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -4276,8 +4276,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::hachamf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(hachamf_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(hachamf_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
 	/* video hardware */
@@ -4297,8 +4297,8 @@ MACHINE_CONFIG_START(nmk16_state::hachamf)
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -4322,8 +4322,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::macross)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(macross_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(macross_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
 	/* video hardware */
@@ -4343,8 +4343,8 @@ MACHINE_CONFIG_START(nmk16_state::macross)
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -4362,8 +4362,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::blkheart)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(macross_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(macross_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
 	/* video hardware */
@@ -4383,8 +4383,8 @@ MACHINE_CONFIG_START(nmk16_state::blkheart)
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8 ) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8 ) /* verified on pcb */
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -4402,8 +4402,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::gunnail)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(gunnail_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(gunnail_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
 	/* video hardware */
@@ -4422,8 +4422,8 @@ MACHINE_CONFIG_START(nmk16_state::gunnail)
 	MCFG_NMK004_ADD("nmk004", XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -4441,13 +4441,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::macross2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(macross2_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(macross2_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(macross2_sound_map)
-	MCFG_CPU_IO_MAP(macross2_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(macross2_sound_map)
+	MCFG_DEVICE_IO_MAP(macross2_sound_io_map)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_HIRES
@@ -4466,7 +4466,7 @@ MACHINE_CONFIG_START(nmk16_state::macross2)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
@@ -4487,13 +4487,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::tdragon2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz  */
-	MCFG_CPU_PROGRAM_MAP(macross2_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000) /* 10 MHz  */
+	MCFG_DEVICE_PROGRAM_MAP(macross2_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz  */
-	MCFG_CPU_PROGRAM_MAP(macross2_sound_map)
-	MCFG_CPU_IO_MAP(macross2_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* 4 MHz  */
+	MCFG_DEVICE_PROGRAM_MAP(macross2_sound_map)
+	MCFG_DEVICE_IO_MAP(macross2_sound_io_map)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_HIRES
@@ -4512,7 +4512,7 @@ MACHINE_CONFIG_START(nmk16_state::tdragon2)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
@@ -4533,20 +4533,20 @@ MACHINE_CONFIG_END
 // TODO : Sound system is different
 MACHINE_CONFIG_START(nmk16_state::tdragon3h)
 	tdragon2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tdragon3h_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tdragon3h_map)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(nmk16_state::raphero)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14000000) /* 14 MHz measured */
-	MCFG_CPU_PROGRAM_MAP(raphero_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14000000) /* 14 MHz measured */
+	MCFG_DEVICE_PROGRAM_MAP(raphero_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
-	MCFG_CPU_ADD("audiocpu",TMP90841, 8000000)
-	MCFG_CPU_PROGRAM_MAP(raphero_sound_mem_map)
+	MCFG_DEVICE_ADD("audiocpu",TMP90841, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(raphero_sound_mem_map)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_HIRES
@@ -4565,7 +4565,7 @@ MACHINE_CONFIG_START(nmk16_state::raphero)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
@@ -4586,8 +4586,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::bjtwin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(bjtwin_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(bjtwin_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
 	/* video hardware */
@@ -4638,14 +4638,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
 MACHINE_CONFIG_START(nmk16_state::manybloc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10? MHz - check */
-	MCFG_CPU_PROGRAM_MAP(manybloc_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(nmk16_state, irq1_line_hold, 56)/* this needs to equal the framerate on this, rather than being double it .. */
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000) /* 10? MHz - check */
+	MCFG_DEVICE_PROGRAM_MAP(manybloc_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(nmk16_state, irq1_line_hold, 56)/* this needs to equal the framerate on this, rather than being double it .. */
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", nmk16_state, manybloc_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)
-	MCFG_CPU_PROGRAM_MAP(tharrier_sound_map)
-	MCFG_CPU_IO_MAP(tharrier_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)
+	MCFG_DEVICE_PROGRAM_MAP(tharrier_sound_map)
+	MCFG_DEVICE_IO_MAP(tharrier_sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4669,7 +4669,7 @@ MACHINE_CONFIG_START(nmk16_state::manybloc)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
@@ -5157,12 +5157,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(nmk16_state::stagger1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL(12'000'000)) /* 68000p10 running at 12mhz, verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(afega_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(12'000'000)) /* 68000p10 running at 12mhz, verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(afega_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(afega_sound_cpu)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(afega_sound_cpu)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
@@ -5247,12 +5247,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::firehawk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,12000000)
-	MCFG_CPU_PROGRAM_MAP(firehawk_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,12000000)
+	MCFG_DEVICE_PROGRAM_MAP(firehawk_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)
-	MCFG_CPU_PROGRAM_MAP(firehawk_sound_cpu)
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)
+	MCFG_DEVICE_PROGRAM_MAP(firehawk_sound_cpu)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
@@ -5280,20 +5280,20 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nmk16_state::spec2k)
 	firehawk(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(afega_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(afega_map)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(nmk16_state::twinactn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,12000000)
-	MCFG_CPU_PROGRAM_MAP(twinactn_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,12000000)
+	MCFG_DEVICE_PROGRAM_MAP(twinactn_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(twinactn_sound_cpu)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(twinactn_sound_cpu)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES

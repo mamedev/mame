@@ -489,8 +489,8 @@ void boxer_state::machine_reset()
 MACHINE_CONFIG_START(boxer_state::boxer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16)
-	MCFG_CPU_PROGRAM_MAP(boxer_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16)
+	MCFG_DEVICE_PROGRAM_MAP(boxer_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

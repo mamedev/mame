@@ -119,8 +119,8 @@ DRIVER_INIT_MEMBER( esprit_state, init )
 
 
 MACHINE_CONFIG_START(esprit_state::esprit)
-	MCFG_CPU_ADD("maincpu", M6502, 1000000) // no idea of clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000) // no idea of clock
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -141,8 +141,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(esprit_state::esprit3)
 	esprit(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mem3_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mem3_map)
 MACHINE_CONFIG_END
 
 ROM_START( esprit )

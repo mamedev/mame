@@ -336,14 +336,14 @@ INTERRUPT_GEN_MEMBER(tankbust_state::vblank_irq)
 MACHINE_CONFIG_START(tankbust_state::tankbust)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(14'318'181)/2)    /* Verified on PCB */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tankbust_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(14'318'181)/2)    /* Verified on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tankbust_state,  vblank_irq)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(14'318'181)/4)        /* Verified on PCB */
-//  MCFG_CPU_ADD("sub", Z80, XTAL(14'318'181)/3)        /* Accurate to audio recording, but apparently incorrect clock */
-	MCFG_CPU_PROGRAM_MAP(map_cpu2)
-	MCFG_CPU_IO_MAP(port_map_cpu2)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(14'318'181)/4)        /* Verified on PCB */
+//  MCFG_DEVICE_ADD("sub", Z80, XTAL(14'318'181)/3)        /* Accurate to audio recording, but apparently incorrect clock */
+	MCFG_DEVICE_PROGRAM_MAP(map_cpu2)
+	MCFG_DEVICE_IO_MAP(port_map_cpu2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -366,12 +366,12 @@ MACHINE_CONFIG_START(tankbust_state::tankbust)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(14'318'181)/16)  /* Verified on PCB */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(tankbust_state, soundlatch_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(tankbust_state, soundtimer_r))
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(14'318'181)/16)  /* Verified on PCB */
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, tankbust_state, soundlatch_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, tankbust_state, soundtimer_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(14'318'181)/16)  /* Verified on PCB */
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(14'318'181)/16)  /* Verified on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 

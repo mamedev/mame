@@ -187,30 +187,32 @@ Table 3-2.  TMS32025/26 Memory Blocks
 DEFINE_DEVICE_TYPE(TMS32025, tms32025_device, "tms32025", "Texas Instruments TMS32025")
 DEFINE_DEVICE_TYPE(TMS32026, tms32026_device, "tms32026", "Texas Instruments TMS32026")
 
-ADDRESS_MAP_START(tms32025_device::tms32025_data)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(drr_r, drr_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(dxr_r, dxr_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(tim_r, tim_w)
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(prd_r, prd_w)
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(imr_r, imr_w)
-	AM_RANGE(0x0005, 0x0005) AM_READWRITE(greg_r, greg_w)
-	AM_RANGE(0x0060, 0x007f) AM_RAM AM_SHARE("b2")
-	AM_RANGE(0x0200, 0x02ff) AM_RAM AM_SHARE("b0")
-	AM_RANGE(0x0300, 0x03ff) AM_RAM AM_SHARE("b1")
-ADDRESS_MAP_END
+void tms32025_device::tms32025_data(address_map &map)
+{
+	map(0x0000, 0x0000).rw(this, FUNC(tms32025_device::drr_r), FUNC(tms32025_device::drr_w));
+	map(0x0001, 0x0001).rw(this, FUNC(tms32025_device::dxr_r), FUNC(tms32025_device::dxr_w));
+	map(0x0002, 0x0002).rw(this, FUNC(tms32025_device::tim_r), FUNC(tms32025_device::tim_w));
+	map(0x0003, 0x0003).rw(this, FUNC(tms32025_device::prd_r), FUNC(tms32025_device::prd_w));
+	map(0x0004, 0x0004).rw(this, FUNC(tms32025_device::imr_r), FUNC(tms32025_device::imr_w));
+	map(0x0005, 0x0005).rw(this, FUNC(tms32025_device::greg_r), FUNC(tms32025_device::greg_w));
+	map(0x0060, 0x007f).ram().share("b2");
+	map(0x0200, 0x02ff).ram().share("b0");
+	map(0x0300, 0x03ff).ram().share("b1");
+}
 
-ADDRESS_MAP_START(tms32025_device::tms32026_data)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(drr_r, drr_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(dxr_r, dxr_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(tim_r, tim_w)
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(prd_r, prd_w)
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(imr_r, imr_w)
-	AM_RANGE(0x0005, 0x0005) AM_READWRITE(greg_r, greg_w)
-	AM_RANGE(0x0060, 0x007f) AM_RAM AM_SHARE("b2")
-	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_SHARE("b0")
-	AM_RANGE(0x0400, 0x05ff) AM_RAM AM_SHARE("b1")
-	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_SHARE("b3")
-ADDRESS_MAP_END
+void tms32025_device::tms32026_data(address_map &map)
+{
+	map(0x0000, 0x0000).rw(this, FUNC(tms32025_device::drr_r), FUNC(tms32025_device::drr_w));
+	map(0x0001, 0x0001).rw(this, FUNC(tms32025_device::dxr_r), FUNC(tms32025_device::dxr_w));
+	map(0x0002, 0x0002).rw(this, FUNC(tms32025_device::tim_r), FUNC(tms32025_device::tim_w));
+	map(0x0003, 0x0003).rw(this, FUNC(tms32025_device::prd_r), FUNC(tms32025_device::prd_w));
+	map(0x0004, 0x0004).rw(this, FUNC(tms32025_device::imr_r), FUNC(tms32025_device::imr_w));
+	map(0x0005, 0x0005).rw(this, FUNC(tms32025_device::greg_r), FUNC(tms32025_device::greg_w));
+	map(0x0060, 0x007f).ram().share("b2");
+	map(0x0200, 0x03ff).ram().share("b0");
+	map(0x0400, 0x05ff).ram().share("b1");
+	map(0x0600, 0x07ff).ram().share("b3");
+}
 
 
 tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -123,25 +123,25 @@ ioport_constructor vme_hcpu30_card_device::device_input_ports() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(vme_hcpu30_card_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", M68030, 2*16670000)
-	MCFG_CPU_PROGRAM_MAP(hcpu30_mem)
+	MCFG_DEVICE_ADD("maincpu", M68030, 2*16670000)
+	MCFG_DEVICE_PROGRAM_MAP(hcpu30_mem)
 
 	MCFG_DUSCC68562_ADD("duscc", DUSCC_CLOCK, 0, 0, 0, 0)
-	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
-	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
-//  MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE()
+	MCFG_DUSCC_OUT_TXDA_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRA_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSA_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
+	MCFG_DUSCC_OUT_TXDB_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
+//  MCFG_DUSCC_OUT_INT_CB(WRITELINE()
 
-	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, ctsa_w))
+	MCFG_DEVICE_ADD (RS232P1_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc", duscc68562_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD (RS232P2_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, ctsb_w))
+	MCFG_DEVICE_ADD (RS232P2_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc", duscc68562_device, ctsb_w))
 MACHINE_CONFIG_END
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset */

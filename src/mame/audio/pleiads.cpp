@@ -18,10 +18,10 @@
 #define TONE1_CLOCK  8000
 
 
-DEFINE_DEVICE_TYPE(PLEIADS, pleiads_sound_device, "pleiads_sound", "Pleiads Custom Sound")
+DEFINE_DEVICE_TYPE(PLEIADS_SOUND, pleiads_sound_device, "pleiads_sound", "Pleiads Custom Sound")
 
 pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pleiads_sound_device(mconfig, PLEIADS, tag, owner, clock)
+	: pleiads_sound_device(mconfig, PLEIADS_SOUND, tag, owner, clock)
 {
 }
 
@@ -106,10 +106,10 @@ void pleiads_sound_device::device_start()
 	common_start();
 }
 
-DEFINE_DEVICE_TYPE(NAUGHTYB, naughtyb_sound_device, "naughtyb_sound", "Naughty Boy Custom Sound")
+DEFINE_DEVICE_TYPE(NAUGHTYB_SOUND, naughtyb_sound_device, "naughtyb_sound", "Naughty Boy Custom Sound")
 
 naughtyb_sound_device::naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pleiads_sound_device(mconfig, NAUGHTYB, tag, owner, clock)
+	: pleiads_sound_device(mconfig, NAUGHTYB_SOUND, tag, owner, clock)
 {
 }
 
@@ -174,10 +174,10 @@ void naughtyb_sound_device::device_start()
 	common_start();
 }
 
-DEFINE_DEVICE_TYPE(POPFLAME, popflame_sound_device, "popflame_sound", "Pop Flamer Custom Sound")
+DEFINE_DEVICE_TYPE(POPFLAME_SOUND, popflame_sound_device, "popflame_sound", "Pop Flamer Custom Sound")
 
 popflame_sound_device::popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pleiads_sound_device(mconfig, POPFLAME, tag, owner, clock)
+	: pleiads_sound_device(mconfig, POPFLAME_SOUND, tag, owner, clock)
 {
 }
 

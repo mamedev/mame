@@ -580,10 +580,10 @@ void cc40_state::machine_start()
 MACHINE_CONFIG_START(cc40_state::cc40)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS70C20, XTAL(5'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(cc40_state, keyboard_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(cc40_state, keyboard_w))
+	MCFG_DEVICE_ADD("maincpu", TMS70C20, XTAL(5'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, cc40_state, keyboard_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, cc40_state, keyboard_w))
 
 	MCFG_NVRAM_ADD_0FILL("sysram.0")
 	MCFG_NVRAM_ADD_0FILL("sysram.1")
@@ -608,9 +608,9 @@ MACHINE_CONFIG_START(cc40_state::cc40)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "cc40_cart")

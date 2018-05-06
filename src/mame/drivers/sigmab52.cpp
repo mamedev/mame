@@ -593,17 +593,17 @@ void sigmab52_state::machine_reset()
 MACHINE_CONFIG_START(sigmab52_state::jwildb52)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(jwildb52_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(jwildb52_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(sound_prog_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sound_prog_map)
 
 	MCFG_DEVICE_ADD("6840ptm_1", PTM6840, XTAL(8'000'000)/4) // FIXME
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("6840ptm_2", PTM6840, XTAL(8'000'000)/8) // FIXME
-	MCFG_PTM6840_IRQ_CB(WRITELINE(sigmab52_state, ptm2_irq))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, sigmab52_state, ptm2_irq))
 
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
@@ -624,7 +624,7 @@ MACHINE_CONFIG_START(sigmab52_state::jwildb52)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

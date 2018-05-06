@@ -398,10 +398,10 @@ void m52_state::machine_reset()
 MACHINE_CONFIG_START(m52_state::m52)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m52_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m52_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m52)
@@ -425,8 +425,8 @@ MACHINE_CONFIG_START(m52_state::alpha1v)
 	m52(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(alpha1v_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(alpha1v_map)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 136, 376, 282, 16, 272)
 MACHINE_CONFIG_END

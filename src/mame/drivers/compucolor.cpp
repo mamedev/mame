@@ -396,10 +396,10 @@ void compucolor2_state::machine_reset()
 
 MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 	// basic machine hardware
-	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL(17'971'200)/9)
-	MCFG_CPU_PROGRAM_MAP(compucolor2_mem)
-	MCFG_CPU_IO_MAP(compucolor2_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(compucolor2_state,int_ack)
+	MCFG_DEVICE_ADD(I8080_TAG, I8080, XTAL(17'971'200)/9)
+	MCFG_DEVICE_PROGRAM_MAP(compucolor2_mem)
+	MCFG_DEVICE_IO_MAP(compucolor2_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(compucolor2_state,int_ack)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -410,28 +410,28 @@ MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 
 	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL(17'971'200)/2/6)
 	MCFG_TMS9927_CHAR_WIDTH(6)
-	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE("blink", ripple_counter_device, clock_w))
+	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE("blink", ripple_counter_device, clock_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("blink", RIPPLE_COUNTER, 0) // 74LS393 at UG10
 	MCFG_RIPPLE_COUNTER_STAGES(8)
-	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(DEVWRITELINE(TMS5501_TAG, tms5501_device, sens_w)) MCFG_DEVCB_BIT(4)
+	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITELINE(TMS5501_TAG, tms5501_device, sens_w)) MCFG_DEVCB_BIT(4)
 
 	// devices
 	MCFG_DEVICE_ADD(TMS5501_TAG, TMS5501, XTAL(17'971'200)/9)
 	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE(I8080_TAG, I8085_INTR_LINE))
-	MCFG_TMS5501_XMT_CALLBACK(WRITELINE(compucolor2_state, xmt_w))
-	MCFG_TMS5501_XI_CALLBACK(READ8(compucolor2_state, xi_r))
-	MCFG_TMS5501_XO_CALLBACK(WRITE8(compucolor2_state, xo_w))
+	MCFG_TMS5501_XMT_CALLBACK(WRITELINE(*this, compucolor2_state, xmt_w))
+	MCFG_TMS5501_XI_CALLBACK(READ8(*this, compucolor2_state, xi_r))
+	MCFG_TMS5501_XO_CALLBACK(WRITE8(*this, compucolor2_state, xo_w))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
 
 	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd0", compucolor_floppy_port_devices, "floppy")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
 
 	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd1", compucolor_floppy_port_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

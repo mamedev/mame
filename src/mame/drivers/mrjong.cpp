@@ -188,10 +188,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(mrjong_state::mrjong)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,15468000/6) /* 2.578 MHz?? */
-	MCFG_CPU_PROGRAM_MAP(mrjong_map)
-	MCFG_CPU_IO_MAP(mrjong_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mrjong_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80,15468000/6) /* 2.578 MHz?? */
+	MCFG_DEVICE_PROGRAM_MAP(mrjong_map)
+	MCFG_DEVICE_IO_MAP(mrjong_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -201,6 +200,7 @@ MACHINE_CONFIG_START(mrjong_state::mrjong)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mrjong_state, screen_update_mrjong)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrjong)
 	MCFG_PALETTE_ADD("palette", 4*32)
@@ -210,10 +210,10 @@ MACHINE_CONFIG_START(mrjong_state::mrjong)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489, 15468000/6)
+	MCFG_DEVICE_ADD("sn1", SN76489, 15468000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76489, 15468000/6)
+	MCFG_DEVICE_ADD("sn2", SN76489, 15468000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
