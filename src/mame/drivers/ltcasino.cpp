@@ -13,6 +13,45 @@ inputs
 colours
 etc.
 
+Mini Vegas
+CC-089  (c) Entertainment Enterprises Ltd. 1983
+ +---------------------------------------------------------------------+
+ |        +-+                  M2114          A.IC19         18.432MHz |
+ |        |H|                                                      D1  |
+ |        |D|                  M2114  M2114                            |
+++  2003C |6|                                 B.IC18               +-+ |
+|         |8|                  M2114  M2114                        | | |
+|         |2|                                                      |9| |
+|         |1|                  M2114  M2114   C.IC17               |9| |
+|         +-+                                                      |3| |
+|         +-+                         M2114                        |7| |
+|   DSW3  |H|                         TC5514  D.IC16               | | |
+|         |D|       +-+                                            +-+ |
+|         |6|       | |                                            +-+ |
+|         |8|       |8|               TC5514  E.IC15               |R| |
+|         |2|       |9|                                            |6| |
+|         |1|       |1|                                            |5| |
+++        +-+       |0|               TC5514  F.IC14               |0| |
+ |                  | |                                            |2| |
+ |    VR1     DSW2  +-+                                            +-+ |
+ |  MB3712    DSW1  BAT               TC5514  G.IC13                   |
+ +---------------------------------------------------------------------+
+
+  CPU: Rockwell R6502AP 2MHz
+Video: TMS9937 NL CRT5037 NMOS Single chip Video Timer/Controller (VTC)
+Sound: AY-3-8910
+       MB3712 5.7W Amp
+  OSC: 18.432MHz
+  RAM: M2114-3 1KBx4 SRAM x 8
+       TC5514P-1 1KBx4 SRAM x 4
+  DSW: 3 8-switch dipswitches
+  VR1: Volume pot
+Other: HD6821P Hitatchi HD46821P 1MHz NMOS Peripheral Interface Adapter (PIA) x 2
+       NEC uPA200C Darlington Array
+       3.6v Battery
+       D1 - Power On Diode
+       44 pin edge connector
+
 */
 
 #include "emu.h"
@@ -656,7 +695,7 @@ uint32_t ltcasino_state::screen_update_ltcasino(screen_device &screen, bitmap_in
 
 MACHINE_CONFIG_START(ltcasino_state::ltcasino)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502,2000000)       /* ? MHz */
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(18'432'000)/9) /* 2.048MHz ?? (or 18.432MHz/8 = 2.304MHz) - not verified */
 	MCFG_DEVICE_PROGRAM_MAP(ltcasino_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ltcasino_state,  irq0_line_hold)
 
@@ -676,7 +715,7 @@ MACHINE_CONFIG_START(ltcasino_state::ltcasino)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000)/18) /* 1.024MHz ?? (or 18.432MHz/16 = 1.152MHz) - not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_CONFIG_END
 
