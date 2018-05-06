@@ -242,19 +242,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(volfied_state::cchip_irq_clear_cb)
 MACHINE_CONFIG_START(volfied_state::volfied)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)   /* 8MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", volfied_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK)   /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", volfied_state,  interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)   /* 4MHz sound CPU, required to run the game */
-	MCFG_CPU_PROGRAM_MAP(z80_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)   /* 4MHz sound CPU, required to run the game */
+	MCFG_DEVICE_PROGRAM_MAP(z80_map)
 
 	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(20'000'000)/2) /* 20MHz OSC next to C-Chip */
 	MCFG_CCHIP_IN_PORTA_CB(IOPORT("F00007"))
 	MCFG_CCHIP_IN_PORTB_CB(IOPORT("F00009"))
 	MCFG_CCHIP_IN_PORTC_CB(IOPORT("F0000B"))
 	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("F0000D"))
-	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(volfied_state, counters_w))
+	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(*this, volfied_state, counters_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -280,7 +280,7 @@ MACHINE_CONFIG_START(volfied_state::volfied)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))

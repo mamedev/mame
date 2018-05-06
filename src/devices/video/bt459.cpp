@@ -24,12 +24,13 @@
 
 DEFINE_DEVICE_TYPE(BT459, bt459_device, "bt459", "Brooktree 150MHz Monolithic CMOS 256x24 Color Palette RAMDAC")
 
-ADDRESS_MAP_START(bt459_device::map)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(address_lo_r, address_lo_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(address_hi_r, address_hi_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(register_r, register_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(palette_r, palette_w)
-ADDRESS_MAP_END
+void bt459_device::map(address_map &map)
+{
+	map(0x00, 0x00).rw(this, FUNC(bt459_device::address_lo_r), FUNC(bt459_device::address_lo_w));
+	map(0x01, 0x01).rw(this, FUNC(bt459_device::address_hi_r), FUNC(bt459_device::address_hi_w));
+	map(0x02, 0x02).rw(this, FUNC(bt459_device::register_r), FUNC(bt459_device::register_w));
+	map(0x03, 0x03).rw(this, FUNC(bt459_device::palette_r), FUNC(bt459_device::palette_w));
+}
 
 bt459_device::bt459_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BT459, tag, owner, clock),

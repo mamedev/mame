@@ -494,12 +494,12 @@ static GFXDECODE_START( monzagp )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(monzagp_state::monzagp)
-	MCFG_CPU_ADD("maincpu", I8035, 12000000/4) /* 400KHz ??? - Main board Crystal is 12MHz */
-	MCFG_CPU_PROGRAM_MAP(monzagp_map)
-	MCFG_CPU_IO_MAP(monzagp_io)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(monzagp_state, port1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(monzagp_state, port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(monzagp_state, port2_w))
+	MCFG_DEVICE_ADD("maincpu", I8035, 12000000/4) /* 400KHz ??? - Main board Crystal is 12MHz */
+	MCFG_DEVICE_PROGRAM_MAP(monzagp_map)
+	MCFG_DEVICE_IO_MAP(monzagp_io)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, monzagp_state, port1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, monzagp_state, port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, monzagp_state, port2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

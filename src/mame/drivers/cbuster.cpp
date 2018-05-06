@@ -248,8 +248,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 24,16,8,0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*4) },
 	8*32
 };
 
@@ -259,10 +259,8 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 24, 16, 8, 0 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP8(16*8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*4) },
 	128*8
 };
 
@@ -272,10 +270,8 @@ static const gfx_layout spritelayout =
 	(4096*2)+2048,  /* Main bank + 4 extra roms */
 	4,
 	{ 0xa0000*8+8, 0xa0000*8, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
@@ -308,12 +304,12 @@ void cbuster_state::machine_reset()
 MACHINE_CONFIG_START(cbuster_state::twocrude)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* Custom chip 59 @ 12MHz Verified */
-	MCFG_CPU_PROGRAM_MAP(twocrude_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cbuster_state,  irq4_line_assert)/* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* Custom chip 59 @ 12MHz Verified */
+	MCFG_DEVICE_PROGRAM_MAP(twocrude_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cbuster_state,  irq4_line_assert)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(24'000'000)/4) /* Custom chip 45, 6MHz Verified */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(24'000'000)/4) /* Custom chip 45, 6MHz Verified */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -371,10 +367,10 @@ MACHINE_CONFIG_START(cbuster_state::twocrude)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	// YM2203_PITCH_HACK - Pitch is too low at 1.3425MHz (see also stfight.cpp)
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000)/24 * 3) /* 1.3425MHz Verified */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/24 * 3) /* 1.3425MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_YM2151_ADD("ym2", XTAL(32'220'000)/9) /* 3.58MHz Verified */
+	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000)/9) /* 3.58MHz Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 

@@ -525,15 +525,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(luckybal_state::luckybal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io)
+	MCFG_DEVICE_ADD("maincpu", Z180, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io)
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(luckybal_state, output_port_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(luckybal_state, output_port_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(luckybal_state, input_port_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(luckybal_state, output_port_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, luckybal_state, output_port_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, luckybal_state, output_port_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, luckybal_state, input_port_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, luckybal_state, output_port_c_w))
 
 	MCFG_DEVICE_ADD("latch1", CD4099, 0)
 
@@ -548,9 +548,9 @@ MACHINE_CONFIG_START(luckybal_state::luckybal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // DAC 08
+	MCFG_DEVICE_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // DAC 08
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 MACHINE_CONFIG_END
 

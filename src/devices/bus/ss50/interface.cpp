@@ -213,10 +213,11 @@ ss50_card_interface::ss50_card_interface(const machine_config &mconfig, device_t
 {
 }
 
-SLOT_INTERFACE_START(ss50_default_2rs_devices)
-	SLOT_INTERFACE("mpc", SS50_MPC)
-	//SLOT_INTERFACE("mpl", SS50_MPL)
-	//SLOT_INTERFACE("mpn", SS50_MPN)
-	SLOT_INTERFACE("mps", SS50_MPS)
-	//SLOT_INTERFACE("mpt", SS50_MPT)
-SLOT_INTERFACE_END
+void ss50_default_2rs_devices(device_slot_interface &device)
+{
+	device.option_add("mpc", SS50_MPC);
+	//device.option_add("mpl", SS50_MPL);
+	//device.option_add("mpn", SS50_MPN);
+	device.option_add("mps", SS50_MPS);
+	//device.option_add("mpt", SS50_MPT);
+}

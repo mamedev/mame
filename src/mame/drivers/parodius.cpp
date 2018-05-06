@@ -223,7 +223,7 @@ void parodius_state::machine_reset()
 WRITE8_MEMBER( parodius_state::banking_callback )
 {
 	if (data & 0xf0)
-		logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), data);
+		logerror("%s: setlines %02x\n", machine().describe_context(), data);
 
 	membank("bank1")->set_entry((data & 0x0f) ^ 0x0f);
 }
@@ -231,13 +231,13 @@ WRITE8_MEMBER( parodius_state::banking_callback )
 MACHINE_CONFIG_START(parodius_state::parodius)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)        /* 053248 */
-	MCFG_CPU_PROGRAM_MAP(parodius_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", parodius_state,  parodius_interrupt)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(parodius_state, banking_callback))
+	MCFG_DEVICE_ADD("maincpu", KONAMI, 3000000)        /* 053248 */
+	MCFG_DEVICE_PROGRAM_MAP(parodius_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", parodius_state,  parodius_interrupt)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, parodius_state, banking_callback))
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(parodius_sound_map)    /* NMIs are triggered by the 053260 */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
+	MCFG_DEVICE_PROGRAM_MAP(parodius_sound_map)    /* NMIs are triggered by the 053260 */
 
 	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)

@@ -458,23 +458,23 @@ MACHINE_RESET_MEMBER(missb2_state,missb2)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
 	m_oki->reset();
-	bublbobl_bankswitch_w(m_maincpu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
+	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
 }
 
 MACHINE_CONFIG_START(missb2_state::missb2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)   // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_XTAL/4)   // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(subcpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(subcpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)  // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_XTAL/8)  // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
@@ -508,12 +508,12 @@ MACHINE_CONFIG_START(missb2_state::missb2)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<1>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<1>))
 
 	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, MAIN_XTAL/8)
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(missb2_state, irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM3526, MAIN_XTAL/8)
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, missb2_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified

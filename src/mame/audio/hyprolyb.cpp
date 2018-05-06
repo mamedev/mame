@@ -23,7 +23,7 @@ hyprolyb_adpcm_device::hyprolyb_adpcm_device(const machine_config &mconfig, cons
 
 void hyprolyb_adpcm_device::device_start()
 {
-	m_space = &machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	m_space = &machine().device<cpu_device>("audiocpu")->space(AS_PROGRAM);
 	m_msm = machine().device<msm5205_device>("msm");
 	save_item(NAME(m_adpcm_ready));  // only bootlegs
 	save_item(NAME(m_adpcm_busy));

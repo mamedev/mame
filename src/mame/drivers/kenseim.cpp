@@ -271,7 +271,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_portc_w)
 {
 	// I'm guessing these are the 20 'power meter' LEDs, 10 for each player? (it writes 42 times, with the last write being some terminator?)
 
-//  printf("%s mb8936 write %02x to port C but no handler assigned (serial data?)\n", machine().describe_context(), data);
+//  printf("%s mb8936 write %02x to port C but no handler assigned (serial data?)\n", machine().describe_context().c_str(), data);
 
 	if (data & 0x08)
 	{
@@ -306,7 +306,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_portc_w)
 
 WRITE8_MEMBER(kenseim_state::mb8936_porta_w) // maybe molesa output? (6-bits?)
 {
-	//if (data&0xc0) printf("%s mb8936 write %02x to port A (mole output 1?)\n", machine().describe_context(), data);
+	//if (data&0xc0) printf("%s mb8936 write %02x to port A (mole output 1?)\n", machine().describe_context().c_str(), data);
 
 
 	for (int i = 0; i < 6; i++)
@@ -325,7 +325,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_porta_w) // maybe molesa output? (6-bits?)
 
 WRITE8_MEMBER(kenseim_state::mb8936_portb_w) // maybe molesb output? (6-bits?)
 {
-	//if (data&0xc0) printf("%s mb8936 write %02x to port B (mole output 2?)\n", machine().describe_context(), data);
+	//if (data&0xc0) printf("%s mb8936 write %02x to port B (mole output 2?)\n", machine().describe_context().c_str(), data);
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -344,7 +344,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_portb_w) // maybe molesb output? (6-bits?)
 WRITE8_MEMBER(kenseim_state::mb8936_portf_w)
 {
 	// typically written when the 'moles' output is, maybe the 2 strobes?
-	//printf("%s mb8936 write %02x to port F (strobe?)\n", machine().describe_context(), data);
+	//printf("%s mb8936 write %02x to port F (strobe?)\n", machine().describe_context().c_str(), data);
 }
 
 
@@ -479,27 +479,27 @@ MACHINE_CONFIG_START(kenseim_state::kenseim)
 	cps1_12MHz(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL(16'000'000)/2) // tmpz84c011-8
+	MCFG_DEVICE_ADD("gamecpu", TMPZ84C011, XTAL(16'000'000)/2) // tmpz84c011-8
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_gamecpu)
-	MCFG_CPU_PROGRAM_MAP(kenseim_map)
-	MCFG_CPU_IO_MAP(kenseim_io_map)
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(kenseim_state, cpu_portc_w))
-	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(kenseim_state, cpu_portd_w))
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(kenseim_state, cpu_porte_w))
+	MCFG_DEVICE_PROGRAM_MAP(kenseim_map)
+	MCFG_DEVICE_IO_MAP(kenseim_io_map)
+	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(*this, kenseim_state, cpu_portc_w))
+	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(*this, kenseim_state, cpu_portd_w))
+	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(*this, kenseim_state, cpu_porte_w))
 	MCFG_TMPZ84C011_PORTA_READ_CB(IOPORT("DSW1"))
 	MCFG_TMPZ84C011_PORTB_READ_CB(IOPORT("DSW2"))
 	MCFG_TMPZ84C011_PORTC_READ_CB(IOPORT("CAB-IN"))
-	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(kenseim_state, cpu_portd_r))
+	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(*this, kenseim_state, cpu_portd_r))
 
 	MCFG_MB89363B_ADD("mb89363b")
 	// a,b,c always $80: all ports set as output
 	// d,e,f always $92: port D and E as input, port F as output
-	MCFG_MB89363B_OUT_PORTA_CB(WRITE8(kenseim_state, mb8936_porta_w))
-	MCFG_MB89363B_OUT_PORTB_CB(WRITE8(kenseim_state, mb8936_portb_w))
-	MCFG_MB89363B_OUT_PORTC_CB(WRITE8(kenseim_state, mb8936_portc_w))
+	MCFG_MB89363B_OUT_PORTA_CB(WRITE8(*this, kenseim_state, mb8936_porta_w))
+	MCFG_MB89363B_OUT_PORTB_CB(WRITE8(*this, kenseim_state, mb8936_portb_w))
+	MCFG_MB89363B_OUT_PORTC_CB(WRITE8(*this, kenseim_state, mb8936_portc_w))
 	MCFG_MB89363B_IN_PORTD_CB(IOPORT("MOLEA"))
 	MCFG_MB89363B_IN_PORTE_CB(IOPORT("MOLEB"))
-	MCFG_MB89363B_OUT_PORTF_CB(WRITE8(kenseim_state, mb8936_portf_w))
+	MCFG_MB89363B_OUT_PORTF_CB(WRITE8(*this, kenseim_state, mb8936_portf_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END

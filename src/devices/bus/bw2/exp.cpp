@@ -187,6 +187,7 @@ WRITE8_MEMBER( bw2_expansion_slot_device::modsel_w )
 // slot devices
 #include "ramcard.h"
 
-SLOT_INTERFACE_START( bw2_expansion_cards )
-	SLOT_INTERFACE("ramcard", BW2_RAMCARD)
-SLOT_INTERFACE_END
+void bw2_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("ramcard", BW2_RAMCARD);
+}

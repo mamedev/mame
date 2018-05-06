@@ -913,14 +913,14 @@ MACHINE_RESET_MEMBER(jack_state,joinem)
 MACHINE_CONFIG_START(jack_state::jack)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'000'000)/6)
-	MCFG_CPU_PROGRAM_MAP(jack_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jack_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'000'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(jack_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jack_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'000'000)/6)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(jack_state, jack_sh_irq_ack)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'000'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(jack_state, jack_sh_irq_ack)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -942,16 +942,16 @@ MACHINE_CONFIG_START(jack_state::jack)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(ASSERTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(18'000'000)/12)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device,read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(jack_state, timer_r))
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'000'000)/12)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device,read))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jack_state, timer_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jack_state::treahunt)
 	jack(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -959,8 +959,8 @@ MACHINE_CONFIG_START(jack_state::striv)
 	jack(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(striv_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(striv_map)
 
 	MCFG_MACHINE_START_OVERRIDE(jack_state,striv)
 	MCFG_MACHINE_RESET_OVERRIDE(jack_state,striv)
@@ -983,10 +983,10 @@ MACHINE_CONFIG_START(jack_state::joinem)
 	jack(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(joinem_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jack_state, joinem_vblank_irq)
-	MCFG_CPU_PERIODIC_INT_DRIVER(jack_state, irq0_line_hold, 250) // ??? controls game speed
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(joinem_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jack_state, joinem_vblank_irq)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(jack_state, irq0_line_hold, 250) // ??? controls game speed
 
 	MCFG_MACHINE_START_OVERRIDE(jack_state,joinem)
 	MCFG_MACHINE_RESET_OVERRIDE(jack_state,joinem)
@@ -1009,8 +1009,8 @@ MACHINE_CONFIG_START(jack_state::unclepoo)
 	joinem(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(unclepoo_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(unclepoo_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

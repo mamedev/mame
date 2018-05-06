@@ -455,14 +455,14 @@ static INPUT_PORTS_START( smondial2 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::montec)
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP( montec_mem )
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_assert, XTAL(4'000'000) / (1 << 13))
+	MCFG_DEVICE_ADD("maincpu", M65C02, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP( montec_mem )
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_assert, XTAL(4'000'000) / (1 << 13))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
+	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
@@ -472,16 +472,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::monteciv)
 	montec(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL(8'000'000) )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK( XTAL(8'000'000) )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::megaiv)
 	montec(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL(4'915'200) )
-	MCFG_CPU_PROGRAM_MAP(megaiv_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'915'200) / (1 << 13))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK( XTAL(4'915'200) )
+	MCFG_DEVICE_PROGRAM_MAP(megaiv_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'915'200) / (1 << 13))
 
 	MCFG_DEVICE_REMOVE("board")
 	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
@@ -491,10 +491,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::mondial2)
 	megaiv(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL(2'000'000) )
-	MCFG_CPU_PROGRAM_MAP(mondial2_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(2'000'000) / (1 << 12))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK( XTAL(2'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(mondial2_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(2'000'000) / (1 << 12))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("refresh_leds", mephisto_montec_state, refresh_leds, attotime::from_hz(10))
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_mondial2)
@@ -502,16 +502,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::smondial)
 	megaiv(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL(4'000'000) )
-	MCFG_CPU_PROGRAM_MAP(smondial_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'000'000) / (1 << 13))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK( XTAL(4'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(smondial_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'000'000) / (1 << 13))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::smondial2)
 	smondial(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(smondial2_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(smondial2_mem)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "smondial2_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "smondial2")

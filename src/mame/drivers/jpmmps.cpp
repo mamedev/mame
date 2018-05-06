@@ -259,17 +259,17 @@ MACHINE_CONFIG_START(jpmmps_state::jpmmps)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // bb
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // diagnostic led
 
-	//MCFG_CPU_ADD("reelmcu", TMS7041, XTAL(5'000'000))
+	//MCFG_DEVICE_ADD("reelmcu", TMS7041, XTAL(5'000'000))
 
 	MCFG_DEVICE_ADD("ppi8255_ic26", I8255, 0)
 	// Port B 0 is coin lockout
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(jpmmps_state, jpmmps_meters_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jpmmps_state, jpmmps_meters_w))
 
 	MCFG_DEVICE_ADD("ppi8255_ic21", I8255, 0)
 
 	MCFG_DEVICE_ADD("ppi8255_ic22", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(jpmmps_state, jpmmps_psg_buf_w)) // SN chip data
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(jpmmps_state, jpmmps_ic22_portc_w))  // C3 is last meter, C2 latches in data
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jpmmps_state, jpmmps_psg_buf_w)) // SN chip data
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jpmmps_state, jpmmps_ic22_portc_w))  // C3 is last meter, C2 latches in data
 
 	MCFG_DEVICE_ADD("ppi8255_ic25", I8255, 0)
 
@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(jpmmps_state::jpmmps)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn", SN76489, SOUND_CLOCK)
+	MCFG_DEVICE_ADD("sn", SN76489, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)

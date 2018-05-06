@@ -276,8 +276,8 @@ PALETTE_INIT_MEMBER(itgambl2_state, itgambl2)
 MACHINE_CONFIG_START(itgambl2_state::itgambl2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83337, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(itgambl2_map)
+	MCFG_DEVICE_ADD("maincpu", H83337, MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(itgambl2_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(itgambl2_state::itgambl2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

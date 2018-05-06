@@ -1149,9 +1149,8 @@ WRITE16_MEMBER(namcos21_state::pointram_control_w)
 
 	/* m_pointram_control&0x20 : bank for depthcue data */
 #if 0
-	logerror( "dsp_control_w:'%s':%x[%x]:=%04x ",
-		cpu->tag,
-		cpu->safe_pc(),
+	logerror( "%s dsp_control_w:[%x]:=%04x ",
+		machine().describe_context(),
 		offset,
 		m_pointram_control );
 
@@ -1802,6 +1801,15 @@ static INPUT_PORTS_START( cybsled )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( starblad )
+	PORT_INCLUDE(s21default)
+
+	PORT_MODIFY("AN1")      /* IN#3: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(10)
+	PORT_MODIFY("AN2")      /* IN#4: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(10)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( aircomb )
 	PORT_INCLUDE(s21default)
 
@@ -1894,8 +1902,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 MACHINE_CONFIG_START(namcos21_state::configure_c148_standard)
 	MCFG_NAMCO_C148_ADD("master_intc","maincpu",true)
 	MCFG_NAMCO_C148_LINK("slave_intc")
-	MCFG_NAMCO_C148_EXT1_CB(WRITE8(namcos21_state, sound_reset_w))
-	MCFG_NAMCO_C148_EXT2_CB(WRITE8(namcos21_state, system_reset_w))
+	MCFG_NAMCO_C148_EXT1_CB(WRITE8(*this, namcos21_state, sound_reset_w))
+	MCFG_NAMCO_C148_EXT2_CB(WRITE8(*this, namcos21_state, system_reset_w))
 
 	MCFG_NAMCO_C148_ADD("slave_intc","slave",false)
 	MCFG_NAMCO_C148_LINK("master_intc")
@@ -1903,37 +1911,37 @@ MACHINE_CONFIG_START(namcos21_state::configure_c148_standard)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos21_state::namcos21)
-	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
-	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
-	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, 3072000) /* Sound */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
-	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3072000) /* Sound */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
-	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("mcu", HD63705,2048000) /* IO */
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("dspmaster", TMS32025,24000000) /* 24 MHz? overclocked */
-	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
-	MCFG_CPU_DATA_MAP(master_dsp_data)
-	MCFG_CPU_IO_MAP(master_dsp_io)
+	MCFG_DEVICE_ADD("dspmaster", TMS32025,24000000) /* 24 MHz? overclocked */
+	MCFG_DEVICE_PROGRAM_MAP(master_dsp_program)
+	MCFG_DEVICE_DATA_MAP(master_dsp_data)
+	MCFG_DEVICE_IO_MAP(master_dsp_io)
 	MCFG_TMS32025_HOLD_IN_CB(NOOP)
 	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(namcos21_state, dsp_xf_w))
+	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos21_state, dsp_xf_w))
 
-	MCFG_CPU_ADD("dspslave", TMS32025,24000000*4) /* 24 MHz?; overclocked */
-	MCFG_CPU_PROGRAM_MAP(slave_dsp_program)
-	MCFG_CPU_DATA_MAP(slave_dsp_data)
-	MCFG_CPU_IO_MAP(slave_dsp_io)
+	MCFG_DEVICE_ADD("dspslave", TMS32025,24000000*4) /* 24 MHz?; overclocked */
+	MCFG_DEVICE_PROGRAM_MAP(slave_dsp_program)
+	MCFG_DEVICE_DATA_MAP(slave_dsp_data)
+	MCFG_DEVICE_IO_MAP(slave_dsp_io)
 	MCFG_TMS32025_HOLD_IN_CB(NOOP)
 	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(namcos21_state, slave_XF_output_w))
+	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos21_state, slave_XF_output_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -1970,27 +1978,27 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(namcos21_state::driveyes)
-	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
-	MCFG_CPU_PROGRAM_MAP(driveyes_master_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
+	MCFG_DEVICE_PROGRAM_MAP(driveyes_master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
-	MCFG_CPU_PROGRAM_MAP(driveyes_slave_map)
+	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
+	MCFG_DEVICE_PROGRAM_MAP(driveyes_slave_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, 3072000) /* Sound */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
-	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3072000) /* Sound */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
-	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("mcu", HD63705,2048000) /* IO */
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("dsp", TMS32025,24000000*2) /* 24 MHz? overclocked */
-	MCFG_CPU_PROGRAM_MAP(winrun_dsp_program)
-	MCFG_CPU_DATA_MAP(winrun_dsp_data)
-	MCFG_CPU_IO_MAP(winrun_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(namcos21_state, winrun_poly_reset_r))
+	MCFG_DEVICE_ADD("dsp", TMS32025,24000000*2) /* 24 MHz? overclocked */
+	MCFG_DEVICE_PROGRAM_MAP(winrun_dsp_program)
+	MCFG_DEVICE_DATA_MAP(winrun_dsp_data)
+	MCFG_DEVICE_IO_MAP(winrun_dsp_io)
+	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos21_state, winrun_poly_reset_r))
 	MCFG_TMS32025_HOLD_IN_CB(NOOP)
 	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
 	MCFG_TMS32025_XF_OUT_CB(NOOP)
@@ -2030,33 +2038,33 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos21_state::winrun)
-	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
-	MCFG_CPU_PROGRAM_MAP(winrun_master_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
+	MCFG_DEVICE_PROGRAM_MAP(winrun_master_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
-	MCFG_CPU_PROGRAM_MAP(winrun_slave_map)
+	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
+	MCFG_DEVICE_PROGRAM_MAP(winrun_slave_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, 3072000) /* Sound */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
-	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3072000) /* Sound */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
-	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("mcu", HD63705,2048000) /* IO */
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("dsp", TMS32025,24000000) /* 24 MHz? overclocked */
-	MCFG_CPU_PROGRAM_MAP(winrun_dsp_program)
-	MCFG_CPU_DATA_MAP(winrun_dsp_data)
-	MCFG_CPU_IO_MAP(winrun_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(namcos21_state, winrun_poly_reset_r))
+	MCFG_DEVICE_ADD("dsp", TMS32025,24000000) /* 24 MHz? overclocked */
+	MCFG_DEVICE_PROGRAM_MAP(winrun_dsp_program)
+	MCFG_DEVICE_DATA_MAP(winrun_dsp_data)
+	MCFG_DEVICE_IO_MAP(winrun_dsp_io)
+	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos21_state, winrun_poly_reset_r))
 	MCFG_TMS32025_HOLD_IN_CB(NOOP)
 	MCFG_TMS32025_HOLD_ACK_OUT_CB(NOOP)
 	MCFG_TMS32025_XF_OUT_CB(NOOP)
 
-	MCFG_CPU_ADD("gpu", M68000,12288000) /* graphics coprocessor */
-	MCFG_CPU_PROGRAM_MAP(winrun_gpu_map)
+	MCFG_DEVICE_ADD("gpu", M68000,12288000) /* graphics coprocessor */
+	MCFG_DEVICE_PROGRAM_MAP(winrun_gpu_map)
 
 	configure_c148_standard(config);
 	MCFG_NAMCO_C148_ADD("gpu_intc","gpu",false)
@@ -2785,8 +2793,8 @@ GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, winrun,  
 GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
 GAME( 1991, driveyes,  0,        driveyes, driveyes,   namcos21_state, driveyes, ROT0,    "Namco", "Driver's Eyes (Japan)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN)
 GAME( 1991, solvalou,  0,        namcos21, s21default, namcos21_state, solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, starblad,  0,        namcos21, s21default, namcos21_state, starblad, ROT0,    "Namco", "Starblade (World)",                     MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, starbladj, starblad, namcos21, s21default, namcos21_state, starblad, ROT0,    "Namco", "Starblade (Japan)",                     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, starblad,  0,        namcos21, starblad,   namcos21_state, starblad, ROT0,    "Namco", "Starblade (World)",                     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, starbladj, starblad, namcos21, starblad,   namcos21_state, starblad, ROT0,    "Namco", "Starblade (Japan)",                     MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, aircomb,   0,        namcos21, aircomb,    namcos21_state, aircomb,  ROT0,    "Namco", "Air Combat (US)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // There's code for a SCI, is it even possible to play multiplayer?
 GAME( 1992, aircombj,  aircomb,  namcos21, aircomb,    namcos21_state, aircomb,  ROT0,    "Namco", "Air Combat (Japan)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, cybsled,   0,        namcos21, cybsled,    namcos21_state, cybsled,  ROT0,    "Namco", "Cyber Sled (World)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )

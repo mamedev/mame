@@ -2510,28 +2510,7 @@ void ssv_state::init_eaglshot_banking()
 	membank("gfxrom")->configure_entries(0, 6+1, memregion("gfxdata")->base(), 0x200000);
 }
 
-// massages the data from the BPMicro-compatible dump to runnable form
-void ssv_state::init_st010()
-{
-	uint8_t *dspsrc = (uint8_t *)memregion("st010")->base();
-	uint32_t *dspprg = (uint32_t *)memregion("dspprg")->base();
-	uint16_t *dspdata = (uint16_t *)memregion("dspdata")->base();
-
-	// copy DSP program
-	for (int i = 0; i < 0x10000; i+= 4)
-	{
-		*dspprg = dspsrc[0+i]<<24 | dspsrc[1+i]<<16 | dspsrc[2+i]<<8;
-		dspprg++;
-	}
-
-	// copy DSP data
-	for (int i = 0; i < 0x1000; i+= 2)
-	{
-		*dspdata++ = dspsrc[0x10000+i]<<8 | dspsrc[0x10001+i];
-	}
-}
-
-DRIVER_INIT_MEMBER(ssv_state,drifto94)     {    init(0); init_st010();  }
+DRIVER_INIT_MEMBER(ssv_state,drifto94)     {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,eaglshot)     {    init(0); init_eaglshot_banking(); }
 DRIVER_INIT_MEMBER(ssv_state,gdfs)         {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,hypreact)     {    init(0); }
@@ -2545,13 +2524,13 @@ DRIVER_INIT_MEMBER(ssv_state,srmp4)        {    init(0);
 //  ((uint16_t *)memregion("maincpu")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
 DRIVER_INIT_MEMBER(ssv_state,srmp7)        {    init(0); }
-DRIVER_INIT_MEMBER(ssv_state,stmblade)     {    init(0); init_st010(); }
+DRIVER_INIT_MEMBER(ssv_state,stmblade)     {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,survarts)     {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,dynagear)     {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,sxyreact)     {    init(0); init_hypreac2_common();  save_item(NAME(m_sxyreact_serial)); save_item(NAME(m_sxyreact_dial)); }
 DRIVER_INIT_MEMBER(ssv_state,cairblad)     {    init(0); init_hypreac2_common();    }
 DRIVER_INIT_MEMBER(ssv_state,sxyreac2)     {    init(0); init_hypreac2_common();  save_item(NAME(m_sxyreact_serial)); save_item(NAME(m_sxyreact_dial)); }
-DRIVER_INIT_MEMBER(ssv_state,twineag2)     {    init(1); init_st010();  }
+DRIVER_INIT_MEMBER(ssv_state,twineag2)     {    init(1); }
 DRIVER_INIT_MEMBER(ssv_state,ultrax)        {   init(1); }
 DRIVER_INIT_MEMBER(ssv_state,vasara)        {   init(0); }
 DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init(0); save_item(NAME(m_latches)); }
@@ -2569,8 +2548,8 @@ DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init(0); save_item(NAME(m_latche
 MACHINE_CONFIG_START(ssv_state::ssv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V60, SSV_MASTER_CLOCK) /* Based on STA-0001 & STA-0001B System boards */
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ssv_state,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", V60, SSV_MASTER_CLOCK) /* Based on STA-0001 & STA-0001B System boards */
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ssv_state,irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ssv_state, interrupt, "screen", 0, 1)
 
@@ -2587,7 +2566,7 @@ MACHINE_CONFIG_START(ssv_state::ssv)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ensoniq", ES5506, SSV_MASTER_CLOCK)
+	MCFG_DEVICE_ADD("ensoniq", ES5506, SSV_MASTER_CLOCK)
 	MCFG_ES5506_REGION0("ensoniq.0")
 	MCFG_ES5506_REGION1("ensoniq.1")
 	MCFG_ES5506_REGION2("ensoniq.2")
@@ -2602,12 +2581,12 @@ MACHINE_CONFIG_START(ssv_state::drifto94)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(drifto94_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(drifto94_map)
 
-	MCFG_CPU_ADD("dsp", UPD96050, 10000000) /* TODO: correct? */
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
-	MCFG_CPU_DATA_MAP(dsp_data_map)
+	MCFG_DEVICE_ADD("dsp", UPD96050, 10000000) /* TODO: correct? */
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -2623,8 +2602,8 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gdfs_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gdfs_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2633,7 +2612,7 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	MCFG_ADC0808_IN1_CB(IOPORT("GUNY1"))
 	MCFG_ADC0808_IN2_CB(IOPORT("GUNX2"))
 	MCFG_ADC0808_IN3_CB(IOPORT("GUNY2"))
-	MCFG_ADC0808_EOC_CB(WRITELINE(ssv_state, gdfs_adc_int_w))
+	MCFG_ADC0808_EOC_CB(WRITELINE(*this, ssv_state, gdfs_adc_int_w))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2652,8 +2631,8 @@ MACHINE_CONFIG_START(ssv_state::hypreact)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hypreact_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hypreact_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2667,8 +2646,8 @@ MACHINE_CONFIG_START(ssv_state::hypreac2)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hypreac2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hypreac2_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2682,8 +2661,8 @@ MACHINE_CONFIG_START(ssv_state::janjans1)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(janjans1_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(janjans1_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2695,8 +2674,8 @@ MACHINE_CONFIG_START(ssv_state::keithlcy)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(keithlcy_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(keithlcy_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2708,8 +2687,8 @@ MACHINE_CONFIG_START(ssv_state::meosism)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(meosism_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(meosism_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2725,8 +2704,8 @@ MACHINE_CONFIG_START(ssv_state::mslider)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mslider_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mslider_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2738,8 +2717,8 @@ MACHINE_CONFIG_START(ssv_state::ryorioh)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ryorioh_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ryorioh_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2752,8 +2731,8 @@ MACHINE_CONFIG_START(ssv_state::vasara)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ryorioh_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ryorioh_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2766,8 +2745,8 @@ MACHINE_CONFIG_START(ssv_state::srmp4)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(srmp4_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(srmp4_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2781,8 +2760,8 @@ MACHINE_CONFIG_START(ssv_state::srmp7)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(srmp7_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(srmp7_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2796,12 +2775,12 @@ MACHINE_CONFIG_START(ssv_state::stmblade)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(drifto94_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(drifto94_map)
 
-	MCFG_CPU_ADD("dsp", UPD96050, 10000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
-	MCFG_CPU_DATA_MAP(dsp_data_map)
+	MCFG_DEVICE_ADD("dsp", UPD96050, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map)
 
 	/* don't need this, game just does a simple check at boot then the DSP stalls into a tight loop. */
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -2817,8 +2796,8 @@ MACHINE_CONFIG_START(ssv_state::survarts)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(survarts_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(survarts_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2842,8 +2821,8 @@ MACHINE_CONFIG_START(ssv_state::eaglshot)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(eaglshot_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(eaglshot_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2867,8 +2846,8 @@ MACHINE_CONFIG_START(ssv_state::sxyreact)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sxyreact_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sxyreact_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2883,8 +2862,8 @@ MACHINE_CONFIG_START(ssv_state::sxyreac2)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sxyreact_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sxyreact_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2899,8 +2878,8 @@ MACHINE_CONFIG_START(ssv_state::cairblad)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sxyreact_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sxyreact_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2915,12 +2894,12 @@ MACHINE_CONFIG_START(ssv_state::twineag2)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(twineag2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(twineag2_map)
 
-	MCFG_CPU_ADD("dsp", UPD96050, 10000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
-	MCFG_CPU_DATA_MAP(dsp_data_map)
+	MCFG_DEVICE_ADD("dsp", UPD96050, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -2936,8 +2915,8 @@ MACHINE_CONFIG_START(ssv_state::ultrax)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ultrax_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ultrax_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2950,11 +2929,11 @@ MACHINE_CONFIG_START(ssv_state::jsk)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(jsk_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(jsk_map)
 
-	MCFG_CPU_ADD("sub", V810,25000000)
-	MCFG_CPU_PROGRAM_MAP(jsk_v810_mem)
+	MCFG_DEVICE_ADD("sub", V810,25000000)
+	MCFG_DEVICE_PROGRAM_MAP(jsk_v810_mem)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -3147,9 +3126,11 @@ ROM_START( drifto94 )
 	ROM_LOAD16_BYTE( "vg003-18.u15", 0x000000, 0x200000, CRC(511b3e93) SHA1(09eda175c8f1b21c18645519cc6e89c6ca1fc5de) )
 
 	ROM_REGION( 0x11000, "st010", 0)
-	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
-	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
-	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
+	ROM_LOAD( "st010.bin",    0x00000, 0x11000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) // BPMicro-compatible dump
+	ROM_REGION32_BE( 0x10000, "dspprg", 0)
+	ROM_COPY( "st010", 0x00000, 0x00000, 0x10000 )
+	ROM_REGION16_BE( 0x01000, "dspdata", 0)
+	ROM_COPY( "st010", 0x10000, 0x00000, 0x01000 )
 ROM_END
 
 
@@ -4336,9 +4317,11 @@ ROM_START( stmblade )
 	ROM_LOAD16_BYTE( "sb-snd0.u22", 0x000000, 0x200000, CRC(4efd605b) SHA1(9c97be105c923c7db847d9b9aea37025edb685a0) )
 
 	ROM_REGION( 0x11000, "st010", 0)
-	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
-	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
-	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
+	ROM_LOAD( "st010.bin",    0x00000, 0x11000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) // BPMicro-compatible dump
+	ROM_REGION32_BE( 0x10000, "dspprg", 0)
+	ROM_COPY( "st010", 0x00000, 0x00000, 0x10000 )
+	ROM_REGION16_BE( 0x01000, "dspdata", 0)
+	ROM_COPY( "st010", 0x10000, 0x00000, 0x01000 )
 ROM_END
 
 ROM_START( stmbladej )
@@ -4365,9 +4348,11 @@ ROM_START( stmbladej )
 	ROM_LOAD16_BYTE( "sb-snd0.u22", 0x000000, 0x200000, CRC(4efd605b) SHA1(9c97be105c923c7db847d9b9aea37025edb685a0) )
 
 	ROM_REGION( 0x11000, "st010", 0)
-	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
-	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
-	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
+	ROM_LOAD( "st010.bin",    0x00000, 0x11000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) // BPMicro-compatible dump
+	ROM_REGION32_BE( 0x10000, "dspprg", 0)
+	ROM_COPY( "st010", 0x00000, 0x00000, 0x10000 )
+	ROM_REGION16_BE( 0x01000, "dspdata", 0)
+	ROM_COPY( "st010", 0x10000, 0x00000, 0x01000 )
 ROM_END
 
 
@@ -4440,9 +4425,11 @@ ROM_START( twineag2 )
 	ROM_COPY( "ensoniq.1", 0x000000, 0x000000, 0x400000 )
 
 	ROM_REGION( 0x11000, "st010", 0)
-	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
-	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
-	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
+	ROM_LOAD( "st010.bin",    0x00000, 0x11000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) // BPMicro-compatible dump
+	ROM_REGION32_BE( 0x10000, "dspprg", 0)
+	ROM_COPY( "st010", 0x00000, 0x00000, 0x10000 )
+	ROM_REGION16_BE( 0x01000, "dspdata", 0)
+	ROM_COPY( "st010", 0x10000, 0x00000, 0x01000 )
 ROM_END
 
 
@@ -4790,8 +4777,9 @@ GAME( 1994,  twineag2,  0,        twineag2, twineag2, ssv_state, twineag2, ROT27
 
 GAME( 1995,  gdfs,      0,        gdfs,     gdfs,     ssv_state, gdfs,     ROT0,   "Banpresto",          "Mobil Suit Gundam Final Shooting (Japan)",                               MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995,  ultrax,    0,        ultrax,   ultrax,   ssv_state, ultrax,   ROT270, "Banpresto / Tsuburaya Productions", "Ultra X Weapons / Ultra Keibitai",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-01-30 13:27:15 on startup
-GAME( 1995,  ultraxg,   ultrax,   ultrax,   ultrax,   ssv_state, ultrax,   ROT270, "Banpresto / Tsuburaya Productions", "Ultra X Weapons / Ultra Keibitai (GAMEST review build)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-02-16 15:30:24 on startup (newer, but could have pause functionality due to being a review build so left as clone)
+// Ultra X Weapon: "developed by Seta" in ending screen
+GAME( 1995,  ultrax,    0,        ultrax,   ultrax,   ssv_state, ultrax,   ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-01-30 13:27:15 on startup
+GAME( 1995,  ultraxg,   ultrax,   ultrax,   ultrax,   ssv_state, ultrax,   ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai (GAMEST review build)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-02-16 15:30:24 on startup (newer, but could have pause functionality due to being a review build so left as clone)
 
 GAME( 1996,  janjans1,  0,        janjans1, janjans1, ssv_state, janjans1, ROT0,   "Visco",              "Lovely Pop Mahjong JangJang Shimasho (Japan)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 

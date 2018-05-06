@@ -479,8 +479,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8
 };
 
@@ -490,10 +490,8 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
@@ -529,16 +527,16 @@ void dassault_state::machine_reset()
 MACHINE_CONFIG_START(dassault_state::dassault)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
-	MCFG_CPU_PROGRAM_MAP(dassault_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq4_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(dassault_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dassault_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
-	MCFG_CPU_PROGRAM_MAP(dassault_sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_assert)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(dassault_sub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/8)    /* Accurate */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000)/8)    /* Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(8400)) /* 140 CPU slices per frame */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // I was seeing random lockups.. let's see if this helps
@@ -608,13 +606,13 @@ MACHINE_CONFIG_START(dassault_state::dassault)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0)) // IRQ1
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000)/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_YM2151_ADD("ym2", XTAL(32'220'000)/9)
+	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000)/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(dassault_state,sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, dassault_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 

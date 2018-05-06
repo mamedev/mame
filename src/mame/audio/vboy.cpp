@@ -191,6 +191,9 @@ static inline void mputb(uint8_t *ptr, int8_t data) { *ptr = data; }
 //  LIVE DEVICE
 //**************************************************************************
 
+constexpr unsigned vboysnd_device::AUDIO_FREQ;
+
+
 //-------------------------------------------------
 //  vboysnd_device - constructor
 //-------------------------------------------------

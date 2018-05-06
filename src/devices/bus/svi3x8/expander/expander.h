@@ -158,7 +158,7 @@ protected:
 };
 
 // device type definition
-extern const device_type SVI_EXPANDER;
+DECLARE_DEVICE_TYPE(SVI_EXPANDER, svi_expander_device)
 
 // include here so drivers don't need to
 #include "modules.h"

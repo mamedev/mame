@@ -1438,9 +1438,10 @@ device_memory_interface::space_config_vector mos8563_device::memory_space_config
 }
 
 // default address maps
-ADDRESS_MAP_START(mos8563_device::mos8563_videoram_map)
-	AM_RANGE(0x0000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mos8563_device::mos8563_videoram_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
+}
 
 
 r6545_1_device::r6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

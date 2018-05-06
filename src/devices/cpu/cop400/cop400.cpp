@@ -134,32 +134,38 @@ DEFINE_DEVICE_TYPE(COP446C, cop446c_cpu_device, "cop446c", "National Semiconduct
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(cop400_cpu_device::program_512b)
-	AM_RANGE(0x000, 0x1ff) AM_ROM
-ADDRESS_MAP_END
+void cop400_cpu_device::program_512b(address_map &map)
+{
+	map(0x000, 0x1ff).rom();
+}
 
-ADDRESS_MAP_START(cop400_cpu_device::program_1kb)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
+void cop400_cpu_device::program_1kb(address_map &map)
+{
+	map(0x000, 0x3ff).rom();
+}
 
-ADDRESS_MAP_START(cop400_cpu_device::program_2kb)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void cop400_cpu_device::program_2kb(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
-ADDRESS_MAP_START(cop400_cpu_device::data_32b)
-	AM_RANGE(0x00, 0x07) AM_MIRROR(0x08) AM_RAM
-	AM_RANGE(0x10, 0x17) AM_MIRROR(0x08) AM_RAM
-	AM_RANGE(0x20, 0x27) AM_MIRROR(0x08) AM_RAM
-	AM_RANGE(0x30, 0x37) AM_MIRROR(0x08) AM_RAM
-ADDRESS_MAP_END
+void cop400_cpu_device::data_32b(address_map &map)
+{
+	map(0x00, 0x07).mirror(0x08).ram();
+	map(0x10, 0x17).mirror(0x08).ram();
+	map(0x20, 0x27).mirror(0x08).ram();
+	map(0x30, 0x37).mirror(0x08).ram();
+}
 
-ADDRESS_MAP_START(cop400_cpu_device::data_64b)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
+void cop400_cpu_device::data_64b(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+}
 
-ADDRESS_MAP_START(cop400_cpu_device::data_128b)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void cop400_cpu_device::data_128b(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+}
 
 
 cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t program_addr_bits, uint8_t data_addr_bits, uint8_t featuremask, uint8_t g_mask, uint8_t d_mask, uint8_t in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data)

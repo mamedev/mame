@@ -53,7 +53,7 @@ private:
 
 	uint16_t m_conf[11], m_input[2];
 	int m_input_ptr, m_memory_ptr, m_conf_ptr;
-	int m_command;
+	int m_command, m_horiz_pix_total, m_vert_pix_total;
 
 	uint16_t m_sad;
 	uint16_t m_org;
@@ -63,7 +63,7 @@ private:
 	uint16_t m_udl;
 
 	bool m_enable_video, m_enable_cursor, m_enable_sprite;
-	uint16_t m_cursor_x, m_cursor_y;
+	uint16_t m_cursor_x, m_cursor_y, m_saved_x;
 	uint16_t m_sprite_x, m_sprite_y;
 	struct {
 		uint16_t width, height, org_x, org_y, width_w;

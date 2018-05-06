@@ -362,10 +362,11 @@ WRITE8_MEMBER(nes_datach_device::write_h)
 //  BARCODE READER + CART SLOT + X24C02
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START(datach_cart)
-	SLOT_INTERFACE_INTERNAL("datach_rom", NES_DATACH_ROM)
-	SLOT_INTERFACE_INTERNAL("datach_ep1", NES_DATACH_24C01)
-SLOT_INTERFACE_END
+static void datach_cart(device_slot_interface &device)
+{
+	device.option_add_internal("datach_rom", NES_DATACH_ROM);
+	device.option_add_internal("datach_ep1", NES_DATACH_24C01);
+}
 
 
 MACHINE_CONFIG_START(nes_datach_device::device_add_mconfig)

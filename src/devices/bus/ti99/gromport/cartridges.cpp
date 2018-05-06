@@ -397,11 +397,11 @@ void ti99_cartridge_device::device_config_complete()
     5 GROMs that may be contained in a cartridge
 */
 MACHINE_CONFIG_START(ti99_cartridge_device::device_add_mconfig)
-	MCFG_GROM_ADD( GROM3_TAG, 3, CARTGROM_TAG, 0x0000, WRITELINE(ti99_cartridge_device, ready_line))
-	MCFG_GROM_ADD( GROM4_TAG, 4, CARTGROM_TAG, 0x2000, WRITELINE(ti99_cartridge_device, ready_line))
-	MCFG_GROM_ADD( GROM5_TAG, 5, CARTGROM_TAG, 0x4000, WRITELINE(ti99_cartridge_device, ready_line))
-	MCFG_GROM_ADD( GROM6_TAG, 6, CARTGROM_TAG, 0x6000, WRITELINE(ti99_cartridge_device, ready_line))
-	MCFG_GROM_ADD( GROM7_TAG, 7, CARTGROM_TAG, 0x8000, WRITELINE(ti99_cartridge_device, ready_line))
+	MCFG_GROM_ADD( GROM3_TAG, 3, CARTGROM_TAG, 0x0000, WRITELINE(*this, ti99_cartridge_device, ready_line))
+	MCFG_GROM_ADD( GROM4_TAG, 4, CARTGROM_TAG, 0x2000, WRITELINE(*this, ti99_cartridge_device, ready_line))
+	MCFG_GROM_ADD( GROM5_TAG, 5, CARTGROM_TAG, 0x4000, WRITELINE(*this, ti99_cartridge_device, ready_line))
+	MCFG_GROM_ADD( GROM6_TAG, 6, CARTGROM_TAG, 0x6000, WRITELINE(*this, ti99_cartridge_device, ready_line))
+	MCFG_GROM_ADD( GROM7_TAG, 7, CARTGROM_TAG, 0x8000, WRITELINE(*this, ti99_cartridge_device, ready_line))
 MACHINE_CONFIG_END
 
 

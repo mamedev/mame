@@ -124,7 +124,7 @@ READ8_MEMBER(pc1403_state::pc1403_inb)
 WRITE8_MEMBER(pc1403_state::pc1403_outc)
 {
 	m_portc = data;
-//    logerror("%g pc %.4x outc %.2x\n", device->machine().time().as_double(), device->m_maincpu->safe_pc(), data);
+//    logerror("%s %g pc %.4x outc %.2x\n", machine().describe_context(), machine().time().as_double(), data);
 }
 
 

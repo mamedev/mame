@@ -516,9 +516,9 @@ MACHINE_RESET_MEMBER(svision_state,tvlink)
 
 MACHINE_CONFIG_START(svision_state::svision)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, 4000000)        /* ? stz used! speed? */
-	MCFG_CPU_PROGRAM_MAP(svision_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", svision_state,  svision_frame_int)
+	MCFG_DEVICE_ADD("maincpu", M65C02, 4000000)        /* ? stz used! speed? */
+	MCFG_DEVICE_PROGRAM_MAP(svision_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", svision_state,  svision_frame_int)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -535,7 +535,7 @@ MACHINE_CONFIG_START(svision_state::svision)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", SVISION_SND, 0)
+	MCFG_DEVICE_ADD("custom", SVISION_SND, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 	SVISION_SND_IRQ_CB(svision_state, svision_irq)
@@ -557,8 +557,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(svision_state::svisionp)
 	svision(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(4430000)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(4430000)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_PALETTE_MODIFY("palette")
@@ -567,8 +567,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(svision_state::svisionn)
 	svision(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(3560000/*?*/)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(3560000/*?*/)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_PALETTE_MODIFY("palette")
@@ -577,8 +577,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(svision_state::tvlinkp)
 	svisionp(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tvlink_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tvlink_mem)
 
 	MCFG_MACHINE_RESET_OVERRIDE(svision_state, tvlink)
 

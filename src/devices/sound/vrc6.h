@@ -55,6 +55,6 @@ private:
 
 
 // device type definition
-extern const device_type VRC6;
+DECLARE_DEVICE_TYPE(VRC6, vrc6snd_device)
 
 #endif // MAME_SOUND_VRC6_H

@@ -386,9 +386,9 @@ DRIVER_INIT_MEMBER( bcs3_state, bcs3d )
 MACHINE_CONFIG_START(bcs3_state::bcs3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000) /2)
-	MCFG_CPU_PROGRAM_MAP(bcs3_mem)
-	MCFG_CPU_IO_MAP(bcs3_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) /2)
+	MCFG_DEVICE_PROGRAM_MAP(bcs3_mem)
+	MCFG_DEVICE_IO_MAP(bcs3_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
 	/* video hardware */
@@ -404,8 +404,8 @@ MACHINE_CONFIG_START(bcs3_state::bcs3)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(5'000'000) / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(bcs3_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(bcs3_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, bcs3_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, bcs3_state, ctc_z1_w))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
@@ -413,9 +413,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(bcs3_state::bcs3a)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(7'000'000) /2)
-	MCFG_CPU_PROGRAM_MAP(bcs3a_mem)
-	MCFG_CPU_IO_MAP(bcs3_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(7'000'000) /2)
+	MCFG_DEVICE_PROGRAM_MAP(bcs3a_mem)
+	MCFG_DEVICE_IO_MAP(bcs3_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
 	/* video hardware */
@@ -431,8 +431,8 @@ MACHINE_CONFIG_START(bcs3_state::bcs3a)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(7'000'000) / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(bcs3_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(bcs3_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, bcs3_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, bcs3_state, ctc_z1_w))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END

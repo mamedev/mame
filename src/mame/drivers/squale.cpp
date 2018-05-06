@@ -246,7 +246,7 @@ WRITE8_MEMBER( squale_state::fdc_sel0_w )
 	floppy_image_device *floppy = 0;
 
 	#ifdef DBGMODE
-	printf("%s: write fdc_sel0_w reg : 0x%X\n",machine().describe_context(),data);
+	printf("%s: write fdc_sel0_w reg : 0x%X\n",machine().describe_context().c_str(),data);
 	#endif
 
 	fdc_sel0 = data;
@@ -292,7 +292,7 @@ WRITE8_MEMBER( squale_state::fdc_sel0_w )
 WRITE8_MEMBER( squale_state::fdc_sel1_w )
 {
 	#ifdef DBGMODE
-	printf("%s: write fdc_sel1_w reg : 0x%X\n",machine().describe_context(),data);
+	printf("%s: write fdc_sel1_w reg : 0x%X\n",machine().describe_context().c_str(),data);
 	#endif
 
 	fdc_sel1 = data;
@@ -305,7 +305,7 @@ READ8_MEMBER( squale_state::fdc_sel0_r )
 	data = fdc_sel0;
 
 	#ifdef DBGMODE
-	printf("%s: read fdc_sel0_r 0x%.2X\n",machine().describe_context(),data);
+	printf("%s: read fdc_sel0_r 0x%.2X\n",machine().describe_context().c_str(),data);
 	#endif
 
 	return data;
@@ -318,7 +318,7 @@ READ8_MEMBER( squale_state::fdc_sel1_r )
 	data = fdc_sel1;
 
 	#ifdef DBGMODE
-	printf("%s: read fdc_sel1_r 0x%.2X\n",machine().describe_context(),data);
+	printf("%s: read fdc_sel1_r 0x%.2X\n",machine().describe_context().c_str(),data);
 	#endif
 
 	return data;
@@ -332,7 +332,7 @@ WRITE8_MEMBER( squale_state::pia_u75_porta_w )
 {
 	// U75 PIA Port A : Keyboard rows output
 	#ifdef DBGMODE
-	printf("%s: write pia_u75_porta_w : 0x%.2X\n",machine().describe_context(),data);
+	printf("%s: write pia_u75_porta_w : 0x%.2X\n",machine().describe_context().c_str(),data);
 	#endif
 	keyboard_line = data;
 	return;
@@ -344,7 +344,7 @@ READ8_MEMBER( squale_state::pia_u75_porta_r )
 	uint8_t data;
 
 	#ifdef DBGMODE
-	printf("%s: read pia_u75_porta_r\n",machine().describe_context());
+	printf("%s: read pia_u75_porta_r\n",machine().describe_context().c_str());
 	#endif
 
 	data = keyboard_line;
@@ -380,7 +380,7 @@ READ8_MEMBER( squale_state::pia_u75_portb_r )
 	}
 
 	#ifdef DBGMODE
-	printf("%s: read pia_u75_portb_r : 0x%.2X\n",machine().describe_context(),data);
+	printf("%s: read pia_u75_portb_r : 0x%.2X\n",machine().describe_context().c_str(),data);
 	#endif
 
 	return data;
@@ -390,7 +390,7 @@ WRITE8_MEMBER( squale_state::pia_u75_portb_w )
 {
 	// U75 PIA Port B : Keyboard column input
 	#ifdef DBGMODE
-	printf("%s: write pia_u75_portb_w : 0x%.2X\n",machine().describe_context(),data);
+	printf("%s: write pia_u75_portb_w : 0x%.2X\n",machine().describe_context().c_str(),data);
 	#endif
 	return;
 }
@@ -418,7 +418,7 @@ READ8_MEMBER( squale_state::ay_portb_r )
 	data |= ( ioport("ay_joy_2")->read() ) & 0x8F;
 
 	#ifdef DBGMODE
-	printf("%s: read ay_portb_r : 0x%.2X\n",machine().describe_context(),data);
+	printf("%s: read ay_portb_r : 0x%.2X\n",machine().describe_context().c_str(),data);
 	#endif
 
 	return data;
@@ -439,7 +439,7 @@ READ8_MEMBER( squale_state::ay_porta_r )
 	uint8_t data;
 
 	#ifdef DBGMODE
-	printf("%s: read ay_porta_r\n",machine().describe_context());
+	printf("%s: read ay_porta_r\n",machine().describe_context().c_str());
 	#endif
 
 	data =  ( ioport("ay_joy_2")->read() ) & 0x8F;
@@ -460,7 +460,7 @@ WRITE8_MEMBER( squale_state::ay_porta_w )
 	// B0 : Joystick 1 - Right
 
 	#ifdef DBGMODE
-	printf("%s: write ay_porta_w : 0x%.2X\n",machine().describe_context(),data);
+	printf("%s: write ay_porta_w : 0x%.2X\n",machine().describe_context().c_str(),data);
 	#endif
 	return;
 }
@@ -478,7 +478,7 @@ WRITE8_MEMBER( squale_state::ay_portb_w )
 	// B0 : Joystick 2 - Right
 
 	#ifdef DBGMODE
-	printf("%s: write ay_portb_w : 0x%.2X\n",machine().describe_context(),data);
+	printf("%s: write ay_portb_w : 0x%.2X\n",machine().describe_context().c_str(),data);
 	#endif
 	return;
 }
@@ -493,7 +493,7 @@ READ8_MEMBER( squale_state::pia_u72_porta_r )
 	uint8_t data;
 
 	#ifdef DBGMODE
-	printf("%s: read pia_u72_porta_r\n",machine().describe_context());
+	printf("%s: read pia_u72_porta_r\n",machine().describe_context().c_str());
 	#endif
 
 	if( m_cart_rom && m_cart_rom->bytes() )
@@ -509,7 +509,7 @@ WRITE8_MEMBER( squale_state::pia_u72_porta_w )
 	// U72 PIA Port A : Cartridge data bus
 
 	#ifdef DBGMODE
-	printf("%s: write pia_u72_porta_w : 0x%.2X\n",machine().describe_context(),data);
+	printf("%s: write pia_u72_porta_w : 0x%.2X\n",machine().describe_context().c_str(),data);
 	#endif
 
 	return;
@@ -520,7 +520,7 @@ WRITE_LINE_MEMBER( squale_state::pia_u72_ca2_w )
 	// U72 PIA CA2 : Cartridge address control
 
 	#ifdef DBGMODE
-	printf("%s: U72 PIA Port CA2 Set to %2x\n", machine().describe_context(),state);
+	printf("%s: U72 PIA Port CA2 Set to %2x\n", machine().describe_context().c_str(),state);
 	#endif
 
 	if( state )
@@ -544,7 +544,7 @@ WRITE_LINE_MEMBER( squale_state::pia_u75_cb2_w )
 	// U75 PIA CB2 : Cartridge address reset
 
 	#ifdef DBGMODE
-	printf("%s: U75 PIA Port CB2 Set to %2x\n", machine().describe_context(),state);
+	printf("%s: U75 PIA Port CB2 Set to %2x\n", machine().describe_context().c_str(),state);
 	#endif
 
 	if( state )
@@ -570,7 +570,7 @@ READ8_MEMBER( squale_state::pia_u72_portb_r )
 	uint8_t data = 0xFF;
 
 	#ifdef DBGMODE
-	printf("%s: read pia_u72_portb_r\n",machine().describe_context());
+	printf("%s: read pia_u72_portb_r\n",machine().describe_context().c_str());
 	#endif
 
 	return data;
@@ -581,7 +581,7 @@ WRITE8_MEMBER( squale_state::pia_u72_portb_w )
 	// U72 PIA Port B : Printer data bus
 
 	#ifdef DBGMODE
-	printf("%s: write pia_u72_portb_w : 0x%.2X\n",machine().describe_context(),data);
+	printf("%s: write pia_u72_portb_w : 0x%.2X\n",machine().describe_context().c_str(),data);
 	#endif
 
 	return;
@@ -592,7 +592,7 @@ WRITE_LINE_MEMBER( squale_state::pia_u72_cb2_w )
 	// U72 PIA CB2 : Printer Data Strobe line
 
 	#ifdef DBGMODE
-	printf("%s: U72 PIA Port CB2 Set to %2x\n", machine().describe_context(),state);
+	printf("%s: U72 PIA Port CB2 Set to %2x\n", machine().describe_context().c_str(),state);
 	#endif
 }
 
@@ -739,9 +739,10 @@ static INPUT_PORTS_START( squale )
 
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START( squale_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void squale_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 void squale_state::machine_start()
 {
@@ -779,34 +780,34 @@ void squale_state::machine_reset()
 
 MACHINE_CONFIG_START(squale_state::squale)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(squale_mem)
+	MCFG_DEVICE_ADD("maincpu", MC6809, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(squale_mem)
 
 	/* Cartridge pia */
 	MCFG_DEVICE_ADD("pia_u72", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(squale_state, pia_u72_porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(squale_state, pia_u72_portb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(squale_state, pia_u72_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(squale_state, pia_u72_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(squale_state, pia_u72_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(squale_state, pia_u72_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, squale_state, pia_u72_porta_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, squale_state, pia_u72_portb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, squale_state, pia_u72_porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, squale_state, pia_u72_portb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, squale_state, pia_u72_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, squale_state, pia_u72_cb2_w))
 
 	/* Keyboard pia */
 	MCFG_DEVICE_ADD("pia_u75", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(squale_state, pia_u75_porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(squale_state, pia_u75_portb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(squale_state, pia_u75_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(squale_state, pia_u75_portb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(squale_state, pia_u75_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, squale_state, pia_u75_porta_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, squale_state, pia_u75_portb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, squale_state, pia_u75_porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, squale_state, pia_u75_portb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, squale_state, pia_u75_cb2_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, AY_CLOCK)
+	MCFG_DEVICE_ADD("ay8910", AY8910, AY_CLOCK)
 	// TODO : Add port I/O handler
-	MCFG_AY8910_PORT_A_READ_CB(READ8(squale_state, ay_porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(squale_state, ay_portb_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(squale_state, ay_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(squale_state, ay_portb_w))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, squale_state, ay_porta_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, squale_state, ay_portb_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, squale_state, ay_porta_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, squale_state, ay_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD ("ef6850", ACIA6850, 0)

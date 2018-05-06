@@ -240,7 +240,7 @@ WRITE8_MEMBER(segald_state::astron_COLOR_write)
 WRITE8_MEMBER(segald_state::astron_FIX_write)
 {
 	m_fix_ram[offset] = data;
-	/* logerror("FIX write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, space.device().safe_pc()); */
+	/* logerror("%s FIX write : 0x%04x [0x%x]\n", machine().describe_context(), data, offset); */
 }
 
 WRITE8_MEMBER(segald_state::astron_io_bankswitch_w)
@@ -375,10 +375,10 @@ void segald_state::machine_start()
 MACHINE_CONFIG_START(segald_state::astron)
 
 	/* main cpu */
-	MCFG_CPU_ADD("maincpu", Z80, SCHEMATIC_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(mainmem)
-	MCFG_CPU_IO_MAP(mainport)
-	MCFG_CPU_PERIODIC_INT_DRIVER(segald_state, nmi_line_pulse,  1000.0/59.94)
+	MCFG_DEVICE_ADD("maincpu", Z80, SCHEMATIC_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(mainmem)
+	MCFG_DEVICE_IO_MAP(mainport)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(segald_state, nmi_line_pulse,  1000.0/59.94)
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(segald_state::astron)
 	/* sound hardare */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

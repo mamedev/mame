@@ -226,12 +226,11 @@ void pcktgal_state::machine_start()
 MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 2000000)
-	MCFG_CPU_PROGRAM_MAP(pcktgal_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pcktgal_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", M6502, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(pcktgal_map)
 
-	MCFG_CPU_ADD("audiocpu", DECO_222, 1500000)
-	MCFG_CPU_PROGRAM_MAP(pcktgal_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", DECO_222, 1500000)
+	MCFG_DEVICE_PROGRAM_MAP(pcktgal_sound_map)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 
@@ -243,6 +242,7 @@ MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pcktgal_state, screen_update_pcktgal)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcktgal)
 	MCFG_PALETTE_ADD("palette", 512)
@@ -258,14 +258,14 @@ MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3812, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(pcktgal_state, adpcm_int))  /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, pcktgal_state, adpcm_int))  /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz            */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
@@ -281,8 +281,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pcktgal_state::pcktgal2)
 	pcktgal(config);
 	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000) /* doesn't use the encrypted 222 */
-	MCFG_CPU_PROGRAM_MAP(pcktgal_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000) /* doesn't use the encrypted 222 */
+	MCFG_DEVICE_PROGRAM_MAP(pcktgal_sound_map)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

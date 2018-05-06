@@ -135,139 +135,139 @@ WRITE_LINE_MEMBER(leland_80186_sound_device::i80186_tmr1_w)
 
 MACHINE_CONFIG_START(leland_80186_sound_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u31 + ad7524.u46
-	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u32 + ad7524.u47
-	MCFG_SOUND_ADD("dac3", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u33 + ad7524.u48
-	MCFG_SOUND_ADD("dac4", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u34 + ad7524.u49
-	MCFG_SOUND_ADD("dac5", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u35 + ad7524.u50
-	MCFG_SOUND_ADD("dac6", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u36 + ad7524.u51
-	MCFG_SOUND_ADD("dac9", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // ad7533.u64
-	MCFG_SOUND_ADD("dac1vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT) // 74hc374.u17 + r2-r9 (24k,12k,6.2k,3k,1.5k,750,360,160)
-	MCFG_SOUND_ADD("dac2vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT) // 74hc374.u18 + r12-r19 (24k,12k,6.2k,3k,1.5k,750,360,160)
-	MCFG_SOUND_ADD("dac3vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac3", -1.0, DAC_VREF_NEG_INPUT) // 74hc374.u19 + r22-r29 (24k,12k,6.2k,3k,1.5k,750,360,160)
-	MCFG_SOUND_ADD("dac4vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac4", -1.0, DAC_VREF_NEG_INPUT) // 74hc374.u20 + r32-r39 (24k,12k,6.2k,3k,1.5k,750,360,160)
-	MCFG_SOUND_ADD("dac5vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac5", -1.0, DAC_VREF_NEG_INPUT) // 74hc374.u21 + r42-r49 (24k,12k,6.2k,3k,1.5k,750,360,160)
-	MCFG_SOUND_ADD("dac6vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac6", -1.0, DAC_VREF_NEG_INPUT) // 74hc374.u22 + r52-r59 (24k,12k,6.2k,3k,1.5k,750,360,160)
+	MCFG_DEVICE_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u31 + ad7524.u46
+	MCFG_DEVICE_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u32 + ad7524.u47
+	MCFG_DEVICE_ADD("dac3", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u33 + ad7524.u48
+	MCFG_DEVICE_ADD("dac4", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u34 + ad7524.u49
+	MCFG_DEVICE_ADD("dac5", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u35 + ad7524.u50
+	MCFG_DEVICE_ADD("dac6", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u36 + ad7524.u51
+	MCFG_DEVICE_ADD("dac9", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // ad7533.u64
+	MCFG_DEVICE_ADD("dac1vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT) // 74hc374.u17 + r2-r9 (24k,12k,6.2k,3k,1.5k,750,360,160)
+	MCFG_DEVICE_ADD("dac2vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT) // 74hc374.u18 + r12-r19 (24k,12k,6.2k,3k,1.5k,750,360,160)
+	MCFG_DEVICE_ADD("dac3vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac3", -1.0, DAC_VREF_NEG_INPUT) // 74hc374.u19 + r22-r29 (24k,12k,6.2k,3k,1.5k,750,360,160)
+	MCFG_DEVICE_ADD("dac4vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac4", -1.0, DAC_VREF_NEG_INPUT) // 74hc374.u20 + r32-r39 (24k,12k,6.2k,3k,1.5k,750,360,160)
+	MCFG_DEVICE_ADD("dac5vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac5", -1.0, DAC_VREF_NEG_INPUT) // 74hc374.u21 + r42-r49 (24k,12k,6.2k,3k,1.5k,750,360,160)
+	MCFG_DEVICE_ADD("dac6vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac6", -1.0, DAC_VREF_NEG_INPUT) // 74hc374.u22 + r52-r59 (24k,12k,6.2k,3k,1.5k,750,360,160)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac4vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac5vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac6vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac9", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac9", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac4vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac5vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac6vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac9", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac9", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("pit0", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4000000)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(":audiocpu", i80186_cpu_device, drq0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(":audiocpu", i80186_cpu_device, drq0_w))
 	MCFG_PIT8253_CLK1(4000000)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE(":audiocpu", i80186_cpu_device, drq1_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(":audiocpu", i80186_cpu_device, drq1_w))
 	MCFG_PIT8253_CLK2(4000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit0_2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, leland_80186_sound_device, pit0_2_w))
 
 	MCFG_DEVICE_ADD("pit1", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4000000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(leland_80186_sound_device, pit1_0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, leland_80186_sound_device, pit1_0_w))
 	MCFG_PIT8253_CLK1(4000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(leland_80186_sound_device, pit1_1_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, leland_80186_sound_device, pit1_1_w))
 	MCFG_PIT8253_CLK2(4000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit1_2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, leland_80186_sound_device, pit1_2_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redline_80186_sound_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac3", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac4", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac5", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac6", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac7", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac8", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac1vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_SOUND_ADD("dac2vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_SOUND_ADD("dac3vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac3", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_SOUND_ADD("dac4vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac4", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_SOUND_ADD("dac5vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac5", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_SOUND_ADD("dac6vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac6", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_SOUND_ADD("dac7vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac7", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_SOUND_ADD("dac8vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac8", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac8", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac3", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac4", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac5", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac6", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac7", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac8", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac1vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac2vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac3vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac3", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac4vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac4", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac5vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac5", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac6vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac6", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac7vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac7", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac8vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac8", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac8", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac4vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac5vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac6vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac7vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac8vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac4vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac5vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac6vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac7vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac8vol", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_DEVICE_ADD("pit0", PIT8254, 0)
 	MCFG_PIT8253_CLK0(7000000)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(":audiocpu", i80186_cpu_device, drq0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(":audiocpu", i80186_cpu_device, drq0_w))
 	MCFG_PIT8253_CLK1(7000000)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE(":audiocpu", i80186_cpu_device, drq1_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(":audiocpu", i80186_cpu_device, drq1_w))
 	MCFG_PIT8253_CLK2(7000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit0_2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, leland_80186_sound_device, pit0_2_w))
 
 	MCFG_DEVICE_ADD("pit1", PIT8254, 0)
 	MCFG_PIT8253_CLK0(7000000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(leland_80186_sound_device, pit1_0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, leland_80186_sound_device, pit1_0_w))
 	MCFG_PIT8253_CLK1(7000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(leland_80186_sound_device, pit1_1_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, leland_80186_sound_device, pit1_1_w))
 	MCFG_PIT8253_CLK2(7000000)
 
 	MCFG_DEVICE_ADD("pit2", PIT8254, 0)
 	MCFG_PIT8253_CLK0(7000000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(leland_80186_sound_device, pit1_2_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, leland_80186_sound_device, pit1_2_w))
 	MCFG_PIT8253_CLK1(7000000)
 	MCFG_PIT8253_CLK2(7000000)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ataxx_80186_sound_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac3", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac4", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac9", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
-	MCFG_SOUND_ADD("dac1vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_SOUND_ADD("dac2vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_SOUND_ADD("dac3vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac3", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_SOUND_ADD("dac4vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac4", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac3", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac4", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac9", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac1vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac2vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac3vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac3", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac4vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac4", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac4vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac9", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac9", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac4vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac9", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac9", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("pit0", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4000000)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(":audiocpu", i80186_cpu_device, drq0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(":audiocpu", i80186_cpu_device, drq0_w))
 	MCFG_PIT8253_CLK1(4000000)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE(":audiocpu", i80186_cpu_device, drq1_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(":audiocpu", i80186_cpu_device, drq1_w))
 	MCFG_PIT8253_CLK2(4000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit0_2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, leland_80186_sound_device, pit0_2_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wsf_80186_sound_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac3", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac4", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_SOUND_ADD("dac9", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
-	MCFG_SOUND_ADD("dac1vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_SOUND_ADD("dac2vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_SOUND_ADD("dac3vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac3", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
-	MCFG_SOUND_ADD("dac4vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE_EX(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac4", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac3", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac4", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("dac9", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac1vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac2vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac3vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac3", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
+	MCFG_DEVICE_ADD("dac4vol", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac4", -1.0, DAC_VREF_NEG_INPUT) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac4vol", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac9", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac9", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac4vol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac9", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac9", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* sound hardware */
 	MCFG_YM2151_ADD("ymsnd", 4000000)
@@ -276,11 +276,11 @@ MACHINE_CONFIG_START(wsf_80186_sound_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("pit0", PIT8254, 0)
 	MCFG_PIT8253_CLK0(4000000)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(":audiocpu", i80186_cpu_device, drq0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(":audiocpu", i80186_cpu_device, drq0_w))
 	MCFG_PIT8253_CLK1(4000000)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE(":audiocpu", i80186_cpu_device, drq1_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(":audiocpu", i80186_cpu_device, drq1_w))
 	MCFG_PIT8253_CLK2(4000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit0_2_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, leland_80186_sound_device, pit0_2_w))
 MACHINE_CONFIG_END
 
 
@@ -403,12 +403,12 @@ WRITE16_MEMBER(leland_80186_sound_device::peripheral_ctrl)
 			uint32_t temp = (m_peripheral & 0xffc0) << 4;
 			if (data & 0x0040)
 			{
-				m_audiocpu->device_t::memory().space(AS_PROGRAM).install_readwrite_handler(temp, temp + 0x2ff, read16_delegate(FUNC(leland_80186_sound_device::peripheral_r), this), write16_delegate(FUNC(leland_80186_sound_device::peripheral_w), this));
+				m_audiocpu->space(AS_PROGRAM).install_readwrite_handler(temp, temp + 0x2ff, read16_delegate(FUNC(leland_80186_sound_device::peripheral_r), this), write16_delegate(FUNC(leland_80186_sound_device::peripheral_w), this));
 			}
 			else
 			{
 				temp &= 0xffff;
-				m_audiocpu->device_t::memory().space(AS_IO).install_readwrite_handler(temp, temp + 0x2ff, read16_delegate(FUNC(leland_80186_sound_device::peripheral_r), this), write16_delegate(FUNC(leland_80186_sound_device::peripheral_w), this));
+				m_audiocpu->space(AS_IO).install_readwrite_handler(temp, temp + 0x2ff, read16_delegate(FUNC(leland_80186_sound_device::peripheral_r), this), write16_delegate(FUNC(leland_80186_sound_device::peripheral_w), this));
 			}
 			break;
 		}
@@ -434,7 +434,7 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_control_w )
 
 	if (LOG_COMM)
 	{
-		logerror("%04X:80186 control = %02X", m_audiocpu->device_t::safe_pc(), data);
+		logerror("%s:80186 control = %02X", machine().describe_context(), data);
 		if (!(data & 0x80)) logerror("  /RESET");
 		if (!(data & 0x40)) logerror("  ZNMI");
 		if (!(data & 0x20)) logerror("  INT0");
@@ -444,8 +444,8 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_control_w )
 	}
 
 	/* /RESET */
-	m_audiocpu->device_t::execute().set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-	m_audiocpu->device_t::execute().set_input_line(INPUT_LINE_TEST, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_TEST, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* /NMI */
 /*  If the master CPU doesn't get a response by the time it's ready to send
@@ -486,7 +486,7 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_command_lo_w )
 
 WRITE8_MEMBER( leland_80186_sound_device::leland_80186_command_hi_w )
 {
-	if (LOG_COMM) logerror("%04X:Write sound command latch hi = %02X\n", m_audiocpu->device_t::safe_pc(), data);
+	if (LOG_COMM) logerror("%s:Write sound command latch hi = %02X\n", machine().describe_context(), data);
 	m_sound_command = (m_sound_command & 0x00ff) | (data << 8);
 }
 
@@ -527,7 +527,7 @@ void leland_80186_sound_device::delayed_response_r(void *ptr, int param)
 READ8_MEMBER( leland_80186_sound_device::leland_80186_response_r )
 {
 	cpu_device *master = machine().device<cpu_device>("master");
-	offs_t pc = master->device_t::safe_pcbase();
+	offs_t pc = master->pcbase();
 
 	if (LOG_COMM) logerror("%04X:Read sound response latch = %02X\n", pc, m_sound_response);
 
@@ -674,7 +674,7 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
 		break;
 	}
 
-	logerror("%05X:Unexpected peripheral write %d/%02X = %02X\n", m_audiocpu->device_t::safe_pc(), 5, offset, data);
+	logerror("%s:Unexpected peripheral write %d/%02X = %02X\n", machine().describe_context(), 5, offset, data);
 }
 
 
@@ -705,7 +705,7 @@ READ16_MEMBER( leland_80186_sound_device::peripheral_r )
 				return ((m_clock_active << 1) & 0x7e);
 
 		case 1:
-			if (LOG_COMM) logerror("%05X:Read sound command latch = %02X\n", m_audiocpu->device_t::safe_pc(), m_sound_command);
+			if (LOG_COMM) logerror("%s:Read sound command latch = %02X\n", machine().describe_context(), m_sound_command);
 			return m_sound_command;
 
 		case 2:
@@ -730,11 +730,11 @@ READ16_MEMBER( leland_80186_sound_device::peripheral_r )
 					return m_pit2->read(space, offset & 3);
 			}
 			else
-				logerror("%05X:Unexpected peripheral read %d/%02X\n", m_audiocpu->device_t::safe_pc(), select, offset*2);
+				logerror("%s:Unexpected peripheral read %d/%02X\n", machine().describe_context(), select, offset*2);
 			break;
 
 		default:
-			logerror("%05X:Unexpected peripheral read %d/%02X\n", m_audiocpu->device_t::safe_pc(), select, offset*2);
+			logerror("%s:Unexpected peripheral read %d/%02X\n", machine().describe_context(), select, offset*2);
 			break;
 	}
 	return 0xffff;
@@ -749,7 +749,7 @@ WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
 	switch (select)
 	{
 		case 1:
-			if (LOG_COMM) logerror("%05X:Write sound response latch = %02X\n", m_audiocpu->device_t::safe_pc(), data);
+			if (LOG_COMM) logerror("%s:Write sound response latch = %02X\n", machine().describe_context(), data);
 			m_sound_response = data;
 			break;
 
@@ -787,7 +787,7 @@ WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
 			break;
 
 		default:
-			logerror("%05X:Unexpected peripheral write %d/%02X = %02X\n", m_audiocpu->device_t::safe_pc(), select, offset, data);
+			logerror("%s:Unexpected peripheral write %d/%02X = %02X\n", machine().describe_context(), select, offset, data);
 			break;
 	}
 }

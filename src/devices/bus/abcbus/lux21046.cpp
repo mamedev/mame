@@ -256,14 +256,15 @@ FLOPPY_FORMATS_MEMBER( luxor_55_21046_device::floppy_formats )
 	FLOPPY_ABC800_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( abc_floppies )
-	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD )
-	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void abc_floppies(device_slot_interface &device)
+{
+	device.option_add("525sssd", FLOPPY_525_SSSD);
+	device.option_add("525sd", FLOPPY_525_SD);
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 WRITE_LINE_MEMBER( luxor_55_21046_device::fdc_intrq_w )
 {
@@ -290,22 +291,22 @@ static const z80_daisy_config z80_daisy_chain[] =
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(luxor_55_21046_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
 	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(luxor_55_21046_mem)
-	MCFG_CPU_IO_MAP(luxor_55_21046_io)
+	MCFG_DEVICE_PROGRAM_MAP(luxor_55_21046_mem)
+	MCFG_DEVICE_IO_MAP(luxor_55_21046_io)
 
 	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL(16'000'000)/4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
-	MCFG_Z80DMA_OUT_INT_CB(WRITELINE(luxor_55_21046_device, dma_int_w))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(luxor_55_21046_device, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(luxor_55_21046_device, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(luxor_55_21046_device, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(luxor_55_21046_device, io_write_byte))
+	MCFG_Z80DMA_OUT_INT_CB(WRITELINE(*this, luxor_55_21046_device, dma_int_w))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, luxor_55_21046_device, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, luxor_55_21046_device, memory_write_byte))
+	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, luxor_55_21046_device, io_read_byte))
+	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, luxor_55_21046_device, io_write_byte))
 
 	MCFG_FD1793_ADD(SAB1793_TAG, XTAL(16'000'000)/16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(luxor_55_21046_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, luxor_55_21046_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(abc830_device::device_add_mconfig)

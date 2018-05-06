@@ -246,6 +246,19 @@
 		</part>
 	</software>
 
+	<software name="egghead">
+		<description>Egghead in Space</description>
+		<year>2004</year>
+		<publisher>Cronosoft</publisher>
+		<info name="author" value="Chris Dewhurst" />
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="eggheadinspace-dfs_e.ssd" size="204800" crc="2b6b2898" sha1="6032eddce98e4a0b16ea410464f0d0b2ea46e7b6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elixir">
 		<description>Elixir</description>
 		<year>1987</year>
@@ -585,6 +598,19 @@
 		</part>
 	</software>
 
+	<software name="ravenwd">
+		<description>The Darkness of Raven Wood</description>
+		<year>2016</year>
+		<publisher>Rucksack Games</publisher>
+		<info name="author" value="John Blythe" />
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="ravenwd-dfs_e.ssd" size="204800" crc="c84dbfe5" sha1="79ae5d2e24dc43d5713625db3c423e305756a2cb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="repton3">
 		<description>Repton 3</description>
 		<year>1986</year>
@@ -773,6 +799,19 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="welcomedisc-adfs_e.adf" size="327680" crc="a6733fa6" sha1="70b5d940c9c7da85e82e29b1b4e3ad29a44c51bd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zaor">
+		<description>Zombies Ate Our Roadies!</description>
+		<year>2017</year>
+		<publisher>Acorn Electron Today</publisher>
+		<info name="author" value="Stuart Johns" />
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="204800">
+				<rom name="zoar-dfs_e.ssd" size="204800" crc="3aca76fd" sha1="b022ffe0f6e3d0e3a4b17b984a4acc1fce26a93b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

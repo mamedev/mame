@@ -97,9 +97,9 @@ static INPUT_PORTS_START( hp2622 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(hp2620_state::hp2622)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(25'771'500) / 7) // 3.68 MHz
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(25'771'500) / 7) // 3.68 MHz
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram") // 5101 (A7 tied to GND) + battery (+ wait states)
 

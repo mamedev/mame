@@ -50,6 +50,7 @@ public:
 	u16 m_led_select;
 	u16 m_led_data;
 	u8 m_lcd_control;
+	u8 m_lcd_data;
 
 	u16 read_inputs(int columns);
 

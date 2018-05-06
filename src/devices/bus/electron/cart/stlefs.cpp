@@ -34,10 +34,11 @@ FLOPPY_FORMATS_MEMBER(electron_stlefs_device::floppy_formats)
 	FLOPPY_ACORN_ADFS_OLD_FORMAT
 FLOPPY_FORMATS_END
 
-SLOT_INTERFACE_START(stlefs_floppies)
-	SLOT_INTERFACE("35dd",  FLOPPY_35_DD)
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+void stlefs_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd",  FLOPPY_35_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -46,8 +47,8 @@ SLOT_INTERFACE_END
 MACHINE_CONFIG_START(electron_stlefs_device::device_add_mconfig)
 	/* fdc */
 	MCFG_WD1770_ADD("fdc", 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(electron_stlefs_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(electron_stlefs_device, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, electron_stlefs_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, electron_stlefs_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", stlefs_floppies, "525qd", electron_stlefs_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", stlefs_floppies, nullptr, electron_stlefs_device::floppy_formats)

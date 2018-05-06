@@ -458,7 +458,7 @@ CUSTOM_INPUT_MEMBER(psikyo_state::z80_nmi_r)
 		/* main CPU might be waiting for sound CPU to finish NMI,
 		   so set a timer to give sound CPU a chance to run */
 		machine().scheduler().synchronize();
-//      logerror("%s - Read coin port during Z80 NMI\n", machine.describe_context());
+//      logerror("%s - Read coin port during Z80 NMI\n", machine().describe_context());
 	}
 
 	return ret;
@@ -1026,13 +1026,13 @@ void psikyo_state::machine_reset()
 MACHINE_CONFIG_START(psikyo_state::sngkace)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sngkace_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", psikyo_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sngkace_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", psikyo_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/8) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sngkace_sound_map)
-	MCFG_CPU_IO_MAP(sngkace_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sngkace_sound_map)
+	MCFG_DEVICE_IO_MAP(sngkace_sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1041,7 +1041,7 @@ MACHINE_CONFIG_START(psikyo_state::sngkace)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(psikyo_state, screen_vblank_psikyo))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, psikyo_state, screen_vblank_psikyo))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)
@@ -1053,7 +1053,7 @@ MACHINE_CONFIG_START(psikyo_state::sngkace)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(32'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(32'000'000)/4) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono",  1.0)
 
@@ -1072,13 +1072,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(psikyo_state::gunbird)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
-	MCFG_CPU_PROGRAM_MAP(gunbird_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", psikyo_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(gunbird_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", psikyo_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* ! LZ8420M (Z80 core) ! */
-	MCFG_CPU_PROGRAM_MAP(gunbird_sound_map)
-	MCFG_CPU_IO_MAP(gunbird_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* ! LZ8420M (Z80 core) ! */
+	MCFG_DEVICE_PROGRAM_MAP(gunbird_sound_map)
+	MCFG_DEVICE_IO_MAP(gunbird_sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1087,7 +1087,7 @@ MACHINE_CONFIG_START(psikyo_state::gunbird)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(psikyo_state, screen_vblank_psikyo))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, psikyo_state, screen_vblank_psikyo))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)
@@ -1099,7 +1099,7 @@ MACHINE_CONFIG_START(psikyo_state::gunbird)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono",  1.0)
 
@@ -1110,16 +1110,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psikyo_state::s1945jn)
 	gunbird(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(s1945jn_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(s1945jn_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psikyo_state::s1945bl) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
-	MCFG_CPU_PROGRAM_MAP(psikyo_bootleg_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", psikyo_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(psikyo_bootleg_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", psikyo_state,  irq1_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1128,7 +1128,7 @@ MACHINE_CONFIG_START(psikyo_state::s1945bl) /* Bootleg hardware based on the unp
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo_bootleg)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(psikyo_state, screen_vblank_psikyo))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, psikyo_state, screen_vblank_psikyo))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)
@@ -1155,15 +1155,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(psikyo_state::s1945)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
-	MCFG_CPU_PROGRAM_MAP(s1945_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", psikyo_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(s1945_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", psikyo_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* ! LZ8420M (Z80 core) ! */
-	MCFG_CPU_PROGRAM_MAP(gunbird_sound_map)
-	MCFG_CPU_IO_MAP(s1945_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* ! LZ8420M (Z80 core) ! */
+	MCFG_DEVICE_PROGRAM_MAP(gunbird_sound_map)
+	MCFG_DEVICE_IO_MAP(s1945_sound_io_map)
 
-	MCFG_CPU_ADD("mcu", PIC16C57, 4000000)  /* 4 MHz? */
+	MCFG_DEVICE_ADD("mcu", PIC16C57, 4000000)  /* 4 MHz? */
 	MCFG_DEVICE_DISABLE()   /* Internal ROM aren't dumped */
 
 	/* video hardware */
@@ -1173,7 +1173,7 @@ MACHINE_CONFIG_START(psikyo_state::s1945)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(psikyo_state, screen_update_psikyo)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(psikyo_state, screen_vblank_psikyo))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, psikyo_state, screen_vblank_psikyo))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)
@@ -1185,7 +1185,7 @@ MACHINE_CONFIG_START(psikyo_state::s1945)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
+	MCFG_DEVICE_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

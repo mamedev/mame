@@ -451,8 +451,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(pingpong_state::pingpong)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,18432000/6)      /* 3.072 MHz (probably) */
-	MCFG_CPU_PROGRAM_MAP(pingpong_map)
+	MCFG_DEVICE_ADD("maincpu",Z80,18432000/6)      /* 3.072 MHz (probably) */
+	MCFG_DEVICE_PROGRAM_MAP(pingpong_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pingpong_state, pingpong_interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -473,15 +473,15 @@ MACHINE_CONFIG_START(pingpong_state::pingpong)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76496, 18432000/8)
+	MCFG_DEVICE_ADD("snsnd", SN76496, 18432000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /* too fast! */
 MACHINE_CONFIG_START(pingpong_state::merlinmm)
 	pingpong(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(merlinmm_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(merlinmm_map)
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(pingpong_state, merlinmm_interrupt)
 

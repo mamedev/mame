@@ -1736,8 +1736,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8    /* every char takes 8 consecutive bytes */
 };
 
@@ -1747,10 +1747,8 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 16, 0, 24, 8 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP8(16*8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*4) },
 	128*8
 };
 
@@ -1760,10 +1758,8 @@ static const gfx_layout spritelayout_5bpp =
 	RGN_FRAC(1,2),
 	5,
 	{ RGN_FRAC(1,2), 16, 0, 24, 8 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP8(16*8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*4) },
 	128*8
 };
 
@@ -1773,10 +1769,8 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
@@ -1786,10 +1780,8 @@ static const gfx_layout tilelayout_8bpp =
 	RGN_FRAC(1,4),
 	8,
 	{ RGN_FRAC(3,4)+8, RGN_FRAC(3,4)+0, RGN_FRAC(2,4)+8, RGN_FRAC(2,4)+0, RGN_FRAC(1,4)+8, RGN_FRAC(1,4)+0, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
@@ -1799,11 +1791,8 @@ static const gfx_layout spritelayout_5bpp_alt =
 	RGN_FRAC(1,5),
 	5,
 	{ 0x800000*8, 0x600000*8, 0x400000*8, 0x200000*8, 0 },
-	{
-		16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-		0,1,2,3,4,5,6,7
-	},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	32*8
 };
 
@@ -1815,8 +1804,7 @@ static const gfx_layout spritelayout4 =
 	{0,1,2,3},
 	{3*8,2*8,1*8,0*8,7*8,6*8,5*8,4*8,
 		11*8,10*8,9*8,8*8,15*8,14*8,13*8,12*8},
-	{0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,
-		8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
+	{ STEP16(0,16*8) },
 	16*16*8
 };
 
@@ -1828,8 +1816,7 @@ static const gfx_layout spritelayout5 =
 	{4,5,6,7},
 	{3*8,2*8,1*8,0*8,7*8,6*8,5*8,4*8,
 		11*8,10*8,9*8,8*8,15*8,14*8,13*8,12*8},
-	{0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,
-		8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
+	{ STEP16(0,16*8) },
 	16*16*8
 };
 
@@ -1879,18 +1866,18 @@ GFXDECODE_END
 MACHINE_CONFIG_START(captaven_state::captaven)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'000'000)/4) /* verified on pcb (Data East 101 custom)*/
-	MCFG_CPU_PROGRAM_MAP(captaven_map)
+	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000)/4) /* verified on pcb (Data East 101 custom)*/
+	MCFG_DEVICE_PROGRAM_MAP(captaven_map)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/4/3)  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(h6280_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000)/4/3)  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
+	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
+	MCFG_DECO_IRQ_RASTER2_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
+	MCFG_DECO_IRQ_VBLANK_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
@@ -1947,9 +1934,9 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000)/9) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000)/9) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state, sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
@@ -1964,12 +1951,12 @@ MACHINE_CONFIG_END
 
 // DE-0380-2
 MACHINE_CONFIG_START(fghthist_state::fghthist)
-	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(fghthist_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(fghthist_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(h6280_sound_custom_latch_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_custom_latch_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2018,7 +2005,7 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_DECO146_IN_PORTB_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
+	MCFG_DECO146_IN_PORTB_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
@@ -2031,9 +2018,9 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state, sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
@@ -2049,11 +2036,11 @@ MACHINE_CONFIG_END
 // DE-0395-1
 MACHINE_CONFIG_START(fghthist_state::fghthsta)
 	fghthist(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fghthsta_memmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fghthsta_memmap)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(h6280_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
 
 	MCFG_DEVICE_REMOVE("soundlatch")
 
@@ -2066,18 +2053,18 @@ MACHINE_CONFIG_START(fghthist_state::fghthistu)
 	fghthsta(config);
 	MCFG_DEVICE_REMOVE("audiocpu")
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'220'000) / 9)
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
-	MCFG_CPU_IO_MAP(z80_sound_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'220'000) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_IO_MAP(z80_sound_io)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("sound_irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_MODIFY("ioprot")
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(DEVWRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<0>))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<0>))
 
-	MCFG_SOUND_MODIFY("ymsnd")
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
+	MCFG_DEVICE_MODIFY("ymsnd")
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
@@ -2087,18 +2074,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dragngun_state::dragngun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(dragngun_map)
+	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(dragngun_map)
 
-	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8)
-	MCFG_CPU_PROGRAM_MAP(h6280_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, 32220000/8)
+	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
 
 	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
+	MCFG_DECO_IRQ_RASTER2_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
+	MCFG_DECO_IRQ_VBLANK_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2160,9 +2147,9 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state, sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
@@ -2190,36 +2177,36 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dragngun_state::lockloadu)
 	dragngun(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(lockloadu_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(lockloadu_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(lockloadu_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(lockloadu_sound_map)
 
 	MCFG_DEVICE_MODIFY("irq")
-	MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<2>))
+	MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<2>))
 
 	MCFG_DEVICE_MODIFY("tilegen2")
 	MCFG_DECO16IC_PF1_SIZE(DECO_32x32)
 	MCFG_DECO16IC_PF2_SIZE(DECO_32x32)    // lockload definitely wants pf34 half width..
 
-	MCFG_SOUND_MODIFY("ymsnd")
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(dragngun_state, lockload_okibank_lo_w))
+	MCFG_DEVICE_MODIFY("ymsnd")
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, dragngun_state, lockload_okibank_lo_w))
 MACHINE_CONFIG_END
 
 // DE-0420-1 + Bottom board DE-0421-0
 MACHINE_CONFIG_START(dragngun_state::lockload)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(lockload_map)
+	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(lockload_map)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", ARM_IRQ_LINE))
 
-	MCFG_CPU_ADD("audiocpu", Z80, 32220000/8)
-	MCFG_CPU_PROGRAM_MAP(lockload_sound_map)
-	MCFG_CPU_IO_MAP(z80_sound_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 32220000/8)
+	MCFG_DEVICE_PROGRAM_MAP(lockload_sound_map)
+	MCFG_DEVICE_IO_MAP(z80_sound_io)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("sound_irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
@@ -2227,9 +2214,9 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	MCFG_DECO_IRQ_ADD("irq", "screen")
 	MCFG_DECO_IRQ_LIGHTGUN1_CB(IOPORT("LIGHT0_Y"))
 	MCFG_DECO_IRQ_LIGHTGUN2_CB(IOPORT("LIGHT1_Y"))
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
-	MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<2>))
+	MCFG_DECO_IRQ_RASTER2_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<0>))
+	MCFG_DECO_IRQ_VBLANK_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
+	MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(WRITELINE("irq_merger", input_merger_any_high_device, in_w<2>))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* to improve main<->audio comms */
 
@@ -2286,15 +2273,15 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(DEVWRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<0>))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<0>))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(dragngun_state, lockload_okibank_lo_w))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, dragngun_state, lockload_okibank_lo_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
@@ -2314,9 +2301,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nslasher_state::tattass)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, 28000000/4) // unconfirmed
-	MCFG_CPU_PROGRAM_MAP(tattass_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", ARM, 28000000/4) // unconfirmed
+	MCFG_DEVICE_PROGRAM_MAP(tattass_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
 
 	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
 
@@ -2372,9 +2359,9 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 
 	MCFG_DECO104_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_DECO146_IN_PORTB_CB(READ16(nslasher_state, port_b_tattass))
+	MCFG_DECO146_IN_PORTB_CB(READ16(*this, nslasher_state, port_b_tattass))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE(nslasher_state, tattass_sound_irq_w))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE(*this, nslasher_state, tattass_sound_irq_w))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
 	MCFG_VIDEO_START_OVERRIDE(nslasher_state,nslasher)
@@ -2386,13 +2373,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nslasher_state::nslasher)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'322'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(nslasher_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", ARM, XTAL(28'322'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(nslasher_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 32220000/9)
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
-	MCFG_CPU_IO_MAP(z80_sound_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 32220000/9)
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_IO_MAP(z80_sound_io)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("sound_irq_merger")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
@@ -2455,17 +2442,17 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 
 	MCFG_DECO104_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_DECO146_IN_PORTB_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
+	MCFG_DECO146_IN_PORTB_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(DEVWRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<0>))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<0>))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state, sound_bankswitch_w))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
@@ -2481,16 +2468,16 @@ MACHINE_CONFIG_END
 // the US release uses a H6280 instead of a Z80, much like Lock 'n' Loaded
 MACHINE_CONFIG_START(nslasher_state::nslasheru)
 	nslasher(config);
-	MCFG_CPU_REPLACE("audiocpu", H6280, 32220000/8)
-	MCFG_CPU_PROGRAM_MAP(h6280_sound_map)
+	MCFG_DEVICE_REPLACE("audiocpu", H6280, 32220000/8)
+	MCFG_DEVICE_PROGRAM_MAP(h6280_sound_map)
 
-	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_DEVICE_MODIFY("ymsnd")
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
 
 	MCFG_DEVICE_REMOVE("ioprot")
 	MCFG_DECO104_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_DECO146_IN_PORTB_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
+	MCFG_DECO146_IN_PORTB_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(0)
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("IN1"))
 	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE

@@ -404,19 +404,20 @@ FLOPPY_FORMATS_MEMBER( hec2hrp_state::minidisc_formats )
 	FLOPPY_HMD_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( minidisc_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void minidisc_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_35_DD);
+}
 
 
 /******************************************************************************/
 MACHINE_CONFIG_START(hec2hrp_state::hec2hr)
 /******************************************************************************/
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(hec2hrp_mem)
-	MCFG_CPU_IO_MAP(hec2hrp_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hec2hrp_mem)
+	MCFG_DEVICE_IO_MAP(hec2hrp_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrp)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
@@ -448,10 +449,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hec2hrp_state::hec2hrp)
 /*****************************************************************************/
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(hec2hrp_mem)
-	MCFG_CPU_IO_MAP(hec2hrp_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hec2hrp_mem)
+	MCFG_DEVICE_IO_MAP(hec2hrp_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrp)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
@@ -479,26 +480,27 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hrp)
 
 MACHINE_CONFIG_END
 
-static SLOT_INTERFACE_START( hector_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void hector_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 /*****************************************************************************/
 MACHINE_CONFIG_START(hec2hrp_state::hec2mx40)
 /*****************************************************************************/
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
-	MCFG_CPU_IO_MAP(hec2mx40_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
+	MCFG_DEVICE_IO_MAP(hec2mx40_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
 
 	/* Disc II unit */
-	MCFG_CPU_ADD("disc2cpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
-	MCFG_CPU_IO_MAP(hecdisc2_io)
+	MCFG_DEVICE_ADD("disc2cpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hecdisc2_mem)
+	MCFG_DEVICE_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_interrupt))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_dma_irq))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, hec2hrp_state, disc2_fdc_interrupt))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, hec2hrp_state, disc2_fdc_dma_irq))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
@@ -531,20 +533,20 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hec2hrp_state::hec2hrx)
 /*****************************************************************************/
 /* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
-	MCFG_CPU_IO_MAP(hec2hrx_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
+	MCFG_DEVICE_IO_MAP(hec2hrx_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
 	/* Disc II unit */
-	MCFG_CPU_ADD("disc2cpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
-	MCFG_CPU_IO_MAP(hecdisc2_io)
+	MCFG_DEVICE_ADD("disc2cpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hecdisc2_mem)
+	MCFG_DEVICE_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_interrupt))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_dma_irq))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, hec2hrp_state, disc2_fdc_interrupt))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, hec2hrp_state, disc2_fdc_dma_irq))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
@@ -576,10 +578,10 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mdhrx)
 /*****************************************************************************/
 // minidisc
 /* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
-	MCFG_CPU_IO_MAP(hec2mdhrx_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
+	MCFG_DEVICE_IO_MAP(hec2mdhrx_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2mdhrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2mdhrx)
 
@@ -617,20 +619,20 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hec2hrp_state::hec2mx80)
 /*****************************************************************************/
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(hec2hrx_mem)
-	MCFG_CPU_IO_MAP(hec2mx80_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
+	MCFG_DEVICE_IO_MAP(hec2mx80_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
 	/* Disc II unit */
-	MCFG_CPU_ADD("disc2cpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
-	MCFG_CPU_IO_MAP(hecdisc2_io)
+	MCFG_DEVICE_ADD("disc2cpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hecdisc2_mem)
+	MCFG_DEVICE_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_interrupt))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_dma_irq))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, hec2hrp_state, disc2_fdc_interrupt))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, hec2hrp_state, disc2_fdc_dma_irq))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 

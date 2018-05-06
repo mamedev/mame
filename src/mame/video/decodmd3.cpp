@@ -133,8 +133,8 @@ void decodmd_type3_device::decodmd3_map(address_map &map)
 
 MACHINE_CONFIG_START(decodmd_type3_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dmdcpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(decodmd3_map)
+	MCFG_DEVICE_ADD("dmdcpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(decodmd3_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

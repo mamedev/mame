@@ -22,12 +22,13 @@
 #include "geocable.h"
 #include "bus/vic20/vic1011.h"
 
-SLOT_INTERFACE_START( c64_user_port_cards )
-	SLOT_INTERFACE("4cga", C64_4CGA)
-	SLOT_INTERFACE("4dxh", C64_4DXH)
-	SLOT_INTERFACE("4ksa", C64_4KSA)
-	SLOT_INTERFACE("4tba", C64_4TBA)
-	SLOT_INTERFACE("bn1541", C64_BN1541)
-	SLOT_INTERFACE("geocable", C64_GEOCABLE)
-	SLOT_INTERFACE("rs232", VIC1011)
-SLOT_INTERFACE_END
+void c64_user_port_cards(device_slot_interface &device)
+{
+	device.option_add("4cga", C64_4CGA);
+	device.option_add("4dxh", C64_4DXH);
+	device.option_add("4ksa", C64_4KSA);
+	device.option_add("4tba", C64_4TBA);
+	device.option_add("bn1541", C64_BN1541);
+	device.option_add("geocable", C64_GEOCABLE);
+	device.option_add("rs232", VIC1011);
+}

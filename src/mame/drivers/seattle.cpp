@@ -1103,50 +1103,55 @@ PCI Mem  = 08000000-09FFFFFF
 
 */
 
-ADDRESS_MAP_START(seattle_state::seattle_cs0_map)
-ADDRESS_MAP_END
+void seattle_state::seattle_cs0_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(seattle_state::seattle_cs1_map)
-	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(asic_fifo_w)
-ADDRESS_MAP_END
+void seattle_state::seattle_cs1_map(address_map &map)
+{
+	map(0x01000000, 0x01000003).w(this, FUNC(seattle_state::asic_fifo_w));
+}
 
-ADDRESS_MAP_START(seattle_state::seattle_cs2_map)
-	AM_RANGE(0x00000000, 0x00000003) AM_READWRITE(analog_port_r, analog_port_w)  // Flagstaff only
-ADDRESS_MAP_END
+void seattle_state::seattle_cs2_map(address_map &map)
+{
+	map(0x00000000, 0x00000003).rw(this, FUNC(seattle_state::analog_port_r), FUNC(seattle_state::analog_port_w));  // Flagstaff only
+}
 
 // This map shares the PHOENIX, SEATTLE, and SEATTLE_WIDGET calls
-ADDRESS_MAP_START(seattle_state::seattle_cs3_map)
-	AM_RANGE(0x00000000, 0x0000003f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
-	AM_RANGE(0x00100000, 0x0011ffff) AM_READWRITE(cmos_r, cmos_w)
-	AM_RANGE(0x00800000, 0x0080001f) AM_READWRITE(carnevil_gun_r, carnevil_gun_w) // Carnevil driver only
-	AM_RANGE(0x00c00000, 0x00c0001f) AM_READWRITE(widget_r, widget_w); // Seattle widget only
-	AM_RANGE(0x01000000, 0x01000003) AM_READWRITE(cmos_protect_r, cmos_protect_w)
-	AM_RANGE(0x01100000, 0x01100003) AM_WRITE(seattle_watchdog_w)
-	AM_RANGE(0x01300000, 0x01300003) AM_READWRITE(seattle_interrupt_enable_r, seattle_interrupt_enable_w)
-	AM_RANGE(0x01400000, 0x01400003) AM_READWRITE(interrupt_config_r, interrupt_config_w)
-	AM_RANGE(0x01500000, 0x01500003) AM_READ(interrupt_state_r)
-	AM_RANGE(0x01600000, 0x01600003) AM_READ(interrupt_state2_r)
-	AM_RANGE(0x01700000, 0x01700003) AM_WRITE(vblank_clear_w)
-	AM_RANGE(0x01800000, 0x01800003) AM_NOP
-	AM_RANGE(0x01900000, 0x01900003) AM_READWRITE(status_leds_r, status_leds_w)
-	AM_RANGE(0x01f00000, 0x01f00003) AM_READWRITE(asic_reset_r, asic_reset_w)
-ADDRESS_MAP_END
+void seattle_state::seattle_cs3_map(address_map &map)
+{
+	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
+	map(0x00100000, 0x0011ffff).rw(this, FUNC(seattle_state::cmos_r), FUNC(seattle_state::cmos_w));
+	map(0x00800000, 0x0080001f).rw(this, FUNC(seattle_state::carnevil_gun_r), FUNC(seattle_state::carnevil_gun_w)); // Carnevil driver only
+	map(0x00c00000, 0x00c0001f).rw(this, FUNC(seattle_state::widget_r), FUNC(seattle_state::widget_w)); // Seattle widget only
+	map(0x01000000, 0x01000003).rw(this, FUNC(seattle_state::cmos_protect_r), FUNC(seattle_state::cmos_protect_w));
+	map(0x01100000, 0x01100003).w(this, FUNC(seattle_state::seattle_watchdog_w));
+	map(0x01300000, 0x01300003).rw(this, FUNC(seattle_state::seattle_interrupt_enable_r), FUNC(seattle_state::seattle_interrupt_enable_w));
+	map(0x01400000, 0x01400003).rw(this, FUNC(seattle_state::interrupt_config_r), FUNC(seattle_state::interrupt_config_w));
+	map(0x01500000, 0x01500003).r(this, FUNC(seattle_state::interrupt_state_r));
+	map(0x01600000, 0x01600003).r(this, FUNC(seattle_state::interrupt_state2_r));
+	map(0x01700000, 0x01700003).w(this, FUNC(seattle_state::vblank_clear_w));
+	map(0x01800000, 0x01800003).noprw();
+	map(0x01900000, 0x01900003).rw(this, FUNC(seattle_state::status_leds_r), FUNC(seattle_state::status_leds_w));
+	map(0x01f00000, 0x01f00003).rw(this, FUNC(seattle_state::asic_reset_r), FUNC(seattle_state::asic_reset_w));
+}
 
-ADDRESS_MAP_START(seattle_state::seattle_flagstaff_cs3_map)
-	AM_RANGE(0x00000000, 0x0000003f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
-	AM_RANGE(0x00100000, 0x0011ffff) AM_READWRITE(cmos_r, cmos_w)
-	AM_RANGE(0x00c00000, 0x00c0003f) AM_READWRITE(ethernet_r, ethernet_w);
-	AM_RANGE(0x01000000, 0x01000003) AM_READWRITE(cmos_protect_r, cmos_protect_w)
-	AM_RANGE(0x01100000, 0x01100003) AM_WRITE(seattle_watchdog_w)
-	AM_RANGE(0x01300000, 0x01300003) AM_READWRITE(seattle_interrupt_enable_r, seattle_interrupt_enable_w)
-	AM_RANGE(0x01400000, 0x01400003) AM_READWRITE(interrupt_config_r, interrupt_config_w)
-	AM_RANGE(0x01500000, 0x01500003) AM_READ(interrupt_state_r)
-	AM_RANGE(0x01600000, 0x01600003) AM_READ(interrupt_state2_r)
-	AM_RANGE(0x01700000, 0x01700003) AM_WRITE(vblank_clear_w)
-	AM_RANGE(0x01800000, 0x01800003) AM_NOP
-	AM_RANGE(0x01900000, 0x01900003) AM_READWRITE(status_leds_r, status_leds_w)
-	AM_RANGE(0x01f00000, 0x01f00003) AM_READWRITE(asic_reset_r, asic_reset_w)
-ADDRESS_MAP_END
+void seattle_state::seattle_flagstaff_cs3_map(address_map &map)
+{
+	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
+	map(0x00100000, 0x0011ffff).rw(this, FUNC(seattle_state::cmos_r), FUNC(seattle_state::cmos_w));
+	map(0x00c00000, 0x00c0003f).rw(this, FUNC(seattle_state::ethernet_r), FUNC(seattle_state::ethernet_w));
+	map(0x01000000, 0x01000003).rw(this, FUNC(seattle_state::cmos_protect_r), FUNC(seattle_state::cmos_protect_w));
+	map(0x01100000, 0x01100003).w(this, FUNC(seattle_state::seattle_watchdog_w));
+	map(0x01300000, 0x01300003).rw(this, FUNC(seattle_state::seattle_interrupt_enable_r), FUNC(seattle_state::seattle_interrupt_enable_w));
+	map(0x01400000, 0x01400003).rw(this, FUNC(seattle_state::interrupt_config_r), FUNC(seattle_state::interrupt_config_w));
+	map(0x01500000, 0x01500003).r(this, FUNC(seattle_state::interrupt_state_r));
+	map(0x01600000, 0x01600003).r(this, FUNC(seattle_state::interrupt_state2_r));
+	map(0x01700000, 0x01700003).w(this, FUNC(seattle_state::vblank_clear_w));
+	map(0x01800000, 0x01800003).noprw();
+	map(0x01900000, 0x01900003).rw(this, FUNC(seattle_state::status_leds_r), FUNC(seattle_state::status_leds_w));
+	map(0x01f00000, 0x01f00003).rw(this, FUNC(seattle_state::asic_reset_r), FUNC(seattle_state::asic_reset_w));
+}
 
 /*************************************
  *
@@ -1320,8 +1325,8 @@ static INPUT_PORTS_START( sfrush )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("Track 3") PORT_PLAYER(1) /* track 3 */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_NAME("Track 4") PORT_PLAYER(1) /* track 4 */
 	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, seattle_state, gearshift_r, "GEAR" )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1866,7 +1871,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(seattle_state::seattle_common)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*3)
+	MCFG_DEVICE_ADD("maincpu", R5000LE, SYSTEM_CLOCK*3)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -1889,8 +1894,8 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	MCFG_VOODOO_PCI_FBMEM(2)
 	MCFG_VOODOO_PCI_TMUMEM(4, 0)
 	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
-	MCFG_VOODOO_VBLANK_CB(DEVWRITELINE(":", seattle_state, vblank_assert))
-	MCFG_VOODOO_STALL_CB(DEVWRITELINE(PCI_ID_GALILEO, gt64xxx_device, pci_stall))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, seattle_state, vblank_assert))
+	MCFG_VOODOO_STALL_CB(WRITELINE(PCI_ID_GALILEO, gt64xxx_device, pci_stall))
 
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -1907,7 +1912,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::phoenixsa)
 	seattle_common(config);
-	MCFG_CPU_REPLACE("maincpu", R4700LE, SYSTEM_CLOCK*2)
+	MCFG_DEVICE_REPLACE("maincpu", R4700LE, SYSTEM_CLOCK*2)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -1920,7 +1925,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::seattle150)
 	seattle_common(config);
-	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*3)
+	MCFG_DEVICE_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*3)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -1930,13 +1935,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seattle_state::seattle150_widget)
 	seattle150(config);
 	MCFG_SMC91C94_ADD("ethernet")
-	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
+	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ethernet_interrupt))
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(seattle_state::seattle200)
 	seattle_common(config);
-	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
+	MCFG_DEVICE_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -1946,12 +1951,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seattle_state::seattle200_widget)
 	seattle200(config);
 	MCFG_SMC91C94_ADD("ethernet")
-	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
+	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ethernet_interrupt))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::flagstaff)
 	seattle_common(config);
-	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
+	MCFG_DEVICE_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
@@ -1960,7 +1965,7 @@ MACHINE_CONFIG_START(seattle_state::flagstaff)
 	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_flagstaff_cs3_map)
 
 	MCFG_SMC91C94_ADD("ethernet")
-	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
+	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ethernet_interrupt))
 
 	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO)
 	MCFG_VOODOO_PCI_FBMEM(2)
@@ -1979,7 +1984,7 @@ MACHINE_CONFIG_START(seattle_state::wg3dh)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
 	MCFG_MIDWAY_IOASIC_UPPER(310/* others? */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 
@@ -1993,35 +1998,35 @@ MACHINE_CONFIG_START(seattle_state::mace)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_MACE)
 	MCFG_MIDWAY_IOASIC_UPPER(319/* others? */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::sfrush)
 	flagstaff(config);
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE_SEATTLE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x5236)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(DEVWRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
+	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
 	MCFG_MIDWAY_IOASIC_UPPER(315/* no alternates */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(seattle_state, wheel_board_w))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(*this, seattle_state, wheel_board_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::sfrushrk)
 	flagstaff(config);
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE_SEATTLE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x5329)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(DEVWRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
+	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_SFRUSHRK)
 	MCFG_MIDWAY_IOASIC_UPPER(331/* unknown */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(seattle_state, wheel_board_w))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(*this, seattle_state, wheel_board_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::sfrushrkw)
@@ -2040,7 +2045,7 @@ MACHINE_CONFIG_START(seattle_state::calspeed)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CALSPEED)
 	MCFG_MIDWAY_IOASIC_UPPER(328/* others? */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
 MACHINE_CONFIG_END
 
@@ -2054,7 +2059,7 @@ MACHINE_CONFIG_START(seattle_state::vaportrx)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_VAPORTRX)
 	MCFG_MIDWAY_IOASIC_UPPER(324/* 334? unknown */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::biofreak)
@@ -2067,7 +2072,7 @@ MACHINE_CONFIG_START(seattle_state::biofreak)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
 	MCFG_MIDWAY_IOASIC_UPPER(231/* no alternates */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::blitz)
@@ -2080,7 +2085,7 @@ MACHINE_CONFIG_START(seattle_state::blitz)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
 	MCFG_MIDWAY_IOASIC_UPPER(444/* or 528 */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::blitz99)
@@ -2093,7 +2098,7 @@ MACHINE_CONFIG_START(seattle_state::blitz99)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
 	MCFG_MIDWAY_IOASIC_UPPER(481/* or 484 or 520 */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::blitz2k)
@@ -2106,7 +2111,7 @@ MACHINE_CONFIG_START(seattle_state::blitz2k)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
 	MCFG_MIDWAY_IOASIC_UPPER(494/* or 498 */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::carnevil)
@@ -2119,7 +2124,7 @@ MACHINE_CONFIG_START(seattle_state::carnevil)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CARNEVIL)
 	MCFG_MIDWAY_IOASIC_UPPER(469/* 469 or 486 or 528 */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seattle_state::hyprdriv)
@@ -2132,7 +2137,7 @@ MACHINE_CONFIG_START(seattle_state::hyprdriv)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_HYPRDRIV)
 	MCFG_MIDWAY_IOASIC_UPPER(469/* unknown */)
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
+	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(*this, seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
 /*************************************

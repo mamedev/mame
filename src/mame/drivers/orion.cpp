@@ -86,29 +86,30 @@ FLOPPY_FORMATS_MEMBER( orion_state::orion_floppy_formats )
 	FLOPPY_SMX_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( orion_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void orion_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 /* Machine driver */
 MACHINE_CONFIG_START(orion_state::orion128)
-	MCFG_CPU_ADD("maincpu", I8080, 2000000)
-	MCFG_CPU_PROGRAM_MAP(orion128_mem)
-	MCFG_CPU_IO_MAP(orion128_io)
+	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(orion128_mem)
+	MCFG_DEVICE_IO_MAP(orion128_io)
 
 	MCFG_MACHINE_START_OVERRIDE(orion_state, orion128 )
 	MCFG_MACHINE_RESET_OVERRIDE(orion_state, orion128 )
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(orion_state, orion_romdisk_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(orion_state, orion_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(orion_state, orion_romdisk_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, orion_state, orion_romdisk_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, orion_state, orion_romdisk_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, orion_state, orion_romdisk_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, radio86_8255_portc_r2))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -157,32 +158,32 @@ MACHINE_CONFIG_START(orion_state::orion128ms)
 	orion128(config);
 	MCFG_DEVICE_REMOVE("ppi8255_2")
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, rk7007_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, rk7007_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(orion_state::orionz80)
-	MCFG_CPU_ADD("maincpu", Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(orionz80_mem)
-	MCFG_CPU_IO_MAP(orionz80_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", orion_state, orionz80_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(orionz80_mem)
+	MCFG_DEVICE_IO_MAP(orionz80_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", orion_state, orionz80_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(orion_state, orionz80 )
 	MCFG_MACHINE_RESET_OVERRIDE(orion_state, orionz80 )
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(orion_state, orion_romdisk_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(orion_state, orion_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(orion_state, orion_romdisk_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, orion_state, orion_romdisk_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, orion_state, orion_romdisk_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, orion_state, orion_romdisk_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, radio86_8255_portc_r2))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -201,11 +202,11 @@ MACHINE_CONFIG_START(orion_state::orionz80)
 	MCFG_MC146818_ADD( "rtc", XTAL(4'194'304) )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay8912", AY8912, 1773400)
+	MCFG_DEVICE_ADD("ay8912", AY8912, 1773400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -238,29 +239,29 @@ MACHINE_CONFIG_START(orion_state::orionz80ms)
 
 	MCFG_DEVICE_REMOVE("ppi8255_2")
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, rk7007_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, rk7007_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(orion_state::orionpro)
-	MCFG_CPU_ADD("maincpu", Z80, 5000000)
-	MCFG_CPU_PROGRAM_MAP(orionpro_mem)
-	MCFG_CPU_IO_MAP(orionpro_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 5000000)
+	MCFG_DEVICE_PROGRAM_MAP(orionpro_mem)
+	MCFG_DEVICE_IO_MAP(orionpro_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(orion_state, orionpro )
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(orion_state, orion_romdisk_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(orion_state, orion_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(orion_state, orion_romdisk_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, orion_state, orion_romdisk_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, orion_state, orion_romdisk_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, orion_state, orion_romdisk_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, radio86_8255_portc_r2))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -277,11 +278,11 @@ MACHINE_CONFIG_START(orion_state::orionpro)
 	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay8912", AY8912, 1773400)
+	MCFG_DEVICE_ADD("ay8912", AY8912, 1773400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_CASSETTE_ADD( "cassette" )

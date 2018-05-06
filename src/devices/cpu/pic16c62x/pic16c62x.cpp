@@ -71,47 +71,53 @@ DEFINE_DEVICE_TYPE(PIC16C622A, pic16c622a_device, "pic16c622a",  "Microchip PIC1
  *  Internal Memory Map
  ****************************************************************************/
 
-ADDRESS_MAP_START(pic16c62x_device::pic16c62x_rom_9)
-	AM_RANGE(0x000, 0x1ff) AM_ROM
-ADDRESS_MAP_END
+void pic16c62x_device::pic16c62x_rom_9(address_map &map)
+{
+	map(0x000, 0x1ff).rom();
+}
 
-ADDRESS_MAP_START(pic16c62x_device::pic16c62x_rom_10)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
+void pic16c62x_device::pic16c62x_rom_10(address_map &map)
+{
+	map(0x000, 0x3ff).rom();
+}
 
-ADDRESS_MAP_START(pic16c62x_device::pic16c62x_rom_11)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void pic16c62x_device::pic16c62x_rom_11(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
-ADDRESS_MAP_START(pic16c62x_device::pic16c620_ram)
-	AM_RANGE(0x00, 0x06) AM_RAM
-	AM_RANGE(0x0a, 0x0c) AM_RAM
-	AM_RANGE(0x1f, 0x6f) AM_RAM
-	AM_RANGE(0x80, 0x86) AM_RAM
-	AM_RANGE(0x8a, 0x8e) AM_RAM
-	AM_RANGE(0x9f, 0x9f) AM_RAM
-ADDRESS_MAP_END
+void pic16c62x_device::pic16c620_ram(address_map &map)
+{
+	map(0x00, 0x06).ram();
+	map(0x0a, 0x0c).ram();
+	map(0x1f, 0x6f).ram();
+	map(0x80, 0x86).ram();
+	map(0x8a, 0x8e).ram();
+	map(0x9f, 0x9f).ram();
+}
 
-ADDRESS_MAP_START(pic16c62x_device::pic16c622_ram)
-	AM_RANGE(0x00, 0x06) AM_RAM
-	AM_RANGE(0x0a, 0x0c) AM_RAM
-	AM_RANGE(0x1f, 0x7f) AM_RAM
-	AM_RANGE(0x80, 0x86) AM_RAM
-	AM_RANGE(0x8a, 0x8e) AM_RAM
-	AM_RANGE(0x9f, 0xbf) AM_RAM
-ADDRESS_MAP_END
+void pic16c62x_device::pic16c622_ram(address_map &map)
+{
+	map(0x00, 0x06).ram();
+	map(0x0a, 0x0c).ram();
+	map(0x1f, 0x7f).ram();
+	map(0x80, 0x86).ram();
+	map(0x8a, 0x8e).ram();
+	map(0x9f, 0xbf).ram();
+}
 
 // pic16c620a, pic16c621a and pic16c622a
-ADDRESS_MAP_START(pic16c62x_device::pic16c62xa_ram)
-	AM_RANGE(0x00, 0x06) AM_RAM
-	AM_RANGE(0x0a, 0x0c) AM_RAM
-	AM_RANGE(0x1f, 0x6f) AM_RAM
-	AM_RANGE(0x70, 0x7f) AM_RAM AM_SHARE(nullptr)
-	AM_RANGE(0x80, 0x86) AM_RAM
-	AM_RANGE(0x8a, 0x8e) AM_RAM
-	AM_RANGE(0x9f, 0xbf) AM_RAM
-	AM_RANGE(0xf0, 0xff) AM_RAM AM_SHARE(nullptr)
-ADDRESS_MAP_END
+void pic16c62x_device::pic16c62xa_ram(address_map &map)
+{
+	map(0x00, 0x06).ram();
+	map(0x0a, 0x0c).ram();
+	map(0x1f, 0x6f).ram();
+	map(0x70, 0x7f).ram().share(nullptr);
+	map(0x80, 0x86).ram();
+	map(0x8a, 0x8e).ram();
+	map(0x9f, 0xbf).ram();
+	map(0xf0, 0xff).ram().share(nullptr);
+}
 
 
 pic16c62x_device::pic16c62x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int picmodel)

@@ -273,9 +273,9 @@ void borisdpl_state::machine_start()
 
 MACHINE_CONFIG_START(chesstrv_state::chesstrv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", F8, 3000000 )      // Fairchild 3870
-	MCFG_CPU_PROGRAM_MAP( chesstrv_mem )
-	MCFG_CPU_IO_MAP( chesstrv_io )
+	MCFG_DEVICE_ADD( "maincpu", F8, 3000000 )      // Fairchild 3870
+	MCFG_DEVICE_PROGRAM_MAP( chesstrv_mem )
+	MCFG_DEVICE_IO_MAP( chesstrv_io )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_chesstrv )
@@ -283,9 +283,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(borisdpl_state::borisdpl)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", F8, 30000000 )     // Motorola SC80265P
-	MCFG_CPU_PROGRAM_MAP( chesstrv_mem )
-	MCFG_CPU_IO_MAP( borisdpl_io )
+	MCFG_DEVICE_ADD( "maincpu", F8, 30000000 )     // Motorola SC80265P
+	MCFG_DEVICE_PROGRAM_MAP( chesstrv_mem )
+	MCFG_DEVICE_IO_MAP( borisdpl_io )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_borisdpl )

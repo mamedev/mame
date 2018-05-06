@@ -680,22 +680,22 @@ MACHINE_CONFIG_START(mtech_state::megatech)
 	md_ntsc(config);
 
 	/* Megatech has an extra SMS based bios *and* an additional screen */
-	MCFG_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
-	MCFG_CPU_PROGRAM_MAP(megatech_bios_map)
-	MCFG_CPU_IO_MAP(megatech_bios_portmap)
+	MCFG_DEVICE_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
+	MCFG_DEVICE_PROGRAM_MAP(megatech_bios_map)
+	MCFG_DEVICE_IO_MAP(megatech_bios_portmap)
 
 	MCFG_DEVICE_ADD("io1", CXD1095, 0)
 	MCFG_CXD1095_IN_PORTA_CB(IOPORT("BIOS_DSW0"))
 	MCFG_CXD1095_IN_PORTB_CB(IOPORT("BIOS_DSW1"))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(mtech_state, cart_select_w))
+	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, mtech_state, cart_select_w))
 
 	MCFG_DEVICE_ADD("io2", CXD1095, 0)
 	MCFG_CXD1095_IN_PORTA_CB(IOPORT("BIOS_IN0"))
 	MCFG_CXD1095_IN_PORTB_CB(IOPORT("BIOS_IN1"))
-	MCFG_CXD1095_IN_PORTC_CB(READ8(mtech_state, bios_portc_r))
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(mtech_state, bios_portd_w))
-	MCFG_CXD1095_IN_PORTE_CB(READ8(mtech_state, bios_porte_r))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(mtech_state, bios_porte_w))
+	MCFG_CXD1095_IN_PORTC_CB(READ8(*this, mtech_state, bios_portc_r))
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, mtech_state, bios_portd_w))
+	MCFG_CXD1095_IN_PORTE_CB(READ8(*this, mtech_state, bios_porte_r))
+	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, mtech_state, bios_porte_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(mtech_state, megatech)
 
@@ -706,7 +706,7 @@ MACHINE_CONFIG_START(mtech_state::megatech)
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mtech_state, screen_update_main)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mtech_state, screen_vblank_main))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mtech_state, screen_vblank_main))
 
 	MCFG_DEVICE_MODIFY("gen_vdp")
 	MCFG_SEGA315_5313_INT_CB(INPUTLINE("genesis_snd_z80", 0))
@@ -724,7 +724,7 @@ MACHINE_CONFIG_START(mtech_state::megatech)
 	MCFG_SEGA315_5246_INT_CB(INPUTLINE("mtbios", 0))
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
+	MCFG_DEVICE_ADD("sn2", SN76496, MASTER_CLOCK/15)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END

@@ -187,9 +187,9 @@ F3853_INTERRUPT_REQ_CB(mk1_state::mk1_interrupt)
 
 MACHINE_CONFIG_START(mk1_state::mk1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", F8, MAIN_CLOCK )        /* MK3850 */
-	MCFG_CPU_PROGRAM_MAP(mk1_mem)
-	MCFG_CPU_IO_MAP(mk1_io)
+	MCFG_DEVICE_ADD( "maincpu", F8, MAIN_CLOCK )        /* MK3850 */
+	MCFG_DEVICE_PROGRAM_MAP(mk1_mem)
+	MCFG_DEVICE_IO_MAP(mk1_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 

@@ -102,7 +102,7 @@ protected:
 DECLARE_DEVICE_TYPE(APRICOT_KEYBOARD_INTERFACE, apricot_keyboard_bus_device)
 
 // supported devices
-SLOT_INTERFACE_EXTERN( apricot_keyboard_devices );
+void apricot_keyboard_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_APRICOT_KEYBOARD_KEYBOARD_H

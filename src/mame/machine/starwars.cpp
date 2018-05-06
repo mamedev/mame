@@ -71,21 +71,6 @@ WRITE_LINE_MEMBER(starwars_state::coin2_counter_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE_LINE_MEMBER(starwars_state::led1_w)
-{
-	output().set_led_value(0, !state);
-}
-
-WRITE_LINE_MEMBER(starwars_state::led2_w)
-{
-	output().set_led_value(1, !state);
-}
-
-WRITE_LINE_MEMBER(starwars_state::led3_w)
-{
-	output().set_led_value(2, !state);
-}
-
 
 
 /*************************************
@@ -165,8 +150,6 @@ void starwars_state::run_mproc()
 	int MA;
 	int IP15_8, IP7, IP6_0; /* Instruction PROM values */
 	int mptime;
-
-	logerror("Running Matrix Processor...\n");
 
 	mptime = 0;
 	m_math_run = 1;

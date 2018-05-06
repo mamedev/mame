@@ -162,7 +162,7 @@ void cedar_magnet_sprite_device::do_blit()
 WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port80_w)
 {
 	m_spritecodelow = data;
-//  printf("%s:sprite numlow / trigger %02x\n", machine().describe_context(), data);
+//  printf("%s:sprite numlow / trigger %02x\n", machine().describe_context().c_str(), data);
 
 	do_blit();
 }
@@ -171,20 +171,20 @@ WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port84_w)
 {
 	m_spritecodehigh = data;
 	m_high_write = 1;
-//  printf("%s:sprite numhigh %02x\n", machine().describe_context(), data);
+//  printf("%s:sprite numhigh %02x\n", machine().describe_context().c_str(), data);
 }
 
 WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port88_w)
 {
 // frequent
-//  printf("%s:sprite_y_coordinate %02x\n", machine().describe_context(), data);
+//  printf("%s:sprite_y_coordinate %02x\n", machine().describe_context().c_str(), data);
 	m_upperaddr = data;
 }
 
 WRITE8_MEMBER(cedar_magnet_sprite_device::pio2_pa_w)
 {
 // frequent
-//  printf("%s:sprite_x_coordinate %02x\n", machine().describe_context(), data);
+//  printf("%s:sprite_x_coordinate %02x\n", machine().describe_context().c_str(), data);
 	m_loweraddr = data;
 }
 
@@ -198,34 +198,34 @@ WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port8c_w)
 // possible watchdog?
 WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port9c_w)
 {
-//  printf("%s:sprite_port9c_w %02x\n", machine().describe_context(), data);
+//  printf("%s:sprite_port9c_w %02x\n", machine().describe_context().c_str(), data);
 }
 
 MACHINE_CONFIG_START(cedar_magnet_sprite_device::device_add_mconfig)
-	MCFG_CPU_ADD("spritecpu", Z80,4000000)
-	MCFG_CPU_PROGRAM_MAP(cedar_magnet_sprite_map)
-	MCFG_CPU_IO_MAP(cedar_magnet_sprite_io)
+	MCFG_DEVICE_ADD("spritecpu", Z80,4000000)
+	MCFG_DEVICE_PROGRAM_MAP(cedar_magnet_sprite_map)
+	MCFG_DEVICE_IO_MAP(cedar_magnet_sprite_io)
 
 	MCFG_DEVICE_ADD("z80pio0", Z80PIO, 4000000/2)
 //  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_sprite_device, pio0_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(cedar_magnet_sprite_device, pio0_pa_w))
-//  MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_sprite_device, pio0_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(cedar_magnet_sprite_device, pio0_pb_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, cedar_magnet_sprite_device, pio0_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, cedar_magnet_sprite_device, pio0_pa_w))
+//  MCFG_Z80PIO_IN_PB_CB(READ8(*this, cedar_magnet_sprite_device, pio0_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, cedar_magnet_sprite_device, pio0_pb_w))
 
 	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 4000000/2)
 //  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-//  MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_sprite_device, pio1_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(cedar_magnet_sprite_device, pio1_pa_w))
-//  MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_sprite_device, pio1_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(cedar_magnet_sprite_device, pio1_pb_w))
+//  MCFG_Z80PIO_IN_PA_CB(READ8(*this, cedar_magnet_sprite_device, pio1_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, cedar_magnet_sprite_device, pio1_pa_w))
+//  MCFG_Z80PIO_IN_PB_CB(READ8(*this, cedar_magnet_sprite_device, pio1_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, cedar_magnet_sprite_device, pio1_pb_w))
 
 	MCFG_DEVICE_ADD("z80pio2", Z80PIO, 4000000/2)
 //  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-//  MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_sprite_device, pio2_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(cedar_magnet_sprite_device, pio2_pa_w))
-//  MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_sprite_device, pio2_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(cedar_magnet_sprite_device, pio2_pb_w))
+//  MCFG_Z80PIO_IN_PA_CB(READ8(*this, cedar_magnet_sprite_device, pio2_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, cedar_magnet_sprite_device, pio2_pa_w))
+//  MCFG_Z80PIO_IN_PB_CB(READ8(*this, cedar_magnet_sprite_device, pio2_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, cedar_magnet_sprite_device, pio2_pb_w))
 
 	MCFG_DEVICE_ADD("sp_sub_ram", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(cedar_magnet_sprite_sub_ram_map)
@@ -239,7 +239,7 @@ MACHINE_CONFIG_END
 READ8_MEMBER(cedar_magnet_sprite_device::pio0_pa_r)
 {
 //  actually read
-//  printf("%s: pio0_pa_r\n", machine().describe_context());
+//  printf("%s: pio0_pa_r\n", machine().describe_context().c_str());
 	return 0x00;
 }
 
@@ -253,17 +253,17 @@ WRITE8_MEMBER(cedar_magnet_sprite_device::pio0_pa_w)
 WRITE8_MEMBER(cedar_magnet_sprite_device::pio0_pb_w)
 {
 	pio0_pb_data = data;
-	//printf("%s: pio0_pb_w %02x\n", machine().describe_context(), data);
+	//printf("%s: pio0_pb_w %02x\n", machine().describe_context().c_str(), data);
 }
 
 WRITE8_MEMBER(cedar_magnet_sprite_device::pio1_pa_w)
 {
-	//printf("%s: pio1_pa_w %02x\n", machine().describe_context(), data);
+	//printf("%s: pio1_pa_w %02x\n", machine().describe_context().c_str(), data);
 }
 
 WRITE8_MEMBER(cedar_magnet_sprite_device::pio1_pb_w)
 {
-	//printf("%s: pio1_pb_w %02x\n", machine().describe_context(), data);
+	//printf("%s: pio1_pb_w %02x\n", machine().describe_context().c_str(), data);
 }
 
 
@@ -281,7 +281,7 @@ WRITE8_MEMBER(cedar_magnet_sprite_device::pio2_pb_w)
 	}
 
 	pio2_pb_data = data;
-	//printf("%s: ******************************************* BANK? **** pio2_pb_w %02x\n", machine().describe_context(), data);
+	//printf("%s: ******************************************* BANK? **** pio2_pb_w %02x\n", machine().describe_context().c_str(), data);
 	// yes, it ends up banking the ram right out from under itself during startup execution...
 	// during this time the main cpu is waiting in a loop, after which it copies the startup code again, and reboots it.
 	m_sprite_ram_bankdev->set_bank(data & 0x03);

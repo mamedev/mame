@@ -353,9 +353,9 @@ void mt32_state::mt32_io(address_map &map)
 }
 
 MACHINE_CONFIG_START(mt32_state::mt32)
-	MCFG_CPU_ADD( "maincpu", P8098, XTAL(12'000'000) )
-	MCFG_CPU_PROGRAM_MAP( mt32_map )
-	MCFG_CPU_IO_MAP( mt32_io )
+	MCFG_DEVICE_ADD( "maincpu", P8098, XTAL(12'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP( mt32_map )
+	MCFG_DEVICE_IO_MAP( mt32_io )
 
 	MCFG_RAM_ADD( "ram" )
 	MCFG_RAM_DEFAULT_SIZE( "32K" )

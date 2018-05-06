@@ -102,6 +102,6 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(HP80_IO_SLOT, hp80_io_slot_device)
 
-SLOT_INTERFACE_EXTERN(hp80_io_slot_devices);
+void hp80_io_slot_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_HP80_IO_HP80_IO_H

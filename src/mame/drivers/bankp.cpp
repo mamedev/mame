@@ -296,10 +296,10 @@ INTERRUPT_GEN_MEMBER(bankp_state::vblank_irq)
 MACHINE_CONFIG_START(bankp_state::bankp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(bankp_map)
-	MCFG_CPU_IO_MAP(bankp_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bankp_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(bankp_map)
+	MCFG_DEVICE_IO_MAP(bankp_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bankp_state,  vblank_irq)
 
 
 	/* video hardware */
@@ -316,13 +316,13 @@ MACHINE_CONFIG_START(bankp_state::bankp)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489, MASTER_CLOCK/6)
+	MCFG_DEVICE_ADD("sn1", SN76489, MASTER_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76489, MASTER_CLOCK/6)
+	MCFG_DEVICE_ADD("sn2", SN76489, MASTER_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn3", SN76489, MASTER_CLOCK/6)
+	MCFG_DEVICE_ADD("sn3", SN76489, MASTER_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

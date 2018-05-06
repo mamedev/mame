@@ -302,13 +302,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(matmania_state::matmania)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(matmania_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", matmania_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
+	MCFG_DEVICE_PROGRAM_MAP(matmania_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", matmania_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1200000)    /* 1.2 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(matmania_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(matmania_state, nmi_line_pulse, 15*60) /* ???? */
+	MCFG_DEVICE_ADD("audiocpu", M6502, 1200000)    /* 1.2 MHz ???? */
+	MCFG_DEVICE_PROGRAM_MAP(matmania_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(matmania_state, nmi_line_pulse, 15*60) /* ???? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -330,29 +330,29 @@ MACHINE_CONFIG_START(matmania_state::matmania)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(matmania_state::maniach)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(maniach_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", matmania_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
+	MCFG_DEVICE_PROGRAM_MAP(maniach_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", matmania_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", M6809, 1500000)    /* 1.5 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(maniach_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6809, 1500000)    /* 1.5 MHz ???? */
+	MCFG_DEVICE_PROGRAM_MAP(maniach_sound_map)
 
-	MCFG_CPU_ADD("mcu", TAITO68705_MCU, 1500000*2)  /* (don't know really how fast, but it doesn't need to even be this fast) */
+	MCFG_DEVICE_ADD("mcu", TAITO68705_MCU, 1500000*2)  /* (don't know really how fast, but it doesn't need to even be this fast) */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slice per frame - high interleaving to sync main and mcu */
 
@@ -374,13 +374,13 @@ MACHINE_CONFIG_START(matmania_state::maniach)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, 3600000)
+	MCFG_DEVICE_ADD("ymsnd", YM3526, 3600000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

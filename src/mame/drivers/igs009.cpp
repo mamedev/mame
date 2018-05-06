@@ -96,7 +96,7 @@ public:
 
 	void show_out();
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
-	INTERRUPT_GEN_MEMBER(interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	TILE_GET_INFO_MEMBER(get_jingbell_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_gp98_reel1_tile_info);
@@ -810,30 +810,29 @@ void igs009_state::machine_reset()
 	m_video_enable  =   1;
 }
 
-INTERRUPT_GEN_MEMBER(igs009_state::interrupt)
+WRITE_LINE_MEMBER(igs009_state::vblank_irq)
 {
-	if (m_nmi_enable & 0x80)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && BIT(m_nmi_enable, 7))
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 MACHINE_CONFIG_START(igs009_state::jingbell)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 2)   /* HD64180RP8, 8 MHz? */
-	MCFG_CPU_PROGRAM_MAP(jingbell_map)
-	MCFG_CPU_IO_MAP(jingbell_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs009_state, interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 2)   /* HD64180RP8, 8 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(jingbell_map)
+	MCFG_DEVICE_IO_MAP(jingbell_portmap)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(igs009_state, nmi_and_coins_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, igs009_state, nmi_and_coins_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(igs009_state, video_and_leds_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(igs009_state, leds_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, igs009_state, video_and_leds_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, igs009_state, leds_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -843,6 +842,7 @@ MACHINE_CONFIG_START(igs009_state::jingbell)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs009_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs009_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jingbell)
 	MCFG_PALETTE_ADD("palette", 0x400)
@@ -850,7 +850,7 @@ MACHINE_CONFIG_START(igs009_state::jingbell)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000) / 12, PIN7_HIGH)
@@ -861,8 +861,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(igs009_state::gp98)
 	jingbell(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(gp98_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(gp98_portmap)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gp98)
 

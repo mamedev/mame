@@ -540,10 +540,10 @@ MACHINE_CONFIG_START(isa8_ega_device::device_add_mconfig)
 	MCFG_CRTC_EGA_SET_SCREEN(EGA_SCREEN_NAME)
 	MCFG_CRTC_EGA_HPIXELS_PER_COLUMN(8)
 	MCFG_CRTC_EGA_ROW_UPDATE_CB(isa8_ega_device, ega_update_row)
-	MCFG_CRTC_EGA_RES_OUT_DE_CB(WRITELINE(isa8_ega_device, de_changed))
-	MCFG_CRTC_EGA_RES_OUT_HSYNC_CB(WRITELINE(isa8_ega_device, hsync_changed))
-	MCFG_CRTC_EGA_RES_OUT_VSYNC_CB(WRITELINE(isa8_ega_device, vsync_changed))
-	MCFG_CRTC_EGA_RES_OUT_VBLANK_CB(WRITELINE(isa8_ega_device, vblank_changed))
+	MCFG_CRTC_EGA_RES_OUT_DE_CB(WRITELINE(*this, isa8_ega_device, de_changed))
+	MCFG_CRTC_EGA_RES_OUT_HSYNC_CB(WRITELINE(*this, isa8_ega_device, hsync_changed))
+	MCFG_CRTC_EGA_RES_OUT_VSYNC_CB(WRITELINE(*this, isa8_ega_device, vsync_changed))
+	MCFG_CRTC_EGA_RES_OUT_VBLANK_CB(WRITELINE(*this, isa8_ega_device, vblank_changed))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

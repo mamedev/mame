@@ -93,9 +93,10 @@ FLOPPY_FORMATS_MEMBER( ep64_exdos_device::floppy_formats )
 	FLOPPY_EP64_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( ep64_exdos_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void ep64_exdos_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 
 //-------------------------------------------------

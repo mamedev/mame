@@ -79,9 +79,10 @@ WRITE_LINE_MEMBER(tsamurai_state::nmi_enable_w)
 	m_nmi_enabled = state;
 }
 
-INTERRUPT_GEN_MEMBER(tsamurai_state::interrupt)
+WRITE_LINE_MEMBER(tsamurai_state::vblank_irq)
 {
-	if (m_nmi_enabled) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_enabled)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(tsamurai_state::tsamurai_unknown_d803_r)
@@ -718,25 +719,24 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(z80_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(z80_io_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(sound1_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound1_map)
 
-	MCFG_CPU_ADD("audio2", Z80, XTAL(24'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(sound2_map)
+	MCFG_DEVICE_ADD("audio2", Z80, XTAL(24'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound2_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,tsamurai)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tsamurai_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tsamurai_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tsamurai_state, textbank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tsamurai_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(tsamurai_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tsamurai_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, tsamurai_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, tsamurai_state, textbank1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, tsamurai_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, tsamurai_state, coin2_counter_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -746,6 +746,7 @@ MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(tsamurai_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
@@ -754,37 +755,36 @@ MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(24'000'000)/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(24'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(vsgongf_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(vsgongf_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(sound_vsgongf_map)
-	MCFG_CPU_IO_MAP(vsgongf_audio_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tsamurai_state, vsgongf_sound_interrupt, 3*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_vsgongf_map)
+	MCFG_DEVICE_IO_MAP(vsgongf_audio_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(tsamurai_state, vsgongf_sound_interrupt, 3*60)
 
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,vsgongf)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 4L
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // vreg? always 0
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tsamurai_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tsamurai_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tsamurai_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(tsamurai_state, textbank1_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, tsamurai_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, tsamurai_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, tsamurai_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, tsamurai_state, textbank1_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -794,6 +794,7 @@ MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(tsamurai_state, screen_update_vsgongf)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
@@ -804,43 +805,41 @@ MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(24'000'000)/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(24'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(tsamurai_state::m660)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(m660_map)
-	MCFG_CPU_IO_MAP(z80_m660_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(m660_map)
+	MCFG_DEVICE_IO_MAP(z80_m660_io_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(sound1_m660_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound1_m660_map)
 
-	MCFG_CPU_ADD("audio2", Z80, XTAL(24'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(sound2_m660_map)
+	MCFG_DEVICE_ADD("audio2", Z80, XTAL(24'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound2_m660_map)
 
-	MCFG_CPU_ADD("audio3", Z80, XTAL(24'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(sound3_m660_map)
-	MCFG_CPU_IO_MAP(sound3_m660_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("audio3", Z80, XTAL(24'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound3_m660_map)
+	MCFG_DEVICE_IO_MAP(sound3_m660_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,m660)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tsamurai_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tsamurai_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tsamurai_state, textbank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tsamurai_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(tsamurai_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(tsamurai_state, textbank2_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tsamurai_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, tsamurai_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, tsamurai_state, textbank1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, tsamurai_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, tsamurai_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, tsamurai_state, textbank2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -850,6 +849,8 @@ MACHINE_CONFIG_START(tsamurai_state::m660)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(tsamurai_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audio3", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
@@ -858,14 +859,14 @@ MACHINE_CONFIG_START(tsamurai_state::m660)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(24'000'000)/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(24'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

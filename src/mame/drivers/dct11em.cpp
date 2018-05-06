@@ -56,9 +56,9 @@ uint32_t dct11em_state::screen_update_dct11em(screen_device &screen, bitmap_ind1
 
 MACHINE_CONFIG_START(dct11em_state::dct11em)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, 7500000) // 7.5MHz XTAL
+	MCFG_DEVICE_ADD("maincpu",T11, 7500000) // 7.5MHz XTAL
 	MCFG_T11_INITIAL_MODE(0x1403)  /* according to specs */
-	MCFG_CPU_PROGRAM_MAP(dct11em_mem)
+	MCFG_DEVICE_PROGRAM_MAP(dct11em_mem)
 
 
 	/* video hardware */

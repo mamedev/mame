@@ -322,4 +322,17 @@
 		</part>
 	</software>
 
+	<software name="multimax">
+		<description>MultiMAX</description>
+		<year>2014</year>
+		<publisher>Rob Clarke &amp; Michal Pleban</publisher>
+		<part name="cart" interface="vic10_cart">
+			<feature name="slot" value="multimax" />
+			<dataarea name="lorom" size="0x100000">
+				<rom name="multimax.bin" size="0x100000" crc="4853de57" sha1="1d8b0b111af7cbd1e4bffd58d4c22d8f49de3741" offset="0x0000" />
+			</dataarea>
+			<dataarea name="exram" size="0x800" />
+		</part>
+	</software>
+
 </softwarelist>

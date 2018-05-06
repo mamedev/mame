@@ -866,29 +866,30 @@ FLOPPY_FORMATS_MEMBER( mz2000_state::floppy_formats )
 	FLOPPY_2D_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( mz2000_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void mz2000_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 
 MACHINE_CONFIG_START(mz2000_state::mz2000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(mz2000_map)
-	MCFG_CPU_IO_MAP(mz2000_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(mz2000_map)
+	MCFG_DEVICE_IO_MAP(mz2000_io)
 
 	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mz2000_state, mz2000_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mz2000_state, mz2000_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(mz2000_state, mz2000_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mz2000_state, mz2000_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(mz2000_state, mz2000_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz2000_state, mz2000_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, mz2000_state, mz2000_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz2000_state, mz2000_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz2000_state, mz2000_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mz2000_state, mz2000_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz2000_state, mz2000_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz2000_state, mz2000_portc_w))
 
 	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, MASTER_CLOCK)
-	MCFG_Z80PIO_IN_PA_CB(READ8(mz2000_state, mz2000_pio1_porta_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mz2000_state, mz2000_pio1_porta_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(mz2000_state, mz2000_pio1_portb_r))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mz2000_state, mz2000_pio1_porta_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz2000_state, mz2000_pio1_porta_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mz2000_state, mz2000_pio1_portb_r))
 
 	/* TODO: clocks aren't known */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
@@ -929,14 +930,14 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 4096)
+	MCFG_DEVICE_ADD("beeper", BEEP, 4096)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mz2000_state::mz80b)
 	mz2000(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(mz80b_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(mz80b_io)
 MACHINE_CONFIG_END
 
 

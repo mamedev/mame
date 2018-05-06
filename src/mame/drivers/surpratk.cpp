@@ -29,7 +29,7 @@ INTERRUPT_GEN_MEMBER(surpratk_state::surpratk_interrupt)
 WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 {
 	if (data & 0xf8)
-		logerror("%04x: videobank = %02x\n",m_maincpu->pc(),data);
+		logerror("%s: videobank = %02x\n", machine().describe_context(), data);
 
 	/* bit 0 = select 053245 at 0000-07ff */
 	/* bit 1 = select palette at 0000-07ff */
@@ -164,17 +164,17 @@ void surpratk_state::machine_reset()
 
 WRITE8_MEMBER( surpratk_state::banking_callback )
 {
-//  logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), data);
+//  logerror("%s: setlines %02x\n", machine().describe_context(), data);
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
 MACHINE_CONFIG_START(surpratk_state::surpratk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
-	MCFG_CPU_PROGRAM_MAP(surpratk_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", surpratk_state,  surpratk_interrupt)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(surpratk_state, banking_callback))
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
+	MCFG_DEVICE_PROGRAM_MAP(surpratk_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", surpratk_state,  surpratk_interrupt)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, surpratk_state, banking_callback))
 
 	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)

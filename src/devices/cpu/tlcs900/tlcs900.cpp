@@ -25,22 +25,26 @@ DEFINE_DEVICE_TYPE(TMP95C061, tmp95c061_device, "tmp95c061", "Toshiba TMP95C061"
 DEFINE_DEVICE_TYPE(TMP95C063, tmp95c063_device, "tmp95c063", "Toshiba TMP95C063")
 
 
-ADDRESS_MAP_START(tmp95c061_device::tmp95c061_mem8)
-	AM_RANGE( 0x000000, 0x00007f ) AM_READWRITE( internal_r, internal_w )
-ADDRESS_MAP_END
+void tmp95c061_device::tmp95c061_mem8(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(this, FUNC(tmp95c061_device::internal_r), FUNC(tmp95c061_device::internal_w));
+}
 
-ADDRESS_MAP_START(tmp95c061_device::tmp95c061_mem16)
-	AM_RANGE( 0x000000, 0x00007f ) AM_READWRITE8( internal_r, internal_w, 0xffff )
-ADDRESS_MAP_END
+void tmp95c061_device::tmp95c061_mem16(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(this, FUNC(tmp95c061_device::internal_r), FUNC(tmp95c061_device::internal_w));
+}
 
 
-ADDRESS_MAP_START(tmp95c063_device::tmp95c063_mem8)
-	AM_RANGE( 0x000000, 0x00009f ) AM_READWRITE( internal_r, internal_w )
-ADDRESS_MAP_END
+void tmp95c063_device::tmp95c063_mem8(address_map &map)
+{
+	map(0x000000, 0x00009f).rw(this, FUNC(tmp95c063_device::internal_r), FUNC(tmp95c063_device::internal_w));
+}
 
-ADDRESS_MAP_START(tmp95c063_device::tmp95c063_mem16)
-	AM_RANGE( 0x000000, 0x00009f ) AM_READWRITE8( internal_r, internal_w, 0xffff )
-ADDRESS_MAP_END
+void tmp95c063_device::tmp95c063_mem16(address_map &map)
+{
+	map(0x000000, 0x00009f).rw(this, FUNC(tmp95c063_device::internal_r), FUNC(tmp95c063_device::internal_w));
+}
 
 
 tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

@@ -454,16 +454,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(sprcros2_state::master_scanline)
 MACHINE_CONFIG_START(sprcros2_state::sprcros2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master_cpu",Z80,MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_IO_MAP(master_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sprcros2_state,  master_vblank_irq)
+	MCFG_DEVICE_ADD("master_cpu",Z80,MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_IO_MAP(master_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sprcros2_state,  master_vblank_irq)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sprcros2_state, master_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave_cpu",Z80,MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_IO_MAP(slave_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sprcros2_state,  slave_vblank_irq)
+	MCFG_DEVICE_ADD("slave_cpu",Z80,MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_IO_MAP(slave_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sprcros2_state,  slave_vblank_irq)
 
 	MCFG_QUANTUM_PERFECT_CPU("master_cpu")
 
@@ -481,13 +481,13 @@ MACHINE_CONFIG_START(sprcros2_state::sprcros2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn1", SN76489, 10000000/4)
+	MCFG_DEVICE_ADD("sn1", SN76489, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489, 10000000/4)
+	MCFG_DEVICE_ADD("sn2", SN76489, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn3", SN76489, 10000000/4)
+	MCFG_DEVICE_ADD("sn3", SN76489, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

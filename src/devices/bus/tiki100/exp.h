@@ -186,6 +186,6 @@ DECLARE_DEVICE_TYPE(TIKI100_BUS, tiki100_bus_device)
 
 
 
-SLOT_INTERFACE_EXTERN( tiki100_cards );
+void tiki100_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_TIKI100_EXP_H

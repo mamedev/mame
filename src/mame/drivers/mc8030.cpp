@@ -183,9 +183,9 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(mc8030_state::mc8030)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(2'457'600))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(2'457'600))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	/* video hardware */
@@ -202,10 +202,10 @@ MACHINE_CONFIG_START(mc8030_state::mc8030)
 	/* Devices */
 	MCFG_DEVICE_ADD("zve_pio", Z80PIO, XTAL(2'457'600))
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(mc8030_state, zve_port_a_r))
-	//MCFG_Z80PIO_OUT_PA_CB(WRITE8(mc8030_state, zve_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(mc8030_state, zve_port_b_r))
-	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(mc8030_state, zve_port_b_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mc8030_state, zve_port_a_r))
+	//MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mc8030_state, zve_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mc8030_state, zve_port_b_r))
+	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, mc8030_state, zve_port_b_w))
 
 	MCFG_DEVICE_ADD("zve_ctc", Z80CTC, XTAL(2'457'600))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -213,10 +213,10 @@ MACHINE_CONFIG_START(mc8030_state::mc8030)
 
 	MCFG_DEVICE_ADD("asp_pio", Z80PIO, XTAL(2'457'600))
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(mc8030_state, asp_port_a_r))
-	//MCFG_Z80PIO_OUT_PA_CB(WRITE8(mc8030_state, asp_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(mc8030_state, asp_port_b_r))
-	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(mc8030_state, asp_port_b_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mc8030_state, asp_port_a_r))
+	//MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mc8030_state, asp_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mc8030_state, asp_port_b_r))
+	//MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, mc8030_state, asp_port_b_w))
 
 	MCFG_DEVICE_ADD("asp_ctc", Z80CTC, XTAL(2'457'600))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -225,19 +225,19 @@ MACHINE_CONFIG_START(mc8030_state::mc8030)
 	// ZC2: KMBG (??)
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("asp_sio", z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("asp_sio", z80sio_device, rxca_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("asp_sio", z80sio_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("asp_sio", z80sio_device, rxca_w))
 
 	MCFG_DEVICE_ADD("asp_sio", Z80SIO, 4800)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	// SIO CH A in = keyboard; out = beeper; CH B = IFSS (??)
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("asp_sio", z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("asp_sio", z80sio_device, ctsa_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("asp_sio", z80sio_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("asp_sio", z80sio_device, ctsa_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
