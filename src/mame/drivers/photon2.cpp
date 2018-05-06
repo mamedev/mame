@@ -354,9 +354,9 @@ void photon2_state::machine_start()
 
 MACHINE_CONFIG_START(photon2_state::photon2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(spectrum_mem)
-	MCFG_CPU_IO_MAP(spectrum_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(spectrum_mem)
+	MCFG_DEVICE_IO_MAP(spectrum_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", photon2_state, spec_interrupt_hack, "screen", 0, 1)
 
 
@@ -367,7 +367,7 @@ MACHINE_CONFIG_START(photon2_state::photon2)
 	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(photon2_state, screen_update_spectrum)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(photon2_state, screen_vblank_spectrum))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, photon2_state, screen_vblank_spectrum))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(photon2_state::photon2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END

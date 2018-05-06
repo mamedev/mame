@@ -465,9 +465,9 @@ void galaxi_state::machine_reset()
 MACHINE_CONFIG_START(galaxi_state::galaxi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(galaxi_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxi_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(galaxi_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxi_state,  irq4_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -496,7 +496,7 @@ MACHINE_CONFIG_START(galaxi_state::magjoker)
 	galaxi(config);
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("oki")
+	MCFG_DEVICE_MODIFY("oki")
 
 	/* ADPCM samples are recorded with extremely low volume */
 	MCFG_SOUND_ROUTES_RESET()
@@ -508,8 +508,8 @@ MACHINE_CONFIG_START(galaxi_state::lastfour)
 	galaxi(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(lastfour_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(lastfour_map)
 MACHINE_CONFIG_END
 
 

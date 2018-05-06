@@ -1226,8 +1226,8 @@ MACHINE_START_MEMBER(multigam_state,supergm3)
 
 MACHINE_CONFIG_START(multigam_state::multigam)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(multigam_map)
+	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(multigam_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1251,8 +1251,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(multigam_state::multigm3)
 	multigam(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(multigm3_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(multigm3_map)
 
 	MCFG_MACHINE_START_OVERRIDE(multigam_state, multigm3 )
 	MCFG_MACHINE_RESET_OVERRIDE(multigam_state, multigm3 )
@@ -1260,14 +1260,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(multigam_state::multigmt)
 	multigam(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(multigmt_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(multigmt_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(multigam_state::supergm3)
 	multigam(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(supergm3_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(supergm3_map)
 
 	MCFG_MACHINE_START_OVERRIDE(multigam_state,supergm3)
 MACHINE_CONFIG_END

@@ -279,10 +279,10 @@ void mosaic_state::machine_reset()
 MACHINE_CONFIG_START(mosaic_state::mosaic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'288'000)/2)  /* 6.144MHz */
-	MCFG_CPU_PROGRAM_MAP(mosaic_map)
-	MCFG_CPU_IO_MAP(mosaic_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaic_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'288'000)/2)  /* 6.144MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mosaic_map)
+	MCFG_DEVICE_IO_MAP(mosaic_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaic_state,  irq0_line_hold)
 
 
 	/* video hardware */
@@ -302,16 +302,16 @@ MACHINE_CONFIG_START(mosaic_state::mosaic)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'288'000)/4) /* 3.072MHz or 3.579545MHz (14.31818MHz/4)? */
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'288'000)/4) /* 3.072MHz or 3.579545MHz (14.31818MHz/4)? */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mosaic_state::gfire2)
 	mosaic(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gfire2_map)
-	MCFG_CPU_IO_MAP(gfire2_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gfire2_map)
+	MCFG_DEVICE_IO_MAP(gfire2_io_map)
 MACHINE_CONFIG_END
 
 

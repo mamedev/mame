@@ -294,12 +294,12 @@ void gijoe_state::machine_reset()
 MACHINE_CONFIG_START(gijoe_state::gijoe)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)   /* 16MHz Confirmed */
-	MCFG_CPU_PROGRAM_MAP(gijoe_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gijoe_state,  gijoe_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)   /* 16MHz Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(gijoe_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gijoe_state,  gijoe_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/4)  /* Amuse & confirmed. Z80E at 8MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4)  /* Amuse & confirmed. Z80E at 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 

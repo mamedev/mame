@@ -583,8 +583,8 @@ MACHINE_START_MEMBER(nevada_state, nevada)
 
 MACHINE_CONFIG_START(nevada_state::nevada)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CPU)
-	MCFG_CPU_PROGRAM_MAP(nevada_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CPU)
+	MCFG_DEVICE_PROGRAM_MAP(nevada_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(150))   /* 150ms Ds1232 TD to Ground */
@@ -613,7 +613,7 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, SOUND_CLOCK)
+	MCFG_DEVICE_ADD("aysnd", AY8912, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_DEVICE_ADD("duart18", MC68681, XTAL(3'686'400))  // UARTA = Modem 1200Baud
@@ -626,10 +626,10 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 
 	MCFG_DEVICE_ADD("duart40", MC68681, XTAL(3'686'400))  // UARTA = Touch , UARTB = Bill Acceptor
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_5))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_device, rx))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("microtouch", microtouch_device, rx))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW3"))
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("duart40", mc68681_device, rx_a_w) )
+	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("duart40", mc68681_device, rx_a_w) )
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))

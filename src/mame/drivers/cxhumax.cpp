@@ -1055,8 +1055,8 @@ void cxhumax_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(cxhumax_state::cxhumax)
-	MCFG_CPU_ADD("maincpu", ARM920T, 180000000) // CX24175 (RevC up?)
-	MCFG_CPU_PROGRAM_MAP(cxhumax_map)
+	MCFG_DEVICE_ADD("maincpu", ARM920T, 180000000) // CX24175 (RevC up?)
+	MCFG_DEVICE_PROGRAM_MAP(cxhumax_map)
 
 
 	MCFG_INTEL_28F320J3D_ADD("flash")

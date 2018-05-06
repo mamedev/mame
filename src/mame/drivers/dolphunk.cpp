@@ -233,18 +233,18 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(dauphin_state::dauphin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(dauphin_mem)
-	MCFG_CPU_IO_MAP(dauphin_io)
-	MCFG_S2650_SENSE_INPUT(READLINE(dauphin_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(dauphin_state, cass_w))
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(dauphin_mem)
+	MCFG_DEVICE_IO_MAP(dauphin_io)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, dauphin_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, dauphin_state, cass_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_dolphunk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cassette */

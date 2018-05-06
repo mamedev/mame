@@ -478,13 +478,13 @@ void superwng_state::machine_reset()
 MACHINE_CONFIG_START(superwng_state::superwng)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(superwng_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superwng_state,  superwng_nmi_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(superwng_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superwng_state,  superwng_nmi_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(superwng_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(superwng_state, superwng_sound_nmi_assert,  4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(superwng_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(superwng_state, superwng_sound_nmi_assert,  4*60)
 
 
 	/* video hardware */
@@ -503,11 +503,11 @@ MACHINE_CONFIG_START(superwng_state::superwng)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(superwng_state, superwng_sound_byte_r))
+	MCFG_DEVICE_ADD("ay1", AY8910, MASTER_CLOCK/12)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, superwng_state, superwng_sound_byte_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MASTER_CLOCK/12)
+	MCFG_DEVICE_ADD("ay2", AY8910, MASTER_CLOCK/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

@@ -285,22 +285,22 @@ MACHINE_CONFIG_START(spcforce_state::spcforce)
 
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MCFG_CPU_ADD("maincpu", I8085A, 8000000 * 2)        /* 4.00 MHz??? */
-	MCFG_CPU_PROGRAM_MAP(spcforce_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spcforce_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 8000000 * 2)        /* 4.00 MHz??? */
+	MCFG_DEVICE_PROGRAM_MAP(spcforce_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spcforce_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", I8035, 6144000)        /* divisor ??? */
-	MCFG_CPU_PROGRAM_MAP(spcforce_sound_map)
-	MCFG_MCS48_PORT_BUS_IN_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(spcforce_state, SN76496_latch_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(spcforce_state, SN76496_select_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(spcforce_state, SN76496_select_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(spcforce_state, t0_r))
+	MCFG_DEVICE_ADD("audiocpu", I8035, 6144000)        /* divisor ??? */
+	MCFG_DEVICE_PROGRAM_MAP(spcforce_sound_map)
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, spcforce_state, SN76496_latch_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, spcforce_state, SN76496_select_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, spcforce_state, SN76496_select_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, spcforce_state, t0_r))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(spcforce_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(spcforce_state, irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(spcforce_state, unknown_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, spcforce_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, spcforce_state, irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, spcforce_state, unknown_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -320,25 +320,25 @@ MACHINE_CONFIG_START(spcforce_state::spcforce)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("sn1", SN76496, 2000000)
+	MCFG_DEVICE_ADD("sn1", SN76496, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SN76496_READY_HANDLER(WRITELINE(spcforce_state, write_sn1_ready))
+	MCFG_SN76496_READY_HANDLER(WRITELINE(*this, spcforce_state, write_sn1_ready))
 
-	MCFG_SOUND_ADD("sn2", SN76496, 2000000)
+	MCFG_DEVICE_ADD("sn2", SN76496, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SN76496_READY_HANDLER(WRITELINE(spcforce_state, write_sn2_ready))
+	MCFG_SN76496_READY_HANDLER(WRITELINE(*this, spcforce_state, write_sn2_ready))
 
-	MCFG_SOUND_ADD("sn3", SN76496, 2000000)
+	MCFG_DEVICE_ADD("sn3", SN76496, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SN76496_READY_HANDLER(WRITELINE(spcforce_state, write_sn3_ready))
+	MCFG_SN76496_READY_HANDLER(WRITELINE(*this, spcforce_state, write_sn3_ready))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(spcforce_state::meteors)
 	spcforce(config);
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(spcforce_state, irq_mask_w)) // ??
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(spcforce_state, flip_screen_w)) // irq mask isn't here, gets written too early causing the game to not boot, see startup code
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, spcforce_state, irq_mask_w)) // ??
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, spcforce_state, flip_screen_w)) // irq mask isn't here, gets written too early causing the game to not boot, see startup code
 MACHINE_CONFIG_END
 
 

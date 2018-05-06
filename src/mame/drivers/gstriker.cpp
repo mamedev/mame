@@ -494,13 +494,13 @@ INPUT_PORTS_END
 /*** MACHINE DRIVER **********************************************************/
 
 MACHINE_CONFIG_START(gstriker_state::gstriker)
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(gstriker_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(gstriker_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2) /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2) /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 	MCFG_DEVICE_ADD("io", VS9209, 0)
 	MCFG_VS9209_IN_PORTA_CB(IOPORT("P1"))
@@ -508,15 +508,15 @@ MACHINE_CONFIG_START(gstriker_state::gstriker)
 	MCFG_VS9209_IN_PORTC_CB(IOPORT("SYSTEM"))
 	MCFG_VS9209_IN_PORTD_CB(IOPORT("DSW1"))
 	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
-	MCFG_VS9209_IN_PORTH_CB(DEVREADLINE("soundlatch", generic_latch_8_device, pending_r)) MCFG_DEVCB_BIT(0)
-	MCFG_VS9209_OUT_PORTH_CB(DEVWRITELINE("watchdog", mb3773_device, write_line_ck)) MCFG_DEVCB_BIT(3)
+	MCFG_VS9209_IN_PORTH_CB(READLINE("soundlatch", generic_latch_8_device, pending_r)) MCFG_DEVCB_BIT(0)
+	MCFG_VS9209_OUT_PORTH_CB(WRITELINE("watchdog", mb3773_device, write_line_ck)) MCFG_DEVCB_BIT(3)
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("link", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("link", rs232_port_device, write_rts))
+	//MCFG_ACIA6850_TXD_HANDLER(WRITELINE("link", rs232_port_device, write_txd))
+	//MCFG_ACIA6850_RTS_HANDLER(WRITELINE("link", rs232_port_device, write_rts))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -525,7 +525,7 @@ MACHINE_CONFIG_START(gstriker_state::gstriker)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gstriker_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(gstriker_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gstriker_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gstriker)
@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(gstriker_state::gstriker)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -564,13 +564,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gstriker_state::twc94)
 	gstriker(config);
-	MCFG_CPU_REPLACE("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(twcup94_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(twcup94_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstriker_state,  irq1_line_hold)
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_VS9209_OUT_PORTH_CB(WRITE8(gstriker_state, twcup94_prot_reg_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("watchdog", mb3773_device, write_line_ck)) MCFG_DEVCB_BIT(3)
+	MCFG_VS9209_OUT_PORTH_CB(WRITE8(*this, gstriker_state, twcup94_prot_reg_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("watchdog", mb3773_device, write_line_ck)) MCFG_DEVCB_BIT(3)
 
 	MCFG_DEVICE_REMOVE("acia")
 MACHINE_CONFIG_END

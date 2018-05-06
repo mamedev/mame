@@ -448,8 +448,8 @@ void bishi_state::machine_reset()
 MACHINE_CONFIG_START(bishi_state::bishi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK) /* 12MHz (24MHz OSC / 2 ) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK) /* 12MHz (24MHz OSC / 2 ) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bishi_state, bishi_scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -479,7 +479,7 @@ MACHINE_CONFIG_START(bishi_state::bishi)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, SOUND_CLOCK) /* 16.9344MHz */
+	MCFG_DEVICE_ADD("ymz", YMZ280B, SOUND_CLOCK) /* 16.9344MHz */
 	MCFG_YMZ280B_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

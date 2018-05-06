@@ -552,12 +552,12 @@ void fuuki32_state::machine_reset()
 MACHINE_CONFIG_START(fuuki32_state::fuuki32)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, CPU_CLOCK) /* 20MHz verified */
-	MCFG_CPU_PROGRAM_MAP(fuuki32_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, CPU_CLOCK) /* 20MHz verified */
+	MCFG_DEVICE_PROGRAM_MAP(fuuki32_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CPU_CLOCK) /* 6MHz verified */
-	MCFG_CPU_PROGRAM_MAP(fuuki32_sound_map)
-	MCFG_CPU_IO_MAP(fuuki32_sound_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CPU_CLOCK) /* 6MHz verified */
+	MCFG_DEVICE_PROGRAM_MAP(fuuki32_sound_map)
+	MCFG_DEVICE_IO_MAP(fuuki32_sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -565,7 +565,7 @@ MACHINE_CONFIG_START(fuuki32_state::fuuki32)
 	MCFG_SCREEN_SIZE(64 * 8, 32 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0, 30 * 8 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(fuuki32_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fuuki32_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fuuki32_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fuuki32)
@@ -578,7 +578,7 @@ MACHINE_CONFIG_START(fuuki32_state::fuuki32)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymf1", YMF278B, YMF278B_STD_CLOCK) // 33.8688MHz
+	MCFG_DEVICE_ADD("ymf1", YMF278B, YMF278B_STD_CLOCK) // 33.8688MHz
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)

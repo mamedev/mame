@@ -113,8 +113,8 @@ void c64_multiscreen_cartridge_device::multiscreen_mem(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c64_multiscreen_cartridge_device::device_add_mconfig)
-	MCFG_CPU_ADD(MC6802P_TAG, M6802, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(multiscreen_mem)
+	MCFG_DEVICE_ADD(MC6802P_TAG, M6802, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(multiscreen_mem)
 
 	MCFG_DEVICE_ADD(MC6821P_0_TAG, PIA6821, 0)
 	MCFG_DEVICE_ADD(MC6821P_1_TAG, PIA6821, 0)

@@ -274,9 +274,9 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(cit101_state::cit101)
-	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	//MCFG_SCREEN_RAW_PARAMS(14.976_MHz_XTAL, 960, 0, 800, 260, 0, 240)
@@ -285,62 +285,62 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
 
 	MCFG_DEVICE_ADD("comuart", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("comm", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("comm", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("comm", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<0>))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<2>))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("comm", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("comm", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("comm", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<0>))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<2>))
 
-	MCFG_RS232_PORT_ADD("comm", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("comuart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("comuart", i8251_device, write_dsr))
+	MCFG_DEVICE_ADD("comm", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("comuart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("comuart", i8251_device, write_dsr))
 	// CTS can be disabled in SET-UP Mode C
 	// DSR, CD, SI, RI are examined only during the modem test, not "always ignored" as the User's Manual claims
 
 	MCFG_DEVICE_ADD("auxuart", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("printer", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<1>))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<3>))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("printer", rs232_port_device, write_txd))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<1>))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<3>))
 
-	MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("auxuart", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("auxuart", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("auxuart", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("auxuart", i8251_device, write_cts))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("uartint")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", I8085_RST55_LINE))
 
 	MCFG_DEVICE_ADD("kbduart", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("keyboard", cit101_hle_keyboard_device, write_rxd))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("keyboard", cit101_hle_keyboard_device, write_rxd))
 	MCFG_I8251_RXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST65_LINE))
 
 	MCFG_DEVICE_ADD("keyboard", CIT101_HLE_KEYBOARD, 0)
-	MCFG_CIT101_HLE_KEYBOARD_TXD_CALLBACK(DEVWRITELINE("kbduart", i8251_device, write_rxd))
+	MCFG_CIT101_HLE_KEYBOARD_TXD_CALLBACK(WRITELINE("kbduart", i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("pit0", PIT8253, 0)
 	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_CLK1(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_CLK2(6.144_MHz_XTAL / 4)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("auxuart", i8251_device, write_txc))
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("auxuart", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("auxuart", i8251_device, write_txc))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("auxuart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("pit1", PIT8253, 0)
 	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_CLK1(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_CLK2(6.144_MHz_XTAL / 4)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("comuart", i8251_device, write_txc))
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("comuart", i8251_device, write_rxc))
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("kbduart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("kbduart", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("comuart", i8251_device, write_txc))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("comuart", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("kbduart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("kbduart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(cit101_state, nvr_address_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(cit101_state, nvr_data_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(cit101_state, nvr_data_w))
-	MCFG_I8255_IN_PORTC_CB(DEVREADLINE("comm", rs232_port_device, cts_r)) MCFG_DEVCB_BIT(0)
-	MCFG_DEVCB_CHAIN_INPUT(DEVREADLINE("comm", rs232_port_device, dcd_r)) MCFG_DEVCB_BIT(1) // tied to DSR for loopback test
-	MCFG_DEVCB_CHAIN_INPUT(DEVREADLINE("comm", rs232_port_device, ri_r)) MCFG_DEVCB_BIT(2) // tied to CTS for loopback test
-	MCFG_DEVCB_CHAIN_INPUT(DEVREADLINE("comm", rs232_port_device, si_r)) MCFG_DEVCB_BIT(3) // tied to CTS for loopback test
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(cit101_state, nvr_control_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, cit101_state, nvr_address_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, cit101_state, nvr_data_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, cit101_state, nvr_data_w))
+	MCFG_I8255_IN_PORTC_CB(READLINE("comm", rs232_port_device, cts_r)) MCFG_DEVCB_BIT(0)
+	MCFG_DEVCB_CHAIN_INPUT(READLINE("comm", rs232_port_device, dcd_r)) MCFG_DEVCB_BIT(1) // tied to DSR for loopback test
+	MCFG_DEVCB_CHAIN_INPUT(READLINE("comm", rs232_port_device, ri_r)) MCFG_DEVCB_BIT(2) // tied to CTS for loopback test
+	MCFG_DEVCB_CHAIN_INPUT(READLINE("comm", rs232_port_device, si_r)) MCFG_DEVCB_BIT(3) // tied to CTS for loopback test
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, cit101_state, nvr_control_w))
 
 	MCFG_DEVICE_ADD("nvr", ER2055, 0)
 MACHINE_CONFIG_END

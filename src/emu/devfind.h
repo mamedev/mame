@@ -300,6 +300,17 @@ public:
 	///   until resolution time.
 	void set_tag(char const *tag);
 
+	/// \brief Set search tag
+	///
+	/// Allows search tag to be changed after construction.  Note that
+	/// this must be done before resolution time to take effect.
+	/// \param [in] finder Object finder to take the search base and tag
+	///   from.
+	void set_tag(finder_base const &finder)
+	{
+		std::tie(m_base, m_tag) = finder.finder_target();
+	}
+
 	/// \brief Is the object to be resolved before memory maps?
 	///
 	/// Some objects must be resolved before memory maps are loaded

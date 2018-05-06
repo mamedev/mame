@@ -70,9 +70,9 @@ const tiny_rom_entry *microdisc_device::device_rom_region() const
 
 MACHINE_CONFIG_START(microdisc_device::device_add_mconfig)
 	MCFG_FD1793_ADD("fdc", XTAL(8'000'000)/8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(microdisc_device, fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(microdisc_device, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(microdisc_device, fdc_hld_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, microdisc_device, fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, microdisc_device, fdc_drq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, microdisc_device, fdc_hld_w))
 	MCFG_WD_FDC_FORCE_READY
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", microdisc_floppies, "3dsdd", microdisc_device::floppy_formats)

@@ -37,8 +37,8 @@ static INPUT_PORTS_START( ampscarp )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(ampscarp_state::ampscarp)
-	MCFG_CPU_ADD("maincpu", MC68HC11, 8'000'000) // type and clock unknown
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", MC68HC11, 8'000'000) // type and clock unknown
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 ROM_START( ampscarp )

@@ -528,11 +528,11 @@ static void vc4000_cart(device_slot_interface &device)
 
 MACHINE_CONFIG_START(vc4000_state::vc4000)
 	/* basic machine hardware */
-//  MCFG_CPU_ADD("maincpu", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
-	MCFG_CPU_ADD("maincpu", S2650, 3546875/4)
-	MCFG_CPU_PROGRAM_MAP(vc4000_mem)
-	MCFG_S2650_SENSE_INPUT(READLINE(vc4000_state, vc4000_vsync_r))
-	MCFG_CPU_PERIODIC_INT_DRIVER(vc4000_state, vc4000_video_line,  312*53)  // GOLF needs this exact value
+//  MCFG_DEVICE_ADD("maincpu", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
+	MCFG_DEVICE_ADD("maincpu", S2650, 3546875/4)
+	MCFG_DEVICE_PROGRAM_MAP(vc4000_mem)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, vc4000_state, vc4000_vsync_r))
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(vc4000_state, vc4000_video_line,  312*53)  // GOLF needs this exact value
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -547,7 +547,7 @@ MACHINE_CONFIG_START(vc4000_state::vc4000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", VC4000_SND, 0)
+	MCFG_DEVICE_ADD("custom", VC4000_SND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* quickload */
@@ -595,8 +595,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vc4000_state::elektor)
 	vc4000(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(elektor_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(elektor_mem)
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

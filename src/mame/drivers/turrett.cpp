@@ -355,13 +355,13 @@ void turrett_devices(device_slot_interface &device)
 MACHINE_CONFIG_START(turrett_state::turrett)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3041, R3041_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", R3041, R3041_CLOCK)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_R3000_BRCOND2_INPUT(READLINE(turrett_state, sbrc2_r))
-	MCFG_R3000_BRCOND3_INPUT(READLINE(turrett_state, sbrc3_r))
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", turrett_state, vblank)
-	MCFG_CPU_PERIODIC_INT_DRIVER(turrett_state, adc, 60)
+	MCFG_R3000_BRCOND2_INPUT(READLINE(*this, turrett_state, sbrc2_r))
+	MCFG_R3000_BRCOND3_INPUT(READLINE(*this, turrett_state, sbrc3_r))
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", turrett_state, vblank)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(turrett_state, adc, 60)
 
 	MCFG_ATA_INTERFACE_ADD("ata", turrett_devices, "hdd", nullptr, true)
 

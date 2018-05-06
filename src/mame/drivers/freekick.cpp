@@ -732,17 +732,17 @@ MACHINE_RESET_MEMBER(freekick_state,oigas)
 }
 
 MACHINE_CONFIG_START(freekick_state::omega)
-	MCFG_CPU_ADD("maincpu", MC8123, XTAL(18'432'000)/6) // unknown divisor
-	MCFG_CPU_PROGRAM_MAP(omega_map)
-	MCFG_CPU_IO_MAP(omega_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
+	MCFG_DEVICE_ADD("maincpu", MC8123, XTAL(18'432'000)/6) // unknown divisor
+	MCFG_DEVICE_PROGRAM_MAP(omega_map)
+	MCFG_DEVICE_IO_MAP(omega_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 3M
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(freekick_state, coin1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(freekick_state, coin2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(freekick_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, freekick_state, coin1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, freekick_state, coin2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, freekick_state, nmi_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // ???
 
 	// video hardware
@@ -750,7 +750,7 @@ MACHINE_CONFIG_START(freekick_state::omega)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/3, 768/2, 0, 512/2, 263, 0+16, 224+16) // unknown divisor
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_gigas)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(freekick_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, freekick_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", freekick)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x200)
@@ -758,37 +758,37 @@ MACHINE_CONFIG_START(freekick_state::omega)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL(18'432'000)/6) // unknown divisor
+	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(18'432'000)/6) // unknown divisor
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, XTAL(18'432'000)/6) // unknown divisor
+	MCFG_DEVICE_ADD("sn2", SN76489A, XTAL(18'432'000)/6) // unknown divisor
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn3", SN76489A, XTAL(18'432'000)/6) // unknown divisor
+	MCFG_DEVICE_ADD("sn3", SN76489A, XTAL(18'432'000)/6) // unknown divisor
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn4", SN76489A, XTAL(18'432'000)/6) // unknown divisor
+	MCFG_DEVICE_ADD("sn4", SN76489A, XTAL(18'432'000)/6) // unknown divisor
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(freekick_state::base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(pbillrd_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(pbillrd_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(freekick_state, coin1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(freekick_state, coin2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(freekick_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, freekick_state, coin1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, freekick_state, coin2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, freekick_state, nmi_enable_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 768/2, 0, 512/2, 263, 0+16, 224+16)
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_pbillrd)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(freekick_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, freekick_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", freekick)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x200)
@@ -796,24 +796,24 @@ MACHINE_CONFIG_START(freekick_state::base)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL(12'000'000)/4)
+	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(12'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, XTAL(12'000'000)/4)
+	MCFG_DEVICE_ADD("sn2", SN76489A, XTAL(12'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn3", SN76489A, XTAL(12'000'000)/4)
+	MCFG_DEVICE_ADD("sn3", SN76489A, XTAL(12'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn4", SN76489A, XTAL(12'000'000)/4)
+	MCFG_DEVICE_ADD("sn4", SN76489A, XTAL(12'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(freekick_state::pbillrd)
 	base(config);
 	MCFG_DEVICE_MODIFY("outlatch") // 10K
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(freekick_state, flipscreen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_y_w))
 	/* flip Y/X could be the other way round... */
 
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,pbillrd)
@@ -822,31 +822,31 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(freekick_state::pbillrdm)
 	pbillrd(config);
-	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(12'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(pbillrd_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
+	MCFG_DEVICE_REPLACE("maincpu", MC8123, XTAL(12'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(pbillrd_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(freekick_state::freekick)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(freekick_map)
-	MCFG_CPU_IO_MAP(freekick_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(freekick_map)
+	MCFG_DEVICE_IO_MAP(freekick_io_map)
 
 	MCFG_DEVICE_MODIFY("outlatch") // 5C
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(freekick_state, spinner_select_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, freekick_state, spinner_select_w))
 
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(freekick_state, snd_rom_addr_l_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(freekick_state, snd_rom_addr_h_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(freekick_state, snd_rom_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, freekick_state, snd_rom_addr_l_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, freekick_state, snd_rom_addr_h_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, freekick_state, snd_rom_r))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
@@ -862,13 +862,13 @@ MACHINE_CONFIG_START(freekick_state::gigas)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gigas_map)
-	MCFG_CPU_IO_MAP(gigas_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gigas_map)
+	MCFG_DEVICE_IO_MAP(gigas_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // ???
 
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
@@ -883,14 +883,14 @@ MACHINE_CONFIG_START(freekick_state::gigasm)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(12'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(gigas_map)
-	MCFG_CPU_IO_MAP(gigas_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
+	MCFG_DEVICE_REPLACE("maincpu", MC8123, XTAL(12'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(gigas_map)
+	MCFG_DEVICE_IO_MAP(gigas_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // ???
 
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
@@ -905,8 +905,8 @@ MACHINE_CONFIG_START(freekick_state::oigas)
 	gigas(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(oigas_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(oigas_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(freekick_state,oigas)
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,oigas)

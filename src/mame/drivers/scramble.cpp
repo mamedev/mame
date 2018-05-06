@@ -1305,22 +1305,22 @@ GFXDECODE_END
 MACHINE_CONFIG_START(scramble_state::scramble)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(scramble_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(scramble_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
-	MCFG_CPU_PROGRAM_MAP(scramble_sound_map)
-	MCFG_CPU_IO_MAP(scramble_sound_io_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(scramble_sound_map)
+	MCFG_DEVICE_IO_MAP(scramble_sound_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(scramble_state,scramble_sh_irq_callback)
 
 	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_1_callback))
+	MCFG_7474_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_1_callback))
 
 	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_2_q_callback))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,scramble_sh_7474_q_callback))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,scramble_sh_7474_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
@@ -1334,8 +1334,8 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, scramble_sh_irqtrigger_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, scramble_state, scramble_sh_irqtrigger_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1357,12 +1357,12 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("8910.1", AY8910, 14318000/8)
+	MCFG_DEVICE_ADD("8910.1", AY8910, 14318000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 
-	MCFG_SOUND_ADD("8910.2", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(scramble_state, scramble_portB_r))
+	MCFG_DEVICE_ADD("8910.2", AY8910, 14318000/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, scramble_state, scramble_portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 
@@ -1370,13 +1370,13 @@ MACHINE_CONFIG_START(scramble_state::mars)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mars_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mars_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255_1")
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, scramble_sh_irqtrigger_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, scramble_state, scramble_sh_irqtrigger_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN3"))
 
 	/* video hardware */
@@ -1389,8 +1389,8 @@ MACHINE_CONFIG_START(scramble_state::devilfsh)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mars_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mars_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", devilfsh)
@@ -1403,9 +1403,9 @@ MACHINE_CONFIG_START(scramble_state::newsin7)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(newsin7_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", scramble_state,  irq0_line_hold) // newsin7a has a corrupt opcode at 0x67, the irq routine instead of NMI avoids it by jumping to 0x68 after doing some other things, probably intentional. newsin7 has this fixed, maybe a bootleg?
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(newsin7_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scramble_state,  irq0_line_hold) // newsin7a has a corrupt opcode at 0x67, the irq routine instead of NMI avoids it by jumping to 0x68 after doing some other things, probably intentional. newsin7 has this fixed, maybe a bootleg?
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", newsin7)
@@ -1419,13 +1419,13 @@ MACHINE_CONFIG_START(scramble_state::mrkougb)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mrkougar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mrkougar_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255_1")
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, mrkougar_sh_irqtrigger_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, scramble_state, mrkougar_sh_irqtrigger_w))
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1444,8 +1444,8 @@ MACHINE_CONFIG_START(scramble_state::ckongs)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ckongs_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ckongs_map)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1458,14 +1458,14 @@ MACHINE_CONFIG_START(scramble_state::hotshock)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hotshock_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hotshock_map)
 
 	MCFG_DEVICE_REMOVE( "ppi8255_0" )
 	MCFG_DEVICE_REMOVE( "ppi8255_1" )
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_IO_MAP(hotshock_sound_io_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_IO_MAP(hotshock_sound_io_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,galaxold)
 
@@ -1475,13 +1475,13 @@ MACHINE_CONFIG_START(scramble_state::hotshock)
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,pisces)
 
-	MCFG_SOUND_MODIFY("8910.1")
+	MCFG_DEVICE_MODIFY("8910.1")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_MODIFY("8910.2")
-	MCFG_AY8910_PORT_A_READ_CB(READ8(scramble_state, hotshock_soundlatch_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(scramble_state, scramble_portB_r))
+	MCFG_DEVICE_MODIFY("8910.2")
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, scramble_state, hotshock_soundlatch_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, scramble_state, scramble_portB_r))
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
@@ -1502,8 +1502,8 @@ MACHINE_CONFIG_START(scramble_state::mimonscr)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mimonscr_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mimonscr_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,mimonkey)
@@ -1514,9 +1514,9 @@ MACHINE_CONFIG_START(scramble_state::triplep)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(triplep_map)
-	MCFG_CPU_IO_MAP(triplep_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(triplep_map)
+	MCFG_DEVICE_IO_MAP(triplep_io_map)
 
 	MCFG_DEVICE_REMOVE("audiocpu")
 	MCFG_DEVICE_REMOVE("ppi8255_1")
@@ -1528,8 +1528,8 @@ MACHINE_CONFIG_START(scramble_state::triplep)
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("8910.1")
-	MCFG_SOUND_CLOCK(18432000/12) // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
+	MCFG_DEVICE_MODIFY("8910.1")
+	MCFG_DEVICE_CLOCK(18432000/12) // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
 
 
 	MCFG_SOUND_ROUTES_RESET()
@@ -1556,11 +1556,11 @@ MACHINE_CONFIG_START(scramble_state::hunchbks)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", S2650, 18432000/6)
-	MCFG_CPU_PROGRAM_MAP(hunchbks_map)
-	MCFG_CPU_IO_MAP(hunchbks_readport)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", scramble_state,  hunchbks_vh_interrupt)
+	MCFG_DEVICE_REPLACE("maincpu", S2650, 18432000/6)
+	MCFG_DEVICE_PROGRAM_MAP(hunchbks_map)
+	MCFG_DEVICE_IO_MAP(hunchbks_readport)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scramble_state,  hunchbks_vh_interrupt)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
@@ -1576,25 +1576,25 @@ MACHINE_CONFIG_START(scramble_state::hncholms)
 	hunchbks(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(18432000/6/2/2)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(18432000/6/2/2)
 
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,scorpion)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::ad2083)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(ad2083_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ad2083_map)
 
 	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,scramble_sh_7474_q_callback))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,scramble_sh_7474_q_callback))
 
 	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
-	MCFG_7474_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_1_callback))
+	MCFG_7474_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_1_callback))
 
 	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_2_q_callback))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scramble_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
@@ -1628,21 +1628,21 @@ MACHINE_CONFIG_START(scramble_state::harem)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(harem_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(harem_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(harem_sound_map)
-	MCFG_CPU_IO_MAP(harem_sound_io_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(harem_sound_map)
+	MCFG_DEVICE_IO_MAP(harem_sound_io_map)
 
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,harem)
 
 	/* extra AY8910 with I/O ports */
-	MCFG_SOUND_ADD("8910.3", AY8910, 14318000/8)
+	MCFG_DEVICE_ADD("8910.3", AY8910, 14318000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("digitalker", digitalker_device, digitalker_data_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(scramble_state, harem_digitalker_control_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("digitalker", digitalker_device, digitalker_data_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, scramble_state, harem_digitalker_control_w))
 
 	MCFG_DIGITALKER_ADD("digitalker", 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)

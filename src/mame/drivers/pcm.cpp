@@ -255,9 +255,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(pcm_state::pcm)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(10'000'000) /4)
-	MCFG_CPU_PROGRAM_MAP(pcm_mem)
-	MCFG_CPU_IO_MAP(pcm_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(10'000'000) /4)
+	MCFG_DEVICE_PROGRAM_MAP(pcm_mem)
+	MCFG_DEVICE_IO_MAP(pcm_io)
 	MCFG_Z80_DAISY_CHAIN(pcm_daisy_chain)
 
 	/* video hardware */
@@ -276,7 +276,7 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -288,9 +288,9 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 
 	MCFG_DEVICE_ADD("pio_s", Z80PIO, XTAL(10'000'000)/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(DEVREAD8(K7659_KEYBOARD_TAG, k7659_keyboard_device, read))
-	MCFG_Z80PIO_IN_PB_CB(READ8(pcm_state, pcm_85_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(pcm_state, pcm_85_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(K7659_KEYBOARD_TAG, k7659_keyboard_device, read))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, pcm_state, pcm_85_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, pcm_state, pcm_85_w))
 
 	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(10'000'000) /4)
 
@@ -299,10 +299,10 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 
 	MCFG_DEVICE_ADD("ctc_s", Z80CTC, XTAL(10'000'000) /4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(pcm_state, pcm_82_w))  // speaker
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("sio", z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, rxca_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("sio", z80sio_device, rxtxcb_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, pcm_state, pcm_82_w))  // speaker
 MACHINE_CONFIG_END
 
 /* ROM definition */

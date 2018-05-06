@@ -362,8 +362,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(videopin_state::videopin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 16)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(videopin_state::videopin)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(videopin)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

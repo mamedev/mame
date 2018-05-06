@@ -568,16 +568,16 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gatron_state::gat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/24)   /* 666.66 kHz, guess */
-	MCFG_CPU_PROGRAM_MAP(gat_map)
-	MCFG_CPU_IO_MAP(gat_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/24)   /* 666.66 kHz, guess */
+	MCFG_DEVICE_PROGRAM_MAP(gat_map)
+	MCFG_DEVICE_IO_MAP(gat_portmap)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gatron_state, output_port_1_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gatron_state, output_port_1_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -595,7 +595,7 @@ MACHINE_CONFIG_START(gatron_state::gat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("snsnd", SN76489, MASTER_CLOCK/8 )   // Present in Bingo PCB. Clock need to be verified.
+	MCFG_DEVICE_ADD("snsnd", SN76489, MASTER_CLOCK/8 )   // Present in Bingo PCB. Clock need to be verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_CONFIG_END
 

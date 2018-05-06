@@ -243,8 +243,8 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(rgum_state::rgum)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(rgum_map)
+	MCFG_DEVICE_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(rgum_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(rgum_state::rgum)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 24000000/16) /* guessed to use the same xtal as the crtc */
+	MCFG_DEVICE_ADD("aysnd", AY8910, 24000000/16) /* guessed to use the same xtal as the crtc */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

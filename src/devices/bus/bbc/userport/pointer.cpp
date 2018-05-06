@@ -15,7 +15,7 @@
     an input. The CB1 and CB2 lines are used in conjunction with PB3 and PB4 for
     sensing pulses and determining the direction of rotation of the ball.
 
-    The connections are:—
+    The connections are:
       CB1 X1
       CB2 Y2
       PB0 Left switch button

@@ -366,13 +366,13 @@ void rvoice_state::null_kbd_put(u8 data)
 
 MACHINE_CONFIG_START(rvoice_state::rvoicepc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD63701, XTAL(7'372'800))
-	MCFG_CPU_PROGRAM_MAP(hd63701_main_mem)
-	MCFG_CPU_IO_MAP(hd63701_main_io)
+	MCFG_DEVICE_ADD("maincpu", HD63701, XTAL(7'372'800))
+	MCFG_DEVICE_PROGRAM_MAP(hd63701_main_mem)
+	MCFG_DEVICE_IO_MAP(hd63701_main_io)
 
-	//MCFG_CPU_ADD("playercpu", HD63701, XTAL(7'372'800)) // not dumped yet
-	//MCFG_CPU_PROGRAM_MAP(hd63701_slave_mem)
-	//MCFG_CPU_IO_MAP(hd63701_slave_io)
+	//MCFG_DEVICE_ADD("playercpu", HD63701, XTAL(7'372'800)) // not dumped yet
+	//MCFG_DEVICE_PROGRAM_MAP(hd63701_slave_mem)
+	//MCFG_DEVICE_IO_MAP(hd63701_slave_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("acia65c51", MOS6551, 0)

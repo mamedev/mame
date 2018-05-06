@@ -572,7 +572,7 @@ GFXDECODE_END
 /* basic configuration for 2 lines display */
 MACHINE_CONFIG_START(psion_state::psion_2lines)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD63701, 980000) // should be HD6303 at 0.98MHz
+	MCFG_DEVICE_ADD("maincpu", HD63701, 980000) // should be HD6303 at 0.98MHz
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -593,7 +593,7 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
+	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", psion_state, nvram_init)     // sys_regs
@@ -624,8 +624,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psion1_state::psion1)
 	psion_2lines(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(psion1_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(psion1_mem)
 
 	MCFG_DEVICE_MODIFY("nmi_timer")
 	MCFG_TIMER_START_DELAY(attotime::from_seconds(1))
@@ -646,29 +646,29 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(psion_state::psioncm)
 	psion_2lines(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(psioncm_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(psioncm_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psion_state::psionla)
 	psion_2lines(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(psionla_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(psionla_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psion_state::psionlam)
 	psion_2lines(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(psionlam_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(psionlam_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psion_state::psionp350)
 	psion_2lines(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(psionp350_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(psionp350_mem)
 
 	MCFG_NVRAM_ADD_0FILL("nvram3") // paged RAM
 MACHINE_CONFIG_END
@@ -676,8 +676,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(psion_state::psionlz)
 	psion_4lines(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(psionlz_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(psionlz_mem)
 
 	MCFG_NVRAM_ADD_0FILL("nvram3") // paged RAM
 MACHINE_CONFIG_END

@@ -666,9 +666,9 @@ static const char *const astinvad_sample_names[] =
 MACHINE_CONFIG_START(astinvad_state::kamikaze)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(kamikaze_map)
-	MCFG_CPU_IO_MAP(kamikaze_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(kamikaze_map)
+	MCFG_DEVICE_IO_MAP(kamikaze_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(astinvad_state, kamikaze)
 	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state, kamikaze)
@@ -679,8 +679,8 @@ MACHINE_CONFIG_START(astinvad_state::kamikaze)
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(astinvad_state, kamikaze_sound1_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(astinvad_state, kamikaze_sound2_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, astinvad_state, kamikaze_sound1_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, astinvad_state, kamikaze_sound2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -692,7 +692,7 @@ MACHINE_CONFIG_START(astinvad_state::kamikaze)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(astinvad_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -704,9 +704,9 @@ MACHINE_CONFIG_START(astinvad_state::spcking2)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("ppi8255_1")
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(astinvad_state, spcking2_sound1_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(astinvad_state, spcking2_sound2_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(astinvad_state, spcking2_sound3_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, astinvad_state, spcking2_sound1_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, astinvad_state, spcking2_sound2_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, astinvad_state, spcking2_sound3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -718,10 +718,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(astinvad_state::spaceint)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* a guess */
-	MCFG_CPU_PROGRAM_MAP(spaceint_map)
-	MCFG_CPU_IO_MAP(spaceint_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", astinvad_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)        /* a guess */
+	MCFG_DEVICE_PROGRAM_MAP(spaceint_map)
+	MCFG_DEVICE_IO_MAP(spaceint_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", astinvad_state, irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(astinvad_state, spaceint)
 	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state, spaceint)
@@ -740,7 +740,7 @@ MACHINE_CONFIG_START(astinvad_state::spaceint)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(astinvad_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

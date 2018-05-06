@@ -103,8 +103,8 @@ void pgm3_state::machine_reset()
 MACHINE_CONFIG_START(pgm3_state::pgm3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM9, 800000000) // wrong, see notes at top of driver
-	MCFG_CPU_PROGRAM_MAP(pgm3_map)
+	MCFG_DEVICE_ADD("maincpu", ARM9, 800000000) // wrong, see notes at top of driver
+	MCFG_DEVICE_PROGRAM_MAP(pgm3_map)
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
@@ -114,7 +114,7 @@ MACHINE_CONFIG_START(pgm3_state::pgm3)
 	MCFG_SCREEN_SIZE(1280, 720)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1280-1, 0, 720-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm3_state, screen_update_pgm3)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm3_state, screen_vblank_pgm3))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pgm3_state, screen_vblank_pgm3))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x1000)

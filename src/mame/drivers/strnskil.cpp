@@ -348,13 +348,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(strnskil_state::strnskil_irq)
 MACHINE_CONFIG_START(strnskil_state::strnskil)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
-	MCFG_CPU_PROGRAM_MAP(strnskil_map1)
+	MCFG_DEVICE_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
+	MCFG_DEVICE_PROGRAM_MAP(strnskil_map1)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", strnskil_state, strnskil_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", Z80,8000000/2) /* 4.000MHz */
-	MCFG_CPU_PROGRAM_MAP(strnskil_map2)
-	MCFG_CPU_PERIODIC_INT_DRIVER(strnskil_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_ADD("sub", Z80,8000000/2) /* 4.000MHz */
+	MCFG_DEVICE_PROGRAM_MAP(strnskil_map2)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(strnskil_state, irq0_line_hold, 2*60)
 
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -376,20 +376,20 @@ MACHINE_CONFIG_START(strnskil_state::strnskil)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76496, 8000000/4)
+	MCFG_DEVICE_ADD("sn1", SN76496, 8000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_SOUND_ADD("sn2", SN76496, 8000000/2)
+	MCFG_DEVICE_ADD("sn2", SN76496, 8000000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(strnskil_state::banbam)
 	strnskil(config);
-	MCFG_CPU_ADD("mcu", MB8841, 8000000/2)
-//  MCFG_MB88XX_READ_K_CB(READ8(strnskil_state, mcu_portk_r))
-//  MCFG_MB88XX_READ_R0_CB(READ8(strnskil_state, mcu_portr0_r))
-//  MCFG_MB88XX_WRITE_R0_CB(WRITE8(strnskil_state, mcu_portr0_w))
+	MCFG_DEVICE_ADD("mcu", MB8841, 8000000/2)
+//  MCFG_MB88XX_READ_K_CB(READ8(*this, strnskil_state, mcu_portk_r))
+//  MCFG_MB88XX_READ_R0_CB(READ8(*this, strnskil_state, mcu_portr0_r))
+//  MCFG_MB88XX_WRITE_R0_CB(WRITE8(*this, strnskil_state, mcu_portr0_w))
 MACHINE_CONFIG_END
 
 /****************************************************************************/

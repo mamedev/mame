@@ -526,15 +526,15 @@ void qdrmfgp_state::machine_reset()
 MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) /*  16.000 MHz */
-	MCFG_CPU_PROGRAM_MAP(qdrmfgp_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) /*  16.000 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(qdrmfgp_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", qdrmfgp_state, qdrmfgp_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(qdrmfgp_state, ide_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, qdrmfgp_state, ide_interrupt))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -563,7 +563,7 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, qdrmfgp_k054539_map)
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(qdrmfgp_state, k054539_irq1_gen))
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, qdrmfgp_state, k054539_irq1_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -571,15 +571,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) /*  16.000 MHz */
-	MCFG_CPU_PROGRAM_MAP(qdrmfgp2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", qdrmfgp_state,  qdrmfgp2_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) /*  16.000 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(qdrmfgp2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", qdrmfgp_state,  qdrmfgp2_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(qdrmfgp_state, gp2_ide_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, qdrmfgp_state, gp2_ide_interrupt))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -76,9 +76,9 @@ void adam_printer_device::adam_prn_io(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(adam_printer_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(adam_prn_mem)
-	MCFG_CPU_IO_MAP(adam_prn_io)
+	MCFG_DEVICE_ADD(M6801_TAG, M6801, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(adam_prn_mem)
+	MCFG_DEVICE_IO_MAP(adam_prn_io)
 	MCFG_DEVICE_DISABLE() // TODO
 MACHINE_CONFIG_END
 

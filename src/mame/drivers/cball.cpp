@@ -265,8 +265,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(cball_state::cball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL(12'096'000) / 16) /* ? */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(12'096'000) / 16) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
 
 	/* video hardware */

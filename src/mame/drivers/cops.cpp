@@ -921,8 +921,8 @@ DRIVER_INIT_MEMBER(cops_state,cops)
 MACHINE_CONFIG_START(cops_state::cops)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(cops_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(cops_map)
 
 	/* video hardware */
 	MCFG_LASERDISC_LDP1450_ADD("laserdisc",9600)
@@ -930,17 +930,17 @@ MACHINE_CONFIG_START(cops_state::cops)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, MAIN_CLOCK/2)
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via1_irq))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, via1_b_w))
-	MCFG_VIA6522_CB1_HANDLER(WRITE8(cops_state, via1_cb1_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, cops_state, via1_irq))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, cops_state, via1_b_w))
+	MCFG_VIA6522_CB1_HANDLER(WRITE8(*this, cops_state, via1_cb1_w))
 
 	MCFG_DEVICE_ADD("via6522_2", VIA6522, MAIN_CLOCK/2)
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via2_irq))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, cops_state, via2_irq))
 
 	MCFG_DEVICE_ADD("via6522_3", VIA6522, MAIN_CLOCK/2)
-	MCFG_VIA6522_READPA_HANDLER(READ8(cops_state, cdrom_data_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(cops_state, cdrom_data_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, cdrom_ctrl_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, cops_state, cdrom_data_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, cops_state, cdrom_data_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, cops_state, cdrom_ctrl_w))
 
 	/* acia (really a 65C52)*/
 
@@ -948,7 +948,7 @@ MACHINE_CONFIG_START(cops_state::cops)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* TODO: Verify clock */
-	MCFG_SOUND_ADD("snsnd", SN76489, MAIN_CLOCK/2)
+	MCFG_DEVICE_ADD("snsnd", SN76489, MAIN_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END
@@ -957,8 +957,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cops_state::revlatns)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(revlatns_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(revlatns_map)
 
 	/* video hardware */
 	MCFG_LASERDISC_LDP1450_ADD("laserdisc",9600)
@@ -966,9 +966,9 @@ MACHINE_CONFIG_START(cops_state::revlatns)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, MAIN_CLOCK/2)
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via1_irq))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, via1_b_w))
-	MCFG_VIA6522_CB1_HANDLER(WRITE8(cops_state, via1_cb1_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, cops_state, via1_irq))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, cops_state, via1_b_w))
+	MCFG_VIA6522_CB1_HANDLER(WRITE8(*this, cops_state, via1_cb1_w))
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 
@@ -978,7 +978,7 @@ MACHINE_CONFIG_START(cops_state::revlatns)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* TODO: Verify clock */
-	MCFG_SOUND_ADD("snsnd", SN76489, MAIN_CLOCK/2)
+	MCFG_DEVICE_ADD("snsnd", SN76489, MAIN_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END

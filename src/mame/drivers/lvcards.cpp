@@ -457,10 +457,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(lvcards_state::lvcards)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu",Z80, 18432000/4) // unknown frequency, assume same as tehkanwc.cpp
-	MCFG_CPU_PROGRAM_MAP(lvcards_map)
-	MCFG_CPU_IO_MAP(lvcards_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lvcards_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",Z80, 18432000/4) // unknown frequency, assume same as tehkanwc.cpp
+	MCFG_DEVICE_PROGRAM_MAP(lvcards_map)
+	MCFG_DEVICE_IO_MAP(lvcards_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lvcards_state,  irq0_line_hold)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -478,7 +478,7 @@ MACHINE_CONFIG_START(lvcards_state::lvcards)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 18432000/12) // unknown frequency, assume same as tehkanwc.cpp
+	MCFG_DEVICE_ADD("aysnd", AY8910, 18432000/12) // unknown frequency, assume same as tehkanwc.cpp
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -489,8 +489,8 @@ MACHINE_CONFIG_START(lvcards_state::lvpoker)
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_1FILL("nvram")
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(lvpoker_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(lvpoker_map)
 	MCFG_MACHINE_START_OVERRIDE(lvcards_state,lvpoker)
 	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
 MACHINE_CONFIG_END
@@ -500,8 +500,8 @@ MACHINE_CONFIG_START(lvcards_state::ponttehk)
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_1FILL("nvram")
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ponttehk_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ponttehk_map)
 	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
 
 	// video hardware

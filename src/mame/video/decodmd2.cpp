@@ -131,8 +131,8 @@ void decodmd_type2_device::decodmd2_map(address_map &map)
 
 MACHINE_CONFIG_START(decodmd_type2_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dmdcpu", MC6809E, XTAL(8'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(decodmd2_map)
+	MCFG_DEVICE_ADD("dmdcpu", MC6809E, XTAL(8'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(decodmd2_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

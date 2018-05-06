@@ -2276,9 +2276,9 @@ void bfm_sc2_state::machine_start()
 }
 
 MACHINE_CONFIG_START(bfm_sc2_vid_state::scorpion2_vid)
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 ) // 6809 CPU at 2 Mhz
-	MCFG_CPU_PROGRAM_MAP(memmap_vid)                    // setup scorpion2 board memorymap
-	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_vid_state, timer_irq,  1000)           // generate 1000 IRQ's per second
+	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/4 ) // 6809 CPU at 2 Mhz
+	MCFG_DEVICE_PROGRAM_MAP(memmap_vid)                    // setup scorpion2 board memorymap
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_vid_state, timer_irq,  1000)           // generate 1000 IRQ's per second
 	MCFG_QUANTUM_TIME(attotime::from_hz(960))                                   // needed for serial communication !!
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -2294,10 +2294,10 @@ MACHINE_CONFIG_START(bfm_sc2_vid_state::scorpion2_vid)
 	MCFG_BFM_ADDER2_ADD("adder2")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3747,9 +3747,9 @@ void bfm_sc2_dmd_state::machine_start()
 /* machine driver for scorpion2 board */
 
 MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
-	MCFG_CPU_PROGRAM_MAP(memmap_no_vid)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_awp_state, timer_irq,  1000)
+	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/4 )
+	MCFG_DEVICE_PROGRAM_MAP(memmap_no_vid)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_awp_state, timer_irq,  1000)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
@@ -3758,10 +3758,10 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 	MCFG_BFMBD1_ADD("vfd1",1)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd",UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd",YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd",YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -3771,17 +3771,17 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 	MCFG_DEFAULT_LAYOUT(layout_sc2_vfd)
 
 	MCFG_STARPOINT_48STEP_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_awp_state, reel_optic_cb<0>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<0>))
 	MCFG_STARPOINT_48STEP_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_awp_state, reel_optic_cb<1>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<1>))
 	MCFG_STARPOINT_48STEP_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_awp_state, reel_optic_cb<2>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<2>))
 	MCFG_STARPOINT_48STEP_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_awp_state, reel_optic_cb<3>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<3>))
 	MCFG_STARPOINT_48STEP_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_awp_state, reel_optic_cb<4>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<4>))
 	MCFG_STARPOINT_48STEP_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_awp_state, reel_optic_cb<5>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_awp_state, reel_optic_cb<5>))
 
 	_8meters(config);
 MACHINE_CONFIG_END
@@ -3807,18 +3807,18 @@ MACHINE_CONFIG_END
 /* machine driver for scorpion2 board + matrix board */
 MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
 	MCFG_QUANTUM_TIME(attotime::from_hz(960))                                   // needed for serial communication !!
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
-	MCFG_CPU_PROGRAM_MAP(memmap_no_vid)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_dmd_state, timer_irq,  1000)
+	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/4 )
+	MCFG_DEVICE_PROGRAM_MAP(memmap_no_vid)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfm_sc2_dmd_state, timer_irq,  1000)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd",YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd",YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd",UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -3827,20 +3827,20 @@ MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sc2_dmd)
 	MCFG_DEVICE_ADD("dm01", BFM_DM01, 0)
-	MCFG_BFM_DM01_BUSY_CB(WRITELINE(bfm_sc2_dmd_state, bfmdm01_busy))
+	MCFG_BFM_DM01_BUSY_CB(WRITELINE(*this, bfm_sc2_dmd_state, bfmdm01_busy))
 
 	MCFG_STARPOINT_48STEP_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_dmd_state, reel_optic_cb<0>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<0>))
 	MCFG_STARPOINT_48STEP_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_dmd_state, reel_optic_cb<1>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<1>))
 	MCFG_STARPOINT_48STEP_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_dmd_state, reel_optic_cb<2>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<2>))
 	MCFG_STARPOINT_48STEP_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_dmd_state, reel_optic_cb<3>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<3>))
 	MCFG_STARPOINT_48STEP_ADD("reel4")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_dmd_state, reel_optic_cb<4>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<4>))
 	MCFG_STARPOINT_48STEP_ADD("reel5")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(bfm_sc2_dmd_state, reel_optic_cb<5>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, bfm_sc2_dmd_state, reel_optic_cb<5>))
 
 	_8meters(config);
 MACHINE_CONFIG_END

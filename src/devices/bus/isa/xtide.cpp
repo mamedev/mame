@@ -264,7 +264,7 @@ DEFINE_DEVICE_TYPE(ISA8_XTIDE, xtide_device, "xtide", "XT-IDE Fixed Drive Adapte
 
 MACHINE_CONFIG_START(xtide_device::device_add_mconfig)
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(xtide_device, ide_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, xtide_device, ide_interrupt))
 
 	MCFG_EEPROM_2864_ADD("eeprom")
 MACHINE_CONFIG_END

@@ -14,30 +14,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/namco.h"
-#include "sound/discrete.h"
 #include "screen.h"
-
-struct filter2_context
-{
-	filter2_context() :
-		x0(0.0),
-		x1(0.0),
-		x2(0.0),
-		y0(0.0),
-		y1(0.0),
-		y2(0.0),
-		a1(0.0),
-		a2(0.0),
-		b0(0.0),
-		b1(0.0),
-		b2(0.0)
-	{}
-
-	double x0, x1, x2;  /* x[k], x[k-1], x[k-2], current and previous 2 input values */
-	double y0, y1, y2;  /* y[k], y[k-1], y[k-2], current and previous 2 output values */
-	double a1, a2;      /* digital filter coefficients, denominator */
-	double b0, b1, b2;  /* digital filter coefficients, numerator */
-};
 
 
 class polepos_state : public driver_device
@@ -148,41 +125,5 @@ public:
 	void z80_io(address_map &map);
 	void z80_map(address_map &map);
 };
-
-
-/*----------- defined in audio/polepos.c -----------*/
-
-class polepos_sound_device : public device_t,
-								public device_sound_interface
-{
-public:
-	polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~polepos_sound_device() { }
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-
-public:
-	DECLARE_WRITE_LINE_MEMBER(clson_w);
-	DECLARE_WRITE8_MEMBER(polepos_engine_sound_lsb_w);
-	DECLARE_WRITE8_MEMBER(polepos_engine_sound_msb_w);
-
-private:
-	uint32_t m_current_position;
-	int m_sample_msb;
-	int m_sample_lsb;
-	int m_sample_enable;
-	sound_stream *m_stream;
-	filter2_context m_filter_engine[3];
-};
-
-DECLARE_DEVICE_TYPE(POLEPOS, polepos_sound_device)
-
-DISCRETE_SOUND_EXTERN( polepos );
 
 #endif // MAME_INCLUDES_POLEPOS_H

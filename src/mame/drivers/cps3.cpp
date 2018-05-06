@@ -2523,11 +2523,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cps3_state::cps3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the internal multiplier to 4x (this should probably be handled in the core..)
-	MCFG_CPU_PROGRAM_MAP(cps3_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps3_state,  cps3_vbl_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cps3_state, cps3_other_interrupt, 80) /* ?source? */
+	MCFG_DEVICE_ADD("maincpu", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the internal multiplier to 4x (this should probably be handled in the core..)
+	MCFG_DEVICE_PROGRAM_MAP(cps3_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cps3_state,  cps3_vbl_interrupt)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cps3_state, cps3_other_interrupt, 80) /* ?source? */
 	MCFG_SH2_DMA_KLUDGE_CB(cps3_state, dma_callback)
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
@@ -2559,7 +2559,7 @@ MACHINE_CONFIG_START(cps3_state::cps3)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("cps3sound", CPS3, MASTER_CLOCK / 3)
+	MCFG_DEVICE_ADD("cps3sound", CPS3, MASTER_CLOCK / 3)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END

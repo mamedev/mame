@@ -272,17 +272,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
 MACHINE_CONFIG_START(deadang_state::deadang)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30,XTAL(16'000'000)/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", V30,XTAL(16'000'000)/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer1", deadang_state, main_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", V30,XTAL(16'000'000)/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("sub", V30,XTAL(16'000'000)/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", deadang_state, sub_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_ROM("audiocpu")
@@ -310,20 +310,20 @@ MACHINE_CONFIG_START(deadang_state::deadang)
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ym1", ym2203_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ym1", ym2203_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ym1", ym2203_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ym1", ym2203_device, write))
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(14'318'181)/4)
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(14'318'181)/4)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(14'318'181)/4)
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000)
+	MCFG_DEVICE_ADD("adpcm1", SEIBU_ADPCM, 8000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("adpcm2", SEIBU_ADPCM, 8000)
+	MCFG_DEVICE_ADD("adpcm2", SEIBU_ADPCM, 8000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
