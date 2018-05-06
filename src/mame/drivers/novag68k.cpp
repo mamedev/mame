@@ -236,8 +236,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(novag68k_state::diablo68k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(diablo68k_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(diablo68k_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag68k_state, irq_on, attotime::from_hz(32.768_kHz_XTAL/128)) // 256Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(1100)) // active for 1.1us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag68k_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
+	MCFG_DEVICE_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -275,8 +275,8 @@ MACHINE_CONFIG_START(novag68k_state::scorpio68k)
 	diablo68k(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(scorpio68k_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(scorpio68k_map)
 
 	//MCFG_DEFAULT_LAYOUT(layout_novag_scorpio68k)
 MACHINE_CONFIG_END

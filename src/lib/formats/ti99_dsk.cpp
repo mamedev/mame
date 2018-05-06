@@ -254,7 +254,7 @@ bool ti99_floppy_format::save(io_generic *io, floppy_image *image)
 					// The criterion for a successful decoding is that we find at least
 					// 6 ID or data address marks on the track. It is highly unlikely
 					// to find so many marks with a wrong cell size.
-					if (marks < 6 && attempt < 4)
+					if (marks < 6 && attempt < 3)
 					{
 						if (TRACE) osd_printf_verbose("ti99_dsk: Decoding with cell size %d failed.\n", cell_size);
 						attempt++;
@@ -266,6 +266,7 @@ bool ti99_floppy_format::save(io_generic *io, floppy_image *image)
 				{
 					if (marks < 6)
 					{
+						// There are no address marks on track 0, head 1.
 						if (min_heads()==1)
 						{
 							if (TRACE) osd_printf_info("ti99_dsk: We don't have a second side and the format allows for single-sided recording.\n");
@@ -286,7 +287,7 @@ bool ti99_floppy_format::save(io_generic *io, floppy_image *image)
 					if (head == 0 && track == 0)
 					{
 						if (marks >=6) { if (TRACE) osd_printf_info("ti99_dsk: Decoding with cell size %d successful.\n", cell_size); }
-						else osd_printf_info("ti99_dsk: No address marks found on track 0. Assuming MFM format.\n");
+						else osd_printf_info("ti99_dsk: No address marks found on track 0. Assuming FM format.\n");
 					}
 				}
 				// Save to the file
@@ -1025,14 +1026,22 @@ void ti99_floppy_format::showtrack(uint8_t* trackdata, int length)
 */
 void ti99_sdf_format::write_track(io_generic *io, uint8_t *trackdata, int *sector, int track, int head, int maxsect, int maxtrack, int numbytes)
 {
+	uint8_t* buf;
+	// For creating an empty space where the sector did not exist
+	uint8_t empty[256];
+	memset(empty, 0, 256);
+
 	int logicaltrack = head * maxtrack;
 	logicaltrack += ((head&1)==0)?  track : (maxtrack - 1 - track);
 	int trackoffset = logicaltrack * maxsect * SECTOR_SIZE;
 
 //  if (head==0 && track==0) showtrack(trackdata, 9216);
 
-	for (int i=0; i < maxsect; i++)
-		io_generic_write(io, trackdata + sector[i], trackoffset + i * SECTOR_SIZE, SECTOR_SIZE);
+	for (int i=0; i < maxsect; i++) {
+		if (sector[i]==-1) buf = empty;
+		else buf = trackdata + sector[i];
+		io_generic_write(io, buf, trackoffset + i * SECTOR_SIZE, SECTOR_SIZE);
+	}
 }
 
 const floppy_format_type FLOPPY_TI99_SDF_FORMAT = &floppy_image_format_creator<ti99_sdf_format>;

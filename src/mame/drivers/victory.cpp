@@ -213,10 +213,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(victory_state::victory)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, VICTORY_MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", victory_state,  vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, VICTORY_MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", victory_state,  vblank_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

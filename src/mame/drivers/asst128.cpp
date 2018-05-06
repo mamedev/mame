@@ -100,10 +100,10 @@ static DEVICE_INPUT_DEFAULTS_START( asst128 )
 DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(asst128_state::asst128)
-	MCFG_CPU_ADD("maincpu", I8086, 4772720)
-	MCFG_CPU_PROGRAM_MAP(asst128_map)
-	MCFG_CPU_IO_MAP(asst128_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, 4772720)
+	MCFG_DEVICE_PROGRAM_MAP(asst128_map)
+	MCFG_DEVICE_IO_MAP(asst128_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mb", ASST128_MOTHERBOARD, 0)
 	downcast<asst128_mb_device &>(*device).set_cputag("maincpu");
@@ -112,13 +112,14 @@ MACHINE_CONFIG_START(asst128_state::asst128)
 	MCFG_DEVICE_MODIFY("mb:cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "board0", pc_isa8_cards, "cga_mc1502", true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "board1", pc_isa8_cards, "lpt", true)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("board0", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga_mc1502", true)
+	MCFG_DEVICE_ADD("board1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", true)
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-	MCFG_PC_FDC_INTRQ_CALLBACK(DEVWRITELINE("mb:pic8259", pic8259_device, ir6_w))
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE("mb:pic8259", pic8259_device, ir6_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", asst128_state::asst128_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", asst128_state::asst128_formats)
 

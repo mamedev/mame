@@ -1851,9 +1851,9 @@ void chihiro_state::an2131sc_configuration(device_t *device)
 
 MACHINE_CONFIG_START(chihiro_state::chihiro_base)
 	xbox_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(chihiro_map)
-	MCFG_CPU_IO_MAP(chihiro_map_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(chihiro_map)
+	MCFG_DEVICE_IO_MAP(chihiro_map_io)
 
 	//MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ide_baseboard, nullptr, "bb", true)
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")

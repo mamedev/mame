@@ -87,7 +87,7 @@ ioport_constructor electron_romboxp_device::device_input_ports() const
 MACHINE_CONFIG_START(electron_romboxp_device::device_add_mconfig)
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(electron_romboxp_device, busy_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, electron_romboxp_device, busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* rom sockets */
@@ -106,11 +106,11 @@ MACHINE_CONFIG_START(electron_romboxp_device::device_add_mconfig)
 
 	/* cartridges */
 	MCFG_ELECTRON_CARTSLOT_ADD("cart1", electron_cart, nullptr) // ROM SLOT 0/1
-	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(electron_romboxp_device, irq_w))
-	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(electron_romboxp_device, nmi_w))
+	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(*this, electron_romboxp_device, irq_w))
+	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(*this, electron_romboxp_device, nmi_w))
 	MCFG_ELECTRON_CARTSLOT_ADD("cart2", electron_cart, nullptr) // ROM SLOT 2/3
-	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(electron_romboxp_device, irq_w))
-	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(electron_romboxp_device, nmi_w))
+	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(*this, electron_romboxp_device, irq_w))
+	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(*this, electron_romboxp_device, nmi_w))
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *electron_romboxp_device::device_rom_region() const

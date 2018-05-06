@@ -422,26 +422,26 @@ INTERRUPT_GEN_MEMBER(appoooh_state::vblank_irq)
 MACHINE_CONFIG_START(appoooh_state::appoooh_common)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* ??? the main xtal is 18.432 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80,18432000/6) /* ??? the main xtal is 18.432 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
 
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489, 18432000/6)
+	MCFG_DEVICE_ADD("sn1", SN76489, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("sn2", SN76489, 18432000/6)
+	MCFG_DEVICE_ADD("sn2", SN76489, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("sn3", SN76489, 18432000/6)
+	MCFG_DEVICE_ADD("sn3", SN76489, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(appoooh_state, adpcm_int)) /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, appoooh_state, adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(appoooh_state::robowres)
 	appoooh_common(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -490,11 +490,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(appoooh_state::robowrese)
 	robowres(config);
 
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5179,18432000/6) /* ??? the main xtal is 18.432 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5179,18432000/6) /* ??? the main xtal is 18.432 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 

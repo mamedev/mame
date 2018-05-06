@@ -197,11 +197,11 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(poly88_state::poly88)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(16'588'800) / 9) // uses 8224 clock generator
-	MCFG_CPU_PROGRAM_MAP(poly88_mem)
-	MCFG_CPU_IO_MAP(poly88_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", poly88_state,  poly88_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(poly88_state,poly88_irq_callback)
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(16'588'800) / 9) // uses 8224 clock generator
+	MCFG_DEVICE_PROGRAM_MAP(poly88_mem)
+	MCFG_DEVICE_IO_MAP(poly88_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", poly88_state,  poly88_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(poly88_state,poly88_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -228,8 +228,8 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, XTAL(16'588'800) / 9)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(poly88_state,write_cas_tx))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(poly88_state,poly88_usart_rxready))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, poly88_state,write_cas_tx))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, poly88_state,poly88_usart_rxready))
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", 2)
@@ -237,9 +237,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(poly88_state::poly8813)
 	poly88(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(poly8813_mem)
-	MCFG_CPU_IO_MAP(poly8813_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(poly8813_mem)
+	MCFG_DEVICE_IO_MAP(poly8813_io)
 MACHINE_CONFIG_END
 
 /* ROM definition */

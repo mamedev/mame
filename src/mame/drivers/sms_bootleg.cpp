@@ -275,9 +275,9 @@ void smsbootleg_state::sms_supergame_io(address_map &map)
 
 MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635)/3)
-	MCFG_CPU_PROGRAM_MAP(sms_supergame_map)
-	MCFG_CPU_IO_MAP(sms_supergame_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'738'635)/3)
+	MCFG_DEVICE_PROGRAM_MAP(sms_supergame_map)
+	MCFG_DEVICE_IO_MAP(sms_supergame_io)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -287,7 +287,7 @@ MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("segapsg", SEGAPSG, XTAL(10'738'635)/3)
+	MCFG_DEVICE_ADD("segapsg", SEGAPSG, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -301,7 +301,7 @@ MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	MCFG_SEGA315_5246_SET_SCREEN("screen")
 	MCFG_SEGA315_5246_IS_PAL(false)
 	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
+	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
 
 MACHINE_CONFIG_END
 

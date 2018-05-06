@@ -353,21 +353,21 @@ GFXDECODE_END
 /* Machine driver */
 MACHINE_CONFIG_START(radio86_state::radio86)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(16'000'000) / 9)
-	MCFG_CPU_PROGRAM_MAP(radio86_mem)
-	MCFG_CPU_IO_MAP(radio86_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(16'000'000) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(radio86_mem)
+	MCFG_DEVICE_IO_MAP(radio86_io)
 	MCFG_MACHINE_RESET_OVERRIDE(radio86_state, radio86 )
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, radio86_8255_portc_r2))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
 
 	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'000'000) / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(radio86_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma8257",i8257_device, dreq2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -384,10 +384,10 @@ MACHINE_CONFIG_START(radio86_state::radio86)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(16'000'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(radio86_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(radio86_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(radio86_state, memory_write_byte))
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, radio86_state, hrq_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, radio86_state, memory_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, radio86_state, memory_write_byte))
+	MCFG_I8257_OUT_IOW_2_CB(WRITE8("i8275", i8275_device, dack_w))
 	MCFG_I8257_REVERSE_RW_MODE(1)
 
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -402,20 +402,20 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(radio86_state::radio16)
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(radio86_16_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(radio86_16_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radio86_state::radiorom)
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(radio86rom_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(radio86rom_mem)
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(radio86_state, radio86rom_romdisk_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(radio86_state, radio86_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_romdisk_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, radio86_state, radio86rom_romdisk_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, radio86_state, radio86_romdisk_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_romdisk_portc_w))
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "radio86_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
@@ -426,53 +426,53 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(radio86_state::radioram)
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(radio86ram_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(radio86ram_mem)
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(radio86_state, radio86ram_romdisk_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(radio86_state, radio86_romdisk_portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_romdisk_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, radio86_state, radio86ram_romdisk_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, radio86_state, radio86_romdisk_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_romdisk_portc_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radio86_state::rk7007)
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(rk7007_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(rk7007_io)
 
 	MCFG_DEVICE_ADD("ms7007", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, rk7007_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, rk7007_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radio86_state::rk700716)
 	radio16(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(rk7007_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(rk7007_io)
 
 	MCFG_DEVICE_ADD("ms7007", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTB_CB(READ8(radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_IN_PORTC_CB(READ8(radio86_state, rk7007_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, rk7007_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radio86_state::mikron2)
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mikron2_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mikron2_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(radio86_state::impuls03)
 	radio86(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(impuls03_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(impuls03_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */

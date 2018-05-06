@@ -11,12 +11,11 @@
 #include "emu.h"
 #include "audio/gomoku.h"
 
-static constexpr int samplerate = 48000;
-static constexpr int defgain = 48;
+constexpr int DEFGAIN = 48;
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(GOMOKU, gomoku_sound_device, "gomoku_sound", "Gomoku Narabe Renju Custom Sound")
+DEFINE_DEVICE_TYPE(GOMOKU_SOUND, gomoku_sound_device, "gomoku_sound", "Gomoku Narabe Renju Custom Sound")
 
 
 //**************************************************************************
@@ -28,21 +27,18 @@ DEFINE_DEVICE_TYPE(GOMOKU, gomoku_sound_device, "gomoku_sound", "Gomoku Narabe R
 //-------------------------------------------------
 
 gomoku_sound_device::gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GOMOKU, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_last_channel(nullptr),
-		m_sound_rom(nullptr),
-		m_num_voices(0),
-		m_sound_enable(0),
-		m_stream(nullptr),
-		m_mixer_table(nullptr),
-		m_mixer_lookup(nullptr),
-		m_mixer_buffer(nullptr),
-		m_mixer_buffer_2(nullptr)
+	: device_t(mconfig, GOMOKU_SOUND, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_sound_rom(*this, DEVICE_SELF)
+	, m_sound_enable(0)
+	, m_stream(nullptr)
+	, m_mixer_table(nullptr)
+	, m_mixer_lookup(nullptr)
+	, m_mixer_buffer(nullptr)
+	, m_mixer_buffer_2(nullptr)
 {
-	memset(m_channel_list, 0, sizeof(gomoku_sound_channel)*MAX_VOICES);
-	memset(m_soundregs1, 0, sizeof(uint8_t)*0x20);
-	memset(m_soundregs2, 0, sizeof(uint8_t)*0x20);
+	std::fill(std::begin(m_soundregs1), std::end(m_soundregs1), 0);
+	std::fill(std::begin(m_soundregs2), std::end(m_soundregs2), 0);
 }
 
 
@@ -56,26 +52,20 @@ void gomoku_sound_device::device_start()
 	int ch;
 
 	/* get stream channels */
-	m_stream = stream_alloc(0, 1, samplerate);
+	m_stream = stream_alloc(0, 1, clock());
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	m_mixer_buffer = std::make_unique<short[]>(2 * samplerate);
-	m_mixer_buffer_2 = m_mixer_buffer.get() + samplerate;
+	m_mixer_buffer = std::make_unique<short[]>(2 * clock());
+	m_mixer_buffer_2 = m_mixer_buffer.get() + clock();
 
 	/* build the mixer table */
-	make_mixer_table(8, defgain);
-
-	/* extract globals from the interface */
-	m_num_voices = MAX_VOICES;
-	m_last_channel = m_channel_list + m_num_voices;
-
-	m_sound_rom = memregion(":gomoku")->base();
+	make_mixer_table(8, DEFGAIN);
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	m_sound_enable = 1;
 
 	/* reset all the voices */
-	for (ch = 0, voice = m_channel_list; voice < m_last_channel; ch++, voice++)
+	for (ch = 0, voice = std::begin(m_channel_list); voice < std::end(m_channel_list); ch++, voice++)
 	{
 		voice->channel = ch;
 		voice->frequency = 0;
@@ -108,7 +98,7 @@ void gomoku_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	memset(m_mixer_buffer.get(), 0, samples * sizeof(short));
 
 	/* loop over each voice and add its contribution */
-	for (ch = 0, voice = m_channel_list; voice < m_last_channel; ch++, voice++)
+	for (ch = 0, voice = std::begin(m_channel_list); voice < std::end(m_channel_list); ch++, voice++)
 	{
 		int f = 16 * voice->frequency;
 		int v = voice->volume;

@@ -777,7 +777,7 @@ MACHINE_CONFIG_START(nes_jf13_device::device_add_mconfig)
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(16)
 	MCFG_SAMPLES_NAMES(jf13_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
@@ -788,7 +788,7 @@ MACHINE_CONFIG_START(nes_jf17_adpcm_device::device_add_mconfig)
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(20)
 	MCFG_SAMPLES_NAMES(jf17_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
@@ -799,7 +799,7 @@ MACHINE_CONFIG_START(nes_jf19_adpcm_device::device_add_mconfig)
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(20)
 	MCFG_SAMPLES_NAMES(jf19_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
@@ -810,7 +810,7 @@ MACHINE_CONFIG_START(nes_jf23_device::device_add_mconfig)
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(20)
 	MCFG_SAMPLES_NAMES(jf23_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
@@ -821,7 +821,7 @@ MACHINE_CONFIG_START(nes_jf24_device::device_add_mconfig)
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(jf24_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
@@ -832,7 +832,7 @@ MACHINE_CONFIG_START(nes_jf29_device::device_add_mconfig)
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(20)
 	MCFG_SAMPLES_NAMES(jf29_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
@@ -843,7 +843,7 @@ MACHINE_CONFIG_START(nes_jf33_device::device_add_mconfig)
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(20)
 	MCFG_SAMPLES_NAMES(jf33_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)

@@ -633,9 +633,9 @@ WRITE_LINE_MEMBER(vpoker_state::ptm_irq)
 MACHINE_CONFIG_START(vpoker_state::vpoker)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809,XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vpoker_state, irq0_line_hold) //irq0 valid too
+	MCFG_DEVICE_ADD("maincpu",M6809,XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vpoker_state, irq0_line_hold) //irq0 valid too
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -654,11 +654,11 @@ MACHINE_CONFIG_START(vpoker_state::vpoker)
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, XTAL(4'000'000))
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_IRQ_CB(WRITELINE(vpoker_state, ptm_irq))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, vpoker_state, ptm_irq))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, 8000000/4 /* guess */)
+//  MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/4 /* guess */)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

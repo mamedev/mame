@@ -248,8 +248,8 @@ MACHINE_CONFIG_START(omti8621_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(OMTI_DISK1_TAG, OMTI_DISK, 0)
 
 	MCFG_PC_FDC_AT_ADD(OMTI_FDC_TAG)
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(omti8621_device, fdc_irq_w))
-	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(omti8621_device, fdc_drq_w))
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(*this, omti8621_device, fdc_irq_w))
+	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(*this, omti8621_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(OMTI_FDC_TAG":0", pc_hd_floppies, "525hd", omti8621_device::floppy_formats)
 // Apollo workstations never have more then 1 floppy drive
 //  MCFG_FLOPPY_DRIVE_ADD(OMTI_FDC_TAG":1", pc_hd_floppies, "525hd", omti8621_device::floppy_formats)

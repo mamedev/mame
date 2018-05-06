@@ -441,16 +441,16 @@ GFXDECODE_END
 //**************************************************************************
 
 MACHINE_CONFIG_START(supbtime_state::supbtime)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(supbtime_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(supbtime_map)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(supbtime_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, supbtime_state, vblank_w))
 	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_supbtime)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -493,14 +493,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(supbtime_state::chinatwn)
 	supbtime(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(chinatwn_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(chinatwn_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(supbtime_state::tumblep)
 	supbtime(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tumblep_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tumblep_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_tumblep)

@@ -3178,16 +3178,16 @@ MACHINE_RESET_MEMBER(taitoz_state,taitoz)
 MACHINE_CONFIG_START(taitoz_state::contcirc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(contcirc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(contcirc_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_CPU_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(contcirc_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(contcirc_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq6_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
@@ -3197,7 +3197,7 @@ MACHINE_CONFIG_START(taitoz_state::contcirc)
 	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(*this, taitoz_state, coin_control_w))
 	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -3231,7 +3231,7 @@ MACHINE_CONFIG_START(taitoz_state::contcirc)
 	MCFG_SPEAKER_ADD("rear",  0.0, 0.0,  1.3)
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 2.0)
@@ -3257,16 +3257,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitoz_state::chasehq)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(chasehq_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(chasehq_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_CPU_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(chq_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(chq_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
@@ -3276,7 +3276,7 @@ MACHINE_CONFIG_START(taitoz_state::chasehq)
 	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(*this, taitoz_state, coin_control_w))
 	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -3310,7 +3310,7 @@ MACHINE_CONFIG_START(taitoz_state::chasehq)
 	MCFG_SPEAKER_ADD("rear",   0.0, 0.0, 1.3)
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 1.0)
@@ -3336,16 +3336,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitoz_state::enforce)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(enforce_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(enforce_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_CPU_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(enforce_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(enforce_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq6_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
@@ -3357,7 +3357,7 @@ MACHINE_CONFIG_START(taitoz_state::enforce)
 	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(*this, taitoz_state, coin_control_w))
 	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -3389,7 +3389,7 @@ MACHINE_CONFIG_START(taitoz_state::enforce)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -3416,13 +3416,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitoz_state::bshark)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(bshark_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(bshark_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(bshark_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(bshark_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,bshark)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
@@ -3441,7 +3441,7 @@ MACHINE_CONFIG_START(taitoz_state::bshark)
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitoz_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -3470,7 +3470,7 @@ MACHINE_CONFIG_START(taitoz_state::bshark)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	//MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) // DG: this is probably specific to Z80 and wrong?
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -3494,8 +3494,8 @@ MACHINE_CONFIG_START(taitoz_state::bsharkjjs)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bsharkjjs_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bsharkjjs_map)
 
 	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
@@ -3504,16 +3504,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitoz_state::sci)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sci_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  sci_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sci_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  sci_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_CPU_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sci_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sci_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
@@ -3525,7 +3525,7 @@ MACHINE_CONFIG_START(taitoz_state::sci)
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitoz_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -3554,7 +3554,7 @@ MACHINE_CONFIG_START(taitoz_state::sci)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -3581,16 +3581,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitoz_state::nightstr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(nightstr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(nightstr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_CPU_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(nightstr_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(nightstr_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
@@ -3609,7 +3609,7 @@ MACHINE_CONFIG_START(taitoz_state::nightstr)
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitoz_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -3643,7 +3643,7 @@ MACHINE_CONFIG_START(taitoz_state::nightstr)
 	MCFG_SPEAKER_ADD("rear",   0.0, 0.0, 1.3)
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 2.0)
@@ -3669,16 +3669,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitoz_state::aquajack)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(aquajack_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(aquajack_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_CPU_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(aquajack_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(aquajack_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
@@ -3690,7 +3690,7 @@ MACHINE_CONFIG_START(taitoz_state::aquajack)
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitoz_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -3722,7 +3722,7 @@ MACHINE_CONFIG_START(taitoz_state::aquajack)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -3749,13 +3749,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitoz_state::spacegun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(spacegun_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(spacegun_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, 16000000)   /* 16 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(spacegun_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, 16000000)   /* 16 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(spacegun_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,bshark)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
@@ -3774,9 +3774,9 @@ MACHINE_CONFIG_START(taitoz_state::spacegun)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0510NIO_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_TC0510NIO_WRITE_3_CB(WRITE8(taitoz_state, spacegun_eeprom_w))
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
+	MCFG_TC0510NIO_READ_3_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_TC0510NIO_WRITE_3_CB(WRITE8(*this, taitoz_state, spacegun_eeprom_w))
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, taitoz_state, coin_control_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -3805,7 +3805,7 @@ MACHINE_CONFIG_START(taitoz_state::spacegun)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	//MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) // DG: this is probably specific to Z80 and wrong?
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -3828,16 +3828,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitoz_state::dblaxle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(dblaxle_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(dblaxle_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(32'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(dblaxle_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(32'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(dblaxle_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
@@ -3850,7 +3850,7 @@ MACHINE_CONFIG_START(taitoz_state::dblaxle)
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, taitoz_state, coin_control_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -3879,7 +3879,7 @@ MACHINE_CONFIG_START(taitoz_state::dblaxle)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(32'000'000)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(32'000'000)/4)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -3906,16 +3906,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitoz_state::racingb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(racingb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  sci_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(racingb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  sci_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(32'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(racingb_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(32'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(racingb_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(taitoz_state,taitoz)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
@@ -3927,7 +3927,7 @@ MACHINE_CONFIG_START(taitoz_state::racingb)
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(taitoz_state, coin_control_w))
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, taitoz_state, coin_control_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -3955,7 +3955,7 @@ MACHINE_CONFIG_START(taitoz_state::racingb)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(32'000'000)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(32'000'000)/4)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)

@@ -131,35 +131,36 @@ void fruitpc_state::fruitpc_sb_conf(device_t *device)
 }
 
 MACHINE_CONFIG_START(fruitpc_state::fruitpc)
-	MCFG_CPU_ADD("maincpu", I486, 66000000) // ST STPCD0166BTC3 66 MHz 486 CPU
-	MCFG_CPU_PROGRAM_MAP(fruitpc_map)
-	MCFG_CPU_IO_MAP(fruitpc_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I486, 66000000) // ST STPCD0166BTC3 66 MHz 486 CPU
+	MCFG_DEVICE_PROGRAM_MAP(fruitpc_map)
+	MCFG_DEVICE_IO_MAP(fruitpc_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	/* video hardware */
 	pcvideo_vga(config);
 
 	MCFG_DEVICE_MODIFY("dma8237_1")
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(fruitpc_state, dma8237_1_dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, fruitpc_state, dma8237_1_dack_w))
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
 	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259_2", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq3_w))
+	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259_2", pic8259_device, ir2_w))
+	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259_1", pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259_1", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259_1", pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259_1", pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259_1", pic8259_device, ir7_w))
+	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma8237_1", am9517a_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma8237_1", am9517a_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma8237_1", am9517a_device, dreq3_w))
 
-	MCFG_ISA8_SLOT_ADD("isa", "isa1", fruitpc_isa8_cards, "sb15", true)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", fruitpc_isa8_cards, "sb15", true)
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("sb15", fruitpc_sb_def)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("sb15", fruitpc_sb_conf)
 MACHINE_CONFIG_END

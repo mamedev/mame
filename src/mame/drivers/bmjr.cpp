@@ -338,9 +338,9 @@ void bmjr_state::machine_reset()
 
 MACHINE_CONFIG_START(bmjr_state::bmjr)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6800, XTAL(4'000'000)/4) //unknown clock / divider
-	MCFG_CPU_PROGRAM_MAP(bmjr_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bmjr_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M6800, XTAL(4'000'000)/4) //unknown clock / divider
+	MCFG_DEVICE_PROGRAM_MAP(bmjr_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bmjr_state,  irq0_line_hold)
 
 
 	/* video hardware */
@@ -357,7 +357,7 @@ MACHINE_CONFIG_START(bmjr_state::bmjr)
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1200) // guesswork
+	MCFG_DEVICE_ADD("beeper", BEEP, 1200) // guesswork
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

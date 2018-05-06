@@ -613,9 +613,9 @@ PALETTE_INIT_MEMBER(megaduck_state, megaduck)
 MACHINE_CONFIG_START(gb_state::gameboy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LR35902, XTAL(4'194'304))
-	MCFG_CPU_PROGRAM_MAP(gameboy_map)
-	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
+	MCFG_DEVICE_ADD("maincpu", LR35902, XTAL(4'194'304))
+	MCFG_DEVICE_PROGRAM_MAP(gameboy_map)
+	MCFG_LR35902_TIMER_CB( WRITE8( *this, gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 
 	/* video hardware */
@@ -638,7 +638,7 @@ MACHINE_CONFIG_START(gb_state::gameboy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("apu", DMG_APU, XTAL(4'194'304))
+	MCFG_DEVICE_ADD("apu", DMG_APU, XTAL(4'194'304))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -652,9 +652,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gb_state::supergb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LR35902, 4295454) /* 4.295454 MHz, derived from SNES xtal */
-	MCFG_CPU_PROGRAM_MAP(sgb_map)
-	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
+	MCFG_DEVICE_ADD("maincpu", LR35902, 4295454) /* 4.295454 MHz, derived from SNES xtal */
+	MCFG_DEVICE_PROGRAM_MAP(sgb_map)
+	MCFG_LR35902_TIMER_CB( WRITE8(*this, gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb)
@@ -679,7 +679,7 @@ MACHINE_CONFIG_START(gb_state::supergb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("apu", DMG_APU, 4295454)
+	MCFG_DEVICE_ADD("apu", DMG_APU, 4295454)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -694,8 +694,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gb_state::supergb2)
 	gameboy(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sgb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sgb_map)
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb)
@@ -730,9 +730,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gb_state::gbcolor)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LR35902, XTAL(4'194'304)) // todo XTAL(8'388'000)
-	MCFG_CPU_PROGRAM_MAP(gbc_map)
-	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
+	MCFG_DEVICE_ADD("maincpu", LR35902, XTAL(4'194'304)) // todo XTAL(8'388'000)
+	MCFG_DEVICE_PROGRAM_MAP(gbc_map)
+	MCFG_LR35902_TIMER_CB( WRITE8(*this, gb_state, gb_timer_callback ) )
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state,gbc)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state,gbc)
@@ -758,7 +758,7 @@ MACHINE_CONFIG_START(gb_state::gbcolor)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("apu", CGB04_APU, XTAL(4'194'304))
+	MCFG_DEVICE_ADD("apu", CGB04_APU, XTAL(4'194'304))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -776,9 +776,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(megaduck_state::megaduck)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LR35902, XTAL(4'194'304)) /* 4.194304 MHz */
-	MCFG_CPU_PROGRAM_MAP(megaduck_map)
-	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
+	MCFG_DEVICE_ADD("maincpu", LR35902, XTAL(4'194'304)) /* 4.194304 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(megaduck_map)
+	MCFG_LR35902_TIMER_CB( WRITE8(*this, gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 
 	/* video hardware */
@@ -804,7 +804,7 @@ MACHINE_CONFIG_START(megaduck_state::megaduck)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("apu", DMG_APU, XTAL(4'194'304))
+	MCFG_DEVICE_ADD("apu", DMG_APU, XTAL(4'194'304))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 

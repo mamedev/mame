@@ -331,8 +331,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(runaway_state::runaway)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 8) /* ? */
-	MCFG_CPU_PROGRAM_MAP(runaway_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 8) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(runaway_map)
 
 
 	MCFG_ATARIVGEAROM_ADD("earom")
@@ -352,19 +352,19 @@ MACHINE_CONFIG_START(runaway_state::runaway)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEY, 12096000 / 8)
+	MCFG_DEVICE_ADD("pokey1", POKEY, 12096000 / 8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("6008"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, 12096000 / 8)
-	MCFG_POKEY_POT0_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT1_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT2_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT3_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT4_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT5_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT6_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT7_R_CB(READ8(runaway_state, runaway_pot_r))
+	MCFG_DEVICE_ADD("pokey2", POKEY, 12096000 / 8)
+	MCFG_POKEY_POT0_R_CB(READ8(*this, runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT1_R_CB(READ8(*this, runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT2_R_CB(READ8(*this, runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT3_R_CB(READ8(*this, runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT4_R_CB(READ8(*this, runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT5_R_CB(READ8(*this, runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT6_R_CB(READ8(*this, runaway_state, runaway_pot_r))
+	MCFG_POKEY_POT7_R_CB(READ8(*this, runaway_state, runaway_pot_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

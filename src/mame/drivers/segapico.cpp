@@ -391,8 +391,8 @@ MACHINE_START_MEMBER(pico_state,pico)
 MACHINE_CONFIG_START(pico_state::pico)
 	md_ntsc(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pico_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pico_mem)
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 	MCFG_DEVICE_REMOVE("ymsnd")
@@ -403,8 +403,8 @@ MACHINE_CONFIG_START(pico_state::pico)
 	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
-	MCFG_SOUND_ADD("315_5641", SEGA_315_5641_PCM, UPD7759_STANDARD_CLOCK*2)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(pico_state,sound_cause_irq))
+	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK*2)
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END
@@ -412,8 +412,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pico_state::picopal)
 	md_pal(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pico_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pico_mem)
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 	MCFG_DEVICE_REMOVE("ymsnd")
@@ -424,8 +424,8 @@ MACHINE_CONFIG_START(pico_state::picopal)
 	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
-	MCFG_SOUND_ADD("315_5641", SEGA_315_5641_PCM, UPD7759_STANDARD_CLOCK*2)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(pico_state,sound_cause_irq))
+	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK*2)
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END
@@ -607,8 +607,8 @@ MACHINE_START_MEMBER(copera_state,copera)
 MACHINE_CONFIG_START(copera_state::copera)
 	md_ntsc(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(copera_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(copera_mem)
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 	MCFG_DEVICE_REMOVE("ymsnd")
@@ -619,8 +619,8 @@ MACHINE_CONFIG_START(copera_state::copera)
 	MCFG_COPERA_CARTRIDGE_ADD("coperaslot", copera_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","copera")
 
-	MCFG_SOUND_ADD("315_5641", SEGA_315_5641_PCM, UPD7759_STANDARD_CLOCK)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(copera_state,sound_cause_irq))
+	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK)
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, copera_state,sound_cause_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END

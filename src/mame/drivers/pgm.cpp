@@ -490,7 +490,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::pgm_interrupt)
 {
 	int scanline = param;
 
-// already being generated  by MCFG_CPU_VBLANK_INT_DRIVER("screen", pgm_state,  irq6_line_hold)
+// already being generated  by MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pgm_state,  irq6_line_hold)
 //  if(scanline == 224)
 //      m_maincpu->set_input_line(6, HOLD_LINE);
 
@@ -510,14 +510,14 @@ MACHINE_RESET_MEMBER(pgm_state,pgm)
 
 MACHINE_CONFIG_START(pgm_state::pgmbase)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 20000000) /* 20 mhz! verified on real board */
-	MCFG_CPU_PROGRAM_MAP(pgm_basic_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pgm_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20000000) /* 20 mhz! verified on real board */
+	MCFG_DEVICE_PROGRAM_MAP(pgm_basic_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pgm_state,  irq6_line_hold)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pgm_state, pgm_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 33868800/4)
-	MCFG_CPU_PROGRAM_MAP(pgm_z80_mem)
-	MCFG_CPU_IO_MAP(pgm_z80_io)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 33868800/4)
+	MCFG_DEVICE_PROGRAM_MAP(pgm_z80_mem)
+	MCFG_DEVICE_IO_MAP(pgm_z80_io)
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_state, pgm )
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_state, pgm )
@@ -532,7 +532,7 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm_state, screen_update_pgm)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm_state, screen_vblank_pgm))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pgm_state, screen_vblank_pgm))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgm)

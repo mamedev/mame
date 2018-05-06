@@ -3264,21 +3264,21 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 #define MAIN_CLOCK XTAL(28'636'363)
 
 MACHINE_CONFIG_START(coolridr_state::coolridr)
-	MCFG_CPU_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 mhz
-	MCFG_CPU_PROGRAM_MAP(system_h1_map)
+	MCFG_DEVICE_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 mhz
+	MCFG_DEVICE_PROGRAM_MAP(system_h1_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_main, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
-	MCFG_CPU_PROGRAM_MAP(system_h1_sound_map)
+	MCFG_DEVICE_ADD("soundcpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
+	MCFG_DEVICE_PROGRAM_MAP(system_h1_sound_map)
 
-	MCFG_CPU_ADD("sub", SH1, 16000000)  // SH7032 HD6417032F20!! 16 mhz
-	MCFG_CPU_PROGRAM_MAP(coolridr_submap)
+	MCFG_DEVICE_ADD("sub", SH1, 16000000)  // SH7032 HD6417032F20!! 16 mhz
+	MCFG_DEVICE_PROGRAM_MAP(coolridr_submap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", coolridr_state, system_h1_sub, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)
-	MCFG_315_5649_OUT_PB_CB(WRITE8(coolridr_state, lamps_w))
+	MCFG_315_5649_OUT_PB_CB(WRITE8(*this, coolridr_state, lamps_w))
 	MCFG_315_5649_IN_PC_CB(IOPORT("IN0"))
 	MCFG_315_5649_IN_PD_CB(IOPORT("P1"))
 	MCFG_315_5649_IN_PE_CB(IOPORT("P2"))
@@ -3310,25 +3310,25 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("scsp1", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(coolridr_state, scsp_irq))
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(coolridr_state, scsp1_to_sh1_irq))
+	MCFG_DEVICE_ADD("scsp1", SCSP)
+	MCFG_SCSP_IRQ_CB(WRITE8(*this, coolridr_state, scsp_irq))
+	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(*this, coolridr_state, scsp1_to_sh1_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("scsp2", SCSP, 0)
-	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(coolridr_state, scsp2_to_sh1_irq))
+	MCFG_DEVICE_ADD("scsp2", SCSP)
+	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(*this, coolridr_state, scsp2_to_sh1_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coolridr_state::aquastge)
 	coolridr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(aquastge_h1_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(aquastge_h1_map)
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(aquastge_submap)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(aquastge_submap)
 
 	MCFG_DEVICE_REMOVE("io")
 	MCFG_DEVICE_ADD("io", SEGA_315_5649, 0)

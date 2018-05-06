@@ -1432,25 +1432,25 @@ static void gba_cart(device_slot_interface &device)
 
 MACHINE_CONFIG_START(gba_state::gbadv)
 
-	MCFG_CPU_ADD("maincpu", ARM7, XTAL(16'777'216))
-	MCFG_CPU_PROGRAM_MAP(gba_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, XTAL(16'777'216))
+	MCFG_DEVICE_PROGRAM_MAP(gba_map)
 
 	MCFG_GBA_LCD_ADD("lcd")
-	MCFG_GBA_LCD_INT_HBLANK(WRITELINE(gba_state, int_hblank_callback))
-	MCFG_GBA_LCD_INT_VBLANK(WRITELINE(gba_state, int_vblank_callback))
-	MCFG_GBA_LCD_INT_VCOUNT(WRITELINE(gba_state, int_vcount_callback))
-	MCFG_GBA_LCD_DMA_HBLANK(WRITELINE(gba_state, dma_hblank_callback))
-	MCFG_GBA_LCD_DMA_VBLANK(WRITELINE(gba_state, dma_vblank_callback))
+	MCFG_GBA_LCD_INT_HBLANK(WRITELINE(*this, gba_state, int_hblank_callback))
+	MCFG_GBA_LCD_INT_VBLANK(WRITELINE(*this, gba_state, int_vblank_callback))
+	MCFG_GBA_LCD_INT_VCOUNT(WRITELINE(*this, gba_state, int_vcount_callback))
+	MCFG_GBA_LCD_DMA_HBLANK(WRITELINE(*this, gba_state, dma_hblank_callback))
+	MCFG_GBA_LCD_DMA_VBLANK(WRITELINE(*this, gba_state, dma_vblank_callback))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", CGB04_APU, XTAL(16'777'216)/4)
+	MCFG_DEVICE_ADD("custom", CGB04_APU, XTAL(16'777'216)/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
-	MCFG_SOUND_ADD("ldaca", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("rdaca", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("ldacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("rdacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("ldaca", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("rdaca", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("ldacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("rdacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "ldaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldaca", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE(0, "rdaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdaca", -1.0, DAC_VREF_NEG_INPUT)

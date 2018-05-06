@@ -600,10 +600,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(statriv2_state::statriv2)
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MCFG_CPU_ADD("maincpu", I8085A, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(statriv2_map)
-	MCFG_CPU_IO_MAP(statriv2_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", statriv2_state, statriv2_interrupt)
+	MCFG_DEVICE_ADD("maincpu", I8085A, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(statriv2_map)
+	MCFG_DEVICE_IO_MAP(statriv2_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", statriv2_state, statriv2_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -614,7 +614,7 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(statriv2_state, ppi_portc_hi_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, statriv2_state, ppi_portc_hi_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -632,7 +632,7 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -653,8 +653,8 @@ MACHINE_CONFIG_START(statriv2_state::funcsino)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(MASTER_CLOCK/2)  /* 3 MHz?? seems accurate */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(MASTER_CLOCK/2)  /* 3 MHz?? seems accurate */
 MACHINE_CONFIG_END
 
 

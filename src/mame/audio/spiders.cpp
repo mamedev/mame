@@ -208,7 +208,7 @@ WRITE8_MEMBER(spiders_state::spiders_audio_ctrl_w)
 MACHINE_CONFIG_START(spiders_state::spiders_audio)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(spiders)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

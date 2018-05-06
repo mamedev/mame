@@ -213,9 +213,9 @@ WRITE8_MEMBER( sc2_state::pio_port_b_w )
 
 MACHINE_CONFIG_START(sc2_state::sc2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(sc2_mem)
-	MCFG_CPU_IO_MAP(sc2_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sc2_mem)
+	MCFG_DEVICE_IO_MAP(sc2_io)
 
 
 	/* video hardware */
@@ -223,14 +223,14 @@ MACHINE_CONFIG_START(sc2_state::sc2)
 
 	/* devices */
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(sc2_state, pio_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(sc2_state, pio_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(sc2_state, pio_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(sc2_state, pio_port_b_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, sc2_state, pio_port_a_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, sc2_state, pio_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, sc2_state, pio_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, sc2_state, pio_port_b_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
+	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.50 )
 MACHINE_CONFIG_END
 

@@ -134,8 +134,8 @@ void odyssey_state::machine_reset()
 MACHINE_CONFIG_START(odyssey_state::odyssey)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // a Celeron at 1.70 GHz on the MB I checked.
-	MCFG_CPU_PROGRAM_MAP(odyssey_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 133000000) // a Celeron at 1.70 GHz on the MB I checked.
+	MCFG_DEVICE_PROGRAM_MAP(odyssey_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

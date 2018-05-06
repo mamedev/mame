@@ -15,7 +15,7 @@
 class m72_audio_device : public device_t, public device_sound_interface
 {
 public:
-	m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~m72_audio_device() {}
 
 	DECLARE_READ8_MEMBER(sample_r);

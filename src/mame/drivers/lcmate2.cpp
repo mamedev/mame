@@ -230,9 +230,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545)) // confirmed
-	MCFG_CPU_PROGRAM_MAP(lcmate2_mem)
-	MCFG_CPU_IO_MAP(lcmate2_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545)) // confirmed
+	MCFG_DEVICE_PROGRAM_MAP(lcmate2_mem)
+	MCFG_DEVICE_IO_MAP(lcmate2_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -255,7 +255,7 @@ MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

@@ -634,19 +634,19 @@ DRIVER_INIT_MEMBER( fp1100_state, fp1100 )
 
 MACHINE_CONFIG_START(fp1100_state::fp1100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fp1100_state, vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fp1100_state, vblank_irq)
 
-	MCFG_CPU_ADD( "sub", UPD7801, MAIN_CLOCK/4 )
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(fp1100_state, porta_w))
-	MCFG_UPD7810_PORTB_READ_CB(READ8(fp1100_state, portb_r))
-	MCFG_UPD7810_PORTB_WRITE_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(fp1100_state, portc_r))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(fp1100_state, portc_w))
-	MCFG_UPD7810_TXD(WRITELINE(fp1100_state, cass_w))
+	MCFG_DEVICE_ADD( "sub", UPD7801, MAIN_CLOCK/4 )
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, fp1100_state, porta_w))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(*this, fp1100_state, portb_r))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(*this, fp1100_state, portc_r))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, fp1100_state, portc_w))
+	MCFG_UPD7810_TXD(WRITELINE(*this, fp1100_state, cass_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(fp1100_state, fp1100)
 
@@ -662,7 +662,7 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 950) // guess
+	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) // inside the keyboard
 
 	/* CRTC */
@@ -673,7 +673,7 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 
 	/* Printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fp1100_state, centronics_busy_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fp1100_state, centronics_busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* Cassette */

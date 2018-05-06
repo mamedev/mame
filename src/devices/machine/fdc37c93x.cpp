@@ -235,23 +235,23 @@ FLOPPY_FORMATS_END
 MACHINE_CONFIG_START(fdc37c93x_device::device_add_mconfig)
 	// floppy disc controller
 	MCFG_SMC37C78_ADD("fdc")
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(fdc37c93x_device, irq_floppy_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(fdc37c93x_device, drq_floppy_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, fdc37c93x_device, irq_floppy_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, fdc37c93x_device, drq_floppy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", fdc37c93x_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", fdc37c93x_device::floppy_formats)
 	// parallel port
 	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(fdc37c93x_device, irq_parallel_w))
+	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(*this, fdc37c93x_device, irq_parallel_w))
 	// RTC
 	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(fdc37c93x_device, irq_rtc_w))
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, fdc37c93x_device, irq_rtc_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 	// keyboard
 	MCFG_DEVICE_ADD("pc_kbdc", KBDC8042, 0)
 	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_PS2)
-	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(WRITELINE(fdc37c93x_device, irq_keyboard_w))
-	MCFG_KBDC8042_SYSTEM_RESET_CB(WRITELINE(fdc37c93x_device, kbdp20_gp20_reset_w))
-	MCFG_KBDC8042_GATE_A20_CB(WRITELINE(fdc37c93x_device, kbdp21_gp25_gatea20_w))
+	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(WRITELINE(*this, fdc37c93x_device, irq_keyboard_w))
+	MCFG_KBDC8042_SYSTEM_RESET_CB(WRITELINE(*this, fdc37c93x_device, kbdp20_gp20_reset_w))
+	MCFG_KBDC8042_GATE_A20_CB(WRITELINE(*this, fdc37c93x_device, kbdp21_gp25_gatea20_w))
 MACHINE_CONFIG_END
 
 WRITE_LINE_MEMBER(fdc37c93x_device::irq_floppy_w)

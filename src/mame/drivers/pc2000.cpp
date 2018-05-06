@@ -880,10 +880,10 @@ DEVICE_IMAGE_LOAD_MEMBER( pc2000_state, pc2000_cart )
 
 MACHINE_CONFIG_START(pc2000_state::pc2000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000)) /* probably not accurate */
-	MCFG_CPU_PROGRAM_MAP(pc2000_mem)
-	MCFG_CPU_IO_MAP(pc2000_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(pc2000_state, irq0_line_hold, 50)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) /* probably not accurate */
+	MCFG_DEVICE_PROGRAM_MAP(pc2000_mem)
+	MCFG_DEVICE_IO_MAP(pc2000_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(pc2000_state, irq0_line_hold, 50)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -904,7 +904,7 @@ MACHINE_CONFIG_START(pc2000_state::pc2000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
+	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "genius_cart")
@@ -938,8 +938,8 @@ HD44780_PIXEL_UPDATE(gl4004_state::gl4000_pixel_update)
 
 MACHINE_CONFIG_START(gl3000s_state::gl3000s)
 	pc2000(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(gl3000s_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(gl3000s_io)
 
 	MCFG_DEVICE_REMOVE("hd44780")
 	MCFG_SED1520_ADD("sed1520_l", UPDATE(gl3000s_state, screen_update_left))    // left panel is 59 pixels (0-58)
@@ -975,10 +975,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pc1000_state::misterx)
 	pc2000(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pc1000_mem)
-	MCFG_CPU_IO_MAP(pc1000_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(pc1000_state, irq0_line_hold,  10)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pc1000_mem)
+	MCFG_DEVICE_IO_MAP(pc1000_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(pc1000_state, irq0_line_hold,  10)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

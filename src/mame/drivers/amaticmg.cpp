@@ -844,9 +844,9 @@ void amaticmg_state::machine_reset()
 
 MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)     /* WRONG! */
-	MCFG_CPU_PROGRAM_MAP(amaticmg_map)
-	MCFG_CPU_IO_MAP(amaticmg_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)     /* WRONG! */
+	MCFG_DEVICE_PROGRAM_MAP(amaticmg_map)
+	MCFG_DEVICE_IO_MAP(amaticmg_portmap)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -857,9 +857,9 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(amaticmg_state, out_a_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amaticmg_state, out_a_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("SW1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(amaticmg_state, out_c_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amaticmg_state, out_c_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -883,7 +883,7 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, SND_CLOCK) /* Y3014B DAC */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, SND_CLOCK) /* Y3014B DAC */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
@@ -898,8 +898,8 @@ WRITE_LINE_MEMBER(amaticmg_state::amaticmg2_irq)
 MACHINE_CONFIG_START(amaticmg_state::amaticmg2)
 	amaticmg(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(amaticmg2_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(amaticmg2_portmap)
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0) // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
 
@@ -907,7 +907,7 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg2)
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
 
 	MCFG_DEVICE_MODIFY("crtc")
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(amaticmg_state, amaticmg2_irq))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amaticmg_state, amaticmg2_irq))
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", amaticmg2)
 	MCFG_PALETTE_MODIFY("palette")
@@ -919,8 +919,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(amaticmg_state::amaticmg4)
 	amaticmg(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(amaticmg4_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(amaticmg4_portmap)
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0) // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
 
@@ -928,7 +928,7 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg4)
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
 
 	MCFG_DEVICE_MODIFY("crtc")
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(amaticmg_state, amaticmg2_irq))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amaticmg_state, amaticmg2_irq))
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", amaticmg2)
 	MCFG_PALETTE_MODIFY("palette")

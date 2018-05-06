@@ -379,9 +379,9 @@ PALETTE_INIT_MEMBER(bingoman_state, bingoman)
 MACHINE_CONFIG_START(bingoman_state::bingoman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83002, XTAL(20'000'000)) /* TODO: correct CPU type */
-	MCFG_CPU_PROGRAM_MAP(bingoman_prg_map)
-	MCFG_CPU_IO_MAP(bingoman_io_map)
+	MCFG_DEVICE_ADD("maincpu", H83002, XTAL(20'000'000)) /* TODO: correct CPU type */
+	MCFG_DEVICE_PROGRAM_MAP(bingoman_prg_map)
+	MCFG_DEVICE_IO_MAP(bingoman_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

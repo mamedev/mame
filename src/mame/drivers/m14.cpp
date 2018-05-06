@@ -432,10 +432,10 @@ void m14_state::machine_reset()
 MACHINE_CONFIG_START(m14_state::m14)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A,6000000) //guess: 6 Mhz internally divided by 2
-	MCFG_CPU_PROGRAM_MAP(m14_map)
-	MCFG_CPU_IO_MAP(m14_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m14_state, m14_irq)
+	MCFG_DEVICE_ADD("maincpu",I8085A,6000000) //guess: 6 Mhz internally divided by 2
+	MCFG_DEVICE_PROGRAM_MAP(m14_map)
+	MCFG_DEVICE_IO_MAP(m14_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m14_state, m14_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -454,12 +454,12 @@ MACHINE_CONFIG_START(m14_state::m14)
 	/* sound hardware */
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(5)
 	MCFG_SAMPLES_NAMES(m14_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
-//  MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+//  MCFG_DEVICE_ADD("discrete", DISCRETE)
 //  MCFG_DISCRETE_INTF(m14)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

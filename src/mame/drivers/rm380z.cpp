@@ -235,9 +235,9 @@ uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 
 
 MACHINE_CONFIG_START(rm380z_state::rm380z)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(rm380z_mem)
-	MCFG_CPU_IO_MAP(rm380z_io)
+	MCFG_DEVICE_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(rm380z_mem)
+	MCFG_DEVICE_IO_MAP(rm380z_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -275,9 +275,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rm380z_state::rm480z)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(rm480z_mem)
-	MCFG_CPU_IO_MAP(rm480z_io)
+	MCFG_DEVICE_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(rm480z_mem)
+	MCFG_DEVICE_IO_MAP(rm480z_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(rm380z_state, rm480z)
 	/* video hardware */

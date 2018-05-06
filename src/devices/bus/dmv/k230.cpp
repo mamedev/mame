@@ -167,21 +167,21 @@ void dmv_k234_device::device_reset()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(dmv_k230_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(15'000'000) / 3)
-	MCFG_CPU_PROGRAM_MAP(k230_mem)
-	MCFG_CPU_IO_MAP(k230_io)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(15'000'000) / 3)
+	MCFG_DEVICE_PROGRAM_MAP(k230_mem)
+	MCFG_DEVICE_IO_MAP(k230_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dmv_k234_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", M68008, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(k234_mem)
+	MCFG_DEVICE_ADD("maincpu", M68008, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(k234_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dmv_k235_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", V20, XTAL(15'000'000) / 3)
-	MCFG_CPU_PROGRAM_MAP(k230_mem)
-	MCFG_CPU_IO_MAP(k235_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", V20, XTAL(15'000'000) / 3)
+	MCFG_DEVICE_PROGRAM_MAP(k230_mem)
+	MCFG_DEVICE_IO_MAP(k235_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))

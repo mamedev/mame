@@ -73,8 +73,8 @@ void unianapc_state::machine_reset()
 MACHINE_CONFIG_START(unianapc_state::unianapc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 1.70 GHz
-	MCFG_CPU_PROGRAM_MAP(unianapc_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 1.70 GHz
+	MCFG_DEVICE_PROGRAM_MAP(unianapc_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

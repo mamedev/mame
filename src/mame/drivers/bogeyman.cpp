@@ -232,9 +232,9 @@ WRITE8_MEMBER(bogeyman_state::colbank_w)
 MACHINE_CONFIG_START(bogeyman_state::bogeyman)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* Verified */
-	MCFG_CPU_PROGRAM_MAP(bogeyman_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bogeyman_state, irq0_line_hold,  16*60) // Controls sound
+	MCFG_DEVICE_ADD("maincpu", M6502, 1500000) /* Verified */
+	MCFG_DEVICE_PROGRAM_MAP(bogeyman_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bogeyman_state, irq0_line_hold,  16*60) // Controls sound
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -257,11 +257,11 @@ MACHINE_CONFIG_START(bogeyman_state::bogeyman)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	// verified to be YM2149s from PCB pic
-	MCFG_SOUND_ADD("ay1", YM2149, 1500000)  /* Verified */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(bogeyman_state, colbank_w))
+	MCFG_DEVICE_ADD("ay1", YM2149, 1500000)  /* Verified */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, bogeyman_state, colbank_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", YM2149, 1500000)  /* Verified */
+	MCFG_DEVICE_ADD("ay2", YM2149, 1500000)  /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

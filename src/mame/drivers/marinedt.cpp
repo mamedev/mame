@@ -629,10 +629,10 @@ PALETTE_INIT_MEMBER(marinedt_state, marinedt)
 MACHINE_CONFIG_START(marinedt_state::marinedt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(marinedt_map)
-	MCFG_CPU_IO_MAP(marinedt_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", marinedt_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",Z80,MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(marinedt_map)
+	MCFG_DEVICE_IO_MAP(marinedt_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", marinedt_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -647,7 +647,7 @@ MACHINE_CONFIG_START(marinedt_state::marinedt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

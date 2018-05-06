@@ -244,33 +244,33 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(patinho_feio_state::patinho_feio)
 	/* basic machine hardware */
 	/* CPU @ approx. 500 kHz (memory cycle time is 2usec) */
-	MCFG_CPU_ADD("maincpu", PATO_FEIO_CPU, 500000)
+	MCFG_DEVICE_ADD("maincpu", PATO_FEIO_CPU, 500000)
 	MCFG_PATINHO_RC_READ_CB(IOPORT("RC"))
 	MCFG_PATINHO_BUTTONS_READ_CB(IOPORT("BUTTONS"))
 
 	/* Printer */
-//  MCFG_PATINHO_IODEV_WRITE_CB(0x5, WRITE8(patinho_feio_state, printer_data_w))
+//  MCFG_PATINHO_IODEV_WRITE_CB(0x5, WRITE8(*this, patinho_feio_state, printer_data_w))
 
 	/* Papertape Puncher */
-//  MCFG_PATINHO_IODEV_WRITE_CB(0x8, WRITE8(patinho_feio_state, papertape_punch_data_w))
+//  MCFG_PATINHO_IODEV_WRITE_CB(0x8, WRITE8(*this, patinho_feio_state, papertape_punch_data_w))
 
 	/* Card Reader */
-//  MCFG_PATINHO_IODEV_READ_CB(0x9, READ8(patinho_feio_state, cardreader_data_r))
+//  MCFG_PATINHO_IODEV_READ_CB(0x9, READ8(*this, patinho_feio_state, cardreader_data_r))
 
 	/* DECWRITER
 	   (max. speed: ?) */
-	MCFG_PATINHO_IODEV_WRITE_CB(0xA, WRITE8(patinho_feio_state, decwriter_data_w))
+	MCFG_PATINHO_IODEV_WRITE_CB(0xA, WRITE8(*this, patinho_feio_state, decwriter_data_w))
 
 	/* Teleprinter
 	   TeleType ASR33
 	   (max. speed: 10 characteres per second)
 	   with paper tape reading (and optionally punching) capabilities */
-	MCFG_PATINHO_IODEV_WRITE_CB(0xB, WRITE8(patinho_feio_state, teletype_data_w))
+	MCFG_PATINHO_IODEV_WRITE_CB(0xB, WRITE8(*this, patinho_feio_state, teletype_data_w))
 
 	/* Papertape Reader
 	   Hewlett-Packard HP-2737-A
 	   Optical Papertape Reader (max. speed: 300 characteres per second) */
-//  MCFG_PATINHO_IODEV_READ_CB(0xE, READ8(patinho_feio_state, papertapereader_data_r))
+//  MCFG_PATINHO_IODEV_READ_CB(0xE, READ8(*this, patinho_feio_state, papertapereader_data_r))
 
 	/* DECWRITER */
 	MCFG_DEVICE_ADD("decwriter", TELEPRINTER, 0)

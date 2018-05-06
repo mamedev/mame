@@ -67,8 +67,8 @@ ROM_END
 
 MACHINE_CONFIG_START(bbc_weddb2_device::device_add_mconfig)
 	MCFG_WD1772_ADD("wd1772", XTAL(16'000'000) / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_weddb2_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_weddb2_device, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_weddb2_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_weddb2_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", bbc_floppies_525, "525qd", floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", bbc_floppies_525, "525qd", floppy_formats)
@@ -77,8 +77,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bbc_weddb3_device::device_add_mconfig)
 	MCFG_WD1770_ADD("wd1770", XTAL(16'000'000) / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_weddb3_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_weddb3_device, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_weddb3_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_weddb3_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "525qd", floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "525qd", floppy_formats)

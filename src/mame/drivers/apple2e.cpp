@@ -3887,8 +3887,8 @@ static void apple2eaux_cards(device_slot_interface &device)
 
 MACHINE_CONFIG_START(apple2e_state::apple2e)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
-	MCFG_CPU_PROGRAM_MAP(apple2e_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(apple2e_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", apple2e_state, apple2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -3904,12 +3904,12 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* DS1315 for no-slot clock */
 	MCFG_DS1315_ADD("nsc")
-	MCFG_DS1315_BACKING_HANDLER(READ8(apple2e_state, nsc_backing_r))
+	MCFG_DS1315_BACKING_HANDLER(READ8(*this, apple2e_state, nsc_backing_r))
 
 	/* RAM */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -4011,10 +4011,10 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
 	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
 	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(apple2e_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(apple2e_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(apple2e_state, ay3600_data_ready_w))
-	MCFG_AY3600_AKO_CB(WRITELINE(apple2e_state, ay3600_ako_w))
+	MCFG_AY3600_SHIFT_CB(READLINE(*this, apple2e_state, ay3600_shift_r))
+	MCFG_AY3600_CONTROL_CB(READLINE(*this, apple2e_state, ay3600_control_r))
+	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, apple2e_state, ay3600_data_ready_w))
+	MCFG_AY3600_AKO_CB(WRITELINE(*this, apple2e_state, ay3600_ako_w))
 
 	/* repeat timer.  15 Hz from page 7-15 of "Understanding the Apple IIe" */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", apple2e_state, ay3600_repeat, attotime::from_hz(15))
@@ -4022,9 +4022,9 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	/* slot devices */
 	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)
 	MCFG_A2BUS_CPU("maincpu")
-	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(apple2e_state, a2bus_irq_w))
-	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(apple2e_state, a2bus_nmi_w))
-	MCFG_A2BUS_OUT_INH_CB(WRITELINE(apple2e_state, a2bus_inh_w))
+	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, apple2e_state, a2bus_irq_w))
+	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, apple2e_state, a2bus_nmi_w))
+	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, apple2e_state, a2bus_inh_w))
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, nullptr)
@@ -4035,8 +4035,8 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 
 	MCFG_DEVICE_ADD(A2_AUXSLOT_TAG, A2EAUXSLOT, 0)
 	MCFG_A2EAUXSLOT_CPU("maincpu")
-	MCFG_A2EAUXSLOT_OUT_IRQ_CB(WRITELINE(apple2e_state, a2bus_irq_w))
-	MCFG_A2EAUXSLOT_OUT_NMI_CB(WRITELINE(apple2e_state, a2bus_nmi_w))
+	MCFG_A2EAUXSLOT_OUT_IRQ_CB(WRITELINE(*this, apple2e_state, a2bus_irq_w))
+	MCFG_A2EAUXSLOT_OUT_NMI_CB(WRITELINE(*this, apple2e_state, a2bus_nmi_w))
 	MCFG_A2EAUXSLOT_SLOT_ADD(A2_AUXSLOT_TAG, "aux", apple2eaux_cards, "ext80")   // default to an extended 80-column card
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
@@ -4054,14 +4054,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::apple2ee)
 	apple2e(config);
-	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
-	MCFG_CPU_PROGRAM_MAP(apple2e_map)
+	MCFG_DEVICE_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(apple2e_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::spectred)
 	apple2e(config);
-	MCFG_CPU_ADD("keyb_mcu", I8035, XTAL(4'000'000)) /* guessed frequency */
-	MCFG_CPU_PROGRAM_MAP(spectred_keyb_map)
+	MCFG_DEVICE_ADD("keyb_mcu", I8035, XTAL(4'000'000)) /* guessed frequency */
+	MCFG_DEVICE_PROGRAM_MAP(spectred_keyb_map)
 
 		//TODO: implement the actual interfacing to this 8035 MCU and
 		//      and then remove the keyb CPU inherited from apple2e
@@ -4069,23 +4069,23 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::tk3000)
 	apple2e(config);
-	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
-	MCFG_CPU_PROGRAM_MAP(apple2e_map)
+	MCFG_DEVICE_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(apple2e_map)
 
-//  MCFG_CPU_ADD("subcpu", Z80, 1021800)    // schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
-//  MCFG_CPU_PROGRAM_MAP(tk3000_kbd_map)
+//  MCFG_DEVICE_ADD("subcpu", Z80, 1021800)    // schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
+//  MCFG_DEVICE_PROGRAM_MAP(tk3000_kbd_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::apple2ep)
 	apple2e(config);
-	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
-	MCFG_CPU_PROGRAM_MAP(apple2e_map)
+	MCFG_DEVICE_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(apple2e_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::apple2c)
 	apple2ee(config);
-	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
-	MCFG_CPU_PROGRAM_MAP(apple2c_map)
+	MCFG_DEVICE_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(apple2c_map)
 
 	// IIc and friends have no cassette port
 	MCFG_DEVICE_REMOVE(A2_CASSETTE_TAG)
@@ -4100,23 +4100,23 @@ MACHINE_CONFIG_START(apple2e_state::apple2c)
 
 	MCFG_DEVICE_ADD(IIC_ACIA1_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(14'318'181) / 8) // ~1.789 MHz
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_txd))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_txd))
 
 	MCFG_DEVICE_ADD(IIC_ACIA2_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))   // matches SSC so modem software is compatible
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("modem", rs232_port_device, write_txd))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("modem", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(PRINTER_PORT_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IIC_ACIA1_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(IIC_ACIA1_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(IIC_ACIA1_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(IIC_ACIA1_TAG, mos6551_device, write_cts))
+	MCFG_DEVICE_ADD(PRINTER_PORT_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(IIC_ACIA1_TAG, mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(IIC_ACIA1_TAG, mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(IIC_ACIA1_TAG, mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(IIC_ACIA1_TAG, mos6551_device, write_cts))
 
-	MCFG_RS232_PORT_ADD(MODEM_PORT_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IIC_ACIA2_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(IIC_ACIA2_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(IIC_ACIA2_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(IIC_ACIA2_TAG, mos6551_device, write_cts))
+	MCFG_DEVICE_ADD(MODEM_PORT_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(IIC_ACIA2_TAG, mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(IIC_ACIA2_TAG, mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(IIC_ACIA2_TAG, mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(IIC_ACIA2_TAG, mos6551_device, write_cts))
 
 	// TODO: populate the IIc's other virtual slots with ONBOARD_ADD
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_MOCKINGBOARD, NOOP )   // Mockingboard 4C
@@ -4164,8 +4164,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::apple2c_mem)
 	apple2c(config);
-	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
-	MCFG_CPU_PROGRAM_MAP(apple2c_memexp_map)
+	MCFG_DEVICE_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(apple2c_memexp_map)
 
 	MCFG_A2BUS_SLOT_REMOVE("sl6")
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NOOP)
@@ -4194,8 +4194,8 @@ static const floppy_interface floppy_interface =
 
 MACHINE_CONFIG_START(apple2e_state::laser128)
 	apple2c(config);
-	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
-	MCFG_CPU_PROGRAM_MAP(laser128_map)
+	MCFG_DEVICE_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(laser128_map)
 
 	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
@@ -4218,8 +4218,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::laser128ex2)
 	apple2c(config);
-	MCFG_CPU_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
-	MCFG_CPU_PROGRAM_MAP(laser128_map)
+	MCFG_DEVICE_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(laser128_map)
 
 	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)

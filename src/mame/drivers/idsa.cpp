@@ -332,12 +332,12 @@ void idsa_state::machine_reset()
 
 MACHINE_CONFIG_START(idsa_state::idsa)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_CPU_IO_MAP(maincpu_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_IO_MAP(maincpu_io_map)
 
 	MCFG_DEVICE_ADD("irqclk", CLOCK, XTAL(8'000'000) / 4 )
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(idsa_state, clock_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, idsa_state, clock_w))
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT()
@@ -345,34 +345,34 @@ MACHINE_CONFIG_START(idsa_state::idsa)
 	/* sound hardware */
 	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("speech", SP0256, 3120000) // unknown variant
+	MCFG_DEVICE_ADD("speech", SP0256, 3120000) // unknown variant
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.5)
 
-	MCFG_SOUND_ADD("aysnd1", AY8910, 2000000) // 2Mhz according to pinmame, schematic omits the clock line
+	MCFG_DEVICE_ADD("aysnd1", AY8910, 2000000) // 2Mhz according to pinmame, schematic omits the clock line
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 
-	MCFG_SOUND_ADD("aysnd2", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(idsa_state, ay1_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(idsa_state, ay1_b_w))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(idsa_state, ay2_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(idsa_state, ay2_b_w))
+	MCFG_DEVICE_ADD("aysnd2", AY8910, 2000000)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, idsa_state, ay1_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, idsa_state, ay1_b_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, idsa_state, ay2_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, idsa_state, ay2_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(idsa_state::bsktbllp)
 	idsa(config);
 	MCFG_DEVICE_MODIFY("aysnd1")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(idsa_state, ppi_control_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(idsa_state, ppi_data_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, idsa_state, ppi_control_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, idsa_state, ppi_data_w))
 
 	MCFG_DEVICE_ADD("ppi1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(idsa_state, ppi1_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(idsa_state, ppi1_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(idsa_state, ppi1_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, idsa_state, ppi1_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, idsa_state, ppi1_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, idsa_state, ppi1_c_w))
 	MCFG_DEVICE_ADD("ppi2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(idsa_state, ppi2_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(idsa_state, ppi2_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(idsa_state, ppi2_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, idsa_state, ppi2_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, idsa_state, ppi2_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, idsa_state, ppi2_c_w))
 MACHINE_CONFIG_END
 
 

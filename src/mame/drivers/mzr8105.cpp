@@ -208,8 +208,8 @@ static void mzr8105_vme_cards(device_slot_interface &device)
  * Machine configuration
  */
 MACHINE_CONFIG_START(mzr8105_state::mzr8105)
-	MCFG_CPU_ADD ("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP (mzr8105_mem)
+	MCFG_DEVICE_ADD ("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP (mzr8105_mem)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_BUS_OWNER_SPACES()
 	MCFG_VME_SLOT_ADD ("vme", 1, mzr8105_vme_cards, "mzr8300")

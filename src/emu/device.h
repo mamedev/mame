@@ -261,10 +261,6 @@ public:
 	device_feature::type unemulated_features() const { return m_unemulated_features; }
 	device_feature::type imperfect_features() const { return m_imperfect_features; }
 
-	std::unique_ptr<device_t> operator()(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const
-	{
-		return m_creator(*this, mconfig, tag, owner, clock);
-	}
 	std::unique_ptr<device_t> create(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const
 	{
 		return m_creator(*this, mconfig, tag, owner, clock);
@@ -284,7 +280,6 @@ public:
 
 	using device_type_impl_base::device_type_impl_base;
 	using device_type_impl_base::create;
-	using device_type_impl_base::operator();
 
 	template <typename... Params>
 	std::unique_ptr<DeviceClass> create(machine_config &mconfig, char const *tag, device_t *owner, Params &&... args) const

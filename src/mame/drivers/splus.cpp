@@ -674,11 +674,11 @@ INPUT_PORTS_END
 *************************/
 
 MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
-	MCFG_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(splus_map)
-	MCFG_CPU_IO_MAP(splus_iomap)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(splus_state, splus_p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(splus_state, splus_p3_r))
+	MCFG_DEVICE_ADD("maincpu", I80C32, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(splus_map)
+	MCFG_DEVICE_IO_MAP(splus_iomap)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, splus_state, splus_p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, splus_state, splus_p3_r))
 
 	// Fill NVRAM
 	MCFG_NVRAM_ADD_0FILL("cmosl")
@@ -699,7 +699,7 @@ MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, SOUND_CLOCK)
+	MCFG_DEVICE_ADD("aysnd", AY8912, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

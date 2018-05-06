@@ -574,8 +574,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(tk2000_state::tk2000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
-	MCFG_CPU_PROGRAM_MAP(apple2_map)
+	MCFG_DEVICE_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(apple2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tk2000_state, apple2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -594,7 +594,7 @@ MACHINE_CONFIG_START(tk2000_state::tk2000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* /INH banking */

@@ -821,11 +821,11 @@ PALETTE_INIT_MEMBER(cb2001_state, cb2001)
 }
 
 MACHINE_CONFIG_START(cb2001_state::cb2001)
-	MCFG_CPU_ADD("maincpu", V35, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
+	MCFG_DEVICE_ADD("maincpu", V35, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
 	MCFG_V25_CONFIG(cb2001_decryption_table)
-	MCFG_CPU_PROGRAM_MAP(cb2001_map)
-	MCFG_CPU_IO_MAP(cb2001_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cb2001_state,  vblank_irq)
+	MCFG_DEVICE_PROGRAM_MAP(cb2001_map)
+	MCFG_DEVICE_IO_MAP(cb2001_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cb2001_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -851,7 +851,7 @@ MACHINE_CONFIG_START(cb2001_state::cb2001)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000) // wrong
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) // wrong
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

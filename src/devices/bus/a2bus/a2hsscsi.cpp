@@ -62,7 +62,7 @@ void a2bus_hsscsi_device::ncr5380(device_t *device)
 	devcb_base *devcb;
 	(void)devcb;
 	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5380N_DRQ_HANDLER(DEVWRITELINE("^^", a2bus_hsscsi_device, drq_w))
+	MCFG_NCR5380N_DRQ_HANDLER(WRITELINE("^^", a2bus_hsscsi_device, drq_w))
 }
 
 static void hsscsi_devices(device_slot_interface &device)

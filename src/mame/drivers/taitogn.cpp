@@ -697,32 +697,32 @@ void slot_ataflash(device_slot_interface &device)
 MACHINE_CONFIG_START(taitogn_state::coh3002t)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL(100'000'000) )
-	MCFG_CPU_PROGRAM_MAP(taitogn_map)
+	MCFG_DEVICE_ADD( "maincpu", CXD8661R, XTAL(100'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(taitogn_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(taitogn_state, sio0_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE(taitogn_state, sio0_txd))
+	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(*this, taitogn_state, sio0_sck))
+	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE(*this, taitogn_state, sio0_txd))
 
 	MCFG_DEVICE_ADD("cat702_1", CAT702, 0)
-	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(taitogn_state, cat702_1_dataout))
+	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(*this, taitogn_state, cat702_1_dataout))
 
 	MCFG_DEVICE_ADD("cat702_2", CAT702, 0)
-	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(taitogn_state, cat702_2_dataout))
+	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(*this, taitogn_state, cat702_2_dataout))
 
 	MCFG_DEVICE_ADD("znmcu", ZNMCU, 0)
-	MCFG_ZNMCU_DATAOUT_HANDLER(WRITELINE(taitogn_state, znmcu_dataout))
-	MCFG_ZNMCU_DSR_HANDLER(DEVWRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
-	MCFG_ZNMCU_DSW_HANDLER(IOPORT(":DSW"))
-	MCFG_ZNMCU_ANALOG1_HANDLER(IOPORT(":ANALOG1"))
-	MCFG_ZNMCU_ANALOG2_HANDLER(IOPORT(":ANALOG2"))
+	MCFG_ZNMCU_DATAOUT_HANDLER(WRITELINE(*this, taitogn_state, znmcu_dataout))
+	MCFG_ZNMCU_DSR_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
+	MCFG_ZNMCU_DSW_HANDLER(IOPORT("DSW"))
+	MCFG_ZNMCU_ANALOG1_HANDLER(IOPORT("ANALOG1"))
+	MCFG_ZNMCU_ANALOG2_HANDLER(IOPORT("ANALOG2"))
 
 	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 	MCFG_DEVICE_ADD("rf5c296", RF5C296, 0)
-	MCFG_RF5C296_SLOT(":pccard")
+	MCFG_RF5C296_SLOT("pccard")
 
 	MCFG_DEVICE_ADD("pccard", PCCARD_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(slot_ataflash, nullptr, false)
@@ -758,7 +758,7 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	MCFG_TAITO_ZOOM_USE_FLASH
 
 	MCFG_DEVICE_MODIFY("taito_zoom:zsg2")
-	MCFG_ZSG2_EXT_READ_HANDLER(READ32(taitogn_state, zsg2_ext_r))
+	MCFG_ZSG2_EXT_READ_HANDLER(READ32(*this, taitogn_state, zsg2_ext_r))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taitogn_state::coh3002t_t1)
@@ -777,16 +777,16 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t_t1_mp)
 	coh3002t_t1(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(taitogn_mp_map)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(taitogn_mp_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taitogn_state::coh3002t_t2_mp)
 	coh3002t_t2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(taitogn_mp_map)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(taitogn_mp_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taitogn_state::coh3002t_cf)

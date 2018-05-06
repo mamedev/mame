@@ -187,18 +187,18 @@ MACHINE_CONFIG_START(cortex_state::cortex)
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(12'000'000), mem_map, io_map)
 
 	MCFG_DEVICE_ADD("control", LS259, 0) // IC64
-	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cortex_state, basic_led_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cortex_state, keyboard_ack_w))
-	//MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(cortex_state, ebus_int_ack_w))
-	//MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cortex_state, ebus_to_en_w))
-	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(cortex_state, disk_size_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(cortex_state, romsw_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("beeper", beep_device, set_state))
+	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cortex_state, basic_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cortex_state, keyboard_ack_w))
+	//MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cortex_state, ebus_int_ack_w))
+	//MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cortex_state, ebus_to_en_w))
+	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cortex_state, disk_size_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, cortex_state, romsw_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("beeper", beep_device, set_state))
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "crtc", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INT_9995_INT1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(cortex_state, vdp_int_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, cortex_state, vdp_int_w))
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", tms9928a_device, screen_update )
@@ -211,7 +211,7 @@ MACHINE_CONFIG_START(cortex_state::cortex)
 
 	/* Sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 950) // guess
+	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END
 

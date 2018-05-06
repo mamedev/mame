@@ -2022,9 +2022,9 @@ MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
 MACHINE_CONFIG_START(tumbleb_state::tumblepb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14000000)
-	MCFG_CPU_PROGRAM_MAP(tumblepopb_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14000000)
+	MCFG_DEVICE_PROGRAM_MAP(tumblepopb_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
@@ -2060,9 +2060,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tumbleb_state::tumbleb2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14000000)
-	MCFG_CPU_PROGRAM_MAP(tumblepopb_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tumbleb_state,  tumbleb2_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14000000)
+	MCFG_DEVICE_PROGRAM_MAP(tumblepopb_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  tumbleb2_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
@@ -2097,13 +2097,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tumbleb_state::jumpkids)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(jumpkids_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(jumpkids_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
 
 	/* z80? */
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000/2)
-	MCFG_CPU_PROGRAM_MAP(jumpkids_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(jumpkids_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
@@ -2140,9 +2140,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tumbleb_state::fncywld)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(fncywld_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(fncywld_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
@@ -2198,12 +2198,12 @@ MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
 MACHINE_CONFIG_START(tumbleb_state::htchctch)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 15000000) /* verified */
-	MCFG_CPU_PROGRAM_MAP(htchctch_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 15000000) /* verified */
+	MCFG_DEVICE_PROGRAM_MAP(htchctch_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 15000000/4) /* verified on dquizgo */
-	MCFG_CPU_PROGRAM_MAP(semicom_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 15000000/4) /* verified on dquizgo */
+	MCFG_DEVICE_PROGRAM_MAP(semicom_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,htchctch)
@@ -2264,10 +2264,10 @@ MACHINE_CONFIG_START(tumbleb_state::cookbib_mcu)
 	htchctch(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("protection", I8052, 16000000)  // AT89C52
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(tumbleb_state, prot_p0_w))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(tumbleb_state, prot_p1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(tumbleb_state, prot_p2_w))
+	MCFG_DEVICE_ADD("protection", I8052, 16000000)  // AT89C52
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, tumbleb_state, prot_p0_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, tumbleb_state, prot_p1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, tumbleb_state, prot_p2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2279,7 +2279,7 @@ MACHINE_CONFIG_START(tumbleb_state::bcstory)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_bcstory)
 
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, 3427190)
+	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 3427190)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -2303,7 +2303,7 @@ MACHINE_CONFIG_START(tumbleb_state::metlsavr)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, 3427190)
+	MCFG_DEVICE_REPLACE("ymsnd", YM2151, 3427190)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -2314,12 +2314,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tumbleb_state::suprtrio)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14000000) /* 14mhz should be correct, but lots of sprite flicker later in game */
-	MCFG_CPU_PROGRAM_MAP(suprtrio_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14000000) /* 14mhz should be correct, but lots of sprite flicker later in game */
+	MCFG_DEVICE_PROGRAM_MAP(suprtrio_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
-	MCFG_CPU_PROGRAM_MAP(suprtrio_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(suprtrio_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
@@ -2356,9 +2356,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tumbleb_state::pangpang)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14000000)
-	MCFG_CPU_PROGRAM_MAP(pangpang_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tumbleb_state,  tumbleb2_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14000000)
+	MCFG_DEVICE_PROGRAM_MAP(pangpang_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  tumbleb2_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
