@@ -55,11 +55,11 @@ void ide_pci_device::bus_master_map(address_map &map)
 
 MACHINE_CONFIG_START(ide_pci_device::device_add_mconfig)
 	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", "cdrom", true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(ide_pci_device, ide_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, ide_pci_device, ide_interrupt))
 	//MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":pci:00.0", AS_DATA)
 	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide2", ata_devices, "hdd", "cdrom", true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(ide_pci_device, ide_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, ide_pci_device, ide_interrupt))
 	//MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":pci:00.0", AS_DATA)
 MACHINE_CONFIG_END

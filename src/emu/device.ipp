@@ -31,17 +31,17 @@ typedef device_delegate<void (u32)> clock_update_delegate;
 namespace emu { namespace detail {
 
 template <class DeviceClass> template <typename... Params>
-DeviceClass &device_type_impl<DeviceClass>::operator()(machine_config &config, char const *tag, Params &&... args) const
+inline DeviceClass &device_type_impl<DeviceClass>::operator()(machine_config &mconfig, char const *tag, Params &&... args) const
 {
-	return dynamic_cast<DeviceClass &>(*config.device_add(tag, *this, std::forward<Params>(args)...));
+	return dynamic_cast<DeviceClass &>(*mconfig.device_add(tag, *this, std::forward<Params>(args)...));
 }
 
 template <class DeviceClass> template <typename Exposed, bool Required, typename... Params>
-DeviceClass &device_type_impl<DeviceClass>::operator()(machine_config &config, device_finder<Exposed, Required> &finder, Params &&... args) const
+inline DeviceClass &device_type_impl<DeviceClass>::operator()(machine_config &mconfig, device_finder<Exposed, Required> &finder, Params &&... args) const
 {
 	std::pair<device_t &, char const *> const target(finder.finder_target());
-	assert(&config.current_device() == &target.first);
-	DeviceClass &result(dynamic_cast<DeviceClass &>(*config.device_add(target.second, *this, std::forward<Params>(args)...)));
+	assert(&mconfig.current_device() == &target.first);
+	DeviceClass &result(dynamic_cast<DeviceClass &>(*mconfig.device_add(target.second, *this, std::forward<Params>(args)...)));
 	return finder = result;
 }
 

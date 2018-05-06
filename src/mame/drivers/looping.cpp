@@ -629,28 +629,28 @@ MACHINE_CONFIG_START(looping_state::looping)
 
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CPU_CLOCK, looping_map, looping_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", looping_state,  looping_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", looping_state,  looping_interrupt)
 
 	// CPU TMS9980A for audio subsystem; no line connections
 	MCFG_TMS99xx_ADD("audiocpu", TMS9980A,  SOUND_CLOCK/4, looping_sound_map, looping_sound_io_map)
 
-	MCFG_CPU_ADD("mcu", COP420, COP_CLOCK)
+	MCFG_DEVICE_ADD("mcu", COP420, COP_CLOCK)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
-	MCFG_COP400_WRITE_L_CB(WRITE8(looping_state, cop_l_w))
-	MCFG_COP400_READ_L_CB(READ8(looping_state, cop_unk_r))
-	MCFG_COP400_READ_G_CB(READ8(looping_state, cop_unk_r))
-	MCFG_COP400_READ_IN_CB(READ8(looping_state, cop_unk_r))
-	MCFG_COP400_READ_SI_CB(READLINE(looping_state, cop_serial_r))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, looping_state, cop_l_w))
+	MCFG_COP400_READ_L_CB(READ8(*this, looping_state, cop_unk_r))
+	MCFG_COP400_READ_G_CB(READ8(*this, looping_state, cop_unk_r))
+	MCFG_COP400_READ_IN_CB(READ8(*this, looping_state, cop_unk_r))
+	MCFG_COP400_READ_SI_CB(READLINE(*this, looping_state, cop_serial_r))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // C9 on CPU board
 	// Q0 = A16
 	// Q1 = A17
 	// Q2 = COLOR 9
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(looping_state, plr2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, looping_state, plr2_w))
 	// Q4 = C0
 	// Q5 = C1
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(looping_state, main_irq_ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(looping_state, watchdog_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, looping_state, main_irq_ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, looping_state, watchdog_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -666,35 +666,35 @@ MACHINE_CONFIG_START(looping_state::looping)
 	MCFG_PALETTE_INIT_OWNER(looping_state, looping)
 
 	MCFG_DEVICE_ADD("videolatch", LS259, 0) // E2 on video board
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(looping_state, level2_irq_set))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(looping_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(looping_state, flip_screen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, looping_state, level2_irq_set))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, looping_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, looping_state, flip_screen_y_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SOUND_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("aysnd", AY8910, SOUND_CLOCK/4)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
 
-	MCFG_SOUND_ADD("tms", TMS5220, TMS_CLOCK)
-	MCFG_TMS52XX_IRQ_HANDLER(WRITELINE(looping_state, looping_spcint))
+	MCFG_DEVICE_ADD("tms", TMS5220, TMS_CLOCK)
+	MCFG_TMS52XX_IRQ_HANDLER(WRITELINE(*this, looping_state, looping_spcint))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("sen0", LS259, 0) // B3 on sound board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(looping_state, looping_souint_clr))
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(looping_state, looping_sound_sw))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, looping_state, looping_souint_clr))
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, looping_state, looping_sound_sw))
 
 	MCFG_DEVICE_ADD("sen1", LS259, 0) // A1 on sound board with outputs connected to 4016 at B1
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(looping_state, ay_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(looping_state, speech_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(looping_state, ballon_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, looping_state, ay_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, looping_state, speech_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, looping_state, ballon_enable_w))
 MACHINE_CONFIG_END
 
 

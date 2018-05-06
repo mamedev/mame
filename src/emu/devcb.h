@@ -26,11 +26,6 @@ namespace emu { namespace detail {
 
 template <typename Delegate> struct devcb_delegate_initialiser
 {
-	template <typename T> struct is_device_implementation
-	{ static constexpr bool value = std::is_base_of<device_t, T>::value; };
-	template <typename T> struct is_device_interface
-	{ static constexpr bool value = std::is_base_of<device_interface, T>::value && !is_device_implementation<T>::value; };
-
 	devcb_delegate_initialiser(char const *tag, Delegate &&delegate) : m_base(nullptr), m_delegate(std::move(delegate))
 	{
 	}
@@ -53,9 +48,9 @@ template <typename Delegate> struct devcb_delegate_initialiser
 
 inline char const *devcb_delegate_get_tag(char const *tag) { return tag; }
 template <typename T>
-inline std::enable_if_t<devcb_delegate_initialiser<bool>::is_device_implementation<T>::value, char const *> devcb_delegate_get_tag(T &device) { return DEVICE_SELF; }
+inline std::enable_if_t<is_device_implementation<T>::value, char const *> devcb_delegate_get_tag(T &device) { return DEVICE_SELF; }
 template <typename T>
-inline std::enable_if_t<devcb_delegate_initialiser<bool>::is_device_interface<T>::value, char const *> devcb_delegate_get_tag(T &interface) { return DEVICE_SELF; }
+inline std::enable_if_t<is_device_interface<T>::value, char const *> devcb_delegate_get_tag(T &interface) { return DEVICE_SELF; }
 template <typename DeviceClass, bool Required>
 inline char const *devcb_delegate_get_tag(device_finder<DeviceClass, Required> const &finder) { return finder.finder_tag(); }
 
@@ -110,33 +105,19 @@ template <typename DescType> struct devcb_line_desc_creator
 //  MACROS
 //**************************************************************************
 
-// wrappers for read callbacks into the owner device
-#define DEVCB_READLINE(_class, _func) (emu::detail::devcb_delegate_initialiser<read_line_delegate>(DEVICE_SELF, read_line_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)))
-#define DEVCB_READ8(_class, _func) (emu::detail::devcb_delegate_initialiser<read8_delegate>(DEVICE_SELF, read8_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)))
-#define DEVCB_READ16(_class, _func) (emu::detail::devcb_delegate_initialiser<read16_delegate>(DEVICE_SELF, read16_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)))
-#define DEVCB_READ32(_class, _func) (emu::detail::devcb_delegate_initialiser<read32_delegate>(DEVICE_SELF, read32_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)))
-#define DEVCB_READ64(_class, _func) (emu::detail::devcb_delegate_initialiser<read64_delegate>(DEVICE_SELF, read64_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)))
-
 // wrappers for read callbacks into any tagged device
-#define DEVCB_DEVREADLINE(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<read_line_delegate>((tag), read_line_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
-#define DEVCB_DEVREAD8(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<read8_delegate>((tag), read8_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
-#define DEVCB_DEVREAD16(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<read16_delegate>((tag), read16_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
-#define DEVCB_DEVREAD32(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<read32_delegate>((tag), read32_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
-#define DEVCB_DEVREAD64(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<read64_delegate>((tag), read64_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
-
-// wrappers for write callbacks into the owner device
-#define DEVCB_WRITELINE(_class, _func) (emu::detail::devcb_delegate_initialiser<write_line_delegate>(DEVICE_SELF, write_line_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)))
-#define DEVCB_WRITE8(_class, _func) (emu::detail::devcb_delegate_initialiser<write8_delegate>(DEVICE_SELF, write8_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)))
-#define DEVCB_WRITE16(_class, _func) (emu::detail::devcb_delegate_initialiser<write16_delegate>(DEVICE_SELF, write16_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)))
-#define DEVCB_WRITE32(_class, _func) (emu::detail::devcb_delegate_initialiser<write32_delegate>(DEVICE_SELF, write32_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)))
-#define DEVCB_WRITE64(_class, _func) (emu::detail::devcb_delegate_initialiser<write64_delegate>(DEVICE_SELF, write64_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)nullptr)))
+#define DEVCB_READLINE(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<read_line_delegate>((tag), read_line_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
+#define DEVCB_READ8(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<read8_delegate>((tag), read8_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
+#define DEVCB_READ16(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<read16_delegate>((tag), read16_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
+#define DEVCB_READ32(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<read32_delegate>((tag), read32_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
+#define DEVCB_READ64(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<read64_delegate>((tag), read64_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
 
 // wrappers for write callbacks into any tagged device
-#define DEVCB_DEVWRITELINE(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<write_line_delegate>((tag), write_line_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
-#define DEVCB_DEVWRITE8(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<write8_delegate>((tag), write8_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
-#define DEVCB_DEVWRITE16(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<write16_delegate>((tag), write16_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
-#define DEVCB_DEVWRITE32(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<write32_delegate>((tag), write32_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
-#define DEVCB_DEVWRITE64(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<write64_delegate>((tag), write64_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
+#define DEVCB_WRITELINE(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<write_line_delegate>((tag), write_line_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
+#define DEVCB_WRITE8(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<write8_delegate>((tag), write8_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
+#define DEVCB_WRITE16(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<write16_delegate>((tag), write16_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
+#define DEVCB_WRITE32(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<write32_delegate>((tag), write32_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
+#define DEVCB_WRITE64(tag, _class, _func) (emu::detail::devcb_delegate_initialiser<write64_delegate>((tag), write64_delegate(&_class::_func, #_class "::" #_func, emu::detail::devcb_delegate_get_tag(tag), (_class *)nullptr)))
 
 // machine config helpers to add shift, mask, or address space configuration
 #define MCFG_DEVCB_RSHIFT(_shift) devcb->set_rshift(_shift);
@@ -191,14 +172,12 @@ protected:
 
 	template <callback_type Type> struct tag_desc
 	{
-		constexpr tag_desc(device_t *base, char const *tag) : m_base(base), m_tag(tag) { }
 		device_t *m_base;
 		char const *m_tag;
 	};
 
 	template <callback_type Type> struct line_desc
 	{
-		constexpr line_desc(device_t *base, char const *tag, int inputnum) : m_base(base), m_tag(tag), m_inputnum(inputnum) { }
 		device_t *m_base;
 		char const *m_tag;
 		int m_inputnum;
@@ -342,13 +321,14 @@ public:
 	// callback configuration
 	using devcb_base::set_callback;
 	template <typename Delegate>
-	std::enable_if_t<set_helper<Delegate, void>::valid, devcb_base &> set_callback(emu::detail::devcb_delegate_initialiser<Delegate> &&desc)
+	std::enable_if_t<set_helper<Delegate, void>::valid, devcb_read_base &> set_callback(emu::detail::devcb_delegate_initialiser<Delegate> &&desc)
 	{
 		if (desc.m_base) reset(*desc.m_base, set_helper<Delegate, void>::type);
 		else reset(set_helper<Delegate, void>::type);
 		set_helper<Delegate, void>::apply(*this, std::move(desc.m_delegate));
 		return *this;
 	}
+	template <typename... Params> auto &chain(Params &&... args) { return chain_alloc().set_callback(std::forward<Params>(args)...); }
 	devcb_read_base &chain_alloc();
 
 	// resolution
@@ -436,14 +416,14 @@ public:
 	// callback configuration
 	using devcb_base::set_callback;
 	template <typename Delegate>
-	std::enable_if_t<set_helper<Delegate, void>::valid, devcb_base &> set_callback(emu::detail::devcb_delegate_initialiser<Delegate> &&desc)
+	std::enable_if_t<set_helper<Delegate, void>::valid, devcb_write_base &> set_callback(emu::detail::devcb_delegate_initialiser<Delegate> &&desc)
 	{
 		if (desc.m_base) reset(*desc.m_base, set_helper<Delegate, void>::type);
 		else reset(set_helper<Delegate, void>::type);
 		set_helper<Delegate, void>::apply(*this, std::move(desc.m_delegate));
 		return *this;
 	}
-	template <callback_type Type> devcb_base &set_callback(line_desc<Type> desc)
+	template <callback_type Type> devcb_write_base &set_callback(line_desc<Type> desc)
 	{
 		if (desc.m_base) reset(*desc.m_base, Type);
 		else reset(Type);
@@ -451,6 +431,7 @@ public:
 		m_target_int = desc.m_inputnum;
 		return *this;
 	}
+	template <typename... Params> auto &chain(Params &&... args) { return chain_alloc().set_callback(std::forward<Params>(args)...); }
 	devcb_write_base &chain_alloc();
 
 	// resolution

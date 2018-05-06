@@ -775,16 +775,16 @@ void zr107_state::machine_reset()
 MACHINE_CONFIG_START(zr107_state::zr107)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
-	MCFG_CPU_PROGRAM_MAP(zr107_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zr107_state,  zr107_vblank)
+	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
+	MCFG_DEVICE_PROGRAM_MAP(zr107_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", zr107_state,  zr107_vblank)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL(64'000'000)/8)    /* 8MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_memmap)
+	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/8)    /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, XTAL(36'000'000))
+	MCFG_DEVICE_ADD("dsp", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_CPU_DATA_MAP(sharc_map)
+	MCFG_DEVICE_DATA_MAP(sharc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(750000))// Very high sync needed to prevent lockups - why?
 
@@ -825,7 +825,7 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(zr107_state, k054539_irq_gen))
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, zr107_state, k054539_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
@@ -846,16 +846,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(zr107_state::jetwave)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
-	MCFG_CPU_PROGRAM_MAP(jetwave_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zr107_state,  zr107_vblank)
+	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
+	MCFG_DEVICE_PROGRAM_MAP(jetwave_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", zr107_state,  zr107_vblank)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL(64'000'000)/8)    /* 8MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_memmap)
+	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/8)    /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, XTAL(36'000'000))
+	MCFG_DEVICE_ADD("dsp", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_CPU_DATA_MAP(sharc_map)
+	MCFG_DEVICE_DATA_MAP(sharc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2000000)) // Very high sync needed to prevent lockups - why?
 
@@ -904,7 +904,7 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(zr107_state, k054539_irq_gen))
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, zr107_state, k054539_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 

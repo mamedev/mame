@@ -459,7 +459,7 @@ void cv1k_state::machine_reset()
 MACHINE_CONFIG_START(cv1k_state::cv1k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH3BE, 12.8_MHz_XTAL*8) // 102.4MHz
+	MCFG_DEVICE_ADD("maincpu", SH3BE, 12.8_MHz_XTAL*8) // 102.4MHz
 	MCFG_SH4_MD0(0)  // none of this is verified
 	MCFG_SH4_MD1(0)  // (the sh3 is different to the sh4 anyway, should be changed)
 	MCFG_SH4_MD2(0)
@@ -470,9 +470,9 @@ MACHINE_CONFIG_START(cv1k_state::cv1k)
 	MCFG_SH4_MD7(1)
 	MCFG_SH4_MD8(0)
 	MCFG_SH4_CLOCK(12.8_MHz_XTAL*8) // 102.4MHz
-	MCFG_CPU_PROGRAM_MAP(cv1k_map)
-	MCFG_CPU_IO_MAP(cv1k_port)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
+	MCFG_DEVICE_PROGRAM_MAP(cv1k_map)
+	MCFG_DEVICE_IO_MAP(cv1k_port)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
 
 	MCFG_RTC9701_ADD("eeprom")
 	MCFG_SERFLASH_ADD("game")
@@ -501,7 +501,7 @@ MACHINE_CONFIG_START(cv1k_state::cv1k_d)
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", SH3BE, 12.8_MHz_XTAL*8) // 102.4MHz
+	MCFG_DEVICE_ADD("maincpu", SH3BE, 12.8_MHz_XTAL*8) // 102.4MHz
 	MCFG_SH4_MD0(0)  // none of this is verified
 	MCFG_SH4_MD1(0)  // (the sh3 is different to the sh4 anyway, should be changed)
 	MCFG_SH4_MD2(0)
@@ -512,9 +512,9 @@ MACHINE_CONFIG_START(cv1k_state::cv1k_d)
 	MCFG_SH4_MD7(1)
 	MCFG_SH4_MD8(0)
 	MCFG_SH4_CLOCK(12.8_MHz_XTAL*8) // 102.4MHz
-	MCFG_CPU_PROGRAM_MAP(cv1k_d_map)
-	MCFG_CPU_IO_MAP(cv1k_port)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
+	MCFG_DEVICE_PROGRAM_MAP(cv1k_d_map)
+	MCFG_DEVICE_IO_MAP(cv1k_port)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
 
 	MCFG_DEVICE_MODIFY("blitter")
 	MCFG_EPIC12_SET_MAINRAMSIZE(0x1000000)

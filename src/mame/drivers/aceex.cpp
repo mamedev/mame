@@ -84,8 +84,8 @@ void aceex2814_state::machine_reset()
 MACHINE_CONFIG_START(aceex2814_state::aceex2814)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, Y2_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(aceex2814_map)
+	MCFG_DEVICE_ADD("maincpu", I80C31, Y2_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(aceex2814_map)
 MACHINE_CONFIG_END
 
 ROM_START( aceex2814 )

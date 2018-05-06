@@ -131,8 +131,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(maygayew_state::maygayew)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,8000000) // MC68306FC16 - standard 68000 core + peripherals
-	MCFG_CPU_PROGRAM_MAP(maygayew_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,8000000) // MC68306FC16 - standard 68000 core + peripherals
+	MCFG_DEVICE_PROGRAM_MAP(maygayew_map)
 MACHINE_CONFIG_END
 
 ROM_START( mg_gbr )

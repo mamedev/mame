@@ -466,15 +466,15 @@ void calorie_state::machine_reset()
 MACHINE_CONFIG_START(calorie_state::calorie)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(calorie_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(calorie_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,3000000)        /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(calorie_sound_map)
-	MCFG_CPU_IO_MAP(calorie_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(calorie_state, irq0_line_hold,  64)
+	MCFG_DEVICE_ADD("audiocpu", Z80,3000000)        /* 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(calorie_sound_map)
+	MCFG_DEVICE_IO_MAP(calorie_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(calorie_state, irq0_line_hold,  64)
 
 
 	/* video hardware */
@@ -495,22 +495,22 @@ MACHINE_CONFIG_START(calorie_state::calorie)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", YM2149, 1500000)
+	MCFG_DEVICE_ADD("ay1", YM2149, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	MCFG_SOUND_ADD("ay2", YM2149, 1500000)
+	MCFG_DEVICE_ADD("ay2", YM2149, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	MCFG_SOUND_ADD("ay3", YM2149, 1500000)
+	MCFG_DEVICE_ADD("ay3", YM2149, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(calorie_state::caloriee)
 	calorie(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_317_0004,4000000)         /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(calorie_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_317_0004,4000000)         /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(calorie_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 

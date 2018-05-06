@@ -28,10 +28,11 @@ FLOPPY_FORMATS_MEMBER( nascom_fdc_device::floppy_formats )
 	FLOPPY_NASCOM_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( nascom_floppies )
-	SLOT_INTERFACE("55e", TEAC_FD_55E)
-	SLOT_INTERFACE("55f", TEAC_FD_55F)
-SLOT_INTERFACE_END
+static void nascom_floppies(device_slot_interface &device)
+{
+	device.option_add("55e", TEAC_FD_55E);
+	device.option_add("55f", TEAC_FD_55F);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration

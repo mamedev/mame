@@ -250,9 +250,9 @@ void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 #define IGS036_CPU ARM7
 
 MACHINE_CONFIG_START(igs_m036_state::igs_m036)
-	MCFG_CPU_ADD("maincpu",IGS036_CPU, 20000000)
+	MCFG_DEVICE_ADD("maincpu",IGS036_CPU, 20000000)
 
-	MCFG_CPU_PROGRAM_MAP(igs_m036_map)
+	MCFG_DEVICE_PROGRAM_MAP(igs_m036_map)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -269,9 +269,9 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(igs_m036_state::igs_m036_tt)
-	MCFG_CPU_ADD("maincpu",IGS036_CPU, 20000000)
+	MCFG_DEVICE_ADD("maincpu",IGS036_CPU, 20000000)
 
-	MCFG_CPU_PROGRAM_MAP(igs_m036_map)
+	MCFG_DEVICE_PROGRAM_MAP(igs_m036_map)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

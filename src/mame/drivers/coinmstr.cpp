@@ -1255,9 +1255,9 @@ uint32_t coinmstr_state::screen_update_coinmstr(screen_device &screen, bitmap_in
 
 
 MACHINE_CONFIG_START(coinmstr_state::coinmstr)
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 7 MHz.
-	MCFG_CPU_PROGRAM_MAP(coinmstr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", coinmstr_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK) // 7 MHz.
+	MCFG_DEVICE_PROGRAM_MAP(coinmstr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", coinmstr_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("PIA0.A"))
@@ -1290,40 +1290,40 @@ MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK)
+	MCFG_DEVICE_ADD("aysnd", AY8910, SND_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coinmstr_state::quizmstr)
 	coinmstr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(quizmstr_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(quizmstr_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coinmstr_state::trailblz)
 	coinmstr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(trailblz_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(trailblz_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coinmstr_state::supnudg2)
 	coinmstr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(supnudg2_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(supnudg2_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coinmstr_state::pokeroul)
 	coinmstr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(pokeroul_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(pokeroul_io_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coinmstr_state::jpcoin)
 	coinmstr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(jpcoin_map)
-	MCFG_CPU_IO_MAP(jpcoin_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(jpcoin_map)
+	MCFG_DEVICE_IO_MAP(jpcoin_io_map)
 //  MCFG_NVRAM_ADD_0FILL("attr_ram3")
 MACHINE_CONFIG_END
 

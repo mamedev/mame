@@ -546,20 +546,20 @@ void hnayayoi_state::machine_reset()
 MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 20000000/4 )        /* 5 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(hnayayoi_map)
-	MCFG_CPU_IO_MAP(hnayayoi_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 20000000/4 )        /* 5 MHz ???? */
+	MCFG_DEVICE_PROGRAM_MAP(hnayayoi_map)
+	MCFG_DEVICE_IO_MAP(hnayayoi_io_map)
 
 	MCFG_DEVICE_ADD("nmiclock", CLOCK, 8000)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(hnayayoi_state, nmi_clock_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, hnayayoi_state, nmi_clock_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(hnayayoi_state, coin_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("msm", msm5205_device, vclk_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(hnayayoi_state, nmi_enable_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, hnayayoi_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("msm", msm5205_device, vclk_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, hnayayoi_state, nmi_enable_w)) MCFG_DEVCB_INVERT
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -578,8 +578,8 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 20000000/8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(hnayayoi_state, irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 20000000/8)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, hnayayoi_state, irqhandler))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -587,31 +587,31 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hnayayoi_state::hnfubuki)
 	hnayayoi(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hnfubuki_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hnfubuki_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
 	MCFG_DEVICE_MODIFY("mainlatch") // D5
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(hnayayoi_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, hnayayoi_state, nmi_enable_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hnayayoi_state::untoucha)
 	hnayayoi(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(untoucha_map)
-	MCFG_CPU_IO_MAP(untoucha_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(untoucha_map)
+	MCFG_DEVICE_IO_MAP(untoucha_io_map)
 
 	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("msm", msm5205_device, vclk_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(hnayayoi_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("msm", msm5205_device, vclk_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, hnayayoi_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // ?
 
 	MCFG_DEVICE_MODIFY("crtc")

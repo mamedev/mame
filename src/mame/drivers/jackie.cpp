@@ -604,19 +604,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(jackie_state::irq)
 MACHINE_CONFIG_START(jackie_state::jackie)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(jackie_prg_map)
-	MCFG_CPU_IO_MAP(jackie_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(jackie_prg_map)
+	MCFG_DEVICE_IO_MAP(jackie_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jackie_state, irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("ppi1", I8255A, 0) // D8255AC
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(jackie_state, nmi_and_coins_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, jackie_state, nmi_and_coins_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
 
 	MCFG_DEVICE_ADD("ppi2", I8255A, 0) // D8255AC
 	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(jackie_state, lamps_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jackie_state, lamps_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -633,7 +633,7 @@ MACHINE_CONFIG_START(jackie_state::jackie)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

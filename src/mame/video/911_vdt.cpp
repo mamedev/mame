@@ -813,7 +813,7 @@ MACHINE_CONFIG_START(vdt911_device::device_add_mconfig)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
+	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.50)
 
 	MCFG_PALETTE_ADD("palette", 8)

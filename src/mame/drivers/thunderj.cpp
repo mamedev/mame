@@ -243,11 +243,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(thunderj_state::thunderj)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(extra_map)
+	MCFG_DEVICE_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(extra_map)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -262,7 +262,7 @@ MACHINE_CONFIG_START(thunderj_state::thunderj)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(thunderj_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(*this, thunderj_state, scanline_int_write_line))
 	MCFG_ATARI_VAD_PLAYFIELD(thunderj_state, "gfxdecode", get_playfield_tile_info)
 	MCFG_ATARI_VAD_PLAYFIELD2(thunderj_state, "gfxdecode", get_playfield2_tile_info)
 	MCFG_ATARI_VAD_ALPHA(thunderj_state, "gfxdecode", get_alpha_tile_info)

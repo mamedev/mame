@@ -189,9 +189,9 @@ INPUT_PORTS_END
 /* Machine driver */
 MACHINE_CONFIG_START(ut88_state::ut88)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 2000000)
-	MCFG_CPU_PROGRAM_MAP(ut88_mem)
-	MCFG_CPU_IO_MAP(ut88_io)
+	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(ut88_mem)
+	MCFG_DEVICE_IO_MAP(ut88_io)
 	MCFG_MACHINE_RESET_OVERRIDE(ut88_state, ut88 )
 
 	/* video hardware */
@@ -209,18 +209,18 @@ MACHINE_CONFIG_START(ut88_state::ut88)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ut88_state, ut88_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(ut88_state, ut88_8255_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(ut88_state, ut88_8255_portc_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ut88_state, ut88_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, ut88_state, ut88_8255_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ut88_state, ut88_8255_portc_r))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rku_cassette_formats)
@@ -232,9 +232,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ut88_state::ut88mini)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 2000000)
-	MCFG_CPU_PROGRAM_MAP(ut88mini_mem)
-	MCFG_CPU_IO_MAP(ut88mini_io)
+	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(ut88mini_mem)
+	MCFG_DEVICE_IO_MAP(ut88mini_io)
 	MCFG_MACHINE_START_OVERRIDE(ut88_state,ut88mini)
 	MCFG_MACHINE_RESET_OVERRIDE(ut88_state, ut88mini )
 

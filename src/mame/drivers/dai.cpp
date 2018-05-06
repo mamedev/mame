@@ -189,19 +189,19 @@ GFXDECODE_END
 /* machine definition */
 MACHINE_CONFIG_START(dai_state::dai)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 2000000)
-	MCFG_CPU_PROGRAM_MAP(dai_mem)
-	MCFG_CPU_IO_MAP(dai_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(dai_state,int_ack)
+	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(dai_mem)
+	MCFG_DEVICE_IO_MAP(dai_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(dai_state,int_ack)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(2000000)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("custom", dai_sound_device, set_input_ch0))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("custom", dai_sound_device, set_input_ch0))
 	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("custom", dai_sound_device, set_input_ch1))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("custom", dai_sound_device, set_input_ch1))
 	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("custom", dai_sound_device, set_input_ch2))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("custom", dai_sound_device, set_input_ch2))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
@@ -224,7 +224,7 @@ MACHINE_CONFIG_START(dai_state::dai)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", DAI_SOUND, 0)
+	MCFG_DEVICE_ADD("custom", DAI_SOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -236,8 +236,8 @@ MACHINE_CONFIG_START(dai_state::dai)
 	/* tms5501 */
 	MCFG_DEVICE_ADD("tms5501", TMS5501, 2000000)
 	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE))
-	MCFG_TMS5501_XI_CALLBACK(READ8(dai_state, dai_keyboard_r))
-	MCFG_TMS5501_XO_CALLBACK(WRITE8(dai_state, dai_keyboard_w))
+	MCFG_TMS5501_XI_CALLBACK(READ8(*this, dai_state, dai_keyboard_r))
+	MCFG_TMS5501_XO_CALLBACK(WRITE8(*this, dai_state, dai_keyboard_w))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

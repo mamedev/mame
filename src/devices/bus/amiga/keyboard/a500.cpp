@@ -138,8 +138,8 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(a500_kbd_device::device_add_mconfig)
-	MCFG_CPU_ADD("ic1", M6502, XTAL(3'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(mpu6500_map)
+	MCFG_DEVICE_ADD("ic1", M6502, XTAL(3'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mpu6500_map)
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *a500_kbd_device::device_rom_region() const

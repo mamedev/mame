@@ -463,9 +463,9 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
 
 MACHINE_CONFIG_START(intv_state::intv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CP1610, XTAL(3'579'545)/4)        /* Colorburst/4 */
-	MCFG_CPU_PROGRAM_MAP(intv_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt)
+	MCFG_DEVICE_ADD("maincpu", CP1610, XTAL(3'579'545)/4)        /* Colorburst/4 */
+	MCFG_DEVICE_PROGRAM_MAP(intv_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -489,9 +489,9 @@ MACHINE_CONFIG_START(intv_state::intv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8914", AY8914, XTAL(3'579'545)/2)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("iopt_right_ctrl", intv_control_port_device, ctrl_r))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("iopt_left_ctrl",  intv_control_port_device, ctrl_r))
+	MCFG_DEVICE_ADD("ay8914", AY8914, XTAL(3'579'545)/2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("iopt_right_ctrl", intv_control_port_device, ctrl_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("iopt_left_ctrl",  intv_control_port_device, ctrl_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	/* cartridge */
@@ -504,14 +504,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(intv_state::intv2)
 	intv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(intv2_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(intv2_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(intv_state::intvoice)
 	intv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(intvoice_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(intvoice_mem)
 
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_DEVICE_ADD("voice", INTV_ROM_VOICE, 0)
@@ -519,13 +519,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(intv_state::intvecs)
 	intv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(intvecs_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(intvecs_mem)
 
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_DEVICE_ADD("ecs", INTV_ROM_ECS, 0)
 
-	MCFG_SOUND_ADD("speech", SP0256, 3120000)
+	MCFG_DEVICE_ADD("speech", SP0256, 3120000)
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -541,12 +541,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(intv_state::intvkbd)
 	intv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(intvkbd_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(intvkbd_mem)
 
-	MCFG_CPU_ADD("keyboard", M6502, XTAL(7'159'090)/8)
-	MCFG_CPU_PROGRAM_MAP(intvkbd2_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt2)
+	MCFG_DEVICE_ADD("keyboard", M6502, XTAL(7'159'090)/8)
+	MCFG_DEVICE_PROGRAM_MAP(intvkbd2_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

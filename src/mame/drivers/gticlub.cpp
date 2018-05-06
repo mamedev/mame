@@ -953,16 +953,16 @@ uint32_t gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb3
 MACHINE_CONFIG_START(gticlub_state::gticlub)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
-	MCFG_CPU_PROGRAM_MAP(gticlub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gticlub_state,  gticlub_vblank)
+	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
+	MCFG_DEVICE_PROGRAM_MAP(gticlub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gticlub_state,  gticlub_vblank)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_memmap)
+	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, XTAL(36'000'000))
+	MCFG_DEVICE_ADD("dsp", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_CPU_DATA_MAP(sharc_map)
+	MCFG_DEVICE_DATA_MAP(sharc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -1062,19 +1062,19 @@ MACHINE_RESET_MEMBER(gticlub_state,hangplt)
 MACHINE_CONFIG_START(gticlub_state::hangplt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
-	MCFG_CPU_PROGRAM_MAP(hangplt_map)
+	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
+	MCFG_DEVICE_PROGRAM_MAP(hangplt_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_memmap)
+	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, XTAL(36'000'000))
+	MCFG_DEVICE_ADD("dsp", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_CPU_DATA_MAP(hangplt_sharc0_map)
+	MCFG_DEVICE_DATA_MAP(hangplt_sharc0_map)
 
-	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL(36'000'000))
+	MCFG_DEVICE_ADD("dsp2", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_CPU_DATA_MAP(hangplt_sharc1_map)
+	MCFG_DEVICE_DATA_MAP(hangplt_sharc1_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -1094,14 +1094,14 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 	MCFG_VOODOO_TMUMEM(2,2)
 	MCFG_VOODOO_SCREEN_TAG("lscreen")
 	MCFG_VOODOO_CPU_TAG("dsp")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(gticlub_state,voodoo_vblank_0))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, gticlub_state,voodoo_vblank_0))
 
 	MCFG_DEVICE_ADD("voodoo1", VOODOO_1, STD_VOODOO_1_CLOCK)
 	MCFG_VOODOO_FBMEM(2)
 	MCFG_VOODOO_TMUMEM(2,2)
 	MCFG_VOODOO_SCREEN_TAG("rscreen")
 	MCFG_VOODOO_CPU_TAG("dsp2")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(gticlub_state,voodoo_vblank_1))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, gticlub_state,voodoo_vblank_1))
 
 	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
 	MCFG_K033906_VOODOO("voodoo0")

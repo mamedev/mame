@@ -414,14 +414,6 @@ if not _OPTIONS["BIGENDIAN"] then
 	_OPTIONS["BIGENDIAN"] = "0"
 end
 
-if not _OPTIONS["NOASM"] then
-	if _OPTIONS["targetos"]=="emscripten" then
-		_OPTIONS["NOASM"] = "1"
-	else
-		_OPTIONS["NOASM"] = "0"
-	end
-end
-
 if _OPTIONS["NOASM"]=="1" and not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 	_OPTIONS["FORCE_DRC_C_BACKEND"] = "1"
 end

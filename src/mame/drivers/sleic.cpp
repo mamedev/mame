@@ -69,8 +69,8 @@ DRIVER_INIT_MEMBER(sleic_state,sleic)
 
 MACHINE_CONFIG_START(sleic_state::sleic)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, 8000000)
-	MCFG_CPU_PROGRAM_MAP(sleic_map)
+	MCFG_DEVICE_ADD("maincpu", I8088, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(sleic_map)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

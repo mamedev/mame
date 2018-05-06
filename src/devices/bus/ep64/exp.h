@@ -143,7 +143,7 @@ protected:
 DECLARE_DEVICE_TYPE(EP64_EXPANSION_BUS_SLOT, ep64_expansion_bus_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( ep64_expansion_bus_cards );
+void ep64_expansion_bus_cards(device_slot_interface &device);
 
 
 #endif // MAME_BUS_EP64_EXP_H

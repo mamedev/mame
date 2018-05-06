@@ -152,10 +152,10 @@ DEFINE_DEVICE_TYPE(ISA8_PGC, isa8_pgc_device, "isa_ibm_pgc", "IBM Professional G
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(24'000'000)/3)
-	MCFG_CPU_PROGRAM_MAP(pgc_map)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(24'000'000)/3)
+	MCFG_DEVICE_PROGRAM_MAP(pgc_map)
 #if 0
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(isa8_pgc_device, irq_callback)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(isa8_pgc_device, irq_callback)
 #endif
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", isa8_pgc_device, scanline_callback,
@@ -169,7 +169,7 @@ MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DRIVER(isa8_pgc_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 #if 0
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(isa8_pgc_device, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, isa8_pgc_device, vblank_irq))
 #endif
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgc)

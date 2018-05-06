@@ -210,6 +210,8 @@ protected:
 	ppc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map);
 
 public:
+	virtual ~ppc_device() override;
+
 	void set_bus_frequency(uint32_t bus_frequency) { c_bus_frequency = bus_frequency; }
 	void set_bus_frequency(const XTAL &xtal) { set_bus_frequency(xtal.value()); }
 

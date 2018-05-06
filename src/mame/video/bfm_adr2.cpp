@@ -555,10 +555,10 @@ MACHINE_CONFIG_START(bfm_adder2_device::device_add_mconfig)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, bfm_adder2_device, update_screen)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bfm_adder2_device, adder2_vbl_w))      // board has a VBL IRQ
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bfm_adder2_device, adder2_vbl_w))      // board has a VBL IRQ
 
 	MCFG_PALETTE_ADD("palette", 16)
 
-	MCFG_CPU_ADD("adder2", M6809, ADDER_CLOCK/4 )  // adder2 board 6809 CPU at 2 Mhz
-	MCFG_CPU_PROGRAM_MAP(adder2_memmap)             // setup adder2 board memorymap
+	MCFG_DEVICE_ADD("adder2", M6809, ADDER_CLOCK/4 )  // adder2 board 6809 CPU at 2 Mhz
+	MCFG_DEVICE_PROGRAM_MAP(adder2_memmap)             // setup adder2 board memorymap
 MACHINE_CONFIG_END

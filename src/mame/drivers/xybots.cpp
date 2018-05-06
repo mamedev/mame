@@ -177,8 +177,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(xybots_state::xybots)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_SLAPSTIC_ADD("slapstic", 107)
 
@@ -205,7 +205,7 @@ MACHINE_CONFIG_START(xybots_state::xybots)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(xybots_state, screen_update_xybots)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(xybots_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xybots_state, video_int_write_line))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

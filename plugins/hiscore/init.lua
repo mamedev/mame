@@ -94,7 +94,8 @@ function hiscore.startplugin()
 		file = io.open( hiscore_plugin_path .. "/hiscore.dat", "r" );
 	  end
 	  if emu.softname() ~= "" then
-		rm_match = '^' .. emu.romname() .. ',' .. emu.softname() .. ':';
+		local soft = emu.softname():match("([^:]*)$")
+		rm_match = '^' .. emu.romname() .. ',' .. soft .. ':';
 	  else
 		rm_match = '^' .. emu.romname() .. ':';
 	  end
@@ -148,7 +149,8 @@ function hiscore.startplugin()
 	local function get_file_name ()
 	  local r;
 	  if emu.softname() ~= "" then
-		r = hiscore_path .. '/' .. emu.romname() .. "_" .. emu.softname() .. ".hi";
+		local soft = emu.softname():match("([^:]*)$")
+		r = hiscore_path .. '/' .. emu.romname() .. "_" .. soft .. ".hi";
 	  else
 		r = hiscore_path .. '/' .. emu.romname() .. ".hi";
 	  end

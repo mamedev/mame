@@ -558,12 +558,12 @@ MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
 MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)
-	MCFG_CPU_PROGRAM_MAP(lsasquad_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lsasquad_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK / 4)
+	MCFG_DEVICE_PROGRAM_MAP(lsasquad_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lsasquad_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(lsasquad_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(lsasquad_sound_map)
 								/* IRQs are triggered by the YM2203 */
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MASTER_CLOCK / 8)
 
@@ -576,7 +576,7 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -598,13 +598,13 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", YM2149, MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("aysnd", YM2149, MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(lsasquad_state, unk))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lsasquad_state, unk))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, lsasquad_state, unk))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lsasquad_state, unk))
 	MCFG_SOUND_ROUTE(0, "mono", 0.12)
 	MCFG_SOUND_ROUTE(1, "mono", 0.12)
 	MCFG_SOUND_ROUTE(2, "mono", 0.12)
@@ -614,24 +614,24 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(lsasquad_state::storming)
 	lsasquad(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(storming_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(storming_map)
 
 	MCFG_DEVICE_REMOVE("bmcu")
 
-	MCFG_SOUND_REPLACE("aysnd", AY8910, MASTER_CLOCK / 8) // AY-3-8910A
+	MCFG_DEVICE_REPLACE("aysnd", AY8910, MASTER_CLOCK / 8) // AY-3-8910A
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)
-	MCFG_CPU_PROGRAM_MAP(daikaiju_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lsasquad_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK / 4)
+	MCFG_DEVICE_PROGRAM_MAP(daikaiju_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lsasquad_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(daikaiju_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(daikaiju_sound_map)
 	/* IRQs are triggered by the YM2203 */
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MASTER_CLOCK / 8)
@@ -644,7 +644,7 @@ MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -664,13 +664,13 @@ MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", YM2149, MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("aysnd", YM2149, MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(lsasquad_state, unk))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lsasquad_state, unk))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, lsasquad_state, unk))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lsasquad_state, unk))
 	MCFG_SOUND_ROUTE(0, "mono", 0.12)
 	MCFG_SOUND_ROUTE(1, "mono", 0.12)
 	MCFG_SOUND_ROUTE(2, "mono", 0.12)

@@ -1044,16 +1044,16 @@ MACHINE_RESET_MEMBER(playmark_state,playmark)
 MACHINE_CONFIG_START(playmark_state::bigtwin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(bigtwin_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bigtwin_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, 12000000)
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000)
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1084,16 +1084,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(playmark_state::bigtwinb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(bigtwinb_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(bigtwinb_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1124,17 +1124,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(playmark_state::wbeachvl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(wbeachvl_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wbeachvl_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* 12MHz with internal 4x divisor */
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w)) // wrong?
-	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
-//  MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w)) // probably closer to this, but this only supports 2 sample bank bits
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* 12MHz with internal 4x divisor */
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // wrong?
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
+//  MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w)) // probably closer to this, but this only supports 2 sample bank bits
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
@@ -1168,16 +1168,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(playmark_state::excelsr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(excelsr_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(excelsr_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* 12MHz with internal 4x divisor */
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* 12MHz with internal 4x divisor */
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1208,16 +1208,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(playmark_state::hrdtimes)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(hrdtimes_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(hrdtimes_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* verified on pcb */
-//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
-	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* verified on pcb */
+//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w))
 	MCFG_DEVICE_DISABLE()       /* Internal code is not dumped yet */
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
@@ -1249,16 +1249,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(playmark_state::hotmind)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(hotmind_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold) // irq 2 and 6 point to the same location on hotmind
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(hotmind_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold) // irq 2 and 6 point to the same location on hotmind
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* verified on pcb */
-//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
-	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* verified on pcb */
+//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
@@ -1295,16 +1295,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(playmark_state::luckboomh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(luckboomh_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(luckboomh_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* verified on pcb */
-//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
-	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* verified on pcb */
+//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

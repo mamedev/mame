@@ -116,8 +116,8 @@ protected:
 DECLARE_DEVICE_TYPE(ADAM_EXPANSION_SLOT, adam_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( adam_slot1_devices );
-SLOT_INTERFACE_EXTERN( adam_slot2_devices );
-SLOT_INTERFACE_EXTERN( adam_slot3_devices );
+void adam_slot1_devices(device_slot_interface &device);
+void adam_slot2_devices(device_slot_interface &device);
+void adam_slot3_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_ADAM_EXP_H

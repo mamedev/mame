@@ -179,14 +179,14 @@ TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer2)
 }
 
 MACHINE_CONFIG_START(gamate_state::gamate)
-	MCFG_CPU_ADD("maincpu", M6502, 4433000/2) // NCR 65CX02
-	MCFG_CPU_PROGRAM_MAP(gamate_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, 4433000/2) // NCR 65CX02
+	MCFG_DEVICE_PROGRAM_MAP(gamate_mem)
 
 	MCFG_GAMATE_VIDEO_ADD("video")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") // Stereo headphone output
-	MCFG_SOUND_ADD("ay8910", AY8910, 4433000 / 4) // AY compatible, no actual AY chip present
+	MCFG_DEVICE_ADD("ay8910", AY8910, 4433000 / 4) // AY compatible, no actual AY chip present
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 0.25)

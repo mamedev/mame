@@ -406,15 +406,16 @@ static const z80_daisy_config x1_daisy[] =
 	{ nullptr }
 };
 
-static SLOT_INTERFACE_START( x1_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void x1_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(x1twin_state::x1twin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("x1_cpu", Z80, X1_MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(x1_mem)
-	MCFG_CPU_IO_MAP(x1_io)
+	MCFG_DEVICE_ADD("x1_cpu", Z80, X1_MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(x1_mem)
+	MCFG_DEVICE_IO_MAP(x1_io)
 	MCFG_Z80_DAISY_CHAIN(x1_daisy)
 
 	MCFG_DEVICE_ADD("iobank", ADDRESS_MAP_BANK, 0)
@@ -426,27 +427,27 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg3))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc", z80ctc_device, trg2))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc", z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc", z80ctc_device, trg2))
 
 	MCFG_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(x1_state, x1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(x1_state, x1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(x1_state, x1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(x1_state, x1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(x1_state, x1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(x1_state, x1_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, x1_state, x1_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, x1_state, x1_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, x1_state, x1_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, x1_state, x1_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, x1_state, x1_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, x1_state, x1_portc_w))
 
 	MCFG_MACHINE_START_OVERRIDE(x1twin_state,x1)
 	MCFG_MACHINE_RESET_OVERRIDE(x1twin_state,x1)
 
 	#if 0
-	MCFG_CPU_ADD("pce_cpu", H6280, PCE_MAIN_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(pce_mem)
-	MCFG_CPU_IO_MAP(pce_io)
+	MCFG_DEVICE_ADD("pce_cpu", H6280, PCE_MAIN_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(pce_mem)
+	MCFG_DEVICE_IO_MAP(pce_io)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", pce_interrupt, "pce_screen", 0, 1)
 	#endif
 
@@ -478,7 +479,7 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 
 	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
 	// TODO: guesswork, try to implicitily start the motor
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(x1_state, hdl_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, x1_state, hdl_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)
@@ -498,7 +499,7 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 //  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
-	MCFG_SOUND_ADD("ay", AY8910, MAIN_CLOCK/8)
+	MCFG_DEVICE_ADD("ay", AY8910, MAIN_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(0, "x1_l",  0.25)
@@ -517,7 +518,7 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
 
 #if 0
-	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
+	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
 	MCFG_C6280_CPU("pce_cpu")
 	MCFG_SOUND_ROUTE(0, "pce_l", 0.5)
 	MCFG_SOUND_ROUTE(1, "pce_r", 0.5)

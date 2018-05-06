@@ -183,10 +183,10 @@ INTERRUPT_GEN_MEMBER(dlair2_state::dlair2_timer_irq)
 MACHINE_CONFIG_START(dlair2_state::dlair2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088 , MAIN_CLOCK/3)   /* Schematics show I8088 "max" CPU */
-	MCFG_CPU_PROGRAM_MAP(dlair2_map)
-	MCFG_CPU_IO_MAP(dlair2_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(dlair2_state, dlair2_timer_irq, 60) // timer irq, TODO: timing
+	MCFG_DEVICE_ADD("maincpu", I8088 , MAIN_CLOCK/3)   /* Schematics show I8088 "max" CPU */
+	MCFG_DEVICE_PROGRAM_MAP(dlair2_map)
+	MCFG_DEVICE_IO_MAP(dlair2_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(dlair2_state, dlair2_timer_irq, 60) // timer irq, TODO: timing
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

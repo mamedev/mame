@@ -13,14 +13,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/timeplt.h"
 #include "audio/timeplt.h"
 
 #include "machine/gen_latch.h"
 #include "speaker.h"
-
-
-static constexpr XTAL MASTER_CLOCK(14'318'181);
 
 
 DEFINE_DEVICE_TYPE(TIMEPLT_AUDIO, timeplt_audio_device, "timplt_audio", "Time Pilot Audio")
@@ -195,39 +191,31 @@ void locomotn_audio_device::locomotn_sound_map(address_map &map)
 MACHINE_CONFIG_START(timeplt_audio_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("tpsound", Z80, MASTER_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(timeplt_sound_map)
+	MCFG_DEVICE_ADD(m_soundcpu, Z80, DERIVED_CLOCK(1, 8))
+	MCFG_DEVICE_PROGRAM_MAP(timeplt_sound_map)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
 
-	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(timeplt_audio_device, portB_r))
+	MCFG_DEVICE_ADD("ay1", AY8910, DERIVED_CLOCK(1, 8))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(m_soundlatch, generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, timeplt_audio_device, portB_r))
 	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.60)
 	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.60)
 	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.60)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, DERIVED_CLOCK(1, 8))
 	MCFG_SOUND_ROUTE(0, "filter.1.0", 0.60)
 	MCFG_SOUND_ROUTE(1, "filter.1.1", 0.60)
 	MCFG_SOUND_ROUTE(2, "filter.1.2", 0.60)
 
-	MCFG_FILTER_RC_ADD("filter.0.0", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter.0.1", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter.0.2", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	for (required_device<filter_rc_device> &filter : m_filter_0)
+		FILTER_RC(config, filter).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_FILTER_RC_ADD("filter.1.0", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter.1.1", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter.1.2", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	for (required_device<filter_rc_device> &filter : m_filter_1)
+		FILTER_RC(config, filter).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -235,8 +223,8 @@ MACHINE_CONFIG_START(locomotn_audio_device::device_add_mconfig)
 	timeplt_audio_device::device_add_mconfig(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("tpsound")
-	MCFG_CPU_PROGRAM_MAP(locomotn_sound_map)
+	MCFG_DEVICE_MODIFY("tpsound")
+	MCFG_DEVICE_PROGRAM_MAP(locomotn_sound_map)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

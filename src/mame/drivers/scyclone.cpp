@@ -607,17 +607,17 @@ INTERRUPT_GEN_MEMBER(scyclone_state::irq)
 MACHINE_CONFIG_START(scyclone_state::scyclone)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5000000/2) // MOSTEK Z80-CPU   ? MHz  (there's also a 9.987MHz XTAL)  intermissions seem driven directly by CPU speed for reference
-	MCFG_CPU_PROGRAM_MAP(scyclone_map)
-	MCFG_CPU_IO_MAP(scyclone_iomap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", scyclone_state, irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, 5000000/2) // MOSTEK Z80-CPU   ? MHz  (there's also a 9.987MHz XTAL)  intermissions seem driven directly by CPU speed for reference
+	MCFG_DEVICE_PROGRAM_MAP(scyclone_map)
+	MCFG_DEVICE_IO_MAP(scyclone_iomap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scyclone_state, irq)
 
 	// sound ?
-	MCFG_CPU_ADD("subcpu", Z80, 5000000/2) // LH0080 Z80-CPU SHARP  ? MHz   (5Mhz XTAL on this sub-pcb)
-	MCFG_CPU_PROGRAM_MAP(scyclone_sub_map)
-	MCFG_CPU_IO_MAP(scyclone_sub_iomap)
+	MCFG_DEVICE_ADD("subcpu", Z80, 5000000/2) // LH0080 Z80-CPU SHARP  ? MHz   (5Mhz XTAL on this sub-pcb)
+	MCFG_DEVICE_PROGRAM_MAP(scyclone_sub_map)
+	MCFG_DEVICE_IO_MAP(scyclone_sub_iomap)
 	// no idea, but it does wait on an irq in places, irq0 increases a register checked in the wait loop so without it sound dies after a while
-	MCFG_CPU_PERIODIC_INT_DRIVER(scyclone_state, irq0_line_hold, 400*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(scyclone_state, irq0_line_hold, 400*60)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -639,31 +639,31 @@ MACHINE_CONFIG_START(scyclone_state::scyclone)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("snsnd0", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd0", SN76477)
 	MCFG_SN76477_ENABLE(1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
 
-	MCFG_SOUND_ADD("snsnd1", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd1", SN76477)
 	MCFG_SN76477_ENABLE(1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
 
 	// this is just taken from route16.cpp
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0)
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0)
 	MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0)
+	MCFG_DEVICE_ADD("dac2", DAC_8BIT_R2R, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 
 	MCFG_DEVICE_ADD("vref2", VOLTAGE_REGULATOR, 0)
 	MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 
 MACHINE_CONFIG_END
 

@@ -44,7 +44,7 @@ const tiny_rom_entry *sega_837_13551_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(sega_837_13551_device::device_add_mconfig)
-	MCFG_CPU_ADD("iomcu", TMP90PH44, 10000000) // unknown clock
+	MCFG_DEVICE_ADD("iomcu", TMP90PH44, 10000000) // unknown clock
 MACHINE_CONFIG_END
 
 ioport_constructor sega_837_13551_device::device_input_ports() const

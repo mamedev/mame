@@ -307,12 +307,12 @@ READ8_MEMBER(barata_state::port2_r)
 
 MACHINE_CONFIG_START(barata_state::barata)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8051, CPU_CLOCK)
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(barata_state, port0_w))
+	MCFG_DEVICE_ADD("maincpu", I8051, CPU_CLOCK)
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, barata_state, port0_w))
 	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("PORT1"))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(barata_state, port2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(barata_state, port2_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(barata_state, fpga_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, barata_state, port2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, barata_state, port2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, barata_state, fpga_w))
 
 	MCFG_DEFAULT_LAYOUT( layout_barata )
 

@@ -59,7 +59,7 @@ private:
 
 } } } // end namespace bus::ti99::colorbus
 
-SLOT_INTERFACE_EXTERN(ti99_colorbus_port);
+void ti99_colorbus_port(device_slot_interface &device);
 
 #define MCFG_COLORBUS_MOUSE_ADD( _tag )  \
 	MCFG_DEVICE_ADD(_tag, TI99_COLORBUS, 0) \

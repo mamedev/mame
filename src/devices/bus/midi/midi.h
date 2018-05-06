@@ -61,7 +61,7 @@ protected:
 
 DECLARE_DEVICE_TYPE(MIDI_PORT, midi_port_device)
 
-SLOT_INTERFACE_EXTERN(midiin_slot);
-SLOT_INTERFACE_EXTERN(midiout_slot);
+void midiin_slot(device_slot_interface &device);
+void midiout_slot(device_slot_interface &device);
 
 #endif // MAME_BUS_MIDI_MIDI_H

@@ -514,16 +514,16 @@ TIMER_DEVICE_CALLBACK_MEMBER ( sliver_state::obj_irq_cb )
 }
 
 MACHINE_CONFIG_START(sliver_state::sliver)
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(sliver_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sliver_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(sliver_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sliver_state, irq4_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("obj_actel", sliver_state, obj_irq_cb, attotime::from_hz(60)) /* unknown clock, causes "obj actel ready error" without this */
 	// irq 2 valid but not used?
 
-	MCFG_CPU_ADD("audiocpu", I8051, 8000000)
-	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
-	MCFG_CPU_IO_MAP(soundmem_io)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(sliver_state, oki_setbank))
+	MCFG_DEVICE_ADD("audiocpu", I8051, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(soundmem_prg)
+	MCFG_DEVICE_IO_MAP(soundmem_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, sliver_state, oki_setbank))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

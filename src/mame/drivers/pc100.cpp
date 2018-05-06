@@ -490,19 +490,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_10hz_irq)
 	}
 }
 
-static SLOT_INTERFACE_START( pc100_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void pc100_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 #define MASTER_CLOCK 6988800
 
 MACHINE_CONFIG_START(pc100_state::pc100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(pc100_map)
-	MCFG_CPU_IO_MAP(pc100_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc100_state, pc100_vblank_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(pc100_map)
+	MCFG_DEVICE_IO_MAP(pc100_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc100_state, pc100_vblank_irq)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("600hz", pc100_state, pc100_600hz_irq, attotime::from_hz(MASTER_CLOCK/600))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("100hz", pc100_state, pc100_100hz_irq, attotime::from_hz(MASTER_CLOCK/100))
@@ -510,34 +511,34 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("10hz", pc100_state, pc100_10hz_irq, attotime::from_hz(MASTER_CLOCK/10))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pc100_state, rtc_porta_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pc100_state, rtc_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc100_state, rtc_portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pc100_state, rtc_porta_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc100_state, rtc_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc100_state, rtc_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pc100_state, lower_mask_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pc100_state, upper_mask_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc100_state, crtc_bank_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pc100_state, lower_mask_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pc100_state, upper_mask_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc100_state, crtc_bank_w))
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_PIC8259_IN_SP_CB(GND) // ???
 
 	MCFG_DEVICE_ADD("uart8251", I8251, 0)
-	//MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	//MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir1_w))
+	//MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	//MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	//MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir1_w))
 
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc100_state, irqnmi_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(pc100_state, drqnmi_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc100_state, irqnmi_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, pc100_state, drqnmi_w))
 
 	MCFG_DEVICE_ADD("rtc", MSM58321, XTAL(32'768))
-	MCFG_MSM58321_D0_HANDLER(WRITELINE(pc100_state, rtc_portc_0_w))
-	MCFG_MSM58321_D1_HANDLER(WRITELINE(pc100_state, rtc_portc_1_w))
-	MCFG_MSM58321_D2_HANDLER(WRITELINE(pc100_state, rtc_portc_2_w))
-	MCFG_MSM58321_D3_HANDLER(WRITELINE(pc100_state, rtc_portc_3_w))
+	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, pc100_state, rtc_portc_0_w))
+	MCFG_MSM58321_D1_HANDLER(WRITELINE(*this, pc100_state, rtc_portc_1_w))
+	MCFG_MSM58321_D2_HANDLER(WRITELINE(*this, pc100_state, rtc_portc_2_w))
+	MCFG_MSM58321_D3_HANDLER(WRITELINE(*this, pc100_state, rtc_portc_3_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -555,7 +556,7 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("beeper", BEEP, 2400)
+	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 

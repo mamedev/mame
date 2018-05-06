@@ -128,18 +128,18 @@ ioport_constructor a2bus_mouse_device::device_input_ports() const
 -------------------------------------------------*/
 
 MACHINE_CONFIG_START(a2bus_mouse_device::device_add_mconfig)
-	MCFG_CPU_ADD(MOUSE_MCU_TAG, M68705P3, 2043600)
-	MCFG_M68705_PORTA_R_CB(READ8(a2bus_mouse_device, mcu_port_a_r))
-	MCFG_M68705_PORTB_R_CB(READ8(a2bus_mouse_device, mcu_port_b_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(a2bus_mouse_device, mcu_port_a_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(a2bus_mouse_device, mcu_port_b_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(a2bus_mouse_device, mcu_port_c_w))
+	MCFG_DEVICE_ADD(MOUSE_MCU_TAG, M68705P3, 2043600)
+	MCFG_M68705_PORTA_R_CB(READ8(*this, a2bus_mouse_device, mcu_port_a_r))
+	MCFG_M68705_PORTB_R_CB(READ8(*this, a2bus_mouse_device, mcu_port_b_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, a2bus_mouse_device, mcu_port_a_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, a2bus_mouse_device, mcu_port_b_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(*this, a2bus_mouse_device, mcu_port_c_w))
 
 	MCFG_DEVICE_ADD(MOUSE_PIA_TAG, PIA6821, 1021800)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(a2bus_mouse_device, pia_out_a))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a2bus_mouse_device, pia_out_b))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(a2bus_mouse_device, pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(a2bus_mouse_device, pia_irqb_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, a2bus_mouse_device, pia_out_a))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, a2bus_mouse_device, pia_out_b))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, a2bus_mouse_device, pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, a2bus_mouse_device, pia_irqb_w))
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------

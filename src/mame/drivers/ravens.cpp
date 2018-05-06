@@ -338,11 +338,11 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 
 MACHINE_CONFIG_START(ravens_state::ravens)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
-	MCFG_CPU_PROGRAM_MAP(ravens_mem)
-	MCFG_CPU_IO_MAP(ravens_io)
-	MCFG_S2650_SENSE_INPUT(READLINE(ravens_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(ravens_state, cass_w))
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
+	MCFG_DEVICE_PROGRAM_MAP(ravens_mem)
+	MCFG_DEVICE_IO_MAP(ravens_io)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, ravens_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, ravens_state, cass_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_ravens)
@@ -359,11 +359,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ravens_state::ravens2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
-	MCFG_CPU_PROGRAM_MAP(ravens_mem)
-	MCFG_CPU_IO_MAP(ravens2_io)
-	MCFG_S2650_SENSE_INPUT(READLINE(ravens_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(ravens_state, cass_w))
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
+	MCFG_DEVICE_PROGRAM_MAP(ravens_mem)
+	MCFG_DEVICE_IO_MAP(ravens2_io)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, ravens_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, ravens_state, cass_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(ravens_state, ravens2)
 

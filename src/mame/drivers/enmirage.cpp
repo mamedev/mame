@@ -97,9 +97,10 @@ FLOPPY_FORMATS_MEMBER( enmirage_state::floppy_formats )
 	FLOPPY_ESQ8IMG_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( ensoniq_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void ensoniq_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 WRITE_LINE_MEMBER(enmirage_state::mirage_doc_irq)
 {
@@ -214,23 +215,23 @@ WRITE8_MEMBER(enmirage_state::mirage_via_write_portb)
 }
 
 MACHINE_CONFIG_START(enmirage_state::mirage)
-	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
-	MCFG_CPU_PROGRAM_MAP(mirage_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(mirage_map)
 
 	MCFG_DEFAULT_LAYOUT( layout_mirage )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_ES5503_ADD("es5503", 7000000)
 	MCFG_ES5503_OUTPUT_CHANNELS(2)
-	MCFG_ES5503_IRQ_FUNC(WRITELINE(enmirage_state, mirage_doc_irq))
-	MCFG_ES5503_ADC_FUNC(READ8(enmirage_state, mirage_adc_read))
+	MCFG_ES5503_IRQ_FUNC(WRITELINE(*this, enmirage_state, mirage_doc_irq))
+	MCFG_ES5503_ADC_FUNC(READ8(*this, enmirage_state, mirage_adc_read))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("via6522", VIA6522, 1000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(enmirage_state, mirage_via_write_porta))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(enmirage_state, mirage_via_write_portb))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, enmirage_state, mirage_via_write_porta))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, enmirage_state, mirage_via_write_portb))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)

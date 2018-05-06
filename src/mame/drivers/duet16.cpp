@@ -333,13 +333,15 @@ static GFXDECODE_START(duet16)
 GFXDECODE_END
 
 
-static SLOT_INTERFACE_START( duet16_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void duet16_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
-SLOT_INTERFACE_START(duet16_keyboard_devices)
-	SLOT_INTERFACE("keyboard", SERIAL_KEYBOARD)
-SLOT_INTERFACE_END
+void duet16_keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("keyboard", SERIAL_KEYBOARD);
+}
 
 static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
@@ -350,63 +352,63 @@ static DEVICE_INPUT_DEFAULTS_START(keyboard)
 DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(duet16_state::duet16)
-	MCFG_CPU_ADD("maincpu", I8086, 24_MHz_XTAL / 3)
-	MCFG_CPU_PROGRAM_MAP(duet16_mem)
-	MCFG_CPU_IO_MAP(duet16_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, 24_MHz_XTAL / 3)
+	MCFG_DEVICE_PROGRAM_MAP(duet16_mem)
+	MCFG_DEVICE_IO_MAP(duet16_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
 
-	MCFG_CPU_ADD("i8741", I8741, 20_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD("i8741", I8741, 20_MHz_XTAL / 4)
 
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("dmac", AM9517A, 20_MHz_XTAL / 4)
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(duet16_state, hrq_w))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(duet16_state, dma_mem_r))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(duet16_state, dma_mem_w))
-	MCFG_AM9517A_IN_IOR_0_CB(DEVREAD8("fdc", upd765a_device, mdma_r))
-	MCFG_AM9517A_OUT_IOW_0_CB(DEVWRITE8("fdc", upd765a_device, mdma_w))
-	MCFG_AM9517A_OUT_EOP_CB(DEVWRITELINE("fdc", upd765a_device, tc_line_w))
+	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, duet16_state, hrq_w))
+	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, duet16_state, dma_mem_r))
+	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, duet16_state, dma_mem_w))
+	MCFG_AM9517A_IN_IOR_0_CB(READ8("fdc", upd765a_device, mdma_r))
+	MCFG_AM9517A_OUT_IOW_0_CB(WRITE8("fdc", upd765a_device, mdma_w))
+	MCFG_AM9517A_OUT_EOP_CB(WRITELINE("fdc", upd765a_device, tc_line_w))
 
 	MCFG_DEVICE_ADD("bgpit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(8_MHz_XTAL / 13)
 	MCFG_PIT8253_CLK1(8_MHz_XTAL / 13)
 	MCFG_PIT8253_CLK2(8_MHz_XTAL / 13)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("sio", upd7201_new_device, txca_w)) // TODO: selected through LS153
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", upd7201_new_device, rxca_w))
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("sio", upd7201_new_device, txcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", upd7201_new_device, rxcb_w))
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("kbusart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("kbusart", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("sio", upd7201_new_device, txca_w)) // TODO: selected through LS153
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", upd7201_new_device, rxca_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("sio", upd7201_new_device, txcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", upd7201_new_device, rxcb_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("kbusart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("kbusart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("itm", PTM6840, 0)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0.0, 0.0, (8_MHz_XTAL / 8).dvalue()) // C3 = 1MHz
-	MCFG_PTM6840_O3_CB(DEVWRITELINE("itm", ptm6840_device, set_c1)) // C1 = C2 = O3
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("itm", ptm6840_device, set_c2))
-	MCFG_PTM6840_IRQ_CB(DEVWRITELINE("tmint", input_merger_device, in_w<0>))
+	MCFG_PTM6840_O3_CB(WRITELINE("itm", ptm6840_device, set_c1)) // C1 = C2 = O3
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("itm", ptm6840_device, set_c2))
+	MCFG_PTM6840_IRQ_CB(WRITELINE("tmint", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD("sio", UPD7201_NEW, 8_MHz_XTAL / 2)
-	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("pic", pic8259_device, ir1_w)) // INT5
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("pic", pic8259_device, ir1_w)) // INT5
 
 	MCFG_DEVICE_ADD("kbusart", I8251, 8_MHz_XTAL / 4)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("kbd", rs232_port_device, write_txd))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("kbusart", i8251_device, write_cts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("kbint", input_merger_device, in_w<0>))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("kbint", input_merger_device, in_w<1>))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("kbd", rs232_port_device, write_txd))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("kbusart", i8251_device, write_cts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("kbint", input_merger_device, in_w<0>))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("kbint", input_merger_device, in_w<1>))
 
-	MCFG_RS232_PORT_ADD("kbd", duet16_keyboard_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("kbusart", i8251_device, write_rxd))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	MCFG_DEVICE_ADD("kbd", RS232_PORT, duet16_keyboard_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("kbusart", i8251_device, write_rxd))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("kbint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(DEVWRITELINE("pic", pic8259_device, ir5_w)) // INT2
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic", pic8259_device, ir5_w)) // INT2
 
 	MCFG_INPUT_MERGER_ANY_HIGH("tmint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(DEVWRITELINE("pic", pic8259_device, ir0_w)) // INT6
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic", pic8259_device, ir0_w)) // INT6
 
 	MCFG_UPD765A_ADD("fdc", true, false)
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dmac", am9517a_device, dreq0_w))
-	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic", pic8259_device, ir3_w)) // INT4
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dmac", am9517a_device, dreq0_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("pic", pic8259_device, ir3_w)) // INT4
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_SLOT_FIXED(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats)
@@ -428,11 +430,11 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 
 	MCFG_DEVICE_ADD("rtc", MSM58321, 32768_Hz_XTAL)
-	MCFG_MSM58321_D0_HANDLER(WRITELINE(duet16_state, rtc_d0_w))
-	MCFG_MSM58321_D1_HANDLER(WRITELINE(duet16_state, rtc_d1_w))
-	MCFG_MSM58321_D2_HANDLER(WRITELINE(duet16_state, rtc_d2_w))
-	MCFG_MSM58321_D3_HANDLER(WRITELINE(duet16_state, rtc_d3_w))
-	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(duet16_state, rtc_busy_w))
+	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, duet16_state, rtc_d0_w))
+	MCFG_MSM58321_D1_HANDLER(WRITELINE(*this, duet16_state, rtc_d1_w))
+	MCFG_MSM58321_D2_HANDLER(WRITELINE(*this, duet16_state, rtc_d2_w))
+	MCFG_MSM58321_D3_HANDLER(WRITELINE(*this, duet16_state, rtc_d3_w))
+	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(*this, duet16_state, rtc_busy_w))
 	MCFG_MSM58321_YEAR0(1980)
 	MCFG_MSM58321_DEFAULT_24H(true)
 MACHINE_CONFIG_END

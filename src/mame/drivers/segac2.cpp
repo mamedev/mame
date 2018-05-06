@@ -1540,9 +1540,9 @@ WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
 MACHINE_CONFIG_START(segac2_state::segac)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XL2_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
+	MCFG_DEVICE_ADD("maincpu", M68000, XL2_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
 
 	MCFG_MACHINE_START_OVERRIDE(segac2_state,segac2)
 	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
@@ -1551,19 +1551,19 @@ MACHINE_CONFIG_START(segac2_state::segac)
 	MCFG_DEVICE_ADD("io", SEGA_315_5296, XL2_CLOCK/6) // clock divider guessed
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
 	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_315_5296_IN_PORTC_CB(READ8(segac2_state, io_portc_r))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segac2_state, io_portd_w))
+	MCFG_315_5296_IN_PORTC_CB(READ8(*this, segac2_state, io_portc_r))
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segac2_state, io_portd_w))
 	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE"))
 	MCFG_315_5296_IN_PORTF_CB(IOPORT("COINAGE"))
 	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW"))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(segac2_state, io_porth_w))
+	MCFG_315_5296_OUT_PORTH_CB(WRITE8(*this, segac2_state, io_porth_w))
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
 	MCFG_SEGA315_5313_IS_PAL(false)
-	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(segac2_state, vdp_sndirqline_callback_c2));
-	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(segac2_state, vdp_lv6irqline_callback_c2));
-	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(segac2_state, vdp_lv4irqline_callback_c2));
+	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, segac2_state, vdp_sndirqline_callback_c2));
+	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, segac2_state, vdp_lv6irqline_callback_c2));
+	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, segac2_state, vdp_lv4irqline_callback_c2));
 	MCFG_SEGA315_5313_ALT_TIMING(1);
 	MCFG_VIDEO_SET_SCREEN("megadriv")
 
@@ -1574,7 +1574,7 @@ MACHINE_CONFIG_START(segac2_state::segac)
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segac2_state, screen_update_segac2_new)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(segac2_state, screen_vblank_megadriv))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, segac2_state, screen_vblank_megadriv))
 
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
@@ -1583,12 +1583,12 @@ MACHINE_CONFIG_START(segac2_state::segac)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3438, XL2_CLOCK/7)
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(segac2_state, segac2_irq2_interrupt))
+	MCFG_DEVICE_ADD("ymsnd", YM3438, XL2_CLOCK/7)
+	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segac2_state, segac2_irq2_interrupt))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	/* right channel not connected */
 
-	MCFG_SOUND_ADD("snsnd", SN76496, XL2_CLOCK/15)
+	MCFG_DEVICE_ADD("snsnd", SN76496, XL2_CLOCK/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1598,10 +1598,10 @@ MACHINE_CONFIG_START(segac2_state::segac2)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5296_OUT_CNT1_CB(DEVWRITELINE("upd", upd7759_device, reset_w))
+	MCFG_315_5296_OUT_CNT1_CB(WRITELINE("upd", upd7759_device, reset_w))
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("upd", UPD7759, XL1_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759, XL1_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

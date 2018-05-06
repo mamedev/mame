@@ -187,7 +187,8 @@ tms9914_device::tms9914_device(const machine_config &mconfig, const char *tag, d
 		  devcb_write_line(*this),
 		  devcb_write_line(*this),
 		  devcb_write_line(*this) },
-	  m_int_write_func(*this)
+	  m_int_write_func(*this),
+	  m_accrq_write_func(*this)
 {
 	// Silence compiler complaints about unused variables
 	(void)REG_INT0_RLC_BIT;
@@ -284,6 +285,7 @@ WRITE8_MEMBER(tms9914_device::reg8_w)
 
 	case REG_W_DO:
 		m_reg_do = data;
+		set_accrq(false);
 		if (!m_swrst) {
 			BIT_CLR(m_reg_int0_status , REG_INT0_BO_BIT);
 			update_int();
@@ -292,8 +294,12 @@ WRITE8_MEMBER(tms9914_device::reg8_w)
 			} else if (m_t_eoi_state == FSM_T_ENAS) {
 				m_t_eoi_state = FSM_T_ENIS;
 			}
+			bool update = sh_active();
 			if (m_sh_shfs) {
 				m_sh_shfs = false;
+				update = true;
+			}
+			if (update) {
 				update_fsm();
 			}
 		}
@@ -384,6 +390,9 @@ READ8_MEMBER(tms9914_device::reg8_r)
 
 	case REG_R_DI:
 		res = m_reg_di;
+		BIT_CLR(m_reg_int0_status , REG_INT0_BI_BIT);
+		update_int();
+		set_accrq(false);
 		if (!m_hdfa && m_ah_anhs) {
 			m_ah_anhs = false;
 			update_fsm();
@@ -401,6 +410,11 @@ READ8_MEMBER(tms9914_device::reg8_r)
 	return res;
 }
 
+READ_LINE_MEMBER(tms9914_device::cont_r)
+{
+	return m_c_state != FSM_C_CIDS && m_c_state != FSM_C_CADS;
+}
+
 // device-level overrides
 void tms9914_device::device_start()
 {
@@ -410,6 +424,7 @@ void tms9914_device::device_start()
 		f.resolve_safe();
 	}
 	m_int_write_func.resolve_safe();
+	m_accrq_write_func.resolve_safe();
 
 	m_sh_dly_timer = timer_alloc(SH_DELAY_TMR_ID);
 	m_ah_dly_timer = timer_alloc(AH_DELAY_TMR_ID);
@@ -431,6 +446,7 @@ void tms9914_device::device_reset()
 	m_stdl = false;
 	m_shdw = false;
 	m_vstdl = false;
+	m_accrq_line = true;    // Ensure change is propagated
 
 	m_reg_serial_p = 0;
 	m_reg_parallel_p = 0;
@@ -532,6 +548,7 @@ void tms9914_device::do_swrst()
 	m_c_state = FSM_C_CIDS;
 
 	update_int();
+	set_accrq(false);
 }
 
 bool tms9914_device::listener_reset() const
@@ -547,6 +564,11 @@ bool tms9914_device::talker_reset() const
 bool tms9914_device::controller_reset() const
 {
 	return m_swrst || get_ifcin();
+}
+
+bool tms9914_device::sh_active() const
+{
+	return m_sh_state == FSM_SH_SDYS || m_sh_state == FSM_SH_STRS || m_sh_state == FSM_SH_SERS;
 }
 
 void tms9914_device::update_fsm()
@@ -654,7 +676,7 @@ void tms9914_device::update_fsm()
 		bool eoi_signal = false;
 		uint8_t dio_byte = 0;
 		set_signal(IEEE_488_DAV , m_sh_state == FSM_SH_STRS);
-		if (m_sh_state == FSM_SH_SDYS || m_sh_state == FSM_SH_STRS) {
+		if (sh_active()) {
 			dio_byte = m_t_state == FSM_T_SPAS ? m_reg_serial_p : m_reg_do;
 			eoi_signal = m_t_eoi_state == FSM_T_ERAS || m_t_eoi_state == FSM_T_ENAS;
 		}
@@ -1193,7 +1215,7 @@ void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
 		break;
 
 	case AUXCMD_GTS:
-		if (m_c_state == FSM_C_CACS && m_sh_state != FSM_SH_SDYS && m_sh_state != FSM_SH_STRS) {
+		if (m_c_state == FSM_C_CACS && !sh_active()) {
 			m_c_state = FSM_C_CSBS;
 			m_ext_state_change = true;
 			// This ensures a BO interrupt is generated if TACS is active
@@ -1206,7 +1228,10 @@ void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
 		if (m_c_state == FSM_C_CSBS) {
 			m_c_state = FSM_C_CSHS;
 			m_ext_state_change = true;
-			m_c_dly_timer->adjust(clocks_to_attotime(8));
+			// Manual says delay is 8 clock cycles, but 10 at least are needed
+			// to pass diagb hpib diagnostic
+			//m_c_dly_timer->adjust(clocks_to_attotime(8));
+			m_c_dly_timer->adjust(clocks_to_attotime(10));
 			update_fsm();
 		}
 		break;
@@ -1300,6 +1325,9 @@ void tms9914_device::set_int0_bit(unsigned bit_no)
 {
 	BIT_SET(m_reg_int0_status , bit_no);
 	update_int();
+	if (bit_no == REG_INT0_BI_BIT || (bit_no == REG_INT0_BO_BIT && m_c_state != FSM_C_CACS)) {
+		set_accrq(true);
+	}
 }
 
 void tms9914_device::set_int1_bit(unsigned bit_no)
@@ -1338,4 +1366,13 @@ void tms9914_device::update_ifc()
 void tms9914_device::update_ren()
 {
 	set_signal(IEEE_488_REN , m_sre);
+}
+
+void tms9914_device::set_accrq(bool state)
+{
+	if (state != m_accrq_line) {
+		LOG_INT("ACCRQ=%d\n" , state);
+		m_accrq_line = state;
+		m_accrq_write_func(m_accrq_line);
+	}
 }

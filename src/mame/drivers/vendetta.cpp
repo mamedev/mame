@@ -430,10 +430,10 @@ WRITE8_MEMBER( vendetta_state::banking_callback )
 MACHINE_CONFIG_START(vendetta_state::vendetta)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)   /* 052001 (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vendetta_state,  irq)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(vendetta_state, banking_callback))
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)   /* 052001 (verified on pcb) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vendetta_state,  irq)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, vendetta_state, banking_callback))
 
 	MCFG_DEVICE_ADD("videobank0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(videobank0_map)
@@ -449,8 +449,8 @@ MACHINE_CONFIG_START(vendetta_state::vendetta)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified with PCB */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified with PCB */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 							/* interrupts are triggered by the main CPU */
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
@@ -500,8 +500,8 @@ MACHINE_CONFIG_START(vendetta_state::esckids)
 	vendetta(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(esckids_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(esckids_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 //MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )    /* black areas on the edges */
