@@ -541,10 +541,10 @@ void asic65_device::asic65_io_map(address_map &map)
 MACHINE_CONFIG_START(asic65_device::device_add_mconfig)
 
 	/* ASIC65 */
-	MCFG_CPU_ADD("asic65cpu", TMS32010, 20000000)
-	MCFG_CPU_PROGRAM_MAP(asic65_program_map)
-	MCFG_CPU_IO_MAP(asic65_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(asic65_device, get_bio))
+	MCFG_DEVICE_ADD("asic65cpu", TMS32010, 20000000)
+	MCFG_DEVICE_PROGRAM_MAP(asic65_program_map)
+	MCFG_DEVICE_IO_MAP(asic65_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, asic65_device, get_bio))
 MACHINE_CONFIG_END
 
 

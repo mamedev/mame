@@ -105,17 +105,18 @@ PALETTE_INIT_MEMBER(wscolor_state, wscolor)
 	}
 }
 
-static SLOT_INTERFACE_START(wswan_cart)
-	SLOT_INTERFACE_INTERNAL("ws_rom",     WS_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("ws_sram",    WS_ROM_SRAM)
-	SLOT_INTERFACE_INTERNAL("ws_eeprom",  WS_ROM_EEPROM)
-SLOT_INTERFACE_END
+static void wswan_cart(device_slot_interface &device)
+{
+	device.option_add_internal("ws_rom",     WS_ROM_STD);
+	device.option_add_internal("ws_sram",    WS_ROM_SRAM);
+	device.option_add_internal("ws_eeprom",  WS_ROM_EEPROM);
+}
 
 MACHINE_CONFIG_START(wswan_state::wswan)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30MZ, XTAL(3'072'000))
-	MCFG_CPU_PROGRAM_MAP(wswan_mem)
-	MCFG_CPU_IO_MAP(wswan_io)
+	MCFG_DEVICE_ADD("maincpu", V30MZ, XTAL(3'072'000))
+	MCFG_DEVICE_PROGRAM_MAP(wswan_mem)
+	MCFG_DEVICE_IO_MAP(wswan_io)
 
 	MCFG_DEVICE_ADD("vdp", WSWAN_VIDEO, 0)
 	MCFG_WSWAN_VIDEO_TYPE(VDP_TYPE_WSWAN)
@@ -143,7 +144,7 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", WSWAN_SND, 0)
+	MCFG_DEVICE_ADD("custom", WSWAN_SND, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -160,8 +161,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(wscolor_state::wscolor)
 	wswan(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wscolor_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(wscolor_mem)
 
 	MCFG_DEVICE_MODIFY("vdp")
 	MCFG_WSWAN_VIDEO_TYPE(VDP_TYPE_WSC)

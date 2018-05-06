@@ -719,21 +719,21 @@ INTERRUPT_GEN_MEMBER(thepit_state::vblank_irq)
 MACHINE_CONFIG_START(thepit_state::thepit)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(thepit_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thepit_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(thepit_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thepit_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)     /* 2.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_IO_MAP(audio_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thepit_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/4)     /* 2.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_IO_MAP(audio_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thepit_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC42
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(thepit_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, thepit_state, nmi_mask_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // marked "LOCK OUT" on Centuri schematic but never written
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(thepit_state, sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(thepit_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(thepit_state, flip_screen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, thepit_state, sound_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, thepit_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, thepit_state, flip_screen_y_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -752,26 +752,26 @@ MACHINE_CONFIG_START(thepit_state::thepit)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, PIXEL_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_DEVICE_ADD("ay1", AY8910, PIXEL_CLOCK/4)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, PIXEL_CLOCK/4)
+	MCFG_DEVICE_ADD("ay2", AY8910, PIXEL_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(thepit_state::fitter)
 	thepit(config);
 	MCFG_DEVICE_MODIFY("mainlatch") // IC42
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(thepit_state, coin_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, thepit_state, coin_lockout_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(thepit_state::desertdn)
 	fitter(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(desertdan_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(desertdan_main_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -784,11 +784,11 @@ MACHINE_CONFIG_START(thepit_state::intrepid)
 	fitter(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(intrepid_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(intrepid_main_map)
 
 	MCFG_DEVICE_MODIFY("mainlatch") // 2F on Funny Mouse main board; IC46 on Port Man main board
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(thepit_state, intrepid_graphics_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, thepit_state, intrepid_graphics_bank_w))
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", intrepid)

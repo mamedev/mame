@@ -84,9 +84,9 @@ static const z80_daisy_config daisy_chain[] =
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(abc_hdc_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(abc_hdc_mem)
-	MCFG_CPU_IO_MAP(abc_hdc_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(abc_hdc_mem)
+	MCFG_DEVICE_IO_MAP(abc_hdc_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)

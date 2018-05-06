@@ -519,10 +519,10 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(tapatune_state::tapatune_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_CPU_IO_MAP(maincpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tapatune_state, irq0_line_assert, XTAL(24'000'000) / 4 / 4 / 4096)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_IO_MAP(maincpu_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(tapatune_state, irq0_line_assert, XTAL(24'000'000) / 4 / 4 / 4096)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -531,15 +531,15 @@ MACHINE_CONFIG_START(tapatune_state::tapatune_base)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("bsmt", BSMT2000, XTAL(24'000'000))
+	MCFG_DEVICE_ADD("bsmt", BSMT2000, XTAL(24'000'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tapatune_state::tapatune)
 	tapatune_base(config);
-	MCFG_CPU_ADD("videocpu", M68000, XTAL(24'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(video_map)
+	MCFG_DEVICE_ADD("videocpu", M68000, XTAL(24'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(video_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("videocpu")
 
@@ -548,7 +548,7 @@ MACHINE_CONFIG_START(tapatune_state::tapatune)
 	MCFG_MC6845_CHAR_WIDTH(5)
 	MCFG_MC6845_BEGIN_UPDATE_CB(tapatune_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(tapatune_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(tapatune_state, crtc_vsync))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, tapatune_state, crtc_vsync))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

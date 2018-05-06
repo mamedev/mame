@@ -53,7 +53,7 @@ MACHINE_CONFIG_START(a2bus_mcms1_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("mcms_l", "mcms_r")
 
 	MCFG_DEVICE_ADD(ENGINE_TAG, MCMS, 1000000)
-	MCFG_MCMS_IRQ_CALLBACK(WRITELINE(a2bus_mcms1_device, irq_w))
+	MCFG_MCMS_IRQ_CALLBACK(WRITELINE(*this, a2bus_mcms1_device, irq_w))
 
 	MCFG_SOUND_ROUTE(0, "mcms_l", 1.0)
 	MCFG_SOUND_ROUTE(1, "mcms_r", 1.0)

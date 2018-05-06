@@ -60,9 +60,10 @@ FLOPPY_FORMATS_MEMBER(bbc_opus3_device::floppy_formats)
 	FLOPPY_OPUS_DDCPM_FORMAT
 FLOPPY_FORMATS_END0
 
-SLOT_INTERFACE_START(bbc_floppies)
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+void bbc_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 ROM_START( opus3 )
@@ -83,7 +84,7 @@ ROM_END
 MACHINE_CONFIG_START(bbc_opus3_device::device_add_mconfig)
 	/* fdc */
 	MCFG_WD1770_ADD("wd1770", XTAL(16'000'000) / 2)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opus3_device, fdc_drq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_opus3_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies, "525qd", floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies, nullptr, floppy_formats)

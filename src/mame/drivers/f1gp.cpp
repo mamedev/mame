@@ -394,17 +394,17 @@ MACHINE_RESET_MEMBER(f1gp_state,f1gp)
 MACHINE_CONFIG_START(f1gp_state::f1gp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(f1gp_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(f1gp_cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000,XTAL(20'000'000)/2)    /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(f1gp_cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000,XTAL(20'000'000)/2)    /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(f1gp_cpu2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(20'000'000)/4)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(20'000'000)/4)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
@@ -413,11 +413,11 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1000000) // guessed
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -458,7 +458,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000))
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -470,13 +470,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(f1gp_state::f1gpb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,10000000) /* 10 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(f1gpb_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000,10000000) /* 10 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(f1gpb_cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000,10000000)    /* 10 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(f1gpb_cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000,10000000)    /* 10 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(f1gpb_cpu2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
 	/* NO sound CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
@@ -486,11 +486,11 @@ MACHINE_CONFIG_START(f1gp_state::f1gpb)
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd)) // loopback for now
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1000000) // guessed
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -521,8 +521,8 @@ MACHINE_CONFIG_START(f1gp_state::f1gp2)
 	f1gp(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(f1gp2_cpu1_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(f1gp2_cpu1_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", f1gp2)

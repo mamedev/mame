@@ -39,7 +39,7 @@ DECLARE_DEVICE_TYPE(WAVE, wave_device)
 
 
 #define MCFG_SOUND_WAVE_ADD(_tag, _cass_tag) \
-	MCFG_SOUND_ADD( _tag, WAVE, 0 ) \
+	MCFG_DEVICE_ADD( _tag, WAVE, 0 ) \
 	downcast<wave_device &>(*device).set_cassette_tag(_cass_tag);
 
 #endif // MAME_SOUND_WAVE_H

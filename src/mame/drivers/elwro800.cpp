@@ -542,9 +542,10 @@ INTERRUPT_GEN_MEMBER(elwro800_state::elwro800jr_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static SLOT_INTERFACE_START( elwro800jr_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void elwro800jr_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 /* F4 Character Displayer */
 static const gfx_layout elwro800_charlayout =
@@ -568,11 +569,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(elwro800_state::elwro800)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, 3500000)    /* 3.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(elwro800_mem)
-	MCFG_CPU_IO_MAP(elwro800_io)
-	MCFG_CPU_OPCODES_MAP(elwro800_m1)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", elwro800_state,  elwro800jr_interrupt)
+	MCFG_DEVICE_ADD("maincpu",Z80, 3500000)    /* 3.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(elwro800_mem)
+	MCFG_DEVICE_IO_MAP(elwro800_io)
+	MCFG_DEVICE_OPCODES_MAP(elwro800_m1)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", elwro800_state,  elwro800jr_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(elwro800_state,elwro800)
 
@@ -583,7 +584,7 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(elwro800_state, screen_update_spectrum )
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(elwro800_state, screen_vblank_spectrum))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, elwro800_state, screen_vblank_spectrum))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
@@ -596,15 +597,15 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("JOY"))
-	MCFG_I8255_IN_PORTB_CB(DEVREAD8("cent_data_in", input_buffer_device, read))
-	MCFG_I8255_OUT_PORTB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_IN_PORTC_CB(READ8(elwro800_state, i8255_port_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(elwro800_state, i8255_port_c_w))
+	MCFG_I8255_IN_PORTB_CB(READ8("cent_data_in", input_buffer_device, read))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, elwro800_state, i8255_port_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, elwro800_state, i8255_port_c_w))
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(elwro800_state, write_centronics_ack))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, elwro800_state, write_centronics_ack))
 
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -615,7 +616,7 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_CASSETTE_ADD( "cassette" )

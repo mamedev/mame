@@ -93,10 +93,10 @@ void wangpc_wdc_device::wangpc_wdc_io(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(wangpc_wdc_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, 2000000) // XTAL(10'000'000) / ?
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 2000000) // XTAL(10'000'000) / ?
 	//MCFG_Z80_DAISY_CHAIN(wangpc_wdc_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(wangpc_wdc_mem)
-	MCFG_CPU_IO_MAP(wangpc_wdc_io)
+	MCFG_DEVICE_PROGRAM_MAP(wangpc_wdc_mem)
+	MCFG_DEVICE_IO_MAP(wangpc_wdc_io)
 
 	MCFG_DEVICE_ADD(MK3882_TAG, Z80CTC, 2000000)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))

@@ -350,22 +350,22 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(meyc8088_state::meyc8088)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, (XTAL(15'000'000) / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
-	MCFG_CPU_PROGRAM_MAP(meyc8088_map)
+	MCFG_DEVICE_ADD("maincpu", I8088, (XTAL(15'000'000) / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
+	MCFG_DEVICE_PROGRAM_MAP(meyc8088_map)
 
 	MCFG_DEVICE_ADD("i8155_1", I8155, XTAL(15'000'000) / (3*1))
 	// all ports set to input
-	MCFG_I8155_IN_PORTA_CB(READ8(meyc8088_state, meyc8088_input_r))
+	MCFG_I8155_IN_PORTA_CB(READ8(*this, meyc8088_state, meyc8088_input_r))
 	MCFG_I8155_IN_PORTB_CB(IOPORT("SW"))
-	MCFG_I8155_IN_PORTC_CB(READ8(meyc8088_state, meyc8088_status_r))
+	MCFG_I8155_IN_PORTC_CB(READ8(*this, meyc8088_state, meyc8088_status_r))
 	// i8251A trigger txc/rxc (debug related, unpopulated on sold boards)
 
 	MCFG_DEVICE_ADD("i8155_2", I8155, XTAL(15'000'000) / (3*32))
 	// all ports set to output
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(meyc8088_state, meyc8088_lights2_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(meyc8088_state, meyc8088_lights1_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(meyc8088_state, meyc8088_common_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("dac", dac_bit_interface, write))
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, meyc8088_state, meyc8088_lights2_w))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, meyc8088_state, meyc8088_lights1_w))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, meyc8088_state, meyc8088_common_w))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE("dac", dac_bit_interface, write))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(meyc8088_state::meyc8088)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000)/3, 320, 0, 256, 261, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(meyc8088_state, screen_update_meyc8088)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(meyc8088_state, screen_vblank_meyc8088))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, meyc8088_state, screen_vblank_meyc8088))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 32)
@@ -384,9 +384,9 @@ MACHINE_CONFIG_START(meyc8088_state::meyc8088)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 

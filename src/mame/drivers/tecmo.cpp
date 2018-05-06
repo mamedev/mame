@@ -292,7 +292,7 @@ static INPUT_PORTS_START( tecmo_default )
 
 	PORT_START("SYS_2")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	
+
 	PORT_START("SYS_3")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -591,7 +591,7 @@ static INPUT_PORTS_START( silkwormp )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	
+
 	PORT_MODIFY("JOY2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
@@ -602,13 +602,13 @@ static INPUT_PORTS_START( silkwormp )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
-	
+
 	PORT_MODIFY("SYS_2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )   // Coin inputs are switched
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
-	
+
 	PORT_MODIFY("SYS_3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 )   // Vehicle swap extra button
 
@@ -646,7 +646,7 @@ static INPUT_PORTS_START( silkwormp )
 	PORT_DIPSETTING(    0x06, "200000" )
 	PORT_DIPSETTING(    0x07, DEF_STR( None ) )
 	PORT_DIPNAME( 0x70, 0x60, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:!5,!6,!7")
-    PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x40, "2" )          // from the Tecmo US manual
 	PORT_DIPSETTING(    0x60, "3" )          //  (although conflicting info exists, so unverified)
 	PORT_DIPSETTING(    0x30, "4" )
@@ -717,12 +717,12 @@ void tecmo_state::machine_reset()
 MACHINE_CONFIG_START(tecmo_state::rygar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rygar_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rygar_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tecmo_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(4'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rygar_sound_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(4'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rygar_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -746,12 +746,12 @@ MACHINE_CONFIG_START(tecmo_state::rygar)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL(4'000'000)) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(4'000'000)) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb, even if schematics shows a 384khz resonator */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(tecmo_state, adpcm_int))    /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb, even if schematics shows a 384khz resonator */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tecmo_state, adpcm_int))    /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -761,15 +761,15 @@ MACHINE_CONFIG_START(tecmo_state::gemini)
 	rygar(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	// xtal found on bootleg, to be confirmed on a real board
-	MCFG_CPU_CLOCK(XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(gemini_map)
+	MCFG_DEVICE_CLOCK(XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(gemini_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(tecmo_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(tecmo_sound_map)
 
-	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL(4'000'000))
+	MCFG_DEVICE_REPLACE("ymsnd", YM3812, XTAL(4'000'000))
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -785,9 +785,9 @@ MACHINE_CONFIG_START(tecmo_state::silkworm)
 	gemini(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000)
-	MCFG_CPU_PROGRAM_MAP(silkworm_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(6000000)
+	MCFG_DEVICE_PROGRAM_MAP(silkworm_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tecmo_state::backfirt)
@@ -799,11 +799,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tecmo_state::silkwormp)
 	silkworm(config);
-	
+
 	/* bootleg pcb doesn't have the MSM5205 populated */
 	MCFG_DEVICE_REMOVE("msm")
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(silkwormp_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(silkwormp_sound_map)
 MACHINE_CONFIG_END
 
 
@@ -1166,7 +1166,7 @@ ROM_START( silkwormb )
 	ROM_LOAD( "e10.11",       0x10000, 0x08000, CRC(c0c4687d) SHA1(afe05eb7e5a65c995aeac9ea773ad79eb053303f) )  /* fg tiles TMM24256 */
 	ROM_LOAD( "silkworm.12",  0x20000, 0x10000, CRC(bb0f568f) SHA1(b66c6d0407ed0b068c6bf07987f1b923d4a6e4f8) )  /* fg tiles TMM24512 */
 	ROM_LOAD( "e12.13",       0x30000, 0x08000, CRC(fc472811) SHA1(e862ec9b38f3f3a1f4668fbc587063eee8e9e821) )  /* fg tiles 27C256   */
-	
+
 	ROM_REGION( 0x40000, "gfx4", 0 )
 	ROM_LOAD( "silkworm.14",  0x00000, 0x10000, CRC(409df64b) SHA1(cada970bf9cc8f6522e7a71e00fe873568852873) )  /* bg tiles TMM24512 */
 	ROM_LOAD( "e14.15",       0x10000, 0x08000, CRC(b02acdb6) SHA1(6be74bb89680b79b3a5d13af638ed5a0bb077dad) )  /* bg tiles 27C256   */

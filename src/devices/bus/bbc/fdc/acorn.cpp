@@ -29,13 +29,14 @@ FLOPPY_FORMATS_MEMBER( bbc_acorn8271_device::floppy_formats )
 	FLOPPY_FSD_FORMAT
 FLOPPY_FORMATS_END0
 
-static SLOT_INTERFACE_START( bbc_floppies_525 )
-	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD)
-	SLOT_INTERFACE("525sd",   FLOPPY_525_SD)
-	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD)
-	SLOT_INTERFACE("525dd",   FLOPPY_525_DD)
-	SLOT_INTERFACE("525qd",   FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void bbc_floppies_525(device_slot_interface &device)
+{
+	device.option_add("525sssd", FLOPPY_525_SSSD);
+	device.option_add("525sd",   FLOPPY_525_SD);
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+	device.option_add("525dd",   FLOPPY_525_DD);
+	device.option_add("525qd",   FLOPPY_525_QD);
+}
 
 ROM_START( acorn8271 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
@@ -122,9 +123,9 @@ ROM_END
 
 MACHINE_CONFIG_START(bbc_acorn8271_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("i8271", I8271, 0)
-	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_acorn8271_device, fdc_intrq_w))
-	MCFG_I8271_HDL_CALLBACK(WRITELINE(bbc_acorn8271_device, motor_w))
-	MCFG_I8271_OPT_CALLBACK(WRITELINE(bbc_acorn8271_device, side_w))
+	MCFG_I8271_IRQ_CALLBACK(WRITELINE(*this, bbc_acorn8271_device, fdc_intrq_w))
+	MCFG_I8271_HDL_CALLBACK(WRITELINE(*this, bbc_acorn8271_device, motor_w))
+	MCFG_I8271_OPT_CALLBACK(WRITELINE(*this, bbc_acorn8271_device, side_w))
 	MCFG_FLOPPY_DRIVE_ADD("i8271:0", bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("i8271:1", bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats)
@@ -133,8 +134,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bbc_acorn1770_device::device_add_mconfig)
 	MCFG_WD1770_ADD("wd1770", XTAL(16'000'000) / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_acorn1770_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_acorn1770_device, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_acorn1770_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_acorn1770_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", bbc_floppies_525, "525qd", bbc_acorn8271_device::floppy_formats)

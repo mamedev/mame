@@ -65,11 +65,12 @@ GFXDECODE_MEMBER( namco_c45_road_device::gfxinfo )
 GFXDECODE_END
 
 
-ADDRESS_MAP_START(namco_c45_road_device::map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM_WRITE(tilemap_w) AM_SHARE("tmapram")
-	AM_RANGE(0x10000, 0x1f9ff) AM_RAM_WRITE(tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x1fa00, 0x1ffff) AM_RAM AM_SHARE("lineram")
-ADDRESS_MAP_END
+void namco_c45_road_device::map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram().w(this, FUNC(namco_c45_road_device::tilemap_w)).share("tmapram");
+	map(0x10000, 0x1f9ff).ram().w(this, FUNC(namco_c45_road_device::tileram_w)).share("tileram");
+	map(0x1fa00, 0x1ffff).ram().share("lineram");
+}
 
 
 //-------------------------------------------------

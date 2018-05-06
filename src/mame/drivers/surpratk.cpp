@@ -171,10 +171,10 @@ WRITE8_MEMBER( surpratk_state::banking_callback )
 MACHINE_CONFIG_START(surpratk_state::surpratk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
-	MCFG_CPU_PROGRAM_MAP(surpratk_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", surpratk_state,  surpratk_interrupt)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(surpratk_state, banking_callback))
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
+	MCFG_DEVICE_PROGRAM_MAP(surpratk_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", surpratk_state,  surpratk_interrupt)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, surpratk_state, banking_callback))
 
 	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)

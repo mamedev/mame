@@ -196,8 +196,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(shaolins_state::shaolins)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/12)        /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(shaolins_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/12)        /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(shaolins_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", shaolins_state, interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -218,10 +218,10 @@ MACHINE_CONFIG_START(shaolins_state::shaolins)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, MASTER_CLOCK/12)        /* verified on pcb */
+	MCFG_DEVICE_ADD("sn1", SN76489A, MASTER_CLOCK/12)        /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, MASTER_CLOCK/6)        /* verified on pcb */
+	MCFG_DEVICE_ADD("sn2", SN76489A, MASTER_CLOCK/6)        /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -229,10 +229,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( shaolinb )
 	shaolins(config);
 
-	MCFG_SOUND_REPLACE("sn1", SN76489, MASTER_CLOCK/12) /* only type verified on pcb */
+	MCFG_DEVICE_REPLACE("sn1", SN76489, MASTER_CLOCK/12) /* only type verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_REPLACE("sn2", SN76489, MASTER_CLOCK/6)  /* only type verified on pcb */
+	MCFG_DEVICE_REPLACE("sn2", SN76489, MASTER_CLOCK/6)  /* only type verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 #endif

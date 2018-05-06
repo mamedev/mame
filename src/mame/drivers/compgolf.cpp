@@ -225,8 +225,8 @@ void compgolf_state::machine_reset()
 MACHINE_CONFIG_START(compgolf_state::compgolf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 2000000) // HD68B09EP
-	MCFG_CPU_PROGRAM_MAP(compgolf_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000) // HD68B09EP
+	MCFG_DEVICE_PROGRAM_MAP(compgolf_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -245,10 +245,10 @@ MACHINE_CONFIG_START(compgolf_state::compgolf)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(compgolf_state, compgolf_scrollx_lo_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(compgolf_state, compgolf_scrolly_lo_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, compgolf_state, compgolf_scrollx_lo_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, compgolf_state, compgolf_scrolly_lo_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

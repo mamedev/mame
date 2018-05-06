@@ -2049,5 +2049,7 @@ namespace
 	};
 };
 
-DEFINE_DEVICE_TYPE(GIME_NTSC, gime_ntsc_device, "gime_ntsc", "TCC1014 (VC2645QC) GIME (NTSC)")
-DEFINE_DEVICE_TYPE(GIME_PAL,  gime_pal_device,  "gime_pal",  "TCC1014 (VC2645QC) GIME (PAL)")
+DEFINE_DEVICE_TYPE_PRIVATE(GIME_NTSC, gime_device, gime_ntsc_device, "gime_ntsc", "TCC1014 (VC2645QC) GIME (NTSC)")
+DEFINE_DEVICE_TYPE_PRIVATE(GIME_PAL,  gime_device, gime_pal_device,  "gime_pal",  "TCC1014 (VC2645QC) GIME (PAL)")
+template class device_finder<gime_device, false>;
+template class device_finder<gime_device, true>;

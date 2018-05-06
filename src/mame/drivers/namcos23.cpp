@@ -3564,40 +3564,40 @@ GFXDECODE_END
 MACHINE_CONFIG_START(namcos23_state::gorgon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
+	MCFG_DEVICE_ADD("maincpu", R4650BE, BUSCLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(8192)   // VERIFIED
 	MCFG_MIPS3_DCACHE_SIZE(8192)   // VERIFIED
-	MCFG_CPU_PROGRAM_MAP(gorgon_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
+	MCFG_DEVICE_PROGRAM_MAP(gorgon_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
 
-	MCFG_CPU_ADD("subcpu", H83002, H8CLOCK )
-	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
-	MCFG_CPU_IO_MAP( s23h8iomap )
+	MCFG_DEVICE_ADD("subcpu", H83002, H8CLOCK )
+	MCFG_DEVICE_PROGRAM_MAP( s23h8rwmap )
+	MCFG_DEVICE_IO_MAP( s23h8iomap )
 
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY(":subcpu:sci0")
+	MCFG_DEVICE_MODIFY("subcpu:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
 
-	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
-	MCFG_CPU_IO_MAP( s23iobrdiomap )
+	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
+	MCFG_DEVICE_PROGRAM_MAP( s23iobrdmap )
+	MCFG_DEVICE_IO_MAP( s23iobrdiomap )
 
 	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":subcpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("subcpu:sci0", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("subcpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
 	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
-	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
+	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
 	MCFG_DEVICE_MODIFY("subcpu:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("namco_settings", namco_settings_device, data_w))
+	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namco_settings", namco_settings_device, clk_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3608,7 +3608,7 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos23_state, sub_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos23_state, sub_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
@@ -3630,40 +3630,40 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos23_state::s23)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
+	MCFG_DEVICE_ADD("maincpu", R4650BE, BUSCLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(8192)   // VERIFIED
 	MCFG_MIPS3_DCACHE_SIZE(8192)   // VERIFIED
-	MCFG_CPU_PROGRAM_MAP(s23_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
+	MCFG_DEVICE_PROGRAM_MAP(s23_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
 
-	MCFG_CPU_ADD("subcpu", H83002, H8CLOCK )
-	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
-	MCFG_CPU_IO_MAP( s23h8iomap )
+	MCFG_DEVICE_ADD("subcpu", H83002, H8CLOCK )
+	MCFG_DEVICE_PROGRAM_MAP( s23h8rwmap )
+	MCFG_DEVICE_IO_MAP( s23h8iomap )
 
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY(":subcpu:sci0")
+	MCFG_DEVICE_MODIFY("subcpu:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
 
-	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
-	MCFG_CPU_IO_MAP( s23iobrdiomap )
+	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
+	MCFG_DEVICE_PROGRAM_MAP( s23iobrdmap )
+	MCFG_DEVICE_IO_MAP( s23iobrdiomap )
 
 	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":subcpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("subcpu:sci0", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("subcpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
 	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
-	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
+	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
 	MCFG_DEVICE_MODIFY("subcpu:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("namco_settings", namco_settings_device, data_w))
+	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namco_settings", namco_settings_device, clk_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3674,7 +3674,7 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos23_state, sub_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos23_state, sub_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
@@ -3696,20 +3696,20 @@ MACHINE_CONFIG_START(namcos23_state::timecrs2)
 	s23(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("iocpu")
-	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
+	MCFG_DEVICE_MODIFY("iocpu")
+	MCFG_DEVICE_PROGRAM_MAP( timecrs2iobrdmap )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos23_state::gmen)
 	s23(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(BUSCLOCK*5)
-	MCFG_CPU_PROGRAM_MAP(gmen_mips_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(BUSCLOCK*5)
+	MCFG_DEVICE_PROGRAM_MAP(gmen_mips_map)
 
-	MCFG_CPU_ADD("gmen_sh2", SH2, XTAL(28'700'000))
-	MCFG_CPU_PROGRAM_MAP(gmen_sh2_map)
+	MCFG_DEVICE_ADD("gmen_sh2", SH2, XTAL(28'700'000))
+	MCFG_DEVICE_PROGRAM_MAP(gmen_sh2_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos23_state,gmen)
 MACHINE_CONFIG_END
@@ -3718,18 +3718,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos23_state::ss23)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*5)
+	MCFG_DEVICE_ADD("maincpu", R4650BE, BUSCLOCK*5)
 	MCFG_MIPS3_ICACHE_SIZE(8192)   // VERIFIED
 	MCFG_MIPS3_DCACHE_SIZE(8192)   // VERIFIED
-	MCFG_CPU_PROGRAM_MAP(s23_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
+	MCFG_DEVICE_PROGRAM_MAP(s23_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos23_state, interrupt)
 
-	MCFG_CPU_ADD("subcpu", H83002, H8CLOCK )
-	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
-	MCFG_CPU_IO_MAP( s23h8iomap )
+	MCFG_DEVICE_ADD("subcpu", H83002, H8CLOCK )
+	MCFG_DEVICE_PROGRAM_MAP( s23h8rwmap )
+	MCFG_DEVICE_IO_MAP( s23h8iomap )
 
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY(":subcpu:sci0")
+	MCFG_DEVICE_MODIFY("subcpu:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
@@ -3737,12 +3737,12 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
 	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
-	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
+	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
 	MCFG_DEVICE_MODIFY("subcpu:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("namco_settings", namco_settings_device, data_w))
+	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namco_settings", namco_settings_device, clk_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3753,7 +3753,7 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos23_state, sub_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos23_state, sub_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
@@ -3774,31 +3774,31 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos23_state::timecrs2v4a)
 	ss23(config);
 	/* basic machine hardware */
-	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
-	MCFG_CPU_IO_MAP( s23iobrdiomap )
+	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
+	MCFG_DEVICE_PROGRAM_MAP( timecrs2iobrdmap )
+	MCFG_DEVICE_IO_MAP( s23iobrdiomap )
 
 	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":subcpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("subcpu:sci0", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("subcpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos23_state::ss23e2)
 	ss23(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(BUSCLOCK*6)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(BUSCLOCK*6)
 
-	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
-	MCFG_CPU_IO_MAP( s23iobrdiomap )
+	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
+	MCFG_DEVICE_PROGRAM_MAP( s23iobrdmap )
+	MCFG_DEVICE_IO_MAP( s23iobrdiomap )
 
 	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":subcpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("subcpu:sci0", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("subcpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
 MACHINE_CONFIG_END
 
 

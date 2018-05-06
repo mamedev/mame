@@ -656,9 +656,9 @@ uint32_t ltcasino_state::screen_update_ltcasino(screen_device &screen, bitmap_in
 
 MACHINE_CONFIG_START(ltcasino_state::ltcasino)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,2000000)       /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(ltcasino_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ltcasino_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M6502,2000000)       /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ltcasino_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ltcasino_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -676,7 +676,7 @@ MACHINE_CONFIG_START(ltcasino_state::ltcasino)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_CONFIG_END
 

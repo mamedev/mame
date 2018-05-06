@@ -4377,7 +4377,7 @@ class discrete_sound_device :   public discrete_device,
 {
 public:
 	// construction/destruction
-	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~discrete_sound_device(void) { };
 
 	/* --------------------------------- */

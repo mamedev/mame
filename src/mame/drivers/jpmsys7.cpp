@@ -56,8 +56,8 @@ static INPUT_PORTS_START(  jpmsys7 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(jpmsys7_state::jpmsys7)
-	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000)  // seems to be a Coldfire of some kind
-	MCFG_CPU_PROGRAM_MAP(jpmsys7_map)
+	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000)  // seems to be a Coldfire of some kind
+	MCFG_DEVICE_PROGRAM_MAP(jpmsys7_map)
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

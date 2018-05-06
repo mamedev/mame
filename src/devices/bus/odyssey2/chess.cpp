@@ -46,7 +46,7 @@ void o2_chess_device::chess_io(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(o2_chess_device::device_add_mconfig)
-	MCFG_CPU_ADD("subcpu", NSC800, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(chess_mem)
-	MCFG_CPU_IO_MAP(chess_io)
+	MCFG_DEVICE_ADD("subcpu", NSC800, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(chess_mem)
+	MCFG_DEVICE_IO_MAP(chess_io)
 MACHINE_CONFIG_END

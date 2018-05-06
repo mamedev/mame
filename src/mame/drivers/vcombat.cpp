@@ -554,22 +554,22 @@ WRITE_LINE_MEMBER(vcombat_state::sound_update)
 }
 
 MACHINE_CONFIG_START(vcombat_state::vcombat)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
 
 	/* The middle board i860 */
-	MCFG_CPU_ADD("vid_0", I860, XTAL(20'000'000))
-	MCFG_CPU_PROGRAM_MAP(vid_0_map)
+	MCFG_DEVICE_ADD("vid_0", I860, XTAL(20'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vid_0_map)
 
 	/* The top board i860 */
-	MCFG_CPU_ADD("vid_1", I860, XTAL(20'000'000))
-	MCFG_CPU_PROGRAM_MAP(vid_1_map)
+	MCFG_DEVICE_ADD("vid_1", I860, XTAL(20'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vid_1_map)
 
 	/* Sound CPU */
-	MCFG_CPU_ADD("soundcpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vcombat_state, irq1_line_hold,  15000) /* Remove this if MC6845 is enabled */
+	MCFG_DEVICE_ADD("soundcpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(vcombat_state, irq1_line_hold,  15000) /* Remove this if MC6845 is enabled */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,vcombat)
@@ -595,24 +595,24 @@ MACHINE_CONFIG_START(vcombat_state::vcombat)
 	MCFG_SCREEN_UPDATE_DRIVER(vcombat_state, screen_update_vcombat_aux)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(vcombat_state::shadfgtr)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
 
 	/* The middle board i860 */
-	MCFG_CPU_ADD("vid_0", I860, XTAL(20'000'000))
-	MCFG_CPU_PROGRAM_MAP(vid_0_map)
+	MCFG_DEVICE_ADD("vid_0", I860, XTAL(20'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vid_0_map)
 
 	/* Sound CPU */
-	MCFG_CPU_ADD("soundcpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,shadfgtr)
@@ -622,16 +622,16 @@ MACHINE_CONFIG_START(vcombat_state::shadfgtr)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(20'000'000) / 4 / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(vcombat_state, sound_update))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, vcombat_state, sound_update))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000) / 4, 320, 0, 256, 277, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(vcombat_state, screen_update_vcombat_main)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

@@ -11,7 +11,7 @@
 
 #pragma once
 
-SLOT_INTERFACE_EXTERN( svi_slot_cards );
-SLOT_INTERFACE_EXTERN( sv602_slot_cards );
+void svi_slot_cards(device_slot_interface &device);
+void sv602_slot_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_SVI3X8_SLOT_CARDS_H

@@ -155,8 +155,8 @@ WRITE8_MEMBER(poly_state::baud_rate_w)
 
 MACHINE_CONFIG_START(poly_state::poly)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(12'057'600) / 3) // nominally 4 MHz
-	MCFG_CPU_PROGRAM_MAP(poly_mem)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(12'057'600) / 3) // nominally 4 MHz
+	MCFG_DEVICE_PROGRAM_MAP(poly_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -168,12 +168,12 @@ MACHINE_CONFIG_START(poly_state::poly)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("saa5050", SAA5050, XTAL(12'057'600) / 2)
-	MCFG_SAA5050_D_CALLBACK(READ8(poly_state, videoram_r))
+	MCFG_SAA5050_D_CALLBACK(READ8(*this, poly_state, videoram_r))
 	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
@@ -181,24 +181,24 @@ MACHINE_CONFIG_START(poly_state::poly)
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(poly_state, pia1_b_in))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, poly_state, pia1_b_in))
 	// CB1 kbd strobe
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(12'057'600) / 3)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O2_CB(WRITELINE(poly_state, ptm_o2_callback))
-	MCFG_PTM6840_O3_CB(WRITELINE(poly_state, ptm_o3_callback))
+	MCFG_PTM6840_O2_CB(WRITELINE(*this, poly_state, ptm_o2_callback))
+	MCFG_PTM6840_O3_CB(WRITELINE(*this, poly_state, ptm_o3_callback))
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	//MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	//MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
 
 	MCFG_DEVICE_ADD("adlc", MC6854, 0)
 

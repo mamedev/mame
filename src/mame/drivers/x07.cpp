@@ -1482,9 +1482,9 @@ void x07_state::machine_reset()
 MACHINE_CONFIG_START(x07_state::x07)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NSC800, 15.36_MHz_XTAL / 4)
-	MCFG_CPU_PROGRAM_MAP(x07_mem)
-	MCFG_CPU_IO_MAP(x07_io)
+	MCFG_DEVICE_ADD("maincpu", NSC800, 15.36_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(x07_mem)
+	MCFG_DEVICE_IO_MAP(x07_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("lcd", LCD)
@@ -1502,7 +1502,7 @@ MACHINE_CONFIG_START(x07_state::x07)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.50 )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

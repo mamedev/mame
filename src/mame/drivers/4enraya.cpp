@@ -473,10 +473,10 @@ void _4enraya_state::machine_reset()
 MACHINE_CONFIG_START(_4enraya_state::_4enraya )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(_4enraya_state, irq0_line_hold, 4*60) // unknown timing
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(_4enraya_state, irq0_line_hold, 4*60) // unknown timing
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -493,7 +493,7 @@ MACHINE_CONFIG_START(_4enraya_state::_4enraya )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4) /* guess */
+	MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
 MACHINE_CONFIG_END
 
@@ -502,14 +502,14 @@ MACHINE_CONFIG_START(_4enraya_state::unkpacg)
 	_4enraya(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(unkpacg_main_map)
-	MCFG_CPU_IO_MAP(unkpacg_main_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(unkpacg_main_map)
+	MCFG_DEVICE_IO_MAP(unkpacg_main_portmap)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_REPLACE("aysnd", AY8910, MAIN_CLOCK/4) /* guess */
+	MCFG_DEVICE_REPLACE("aysnd", AY8910, MAIN_CLOCK/4) /* guess */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

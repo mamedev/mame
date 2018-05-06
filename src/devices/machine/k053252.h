@@ -29,7 +29,7 @@
 	downcast<k053252_device &>(*device).set_offsets(_offsx, _offsy);
 
 #define MCFG_K053252_SET_SLAVE_SCREEN(_tag) \
-	downcast<k053252_device &>(*device).set_slave_screen("^" _tag);
+	downcast<k053252_device &>(*device).set_slave_screen(_tag);
 
 
 class k053252_device : public device_t, public device_video_interface

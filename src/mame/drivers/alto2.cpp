@@ -283,10 +283,10 @@ MACHINE_CONFIG_START(alto2_state::alto2)
 	// Basic machine hardware
 	// SYSCLK is Display Control part A51 (tagged 29.4MHz) divided by 5(?)
 	// 5.8MHz according to de.wikipedia.org/wiki/Xerox_Alto
-	MCFG_CPU_ADD("maincpu", ALTO2, XTAL(29'491'200)/5)
-	MCFG_CPU_PROGRAM_MAP(alto2_ucode_map)
-	MCFG_CPU_DATA_MAP(alto2_const_map)
-	MCFG_CPU_IO_MAP(alto2_iomem_map)
+	MCFG_DEVICE_ADD("maincpu", ALTO2, XTAL(29'491'200)/5)
+	MCFG_DEVICE_PROGRAM_MAP(alto2_ucode_map)
+	MCFG_DEVICE_DATA_MAP(alto2_const_map)
+	MCFG_DEVICE_IO_MAP(alto2_iomem_map)
 
 	// Video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white())
@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(alto2_state::alto2)
 
 	// Sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_DIABLO_DRIVES_ADD()

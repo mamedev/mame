@@ -62,6 +62,6 @@ protected:
 
 DECLARE_DEVICE_TYPE(ORICEXT_CONNECTOR, oricext_connector)
 
-SLOT_INTERFACE_EXTERN( oricext_intf );
+void oricext_intf(device_slot_interface &device);
 
 #endif // MAME_BUS_ORICEXT_ORICEXT_H

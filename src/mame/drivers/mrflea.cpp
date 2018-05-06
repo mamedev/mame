@@ -258,28 +258,28 @@ void mrflea_state::machine_reset()
 MACHINE_CONFIG_START(mrflea_state::mrflea)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
-	MCFG_CPU_PROGRAM_MAP(mrflea_master_map)
-	MCFG_CPU_IO_MAP(mrflea_master_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mrflea_state,  irq0_line_hold) /* NMI resets the game */
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(mrflea_master_map)
+	MCFG_DEVICE_IO_MAP(mrflea_master_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mrflea_state,  irq0_line_hold) /* NMI resets the game */
 
-	MCFG_CPU_ADD("subcpu", Z80, 6000000) // runs in IM 1, so doesn't use 8259 INTA
-	MCFG_CPU_PROGRAM_MAP(mrflea_slave_map)
-	MCFG_CPU_IO_MAP(mrflea_slave_io_map)
+	MCFG_DEVICE_ADD("subcpu", Z80, 6000000) // runs in IM 1, so doesn't use 8259 INTA
+	MCFG_DEVICE_PROGRAM_MAP(mrflea_slave_map)
+	MCFG_DEVICE_IO_MAP(mrflea_slave_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mrflea_state, mrflea_slave_interrupt, "screen", 0, 1)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_DEVICE_ADD("mainppi", I8255, 0)
-	MCFG_I8255_IN_PORTB_CB(DEVREAD8("subppi", i8255_device, pb_r))
-	MCFG_I8255_OUT_PORTC_CB(DEVWRITELINE("subppi", i8255_device, pc4_w)) MCFG_DEVCB_BIT(7) // OBFA -> STBA
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("subppi", i8255_device, pc2_w)) MCFG_DEVCB_BIT(1) // IBFB -> ACKB
+	MCFG_I8255_IN_PORTB_CB(READ8("subppi", i8255_device, pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITELINE("subppi", i8255_device, pc4_w)) MCFG_DEVCB_BIT(7) // OBFA -> STBA
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("subppi", i8255_device, pc2_w)) MCFG_DEVCB_BIT(1) // IBFB -> ACKB
 
 	MCFG_DEVICE_ADD("subppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(DEVREAD8("mainppi", i8255_device, pa_r))
-	MCFG_I8255_OUT_PORTC_CB(DEVWRITELINE("mainppi", i8255_device, pc6_w)) MCFG_DEVCB_BIT(5) // IBFA -> ACKA
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("pic", pic8259_device, ir0_w)) MCFG_DEVCB_BIT(3) // INTRA
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mainppi", i8255_device, pc2_w)) MCFG_DEVCB_BIT(1) // OBFB -> STBB
+	MCFG_I8255_IN_PORTA_CB(READ8("mainppi", i8255_device, pa_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITELINE("mainppi", i8255_device, pc6_w)) MCFG_DEVCB_BIT(5) // IBFA -> ACKA
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("pic", pic8259_device, ir0_w)) MCFG_DEVCB_BIT(3) // INTRA
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("mainppi", i8255_device, pc2_w)) MCFG_DEVCB_BIT(1) // OBFB -> STBB
 
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("subcpu", 0))
@@ -301,23 +301,23 @@ MACHINE_CONFIG_START(mrflea_state::mrflea)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000) // not used for sound?
+	MCFG_DEVICE_ADD("ay2", AY8910, 2000000) // not used for sound?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay3", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay4", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay4", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNKNOWN"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(mrflea_state, mrflea_data1_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, mrflea_state, mrflea_data1_w))
 MACHINE_CONFIG_END
 
 /*************************************

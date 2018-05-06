@@ -112,6 +112,6 @@ private:
 };
 
 // device type definition
-extern const device_type M1COMM;
+DECLARE_DEVICE_TYPE(M1COMM, m1comm_device)
 
 #endif  // MAME_MACHINE_M1COMM_H

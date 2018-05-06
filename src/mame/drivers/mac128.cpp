@@ -1326,8 +1326,8 @@ static const floppy_interface mac_floppy_interface =
 
 MACHINE_CONFIG_START(mac128_state::mac512ke)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, C7M)        /* 7.8336 MHz */
-	MCFG_CPU_PROGRAM_MAP(mac512ke_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, C7M)        /* 7.8336 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mac512ke_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -1345,9 +1345,9 @@ MACHINE_CONFIG_START(mac128_state::mac512ke)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD(DAC_TAG, DAC_8BIT_PWM, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 2 x ls161
+	MCFG_DEVICE_ADD(DAC_TAG, DAC_8BIT_PWM, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 2 x ls161
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
 	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
@@ -1355,20 +1355,20 @@ MACHINE_CONFIG_START(mac128_state::mac512ke)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
 	MCFG_SCC85C30_ADD("scc", C7M, C3_7M, 0, C3_7M, 0)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(mac128_state, set_scc_interrupt))
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, mac128_state, set_scc_interrupt))
 
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac128_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac128_state,mac_via_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac128_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac128_state,mac_via_out_b))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac128_state,mac_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac128_state,mac_via_irq))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, mac128_state,mac_via_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, mac128_state,mac_via_in_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, mac128_state,mac_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, mac128_state,mac_via_out_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, mac128_state,mac_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, mac128_state,mac_via_irq))
 
 	MCFG_MACKBD_ADD(MACKBD_TAG)
 #ifdef MAC_USE_EMULATED_KBD
-	MCFG_MACKBD_DATAOUT_HANDLER(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
-	MCFG_MACKBD_CLKOUT_HANDLER(WRITELINE(mac128_state, mac_kbd_clk_in))
+	MCFG_MACKBD_DATAOUT_HANDLER(WRITELINE("via6522_0", via6522_device, write_cb2))
+	MCFG_MACKBD_CLKOUT_HANDLER(WRITELINE(*this, mac128_state, mac_kbd_clk_in))
 #endif
 
 	/* internal ram */
@@ -1391,8 +1391,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mac128_state::macplus)
 	mac512ke(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(macplus_map)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(macplus_map)
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
@@ -1400,7 +1400,7 @@ MACHINE_CONFIG_START(mac128_state::macplus)
 
 	MCFG_DEVICE_ADD("ncr5380", NCR5380, C7M)
 	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_NCR5380_IRQ_CB(WRITELINE(mac128_state, mac_scsi_irq))
+	MCFG_NCR5380_IRQ_CB(WRITELINE(*this, mac128_state, mac_scsi_irq))
 
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_interface)
 

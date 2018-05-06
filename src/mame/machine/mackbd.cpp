@@ -161,13 +161,13 @@ INPUT_PORTS_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(mackbd_device::device_add_mconfig)
-	MCFG_CPU_ADD(MACKBD_CPU_TAG, I8021, 3000000)    // "the approximate clock rate of the MPU is 3 MHz"
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(mackbd_device, p0_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(mackbd_device, p0_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(mackbd_device, p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(mackbd_device, p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(mackbd_device, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(mackbd_device, p2_w))
+	MCFG_DEVICE_ADD(MACKBD_CPU_TAG, I8021, 3000000)    // "the approximate clock rate of the MPU is 3 MHz"
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, mackbd_device, p0_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, mackbd_device, p0_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, mackbd_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, mackbd_device, p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, mackbd_device, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, mackbd_device, p2_w))
 	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("MODS")) MCFG_DEVCB_RSHIFT(1) // option
 MACHINE_CONFIG_END
 

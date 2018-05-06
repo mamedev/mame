@@ -519,11 +519,11 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 MACHINE_CONFIG_START(casloopy_state::casloopy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",SH2A,8000000)
-	MCFG_CPU_PROGRAM_MAP(casloopy_map)
+	MCFG_DEVICE_ADD("maincpu",SH2A,8000000)
+	MCFG_DEVICE_PROGRAM_MAP(casloopy_map)
 
-//  MCFG_CPU_ADD("subcpu",V60,8000000)
-//  MCFG_CPU_PROGRAM_MAP(casloopy_sub_map)
+//  MCFG_DEVICE_ADD("subcpu",V60,8000000)
+//  MCFG_DEVICE_PROGRAM_MAP(casloopy_sub_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

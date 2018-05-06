@@ -732,7 +732,7 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 		int j = (quick_addr + i);
 		if (image.fread(&ch, 1) != 1)
 		{
-			char message[256];
+			char message[512];
 			snprintf(message, ARRAY_LENGTH(message), "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, message);
 			image.message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
@@ -747,9 +747,9 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 /* Machine driver */
 MACHINE_CONFIG_START(homelab_state::homelab)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(homelab2_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", homelab_state,  homelab_frame)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(homelab2_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homelab_state,  homelab_frame)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -766,9 +766,9 @@ MACHINE_CONFIG_START(homelab_state::homelab)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -779,9 +779,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homelab_state::homelab3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(homelab3_mem)
-	MCFG_CPU_IO_MAP(homelab3_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(homelab3_mem)
+	MCFG_DEVICE_IO_MAP(homelab3_io)
 	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,homelab3)
 
 	/* video hardware */
@@ -799,9 +799,9 @@ MACHINE_CONFIG_START(homelab_state::homelab3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -812,9 +812,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homelab_state::brailab4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(brailab4_mem)
-	MCFG_CPU_IO_MAP(brailab4_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(brailab4_mem)
+	MCFG_DEVICE_IO_MAP(brailab4_io)
 	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,brailab4)
 
 	/* video hardware */
@@ -832,14 +832,14 @@ MACHINE_CONFIG_START(homelab_state::brailab4)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("mea8000", MEA8000, 3840000)
+	MCFG_DEVICE_ADD("mea8000", MEA8000, 3840000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_CASSETTE_ADD( "cassette" )

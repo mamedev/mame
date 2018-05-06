@@ -160,8 +160,6 @@ DECLARE_DEVICE_TYPE(ECONET,      econet_device)
 DECLARE_DEVICE_TYPE(ECONET_SLOT, econet_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( econet_devices );
-
-
+void econet_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_ECONET_ECONET_H

@@ -308,10 +308,10 @@ WRITE8_MEMBER(speedatk_state::output_w)
 
 MACHINE_CONFIG_START(speedatk_state::speedatk)
 
-	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) //divider is unknown
-	MCFG_CPU_PROGRAM_MAP(speedatk_mem)
-	MCFG_CPU_IO_MAP(speedatk_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", speedatk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK/2) //divider is unknown
+	MCFG_DEVICE_PROGRAM_MAP(speedatk_mem)
+	MCFG_DEVICE_IO_MAP(speedatk_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speedatk_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8) // timing is unknown
@@ -337,9 +337,9 @@ MACHINE_CONFIG_START(speedatk_state::speedatk)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/4) //divider is unknown
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/4) //divider is unknown
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(speedatk_state, output_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, speedatk_state, output_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 

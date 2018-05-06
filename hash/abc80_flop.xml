@@ -113,6 +113,7 @@
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=mJqlYFwMZWU -->
+	<!-- TODO sound is missing PWM effects -->
 	<software name="abcdata">
 		<description>ABCDatastorm</description>
 		<year>2017</year>
@@ -122,6 +123,22 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="abcdatastorm.dsk" size="163840" crc="7aa13813" sha1="b0c13aa5928772485d8edb8d41e8e97b3028ac5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=uplyiXYgg6w -->
+	<!-- TODO 3:01-3:25 right half of raster bars are corrupted -->
+	<!-- TODO sound is missing PWM effects -->
+	<software name="abcbook">
+		<description>ABCBook</description>
+		<year>2017</year>
+		<publisher>Five Finger Punch</publisher>
+		<info name="usage" value="RUN&quot;ABCBOOK&quot;" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="abcbook.dsk" size="163840" crc="ff881fbf" sha1="3a91c40464614f19c208101f90877ec3ec7dec89" offset="0" />
 			</dataarea>
 		</part>
 	</software>

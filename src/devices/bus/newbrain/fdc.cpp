@@ -94,9 +94,10 @@ void newbrain_fdc_device::newbrain_fdc_io(address_map &map)
 //  newbrain_floppies
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( newbrain_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void newbrain_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 
 //-------------------------------------------------
@@ -104,12 +105,12 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(newbrain_fdc_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(newbrain_fdc_mem)
-	MCFG_CPU_IO_MAP(newbrain_fdc_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(newbrain_fdc_mem)
+	MCFG_DEVICE_IO_MAP(newbrain_fdc_io)
 
 	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(newbrain_fdc_device, fdc_int_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, newbrain_fdc_device, fdc_int_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", newbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", newbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)

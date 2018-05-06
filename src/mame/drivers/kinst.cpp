@@ -697,11 +697,11 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kinst_state::kinst)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R4600LE, MASTER_CLOCK*2)
+	MCFG_DEVICE_ADD("maincpu", R4600LE, MASTER_CLOCK*2)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kinst_state,  irq0_start)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kinst_state,  irq0_start)
 
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)

@@ -352,9 +352,9 @@ WRITE_LINE_MEMBER( micronic_state::mc146818_irq )
 
 MACHINE_CONFIG_START(micronic_state::micronic)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(micronic_mem)
-	MCFG_CPU_IO_MAP(micronic_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(micronic_mem)
+	MCFG_DEVICE_IO_MAP(micronic_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
@@ -373,7 +373,7 @@ MACHINE_CONFIG_START(micronic_state::micronic)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
+	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* ram banks */
@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(micronic_state::micronic)
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram2", micronic_state, nvram_init)  // additional ram banks
 
 	MCFG_MC146818_ADD( MC146818_TAG, XTAL(32'768) )
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(micronic_state, mc146818_irq))
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, micronic_state, mc146818_irq))
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -270,9 +270,10 @@ void tutor_state::machine_reset()
 	m_tape_interrupt_enable = 0;
 	m_centronics_busy = 0;
 
-	// Enable auto wait states by lowering READY during reset
-	m_maincpu->ready_line(CLEAR_LINE);
+	// Disable auto wait states; with enabled wait states, cassette loading fails
+	m_maincpu->ready_line(ASSERT_LINE);
 	m_maincpu->reset_line(ASSERT_LINE);
+	m_maincpu->hold_line(CLEAR_LINE);
 }
 
 /*
@@ -756,14 +757,14 @@ MACHINE_CONFIG_START(tutor_state::tutor)
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn76489a", SN76489A, 3579545)   /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("sn76489a", SN76489A, 3579545)   /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(tutor_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, tutor_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -778,8 +779,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tutor_state::pyuutajr)
 	tutor(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pyuutajr_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pyuutajr_mem)
 	//MCFG_DEVICE_REMOVE("centronics")
 	//MCFG_DEVICE_REMOVE("cassette")
 MACHINE_CONFIG_END

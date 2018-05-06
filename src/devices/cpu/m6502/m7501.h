@@ -29,6 +29,6 @@ enum {
 	M7501_NMI_LINE = m6502_device::NMI_LINE
 };
 
-extern const device_type M7501;
+DECLARE_DEVICE_TYPE(M7501, m7501_device)
 
 #endif // MAME_CPU_M6502_M7501_H
