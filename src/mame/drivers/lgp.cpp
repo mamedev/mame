@@ -408,19 +408,19 @@ PALETTE_INIT_MEMBER(lgp_state, lgp)
 /* DRIVER */
 MACHINE_CONFIG_START(lgp_state::lgp)
 	/* main cpu */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_PCB_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_program_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lgp_state,  vblank_callback_lgp)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_PCB_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_program_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lgp_state,  vblank_callback_lgp)
 
 	/* sound cpu */
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_PCB_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(sound_program_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_PCB_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(sound_program_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_LDV1000_COMMAND_STROBE_CB(WRITELINE(lgp_state, ld_command_strobe_cb))
+	MCFG_LASERDISC_LDV1000_COMMAND_STROBE_CB(WRITELINE(*this, lgp_state, ld_command_strobe_cb))
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, lgp_state, screen_update_lgp)
 	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 
@@ -435,7 +435,7 @@ MACHINE_CONFIG_START(lgp_state::lgp)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

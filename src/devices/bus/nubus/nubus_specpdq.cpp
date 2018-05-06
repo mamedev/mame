@@ -88,11 +88,10 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
 	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
-	m_assembled_tag(util::string_format("%s:%s", tag, SPECPDQ_SCREEN_NAME)),
 	m_width(0), m_height(0), m_patofsx(0), m_patofsy(0), m_vram_addr(0), m_vram_src(0),
 	m_palette(*this, "palette")
 {
-	set_screen(m_assembled_tag.c_str());
+	set_screen(*this, SPECPDQ_SCREEN_NAME);
 }
 
 //-------------------------------------------------

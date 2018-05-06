@@ -134,7 +134,7 @@ private:
 
 }   }   // end namespace bus::hexbus
 
-SLOT_INTERFACE_EXTERN( hexbus_conn );
+void hexbus_conn(device_slot_interface &device);
 
 DECLARE_DEVICE_TYPE_NS(HEXBUS, bus::hexbus, hexbus_device)
 

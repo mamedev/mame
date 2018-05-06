@@ -70,8 +70,8 @@ void serial_box_device::serial_box_mem(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(serial_box_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6502_TAG, M65C02, XTAL(4'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(serial_box_mem)
+	MCFG_DEVICE_ADD(M6502_TAG, M65C02, XTAL(4'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(serial_box_mem)
 MACHINE_CONFIG_END
 
 

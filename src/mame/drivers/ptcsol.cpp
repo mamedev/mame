@@ -446,14 +446,14 @@ void sol20_state::sol20_io(address_map &map)
 	map(0xfd, 0xfd).rw(this, FUNC(sol20_state::sol20_fd_r), FUNC(sol20_state::sol20_fd_w));
 	map(0xfe, 0xfe).w(this, FUNC(sol20_state::sol20_fe_w));
 	map(0xff, 0xff).portr("S2");
-/*  AM_RANGE(0xf8, 0xf8) serial status in (bit 6=data av, bit 7=tmbe)
-    AM_RANGE(0xf9, 0xf9) serial data in, out
-    AM_RANGE(0xfa, 0xfa) general status in (bit 0=keyb data av, bit 1=parin data av, bit 2=parout ready)
-    AM_RANGE(0xfb, 0xfb) tape
-    AM_RANGE(0xfc, 0xfc) keyboard data in
-    AM_RANGE(0xfd, 0xfd) parallel data in, out
-    AM_RANGE(0xfe, 0xfe) scroll register
-    AM_RANGE(0xff, 0xff) sense switches */
+/*  map(0xf8, 0xf8) serial status in (bit 6=data av, bit 7=tmbe)
+    map(0xf9, 0xf9) serial data in, out
+    map(0xfa, 0xfa) general status in (bit 0=keyb data av, bit 1=parin data av, bit 2=parout ready)
+    map(0xfb, 0xfb) tape
+    map(0xfc, 0xfc) keyboard data in
+    map(0xfd, 0xfd) parallel data in, out
+    map(0xfe, 0xfe) scroll register
+    map(0xff, 0xff) sense switches */
 }
 
 /* Input ports */
@@ -714,10 +714,10 @@ void sol20_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(sol20_state::sol20)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(14'318'181) / 7) // divider selectable as 5, 6 or 7 through jumpers
-	MCFG_CPU_PROGRAM_MAP(sol20_mem)
-	MCFG_CPU_IO_MAP(sol20_io)
-	MCFG_I8085A_INTE(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(14'318'181) / 7) // divider selectable as 5, 6 or 7 through jumpers
+	MCFG_DEVICE_PROGRAM_MAP(sol20_mem)
+	MCFG_DEVICE_IO_MAP(sol20_io)
+	MCFG_I8085A_INTE(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -733,7 +733,7 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00) // music board
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05) // cass1 speaker
@@ -752,13 +752,13 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 	MCFG_CASSETTE_INTERFACE("sol20_cass")
 
 	MCFG_DEVICE_ADD("uart", AY51013, 0) // TMS6011NC
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_AY51013_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_AY51013_TX_CLOCK(4800.0)
 	MCFG_AY51013_RX_CLOCK(4800.0)
 	MCFG_AY51013_AUTO_RDAV(true) // ROD (pin 4) tied to RDD (pin 18)
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 
 	MCFG_DEVICE_ADD("uart_s", AY51013, 0) // TMS6011NC
 	MCFG_AY51013_TX_CLOCK(4800.0)

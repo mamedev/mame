@@ -428,17 +428,17 @@ void timeplt_state::machine_reset()
 MACHINE_CONFIG_START(timeplt_state::timeplt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* not confirmed, but common for Konami games of the era */
-	MCFG_CPU_PROGRAM_MAP(timeplt_main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* not confirmed, but common for Konami games of the era */
+	MCFG_DEVICE_PROGRAM_MAP(timeplt_main_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B3
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(timeplt_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(timeplt_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(timeplt_state, video_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(timeplt_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(timeplt_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, timeplt_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, timeplt_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, timeplt_state, video_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, timeplt_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, timeplt_state, coin_counter_2_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // PAY OUT - not used
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -451,7 +451,7 @@ MACHINE_CONFIG_START(timeplt_state::timeplt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(timeplt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(timeplt_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, timeplt_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", timeplt)
 	MCFG_PALETTE_ADD("palette", 32*4+64*4)
@@ -459,8 +459,7 @@ MACHINE_CONFIG_START(timeplt_state::timeplt)
 
 	/* sound hardware */
 
-	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
-	downcast<timeplt_audio_device *>(device)->timeplt_sound(config);
+	MCFG_DEVICE_ADD("timeplt_audio", TIMEPLT_AUDIO)
 MACHINE_CONFIG_END
 
 
@@ -468,8 +467,8 @@ MACHINE_CONFIG_START(timeplt_state::psurge)
 	timeplt(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(psurge_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(psurge_main_map)
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
@@ -489,8 +488,8 @@ MACHINE_CONFIG_START(timeplt_state::bikkuric)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", chkun)
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(chkun_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(chkun_main_map)
 
 	MCFG_VIDEO_START_OVERRIDE(timeplt_state,chkun)
 MACHINE_CONFIG_END
@@ -501,8 +500,8 @@ MACHINE_CONFIG_START(timeplt_state::chkun)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", chkun)
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("timeplt_audio:ay2")
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("^", timeplt_state, chkun_sound_w))
+	MCFG_DEVICE_MODIFY("timeplt_audio:ay2")
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, timeplt_state, chkun_sound_w))
 
 	MCFG_TC8830F_ADD("tc8830f", XTAL(512'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "timeplt_audio:mono", 0.10)

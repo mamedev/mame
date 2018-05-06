@@ -291,9 +291,9 @@ void miragemj_state::machine_reset()
 MACHINE_CONFIG_START(miragemj_state::mirage)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
-	MCFG_CPU_PROGRAM_MAP(mirage_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", miragemj_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 28000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(mirage_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", miragemj_state,  irq6_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93C45
 
@@ -306,7 +306,7 @@ MACHINE_CONFIG_START(miragemj_state::mirage)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(miragemj_state, screen_update_mirage)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirage)

@@ -612,10 +612,11 @@ void device_ti8x_link_port_byte_interface::bit_received(bool data)
 #include "teeconn.h"
 #include "tispeaker.h"
 
-SLOT_INTERFACE_START(default_ti8x_link_devices)
-	SLOT_INTERFACE("bitsock",       TI8X_BIT_SOCKET)
-	SLOT_INTERFACE("glinkhle",      TI8X_GRAPH_LINK_HLE)
-	SLOT_INTERFACE("tee",           TI8X_TEE_CONNECTOR)
-	SLOT_INTERFACE("monospkr",      TI8X_SPEAKER_MONO)
-	SLOT_INTERFACE("stereospkr",    TI8X_SPEAKER_STEREO)
-SLOT_INTERFACE_END
+void default_ti8x_link_devices(device_slot_interface &device)
+{
+	device.option_add("bitsock",       TI8X_BIT_SOCKET);
+	device.option_add("glinkhle",      TI8X_GRAPH_LINK_HLE);
+	device.option_add("tee",           TI8X_TEE_CONNECTOR);
+	device.option_add("monospkr",      TI8X_SPEAKER_MONO);
+	device.option_add("stereospkr",    TI8X_SPEAKER_STEREO);
+}

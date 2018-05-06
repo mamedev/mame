@@ -359,10 +359,10 @@ INTERRUPT_GEN_MEMBER(cabaret_state::cabaret_interrupt)
 
 MACHINE_CONFIG_START(cabaret_state::cabaret)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(cabaret_map)
-	MCFG_CPU_IO_MAP(cabaret_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cabaret_state, cabaret_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cabaret_map)
+	MCFG_DEVICE_IO_MAP(cabaret_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cabaret_state, cabaret_interrupt)
 
 	MCFG_DEVICE_ADD("ppi1", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS2"))
@@ -371,11 +371,11 @@ MACHINE_CONFIG_START(cabaret_state::cabaret)
 
 	MCFG_DEVICE_ADD("ppi2", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(cabaret_state, ppi2_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(cabaret_state, ppi2_c_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, cabaret_state, ppi2_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, cabaret_state, ppi2_c_w))
 
 	MCFG_DEVICE_ADD("ppi3", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(cabaret_state, nmi_and_coins_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, cabaret_state, nmi_and_coins_w))
 	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0xf0))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW2"))
@@ -395,7 +395,7 @@ MACHINE_CONFIG_START(cabaret_state::cabaret)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

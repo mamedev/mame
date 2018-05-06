@@ -43,10 +43,11 @@ FLOPPY_FORMATS_MEMBER( isbc_218a_device::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( isbc_218a_floppies )
-	SLOT_INTERFACE( "8dd", FLOPPY_8_DSDD )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void isbc_218a_floppies(device_slot_interface &device)
+{
+	device.option_add("8dd", FLOPPY_8_DSDD);
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 
 //-------------------------------------------------
@@ -55,8 +56,8 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(isbc_218a_device::device_add_mconfig)
 	MCFG_I8272A_ADD(I8272_TAG, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(isbc_218a_device, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(isbc_218a_device, fdc_drq))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, isbc_218a_device, fdc_irq))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, isbc_218a_device, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD(I8272_TAG":0", isbc_218a_floppies, "525dd", isbc_218a_device::floppy_formats)
 MACHINE_CONFIG_END
 

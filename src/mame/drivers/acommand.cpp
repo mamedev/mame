@@ -466,8 +466,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(acommand_state::acommand_scanline)
 MACHINE_CONFIG_START(acommand_state::acommand)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,12000000)
-	MCFG_CPU_PROGRAM_MAP(acommand_map)
+	MCFG_DEVICE_ADD("maincpu",M68000,12000000)
+	MCFG_DEVICE_PROGRAM_MAP(acommand_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", acommand_state, acommand_scanline, "screen", 0, 1)
 
 	/* video hardware */

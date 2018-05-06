@@ -210,6 +210,8 @@ protected:
 	ppc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map);
 
 public:
+	virtual ~ppc_device() override;
+
 	void set_bus_frequency(uint32_t bus_frequency) { c_bus_frequency = bus_frequency; }
 	void set_bus_frequency(const XTAL &xtal) { set_bus_frequency(xtal.value()); }
 
@@ -795,7 +797,7 @@ DECLARE_DEVICE_TYPE(PPC603R,   ppc603r_device)
 DECLARE_DEVICE_TYPE(PPC604,    ppc604_device)
 DECLARE_DEVICE_TYPE(MPC8240,   mpc8240_device)
 DECLARE_DEVICE_TYPE(PPC403GA,  ppc403ga_device)
-DECLARE_DEVICE_TYPE(PPC403GCX, ppc403ga_device)
+DECLARE_DEVICE_TYPE(PPC403GCX, ppc403gcx_device)
 DECLARE_DEVICE_TYPE(PPC405GP,  ppc405gp_device)
 
 #endif  // MAME_CPU_POWERPC_PPC_H

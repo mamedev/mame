@@ -90,6 +90,6 @@ protected:
 DECLARE_DEVICE_TYPE(EINSTEIN_USERPORT, einstein_userport_device)
 
 // supported devices
-SLOT_INTERFACE_EXTERN(einstein_userport_cards);
+void einstein_userport_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_EINSTEIN_USERPORT_USERPORT_H

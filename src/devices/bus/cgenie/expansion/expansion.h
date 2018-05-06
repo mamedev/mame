@@ -115,7 +115,7 @@ protected:
 };
 
 // device type definition
-extern const device_type CG_EXP_SLOT;
+DECLARE_DEVICE_TYPE(CG_EXP_SLOT, cg_exp_slot_device)
 
 // include here so drivers don't need to
 #include "carts.h"

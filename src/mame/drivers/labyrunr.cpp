@@ -167,9 +167,9 @@ void labyrunr_state::machine_start()
 MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)      /* 24MHz/8? */
-	MCFG_CPU_PROGRAM_MAP(labyrunr_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(labyrunr_state, labyrunr_timer_interrupt,  4*60)
+	MCFG_DEVICE_ADD("maincpu", HD6309, 3000000*4)      /* 24MHz/8? */
+	MCFG_DEVICE_PROGRAM_MAP(labyrunr_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(labyrunr_state, labyrunr_timer_interrupt,  4*60)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -181,7 +181,7 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(labyrunr_state, screen_update_labyrunr)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(labyrunr_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, labyrunr_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", labyrunr)
 	MCFG_PALETTE_ADD("palette", 2*8*16*16)
@@ -196,7 +196,7 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 3000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
@@ -204,7 +204,7 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_SOUND_ROUTE(2, "mono", 0.40)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM2203, 3000000)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)

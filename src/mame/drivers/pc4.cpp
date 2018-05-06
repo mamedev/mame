@@ -220,9 +220,9 @@ void pc4_state::machine_start()
 
 MACHINE_CONFIG_START(pc4_state::pc4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(pc4_mem)
-	MCFG_CPU_IO_MAP(pc4_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pc4_mem)
+	MCFG_DEVICE_IO_MAP(pc4_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(pc4_state::pc4)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
+	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))

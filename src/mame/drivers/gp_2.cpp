@@ -581,9 +581,9 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(gp_2_state::gp_2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2457600)
-	MCFG_CPU_PROGRAM_MAP(gp_2_map)
-	MCFG_CPU_IO_MAP(gp_2_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2457600)
+	MCFG_DEVICE_PROGRAM_MAP(gp_2_map)
+	MCFG_DEVICE_IO_MAP(gp_2_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -596,9 +596,9 @@ MACHINE_CONFIG_START(gp_2_state::gp_2)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(gp_2_state, porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(gp_2_state, portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gp_2_state, portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, gp_2_state, porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, gp_2_state, portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gp_2_state, portc_w))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 2457600 )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) // Todo: absence of ints will cause a watchdog reset

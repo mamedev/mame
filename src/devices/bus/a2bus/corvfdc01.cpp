@@ -31,9 +31,10 @@ FLOPPY_FORMATS_MEMBER( a2bus_corvfdc01_device::corv_floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( corv_floppies )
-	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
-SLOT_INTERFACE_END
+static void corv_floppies(device_slot_interface &device)
+{
+	device.option_add("8sssd", FLOPPY_8_SSSD);
+}
 
 ROM_START( fdc01 )
 	ROM_REGION(0x20, FDC01_ROM_REGION, 0)
@@ -84,8 +85,8 @@ enum
 
 MACHINE_CONFIG_START(a2bus_corvfdc01_device::device_add_mconfig)
 	MCFG_FD1793_ADD(FDC01_FDC_TAG, XTAL(16'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc01_device, intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc01_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":0", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":1", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":2", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)

@@ -34,10 +34,11 @@ FLOPPY_FORMATS_MEMBER(electron_ap34_device::floppy_formats)
 	FLOPPY_ACORN_ADFS_OLD_FORMAT
 FLOPPY_FORMATS_END0
 
-SLOT_INTERFACE_START(ap34_floppies)
-	SLOT_INTERFACE("35dd",  FLOPPY_35_DD)
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+void ap34_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd",  FLOPPY_35_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration

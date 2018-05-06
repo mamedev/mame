@@ -773,14 +773,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(pgm2_state::pgm2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", IGS036, 100000000) // ?? ARM based CPU, has internal ROM.
-	MCFG_CPU_PROGRAM_MAP(pgm2_rom_map)
+	MCFG_DEVICE_ADD("maincpu", IGS036, 100000000) // ?? ARM based CPU, has internal ROM.
+	MCFG_DEVICE_PROGRAM_MAP(pgm2_rom_map)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pgm2_state,  igs_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pgm2_state,  igs_interrupt)
 	MCFG_TIMER_DRIVER_ADD("mcu_timer", pgm2_state, igs_interrupt2)
 
 	MCFG_ARM_AIC_ADD("arm_aic")
-	MCFG_IRQ_LINE_CB(WRITELINE(pgm2_state, irq))
+	MCFG_IRQ_LINE_CB(WRITELINE(*this, pgm2_state, irq))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -789,7 +789,7 @@ MACHINE_CONFIG_START(pgm2_state::pgm2)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 448-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm2_state, screen_update_pgm2)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm2_state, screen_vblank_pgm2))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pgm2_state, screen_vblank_pgm2))
 
 	MCFG_GFXDECODE_ADD("gfxdecode2", "tx_palette", pgm2_tx)
 
@@ -826,16 +826,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pgm2_state::pgm2_hires)
 	pgm2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pgm2_module_rom_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pgm2_module_rom_map)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pgm2_state::pgm2_ramrom)
 	pgm2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pgm2_ram_rom_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pgm2_ram_rom_map)
 MACHINE_CONFIG_END
 
 /* using macros for the video / sound roms because the locations never change between sets, and

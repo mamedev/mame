@@ -137,9 +137,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tamag1_state::tama)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E0C6S46, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", E0C6S46, 32.768_kHz_XTAL)
 	MCFG_E0C6S46_PIXEL_UPDATE_CB(tamag1_state, pixel_update)
-	MCFG_E0C6S46_WRITE_R_CB(4, WRITE8(tamag1_state, speaker_w))
+	MCFG_E0C6S46_WRITE_R_CB(4, WRITE8(*this, tamag1_state, speaker_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -156,7 +156,7 @@ MACHINE_CONFIG_START(tamag1_state::tama)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

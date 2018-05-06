@@ -479,21 +479,21 @@ WRITE_LINE_MEMBER(mirax_state::vblank_irq)
 }
 
 MACHINE_CONFIG_START(mirax_state::mirax)
-	MCFG_CPU_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
-	MCFG_CPU_PROGRAM_MAP(mirax_main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
+	MCFG_DEVICE_PROGRAM_MAP(mirax_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4)
-	MCFG_CPU_PROGRAM_MAP(mirax_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mirax_state, irq0_line_hold,  4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/4)
+	MCFG_DEVICE_PROGRAM_MAP(mirax_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mirax_state, irq0_line_hold,  4*60)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // R10
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mirax_state, coin_counter0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mirax_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mirax_state, coin_counter1_w)) // only used in 'miraxa' - see notes
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mirax_state, coin_counter0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mirax_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mirax_state, coin_counter1_w)) // only used in 'miraxa' - see notes
 	// One address flips X, the other flips Y, but I can't tell which is which
 	// Since the value is the same for the 2 addresses, it doesn't really matter
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mirax_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mirax_state, flip_screen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mirax_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mirax_state, flip_screen_y_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -503,7 +503,7 @@ MACHINE_CONFIG_START(mirax_state::mirax)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mirax_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mirax_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mirax_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(mirax_state, mirax)
@@ -513,10 +513,10 @@ MACHINE_CONFIG_START(mirax_state::mirax)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8912, 12000000/4)
+	MCFG_DEVICE_ADD("ay1", AY8912, 12000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("ay2", AY8912, 12000000/4)
+	MCFG_DEVICE_ADD("ay2", AY8912, 12000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

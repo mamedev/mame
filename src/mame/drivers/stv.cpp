@@ -1065,18 +1065,18 @@ WRITE8_MEMBER( stv_state::pdr2_output_w )
 MACHINE_CONFIG_START(stv_state::stv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MCFG_CPU_PROGRAM_MAP(stv_mem)
+	MCFG_DEVICE_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MCFG_DEVICE_PROGRAM_MAP(stv_mem)
 	MCFG_SH2_IS_SLAVE(0)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", stv_state, saturn_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
-	MCFG_CPU_PROGRAM_MAP(stv_mem)
+	MCFG_DEVICE_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MCFG_DEVICE_PROGRAM_MAP(stv_mem)
 	MCFG_SH2_IS_SLAVE(1)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_scantimer", stv_state, saturn_slave_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
-	MCFG_CPU_PROGRAM_MAP(sound_mem)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 11289600) //11.2896 MHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
 
 	MCFG_SEGA_SCU_ADD("scu")
 	downcast<sega_scu_device &>(*device).set_hostcpu("maincpu");
@@ -1084,18 +1084,18 @@ MACHINE_CONFIG_START(stv_state::stv)
 	MCFG_SMPC_HLE_ADD("smpc", XTAL(4'000'000))
 	MCFG_SMPC_HLE_SCREEN("screen")
 	downcast<smpc_hle_device &>(*device).set_region_code(0);
-	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(stv_state, pdr1_input_r))
-	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(stv_state, pdr2_input_r))
-	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(stv_state, pdr1_output_w))
-	MCFG_SMPC_HLE_PDR2_OUT_CB(WRITE8(stv_state, pdr2_output_w))
-	MCFG_SMPC_HLE_MASTER_RESET_CB(WRITELINE(saturn_state, master_sh2_reset_w))
-	MCFG_SMPC_HLE_MASTER_NMI_CB(WRITELINE(saturn_state, master_sh2_nmi_w))
-	MCFG_SMPC_HLE_SLAVE_RESET_CB(WRITELINE(saturn_state, slave_sh2_reset_w))
-//  MCFG_SMPC_HLE_SOUND_RESET_CB(WRITELINE(saturn_state, sound_68k_reset_w)) // ST-V games controls reset line via PDR2
-	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(saturn_state, system_reset_w))
-	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(saturn_state, system_halt_w))
-	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(saturn_state, dot_select_w))
-	MCFG_SMPC_HLE_IRQ_HANDLER_CB(DEVWRITELINE("scu", sega_scu_device, smpc_irq_w))
+	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(*this, stv_state, pdr1_input_r))
+	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(*this, stv_state, pdr2_input_r))
+	MCFG_SMPC_HLE_PDR1_OUT_CB(WRITE8(*this, stv_state, pdr1_output_w))
+	MCFG_SMPC_HLE_PDR2_OUT_CB(WRITE8(*this, stv_state, pdr2_output_w))
+	MCFG_SMPC_HLE_MASTER_RESET_CB(WRITELINE(*this, saturn_state, master_sh2_reset_w))
+	MCFG_SMPC_HLE_MASTER_NMI_CB(WRITELINE(*this, saturn_state, master_sh2_nmi_w))
+	MCFG_SMPC_HLE_SLAVE_RESET_CB(WRITELINE(*this, saturn_state, slave_sh2_reset_w))
+//  MCFG_SMPC_HLE_SOUND_RESET_CB(WRITELINE(*this, saturn_state, sound_68k_reset_w)) // ST-V games controls reset line via PDR2
+	MCFG_SMPC_HLE_SYSTEM_RESET_CB(WRITELINE(*this, saturn_state, system_reset_w))
+	MCFG_SMPC_HLE_SYSTEM_HALT_CB(WRITELINE(*this, saturn_state, system_halt_w))
+	MCFG_SMPC_HLE_DOT_SELECT_CB(WRITELINE(*this, saturn_state, dot_select_w))
+	MCFG_SMPC_HLE_IRQ_HANDLER_CB(WRITELINE("scu", sega_scu_device, smpc_irq_w))
 
 	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
 	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
@@ -1115,9 +1115,9 @@ MACHINE_CONFIG_START(stv_state::stv)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("scsp", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(saturn_state, scsp_irq))
-	MCFG_SCSP_MAIN_IRQ_CB(DEVWRITELINE("scu", sega_scu_device, sound_req_w))
+	MCFG_DEVICE_ADD("scsp", SCSP)
+	MCFG_SCSP_IRQ_CB(WRITE8(*this, saturn_state, scsp_irq))
+	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE("scu", sega_scu_device, sound_req_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1132,16 +1132,16 @@ MACHINE_CONFIG_START(stv_state::stvcd)
 	stv(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(stvcd_mem)
+	MCFG_DEVICE_PROGRAM_MAP(stvcd_mem)
 	MCFG_DEVICE_MODIFY("slave")
-	MCFG_CPU_PROGRAM_MAP(stvcd_mem)
+	MCFG_DEVICE_PROGRAM_MAP(stvcd_mem)
 
 	MCFG_DEVICE_ADD("stvcd", STVCD, 0)
 	//MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	//MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_MODIFY("scsp")
-	MCFG_SCSP_EXTS_CB(DEVREAD16("stvcd", stvcd_device, channel_volume_r))
+	MCFG_SCSP_EXTS_CB(READ16("stvcd", stvcd_device, channel_volume_r))
 MACHINE_CONFIG_END
 
 
@@ -3633,7 +3633,7 @@ GAME( 1995, fhboxers,  stvbios, stv,      stv,      stv_state,   fhboxers,   ROT
 GAME( 1997, findlove,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Daiki / FCF",                  "Zenkoku Seifuku Bishoujo Grand Prix Find Love (J 971212 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, gaxeduel,  stvbios, stv,      stv6b,    stv_state,   gaxeduel,   ROT0,   "Sega",                         "Golden Axe - The Duel (JUETL 950117 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
 GAME( 1998, grdforce,  stvbios, stv,      stv,      stv_state,   grdforce,   ROT0,   "Success",                      "Guardian Force (JUET 980318 V0.105)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, groovef,   stvbios, stv,      stv6b,    stv_state,   groovef,    ROT0,   "Atlus",                        "Groove on Fight - Gouketsuji Ichizoku 3 (J 970416 V1.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, groovef,   stvbios, stv,      stv6b,    stv_state,   groovef,    ROT0,   "Atlus",                        "Groove on Fight - Gouketsuji Ichizoku 3 (J 970416 V1.001)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, hanagumi,  stvbios, stv,      stv,      stv_state,   hanagumi,   ROT0,   "Sega",                         "Sakura Taisen - Hanagumi Taisen Columns (J 971007 V1.010)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, introdon,  stvbios, stv,      stv,      stv_state,   stv,        ROT0,   "Sunsoft / Success",            "Karaoke Quiz Intro Don Don! (J 960213 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, kiwames,   stvbios, stv,      stvmp,    stv_state,   stvmp,      ROT0,   "Athena",                       "Pro Mahjong Kiwame S (J 951020 V1.208)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -57,11 +57,24 @@
 		<description>Colorful Animals</description>
 		<year>2018</year>
 		<publisher>Genesis Project</publisher>
-		<info name="usage" value="RUN&quot;A.B&quot;" />
+		<info name="usage" value="BYE, A" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="colorful_animals.dsk" size="163840" crc="ba6ba9a1" sha1="36f9a0b814b222eb5664a87f3b52c0268dfd18c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abc832">
+		<description>ABC832 Systemskiva v2.5 (Swe)</description>
+		<year>1982</year>
+		<publisher>Luxor</publisher>
+		<info name="usage" value="BYE" />
+
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="abc832.dsk" size="655360" crc="36c1ff01" sha1="7aceaa4bf79301f545ec4b8ca7cbaa7f34fff462" offset="0" />
 			</dataarea>
 		</part>
 	</software>

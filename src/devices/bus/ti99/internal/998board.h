@@ -482,7 +482,7 @@ private:
 	bool m_bavold;
 
 	bool m_hsk;         // Handshake line; when true, a bus member needs more time to process the message
-	bool m_hsklocal;	// Local level of HSK
+	bool m_hsklocal;    // Local level of HSK
 	bool m_shsk;        // Stable HSK
 	bool m_hskold;
 
@@ -512,25 +512,25 @@ private:
 
 	// Page 6 (RHSUS*)
 	bool m_rhsus;       // Needed to assert the HSK line until the CPU has read the byte
-	
+
 	bool m_rbusy;
-	
+
 	bool m_phi3;
-	
+
 	// Debugging help
 	uint8_t m_oldvalue;
-/*	
-	// This is a buffer to enqueue changes on the Hexbus
-	// This is not part of the real implementation, but in the emulation
-	// there is no guarantee that two subsequent bus changes will be sensed
-	// on the other side
-	
-	void enqueue(uint8_t val);
-	uint8_t dequeue();
+/*
+    // This is a buffer to enqueue changes on the Hexbus
+    // This is not part of the real implementation, but in the emulation
+    // there is no guarantee that two subsequent bus changes will be sensed
+    // on the other side
 
-	uint8_t m_queue[8];
-	int m_qhead;
-	int m_qtail; */
+    void enqueue(uint8_t val);
+    uint8_t dequeue();
+
+    uint8_t m_queue[8];
+    int m_qhead;
+    int m_qtail; */
 };
 
 class mainboard8_device : public device_t

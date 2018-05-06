@@ -119,9 +119,9 @@ void zms8085_state::machine_start()
 }
 
 MACHINE_CONFIG_START(zms8085_state::zephyr)
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(15'582'000) / 2) // divider not verified
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(15'582'000) / 2) // divider not verified
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(15'582'000), 980, 0, 800, 265, 0, 250)
@@ -130,12 +130,12 @@ MACHINE_CONFIG_START(zms8085_state::zephyr)
 	MCFG_DEVICE_ADD("uart", AY51013, 0) // SMC COM2017
 	MCFG_AY51013_TX_CLOCK(153600) // should actually be configurable somehow
 	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_AY51013_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_AY51013_WRITE_DAV_CB(INPUTLINE("maincpu", I8085_RST65_LINE))
 	MCFG_AY51013_AUTO_RDAV(true)
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************

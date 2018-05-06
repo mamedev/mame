@@ -4,6 +4,7 @@
 #define MAME_INCLUDES_XAVIX_H
 
 #include "cpu/m6502/xavix.h"
+#include "cpu/m6502/xavix2000.h"
 #include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
@@ -41,6 +42,7 @@ public:
 
 	void xavix(machine_config &config);
 	void xavixp(machine_config &config);
+	void xavix2000(machine_config &config);
 
 	void xavix_map(address_map &map);
 	void xavix_lowbus_map(address_map &map);
@@ -63,6 +65,8 @@ private:
 
 	DECLARE_READ8_MEMBER(main_r);
 	DECLARE_WRITE8_MEMBER(main_w);
+	DECLARE_READ8_MEMBER(main2_r);
+	DECLARE_WRITE8_MEMBER(main2_w);
 
 	DECLARE_WRITE8_MEMBER(xavix_7900_w);
 	DECLARE_WRITE8_MEMBER(xavix_7901_w);
@@ -100,7 +104,7 @@ private:
 	DECLARE_WRITE8_MEMBER(xavix_7a01_w);
 	DECLARE_WRITE8_MEMBER(xavix_7a02_w);
 	DECLARE_WRITE8_MEMBER(xavix_7a03_w);
-	
+
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	DECLARE_WRITE8_MEMBER(irq_vector0_lo_w);
 	DECLARE_WRITE8_MEMBER(irq_vector0_hi_w);

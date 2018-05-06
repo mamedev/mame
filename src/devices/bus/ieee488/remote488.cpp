@@ -158,8 +158,8 @@
 
 // Debugging
 #include "logmacro.h"
-#define LOG_PARSER_MASK	(LOG_GENERAL << 1)
-#define LOG_PARSER(...)	LOGMASKED(LOG_PARSER_MASK, __VA_ARGS__)
+#define LOG_PARSER_MASK (LOG_GENERAL << 1)
+#define LOG_PARSER(...) LOGMASKED(LOG_PARSER_MASK, __VA_ARGS__)
 #undef VERBOSE
 #define VERBOSE LOG_GENERAL
 

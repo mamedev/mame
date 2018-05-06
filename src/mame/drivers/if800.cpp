@@ -89,9 +89,9 @@ void if800_state::upd7220_map(address_map &map)
 
 MACHINE_CONFIG_START(if800_state::if800)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 8000000)
-	MCFG_CPU_PROGRAM_MAP(if800_map)
-	MCFG_CPU_IO_MAP(if800_io)
+	MCFG_DEVICE_ADD("maincpu", I8086, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(if800_map)
+	MCFG_DEVICE_IO_MAP(if800_io)
 
 
 //  MCFG_PIC8259_ADD( "pic8259", if800_pic8259_config )

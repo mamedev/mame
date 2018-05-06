@@ -225,12 +225,12 @@ void skyfox_state::machine_reset()
 MACHINE_CONFIG_START(skyfox_state::skyfox)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2) /* Verified at 4MHz */
-	MCFG_CPU_PROGRAM_MAP(skyfox_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", skyfox_state, skyfox_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2) /* Verified at 4MHz */
+	MCFG_DEVICE_PROGRAM_MAP(skyfox_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skyfox_state, skyfox_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
-	MCFG_CPU_PROGRAM_MAP(skyfox_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
+	MCFG_DEVICE_PROGRAM_MAP(skyfox_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -250,10 +250,10 @@ MACHINE_CONFIG_START(skyfox_state::skyfox)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

@@ -116,10 +116,11 @@ FLOPPY_FORMATS_MEMBER( msx_cart_disk_device::floppy_formats )
 FLOPPY_FORMATS_END
 
 
-static SLOT_INTERFACE_START( msx_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-	SLOT_INTERFACE( "35ssdd", FLOPPY_35_SSDD )
-SLOT_INTERFACE_END
+static void msx_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("35ssdd", FLOPPY_35_SSDD);
+}
 
 
 msx_cart_disk_device::msx_cart_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

@@ -1768,9 +1768,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_state::aristmk4_pf)
 
 MACHINE_CONFIG_START(aristmk4_state::aristmk4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK/8) // M68B09E @ 1.5 MHz
-	MCFG_CPU_PROGRAM_MAP(aristmk4_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aristmk4_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CLOCK/8) // M68B09E @ 1.5 MHz
+	MCFG_DEVICE_PROGRAM_MAP(aristmk4_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aristmk4_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("power_fail", aristmk4_state, aristmk4_pf, attotime::from_hz(1))
@@ -1789,26 +1789,26 @@ MACHINE_CONFIG_START(aristmk4_state::aristmk4)
 	MCFG_PALETTE_INIT_OWNER(aristmk4_state, aristmk4)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(aristmk4_state, pa1_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(aristmk4_state, pb1_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(aristmk4_state, pc1_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, aristmk4_state, pa1_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, aristmk4_state, pb1_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, aristmk4_state, pc1_r))
 
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, MAIN_CLOCK/8) // R65C22P2
-	MCFG_VIA6522_READPA_HANDLER(READ8(aristmk4_state, via_a_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(aristmk4_state, via_b_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(aristmk4_state, via_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(aristmk4_state, via_b_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(aristmk4_state, via_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(aristmk4_state, via_cb2_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, aristmk4_state, via_a_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, aristmk4_state, via_b_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, aristmk4_state, via_a_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, aristmk4_state, via_b_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, aristmk4_state, via_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, aristmk4_state, via_cb2_w))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 	// CA1 is connected to +5V, CB1 is not connected.
 
 	MCFG_DEVICE_ADD("pia6821_0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(aristmk4_state, mkiv_pia_ina))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(aristmk4_state, mkiv_pia_outa))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(aristmk4_state, mkiv_pia_outb))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(aristmk4_state, mkiv_pia_ca2))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(aristmk4_state, mkiv_pia_cb2))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, aristmk4_state, mkiv_pia_ina))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, aristmk4_state, mkiv_pia_outa))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, aristmk4_state, mkiv_pia_outb))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, aristmk4_state, mkiv_pia_ca2))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, aristmk4_state, mkiv_pia_cb2))
 
 	MCFG_MC6845_ADD("crtc", C6545_1, "screen", MAIN_CLOCK/8) // TODO: type is unknown
 	/* in fact is a mc6845 driving 4 pixels by memory address.
@@ -1821,17 +1821,17 @@ MACHINE_CONFIG_START(aristmk4_state::aristmk4)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	// the Mark IV has X 2 AY8910 sound chips which are tied to the VIA
-	MCFG_SOUND_ADD("ay1", AY8910 , MAIN_CLOCK/8)
+	MCFG_DEVICE_ADD("ay1", AY8910 , MAIN_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(aristmk4_state, zn434_w)) // Port write to set Vout of the DA convertors ( 2 x ZN434 )
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, aristmk4_state, zn434_w)) // Port write to set Vout of the DA convertors ( 2 x ZN434 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ay2", AY8910 , MAIN_CLOCK/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(aristmk4_state, pblp_out))   // Port A write - goes to lamps on the buttons x8
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(aristmk4_state, pbltlp_out))  // Port B write - goes to lamps on the buttons x4 and light tower x4
+	MCFG_DEVICE_ADD("ay2", AY8910 , MAIN_CLOCK/8)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, aristmk4_state, pblp_out))   // Port A write - goes to lamps on the buttons x8
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, aristmk4_state, pbltlp_out))  // Port B write - goes to lamps on the buttons x4 and light tower x4
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(5)  /* one for each meter - can pulse simultaneously */
 	MCFG_SAMPLES_NAMES(meter_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
@@ -1841,9 +1841,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aristmk4_state::aristmk4_poker)
 	aristmk4(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(aristmk4_poker_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aristmk4_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(aristmk4_poker_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aristmk4_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
 /* same as Aristocrat Mark-IV HW color offset 7 */

@@ -7,8 +7,8 @@
     Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 1999/11/05 -
 
 ******************************************************************************/
-#ifndef MAME_INCLUDES_NB1413M3_H
-#define MAME_INCLUDES_NB1413M3_H
+#ifndef MAME_MACHINE_NB1413M3_H
+#define MAME_MACHINE_NB1413M3_H
 
 #pragma once
 
@@ -202,4 +202,4 @@ DECLARE_DEVICE_TYPE(NB1413M3, nb1413m3_device)
 #define MCFG_NB1413M3_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, NB1413M3, 0)
 
-#endif // MAME_INCLUDES_NB1413M3_H
+#endif // MAME_MACHINE_NB1413M3_H

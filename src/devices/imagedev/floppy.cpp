@@ -1363,7 +1363,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 MACHINE_CONFIG_START(floppy_image_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO(FLOPSPK)
-	MCFG_SOUND_ADD(FLOPSND_TAG, FLOPPYSOUND, 44100)
+	MCFG_DEVICE_ADD(FLOPSND_TAG, FLOPPYSOUND, 44100)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, FLOPSPK, 0.5)
 MACHINE_CONFIG_END
 

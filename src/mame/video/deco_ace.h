@@ -69,6 +69,6 @@ DECLARE_DEVICE_TYPE(DECO_ACE, deco_ace_device)
 	MCFG_DEVICE_ADD(_tag, DECO_ACE, 0)
 
 #define MCFG_DECO_ACE_PALETTE(_palette_tag) \
-	downcast<deco_ace_device &>(*device).set_palette_tag("^" _palette_tag);
+	downcast<deco_ace_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_VIDEO_DECO_ACE_H

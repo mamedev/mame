@@ -410,8 +410,8 @@ MACHINE_CONFIG_START(_8080bw_state::invadpt2)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(invadpt2_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(invadpt2_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* 60 Hz signal clocks two LS161. Ripple carry will */
@@ -455,8 +455,8 @@ MACHINE_CONFIG_START(_8080bw_state::spacerng)
 	invadpt2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(spacerng_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(spacerng_io_map)
 MACHINE_CONFIG_END
 
 
@@ -498,8 +498,8 @@ MACHINE_CONFIG_START(_8080bw_state::spcewars)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(spcewars_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(spcewars_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
@@ -509,7 +509,7 @@ MACHINE_CONFIG_START(_8080bw_state::spcewars)
 	invaders_samples_audio(config);
 
 	/* extra audio channel */
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* video hardware */
@@ -540,8 +540,8 @@ void _8080bw_state::spcewarla_io_map(address_map &map)
 
 MACHINE_CONFIG_START(_8080bw_state::spcewarla)
 	spcewars(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(spcewarla_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(spcewarla_io_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
@@ -610,8 +610,8 @@ MACHINE_CONFIG_START(_8080bw_state::astropal)
 	invaders(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(astropal_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(astropal_io_map)
 
 MACHINE_CONFIG_END
 
@@ -664,9 +664,9 @@ MACHINE_CONFIG_START(_8080bw_state::cosmo)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(cosmo_map)
-	MCFG_CPU_IO_MAP(cosmo_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(cosmo_map)
+	MCFG_DEVICE_IO_MAP(cosmo_io_map)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
@@ -823,10 +823,10 @@ void _8080bw_state::spacecom_io_map(address_map &map)
 MACHINE_CONFIG_START(_8080bw_state::spacecom)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'000'000) / 10) // divider guessed
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000) / 10) // divider guessed
 	// TODO: move irq handling away from mw8080.c, this game runs on custom hardware
-	MCFG_CPU_PROGRAM_MAP(spacecom_map)
-	MCFG_CPU_IO_MAP(spacecom_io_map)
+	MCFG_DEVICE_PROGRAM_MAP(spacecom_map)
+	MCFG_DEVICE_IO_MAP(spacecom_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state, mw8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(mw8080bw_state, mw8080bw)
@@ -938,13 +938,13 @@ MACHINE_CONFIG_START(_8080bw_state::invrvnge)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(invrvnge_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(invrvnge_io_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_CPU_ADD("audiocpu", M6808, XTAL(4'000'000)/2) // MC6808P
-	MCFG_CPU_PROGRAM_MAP(invrvnge_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6808, XTAL(4'000'000)/2) // MC6808P
+	MCFG_DEVICE_PROGRAM_MAP(invrvnge_sound_map)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -960,7 +960,7 @@ MACHINE_CONFIG_START(_8080bw_state::invrvnge)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(4'000'000)/2)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(4'000'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -1076,8 +1076,8 @@ void _8080bw_state::starw1_io_map(address_map &map)
 
 MACHINE_CONFIG_START(_8080bw_state::starw1)
 	invadpt2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(starw1_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(starw1_io_map)
 MACHINE_CONFIG_END
 
 /*******************************************************/
@@ -1120,8 +1120,8 @@ MACHINE_CONFIG_START(_8080bw_state::lrescue)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(lrescue_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(lrescue_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
@@ -1136,22 +1136,22 @@ MACHINE_CONFIG_START(_8080bw_state::lrescue)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(lrescue_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* extra audio channel */
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(_8080bw_state::escmars)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(18'000'000) / 10) // divider guessed
-	MCFG_CPU_PROGRAM_MAP(escmars_map)
-	MCFG_CPU_IO_MAP(lrescue_io_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(18'000'000) / 10) // divider guessed
+	MCFG_DEVICE_PROGRAM_MAP(escmars_map)
+	MCFG_DEVICE_IO_MAP(lrescue_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, extra_8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
@@ -1169,13 +1169,13 @@ MACHINE_CONFIG_START(_8080bw_state::escmars)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(lrescue_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* extra audio channel */
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1249,9 +1249,9 @@ MACHINE_CONFIG_START(_8080bw_state::cosmicmo)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(cosmicmo_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _8080bw_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(cosmicmo_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _8080bw_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
@@ -1402,9 +1402,9 @@ MACHINE_CONFIG_START(_8080bw_state::rollingc)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rollingc_map)
-	MCFG_CPU_IO_MAP(rollingc_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rollingc_map)
+	MCFG_DEVICE_IO_MAP(rollingc_io_map)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1545,9 +1545,9 @@ MACHINE_CONFIG_START(_8080bw_state::schaser)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu",I8080,1996800)       /* 19.968MHz / 10 */
-	MCFG_CPU_PROGRAM_MAP(schaser_map)
-	MCFG_CPU_IO_MAP(schaser_io_map)
+	MCFG_DEVICE_REPLACE("maincpu",I8080,1996800)       /* 19.968MHz / 10 */
+	MCFG_DEVICE_PROGRAM_MAP(schaser_map)
+	MCFG_DEVICE_IO_MAP(schaser_io_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
@@ -1568,7 +1568,7 @@ MACHINE_CONFIG_START(_8080bw_state::schaser)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(470)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_M(2.2))                   // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1.0), RES_K(4.7))   // attack_decay_cap + attack_res
@@ -1582,9 +1582,9 @@ MACHINE_CONFIG_START(_8080bw_state::schaser)
 	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                   // mixer A, B, C
 	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                   // envelope 1, 2
 	MCFG_SN76477_ENABLE(1)                               // enable
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(schaser)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1682,9 +1682,9 @@ MACHINE_CONFIG_START(_8080bw_state::schasercv)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(schaser_map)
-	MCFG_CPU_IO_MAP(schasercv_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(schaser_map)
+	MCFG_DEVICE_IO_MAP(schasercv_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, schasercv)
 
 	/* add shifter */
@@ -1699,14 +1699,14 @@ MACHINE_CONFIG_START(_8080bw_state::schasercv)
 	/* sound hardware */
 	invaders_samples_audio(config);
 
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(_8080bw_state::crashrd)
 	schaser(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(crashrd_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(crashrd_io_map)
 MACHINE_CONFIG_END
 
 
@@ -1781,9 +1781,9 @@ MACHINE_CONFIG_START(_8080bw_state::sflush)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu",M6800,1500000) // ?
-	MCFG_CPU_PROGRAM_MAP(sflush_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _8080bw_state, irq0_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu",M6800,1500000) // ?
+	MCFG_DEVICE_PROGRAM_MAP(sflush_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _8080bw_state, irq0_line_hold)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,sflush)
 
 	/* add shifter */
@@ -1886,8 +1886,8 @@ MACHINE_CONFIG_START(_8080bw_state::lupin3)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(lupin3_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(lupin3_io_map)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
@@ -1903,7 +1903,7 @@ MACHINE_CONFIG_START(_8080bw_state::lupin3)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
 	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
@@ -1919,20 +1919,20 @@ MACHINE_CONFIG_START(_8080bw_state::lupin3)
 	MCFG_SN76477_ENABLE(1)                              // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(lupin3_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(indianbt)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(_8080bw_state::lupin3a)
 	lupin3(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(schaser_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(schaser_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,sflush)
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2053,10 +2053,10 @@ MACHINE_CONFIG_START(_8080bw_state::polaris)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu",I8080,1996800)       /* 19.968MHz / 10 */
-	MCFG_CPU_PROGRAM_MAP(schaser_map)
-	MCFG_CPU_IO_MAP(polaris_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _8080bw_state,  polaris_interrupt)
+	MCFG_DEVICE_REPLACE("maincpu",I8080,1996800)       /* 19.968MHz / 10 */
+	MCFG_DEVICE_PROGRAM_MAP(schaser_map)
+	MCFG_DEVICE_IO_MAP(polaris_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _8080bw_state,  polaris_interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
@@ -2075,7 +2075,7 @@ MACHINE_CONFIG_START(_8080bw_state::polaris)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(polaris)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2187,8 +2187,8 @@ MACHINE_CONFIG_START(_8080bw_state::ballbomb)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(ballbomb_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(ballbomb_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
@@ -2203,7 +2203,7 @@ MACHINE_CONFIG_START(_8080bw_state::ballbomb)
 	/* sound hardware */
 	invaders_samples_audio(config);
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(ballbomb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2270,9 +2270,9 @@ MACHINE_CONFIG_START(_8080bw_state::yosakdon)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(yosakdon_map)
-	MCFG_CPU_IO_MAP(yosakdon_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(yosakdon_map)
+	MCFG_DEVICE_IO_MAP(yosakdon_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* sound hardware */
@@ -2436,8 +2436,8 @@ MACHINE_CONFIG_START(_8080bw_state::indianbt)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(indianbt_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(indianbt_io_map)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
@@ -2453,7 +2453,7 @@ MACHINE_CONFIG_START(_8080bw_state::indianbt)
 	/* sound hardware */
 	invaders_samples_audio(config);
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(indianbt)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2462,9 +2462,9 @@ MACHINE_CONFIG_START(_8080bw_state::indianbtbr)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(schaser_map)
-	MCFG_CPU_IO_MAP(indianbtbr_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(schaser_map)
+	MCFG_DEVICE_IO_MAP(indianbtbr_io_map)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
@@ -2539,8 +2539,8 @@ MACHINE_CONFIG_START(_8080bw_state::steelwkr)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(steelwkr_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(steelwkr_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
@@ -2758,10 +2758,10 @@ void _8080bw_state::shuttlei_io_map(address_map &map)
 MACHINE_CONFIG_START(_8080bw_state::shuttlei)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(18'000'000) / 9)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(18'000'000) / 9)
 	// TODO: move irq handling away from mw8080.cpp, this game runs on custom hardware
-	MCFG_CPU_PROGRAM_MAP(shuttlei_map)
-	MCFG_CPU_IO_MAP(shuttlei_io_map)
+	MCFG_DEVICE_PROGRAM_MAP(shuttlei_map)
+	MCFG_DEVICE_IO_MAP(shuttlei_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, extra_8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
@@ -2885,10 +2885,10 @@ MACHINE_CONFIG_START(_8080bw_state::darthvdr)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(darthvdr_map)
-	MCFG_CPU_IO_MAP(darthvdr_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _8080bw_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(darthvdr_map)
+	MCFG_DEVICE_IO_MAP(darthvdr_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _8080bw_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,darthvdr)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,darthvdr)
@@ -2960,8 +2960,8 @@ MACHINE_CONFIG_START(_8080bw_state::vortex)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(vortex_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(vortex_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -3270,8 +3270,8 @@ MACHINE_CONFIG_START(_8080bw_state::claybust)
 	invaders(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(claybust_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(claybust_io_map)
 
 	MCFG_TIMER_DRIVER_ADD("claybust_gun", _8080bw_state, claybust_gun_callback)
 
@@ -3387,8 +3387,8 @@ MACHINE_CONFIG_START(_8080bw_state::attackfc)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(attackfc_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(attackfc_io_map)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -3527,8 +3527,8 @@ MACHINE_CONFIG_START(_8080bw_state::invmulti)
 	invaders(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(invmulti_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(invmulti_map)
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
@@ -3845,7 +3845,8 @@ ROM_START( spcewars )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sanritsu.1",   0x0000, 0x0400, CRC(ca331679) SHA1(5c362c3d1c721d293bcddbef4033533769c8f0e0) )
 	ROM_LOAD( "sanritsu.2",   0x0400, 0x0400, CRC(48dc791c) SHA1(91a98205c83ca38961e6ba2ac43a41e6e8bc2675) )
-	ROM_LOAD( "ic35.bin",     0x0800, 0x0800, CRC(40c2d55b) SHA1(b641b63046d242ad23911143ed840011fc98eaff) )
+	ROM_LOAD( "sanritsu.3",   0x0800, 0x0400, CRC(c34842cb) SHA1(6565ff760909f9339194b7ea45aa8c4e871b9f56) )
+	ROM_LOAD( "sanritsu.4",   0x0c00, 0x0400, CRC(a7fdfd0e) SHA1(d8501881ce38d7bca29010debf34a8b996f1f103) )
 	ROM_LOAD( "sanritsu.5",   0x1000, 0x0400, CRC(77475431) SHA1(15a04a2655847ee462be65d1065d643c872bb47c) )
 	ROM_LOAD( "sanritsu.6",   0x1400, 0x0400, CRC(392ef82c) SHA1(77c98c11ee727ed3ed6e118f13d97aabdb555540) )
 	ROM_LOAD( "sanritsu.7",   0x1800, 0x0400, CRC(b3a93df8) SHA1(3afc96814149d4d5343fe06eac09f808384d02c4) )

@@ -87,8 +87,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(iqunlim_state::iqunlim)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) // DragonBall EZ (MC68EZ328) (68k core) (is the xtal correct? this was from the other hardware)
-	MCFG_CPU_PROGRAM_MAP(iqunlim_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // DragonBall EZ (MC68EZ328) (68k core) (is the xtal correct? this was from the other hardware)
+	MCFG_DEVICE_PROGRAM_MAP(iqunlim_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

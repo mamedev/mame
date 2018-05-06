@@ -416,10 +416,10 @@ void midqslvr_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(midqslvr_state::midqslvr)
-	MCFG_CPU_ADD("maincpu", PENTIUM, 333000000) // actually Celeron 333
-	MCFG_CPU_PROGRAM_MAP(midqslvr_map)
-	MCFG_CPU_IO_MAP(midqslvr_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 333000000) // actually Celeron 333
+	MCFG_DEVICE_PROGRAM_MAP(midqslvr_map)
+	MCFG_DEVICE_IO_MAP(midqslvr_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 
@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(midqslvr_state::midqslvr)
 	MCFG_PCI_BUS_LEGACY_DEVICE(31, DEVICE_SELF, midqslvr_state, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	/* video hardware */
 	pcvideo_vga(config);

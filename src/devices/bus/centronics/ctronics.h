@@ -11,7 +11,7 @@
 #pragma once
 
 #include "machine/buffer.h"
-#include "machine/latch.h"
+#include "machine/output_latch.h"
 
 
 #define MCFG_CENTRONICS_ADD(_tag, _slot_intf, _def_slot) \
@@ -71,24 +71,24 @@
 
 #define MCFG_CENTRONICS_OUTPUT_LATCH_ADD(_tag, _centronics_tag) \
 	MCFG_DEVICE_ADD(_tag, OUTPUT_LATCH, 0) \
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(DEVWRITELINE(_centronics_tag, centronics_device, write_data0)) \
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(DEVWRITELINE(_centronics_tag, centronics_device, write_data1)) \
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(DEVWRITELINE(_centronics_tag, centronics_device, write_data2)) \
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(DEVWRITELINE(_centronics_tag, centronics_device, write_data3)) \
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(DEVWRITELINE(_centronics_tag, centronics_device, write_data4)) \
-	MCFG_OUTPUT_LATCH_BIT5_HANDLER(DEVWRITELINE(_centronics_tag, centronics_device, write_data5)) \
-	MCFG_OUTPUT_LATCH_BIT6_HANDLER(DEVWRITELINE(_centronics_tag, centronics_device, write_data6)) \
-	MCFG_OUTPUT_LATCH_BIT7_HANDLER(DEVWRITELINE(_centronics_tag, centronics_device, write_data7))
+	MCFG_OUTPUT_LATCH_BIT0_HANDLER(WRITELINE(_centronics_tag, centronics_device, write_data0)) \
+	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE(_centronics_tag, centronics_device, write_data1)) \
+	MCFG_OUTPUT_LATCH_BIT2_HANDLER(WRITELINE(_centronics_tag, centronics_device, write_data2)) \
+	MCFG_OUTPUT_LATCH_BIT3_HANDLER(WRITELINE(_centronics_tag, centronics_device, write_data3)) \
+	MCFG_OUTPUT_LATCH_BIT4_HANDLER(WRITELINE(_centronics_tag, centronics_device, write_data4)) \
+	MCFG_OUTPUT_LATCH_BIT5_HANDLER(WRITELINE(_centronics_tag, centronics_device, write_data5)) \
+	MCFG_OUTPUT_LATCH_BIT6_HANDLER(WRITELINE(_centronics_tag, centronics_device, write_data6)) \
+	MCFG_OUTPUT_LATCH_BIT7_HANDLER(WRITELINE(_centronics_tag, centronics_device, write_data7))
 
 #define MCFG_CENTRONICS_DATA_INPUT_BUFFER(_tag) \
-	MCFG_CENTRONICS_DATA0_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit0)) \
-	MCFG_CENTRONICS_DATA1_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit1)) \
-	MCFG_CENTRONICS_DATA2_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit2)) \
-	MCFG_CENTRONICS_DATA3_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit3)) \
-	MCFG_CENTRONICS_DATA4_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit4)) \
-	MCFG_CENTRONICS_DATA5_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit5)) \
-	MCFG_CENTRONICS_DATA6_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit6)) \
-	MCFG_CENTRONICS_DATA7_HANDLER(DEVWRITELINE(_tag, input_buffer_device, write_bit7))
+	MCFG_CENTRONICS_DATA0_HANDLER(WRITELINE(_tag, input_buffer_device, write_bit0)) \
+	MCFG_CENTRONICS_DATA1_HANDLER(WRITELINE(_tag, input_buffer_device, write_bit1)) \
+	MCFG_CENTRONICS_DATA2_HANDLER(WRITELINE(_tag, input_buffer_device, write_bit2)) \
+	MCFG_CENTRONICS_DATA3_HANDLER(WRITELINE(_tag, input_buffer_device, write_bit3)) \
+	MCFG_CENTRONICS_DATA4_HANDLER(WRITELINE(_tag, input_buffer_device, write_bit4)) \
+	MCFG_CENTRONICS_DATA5_HANDLER(WRITELINE(_tag, input_buffer_device, write_bit5)) \
+	MCFG_CENTRONICS_DATA6_HANDLER(WRITELINE(_tag, input_buffer_device, write_bit6)) \
+	MCFG_CENTRONICS_DATA7_HANDLER(WRITELINE(_tag, input_buffer_device, write_bit7))
 
 DECLARE_DEVICE_TYPE(CENTRONICS, centronics_device)
 
@@ -216,6 +216,6 @@ protected:
 };
 
 
-SLOT_INTERFACE_EXTERN( centronics_devices );
+void centronics_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_CENTRONICS_CTRONICS_H

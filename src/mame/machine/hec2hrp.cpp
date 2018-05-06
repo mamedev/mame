@@ -808,7 +808,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hector_audio)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)  /* Sound level for cassette, as it is in mono => output channel=0*/
 
-	MCFG_SOUND_ADD("sn76477", SN76477, 0)
+	MCFG_DEVICE_ADD("sn76477", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(390)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_K(680))                  // decay_res
 	MCFG_SN76477_ATTACK_PARAMS(CAP_U(47), RES_K(180))   // attack_decay_cap + attack_res
@@ -820,7 +820,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hector_audio)
 	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(1.00001), RES_K(10000))   // oneshot caps + res
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0) /* Son 1bit*/
+	MCFG_DEVICE_ADD("discrete", DISCRETE) /* Son 1bit*/
 	MCFG_DISCRETE_INTF(hec2hrp)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

@@ -1371,8 +1371,8 @@ static const uint8_t descram_ppu_2012_2017[5][6] = {
 
 MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502_VTSCR, NTSC_APU_CLOCK) // selectable speed?
-	MCFG_CPU_PROGRAM_MAP(nes_vt_map)
+	MCFG_DEVICE_ADD("maincpu", M6502_VTSCR, NTSC_APU_CLOCK) // selectable speed?
+	MCFG_DEVICE_PROGRAM_MAP(nes_vt_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.0988)
@@ -1391,8 +1391,8 @@ MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 	MCFG_PPU_VT03_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
 	MCFG_PPU2C0X_SET_NMI(nes_vt_state, ppu_nmi)
-	MCFG_PPU_VT03_READ_BG_CB(READ8(nes_vt_state,chr_r))
-	MCFG_PPU_VT03_READ_SP_CB(READ8(nes_vt_state,spr_r))
+	MCFG_PPU_VT03_READ_BG_CB(READ8(*this, nes_vt_state,chr_r))
+	MCFG_PPU_VT03_READ_SP_CB(READ8(*this, nes_vt_state,spr_r))
 
 	MCFG_DEVICE_ADD("prg", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(prg_map)
@@ -1413,16 +1413,16 @@ MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 	   than just using 2 APUs as registers in the 2nd one affect the PCM channel mode but the
 	   DMA control still comes from the 1st, but in the new mode, sound always outputs via the
 	   2nd.  Probably need to split the APU into interface and sound gen logic. */
-	MCFG_SOUND_ADD("apu", NES_APU, NTSC_APU_CLOCK)
-	MCFG_NES_APU_IRQ_HANDLER(WRITELINE(nes_vt_state, apu_irq))
-	MCFG_NES_APU_MEM_READ_CALLBACK(READ8(nes_vt_state, apu_read_mem))
+	MCFG_DEVICE_ADD("apu", NES_APU, NTSC_APU_CLOCK)
+	MCFG_NES_APU_IRQ_HANDLER(WRITELINE(*this, nes_vt_state, apu_irq))
+	MCFG_NES_APU_MEM_READ_CALLBACK(READ8(*this, nes_vt_state, apu_read_mem))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nes_vt_state::nes_vt_hum)
 	nes_vt(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nes_vt_hum_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nes_vt_hum_map)
 
 	MCFG_PPU_VT03_MODIFY("ppu")
 	MCFG_PPU_VT03_SET_DESCRAMBLE(descram_ppu_2012_2017[3]);
@@ -1430,8 +1430,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nes_vt_state::nes_vt_pjoy)
 	nes_vt(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nes_vt_pjoy_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nes_vt_pjoy_map)
 
 	MCFG_PPU_VT03_MODIFY("ppu")
 	MCFG_PPU_VT03_SET_DESCRAMBLE(descram_ppu_2012_2017[2]);
@@ -1440,8 +1440,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nes_vt_state::nes_vt_sp69)
 	nes_vt(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nes_vt_sp69_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nes_vt_sp69_map)
 
 	MCFG_PPU_VT03_MODIFY("ppu")
 	MCFG_PPU_VT03_SET_DESCRAMBLE(descram_ppu_2012_2017[4]);
@@ -1450,26 +1450,26 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nes_vt_state::nes_vt_xx)
 	nes_vt(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nes_vt_xx_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nes_vt_xx_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nes_vt_state::nes_vt_cy)
 	nes_vt_xx(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nes_vt_cy_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nes_vt_cy_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nes_vt_state::nes_vt_bt)
 	nes_vt_xx(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nes_vt_bt_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nes_vt_bt_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nes_vt_state::nes_vt_dg)
 	nes_vt_xx(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nes_vt_dg_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nes_vt_dg_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50.0070)
@@ -1481,8 +1481,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nes_vt_state::nes_vt_vg )
 	nes_vt_dg(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nes_vt_hh_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nes_vt_hh_map)
 
 	MCFG_PPU_VT03_MODIFY("ppu")
 	MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_VG);
@@ -1492,8 +1492,8 @@ MACHINE_CONFIG_END
 // New mystery handheld architecture, VTxx derived
 MACHINE_CONFIG_START(nes_vt_state::nes_vt_hh)
 	nes_vt_xx(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nes_vt_hh_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nes_vt_hh_map)
 	MCFG_PPU_VT03_MODIFY("ppu")
 	MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_RGB);
 
@@ -1511,8 +1511,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(nes_vt_state::nes_vt_fp)
 	nes_vt_xx(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nes_vt_fp_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nes_vt_fp_map)
 
 	MCFG_PPU_VT03_MODIFY("ppu")
 	MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_RGB12);
@@ -1520,8 +1520,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nes_vt_state::nes_vt_fa)
 	nes_vt_xx(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nes_vt_fa_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nes_vt_fa_map)
 MACHINE_CONFIG_END
 
 

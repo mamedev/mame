@@ -136,11 +136,11 @@ void namco_54xx_device::device_start()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(namco_54xx_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", MB8844, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
-	MCFG_MB88XX_READ_K_CB(READ8(namco_54xx_device, K_r))
-	MCFG_MB88XX_WRITE_O_CB(WRITE8(namco_54xx_device, O_w))
-	MCFG_MB88XX_READ_R0_CB(READ8(namco_54xx_device, R0_r))
-	MCFG_MB88XX_WRITE_R1_CB(WRITE8(namco_54xx_device, R1_w))
+	MCFG_DEVICE_ADD("mcu", MB8844, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
+	MCFG_MB88XX_READ_K_CB(READ8(*this, namco_54xx_device, K_r))
+	MCFG_MB88XX_WRITE_O_CB(WRITE8(*this, namco_54xx_device, O_w))
+	MCFG_MB88XX_READ_R0_CB(READ8(*this, namco_54xx_device, R0_r))
+	MCFG_MB88XX_WRITE_R1_CB(WRITE8(*this, namco_54xx_device, R1_w))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

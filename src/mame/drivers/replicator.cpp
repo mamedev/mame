@@ -608,10 +608,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(replicator_state::replicator)
 
-	MCFG_CPU_ADD("maincpu", ATMEGA1280, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(replicator_prg_map)
-	MCFG_CPU_DATA_MAP(replicator_data_map)
-	MCFG_CPU_IO_MAP(replicator_io_map)
+	MCFG_DEVICE_ADD("maincpu", ATMEGA1280, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(replicator_prg_map)
+	MCFG_DEVICE_DATA_MAP(replicator_data_map)
+	MCFG_DEVICE_IO_MAP(replicator_io_map)
 
 	MCFG_CPU_AVR8_EEPROM("eeprom")
 	MCFG_CPU_AVR8_LFUSE(0xFF)
@@ -641,9 +641,9 @@ MACHINE_CONFIG_START(replicator_state::replicator)
 	/* sound hardware */
 	/* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.5)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( replica1 )

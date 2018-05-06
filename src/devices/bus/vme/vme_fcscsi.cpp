@@ -205,9 +205,10 @@ FLOPPY_FORMATS_MEMBER( vme_fcscsi1_card_device::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( fcscsi_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void fcscsi_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 /* ROM definitions */
@@ -229,14 +230,14 @@ ROM_END
 
 MACHINE_CONFIG_START(vme_fcscsi1_card_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68010, CPU_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
-	MCFG_CPU_PROGRAM_MAP (fcscsi1_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vme_fcscsi1_card_device, maincpu_irq_acknowledge_callback)
+	MCFG_DEVICE_ADD ("maincpu", M68010, CPU_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
+	MCFG_DEVICE_PROGRAM_MAP (fcscsi1_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(vme_fcscsi1_card_device, maincpu_irq_acknowledge_callback)
 
 	/* FDC  */
 	MCFG_WD1772_ADD("fdc", PIT_CRYSTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(vme_fcscsi1_card_device, fdc_irq))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("mc68450", hd63450_device, drq1_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(*this, vme_fcscsi1_card_device, fdc_irq))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("mc68450", hd63450_device, drq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
@@ -244,19 +245,19 @@ MACHINE_CONFIG_START(vme_fcscsi1_card_device::device_add_mconfig)
 
 	/* PIT Parallel Interface and Timer device */
 	MCFG_DEVICE_ADD ("pit", PIT68230, PIT_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
-	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(vme_fcscsi1_card_device, led_w))
+	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(*this, vme_fcscsi1_card_device, led_w))
 
 	/* DMAC it is really a M68450 but the HD63850 is upwards compatible */
 	MCFG_DEVICE_ADD("mc68450", HD63450, 0)   // MC68450 compatible
 	MCFG_HD63450_CPU("maincpu") // CPU - 68010
 	MCFG_HD63450_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2))
 	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
-	MCFG_HD63450_DMA_END_CB(WRITE8(vme_fcscsi1_card_device, dma_end))
-	MCFG_HD63450_DMA_ERROR_CB(WRITE8(vme_fcscsi1_card_device, dma_error))
-	//MCFG_HD63450_DMA_READ_0_CB(READ8(vme_fcscsi1_card_device, scsi_read_byte))  // ch 0 = SCSI
-	//MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(vme_fcscsi1_card_device, scsi_write_byte))
-	MCFG_HD63450_DMA_READ_1_CB(READ8(vme_fcscsi1_card_device, fdc_read_byte))  // ch 1 = fdc
-	MCFG_HD63450_DMA_WRITE_1_CB(WRITE8(vme_fcscsi1_card_device, fdc_write_byte))
+	MCFG_HD63450_DMA_END_CB(WRITE8(*this, vme_fcscsi1_card_device, dma_end))
+	MCFG_HD63450_DMA_ERROR_CB(WRITE8(*this, vme_fcscsi1_card_device, dma_error))
+	//MCFG_HD63450_DMA_READ_0_CB(READ8(*this, vme_fcscsi1_card_device, scsi_read_byte))  // ch 0 = SCSI
+	//MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(*this, vme_fcscsi1_card_device, scsi_write_byte))
+	MCFG_HD63450_DMA_READ_1_CB(READ8(*this, vme_fcscsi1_card_device, fdc_read_byte))  // ch 1 = fdc
+	MCFG_HD63450_DMA_WRITE_1_CB(WRITE8(*this, vme_fcscsi1_card_device, fdc_write_byte))
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *vme_fcscsi1_card_device::device_rom_region() const

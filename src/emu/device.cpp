@@ -25,9 +25,9 @@ namespace {
 
 struct device_registrations
 {
-	device_type_impl *first = nullptr;
-	device_type_impl *last = nullptr;
-	device_type_impl *unsorted = nullptr;
+	device_type_impl_base *first = nullptr;
+	device_type_impl_base *last = nullptr;
+	device_type_impl_base *unsorted = nullptr;
 };
 
 device_registrations &device_registration_data()
@@ -53,7 +53,7 @@ device_registrar::const_iterator device_registrar::cend() const
 }
 
 
-device_type_impl *device_registrar::register_device(device_type_impl &type)
+device_type_impl_base *device_registrar::register_device(device_type_impl_base &type)
 {
 	device_registrations &data(device_registration_data());
 
@@ -204,6 +204,21 @@ std::string device_t::parameter(const char *tag) const
 {
 	// build a fully-qualified name and look it up
 	return machine().parameters().lookup(subtag(tag));
+}
+
+
+//-------------------------------------------------
+//  add_machine_configuration - add device-
+//  specific machine configuration
+//-------------------------------------------------
+
+void device_t::add_machine_configuration(machine_config &config)
+{
+	assert(&config == &m_machine_config);
+	machine_config::token const tok(config.begin_configuration(*this));
+	device_add_mconfig(config);
+	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->next())
+		autodev->end_configuration();
 }
 
 
@@ -480,8 +495,8 @@ bool device_t::findit(bool pre_map, bool isvalidation) const
 			if (isvalidation)
 			{
 				// sanity checking
-				const char *tag = autodev->finder_tag();
-				if (tag == nullptr)
+				char const *const tag = autodev->finder_tag();
+				if (!tag)
 				{
 					osd_printf_error("Finder tag is null!\n");
 					allfound = false;

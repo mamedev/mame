@@ -840,12 +840,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(segag80r_state::g80r_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_OPCODES_MAP(g80r_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
+	MCFG_DEVICE_ADD("maincpu", Z80, VIDEO_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_OPCODES_MAP(g80r_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segag80r)
@@ -877,8 +877,8 @@ MACHINE_CONFIG_START(segag80r_state::sega005)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(main_ppi8255_portmap)
 
 	/* sound boards */
 	sega005_sound_board(config);
@@ -907,8 +907,8 @@ MACHINE_CONFIG_START(segag80r_state::monsterb)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(main_ppi8255_portmap)
 
 	/* background board changes */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
@@ -921,12 +921,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segag80r_state::monster2)
 	monsterb(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_SPAT, VIDEO_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
-	MCFG_CPU_OPCODES_MAP(sega_315_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_SPAT, VIDEO_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_ppi8255_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
+	MCFG_DEVICE_OPCODES_MAP(sega_315_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
@@ -949,16 +949,16 @@ MACHINE_CONFIG_START(segag80r_state::sindbadm)
 	g80r_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5028, VIDEO_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(sindbadm_portmap)
-	MCFG_CPU_OPCODES_MAP(sega_315_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80r_state,  sindbadm_vblank_start)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5028, VIDEO_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(sindbadm_portmap)
+	MCFG_DEVICE_OPCODES_MAP(sega_315_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segag80r_state,  sindbadm_vblank_start)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("FC"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(segag80r_state, sindbadm_misc_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segag80r_state, sindbadm_misc_w))
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
@@ -967,15 +967,15 @@ MACHINE_CONFIG_START(segag80r_state::sindbadm)
 
 	/* sound boards */
 
-	MCFG_CPU_ADD("audiocpu", Z80, SINDBADM_SOUND_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(sindbadm_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(segag80r_state, irq0_line_hold, 4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SINDBADM_SOUND_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(sindbadm_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(segag80r_state, irq0_line_hold, 4*60)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/2) /* matches PCB videos, correct? */
+	MCFG_DEVICE_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/2) /* matches PCB videos, correct? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76496, SINDBADM_SOUND_CLOCK/4) /* matches PCB videos, correct? */
+	MCFG_DEVICE_ADD("sn2", SN76496, SINDBADM_SOUND_CLOCK/4) /* matches PCB videos, correct? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 

@@ -723,8 +723,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(psychic5_state::psychic5)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(psychic5_main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(psychic5_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
@@ -734,9 +734,9 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(psychic5_sound_map)
-	MCFG_CPU_IO_MAP(psychic5_soundport_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(psychic5_sound_map)
+	MCFG_DEVICE_IO_MAP(psychic5_soundport_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))      /* Allow time for 2nd cpu to interleave */
 
@@ -760,14 +760,14 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -777,8 +777,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(psychic5_state::bombsa)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2 ) /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(bombsa_main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2 ) /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bombsa_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
@@ -788,9 +788,9 @@ MACHINE_CONFIG_START(psychic5_state::bombsa)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000) )
-	MCFG_CPU_PROGRAM_MAP(bombsa_sound_map)
-	MCFG_CPU_IO_MAP(bombsa_soundport_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(bombsa_sound_map)
+	MCFG_DEVICE_IO_MAP(bombsa_soundport_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -812,14 +812,14 @@ MACHINE_CONFIG_START(psychic5_state::bombsa)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 	MCFG_SOUND_ROUTE(2, "mono", 0.30)
 	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(12'000'000)/8)
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 	MCFG_SOUND_ROUTE(2, "mono", 0.30)

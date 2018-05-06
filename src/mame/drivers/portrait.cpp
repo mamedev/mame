@@ -250,12 +250,12 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(portrait_state::portrait)
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(portrait_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", portrait_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(portrait_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", portrait_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", I8039, 3120000)  /* ? */
-	MCFG_CPU_PROGRAM_MAP(portrait_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", I8039, 3120000)  /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(portrait_sound_map)
 
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(portrait_state::portrait)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("tms", TMS5200, 640000)
+	MCFG_DEVICE_ADD("tms", TMS5200, 640000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

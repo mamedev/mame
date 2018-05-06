@@ -1112,14 +1112,14 @@ WRITE_LINE_MEMBER(cclimber_state::bagmanf_vblank_irq)
 MACHINE_CONFIG_START(cclimber_state::root)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(cclimber_map)
-	MCFG_CPU_IO_MAP(cclimber_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cclimber_map)
+	MCFG_DEVICE_IO_MAP(cclimber_portmap)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cclimber_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cclimber_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(cclimber_state, flip_screen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cclimber_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cclimber_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cclimber_state, flip_screen_y_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1129,7 +1129,7 @@ MACHINE_CONFIG_START(cclimber_state::root)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_cclimber)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cclimber_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cclimber_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cclimber)
 	MCFG_PALETTE_ADD("palette", 16*4+8*4)
@@ -1142,7 +1142,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cclimber_state::cclimber)
 	root(config);
 	MCFG_DEVICE_MODIFY("mainlatch") // 7J on CCG-1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("cclimber_audio", cclimber_audio_device, sample_trigger_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("cclimber_audio", cclimber_audio_device, sample_trigger_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -1152,14 +1152,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cclimber_state::cclimberx)
 	cclimber(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cclimber_state::ckongb)
 	cclimber(config);
 	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cclimber_state, nmi_mask_w)) //used by Crazy Kong Bootleg with alt levels and speed up
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cclimber_state, nmi_mask_w)) //used by Crazy Kong Bootleg with alt levels and speed up
 MACHINE_CONFIG_END
 
 
@@ -1167,12 +1167,12 @@ MACHINE_CONFIG_START(cclimber_state::cannonb)
 	cclimber(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(cannonb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(cannonb_map)
 
 	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cclimber_state, flip_screen_x_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(cclimber_state, flip_screen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cclimber_state, flip_screen_x_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, cclimber_state, flip_screen_y_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // not used
 
 	/* video hardware */
@@ -1183,11 +1183,11 @@ MACHINE_CONFIG_START(cclimber_state::bagmanf)
 	cclimber(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bagmanf_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bagmanf_map)
 
 	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cclimber_state, bagmanf_vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cclimber_state, bagmanf_vblank_irq))
 MACHINE_CONFIG_END
 
 
@@ -1195,15 +1195,15 @@ MACHINE_CONFIG_START(cclimber_state::yamato)
 	root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(yamato_map)
-	MCFG_CPU_IO_MAP(yamato_portmap)
-	MCFG_CPU_OPCODES_MAP(yamato_decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(yamato_map)
+	MCFG_DEVICE_IO_MAP(yamato_portmap)
+	MCFG_DEVICE_OPCODES_MAP(yamato_decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000) /* 3.072 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(yamato_audio_map)
-	MCFG_CPU_IO_MAP(yamato_audio_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000) /* 3.072 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(yamato_audio_map)
+	MCFG_DEVICE_IO_MAP(yamato_audio_portmap)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1215,10 +1215,10 @@ MACHINE_CONFIG_START(cclimber_state::yamato)
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1536000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1536000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1536000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1536000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
@@ -1226,17 +1226,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cclimber_state::toprollr)
 	cclimber(config);
 
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(toprollr_map)
-	MCFG_CPU_IO_MAP(cclimber_portmap)
-	MCFG_CPU_OPCODES_MAP(toprollr_decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(toprollr_map)
+	MCFG_DEVICE_IO_MAP(cclimber_portmap)
+	MCFG_DEVICE_OPCODES_MAP(toprollr_decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_SIZE(0)
 	MCFG_SEGACRPT_SET_NUMBANKS(3)
 	MCFG_SEGACRPT_SET_BANKSIZE(0x6000)
 
 	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(cclimber_state, toprollr_rombank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(cclimber_state, toprollr_rombank_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, cclimber_state, toprollr_rombank_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, cclimber_state, toprollr_rombank_w))
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", toprollr)
@@ -1253,20 +1253,20 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cclimber_state::swimmer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)    /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(swimmer_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)    /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(swimmer_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cclimber_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cclimber_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(cclimber_state, flip_screen_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cclimber_state, sidebg_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(cclimber_state, palette_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cclimber_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cclimber_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cclimber_state, flip_screen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cclimber_state, sidebg_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cclimber_state, palette_bank_w))
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(4'000'000)/2)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(swimmer_audio_map)
-	MCFG_CPU_IO_MAP(swimmer_audio_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cclimber_state, nmi_line_pulse,  (double)4000000/16384) /* IRQs are triggered by the main CPU */
+	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(4'000'000)/2)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(swimmer_audio_map)
+	MCFG_DEVICE_IO_MAP(swimmer_audio_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cclimber_state, nmi_line_pulse,  (double)4000000/16384) /* IRQs are triggered by the main CPU */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1276,7 +1276,7 @@ MACHINE_CONFIG_START(cclimber_state::swimmer)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_swimmer)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cclimber_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cclimber_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", swimmer)
 	MCFG_PALETTE_ADD("palette", 32*8+4*8+1)
@@ -1289,18 +1289,18 @@ MACHINE_CONFIG_START(cclimber_state::swimmer)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(4'000'000)/2)  /* verified on pcb */
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(4'000'000)/2)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(4'000'000)/2)  /* verified on pcb */
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(4'000'000)/2)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cclimber_state::guzzler)
 	swimmer(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(guzzler_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(guzzler_map)
 MACHINE_CONFIG_END
 
 

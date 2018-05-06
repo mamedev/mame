@@ -12,7 +12,7 @@
 	MCFG_DEVICE_ADD(_tag, PSX_CONTROLLER_PORT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
-SLOT_INTERFACE_EXTERN(psx_controllers);
+void psx_controllers(device_slot_interface &device);
 
 DECLARE_DEVICE_TYPE(PSXCONTROLLERPORTS,      psxcontrollerports_device)
 DECLARE_DEVICE_TYPE(PSX_CONTROLLER_PORT,     psx_controller_port_device)

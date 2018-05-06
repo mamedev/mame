@@ -63,6 +63,6 @@ DECLARE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device)
 
 
 #define MCFG_VIDEO_VRENDER0_CPU(_tag) \
-	downcast<vr0video_device &>(*device).set_cpu_tag("^" _tag);
+	downcast<vr0video_device &>(*device).set_cpu_tag(_tag);
 
 #endif // MAME_VIDEO_VRENDER0_H

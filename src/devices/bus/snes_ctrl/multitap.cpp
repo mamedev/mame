@@ -36,10 +36,11 @@ ioport_constructor snes_multitap_device::device_input_ports() const
 }
 
 
-static SLOT_INTERFACE_START( snes_multitap )
-	SLOT_INTERFACE("joypad", SNES_JOYPAD)
-	SLOT_INTERFACE("twintap", SNES_TWINTAP)
-SLOT_INTERFACE_END
+static void snes_multitap(device_slot_interface &device)
+{
+	device.option_add("joypad", SNES_JOYPAD);
+	device.option_add("twintap", SNES_TWINTAP);
+}
 
 
 //-------------------------------------------------

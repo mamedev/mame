@@ -1343,9 +1343,9 @@ Pixel clock: 3 MHz = 192 HTotal, assuming it's 6 MHz
 MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(arkanoid_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(arkanoid_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 at ic21, counts 128 vblanks before firing watchdog; z80 /RESET ls08 ic19 pin 9 input comes from ls04 ic20 pin 8, ls04 ic20 pin 9 input comes from ic21 ls393 pin 8, and ls393 is set to chain both 4 bit counters together
@@ -1371,7 +1371,7 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL(12'000'000)/4) /* YM2149 clock is 3mhz, pin 26 is low so final clock is 3mhz/2, handled inside the ay core */
+	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(12'000'000)/4) /* YM2149 clock is 3mhz, pin 26 is low so final clock is 3mhz/2, handled inside the ay core */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | YM2149_PIN26_LOW) // all outputs are tied together with no resistors, and pin 26 is low
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
@@ -1393,7 +1393,7 @@ MACHINE_CONFIG_START(arkanoid_state::p3mcuay)
 	MCFG_DEVICE_REPLACE("mcu", ARKANOID_68705P3, XTAL(12'000'000)/4)
 	MCFG_ARKANOID_MCU_PORTB_R_CB(IOPORT("MUX"))
 
-	MCFG_SOUND_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4) // AY-3-8910A
+	MCFG_DEVICE_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4) // AY-3-8910A
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
@@ -1404,15 +1404,15 @@ MACHINE_CONFIG_START(arkanoid_state::bootleg)
 	arkanoid(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(arkanoid_state::aysnd)
 	bootleg(config);
-	MCFG_SOUND_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4)
+	MCFG_DEVICE_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
@@ -1423,9 +1423,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(arkanoid_state::hexa)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* Imported from arkanoid - correct? */
-	MCFG_CPU_PROGRAM_MAP(hexa_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* Imported from arkanoid - correct? */
+	MCFG_DEVICE_PROGRAM_MAP(hexa_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1444,7 +1444,7 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(12'000'000)/4/2) /* Imported from arkanoid - correct? */
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/4/2) /* Imported from arkanoid - correct? */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -1452,22 +1452,22 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(arkanoid_state::hexaa)
 	hexa(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hexaa_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hexaa_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL(12'000'000)/2) // ?
-	MCFG_CPU_PROGRAM_MAP(hexaa_sub_map)
-	MCFG_CPU_IO_MAP(hexaa_sub_iomap)
+	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(12'000'000)/2) // ?
+	MCFG_DEVICE_PROGRAM_MAP(hexaa_sub_map)
+	MCFG_DEVICE_IO_MAP(hexaa_sub_iomap)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(arkanoid_state::brixian)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(brixian_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(brixian_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
 	/* there is a 68705 but it's only role appears to be to copy data to RAM at startup */
 	/* the RAM is also battery backed, making the 68705 almost redundant as long as the battery doesn't die(!) */
@@ -1487,7 +1487,7 @@ MACHINE_CONFIG_START(arkanoid_state::brixian)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(12'000'000)/4/2) /* Imported from arkanoid - correct? */
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/4/2) /* Imported from arkanoid - correct? */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

@@ -381,79 +381,79 @@ static const z80_daisy_config chessmstdm_daisy_chain[] =
 MACHINE_CONFIG_START(chessmst_state::chessmst)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 9.8304_MHz_XTAL/4) // U880 Z80 clone
-	MCFG_CPU_PROGRAM_MAP(chessmst_mem)
-	MCFG_CPU_IO_MAP(chessmst_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 9.8304_MHz_XTAL/4) // U880 Z80 clone
+	MCFG_DEVICE_PROGRAM_MAP(chessmst_mem)
+	MCFG_DEVICE_IO_MAP(chessmst_io)
 	MCFG_Z80_DAISY_CHAIN(chessmst_daisy_chain)
 
 	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 9.8304_MHz_XTAL/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(chessmst_state, pio1_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio1_port_b_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, chessmst_state, pio1_port_a_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio1_port_b_w))
 
 	MCFG_DEVICE_ADD("z80pio2", Z80PIO, 9.8304_MHz_XTAL/4)
-	MCFG_Z80PIO_IN_PA_CB(READ8(chessmst_state, pio2_port_a_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio2_port_b_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, chessmst_state, pio2_port_a_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio2_port_b_w))
 
 	MCFG_DEFAULT_LAYOUT(layout_chessmst)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(chessmst_state::chessmsta)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8_MHz_XTAL/4) // U880 Z80 clone
-	MCFG_CPU_PROGRAM_MAP(chessmst_mem)
-	MCFG_CPU_IO_MAP(chessmst_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL/4) // U880 Z80 clone
+	MCFG_DEVICE_PROGRAM_MAP(chessmst_mem)
+	MCFG_DEVICE_IO_MAP(chessmst_io)
 	MCFG_Z80_DAISY_CHAIN(chessmst_daisy_chain)
 
 	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 8_MHz_XTAL/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(chessmst_state, pio1_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio1_port_b_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, chessmst_state, pio1_port_a_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio1_port_b_w))
 
 	MCFG_DEVICE_ADD("z80pio2", Z80PIO, 8_MHz_XTAL/4)
-	MCFG_Z80PIO_IN_PA_CB(READ8(chessmst_state, pio2_port_a_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio2_port_b_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, chessmst_state, pio2_port_a_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio2_port_b_w))
 
 	MCFG_DEFAULT_LAYOUT(layout_chessmst)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(chessmst_state::chessmstdm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8_MHz_XTAL/2) // U880 Z80 clone
-	MCFG_CPU_PROGRAM_MAP(chessmstdm)
-	MCFG_CPU_IO_MAP(chessmstdm_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL/2) // U880 Z80 clone
+	MCFG_DEVICE_PROGRAM_MAP(chessmstdm)
+	MCFG_DEVICE_IO_MAP(chessmstdm_io)
 	MCFG_Z80_DAISY_CHAIN(chessmstdm_daisy_chain)
 
 	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 8_MHz_XTAL/4)
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(chessmst_state, pio1_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio1_port_b_dm_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, chessmst_state, pio1_port_a_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio1_port_b_dm_w))
 	MCFG_Z80PIO_IN_PB_CB(IOPORT("EXTRA"))
 
 	MCFG_DEVICE_ADD("z80pio2", Z80PIO, 8_MHz_XTAL/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(chessmst_state, pio2_port_a_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio2_port_b_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, chessmst_state, pio2_port_a_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, chessmst_state, pio2_port_b_w))
 
 	MCFG_DEFAULT_LAYOUT(layout_chessmstdm)
 
 	MCFG_DEVICE_ADD("555_timer", CLOCK, 500) // from 555 timer
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(chessmst_state, timer_555_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, chessmst_state, timer_555_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1000)
+	MCFG_DEVICE_ADD("beeper", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "chessmstdm_cart")

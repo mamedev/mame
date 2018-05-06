@@ -395,12 +395,12 @@ void rungun_state::machine_reset()
 MACHINE_CONFIG_START(rungun_state::rng)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(rungun_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rungun_state, rng_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(rungun_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rungun_state, rng_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 8000000)
-	MCFG_CPU_PROGRAM_MAP(rungun_sound_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(rungun_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // higher if sound stutters
 
@@ -445,11 +445,11 @@ MACHINE_CONFIG_START(rungun_state::rng)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, rungun_k054539_map)
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(rungun_state, k054539_nmi_gen))
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, rungun_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

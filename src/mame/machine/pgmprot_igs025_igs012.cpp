@@ -136,8 +136,8 @@ void pgm_012_025_state::drgw2_mem(address_map &map)
 MACHINE_CONFIG_START(pgm_012_025_state::pgm_012_025_drgw2)
 	pgmbase(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(drgw2_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(drgw2_mem)
 
 	MCFG_DEVICE_ADD("igs025", IGS025, 0)
 	//MCFG_IGS025_SET_EXTERNAL_EXECUTE( pgm_022_025_state, igs025_to_igs012_callback )

@@ -67,9 +67,10 @@ const tiny_rom_entry *ql_trump_card_device::device_rom_region() const
 //  SLOT_INTERFACE( ql_trump_card_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( ql_trump_card_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void ql_trump_card_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 
 //-------------------------------------------------

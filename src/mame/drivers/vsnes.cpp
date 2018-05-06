@@ -1703,8 +1703,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(vsnes_state::vsnes)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_map)
+	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(vsnes_cpu1_map)
 								/* some carts also trigger IRQs */
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
@@ -1774,11 +1774,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(vsnes_state::vsdual)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_map)
+	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(vsnes_cpu1_map)
 
-	MCFG_CPU_ADD("sub", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(vsnes_cpu2_map)
+	MCFG_DEVICE_ADD("sub", N2A03, NTSC_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(vsnes_cpu2_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsdual)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)
@@ -1833,16 +1833,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(vsnes_state::vsnes_bootleg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,XTAL(16'000'000)/4) // 4mhz? seems too high but flickers badly otherwise, issue elsewhere?
-	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_bootleg_map)
+	MCFG_DEVICE_ADD("maincpu", M6502,XTAL(16'000'000)/4) // 4mhz? seems too high but flickers badly otherwise, issue elsewhere?
+	MCFG_DEVICE_PROGRAM_MAP(vsnes_cpu1_bootleg_map)
 								/* some carts also trigger IRQs */
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
 
-	MCFG_CPU_ADD("sub", Z80,XTAL(16'000'000)/4)         /* ? MHz */ // Z8400APS-Z80CPU
-	MCFG_CPU_PROGRAM_MAP(vsnes_bootleg_z80_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen1", vsnes_state,  irq0_line_hold)
-//  MCFG_CPU_PERIODIC_INT_DRIVER(vsnes_state, nmi_line_pulse)
+	MCFG_DEVICE_ADD("sub", Z80,XTAL(16'000'000)/4)         /* ? MHz */ // Z8400APS-Z80CPU
+	MCFG_DEVICE_PROGRAM_MAP(vsnes_bootleg_z80_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen1", vsnes_state,  irq0_line_hold)
+//  MCFG_DEVICE_PERIODIC_INT_DRIVER(vsnes_state, nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen1", RASTER)
@@ -1867,13 +1867,13 @@ MACHINE_CONFIG_START(vsnes_state::vsnes_bootleg)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	// PCB has 2, code accesses 3? which 2 really exist?
-	MCFG_SOUND_ADD("sn1", SN76489, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD("sn1", SN76489, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD("sn2", SN76489, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn3", SN76489, XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD("sn3", SN76489, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

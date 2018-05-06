@@ -300,16 +300,16 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(segasp_state::segasp)
 	naomi_aw_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(segasp_map)
-	MCFG_CPU_IO_MAP(onchip_port)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(segasp_map)
+	MCFG_DEVICE_IO_MAP(onchip_port)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("main_eeprom")
 	MCFG_EEPROM_SERIAL_93C46_ADD("sp_eeprom")
 
 // todo, not exactly NaomiM4 (see notes at top of driver) use custom board type here instead
 	MCFG_X76F100_ADD("naomibd_eeprom")  // actually not present
-	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(segasp_state, segasp)

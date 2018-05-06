@@ -466,25 +466,25 @@ WRITE8_MEMBER(pcipc_state::boot_state_award_w)
 }
 
 MACHINE_CONFIG_START(pcipc_state::pcipc)
-	MCFG_CPU_ADD("maincpu", PENTIUM, 90000000)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 90000000)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_PCI_ROOT_ADD(    ":pci")
 	MCFG_I82439HX_ADD(    ":pci:00.0", ":maincpu", 256*1024*1024)
 	MCFG_I82371SB_ISA_ADD(":pci:07.0")
-	MCFG_I82371SB_BOOT_STATE_HOOK(DEVWRITE8(":", pcipc_state, boot_state_phoenix_ver40_rev6_w))
+	MCFG_I82371SB_BOOT_STATE_HOOK(WRITE8(*this, pcipc_state, boot_state_phoenix_ver40_rev6_w))
 //  MCFG_IDE_PCI_ADD(     ":pci:07.1", 0x80867010, 0x03, 0x00000000)
 	MCFG_MGA2064W_ADD(    ":pci:12.0")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcipc_state::pcipctx)
-	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 60000000)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_PCI_ROOT_ADD(    ":pci")
 	MCFG_I82439TX_ADD(    ":pci:00.0", ":maincpu", 256*1024*1024)
 	MCFG_I82371SB_ISA_ADD(":pci:07.0")
-	MCFG_I82371SB_BOOT_STATE_HOOK(DEVWRITE8(":", pcipc_state, boot_state_award_w))
+	MCFG_I82371SB_BOOT_STATE_HOOK(WRITE8(*this, pcipc_state, boot_state_award_w))
 //  MCFG_IDE_PCI_ADD(     ":pci:07.1", 0x80867010, 0x03, 0x00000000)
 	MCFG_MGA2064W_ADD(    ":pci:12.0")
 MACHINE_CONFIG_END

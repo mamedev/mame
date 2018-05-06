@@ -24,7 +24,7 @@
 	downcast<atari_motion_objects_device &>(*device).set_config(_config);
 
 #define MCFG_ATARI_MOTION_OBJECTS_GFXDECODE(_gfxtag) \
-	downcast<atari_motion_objects_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<atari_motion_objects_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 
 //**************************************************************************

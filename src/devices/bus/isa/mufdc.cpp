@@ -33,12 +33,13 @@ FLOPPY_FORMATS_MEMBER( mufdc_device::floppy_formats )
 	FLOPPY_NASLITE_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( drives )
-	SLOT_INTERFACE("525hd", FLOPPY_525_HD)
-	SLOT_INTERFACE("35hd", FLOPPY_35_HD)
-	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
-	SLOT_INTERFACE("35dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void drives(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -46,9 +47,9 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(mufdc_device::device_add_mconfig)
 	MCFG_MCS3201_ADD("fdc")
-	MCFG_MCS3201_INPUT_HANDLER(READ8(mufdc_device, fdc_input_r))
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(mufdc_device, fdc_irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(mufdc_device, fdc_drq_w))
+	MCFG_MCS3201_INPUT_HANDLER(READ8(*this, mufdc_device, fdc_input_r))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, mufdc_device, fdc_irq_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, mufdc_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", drives, "35hd", mufdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", drives, "35hd", mufdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", drives, nullptr, mufdc_device::floppy_formats)

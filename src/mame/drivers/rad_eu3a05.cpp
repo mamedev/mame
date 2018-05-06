@@ -1149,9 +1149,9 @@ INTERRUPT_GEN_MEMBER(radica_eu3a05_state::interrupt)
 MACHINE_CONFIG_START(radica_eu3a05_state::radicasi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502,XTAL(21'281'370)/2) // Tetris has a XTAL(21'281'370), not confirmed on Space Invaders, actual CPU clock unknown.
-	MCFG_CPU_PROGRAM_MAP(radicasi_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", radica_eu3a05_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu",M6502,XTAL(21'281'370)/2) // Tetris has a XTAL(21'281'370), not confirmed on Space Invaders, actual CPU clock unknown.
+	MCFG_DEVICE_PROGRAM_MAP(radicasi_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", radica_eu3a05_state,  interrupt)
 
 	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(radicasi_bank_map)
@@ -1179,7 +1179,7 @@ MACHINE_CONFIG_START(radica_eu3a05_state::radicasi)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DEVICE_ADD("6ch_sound", RADICA6502_SOUND, 8000)
-	MCFG_RADICA6502_SOUND_SPACE_READ_CB(READ8(radica_eu3a05_state, read_full_space))
+	MCFG_RADICA6502_SOUND_SPACE_READ_CB(READ8(*this, radica_eu3a05_state, read_full_space))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
