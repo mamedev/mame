@@ -1638,6 +1638,8 @@ files {
 	MAME_DIR .. "src/mame/includes/stadhero.h",
 	MAME_DIR .. "src/mame/video/stadhero.cpp",
 	MAME_DIR .. "src/mame/drivers/supbtime.cpp",
+	MAME_DIR .. "src/mame/includes/supbtime.h",
+	MAME_DIR .. "src/mame/video/supbtime.cpp",
 	MAME_DIR .. "src/mame/drivers/tryout.cpp",
 	MAME_DIR .. "src/mame/includes/tryout.h",
 	MAME_DIR .. "src/mame/video/tryout.cpp",
@@ -1759,8 +1761,8 @@ files {
 	MAME_DIR .. "src/mame/video/excellent_spr.cpp",
 	MAME_DIR .. "src/mame/video/excellent_spr.h",
 	MAME_DIR .. "src/mame/drivers/lastbank.cpp",
-	MAME_DIR .. "src/mame/includes/witch.h",
 	MAME_DIR .. "src/mame/drivers/witch.cpp",
+	MAME_DIR .. "src/mame/includes/witch.h",
 }
 
 createMAMEProjects(_target, _subtarget, "exidy")
