@@ -681,8 +681,8 @@ MACHINE_CONFIG_START(bbusters_state::bbusters)
 
 	MCFG_VIDEO_START_OVERRIDE(bbusters_state,bbuster)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -723,7 +723,7 @@ MACHINE_CONFIG_START(bbusters_state::mechatt)
 
 	MCFG_VIDEO_START_OVERRIDE(bbusters_state,mechatt)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

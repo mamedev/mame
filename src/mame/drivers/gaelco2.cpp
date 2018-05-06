@@ -184,7 +184,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -614,7 +614,7 @@ MACHINE_CONFIG_START(gaelco2_state::play2000)
 	// MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -718,7 +718,7 @@ MACHINE_CONFIG_START(bang_state::bang)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -955,7 +955,7 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -1259,7 +1259,7 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gaelco2_state, coin4_counter_w))
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0400000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
@@ -1565,7 +1565,7 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -1607,7 +1607,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -1852,7 +1852,7 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, wrally2_state, wrally2_adc_cs))                              /* ADCs chip select line */
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0200000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)

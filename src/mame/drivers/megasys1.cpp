@@ -1721,7 +1721,7 @@ MACHINE_CONFIG_START(megasys1_state::system_A)
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, megasys1_state,sound_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)

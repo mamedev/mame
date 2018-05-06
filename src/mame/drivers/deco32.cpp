@@ -1947,7 +1947,7 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000)/9) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000)/9) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
@@ -2031,7 +2031,7 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
@@ -2108,7 +2108,7 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update_dragngun)
 	//MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -2160,7 +2160,7 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
@@ -2240,7 +2240,7 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update_dragngun)
 
-	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -2292,7 +2292,7 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, dragngun_state, lockload_okibank_lo_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
@@ -2463,7 +2463,7 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, deco32_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
