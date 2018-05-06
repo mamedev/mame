@@ -525,7 +525,7 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.48)
 

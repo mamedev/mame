@@ -900,7 +900,7 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", CLOCK_1 / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
@@ -948,7 +948,7 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", CLOCK_1 / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
@@ -1006,7 +1006,7 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", CLOCK_1 / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
@@ -1064,7 +1064,7 @@ MACHINE_CONFIG_START(cyclwarr_state::bigfight)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", CLOCK_1 / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)

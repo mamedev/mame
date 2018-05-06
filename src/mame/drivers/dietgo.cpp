@@ -268,7 +268,7 @@ MACHINE_CONFIG_START(dietgo_state::dietgo)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000)/9) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000)/9) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 

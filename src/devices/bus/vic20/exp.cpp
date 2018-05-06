@@ -66,7 +66,6 @@ vic20_expansion_slot_device::vic20_expansion_slot_device(const machine_config &m
 	m_write_res(*this),
 	m_card(nullptr)
 {
-	set_default_clock(DERIVED_CLOCK(1, 1));
 }
 
 

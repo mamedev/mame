@@ -2171,7 +2171,7 @@ MACHINE_CONFIG_START(tumbleb_state::fncywld)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_OKIM6295_ADD("oki", 1023924, PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -2234,7 +2234,7 @@ MACHINE_CONFIG_START(tumbleb_state::htchctch)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* on at least hatch catch, cookie & bibi and choky choky the YM2151 clock is connected directly to the Z80 clock so the speed should match */
-	MCFG_YM2151_ADD("ymsnd", 15000000/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 15000000/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 

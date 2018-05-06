@@ -1065,7 +1065,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(vamphalf_state::sound_ym_oki)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(28'000'000)/8) /* 3.5MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(28'000'000)/8) /* 3.5MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1084,7 +1084,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(vamphalf_state::sound_suplup)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1239,7 +1239,7 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

@@ -911,7 +911,7 @@ MACHINE_CONFIG_START(taitox_state::daisenpu)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)

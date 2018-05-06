@@ -822,7 +822,7 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CPU_CLOCK )  /* 4 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK)  /* 4 MHz */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, opwolf_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
@@ -899,7 +899,7 @@ MACHINE_CONFIG_START(opwolf_state::opwolfb) /* OSC clocks unknown for the bootle
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CPU_CLOCK )
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, opwolf_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
