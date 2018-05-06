@@ -235,8 +235,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(shuuz_state::shuuz)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -248,7 +248,7 @@ MACHINE_CONFIG_START(shuuz_state::shuuz)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(shuuz_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(*this, shuuz_state, scanline_int_write_line))
 	MCFG_ATARI_VAD_PLAYFIELD(shuuz_state, "gfxdecode", get_playfield_tile_info)
 	MCFG_ATARI_VAD_MOB(shuuz_state::s_mob_config, "gfxdecode")
 

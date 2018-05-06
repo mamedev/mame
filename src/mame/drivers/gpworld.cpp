@@ -496,10 +496,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gpworld_state::gpworld)
 
 	/* main cpu */
-	MCFG_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(mainmem)
-	MCFG_CPU_IO_MAP(mainport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gpworld_state,  vblank_callback)
+	MCFG_DEVICE_ADD("maincpu", Z80, GUESSED_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(mainmem)
+	MCFG_DEVICE_IO_MAP(mainport)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gpworld_state,  vblank_callback)
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
@@ -515,7 +515,7 @@ MACHINE_CONFIG_START(gpworld_state::gpworld)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

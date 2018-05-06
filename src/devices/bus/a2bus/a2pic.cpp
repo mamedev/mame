@@ -74,7 +74,7 @@ ioport_constructor a2bus_pic_device::device_input_ports() const
 MACHINE_CONFIG_START(a2bus_pic_device::device_add_mconfig)
 	MCFG_CENTRONICS_ADD(PIC_CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("ctx_data_in")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(a2bus_pic_device, ack_w))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, a2bus_pic_device, ack_w))
 
 	MCFG_DEVICE_ADD("ctx_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", PIC_CENTRONICS_TAG)

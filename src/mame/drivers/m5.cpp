@@ -1407,18 +1407,18 @@ void brno_state::machine_reset()
 
 MACHINE_CONFIG_START(m5_state::m5)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(14'318'181)/4)
-	MCFG_CPU_PROGRAM_MAP(m5_mem)
-	MCFG_CPU_IO_MAP(m5_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(14'318'181)/4)
+	MCFG_DEVICE_PROGRAM_MAP(m5_mem)
+	MCFG_DEVICE_IO_MAP(m5_io)
 	MCFG_Z80_DAISY_CHAIN(m5_daisy_chain)
 
-	MCFG_CPU_ADD(Z80_FD5_TAG, Z80, XTAL(14'318'181)/4)
-	MCFG_CPU_PROGRAM_MAP(fd5_mem)
-	MCFG_CPU_IO_MAP(fd5_io)
+	MCFG_DEVICE_ADD(Z80_FD5_TAG, Z80, XTAL(14'318'181)/4)
+	MCFG_DEVICE_PROGRAM_MAP(fd5_mem)
+	MCFG_DEVICE_IO_MAP(fd5_io)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL(14'318'181)/4)
+	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
@@ -1428,7 +1428,7 @@ MACHINE_CONFIG_START(m5_state::m5)
 	// ZC2 = EXCLK
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m5_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, m5_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
@@ -1438,11 +1438,11 @@ MACHINE_CONFIG_START(m5_state::m5)
 	MCFG_CASSETTE_INTERFACE("m5_cass")
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(m5_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(m5_state, ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(m5_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(m5_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(m5_state, ppi_pc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, m5_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, m5_state, ppi_pa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, m5_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, m5_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, m5_state, ppi_pc_w))
 
 	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(Z80_FD5_TAG, INPUT_LINE_IRQ0))
@@ -1473,7 +1473,7 @@ MACHINE_CONFIG_START(m5_state::ntsc)
 	// video hardware
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(m5_state, sordm5_video_interrupt_callback))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, m5_state, sordm5_video_interrupt_callback))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
@@ -1488,7 +1488,7 @@ MACHINE_CONFIG_START(m5_state::pal)
 	// video hardware
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(m5_state, sordm5_video_interrupt_callback))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, m5_state, sordm5_video_interrupt_callback))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
@@ -1502,9 +1502,9 @@ MACHINE_CONFIG_START(brno_state::brno)
 	m5(config);
 
 	// basic machine hardware
-	MCFG_CPU_MODIFY(Z80_TAG)
-	MCFG_CPU_PROGRAM_MAP(m5_mem_brno)
-	MCFG_CPU_IO_MAP(brno_io)
+	MCFG_DEVICE_MODIFY(Z80_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(m5_mem_brno)
+	MCFG_DEVICE_IO_MAP(brno_io)
 //  MCFG_Z80_DAISY_CHAIN(m5_daisy_chain)
 
 
@@ -1516,7 +1516,7 @@ MACHINE_CONFIG_START(brno_state::brno)
 	// video hardware
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(m5_state, sordm5_video_interrupt_callback))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, m5_state, sordm5_video_interrupt_callback))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 

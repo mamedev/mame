@@ -641,12 +641,12 @@ void thunderx_state::machine_reset()
 MACHINE_CONFIG_START(thunderx_state::scontra)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)     /* 052001 (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(scontra_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thunderx_state,  vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)     /* 052001 (verified on pcb) */
+	MCFG_DEVICE_PROGRAM_MAP(scontra_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thunderx_state,  vblank_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(scontra_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(scontra_sound_map)
 
 	MCFG_DEVICE_ADD("bank5800", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(scontra_bank5800_map)
@@ -688,8 +688,8 @@ MACHINE_CONFIG_START(thunderx_state::scontra)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(thunderx_state, volume_callback))
+	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, thunderx_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_CONFIG_END
@@ -706,11 +706,11 @@ MACHINE_CONFIG_START(thunderx_state::thunderx)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")     /* 052001 (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(thunderx_map)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(thunderx_state, banking_callback))
+	MCFG_DEVICE_PROGRAM_MAP(thunderx_map)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, thunderx_state, banking_callback))
 
 	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(thunderx_sound_map)
+	MCFG_DEVICE_PROGRAM_MAP(thunderx_sound_map)
 
 	MCFG_DEVICE_MODIFY("bank5800")
 	MCFG_DEVICE_PROGRAM_MAP(thunderx_bank5800_map)
@@ -724,8 +724,8 @@ MACHINE_CONFIG_START(thunderx_state::gbusters)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")     /* 052526 */
-	MCFG_CPU_PROGRAM_MAP(gbusters_map)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(thunderx_state, banking_callback))
+	MCFG_DEVICE_PROGRAM_MAP(gbusters_map)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, thunderx_state, banking_callback))
 
 	MCFG_DEVICE_MODIFY("k052109")
 	MCFG_K052109_CB(thunderx_state, gbusters_tile_callback)

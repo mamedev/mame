@@ -193,15 +193,15 @@ vt100_keyboard_device::vt100_keyboard_device(const machine_config &mconfig, devi
 
 MACHINE_CONFIG_START(vt100_keyboard_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 786) // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
+	MCFG_DEVICE_ADD("beeper", BEEP, 786) // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("uart", AY31015, 0)
-	MCFG_AY31015_WRITE_SO_CB(WRITELINE(vt100_keyboard_device, signal_out_w))
+	MCFG_AY31015_WRITE_SO_CB(WRITELINE(*this, vt100_keyboard_device, signal_out_w))
 
 	MCFG_DEVICE_ADD("counter", RIPPLE_COUNTER, 0) // 2x 74LS93
 	MCFG_RIPPLE_COUNTER_STAGES(8)
-	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(vt100_keyboard_device, key_scan_w))
+	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(*this, vt100_keyboard_device, key_scan_w))
 MACHINE_CONFIG_END
 
 
@@ -502,7 +502,7 @@ MACHINE_CONFIG_START(ms7002_device::device_add_mconfig)
 	vt100_keyboard_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("uart")
-	MCFG_AY31015_WRITE_TBMT_CB(WRITELINE(ms7002_device, scan_disable_w))
+	MCFG_AY31015_WRITE_TBMT_CB(WRITELINE(*this, ms7002_device, scan_disable_w))
 MACHINE_CONFIG_END
 
 

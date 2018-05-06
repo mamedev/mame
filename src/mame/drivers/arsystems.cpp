@@ -301,8 +301,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(arcadia_amiga_state::arcadia)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
-	MCFG_CPU_PROGRAM_MAP(arcadia_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
+	MCFG_DEVICE_PROGRAM_MAP(arcadia_map)
 
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
@@ -324,39 +324,39 @@ MACHINE_CONFIG_START(arcadia_amiga_state::arcadia)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_NTSC)
+	MCFG_DEVICE_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_NTSC)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
-	MCFG_PAULA_MEM_READ_CB(READ16(amiga_state, chip_ram_r))
-	MCFG_PAULA_INT_CB(WRITELINE(amiga_state, paula_int_w))
+	MCFG_PAULA_MEM_READ_CB(READ16(*this, amiga_state, chip_ram_r))
+	MCFG_PAULA_INT_CB(WRITELINE(*this, amiga_state, paula_int_w))
 
 	/* cia */
 	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_0_irq))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("CIA0PORTA"))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, cia_0_port_a_write))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_0_port_a_write))
 	MCFG_MOS6526_PB_INPUT_CALLBACK(IOPORT("CIA0PORTB"))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(arcadia_amiga_state,arcadia_cia_0_portb_w))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, arcadia_amiga_state,arcadia_cia_0_portb_w))
 	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, cia_1_irq))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
 
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
-	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", mos8520_device, flag_w))
-	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(amiga_state, chip_ram_r))
-	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(amiga_state, chip_ram_w))
-	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(amiga_state, fdc_dskblk_w))
-	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
+	MCFG_AMIGA_FDC_INDEX_CALLBACK(WRITELINE("cia_1", mos8520_device, flag_w))
+	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(*this, amiga_state, chip_ram_r))
+	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(*this, amiga_state, chip_ram_w))
+	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(*this, amiga_state, fdc_dskblk_w))
+	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(*this, amiga_state, fdc_dsksyn_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(arcadia_amiga_state::argh)
 	arcadia(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(argh_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(argh_map)
 MACHINE_CONFIG_END
 
 

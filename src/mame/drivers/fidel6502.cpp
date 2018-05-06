@@ -1691,27 +1691,27 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(fidel6502_state::rsc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1800000) // measured approx 1.81MHz
-	MCFG_CPU_PROGRAM_MAP(rsc_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1800000) // measured approx 1.81MHz
+	MCFG_DEVICE_PROGRAM_MAP(rsc_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(546)) // from 555 timer, measured
 	MCFG_TIMER_START_DELAY(attotime::from_hz(546) - attotime::from_usec(38)) // active for 38us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(546))
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0) // MOS 6520
-	MCFG_PIA_READPA_HANDLER(READ8(fidel6502_state, csc_pia1_pa_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(fidel6502_state, csc_pia1_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(fidel6502_state, csc_pia1_cb1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(fidel6502_state, csc_pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(fidel6502_state, csc_pia1_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(fidel6502_state, csc_pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(fidel6502_state, csc_pia1_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, fidel6502_state, csc_pia1_pa_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_ca1_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_cb1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_cb2_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_rsc_v2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
@@ -1719,35 +1719,35 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::csc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 3.9_MHz_XTAL/2) // from 3.9MHz resonator
-	MCFG_CPU_PROGRAM_MAP(csc_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // 38400Hz/64
+	MCFG_DEVICE_ADD("maincpu", M6502, 3.9_MHz_XTAL/2) // from 3.9MHz resonator
+	MCFG_DEVICE_PROGRAM_MAP(csc_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // 38400Hz/64
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(fidel6502_state, csc_pia0_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(fidel6502_state, csc_pia0_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(fidel6502_state, csc_pia0_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(fidel6502_state, csc_pia0_ca2_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, fidel6502_state, csc_pia0_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, fidel6502_state, csc_pia0_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, fidel6502_state, csc_pia0_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia0_ca2_w))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(fidel6502_state, csc_pia1_pa_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(fidel6502_state, csc_pia1_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(fidel6502_state, csc_pia1_cb1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(fidel6502_state, csc_pia1_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(fidel6502_state, csc_pia1_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(fidel6502_state, csc_pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(fidel6502_state, csc_pia1_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, fidel6502_state, csc_pia1_pa_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_ca1_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, fidel6502_state, csc_pia1_cb1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, fidel6502_state, csc_pia1_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, fidel6502_state, csc_pia1_cb2_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_csc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, csc_speech_r))
+	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidel6502_state, csc_speech_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
@@ -1756,8 +1756,8 @@ MACHINE_CONFIG_START(fidel6502_state::su9)
 	csc(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(su9_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(su9_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, su9)
 
@@ -1767,15 +1767,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::eas)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 3_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(eas_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
+	MCFG_DEVICE_ADD("maincpu", R65C02, 3_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(eas_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0) // port B: input, port A & C: output
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(fidel6502_state, eas_ppi_porta_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fidel6502_state, eas_ppi_porta_w))
 	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0))
-	MCFG_I8255_IN_PORTB_CB(READ8(fidel6502_state, eas_ppi_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidel6502_state, eas_ppi_portc_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, fidel6502_state, eas_ppi_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fidel6502_state, eas_ppi_portc_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1784,11 +1784,11 @@ MACHINE_CONFIG_START(fidel6502_state::eas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, csc_speech_r))
+	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidel6502_state, csc_speech_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
@@ -1802,20 +1802,20 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::pc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 4_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(pc_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
+	MCFG_DEVICE_ADD("maincpu", R65C02, 4_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(pc_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, csc_speech_r))
+	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidel6502_state, csc_speech_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
@@ -1830,9 +1830,9 @@ MACHINE_CONFIG_START(fidel6502_state::eag)
 	eas(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
-	MCFG_CPU_PROGRAM_MAP(eag_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
+	MCFG_DEVICE_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
+	MCFG_DEVICE_PROGRAM_MAP(eag_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eag)
 MACHINE_CONFIG_END
@@ -1840,8 +1840,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::sc9d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 3.9_MHz_XTAL/2) // R6502AP, 3.9MHz resonator
-	MCFG_CPU_PROGRAM_MAP(sc9d_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 3.9_MHz_XTAL/2) // R6502AP, 3.9MHz resonator
+	MCFG_DEVICE_PROGRAM_MAP(sc9d_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(610)) // from 555 timer (22nF, 102K, 2.7K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(610) - attotime::from_usec(41)) // active for 41us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(610))
@@ -1851,7 +1851,7 @@ MACHINE_CONFIG_START(fidel6502_state::sc9d)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
@@ -1866,8 +1866,8 @@ MACHINE_CONFIG_START(fidel6502_state::sc9b)
 	sc9d(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M6502, 1500000) // from ceramic resonator "681 JSA", measured
-	MCFG_CPU_PROGRAM_MAP(sc9_map)
+	MCFG_DEVICE_REPLACE("maincpu", M6502, 1500000) // from ceramic resonator "681 JSA", measured
+	MCFG_DEVICE_PROGRAM_MAP(sc9_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::sc9c)
@@ -1881,7 +1881,7 @@ MACHINE_CONFIG_START(fidel6502_state::playmatic)
 	sc9b(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(3100000) // approximation
 
 	MCFG_DEFAULT_LAYOUT(layout_fidel_playmatic)
@@ -1890,8 +1890,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::sc12)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 3_MHz_XTAL) // R65C02P3
-	MCFG_CPU_PROGRAM_MAP(sc12_trampoline)
+	MCFG_DEVICE_ADD("maincpu", R65C02, 3_MHz_XTAL) // R65C02P3
+	MCFG_DEVICE_PROGRAM_MAP(sc12_trampoline)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nF, 102K, 1K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
@@ -1909,7 +1909,7 @@ MACHINE_CONFIG_START(fidel6502_state::sc12)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
@@ -1924,7 +1924,7 @@ MACHINE_CONFIG_START(fidel6502_state::sc12b)
 	sc12(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(4_MHz_XTAL) // R65C02P4
 
 	// change irq timer frequency
@@ -1941,8 +1941,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::fexcel)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, 12_MHz_XTAL/4) // G65SC102P-3, 12.0M ceramic resonator
-	MCFG_CPU_PROGRAM_MAP(fexcel_map)
+	MCFG_DEVICE_ADD("maincpu", M65SC02, 12_MHz_XTAL/4) // G65SC102P-3, 12.0M ceramic resonator
+	MCFG_DEVICE_PROGRAM_MAP(fexcel_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nF, 102K, 1K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
@@ -1952,7 +1952,7 @@ MACHINE_CONFIG_START(fidel6502_state::fexcel)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
@@ -1961,31 +1961,31 @@ MACHINE_CONFIG_START(fidel6502_state::fexcel4)
 	fexcel(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, 4_MHz_XTAL) // R65C02P4
-	MCFG_CPU_PROGRAM_MAP(fexcel_map)
+	MCFG_DEVICE_REPLACE("maincpu", R65C02, 4_MHz_XTAL) // R65C02P4
+	MCFG_DEVICE_PROGRAM_MAP(fexcel_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fexcelb)
 	fexcel(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fexcelb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fexcelb_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fexcelp)
 	fexcel(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
-	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
+	MCFG_DEVICE_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
+	MCFG_DEVICE_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::granits)
 	fexcelp(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(8_MHz_XTAL) // overclocked
 MACHINE_CONFIG_END
 
@@ -1993,8 +1993,8 @@ MACHINE_CONFIG_START(fidel6502_state::fdes2100)
 	fexcel(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M65C02, 5_MHz_XTAL) // WDC 65C02
-	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
+	MCFG_DEVICE_REPLACE("maincpu", M65C02, 5_MHz_XTAL) // WDC 65C02
+	MCFG_DEVICE_PROGRAM_MAP(fexcelp_map)
 
 	// change irq timer frequency
 	MCFG_DEVICE_REMOVE("irq_on")
@@ -2010,16 +2010,16 @@ MACHINE_CONFIG_START(fidel6502_state::fdes2000)
 	fdes2100(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, 3_MHz_XTAL) // RP65C02G
-	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
+	MCFG_DEVICE_REPLACE("maincpu", R65C02, 3_MHz_XTAL) // RP65C02G
+	MCFG_DEVICE_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fexcelv)
 	fexcelb(config);
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, fexcelv_speech_r))
+	MCFG_DEVICE_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_S14001A_EXT_READ_HANDLER(READ8(*this, fidel6502_state, fexcelv_speech_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
 
@@ -2033,8 +2033,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::fdes2100d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, 6_MHz_XTAL) // W65C02P-6
-	MCFG_CPU_PROGRAM_MAP(fdesdis_map)
+	MCFG_DEVICE_ADD("maincpu", M65C02, 6_MHz_XTAL) // W65C02P-6
+	MCFG_DEVICE_PROGRAM_MAP(fdesdis_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nF, 102K, 1K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
@@ -2044,7 +2044,7 @@ MACHINE_CONFIG_START(fidel6502_state::fdes2100d)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
@@ -2053,16 +2053,16 @@ MACHINE_CONFIG_START(fidel6502_state::fdes2000d)
 	fdes2100d(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, 3_MHz_XTAL) // R65C02P3
-	MCFG_CPU_PROGRAM_MAP(fdesdis_map)
+	MCFG_DEVICE_REPLACE("maincpu", R65C02, 3_MHz_XTAL) // R65C02P3
+	MCFG_DEVICE_PROGRAM_MAP(fdesdis_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fphantom)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 4.9152_MHz_XTAL) // R65C02P4
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
-	MCFG_CPU_PROGRAM_MAP(fphantom_map)
+	MCFG_DEVICE_ADD("maincpu", R65C02, 4.9152_MHz_XTAL) // R65C02P4
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
+	MCFG_DEVICE_PROGRAM_MAP(fphantom_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, fphantom)
 
@@ -2071,7 +2071,7 @@ MACHINE_CONFIG_START(fidel6502_state::fphantom)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
@@ -2079,8 +2079,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::chesster)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 5_MHz_XTAL) // RP65C02G
-	MCFG_CPU_PROGRAM_MAP(chesster_map)
+	MCFG_DEVICE_ADD("maincpu", R65C02, 5_MHz_XTAL) // RP65C02G
+	MCFG_DEVICE_PROGRAM_MAP(chesster_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(9615)) // R/C circuit, measured
 	MCFG_TIMER_START_DELAY(attotime::from_hz(9615) - attotime::from_nsec(2600)) // active for 2.6us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(9615))
@@ -2090,7 +2090,7 @@ MACHINE_CONFIG_START(fidel6502_state::chesster)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac8", DAC_8BIT_R2R, 0) // m74hc374b1.ic1 + 8l513_02.z2
+	MCFG_DEVICE_ADD("dac8", DAC_8BIT_R2R, 0) // m74hc374b1.ic1 + 8l513_02.z2
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac8", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac8", -1.0, DAC_VREF_NEG_INPUT)
@@ -2100,9 +2100,9 @@ MACHINE_CONFIG_START(fidel6502_state::kishon)
 	chesster(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(3.579545_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(kishon_map)
+	MCFG_DEVICE_PROGRAM_MAP(kishon_map)
 MACHINE_CONFIG_END
 
 

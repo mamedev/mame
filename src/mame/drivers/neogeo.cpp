@@ -1892,19 +1892,19 @@ INPUT_CHANGED_MEMBER(aes_base_state::aes_jp1)
 MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD(m_maincpu, M68000, NEOGEO_MAIN_CPU_CLOCK)
+	MCFG_DEVICE_ADD(m_maincpu, M68000, NEOGEO_MAIN_CPU_CLOCK)
 
-	MCFG_CPU_ADD(m_audiocpu, Z80, NEOGEO_AUDIO_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_IO_MAP(audio_io_map)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, NEOGEO_AUDIO_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_IO_MAP(audio_io_map)
 
 	MCFG_DEVICE_ADD("systemlatch", HC259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(neogeo_base_state, set_screen_shadow))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(neogeo_base_state, set_use_cart_vectors))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, neogeo_base_state, set_screen_shadow))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, neogeo_base_state, set_use_cart_vectors))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // memory card 1: write enable/disable
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // memory card 2: write disable/enable
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // memory card: register select enable/set to normal (what does it mean?)
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(neogeo_base_state, set_palette_bank))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, neogeo_base_state, set_palette_bank))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_neogeo)
@@ -1924,11 +1924,11 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
 
 	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(false)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE(m_audionmi, input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE(m_audionmi, input_merger_device, in_w<0>))
 
 	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch2)
 
-	MCFG_SOUND_ADD(m_ym, YM2610, NEOGEO_YM2610_CLOCK)
+	MCFG_DEVICE_ADD(m_ym, YM2610, NEOGEO_YM2610_CLOCK)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE(m_audiocpu, 0))
 MACHINE_CONFIG_END
 
@@ -1947,12 +1947,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ngarcade_base_state::neogeo_arcade)
 	neogeo_base(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(neogeo_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(neogeo_main_map)
 
 	MCFG_DEVICE_MODIFY("systemlatch")
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(ngarcade_base_state, set_use_cart_audio))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(ngarcade_base_state, set_save_ram_unlock))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ngarcade_base_state, set_use_cart_audio))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, ngarcade_base_state, set_save_ram_unlock))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_ticks(3244030, NEOGEO_MASTER_CLOCK))
@@ -2127,8 +2127,8 @@ MACHINE_CONFIG_START(aes_state::aes)
 	neogeo_base(config);
 	neogeo_stereo(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(aes_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(aes_main_map)
 
 	MCFG_NEOGEO_MEMCARD_ADD("memcard")
 

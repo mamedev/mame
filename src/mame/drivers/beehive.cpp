@@ -292,9 +292,9 @@ uint32_t beehive_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 MACHINE_CONFIG_START(beehive_state::beehive)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(beehive_mem)
-	MCFG_CPU_IO_MAP(beehive_io)
+	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(beehive_mem)
+	MCFG_DEVICE_IO_MAP(beehive_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

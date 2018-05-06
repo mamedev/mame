@@ -788,8 +788,8 @@ GFXDECODE_END
 /***** MACHINE DRIVER *****/
 
 MACHINE_CONFIG_START(skns_state::skns)
-	MCFG_CPU_ADD("maincpu", SH2,28638000)
-	MCFG_CPU_PROGRAM_MAP(skns_map)
+	MCFG_DEVICE_ADD("maincpu", SH2,28638000)
+	MCFG_DEVICE_PROGRAM_MAP(skns_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", skns_state, irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
@@ -820,7 +820,7 @@ MACHINE_CONFIG_START(skns_state::skns)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 33333333 / 2)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 33333333 / 2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

@@ -355,9 +355,9 @@ void koikoi_state::machine_reset()
 MACHINE_CONFIG_START(koikoi_state::koikoi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)   /* ?? */
-	MCFG_CPU_PROGRAM_MAP(koikoi_map)
-	MCFG_CPU_IO_MAP(koikoi_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)   /* ?? */
+	MCFG_DEVICE_PROGRAM_MAP(koikoi_map)
+	MCFG_DEVICE_IO_MAP(koikoi_io_map)
 
 
 	/* video hardware */
@@ -378,9 +378,9 @@ MACHINE_CONFIG_START(koikoi_state::koikoi)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, KOIKOI_CRYSTAL/8)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(koikoi_state, input_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(koikoi_state, unknown_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, KOIKOI_CRYSTAL/8)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, koikoi_state, input_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, koikoi_state, unknown_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 

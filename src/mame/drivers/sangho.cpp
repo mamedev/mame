@@ -462,9 +462,9 @@ MACHINE_RESET_MEMBER(sangho_state,sexyboom)
 
 MACHINE_CONFIG_START(sangho_state::pzlestar)
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272)/6) // ?
-	MCFG_CPU_PROGRAM_MAP(sangho_map)
-	MCFG_CPU_IO_MAP(pzlestar_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6) // ?
+	MCFG_DEVICE_PROGRAM_MAP(sangho_map)
+	MCFG_DEVICE_IO_MAP(pzlestar_io_map)
 
 	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272)) // typical 9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
@@ -473,7 +473,7 @@ MACHINE_CONFIG_START(sangho_state::pzlestar)
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,pzlestar)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413,  XTAL(21'477'272)/6)
+	MCFG_DEVICE_ADD("ymsnd", YM2413,  XTAL(21'477'272)/6)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -481,9 +481,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sangho_state::sexyboom)
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272)/6)
-	MCFG_CPU_PROGRAM_MAP(sangho_map)
-	MCFG_CPU_IO_MAP(sexyboom_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6)
+	MCFG_DEVICE_PROGRAM_MAP(sangho_map)
+	MCFG_DEVICE_IO_MAP(sexyboom_io_map)
 
 	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272))
 	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
@@ -494,7 +494,7 @@ MACHINE_CONFIG_START(sangho_state::sexyboom)
 	MCFG_PALETTE_ADD("palette", 19780)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(21'477'272)/6)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(21'477'272)/6)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

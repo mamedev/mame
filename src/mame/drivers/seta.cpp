@@ -7814,12 +7814,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::tndrcade_sub_interrupt)
 MACHINE_CONFIG_START(seta_state::tndrcade)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(tndrcade_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tndrcade_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
-	MCFG_CPU_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
-	MCFG_CPU_PROGRAM_MAP(tndrcade_sub_map)
+	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tndrcade_sub_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, tndrcade_sub_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -7843,13 +7843,13 @@ MACHINE_CONFIG_START(seta_state::tndrcade)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 16000000/4)   /* 4 MHz */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(seta_state, dsw1_r))     /* input A: DSW 1 */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(seta_state, dsw2_r))     /* input B: DSW 2 */
+	MCFG_DEVICE_ADD("ym1", YM2203, 16000000/4)   /* 4 MHz */
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, seta_state, dsw1_r))     /* input A: DSW 1 */
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, seta_state, dsw2_r))     /* input B: DSW 2 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 16000000/4)   /* 4 MHz */
+	MCFG_DEVICE_ADD("ym2", YM3812, 16000000/4)   /* 4 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -7868,12 +7868,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::twineagl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(downtown_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(downtown_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
-	MCFG_CPU_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
-	MCFG_CPU_PROGRAM_MAP(twineagl_sub_map)
+	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(twineagl_sub_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -7900,7 +7900,7 @@ MACHINE_CONFIG_START(seta_state::twineagl)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -7914,12 +7914,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::downtown)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(downtown_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(downtown_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("m_scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M65C02, XTAL(16'000'000)/8) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(downtown_sub_map)
+	MCFG_DEVICE_ADD("sub", M65C02, XTAL(16'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(downtown_sub_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -7946,7 +7946,7 @@ MACHINE_CONFIG_START(seta_state::downtown)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -7982,23 +7982,23 @@ MACHINE_START_MEMBER(seta_state, usclssic)
 MACHINE_CONFIG_START(seta_state::usclssic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(usclssic_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(usclssic_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_CPU_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
-	MCFG_CPU_PROGRAM_MAP(calibr50_sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq0_line_assert)
 
 	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("TRACKX")
 	MCFG_UPD4701_PORTY("TRACKY")
 
 	MCFG_DEVICE_ADD("buttonmux", HC157, 0)
-	MCFG_74157_OUT_CB(DEVWRITELINE("upd4701", upd4701_device, middle_w)) MCFG_DEVCB_BIT(0)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("upd4701", upd4701_device, right_w)) MCFG_DEVCB_BIT(1)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("upd4701", upd4701_device, left_w)) MCFG_DEVCB_BIT(2)
+	MCFG_74157_OUT_CB(WRITELINE("upd4701", upd4701_device, middle_w)) MCFG_DEVCB_BIT(0)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, right_w)) MCFG_DEVCB_BIT(1)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, left_w)) MCFG_DEVCB_BIT(2)
 
 	MCFG_MACHINE_START_OVERRIDE(seta_state,usclssic)
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
@@ -8031,7 +8031,7 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_X1_010_ADDRESS_XOR(0x1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -8049,14 +8049,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::calibr50)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(calibr50_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(calibr50_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_CPU_ADD("sub", M65C02, XTAL(16'000'000)/8) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(calibr50_sub_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(seta_state, irq0_line_assert, 4*60)  // IRQ: 4/frame
+	MCFG_DEVICE_ADD("sub", M65C02, XTAL(16'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(seta_state, irq0_line_assert, 4*60)  // IRQ: 4/frame
 
 	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
 	MCFG_UPD4701_PORTX("ROT1")
@@ -8091,7 +8091,7 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_X1_010_ADDRESS_XOR(0x1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -8106,12 +8106,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::metafox)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(downtown_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(downtown_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
-	MCFG_CPU_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
-	MCFG_CPU_PROGRAM_MAP(metafox_sub_map)
+	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(metafox_sub_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -8138,7 +8138,7 @@ MACHINE_CONFIG_START(seta_state::metafox)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8150,8 +8150,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::atehate)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(atehate_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(atehate_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -8175,7 +8175,7 @@ MACHINE_CONFIG_START(seta_state::atehate)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8193,8 +8193,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::blandia)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(blandia_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(blandia_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -8209,7 +8209,7 @@ MACHINE_CONFIG_START(seta_state::blandia)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta_state, screen_vblank_seta_buffer_sprites))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blandia)
@@ -8223,15 +8223,15 @@ MACHINE_CONFIG_START(seta_state::blandia)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta_state::blandiap)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(blandiap_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(blandiap_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -8246,7 +8246,7 @@ MACHINE_CONFIG_START(seta_state::blandiap)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta_state, screen_vblank_seta_buffer_sprites))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blandia)
@@ -8260,7 +8260,7 @@ MACHINE_CONFIG_START(seta_state::blandiap)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8272,9 +8272,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::blockcar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(blockcar_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(blockcar_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8297,7 +8297,7 @@ MACHINE_CONFIG_START(seta_state::blockcar)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8322,13 +8322,13 @@ MACHINE_CONFIG_START(seta_state::blockcarb)
 	blockcar(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(blockcarb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(blockcarb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // unk freq
-	MCFG_CPU_PROGRAM_MAP(blockcarb_sound_map)
-	MCFG_CPU_IO_MAP(blockcarb_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // unk freq
+	MCFG_DEVICE_PROGRAM_MAP(blockcarb_sound_map)
+	MCFG_DEVICE_IO_MAP(blockcarb_sound_portmap)
 
 	/* the sound hardware / program is ripped from Tetris (S16B) */
 	MCFG_DEVICE_REMOVE("x1snd")
@@ -8346,8 +8346,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::daioh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))   /* 16 MHz, MC68000-16, Verified from PCB */
-	MCFG_CPU_PROGRAM_MAP(daioh_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))   /* 16 MHz, MC68000-16, Verified from PCB */
+	MCFG_DEVICE_PROGRAM_MAP(daioh_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -8371,7 +8371,7 @@ MACHINE_CONFIG_START(seta_state::daioh)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz, Verified from PCB audio */
+	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz, Verified from PCB audio */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8383,8 +8383,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::daiohp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))   /* 16 MHz, MC68000-16, Verified from PCB */
-	MCFG_CPU_PROGRAM_MAP(daiohp_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))   /* 16 MHz, MC68000-16, Verified from PCB */
+	MCFG_DEVICE_PROGRAM_MAP(daiohp_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -8408,7 +8408,7 @@ MACHINE_CONFIG_START(seta_state::daiohp)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz, Verified from PCB audio */
+	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz, Verified from PCB audio */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8425,8 +8425,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::drgnunit)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(drgnunit_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(drgnunit_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -8440,7 +8440,7 @@ MACHINE_CONFIG_START(seta_state::drgnunit)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta_state, screen_vblank_seta_buffer_sprites))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", downtown)
@@ -8451,7 +8451,7 @@ MACHINE_CONFIG_START(seta_state::drgnunit)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8461,8 +8461,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::qzkklgy2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(drgnunit_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(drgnunit_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -8476,7 +8476,7 @@ MACHINE_CONFIG_START(seta_state::qzkklgy2)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta_state, screen_vblank_seta_buffer_sprites))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", qzkklgy2)
@@ -8487,7 +8487,7 @@ MACHINE_CONFIG_START(seta_state::qzkklgy2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -8512,8 +8512,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(setaroul_state::interrupt)
 MACHINE_CONFIG_START(setaroul_state::setaroul)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(setaroul_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(setaroul_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", setaroul_state, interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -8537,7 +8537,7 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(setaroul_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(setaroul_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, setaroul_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", setaroul)
@@ -8550,7 +8550,7 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -8565,8 +8565,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::eightfrc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(wrofaero_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -8591,7 +8591,7 @@ MACHINE_CONFIG_START(seta_state::eightfrc)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8608,8 +8608,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::extdwnhl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(extdwnhl_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(extdwnhl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -8637,7 +8637,7 @@ MACHINE_CONFIG_START(seta_state::extdwnhl)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -8666,8 +8666,8 @@ MACHINE_START_MEMBER(seta_state,wrofaero){ uPD71054_timer_init(); }
 MACHINE_CONFIG_START(seta_state::gundhara)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(wrofaero_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
 #if __uPD71054_TIMER
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 #else
@@ -8704,7 +8704,7 @@ MACHINE_CONFIG_START(seta_state::gundhara)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8716,8 +8716,8 @@ MACHINE_CONFIG_START(seta_state::zombraid)
 	gundhara(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(zombraid_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(zombraid_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -8736,8 +8736,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::jjsquawk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(wrofaero_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -8765,15 +8765,15 @@ MACHINE_CONFIG_START(seta_state::jjsquawk)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta_state::jjsquawb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(jjsquawb_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(jjsquawb_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -8800,7 +8800,7 @@ MACHINE_CONFIG_START(seta_state::jjsquawb)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8812,14 +8812,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::kamenrid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(kamenrid_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(kamenrid_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
 	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(seta_state, pit_out0))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8842,7 +8842,7 @@ MACHINE_CONFIG_START(seta_state::kamenrid)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8855,8 +8855,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::orbs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14318180/2) /* 7.143 MHz */
-	MCFG_CPU_PROGRAM_MAP(orbs_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14318180/2) /* 7.143 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(orbs_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -8880,7 +8880,7 @@ MACHINE_CONFIG_START(seta_state::orbs)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 14318180)   /* 14.318180 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 14318180)   /* 14.318180 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -8895,8 +8895,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::keroppij)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14318180/2) /* 7.143 MHz */
-	MCFG_CPU_PROGRAM_MAP(keroppi_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14318180/2) /* 7.143 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(keroppi_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(seta_state,keroppi)
@@ -8922,7 +8922,7 @@ MACHINE_CONFIG_START(seta_state::keroppij)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 14318180)   /* 14.318180 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 14318180)   /* 14.318180 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -8939,8 +8939,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::krzybowl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(krzybowl_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(krzybowl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
@@ -8972,7 +8972,7 @@ MACHINE_CONFIG_START(seta_state::krzybowl)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8985,13 +8985,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::madshark)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(madshark_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(madshark_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
 	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(seta_state, pit_out0))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9019,7 +9019,7 @@ MACHINE_CONFIG_START(seta_state::madshark)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -9031,15 +9031,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::magspeed)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(magspeed_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(magspeed_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
 	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(seta_state, pit_out0))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9062,7 +9062,7 @@ MACHINE_CONFIG_START(seta_state::magspeed)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -9076,13 +9076,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::msgundam)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(msgundam_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(msgundam_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
 	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(seta_state, pit_out0))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9095,7 +9095,7 @@ MACHINE_CONFIG_START(seta_state::msgundam)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta_state, screen_vblank_seta_buffer_sprites))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
@@ -9106,7 +9106,7 @@ MACHINE_CONFIG_START(seta_state::msgundam)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -9119,8 +9119,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::oisipuzl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(oisipuzl_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(oisipuzl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -9144,7 +9144,7 @@ MACHINE_CONFIG_START(seta_state::oisipuzl)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -9158,9 +9158,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::triplfun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(triplfun_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(triplfun_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9195,13 +9195,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::kiwame)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(kiwame_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(kiwame_map)
 	/* lev 1-7 are the same. WARNING: the interrupt table is written to. */
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(seta_state, kiwame_row_select_w))
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta_state, kiwame_row_select_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -9226,7 +9226,7 @@ MACHINE_CONFIG_START(seta_state::kiwame)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -9242,8 +9242,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::rezon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(wrofaero_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -9268,7 +9268,7 @@ MACHINE_CONFIG_START(seta_state::rezon)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -9283,9 +9283,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::thunderl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(thunderl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(thunderl_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9308,7 +9308,7 @@ MACHINE_CONFIG_START(seta_state::thunderl)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -9334,13 +9334,13 @@ MACHINE_CONFIG_START(seta_state::thunderlbl)
 	thunderl(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(thunderlbl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(thunderlbl_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 10000000/2)
-	MCFG_CPU_PROGRAM_MAP(thunderlbl_sound_map)
-	MCFG_CPU_IO_MAP(thunderlbl_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 10000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(thunderlbl_sound_map)
+	MCFG_DEVICE_IO_MAP(thunderlbl_sound_portmap)
 
 	/* the sound hardware / program is ripped from Tetris (S16B) */
 	MCFG_DEVICE_REMOVE("x1snd")
@@ -9356,12 +9356,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::wiggie)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(wiggie_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wiggie_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(wiggie_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wiggie_sound_map)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9400,9 +9400,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::wits)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(thunderl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(thunderl_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9425,7 +9425,7 @@ MACHINE_CONFIG_START(seta_state::wits)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -9437,9 +9437,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::umanclub)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(umanclub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(umanclub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9462,7 +9462,7 @@ MACHINE_CONFIG_START(seta_state::umanclub)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -9474,13 +9474,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::utoukond)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(utoukond_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(utoukond_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(utoukond_sound_map)
-	MCFG_CPU_IO_MAP(utoukond_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(utoukond_sound_map)
+	MCFG_DEVICE_IO_MAP(utoukond_sound_io_map)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9507,12 +9507,12 @@ MACHINE_CONFIG_START(seta_state::utoukond)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ymsnd", YM3438, 16000000/4) /* 4 MHz */
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(seta_state, utoukond_ym3438_interrupt))
+	MCFG_DEVICE_ADD("ymsnd", YM3438, 16000000/4) /* 4 MHz */
+	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, seta_state, utoukond_ym3438_interrupt))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -9525,10 +9525,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::wrofaero)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(wrofaero_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
 #if __uPD71054_TIMER
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
 #else
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
 #endif  // __uPD71054_TIMER
@@ -9560,7 +9560,7 @@ MACHINE_CONFIG_START(seta_state::wrofaero)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -9579,9 +9579,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::zingzip)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(wrofaero_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9609,7 +9609,7 @@ MACHINE_CONFIG_START(seta_state::zingzip)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -9620,8 +9620,8 @@ MACHINE_CONFIG_START(seta_state::zingzipbl)
 
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(zingzipbl_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(zingzipbl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_REMOVE("x1snd")
@@ -9637,8 +9637,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::pairlove)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(pairlove_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(pairlove_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -9662,7 +9662,7 @@ MACHINE_CONFIG_START(seta_state::pairlove)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -9685,8 +9685,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::crazyfgt_interrupt)
 MACHINE_CONFIG_START(seta_state::crazyfgt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(crazyfgt_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(crazyfgt_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, crazyfgt_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -9713,7 +9713,7 @@ MACHINE_CONFIG_START(seta_state::crazyfgt)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 16000000/4) /* 4 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 16000000/4) /* 4 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)   // clock?
@@ -9746,8 +9746,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(jockeyc_state::interrupt)
 MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) // TMP68000N-8
-	MCFG_CPU_PROGRAM_MAP(jockeyc_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) // TMP68000N-8
+	MCFG_DEVICE_PROGRAM_MAP(jockeyc_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jockeyc_state, interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2.0)) // jockeyc: watchdog test error if over 2.5s
@@ -9783,7 +9783,7 @@ MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)
+	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -9799,8 +9799,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(jockeyc_state::inttoote)
 	jockeyc(config);
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000N-16
-	MCFG_CPU_PROGRAM_MAP(inttoote_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000N-16
+	MCFG_DEVICE_PROGRAM_MAP(inttoote_map)
 
 	// I/O board (not hooked up yet)
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)

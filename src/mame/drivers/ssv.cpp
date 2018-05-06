@@ -2548,8 +2548,8 @@ DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init(0); save_item(NAME(m_latche
 MACHINE_CONFIG_START(ssv_state::ssv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V60, SSV_MASTER_CLOCK) /* Based on STA-0001 & STA-0001B System boards */
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ssv_state,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", V60, SSV_MASTER_CLOCK) /* Based on STA-0001 & STA-0001B System boards */
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ssv_state,irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ssv_state, interrupt, "screen", 0, 1)
 
@@ -2566,7 +2566,7 @@ MACHINE_CONFIG_START(ssv_state::ssv)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ensoniq", ES5506, SSV_MASTER_CLOCK)
+	MCFG_DEVICE_ADD("ensoniq", ES5506, SSV_MASTER_CLOCK)
 	MCFG_ES5506_REGION0("ensoniq.0")
 	MCFG_ES5506_REGION1("ensoniq.1")
 	MCFG_ES5506_REGION2("ensoniq.2")
@@ -2581,12 +2581,12 @@ MACHINE_CONFIG_START(ssv_state::drifto94)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(drifto94_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(drifto94_map)
 
-	MCFG_CPU_ADD("dsp", UPD96050, 10000000) /* TODO: correct? */
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
-	MCFG_CPU_DATA_MAP(dsp_data_map)
+	MCFG_DEVICE_ADD("dsp", UPD96050, 10000000) /* TODO: correct? */
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -2602,8 +2602,8 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gdfs_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gdfs_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2612,7 +2612,7 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	MCFG_ADC0808_IN1_CB(IOPORT("GUNY1"))
 	MCFG_ADC0808_IN2_CB(IOPORT("GUNX2"))
 	MCFG_ADC0808_IN3_CB(IOPORT("GUNY2"))
-	MCFG_ADC0808_EOC_CB(WRITELINE(ssv_state, gdfs_adc_int_w))
+	MCFG_ADC0808_EOC_CB(WRITELINE(*this, ssv_state, gdfs_adc_int_w))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2631,8 +2631,8 @@ MACHINE_CONFIG_START(ssv_state::hypreact)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hypreact_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hypreact_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2646,8 +2646,8 @@ MACHINE_CONFIG_START(ssv_state::hypreac2)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hypreac2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hypreac2_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2661,8 +2661,8 @@ MACHINE_CONFIG_START(ssv_state::janjans1)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(janjans1_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(janjans1_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2674,8 +2674,8 @@ MACHINE_CONFIG_START(ssv_state::keithlcy)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(keithlcy_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(keithlcy_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2687,8 +2687,8 @@ MACHINE_CONFIG_START(ssv_state::meosism)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(meosism_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(meosism_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2704,8 +2704,8 @@ MACHINE_CONFIG_START(ssv_state::mslider)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mslider_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mslider_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2717,8 +2717,8 @@ MACHINE_CONFIG_START(ssv_state::ryorioh)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ryorioh_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ryorioh_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2731,8 +2731,8 @@ MACHINE_CONFIG_START(ssv_state::vasara)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ryorioh_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ryorioh_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2745,8 +2745,8 @@ MACHINE_CONFIG_START(ssv_state::srmp4)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(srmp4_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(srmp4_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2760,8 +2760,8 @@ MACHINE_CONFIG_START(ssv_state::srmp7)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(srmp7_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(srmp7_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2775,12 +2775,12 @@ MACHINE_CONFIG_START(ssv_state::stmblade)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(drifto94_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(drifto94_map)
 
-	MCFG_CPU_ADD("dsp", UPD96050, 10000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
-	MCFG_CPU_DATA_MAP(dsp_data_map)
+	MCFG_DEVICE_ADD("dsp", UPD96050, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map)
 
 	/* don't need this, game just does a simple check at boot then the DSP stalls into a tight loop. */
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -2796,8 +2796,8 @@ MACHINE_CONFIG_START(ssv_state::survarts)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(survarts_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(survarts_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2821,8 +2821,8 @@ MACHINE_CONFIG_START(ssv_state::eaglshot)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(eaglshot_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(eaglshot_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2846,8 +2846,8 @@ MACHINE_CONFIG_START(ssv_state::sxyreact)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sxyreact_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sxyreact_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2862,8 +2862,8 @@ MACHINE_CONFIG_START(ssv_state::sxyreac2)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sxyreact_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sxyreact_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2878,8 +2878,8 @@ MACHINE_CONFIG_START(ssv_state::cairblad)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sxyreact_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sxyreact_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2894,12 +2894,12 @@ MACHINE_CONFIG_START(ssv_state::twineag2)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(twineag2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(twineag2_map)
 
-	MCFG_CPU_ADD("dsp", UPD96050, 10000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
-	MCFG_CPU_DATA_MAP(dsp_data_map)
+	MCFG_DEVICE_ADD("dsp", UPD96050, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -2915,8 +2915,8 @@ MACHINE_CONFIG_START(ssv_state::ultrax)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ultrax_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ultrax_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2929,11 +2929,11 @@ MACHINE_CONFIG_START(ssv_state::jsk)
 	ssv(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(jsk_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(jsk_map)
 
-	MCFG_CPU_ADD("sub", V810,25000000)
-	MCFG_CPU_PROGRAM_MAP(jsk_v810_mem)
+	MCFG_DEVICE_ADD("sub", V810,25000000)
+	MCFG_DEVICE_PROGRAM_MAP(jsk_v810_mem)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

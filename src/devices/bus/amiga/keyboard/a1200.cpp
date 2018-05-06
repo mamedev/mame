@@ -127,13 +127,13 @@ WRITE_LINE_MEMBER(a1200_kbd_device::mpu_tcmp)
 }
 
 MACHINE_CONFIG_START(a1200_kbd_device::device_add_mconfig)
-	MCFG_CPU_ADD("mpu", M68HC705C8A, XTAL(3'000'000))
-	MCFG_M68HC05_PORTB_R_CB(READ8(a1200_kbd_device, mpu_portb_r));
+	MCFG_DEVICE_ADD("mpu", M68HC705C8A, XTAL(3'000'000))
+	MCFG_M68HC05_PORTB_R_CB(READ8(*this, a1200_kbd_device, mpu_portb_r));
 	MCFG_M68HC05_PORTD_R_CB(IOPORT("MOD"));
-	MCFG_M68HC05_PORTA_W_CB(WRITE8(a1200_kbd_device, mpu_porta_w));
-	MCFG_M68HC05_PORTB_W_CB(WRITE8(a1200_kbd_device, mpu_portb_w));
-	MCFG_M68HC05_PORTC_W_CB(WRITE8(a1200_kbd_device, mpu_portc_w));
-	MCFG_M68HC05_TCMP_CB(WRITELINE(a1200_kbd_device, mpu_tcmp));
+	MCFG_M68HC05_PORTA_W_CB(WRITE8(*this, a1200_kbd_device, mpu_porta_w));
+	MCFG_M68HC05_PORTB_W_CB(WRITE8(*this, a1200_kbd_device, mpu_portb_w));
+	MCFG_M68HC05_PORTC_W_CB(WRITE8(*this, a1200_kbd_device, mpu_portc_w));
+	MCFG_M68HC05_TCMP_CB(WRITELINE(*this, a1200_kbd_device, mpu_tcmp));
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *a1200_kbd_device::device_rom_region() const

@@ -500,46 +500,46 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(ecoinf2_state::ecoinf2_oxo)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180,4000000) // some of these hit invalid opcodes with a plain z80, some don't?
-	MCFG_CPU_PROGRAM_MAP(oxo_memmap)
-	MCFG_CPU_IO_MAP(oxo_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z180,4000000) // some of these hit invalid opcodes with a plain z80, some don't?
+	MCFG_DEVICE_PROGRAM_MAP(oxo_memmap)
+	MCFG_DEVICE_IO_MAP(oxo_portmap)
 
 	MCFG_DEFAULT_LAYOUT(layout_ecoinf2)
 
 	MCFG_DEVICE_ADD("ic10_lamp", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf2_state, ppi8255_ic10_write_a_strobedat0))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf2_state, ppi8255_ic10_write_b_strobedat1))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf2_state, ppi8255_ic10_write_c_strobe))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic10_write_a_strobedat0))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic10_write_b_strobedat1))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic10_write_c_strobe))
 
 	// IC24 is the workhorse of the Phoenix, it seems to handle meters, payslides, coin lamps, inhibits and the watchdog! */
 	MCFG_DEVICE_ADD("ic24_coin", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf2_state, ppi8255_ic24_write_a_meters))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf2_state, ppi8255_ic24_write_b_payouts))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf2_state, ppi8255_ic24_write_c_inhibits))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic24_write_a_meters))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic24_write_b_payouts))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic24_write_c_inhibits))
 
 	MCFG_DEVICE_ADD("ic22_inpt", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf2_state, ppi8255_ic22_read_a_levels))    // manual says level switches
-	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf2_state, ppi8255_ic22_read_b_coins))
-	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf2_state, ppi8255_ic22_read_c_misc))  // 0x20 appears to be meter power
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf2_state, ppi8255_ic22_read_a_levels))    // manual says level switches
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf2_state, ppi8255_ic22_read_b_coins))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf2_state, ppi8255_ic22_read_c_misc))  // 0x20 appears to be meter power
 
 	MCFG_DEVICE_ADD("ic23_reel", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf2_state, ppi8255_ic23_write_a_reel01))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf2_state, ppi8255_ic23_write_b_reel23))
-	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf2_state, ppi8255_ic23_read_c_key))   // optos and keys
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic23_write_a_reel01))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic23_write_b_reel23))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf2_state, ppi8255_ic23_read_c_key))   // optos and keys
 
 	MCFG_DEVICE_ADD("ic13_leds", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf2_state, ppi8255_ic13_write_a_strobedat0))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf2_state, ppi8255_ic13_write_b_strobedat1))
-	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf2_state, ppi8255_ic13_read_c_panel))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic13_write_a_strobedat0))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf2_state, ppi8255_ic13_write_b_strobedat1))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf2_state, ppi8255_ic13_read_c_panel))
 
 	MCFG_ECOIN_200STEP_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel_optic_cb<0>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<0>))
 	MCFG_ECOIN_200STEP_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel_optic_cb<1>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<1>))
 	MCFG_ECOIN_200STEP_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel_optic_cb<2>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<2>))
 	MCFG_ECOIN_200STEP_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf2_state, reel_optic_cb<3>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf2_state, reel_optic_cb<3>))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(8)

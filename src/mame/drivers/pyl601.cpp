@@ -536,9 +536,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(pyl601_state::pyl601)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6800, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(pyl601_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pyl601_state,  pyl601_interrupt)
+	MCFG_DEVICE_ADD("maincpu",M6800, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pyl601_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pyl601_state,  pyl601_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -552,7 +552,7 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -573,8 +573,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pyl601_state::pyl601a)
 	pyl601(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL(2'000'000))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK( XTAL(2'000'000))
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pyl601a)
 

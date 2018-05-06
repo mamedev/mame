@@ -518,20 +518,20 @@ void angelkds_state::machine_reset()
 
 MACHINE_CONFIG_START(angelkds_state::angelkds)
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(6'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_IO_MAP(sub_portmap)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_IO_MAP(sub_portmap)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("I40"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("I41"))
-	MCFG_I8255_IN_PORTC_CB(READ8(angelkds_state, angeklds_ff_r)) // or left inputs don't work
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(angelkds_state, angelkds_cpu_bank_write))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, angelkds_state, angeklds_ff_r)) // or left inputs don't work
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, angelkds_state, angelkds_cpu_bank_write))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("I80"))
@@ -556,14 +556,14 @@ MACHINE_CONFIG_START(angelkds_state::angelkds)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(4'000'000))
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.65)
 	MCFG_SOUND_ROUTE(1, "mono", 0.65)
 	MCFG_SOUND_ROUTE(2, "mono", 0.65)
 	MCFG_SOUND_ROUTE(3, "mono", 0.45)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(0, "mono", 0.65)
 	MCFG_SOUND_ROUTE(1, "mono", 0.65)
 	MCFG_SOUND_ROUTE(2, "mono", 0.65)
@@ -573,11 +573,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(angelkds_state::spcpostn)
 	angelkds(config);
 	/* encryption */
-	MCFG_CPU_REPLACE("maincpu", SEGA_317_0005, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_317_0005, XTAL(6'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 
 MACHINE_CONFIG_END

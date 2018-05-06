@@ -224,10 +224,10 @@ READ8_MEMBER( p2000t_state::videoram_r )
 /* Machine definition */
 MACHINE_CONFIG_START(p2000t_state::p2000t)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(p2000t_mem)
-	MCFG_CPU_IO_MAP(p2000t_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", p2000t_state,  p2000_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(p2000t_mem)
+	MCFG_DEVICE_IO_MAP(p2000t_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", p2000t_state,  p2000_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -238,12 +238,12 @@ MACHINE_CONFIG_START(p2000t_state::p2000t)
 	MCFG_SCREEN_UPDATE_DEVICE("saa5050", saa5050_device, screen_update)
 
 	MCFG_DEVICE_ADD("saa5050", SAA5050, 6000000)
-	MCFG_SAA5050_D_CALLBACK(READ8(p2000t_state, videoram_r))
+	MCFG_SAA5050_D_CALLBACK(READ8(*this, p2000t_state, videoram_r))
 	MCFG_SAA5050_SCREEN_SIZE(40, 24, 80)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -251,10 +251,10 @@ MACHINE_CONFIG_END
 /* Machine definition */
 MACHINE_CONFIG_START(p2000m_state::p2000m)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(p2000m_mem)
-	MCFG_CPU_IO_MAP(p2000t_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", p2000m_state,  p2000_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(p2000m_mem)
+	MCFG_DEVICE_IO_MAP(p2000t_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", p2000m_state,  p2000_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -272,7 +272,7 @@ MACHINE_CONFIG_START(p2000m_state::p2000m)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

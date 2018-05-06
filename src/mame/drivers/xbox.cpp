@@ -171,9 +171,9 @@ void xbox_ata_devices(device_slot_interface &device)
 
 MACHINE_CONFIG_START(xbox_state::xbox)
 	xbox_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(xbox_map)
-	MCFG_CPU_IO_MAP(xbox_map_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(xbox_map)
+	MCFG_DEVICE_IO_MAP(xbox_map_io)
 
 	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")
 	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "hdd", true)
@@ -187,7 +187,7 @@ MACHINE_CONFIG_START(xbox_state::xbox)
 
 /* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_DEVICE_ADD("ohci_gamepad", OHCI_GAME_CONTROLLER, 0)

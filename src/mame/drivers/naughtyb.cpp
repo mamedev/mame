@@ -411,8 +411,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(naughtyb_state::naughtyb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
-	MCFG_CPU_PROGRAM_MAP(naughtyb_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
+	MCFG_DEVICE_PROGRAM_MAP(naughtyb_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -439,7 +439,7 @@ MACHINE_CONFIG_START(naughtyb_state::naughtyb)
 	// harmonics (5 1/3' and 2 2/3')
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 
-	MCFG_SOUND_ADD("naughtyb_custom", NAUGHTYB, 0)
+	MCFG_DEVICE_ADD("naughtyb_custom", NAUGHTYB_SOUND)
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -448,8 +448,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(naughtyb_state::popflame)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
-	MCFG_CPU_PROGRAM_MAP(popflame_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
+	MCFG_DEVICE_PROGRAM_MAP(popflame_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -476,7 +476,7 @@ MACHINE_CONFIG_START(naughtyb_state::popflame)
 	// harmonics (5 1/3' and 2 2/3')
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 
-	MCFG_SOUND_ADD("popflame_custom", POPFLAME, 0)
+	MCFG_DEVICE_ADD("popflame_custom", POPFLAME_SOUND)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 MACHINE_CONFIG_END
 

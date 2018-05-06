@@ -494,8 +494,8 @@ void zwackery_state::machine_start()
 
 MACHINE_CONFIG_START(zwackery_state::zwackery)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL(16'000'000)/2
-	MCFG_CPU_PROGRAM_MAP(zwackery_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL(16'000'000)/2
+	MCFG_DEVICE_PROGRAM_MAP(zwackery_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -504,18 +504,18 @@ MACHINE_CONFIG_START(zwackery_state::zwackery)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zwackery_state, pia0_porta_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(zwackery_state, pia0_irq_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(zwackery_state, pia0_irq_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, zwackery_state, pia0_porta_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, zwackery_state, pia0_irq_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, zwackery_state, pia0_irq_w))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(zwackery_state, pia1_porta_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zwackery_state, pia1_porta_w))
-	MCFG_PIA_READPB_HANDLER(READ8(zwackery_state, pia1_portb_r))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("csd", midway_cheap_squeak_deluxe_device, sirq_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, zwackery_state, pia1_porta_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, zwackery_state, pia1_porta_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, zwackery_state, pia1_portb_r))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("csd", midway_cheap_squeak_deluxe_device, sirq_w))
 
 	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(zwackery_state, pia2_porta_r))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, zwackery_state, pia2_porta_r))
 	MCFG_PIA_READPB_HANDLER(IOPORT("DSW"))
 
 	// video hardware
@@ -537,7 +537,7 @@ MACHINE_CONFIG_START(zwackery_state::zwackery)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE, 0)
+	MCFG_DEVICE_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 

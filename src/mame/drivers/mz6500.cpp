@@ -147,9 +147,9 @@ void mz6500_state::upd7220_map(address_map &map)
 
 MACHINE_CONFIG_START(mz6500_state::mz6500)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 8000000) //unk clock
-	MCFG_CPU_PROGRAM_MAP(mz6500_map)
-	MCFG_CPU_IO_MAP(mz6500_io)
+	MCFG_DEVICE_ADD("maincpu", I8086, 8000000) //unk clock
+	MCFG_DEVICE_PROGRAM_MAP(mz6500_map)
+	MCFG_DEVICE_IO_MAP(mz6500_io)
 
 
 	/* video hardware */

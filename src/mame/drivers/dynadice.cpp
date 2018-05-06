@@ -250,13 +250,13 @@ void dynadice_state::machine_reset()
 MACHINE_CONFIG_START(dynadice_state::dynadice)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080,18432000/8)
-	MCFG_CPU_PROGRAM_MAP(dynadice_map)
-	MCFG_CPU_IO_MAP(dynadice_io_map)
+	MCFG_DEVICE_ADD("maincpu", I8080,18432000/8)
+	MCFG_DEVICE_PROGRAM_MAP(dynadice_map)
+	MCFG_DEVICE_IO_MAP(dynadice_io_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80,18432000/6)
-	MCFG_CPU_PROGRAM_MAP(dynadice_sound_map)
-	MCFG_CPU_IO_MAP(dynadice_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,18432000/6)
+	MCFG_DEVICE_PROGRAM_MAP(dynadice_sound_map)
+	MCFG_DEVICE_IO_MAP(dynadice_sound_io_map)
 
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -277,7 +277,7 @@ MACHINE_CONFIG_START(dynadice_state::dynadice)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

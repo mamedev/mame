@@ -847,16 +847,16 @@ MACHINE_RESET_MEMBER(bublbobl_state,tokio)
 MACHINE_CONFIG_START(bublbobl_state::tokio)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(tokio_map_mcu)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(tokio_map_mcu)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(tokio_subcpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(tokio_subcpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8) // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(tokio_sound_map) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
+	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_XTAL/8) // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(tokio_sound_map) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MAIN_XTAL/8) // 3 Mhz
 
@@ -886,11 +886,11 @@ MACHINE_CONFIG_START(bublbobl_state::tokio)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<1>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<1>))
 
 	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, MAIN_XTAL/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, MAIN_XTAL/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.08)
 	MCFG_SOUND_ROUTE(1, "mono", 0.08)
@@ -908,18 +908,18 @@ MACHINE_CONFIG_START(bublbobl_state::bublboblp)
 	MCFG_DEVICE_REMOVE("watchdog")
 	MCFG_WATCHDOG_ADD("watchdog") // this adds back a watchdog, but due to the way MAME handles watchdogs, it will never fire unless it first gets at least one pulse, which it never will.
 
-	MCFG_CPU_REPLACE("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(tokio_map) // no mcu or resistors at all
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(tokio_map) // no mcu or resistors at all
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bublbobl_state::tokiob)
 	tokio(config);
 	MCFG_DEVICE_REMOVE("bmcu") // no mcu, but see below...
 
-	MCFG_CPU_REPLACE("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(tokio_map_bootleg) // resistor tying mcu's footprint PA6 pin low so mcu reads always return 0xBF
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(tokio_map_bootleg) // resistor tying mcu's footprint PA6 pin low so mcu reads always return 0xBF
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -963,15 +963,15 @@ MACHINE_RESET_MEMBER(bublbobl_state,bublbobl)
 MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(bublbobl_maincpu_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(bublbobl_maincpu_map)
 
-	MCFG_CPU_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(subcpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(subcpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8) // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(sound_map) // IRQs are triggered by the YM2203
+	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_XTAL/8) // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map) // IRQs are triggered by the YM2203
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
@@ -1002,23 +1002,23 @@ MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<1>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<1>))
 
 	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
 
-	MCFG_SOUND_ADD("ym1", YM2203, MAIN_XTAL/8)
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<0>))
+	MCFG_DEVICE_ADD("ym1", YM2203, MAIN_XTAL/8)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<0>))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ym2", YM3526, MAIN_XTAL/8)
-	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
+	MCFG_DEVICE_ADD("ym2", YM3526, MAIN_XTAL/8)
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<1>))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bublbobl_state::bublbobl)
 	bublbobl_nomcu(config);
-	MCFG_CPU_ADD("mcu", M6801, XTAL(4'000'000)) // actually 6801U4 - xtal is 4MHz, divided by 4 internally
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_DEVICE_ADD("mcu", M6801, XTAL(4'000'000)) // actually 6801U4 - xtal is 4MHz, divided by 4 internally
+	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", M6801_IRQ_LINE)) // same clock latches the INT pin on the second Z80
@@ -1045,9 +1045,9 @@ MACHINE_CONFIG_START(bublbobl_state::boblbobl)
 	bublbobl_nomcu(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold) // interrupt mode 1, unlike Bubble Bobble
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold) // interrupt mode 1, unlike Bubble Bobble
 
 	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, boblbobl)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, boblbobl)
@@ -1080,11 +1080,11 @@ MACHINE_CONFIG_START(bub68705_state::bub68705)
 	bublbobl_nomcu(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("mcu", M68705P3, XTAL(4'000'000)) // xtal is 4MHz, divided by 4 internally
+	MCFG_DEVICE_ADD("mcu", M68705P3, XTAL(4'000'000)) // xtal is 4MHz, divided by 4 internally
 	MCFG_M68705_PORTC_R_CB(IOPORT("IN0"))
-	MCFG_M68705_PORTA_W_CB(WRITE8(bub68705_state, port_a_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(bub68705_state, port_b_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bub68705_state, bublbobl_m68705_interrupt) // ??? should come from the same clock which latches the INT pin on the second Z80
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, bub68705_state, port_a_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, bub68705_state, port_b_w))
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bub68705_state, bublbobl_m68705_interrupt) // ??? should come from the same clock which latches the INT pin on the second Z80
 
 	MCFG_MACHINE_START_OVERRIDE(bub68705_state, bub68705)
 	MCFG_MACHINE_RESET_OVERRIDE(bub68705_state, bub68705)

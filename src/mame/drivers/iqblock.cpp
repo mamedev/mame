@@ -342,16 +342,16 @@ GFXDECODE_END
 MACHINE_CONFIG_START(iqblock_state::iqblock)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2) /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2) /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", iqblock_state, irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(iqblock_state, port_C_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, iqblock_state, port_C_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -369,7 +369,7 @@ MACHINE_CONFIG_START(iqblock_state::iqblock)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

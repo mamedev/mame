@@ -167,8 +167,8 @@ static void swtpc09_floppies(device_slot_interface &device)
 /* MPU09, MPID, MPS2 DMF2 */
 MACHINE_CONFIG_START(swtpc09_state::swtpc09_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mp09_mem)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mp09_mem)
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
@@ -177,28 +177,28 @@ MACHINE_CONFIG_START(swtpc09_state::swtpc09_base)
 	MCFG_DEVICE_PROGRAM_MAP(flex_dmf2_mem)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(swtpc09_state, pia0_a_r))
-	MCFG_PIA_READPA_HANDLER(READ8(swtpc09_state, pia0_ca1_r))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(swtpc09_state, pia0_irq_a))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, swtpc09_state, pia0_a_r))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, swtpc09_state, pia0_ca1_r))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, swtpc09_state, pia0_irq_a))
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 2000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(50, 0, 50)
-	MCFG_PTM6840_O1_CB(WRITELINE(swtpc09_state, ptm_o1_callback))
-	MCFG_PTM6840_O3_CB(WRITELINE(swtpc09_state, ptm_o3_callback))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(swtpc09_state, ptm_irq))
+	MCFG_PTM6840_O1_CB(WRITELINE(*this, swtpc09_state, ptm_o1_callback))
+	MCFG_PTM6840_O3_CB(WRITELINE(*this, swtpc09_state, ptm_o3_callback))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, swtpc09_state, ptm_irq))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(swtpc09_state, acia_interrupt))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, swtpc09_state, acia_interrupt))
 
 	MCFG_DEVICE_ADD("brg", MC14411, XTAL(1'843'200))
-	MCFG_MC14411_F1_CB(DEVWRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	MCFG_MC14411_F1_CB(WRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
 
 	MCFG_FD1793_ADD("fdc", XTAL(1'000'000))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
@@ -210,8 +210,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(swtpc09_state::swtpc09)
 	swtpc09_base(config);
 	MCFG_DEVICE_MODIFY("fdc")
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, swtpc09_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, swtpc09_state, fdc_drq_w))
 MACHINE_CONFIG_END
 
 /* MPU09, MPID, MPS2 DC4 PIAIDE*/
@@ -241,8 +241,8 @@ MACHINE_CONFIG_END
 /* MPU09, MPID, MPS2 DMF3 */
 MACHINE_CONFIG_START(swtpc09_state::swtpc09d3)
 	swtpc09_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL(8'000'000))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(8'000'000))
 
 	MCFG_DEVICE_MODIFY("pia")
 	MCFG_DEVICE_CLOCK(2000000)
@@ -255,11 +255,11 @@ MACHINE_CONFIG_START(swtpc09_state::swtpc09d3)
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4)
-	MCFG_VIA6522_READPA_HANDLER(READ8(swtpc09_state, dmf3_via_read_porta))
-	MCFG_VIA6522_READPB_HANDLER(READ8(swtpc09_state, dmf3_via_read_portb))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(swtpc09_state, dmf3_via_write_porta))
-	//MCFG_VIA6522_CA1_HANDLER(WRITELINE(swtpc09_state, dmf3_via_write_ca1))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(swtpc09_state, dmf3_via_irq))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, swtpc09_state, dmf3_via_read_porta))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, swtpc09_state, dmf3_via_read_portb))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, swtpc09_state, dmf3_via_write_porta))
+	//MCFG_VIA6522_CA1_HANDLER(WRITELINE(*this, swtpc09_state, dmf3_via_write_ca1))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, swtpc09_state, dmf3_via_irq))
 MACHINE_CONFIG_END
 
 

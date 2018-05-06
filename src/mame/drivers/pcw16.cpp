@@ -1012,34 +1012,34 @@ static void pcw16_com(device_slot_interface &device)
 
 MACHINE_CONFIG_START(pcw16_state::pcw16)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 16000000)
-	MCFG_CPU_PROGRAM_MAP(pcw16_map)
-	MCFG_CPU_IO_MAP(pcw16_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(pcw16_map)
+	MCFG_DEVICE_IO_MAP(pcw16_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 
 	MCFG_DEVICE_ADD( "ns16550_1", NS16550, XTAL(1'843'200) )     /* TODO: Verify uart model */
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport1", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport1", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport1", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(pcw16_state, pcw16_com_interrupt_1))
-	MCFG_RS232_PORT_ADD( "serport1", pcw16_com, "msystems_mouse" )
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, cts_w))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport1", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport1", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport1", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, pcw16_state, pcw16_com_interrupt_1))
+	MCFG_DEVICE_ADD( "serport1", RS232_PORT, pcw16_com, "msystems_mouse" )
+	MCFG_RS232_RXD_HANDLER(WRITELINE("ns16550_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("ns16550_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("ns16550_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("ns16550_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("ns16550_1", ins8250_uart_device, cts_w))
 
 	MCFG_DEVICE_ADD( "ns16550_2", NS16550, XTAL(1'843'200) )     /* TODO: Verify uart model */
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport2", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport2", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport2", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(pcw16_state, pcw16_com_interrupt_2))
-	MCFG_RS232_PORT_ADD( "serport2", pcw16_com, nullptr )
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, dsr_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, cts_w))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport2", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport2", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport2", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, pcw16_state, pcw16_com_interrupt_2))
+	MCFG_DEVICE_ADD( "serport2", RS232_PORT, pcw16_com, nullptr )
+	MCFG_RS232_RXD_HANDLER(WRITELINE("ns16550_2", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("ns16550_2", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("ns16550_2", ins8250_uart_device, dsr_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("ns16550_2", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1055,7 +1055,7 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 3750)
+	MCFG_DEVICE_ADD("beeper", BEEP, 3750)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
@@ -1063,7 +1063,7 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
 
 	MCFG_PC_FDC_SUPERIO_ADD("fdc")
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pcw16_state, fdc_interrupt))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pcw16_state, fdc_interrupt))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
 
@@ -1075,7 +1075,7 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	MCFG_INTEL_E28F008SA_ADD("flash0")
 	MCFG_INTEL_E28F008SA_ADD("flash1")
 
-	MCFG_AT_KEYB_ADD("at_keyboard", 3, WRITELINE(pcw16_state, pcw16_keyboard_callback))
+	MCFG_AT_KEYB_ADD("at_keyboard", 3, WRITELINE(*this, pcw16_state, pcw16_keyboard_callback))
 
 	/* video ints */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("video_timer", pcw16_state, pcw16_timer_callback, attotime::from_usec(5830))

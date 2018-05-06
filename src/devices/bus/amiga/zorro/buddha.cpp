@@ -60,9 +60,9 @@ void buddha_device::mmio_map(address_map &map)
 
 MACHINE_CONFIG_START(buddha_device::device_add_mconfig)
 	MCFG_ATA_INTERFACE_ADD("ata_0", ata_devices, nullptr, nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(buddha_device, ide_0_interrupt_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, buddha_device, ide_0_interrupt_w))
 	MCFG_ATA_INTERFACE_ADD("ata_1", ata_devices, nullptr, nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(buddha_device, ide_1_interrupt_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, buddha_device, ide_1_interrupt_w))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

@@ -377,14 +377,14 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(mainsnk_state::mainsnk)
 
-	MCFG_CPU_ADD("maincpu", Z80, 3360000)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mainsnk_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3360000)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mainsnk_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mainsnk_state, irq0_line_assert,  244)
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mainsnk_state, irq0_line_assert,  244)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -405,10 +405,10 @@ MACHINE_CONFIG_START(mainsnk_state::mainsnk)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 

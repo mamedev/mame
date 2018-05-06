@@ -994,9 +994,9 @@ void magicard_state::ramdac_map(address_map &map)
 
 
 MACHINE_CONFIG_START(magicard_state::magicard)
-	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A / 2)    /* SCC-68070 CCA84 datasheet */
-	MCFG_CPU_PROGRAM_MAP(magicard_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicard_state, magicard_irq) /* no interrupts? (it erases the vectors..) */
+	MCFG_DEVICE_ADD("maincpu", SCC68070, CLOCK_A / 2)    /* SCC-68070 CCA84 datasheet */
+	MCFG_DEVICE_PROGRAM_MAP(magicard_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", magicard_state, magicard_irq) /* no interrupts? (it erases the vectors..) */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -1009,17 +1009,17 @@ MACHINE_CONFIG_START(magicard_state::magicard)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("saa", SAA1099, CLOCK_B)
+	MCFG_DEVICE_ADD("saa", SAA1099, CLOCK_B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(magicard_state::hotslots)
 	magicard(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hotslots_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hotslots_mem)
 
 	MCFG_DEVICE_REMOVE("saa")
-	MCFG_SOUND_ADD("ssg", YMZ284, 4000000)
+	MCFG_DEVICE_ADD("ssg", YMZ284, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

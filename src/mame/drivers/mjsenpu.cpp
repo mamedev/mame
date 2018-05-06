@@ -462,10 +462,10 @@ following clocks are on the PCB
 MACHINE_CONFIG_START(mjsenpu_state::mjsenpu)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E132XT, 27000000*2) /* ?? Mhz */
-	MCFG_CPU_PROGRAM_MAP(mjsenpu_32bit_map)
-	MCFG_CPU_IO_MAP(mjsenpu_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mjsenpu_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", E132XT, 27000000*2) /* ?? Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(mjsenpu_32bit_map)
+	MCFG_DEVICE_IO_MAP(mjsenpu_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mjsenpu_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

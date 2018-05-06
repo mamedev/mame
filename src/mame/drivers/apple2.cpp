@@ -1376,8 +1376,8 @@ static void apple2_cards(device_slot_interface &device)
 
 MACHINE_CONFIG_START(napple2_state::apple2_common)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
-	MCFG_CPU_PROGRAM_MAP(apple2_map)
+	MCFG_DEVICE_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(apple2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", napple2_state, apple2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -1393,7 +1393,7 @@ MACHINE_CONFIG_START(napple2_state::apple2_common)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* /INH banking */
@@ -1405,14 +1405,14 @@ MACHINE_CONFIG_START(napple2_state::apple2_common)
 
 	/* soft switches */
 	MCFG_DEVICE_ADD("softlatch", F9334, 0) // F14 (labeled 74LS259 on some boards and in the Apple ][ Reference Manual)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(napple2_state, txt_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(napple2_state, mix_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(napple2_state, scr_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(napple2_state, res_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(napple2_state, an0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(napple2_state, an1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(napple2_state, an2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(napple2_state, an3_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, napple2_state, txt_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, napple2_state, mix_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, napple2_state, scr_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, napple2_state, res_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, napple2_state, an0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, napple2_state, an1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, napple2_state, an2_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, napple2_state, an3_w))
 
 	/* keyboard controller */
 	MCFG_DEVICE_ADD(A2_KBDC_TAG, AY3600, 0)
@@ -1425,10 +1425,10 @@ MACHINE_CONFIG_START(napple2_state::apple2_common)
 	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
 	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
 	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(napple2_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(napple2_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(napple2_state, ay3600_data_ready_w))
-	MCFG_AY3600_AKO_CB(WRITELINE(napple2_state, ay3600_ako_w))
+	MCFG_AY3600_SHIFT_CB(READLINE(*this, napple2_state, ay3600_shift_r))
+	MCFG_AY3600_CONTROL_CB(READLINE(*this, napple2_state, ay3600_control_r))
+	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, napple2_state, ay3600_data_ready_w))
+	MCFG_AY3600_AKO_CB(WRITELINE(*this, napple2_state, ay3600_ako_w))
 
 	/* repeat timer.  15 Hz from page 90 of "The Apple II Circuit Description */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", napple2_state, ay3600_repeat, attotime::from_hz(15))
@@ -1436,9 +1436,9 @@ MACHINE_CONFIG_START(napple2_state::apple2_common)
 	/* slot devices */
 	MCFG_DEVICE_ADD(A2_BUS_TAG, A2BUS, 0)
 	MCFG_A2BUS_CPU(A2_CPU_TAG)
-	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(napple2_state, a2bus_irq_w))
-	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(napple2_state, a2bus_nmi_w))
-	MCFG_A2BUS_OUT_INH_CB(WRITELINE(napple2_state, a2bus_inh_w))
+	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, napple2_state, a2bus_irq_w))
+	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, napple2_state, a2bus_nmi_w))
+	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, napple2_state, a2bus_inh_w))
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl0", apple2_slot0_cards, "lang")
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl1", apple2_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl2", apple2_cards, nullptr)

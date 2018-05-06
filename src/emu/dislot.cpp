@@ -17,6 +17,7 @@
 
 device_slot_interface::device_slot_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "slot"),
+	m_default_clock(0), // FIXME: zero to preserve behaviour - should probably be DERIVED_CLOCK(1, 1)
 	m_default_option(nullptr),
 	m_fixed(false),
 	m_card_device(nullptr)
@@ -62,7 +63,7 @@ device_slot_interface::slot_option &device_slot_interface::option_add(const char
 	if (m_options.count(name))
 		throw tag_add_exception(name);
 
-	return *m_options.emplace(name, std::make_unique<slot_option>(name, devtype, true)).first->second;
+	return m_options.emplace(name, std::make_unique<slot_option>(name, devtype, true)).first->second->clock(m_default_clock);
 }
 
 
@@ -79,7 +80,7 @@ device_slot_interface::slot_option &device_slot_interface::option_add_internal(c
 	if (m_options.count(name))
 		throw tag_add_exception(name);
 
-	return *m_options.emplace(name, std::make_unique<slot_option>(name, devtype, false)).first->second;
+	return m_options.emplace(name, std::make_unique<slot_option>(name, devtype, false)).first->second->clock(m_default_clock);
 }
 
 

@@ -187,7 +187,7 @@ device_t *machine_config::add_device(std::unique_ptr<device_t> &&device, device_
 device_t *machine_config::device_add(const char *tag, device_type type, u32 clock)
 {
 	std::pair<const char *, device_t *> const owner(resolve_owner(tag));
-	return add_device(type(*this, owner.first, owner.second, clock), owner.second);
+	return add_device(type.create(*this, owner.first, owner.second, clock), owner.second);
 }
 
 
@@ -216,7 +216,7 @@ device_t *machine_config::device_replace(const char *tag, device_type type, u32 
 		remove_references(*old_device);
 
 		// allocate the new device and substitute it for the old one in the owner's list
-		device_t *const new_device = &owner->subdevices().m_list.replace_and_remove(*type(*this, tag, owner, clock).release(), *old_device);
+		device_t *const new_device = &owner->subdevices().m_list.replace_and_remove(*type.create(*this, tag, owner, clock).release(), *old_device);
 		current_device_stack context(*this);
 		new_device->add_machine_configuration(*this);
 		return new_device;

@@ -591,7 +591,7 @@ public:
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	static void ncr5390(device_t *device);
+	void ncr5390(device_t *device);
 	void sun4c(machine_config &config);
 	void sun4(machine_config &config);
 	void sun4_mem(address_map &map);
@@ -1904,13 +1904,13 @@ void sun4_state::ncr5390(device_t *device)
 	devcb_base *devcb;
 	(void)devcb;
 	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5390_IRQ_HANDLER(DEVWRITELINE(":", sun4_state, scsi_irq))
-	MCFG_NCR5390_DRQ_HANDLER(DEVWRITELINE(":", sun4_state, scsi_drq))
+	MCFG_NCR5390_IRQ_HANDLER(WRITELINE(*this, sun4_state, scsi_irq))
+	MCFG_NCR5390_DRQ_HANDLER(WRITELINE(*this, sun4_state, scsi_drq))
 }
 
 MACHINE_CONFIG_START(sun4_state::sun4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MB86901, 16670000)
+	MCFG_DEVICE_ADD("maincpu", MB86901, 16670000)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, sun4_mem)
 	MCFG_SPARC_ADD_ASI_DESC(sun4_asi_desc)
 
@@ -1939,27 +1939,27 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 
 	// Keyboard/mouse
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc1_int))
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, sun4_state, scc1_int))
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
 	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "type4hle")
-	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
 	// RS232 serial ports
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc2_int))
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, sun4_state, scc2_int))
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
 
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_NSCSI_ADD("scsibus:0", sun_scsi_devices, "harddisk", false)
@@ -1970,12 +1970,12 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	MCFG_NSCSI_ADD("scsibus:5", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr5390", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", ncr5390)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", [this] (device_t *device) { ncr5390(device); })
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sun4_state::sun4c)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MB86901, 16670000)
+	MCFG_DEVICE_ADD("maincpu", MB86901, 16670000)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, sun4c_mem)
 	MCFG_SPARC_ADD_ASI_DESC(sun4c_asi_desc)
 
@@ -2004,27 +2004,27 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 
 	// Keyboard/mouse
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc1_int))
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, sun4_state, scc1_int))
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
 
 	MCFG_SUNKBD_PORT_ADD(KEYBOARD_TAG, default_sun_keyboard_devices, "type5hle")
-	MCFG_SUNKBD_RXD_HANDLER(DEVWRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
 
 	// RS232 serial ports
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(sun4_state, scc2_int))
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, sun4_state, scc2_int))
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
 
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_NSCSI_ADD("scsibus:0", sun_scsi_devices, "harddisk", false)
@@ -2035,7 +2035,7 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	MCFG_NSCSI_ADD("scsibus:5", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr5390", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", ncr5390)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", [this] (device_t *device) { ncr5390(device); })
 
 	MCFG_SCREEN_ADD("bwtwo", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(sun4_state, bw2_update)

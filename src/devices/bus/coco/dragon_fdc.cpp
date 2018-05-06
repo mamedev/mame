@@ -151,8 +151,8 @@ static void dragon_fdc_drives(device_slot_interface &device)
 
 MACHINE_CONFIG_START(dragon_fdc_device_base::device_add_mconfig)
 	MCFG_WD2797_ADD(WD2797_TAG, XTAL(4'000'000) / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, dragon_fdc_device_base, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dragon_fdc_device_base, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats)

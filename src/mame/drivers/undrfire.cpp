@@ -567,9 +567,9 @@ INTERRUPT_GEN_MEMBER(undrfire_state::undrfire_interrupt)
 MACHINE_CONFIG_START(undrfire_state::undrfire)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20 MHz - NOT verified */
-	MCFG_CPU_PROGRAM_MAP(undrfire_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  undrfire_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20 MHz - NOT verified */
+	MCFG_DEVICE_PROGRAM_MAP(undrfire_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", undrfire_state,  undrfire_interrupt)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -577,12 +577,12 @@ MACHINE_CONFIG_START(undrfire_state::undrfire)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("INPUTS0"))
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("INPUTS1"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("INPUTS2"))
-	MCFG_TC0510NIO_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_INPUT(READLINE(undrfire_state, frame_counter_r)) MCFG_DEVCB_BIT(0)
-	MCFG_TC0510NIO_WRITE_3_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(undrfire_state, coin_word_w))
+	MCFG_TC0510NIO_READ_3_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_DEVCB_CHAIN_INPUT(READLINE(*this, undrfire_state, frame_counter_r)) MCFG_DEVCB_BIT(0)
+	MCFG_TC0510NIO_WRITE_3_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, undrfire_state, coin_word_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("SYSTEM"))
 
 	/* video hardware */
@@ -620,13 +620,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(undrfire_state::cbombers)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20 MHz - NOT verified */
-	MCFG_CPU_PROGRAM_MAP(cbombers_cpua_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20 MHz - NOT verified */
+	MCFG_DEVICE_PROGRAM_MAP(cbombers_cpua_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(32'000'000)/2)   /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(cbombers_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(32'000'000)/2)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cbombers_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480))   /* CPU slices - Need to interleave Cpu's 1 & 3 */
 
@@ -640,12 +640,12 @@ MACHINE_CONFIG_START(undrfire_state::cbombers)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("INPUTS0"))
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("INPUTS1"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("INPUTS2"))
-	MCFG_TC0510NIO_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_INPUT(READLINE(undrfire_state, frame_counter_r)) MCFG_DEVCB_BIT(0)
-	MCFG_TC0510NIO_WRITE_3_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(undrfire_state, coin_word_w))
+	MCFG_TC0510NIO_READ_3_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_DEVCB_CHAIN_INPUT(READLINE(*this, undrfire_state, frame_counter_r)) MCFG_DEVCB_BIT(0)
+	MCFG_TC0510NIO_WRITE_3_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, undrfire_state, coin_word_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("SYSTEM"))
 
 	/* video hardware */

@@ -3284,17 +3284,17 @@ void cobra_state::machine_reset()
 MACHINE_CONFIG_START(cobra_state::cobra)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC603, 100000000)      /* 603EV, 100? MHz */
+	MCFG_DEVICE_ADD("maincpu", PPC603, 100000000)      /* 603EV, 100? MHz */
 	MCFG_PPC_BUS_FREQUENCY(XTAL(66'666'700))  /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	MCFG_CPU_PROGRAM_MAP(cobra_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cobra_state,  cobra_vblank)
+	MCFG_DEVICE_PROGRAM_MAP(cobra_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cobra_state,  cobra_vblank)
 
-	MCFG_CPU_ADD("subcpu", PPC403GA, 32000000)      /* 403GA, 33? MHz */
-	MCFG_CPU_PROGRAM_MAP(cobra_sub_map)
+	MCFG_DEVICE_ADD("subcpu", PPC403GA, 32000000)      /* 403GA, 33? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cobra_sub_map)
 
-	MCFG_CPU_ADD("gfxcpu", PPC604, 100000000)       /* 604, 100? MHz */
+	MCFG_DEVICE_ADD("gfxcpu", PPC604, 100000000)       /* 604, 100? MHz */
 	MCFG_PPC_BUS_FREQUENCY(XTAL(66'666'700))   /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	MCFG_CPU_PROGRAM_MAP(cobra_gfx_map)
+	MCFG_DEVICE_PROGRAM_MAP(cobra_gfx_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(15005))
 
@@ -3303,7 +3303,7 @@ MACHINE_CONFIG_START(cobra_state::cobra)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, cobra_state, mpc106_pci_r, mpc106_pci_w)
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(cobra_state, ide_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, cobra_state, ide_interrupt))
 
 	/* video hardware */
 
@@ -3320,10 +3320,10 @@ MACHINE_CONFIG_START(cobra_state::cobra)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_M48T58_ADD("m48t58")

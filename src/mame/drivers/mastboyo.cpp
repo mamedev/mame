@@ -186,10 +186,10 @@ PALETTE_INIT_MEMBER(mastboyo_state, mastboyo)
 MACHINE_CONFIG_START(mastboyo_state::mastboyo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 20_MHz_XTAL/6)
-	MCFG_CPU_PROGRAM_MAP(mastboyo_map)
-	MCFG_CPU_IO_MAP(mastboyo_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mastboyo_state, irq0_line_hold, 256.244f) // not sure, INT0 pin was measured at 256.244Hz
+	MCFG_DEVICE_ADD("maincpu", Z80, 20_MHz_XTAL/6)
+	MCFG_DEVICE_PROGRAM_MAP(mastboyo_map)
+	MCFG_DEVICE_IO_MAP(mastboyo_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mastboyo_state, irq0_line_hold, 256.244f) // not sure, INT0 pin was measured at 256.244Hz
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -210,7 +210,7 @@ MACHINE_CONFIG_START(mastboyo_state::mastboyo)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 20_MHz_XTAL/4)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 20_MHz_XTAL/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0")) // DSW
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1")) // player inputs
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

@@ -6,10 +6,6 @@
 #pragma once
 
 
-#define MCFG_RS232_PORT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, RS232_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
 #define MCFG_RS232_RXD_HANDLER(_devcb) \
 	devcb = &downcast<rs232_port_device &>(*device).set_rxd_handler(DEVCB_##_devcb);
 

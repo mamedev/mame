@@ -1353,9 +1353,9 @@ static void vboy_cart(device_slot_interface &device)
 MACHINE_CONFIG_START(vboy_state::vboy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", V810, XTAL(20'000'000) )
-	MCFG_CPU_PROGRAM_MAP(vboy_mem)
-	MCFG_CPU_IO_MAP(vboy_io)
+	MCFG_DEVICE_ADD( "maincpu", V810, XTAL(20'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(vboy_mem)
+	MCFG_DEVICE_IO_MAP(vboy_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer_l", vboy_state, vboy_scanlineL, "3dleft", 0, 1)
 	//MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer_r", vboy_state, vboy_scanlineR, "3dright", 0, 1)
 

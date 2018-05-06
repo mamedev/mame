@@ -5746,13 +5746,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(model3_state::model3_interrupt)
 }
 
 MACHINE_CONFIG_START(model3_state::model3_10)
-	MCFG_CPU_ADD("maincpu", PPC603E, 66000000)
+	MCFG_DEVICE_ADD("maincpu", PPC603E, 66000000)
 	MCFG_PPC_BUS_FREQUENCY(66000000)   /* Multiplier 1, Bus = 66MHz, Core = 66MHz */
-	MCFG_CPU_PROGRAM_MAP(model3_10_mem)
+	MCFG_DEVICE_PROGRAM_MAP(model3_10_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model3_state, model3_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(model3_snd)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(model3_snd)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -5775,12 +5775,12 @@ MACHINE_CONFIG_START(model3_state::model3_10)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("scsp1", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(model3_state, scsp_irq))
+	MCFG_DEVICE_ADD("scsp1", SCSP)
+	MCFG_SCSP_IRQ_CB(WRITE8(*this, model3_state, scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
-	MCFG_SOUND_ADD("scsp2", SCSP, 0)
+	MCFG_DEVICE_ADD("scsp2", SCSP)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
@@ -5794,13 +5794,13 @@ MACHINE_CONFIG_START(model3_state::model3_10)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model3_state::model3_15)
-	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
+	MCFG_DEVICE_ADD("maincpu", PPC603E, 100000000)
 	MCFG_PPC_BUS_FREQUENCY(66000000)       /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	MCFG_CPU_PROGRAM_MAP(model3_mem)
+	MCFG_DEVICE_PROGRAM_MAP(model3_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model3_state, model3_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(model3_snd)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(model3_snd)
 
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_15)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_15)
@@ -5821,12 +5821,12 @@ MACHINE_CONFIG_START(model3_state::model3_15)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("scsp1", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(model3_state, scsp_irq))
+	MCFG_DEVICE_ADD("scsp1", SCSP)
+	MCFG_SCSP_IRQ_CB(WRITE8(*this, model3_state, scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
-	MCFG_SOUND_ADD("scsp2", SCSP, 0)
+	MCFG_DEVICE_ADD("scsp2", SCSP)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
@@ -5848,21 +5848,21 @@ MACHINE_CONFIG_START(model3_state::scud)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
 
 	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model3_state::model3_20)
-	MCFG_CPU_ADD("maincpu", PPC603R, 166000000)
+	MCFG_DEVICE_ADD("maincpu", PPC603R, 166000000)
 	MCFG_PPC_BUS_FREQUENCY(66000000)    /* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
-	MCFG_CPU_PROGRAM_MAP(model3_mem)
+	MCFG_DEVICE_PROGRAM_MAP(model3_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model3_state, model3_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(model3_snd)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(model3_snd)
 
 	MCFG_MACHINE_START_OVERRIDE(model3_state, model3_20)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state, model3_20)
@@ -5883,12 +5883,12 @@ MACHINE_CONFIG_START(model3_state::model3_20)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("scsp1", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(model3_state, scsp_irq))
+	MCFG_DEVICE_ADD("scsp1", SCSP)
+	MCFG_SCSP_IRQ_CB(WRITE8(*this, model3_state, scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
-	MCFG_SOUND_ADD("scsp2", SCSP, 0)
+	MCFG_DEVICE_ADD("scsp2", SCSP)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
@@ -5912,21 +5912,21 @@ uint16_t model3_state::crypt_read_callback(uint32_t addr)
 MACHINE_CONFIG_START(model3_state::model3_20_5881)
 	model3_20(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(model3_5881_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model3_5881_mem)
 
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model3_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model3_state::model3_21)
-	MCFG_CPU_ADD("maincpu", PPC603R, 166000000)
+	MCFG_DEVICE_ADD("maincpu", PPC603R, 166000000)
 	MCFG_PPC_BUS_FREQUENCY(66000000)    /* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
-	MCFG_CPU_PROGRAM_MAP(model3_mem)
+	MCFG_DEVICE_PROGRAM_MAP(model3_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model3_state, model3_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(model3_snd)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(model3_snd)
 
 	MCFG_MACHINE_START_OVERRIDE(model3_state, model3_21)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state, model3_21)
@@ -5947,12 +5947,12 @@ MACHINE_CONFIG_START(model3_state::model3_21)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("scsp1", SCSP, 0)
-	MCFG_SCSP_IRQ_CB(WRITE8(model3_state, scsp_irq))
+	MCFG_DEVICE_ADD("scsp1", SCSP)
+	MCFG_SCSP_IRQ_CB(WRITE8(*this, model3_state, scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
-	MCFG_SOUND_ADD("scsp2", SCSP, 0)
+	MCFG_DEVICE_ADD("scsp2", SCSP)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
@@ -5962,8 +5962,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(model3_state::model3_21_5881)
 	model3_21(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(model3_5881_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model3_5881_mem)
 
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model3_state, crypt_read_callback)

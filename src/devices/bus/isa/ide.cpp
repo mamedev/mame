@@ -72,7 +72,7 @@ DEFINE_DEVICE_TYPE(ISA16_IDE, isa16_ide_device, "isa_ide", "IDE Fixed Drive Adap
 
 MACHINE_CONFIG_START(isa16_ide_device::device_add_mconfig)
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(isa16_ide_device, ide_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, isa16_ide_device, ide_interrupt))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lheadphone", "rheadphone")
 

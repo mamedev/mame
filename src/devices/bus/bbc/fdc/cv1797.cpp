@@ -54,9 +54,9 @@ ROM_END
 
 MACHINE_CONFIG_START(bbc_cv1797_device::device_add_mconfig)
 	MCFG_FD1797_ADD("fd1797", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_cv1797_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_cv1797_device, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(bbc_cv1797_device, motor_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bbc_cv1797_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_cv1797_device, fdc_drq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, bbc_cv1797_device, motor_w))
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", bbc_floppies_525, "525qd", floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", bbc_floppies_525, "525qd", floppy_formats)

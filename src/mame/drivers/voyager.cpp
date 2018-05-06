@@ -500,15 +500,15 @@ void voyager_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(voyager_state::voyager)
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 133000000) // actually AMD Duron CPU of unknown clock
-	MCFG_CPU_PROGRAM_MAP(voyager_map)
-	MCFG_CPU_IO_MAP(voyager_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 133000000) // actually AMD Duron CPU of unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(voyager_map)
+	MCFG_DEVICE_IO_MAP(voyager_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, voyager_state, intel82439tx_pci_r, intel82439tx_pci_w)

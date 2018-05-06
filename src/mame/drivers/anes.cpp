@@ -156,10 +156,10 @@ void anes_state::machine_start()
 
 MACHINE_CONFIG_START(anes_state::anes)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 2) // Z0840008PSC
-	MCFG_CPU_PROGRAM_MAP(prg_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", anes_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 2) // Z0840008PSC
+	MCFG_DEVICE_PROGRAM_MAP(prg_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", anes_state, irq0_line_hold)
 
 	// all wrong
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -174,7 +174,7 @@ MACHINE_CONFIG_START(anes_state::anes)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ym", YM2413, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ym", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

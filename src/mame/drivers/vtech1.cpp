@@ -437,16 +437,16 @@ static const int16_t speaker_levels[] = {-32768, 0, 32767, 0};
 MACHINE_CONFIG_START(vtech1_state::laser110)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, VTECH1_CLK)  /* 3.57950 MHz */
-	MCFG_CPU_PROGRAM_MAP(laser110_mem)
-	MCFG_CPU_IO_MAP(vtech1_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, VTECH1_CLK)  /* 3.57950 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(laser110_mem)
+	MCFG_DEVICE_IO_MAP(vtech1_io)
 
 	// video hardware
 	MCFG_SCREEN_MC6847_PAL_ADD("screen", "mc6847")
 
 	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
 	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0)) MCFG_DEVCB_INVERT
-	MCFG_MC6847_INPUT_CALLBACK(READ8(vtech1_state, mc6847_videoram_r))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, vtech1_state, mc6847_videoram_r))
 	MCFG_MC6847_BW(true)
 	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM1)
 	// GM2 = GND, GM0 = GND, INTEXT = GND
@@ -456,7 +456,7 @@ MACHINE_CONFIG_START(vtech1_state::laser110)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(vtech1_state::laser200)
 	MCFG_DEVICE_REMOVE("mc6847")
 	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
 	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0)) MCFG_DEVCB_INVERT
-	MCFG_MC6847_INPUT_CALLBACK(READ8(vtech1_state, mc6847_videoram_r))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, vtech1_state, mc6847_videoram_r))
 	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM1)
 	// GM2 = GND, GM0 = GND, INTEXT = GND
 	// other lines not connected
@@ -488,26 +488,26 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vtech1_state::laser210)
 	laser200(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(laser210_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(laser210_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vtech1_state::laser310)
 	laser200(config);
-	MCFG_CPU_REPLACE("maincpu", Z80, VZ300_XTAL1_CLK / 5)  /* 3.546894 MHz */
-	MCFG_CPU_PROGRAM_MAP(laser310_mem)
-	MCFG_CPU_IO_MAP(vtech1_io)
+	MCFG_DEVICE_REPLACE("maincpu", Z80, VZ300_XTAL1_CLK / 5)  /* 3.546894 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(laser310_mem)
+	MCFG_DEVICE_IO_MAP(vtech1_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vtech1_state::laser310h)
 	laser310(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(vtech1_shrg_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(vtech1_shrg_io)
 
 	MCFG_DEVICE_REMOVE("mc6847")
 	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
 	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0)) MCFG_DEVCB_INVERT
-	MCFG_MC6847_INPUT_CALLBACK(READ8(vtech1_state, mc6847_videoram_r))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, vtech1_state, mc6847_videoram_r))
 	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM1)
 	// INTEXT = GND
 	// other lines not connected

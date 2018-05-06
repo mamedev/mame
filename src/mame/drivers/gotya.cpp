@@ -212,9 +212,9 @@ void gotya_state::machine_reset()
 MACHINE_CONFIG_START(gotya_state::gotya)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(gotya_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gotya_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(gotya_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gotya_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -235,7 +235,7 @@ MACHINE_CONFIG_START(gotya_state::gotya)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -1266,9 +1266,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(midzeus_state::midzeus)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(zeus_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus_state, display_irq)
+	MCFG_DEVICE_ADD("maincpu", TMS32032, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(zeus_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midzeus_state, display_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(midzeus_state,midzeus)
 	MCFG_MACHINE_RESET_OVERRIDE(midzeus_state,midzeus)
@@ -1301,7 +1301,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(midzeus_state::invasn)
 	midzeus(config);
-	MCFG_CPU_ADD("pic", PIC16C57, 8000000)  /* ? */
+	MCFG_DEVICE_ADD("pic", PIC16C57, 8000000)  /* ? */
 
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(468/* or 488 */)
@@ -1310,9 +1310,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(midzeus2_state::midzeus2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(zeus2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus2_state, display_irq)
+	MCFG_DEVICE_ADD("maincpu", TMS32032, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(zeus2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midzeus2_state, display_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(midzeus2_state,midzeus)
 	MCFG_MACHINE_RESET_OVERRIDE(midzeus2_state,midzeus)
@@ -1324,7 +1324,7 @@ MACHINE_CONFIG_START(midzeus2_state::midzeus2)
 	MCFG_SCREEN_UPDATE_DEVICE("zeus2", zeus2_device, screen_update)
 
 	MCFG_DEVICE_ADD("zeus2", ZEUS2, ZEUS2_VIDEO_CLOCK)
-	MCFG_ZEUS2_IRQ_CB(WRITELINE(midzeus2_state, zeus_irq))
+	MCFG_ZEUS2_IRQ_CB(WRITELINE(*this, midzeus2_state, zeus_irq))
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)

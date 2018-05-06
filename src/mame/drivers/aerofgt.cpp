@@ -1449,13 +1449,13 @@ MACHINE_RESET_MEMBER(aerofgt_state,aerofgt)
 MACHINE_CONFIG_START(aerofgt_state::pspikes)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,XTAL(20'000'000)/2)    /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(pspikes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
+	MCFG_DEVICE_ADD("maincpu",M68000,XTAL(20'000'000)/2)    /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(pspikes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
 
-	MCFG_CPU_ADD("audiocpu",Z80,XTAL(20'000'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(turbofrc_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu",Z80,XTAL(20'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
@@ -1490,7 +1490,7 @@ MACHINE_CONFIG_START(aerofgt_state::pspikes)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1501,9 +1501,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::spikes91)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(spikes91_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
+	MCFG_DEVICE_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(spikes91_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
 
 	/* + Z80 for sound */
 
@@ -1539,9 +1539,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::pspikesb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(pspikesb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
+	MCFG_DEVICE_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(pspikesb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
@@ -1580,13 +1580,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::kickball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,XTAL(10'000'000)) // 10Mhz XTAL near 10Mhz rated CPU
-	MCFG_CPU_PROGRAM_MAP(kickball_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold) /* only IRQ1 is valid */
+	MCFG_DEVICE_ADD("maincpu",M68000,XTAL(10'000'000)) // 10Mhz XTAL near 10Mhz rated CPU
+	MCFG_DEVICE_PROGRAM_MAP(kickball_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold) /* only IRQ1 is valid */
 
-	MCFG_CPU_ADD("audiocpu",Z80,XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(kickball_sound_map)
-	MCFG_CPU_IO_MAP(kickball_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu",Z80,XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(kickball_sound_map)
+	MCFG_DEVICE_IO_MAP(kickball_sound_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
@@ -1620,7 +1620,7 @@ MACHINE_CONFIG_START(aerofgt_state::kickball)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000)) // K-666 (YM3812)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000)) // K-666 (YM3812)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -1631,9 +1631,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::pspikesc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(pspikesc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
+	MCFG_DEVICE_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(pspikesc_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
@@ -1670,13 +1670,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::karatblz)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(karatblz_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(karatblz_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(turbofrc_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
@@ -1716,7 +1716,7 @@ MACHINE_CONFIG_START(aerofgt_state::karatblz)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000) ) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000) ) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1727,13 +1727,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::karatblzbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(karatblzbl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(karatblzbl_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(karatblzbl_sound_map)
-	MCFG_CPU_IO_MAP(karatblzbl_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(karatblzbl_sound_map)
+	MCFG_DEVICE_IO_MAP(karatblzbl_sound_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
@@ -1772,24 +1772,24 @@ MACHINE_CONFIG_START(aerofgt_state::karatblzbl)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(8'000'000)/2)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(8'000'000)/2)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(aerofgt_state::spinlbrk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(spinlbrk_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold) /* there are vectors for 3 and 4 too, analog related? */
+	MCFG_DEVICE_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(spinlbrk_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold) /* there are vectors for 3 and 4 too, analog related? */
 
-	MCFG_CPU_ADD("audiocpu",Z80,XTAL(20'000'000)/4)   /* 5mhz verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(spinlbrk_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu",Z80,XTAL(20'000'000)/4)   /* 5mhz verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(spinlbrk_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,spinlbrk)
@@ -1830,7 +1830,7 @@ MACHINE_CONFIG_START(aerofgt_state::spinlbrk)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1841,13 +1841,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::turbofrc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(turbofrc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
+	MCFG_DEVICE_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(turbofrc_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
 
-	MCFG_CPU_ADD("audiocpu",Z80,XTAL(5'000'000))  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(turbofrc_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu",Z80,XTAL(5'000'000))  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
@@ -1887,7 +1887,7 @@ MACHINE_CONFIG_START(aerofgt_state::turbofrc)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1898,13 +1898,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::aerofgtb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(aerofgtb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
+	MCFG_DEVICE_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(aerofgtb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
 
-	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(aerofgt_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(aerofgt_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
@@ -1945,7 +1945,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgtb)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1956,13 +1956,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(aerofgt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
+	MCFG_DEVICE_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(aerofgt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
 
-	MCFG_CPU_ADD("audiocpu",Z80,XTAL(20'000'000)/4) /* 5 MHz verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(aerofgt_sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu",Z80,XTAL(20'000'000)/4) /* 5 MHz verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(aerofgt_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
@@ -1974,8 +1974,8 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 	MCFG_VS9209_IN_PORTC_CB(IOPORT("SYSTEM"))
 	MCFG_VS9209_IN_PORTD_CB(IOPORT("DSW1"))
 	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
-	MCFG_VS9209_IN_PORTG_CB(DEVREADLINE("soundlatch", generic_latch_8_device, pending_r)) MCFG_DEVCB_BIT(0)
-	MCFG_VS9209_OUT_PORTG_CB(DEVWRITELINE("watchdog", mb3773_device, write_line_ck)) MCFG_DEVCB_BIT(7)
+	MCFG_VS9209_IN_PORTG_CB(READLINE("soundlatch", generic_latch_8_device, pending_r)) MCFG_DEVCB_BIT(0)
+	MCFG_VS9209_OUT_PORTG_CB(WRITELINE("watchdog", mb3773_device, write_line_ck)) MCFG_DEVCB_BIT(7)
 	MCFG_VS9209_IN_PORTH_CB(IOPORT("JP1"))
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
@@ -2008,7 +2008,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -2019,12 +2019,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::aerfboot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(aerfboot_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(aerfboot_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(aerfboot_sound_map)
+	MCFG_DEVICE_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(aerfboot_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
@@ -2062,9 +2062,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::aerfboo2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(aerfboo2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(aerfboo2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq2_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
@@ -2097,12 +2097,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::wbbc97)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(wbbc97_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
+	MCFG_DEVICE_ADD("maincpu",M68000,20000000/2)   /* 10 MHz (?) */
+	MCFG_DEVICE_PROGRAM_MAP(wbbc97_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
 
-	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(wbbc97_sound_map)
+	MCFG_DEVICE_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(wbbc97_sound_map)
 								/* IRQs are triggered by the YM3812 */
 	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
@@ -2135,7 +2135,7 @@ MACHINE_CONFIG_START(aerofgt_state::wbbc97)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(false)
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 3579545)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

@@ -308,8 +308,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(wolfpack_state::wolfpack)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 16)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(wolfpack_state::wolfpack)
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(wolfpack_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wolfpack_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wolfpack_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wolfpack)
@@ -329,7 +329,7 @@ MACHINE_CONFIG_START(wolfpack_state::wolfpack)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speech", S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
+	MCFG_DEVICE_ADD("speech", S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

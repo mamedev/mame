@@ -191,7 +191,7 @@ MACHINE_CONFIG_START(turbo_state::turbo_samples)
 	MCFG_SPEAKER_ADD("lspeaker", -0.2, 0.0, 1.0)    /* left */
 	MCFG_SPEAKER_ADD("rspeaker", 0.2, 0.0, 1.0)     /* right */
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(10)
 	MCFG_SAMPLES_NAMES(turbo_sample_names)
 
@@ -432,7 +432,7 @@ static const char *const subroc3d_sample_names[] =
 MACHINE_CONFIG_START(turbo_state::subroc3d_samples)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(12)
 	MCFG_SAMPLES_NAMES(subroc3d_sample_names)
 
@@ -576,7 +576,7 @@ static const char *const buckrog_sample_names[]=
 
 MACHINE_CONFIG_START(turbo_state::buckrog_samples)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(buckrog_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

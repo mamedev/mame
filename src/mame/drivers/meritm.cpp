@@ -1104,28 +1104,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_end_tick)
 }
 
 MACHINE_CONFIG_START(meritm_state::meritm_crt250)
-	MCFG_CPU_ADD("maincpu", Z80, SYSTEM_CLK/6)
-	MCFG_CPU_PROGRAM_MAP(meritm_crt250_map)
-	MCFG_CPU_IO_MAP(meritm_crt250_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, SYSTEM_CLK/6)
+	MCFG_DEVICE_PROGRAM_MAP(meritm_crt250_map)
+	MCFG_DEVICE_IO_MAP(meritm_crt250_io_map)
 	MCFG_Z80_DAISY_CHAIN(meritm_daisy_chain)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(meritm_state, meritm_crt250_port_b_w))   // used LMP x DRIVE
-	MCFG_I8255_IN_PORTC_CB(READ8(meritm_state, meritm_8255_port_c_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, meritm_state, meritm_crt250_port_b_w))   // used LMP x DRIVE
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, meritm_state, meritm_8255_port_c_r))
 
 	MCFG_DEVICE_ADD("z80pio_0", Z80PIO, SYSTEM_CLK/6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(meritm_state, meritm_audio_pio_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(meritm_state, meritm_audio_pio_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(meritm_state, meritm_audio_pio_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(meritm_state, meritm_audio_pio_port_b_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, meritm_state, meritm_audio_pio_port_a_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, meritm_state, meritm_audio_pio_port_a_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, meritm_state, meritm_audio_pio_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, meritm_state, meritm_audio_pio_port_b_w))
 
 	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, SYSTEM_CLK/6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(IOPORT("PIO1_PORTA"))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(meritm_state, meritm_io_pio_port_a_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, meritm_state, meritm_io_pio_port_a_w))
 	MCFG_Z80PIO_IN_PB_CB(IOPORT("PIO1_PORTB"))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(meritm_state, meritm_io_pio_port_b_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, meritm_state, meritm_io_pio_port_b_w))
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_start", meritm_state, vblank_start_tick, "screen", 259, 262)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_end", meritm_state, vblank_end_tick, "screen", 262, 262)
@@ -1135,58 +1135,58 @@ MACHINE_CONFIG_START(meritm_state::meritm_crt250)
 	MCFG_DS1204_ADD("ds1204")
 
 	MCFG_V9938_ADD("v9938_0", "screen", 0x20000, SYSTEM_CLK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(meritm_state,meritm_vdp0_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, meritm_state,meritm_vdp0_interrupt))
 
 	MCFG_V9938_ADD("v9938_1", "screen", 0x20000, SYSTEM_CLK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(meritm_state,meritm_vdp1_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, meritm_state,meritm_vdp1_interrupt))
 
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938_0", SYSTEM_CLK)
 	MCFG_SCREEN_UPDATE_DRIVER(meritm_state, screen_update_meritm)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8930, SYSTEM_CLK/12)
+	MCFG_DEVICE_ADD("aysnd", AY8930, SYSTEM_CLK/12)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW")) /* Port A read */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(meritm_state, meritm_ay8930_port_b_w))  /* Port B write */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, meritm_state, meritm_ay8930_port_b_w))  /* Port B write */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(meritm_state::meritm_crt250_questions)
 	meritm_crt250(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(meritm_crt250_questions_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(meritm_crt250_questions_map)
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_questions)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(meritm_state::meritm_crt250_crt252_crt258)
 	meritm_crt250_questions(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(meritm_crt250_crt258_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(meritm_crt250_crt258_io_map)
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_crt252_crt258)
 
 	MCFG_DEVICE_ADD("ns16550", NS16550, UART_CLK)
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
-	MCFG_MICROTOUCH_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
+	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE("ns16550", ins8250_uart_device, rx_w))
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, meritm_touch_coord_transform)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(meritm_state::meritm_crt260)
 	meritm_crt250(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(meritm_map)
-	MCFG_CPU_IO_MAP(meritm_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(meritm_map)
+	MCFG_DEVICE_IO_MAP(meritm_io_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTC_CB(READ8(meritm_state, meritm_8255_port_c_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, meritm_state, meritm_8255_port_c_r))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))  // DS1232, TD connected to VCC
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt260)
 
 	MCFG_DEVICE_ADD("ns16550", NS16550, UART_CLK)
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
-	MCFG_MICROTOUCH_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
+	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE("ns16550", ins8250_uart_device, rx_w))
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, meritm_touch_coord_transform)
 MACHINE_CONFIG_END
 

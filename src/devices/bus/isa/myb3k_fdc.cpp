@@ -99,8 +99,8 @@ static void myb3k_8inch_floppies(device_slot_interface &device)
 /*  */
 MACHINE_CONFIG_START(isa8_myb3k_fdc4710_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("fdc", MB8876, XTAL(15'974'400) / 8) /* From StepOne schematics */
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4710_device, irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4710_device, drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, isa8_myb3k_fdc4710_device, irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, isa8_myb3k_fdc4710_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", myb3k_sd_floppies, "525sd", isa8_myb3k_fdc4710_device::myb3k_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", myb3k_sd_floppies, "525sd", isa8_myb3k_fdc4710_device::myb3k_floppy_formats)
 MACHINE_CONFIG_END
@@ -108,8 +108,8 @@ MACHINE_CONFIG_END
 /* Main difference from fdc4710 is that a Hitachi HA16632AP has replaced the descrete VFO enabling 720Kb disks */
 MACHINE_CONFIG_START(isa8_myb3k_fdc4711_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("fdc", FD1791, XTAL(15'974'400) / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4711_device, irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4711_device, drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, isa8_myb3k_fdc4711_device, irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, isa8_myb3k_fdc4711_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats)
@@ -119,8 +119,8 @@ MACHINE_CONFIG_END
 #if 0
 MACHINE_CONFIG_START(isa8_myb3k_fdc4712_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("fdc", FD1791, XTAL(15'974'400) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4712_device, irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(isa8_myb3k_fdc4712_device, drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, isa8_myb3k_fdc4712_device, irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, isa8_myb3k_fdc4712_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", myb3k_8inch_floppies, "8dsdd", isa8_myb3k_fdc4712_device::myb3k_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", myb3k_8inch_floppies, "8dsdd", isa8_myb3k_fdc4712_device::myb3k_floppy_formats)
 MACHINE_CONFIG_END

@@ -542,14 +542,14 @@ WRITE_LINE_MEMBER(marineb_state::wanted_vblank_irq)
 MACHINE_CONFIG_START(marineb_state::marineb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)   /* 3 MHz? */
-	MCFG_CPU_PROGRAM_MAP(marineb_map)
-	MCFG_CPU_IO_MAP(marineb_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)   /* 3 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(marineb_map)
+	MCFG_DEVICE_IO_MAP(marineb_io_map)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(marineb_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(marineb_state, flipscreen_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(marineb_state, flipscreen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, marineb_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_x_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -559,7 +559,7 @@ MACHINE_CONFIG_START(marineb_state::marineb)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_marineb)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(marineb_state, marineb_vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, marineb_state, marineb_vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", marineb)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -567,7 +567,7 @@ MACHINE_CONFIG_START(marineb_state::marineb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK)
+	MCFG_DEVICE_ADD("ay1", AY8910, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -589,8 +589,8 @@ MACHINE_CONFIG_START(marineb_state::springer)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(marineb_state, flipscreen_y_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(marineb_state, flipscreen_x_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_y_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_x_w)) MCFG_DEVCB_INVERT
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -614,23 +614,23 @@ MACHINE_CONFIG_START(marineb_state::wanted)
 	marineb(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(wanted_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(wanted_io_map)
 
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(marineb_state, irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, marineb_state, irq_mask_w))
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", wanted)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_springer)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(marineb_state, wanted_vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, marineb_state, wanted_vblank_irq))
 
 	// sound hardware (PSG type verified only for bcruzm12)
-	MCFG_SOUND_REPLACE("ay1", AY8912, SOUND_CLOCK)
+	MCFG_DEVICE_REPLACE("ay1", AY8912, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8912, SOUND_CLOCK)
+	MCFG_DEVICE_ADD("ay2", AY8912, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -652,8 +652,8 @@ MACHINE_CONFIG_START(marineb_state::bcruzm12)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(marineb_state, flipscreen_y_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(marineb_state, flipscreen_x_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_y_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_x_w)) MCFG_DEVCB_INVERT
 MACHINE_CONFIG_END
 
 /***************************************************************************

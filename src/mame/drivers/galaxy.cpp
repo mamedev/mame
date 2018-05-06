@@ -177,10 +177,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(galaxy_state::galaxy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(galaxy_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxy_state,galaxy_irq_callback)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(galaxy_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(galaxy_state,galaxy_irq_callback)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -219,11 +219,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(galaxyp_mem)
-	MCFG_CPU_IO_MAP(galaxyp_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxy_state,galaxy_irq_callback)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(galaxyp_mem)
+	MCFG_DEVICE_IO_MAP(galaxyp_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(galaxy_state,galaxy_irq_callback)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL/4)
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL/4)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
