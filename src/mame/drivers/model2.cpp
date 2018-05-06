@@ -2401,7 +2401,7 @@ MACHINE_CONFIG_START(model2_state::model2_scsp)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DEVICE_ADD("scsp", SCSP, 22.5792_MHz_XTAL) // TODO : verify clock; guessed // verified from Model 2A Video board
+	MCFG_DEVICE_ADD("scsp", SCSP, 22.5792_MHz_XTAL) // TODO : verify clock; guessed
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, model2_state,scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
