@@ -1759,6 +1759,7 @@ files {
 	MAME_DIR .. "src/mame/video/excellent_spr.cpp",
 	MAME_DIR .. "src/mame/video/excellent_spr.h",
 	MAME_DIR .. "src/mame/drivers/lastbank.cpp",
+	MAME_DIR .. "src/mame/includes/witch.h",
 	MAME_DIR .. "src/mame/drivers/witch.cpp",
 }
 
