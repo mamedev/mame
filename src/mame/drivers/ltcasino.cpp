@@ -79,6 +79,7 @@ public:
 	DECLARE_DRIVER_INIT(mv4in1);
 	TILE_GET_INFO_MEMBER(get_ltcasino_tile_info);
 	virtual void video_start() override;
+	DECLARE_PALETTE_INIT(ltcasino);
 	uint32_t screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -89,16 +90,32 @@ public:
 
 /* Video */
 
+PALETTE_INIT_MEMBER(ltcasino_state, ltcasino)
+{
+	for (int i = 0; i < 64; i++)
+	{
+		palette.set_pen_color(2*i+0, pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
+		palette.set_pen_color(2*i+1, pal1bit(i >> 3), pal1bit(i >> 5), pal1bit(i >> 4));
+	}
+}
+
+/*
+ x--- ---- tile bank
+ -xxx ---- foreground color
+ ---- x--- unknown (used by ltcasino)
+ ---- -xxx background color
+ */
 TILE_GET_INFO_MEMBER(ltcasino_state::get_ltcasino_tile_info)
 {
 	int tileno, colour;
 
 	tileno = m_tile_num_ram[tile_index];
-	colour = m_tile_atr_ram[tile_index];
+	// TODO: wtf +1 on attribute offset otherwise glitches occurs on left side of objects? 
+	colour = m_tile_atr_ram[(tile_index+1) & 0x7ff];
 
 	tileno += (colour & 0x80) << 1;
 
-	SET_TILE_INFO_MEMBER(0,tileno,0,0);
+	SET_TILE_INFO_MEMBER(0,tileno,((colour & 0x70) >> 1) | (colour & 7),0);
 }
 
 void ltcasino_state::video_start()
@@ -106,6 +123,11 @@ void ltcasino_state::video_start()
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ltcasino_state::get_ltcasino_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,64,32);
 }
 
+uint32_t ltcasino_state::screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	return 0;
+}
 
 WRITE8_MEMBER(ltcasino_state::ltcasino_tile_num_w)
 {
@@ -116,7 +138,7 @@ WRITE8_MEMBER(ltcasino_state::ltcasino_tile_num_w)
 WRITE8_MEMBER(ltcasino_state::ltcasino_tile_atr_w)
 {
 	m_tile_atr_ram[offset] = data;
-	m_tilemap->mark_tile_dirty(offset);
+	m_tilemap->mark_tile_dirty((offset + 1) & 0x7ff);
 }
 
 
@@ -682,15 +704,8 @@ static const gfx_layout tiles8x8_layout =
 
 
 static GFXDECODE_START( ltcasino )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 64 )
 GFXDECODE_END
-
-
-uint32_t ltcasino_state::screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	return 0;
-}
 
 
 MACHINE_CONFIG_START(ltcasino_state::ltcasino)
@@ -709,7 +724,8 @@ MACHINE_CONFIG_START(ltcasino_state::ltcasino)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ltcasino)
-	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_ADD("palette", 2*64)
+	MCFG_PALETTE_INIT_OWNER(ltcasino_state, ltcasino)
 
 
 	/* sound hardware */
@@ -771,5 +787,5 @@ DRIVER_INIT_MEMBER(ltcasino_state,mv4in1)
 
 
 GAME( 1982, ltcasino, 0,         ltcasino, ltcasino, ltcasino_state, 0,      ROT0, "Digital Controls Inc.",           "Little Casino (older)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, mv4in1,   ltcasino,  ltcasino, mv4in1,   ltcasino_state, mv4in1, ROT0, "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1",       MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, mv4in1,   ltcasino,  ltcasino, mv4in1,   ltcasino_state, mv4in1, ROT0, "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1",       MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1984, ltcasinn, 0,         ltcasino, ltcasinn, ltcasino_state, 0,      ROT0, "Digital Controls Inc.",           "Little Casino (newer)", MACHINE_NOT_WORKING )
