@@ -305,6 +305,7 @@ void leland_80186_sound_device::device_start()
 	save_item(NAME(m_last_control));
 	save_item(NAME(m_clock_active));
 	save_item(NAME(m_clock_tick));
+	save_item(NAME(m_sound_command));
 	save_item(NAME(m_sound_response));
 	save_item(NAME(m_ext_start));
 	save_item(NAME(m_ext_stop));
@@ -315,6 +316,7 @@ void leland_80186_sound_device::device_start()
 	m_last_control = 0;
 	m_clock_active = 0;
 	m_clock_tick = 0;
+	m_sound_command = 0;
 	m_sound_response = 0;
 	m_ext_start = 0;
 	m_ext_stop = 0;
@@ -464,13 +466,17 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_control_w )
 
 WRITE8_MEMBER( leland_80186_sound_device::leland_80186_command_lo_w )
 {
-	m_soundlatch->write(space, offset, data & 0xff, mem_mask & 0xff);
+	if (LOG_COMM) logerror("%s:Write sound command latch lo = %02X\n", machine().describe_context(), data);
+	m_sound_command = (m_sound_command & 0xff00) | data;
+	m_soundlatch->write(space, offset, m_sound_command);
 }
 
 
 WRITE8_MEMBER( leland_80186_sound_device::leland_80186_command_hi_w )
 {
-	m_soundlatch->write(space, offset, data << 8, mem_mask << 8);
+	if (LOG_COMM) logerror("%s:Write sound command latch hi = %02X\n", machine().describe_context(), data);
+	m_sound_command = (m_sound_command & 0x00ff) | (data << 8);
+	m_soundlatch->write(space, offset, m_sound_command);
 }
 
 

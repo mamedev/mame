@@ -71,6 +71,7 @@ private:
 	uint8_t m_last_control;
 	uint8_t m_clock_active;
 	uint8_t m_clock_tick;
+	uint16_t m_sound_command;
 	uint16_t m_sound_response;
 	uint32_t m_ext_start;
 	uint32_t m_ext_stop;
