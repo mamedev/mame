@@ -377,18 +377,18 @@ MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* slot devices */
-	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)
+	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
 	MCFG_A2BUS_CPU("maincpu")
 	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, apple2gs_state, a2bus_irq_w))
 	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, apple2gs_state, a2bus_nmi_w))
 	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, apple2gs_state, a2bus_inh_w))
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl6", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, nullptr)
+	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl5", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
 	MCFG_IWM_ADD("fdc", apple2_fdc_interface)
 

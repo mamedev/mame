@@ -1067,7 +1067,7 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_RF5C400_ADD("rfsnd", XTAL(16'934'400))  // value from Guru readme, gives 44100 Hz sample rate
+	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(16'934'400))  // value from Guru readme, gives 44100 Hz sample rate
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

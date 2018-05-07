@@ -1065,7 +1065,7 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)        /* guess, seems ok */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_OKIM6295_ADD("oki6295", MASTER_CLOCK/12, PIN7_LOW)    /* guess, seems ok; pin7 guessed, seems ok */
+	MCFG_DEVICE_ADD("oki6295", OKIM6295, MASTER_CLOCK/12, okim6295_device::PIN7_LOW)    /* guess, seems ok; pin7 guessed, seems ok */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.20)
 
 MACHINE_CONFIG_END

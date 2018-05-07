@@ -439,7 +439,7 @@ MACHINE_CONFIG_START(konmedal_state::ddboy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL(14'318'181)/14, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/14, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
