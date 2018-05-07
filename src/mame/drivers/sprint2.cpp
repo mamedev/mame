@@ -525,8 +525,7 @@ MACHINE_CONFIG_START(sprint2_state::sprint2)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led1")) // START LAMP2
 	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, sprint2_state, sprint2_spare_w))
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(sprint2)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, sprint2_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -542,8 +541,7 @@ MACHINE_CONFIG_START(sprint2_state::sprint1)
 
 	MCFG_DEVICE_REMOVE("discrete")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(sprint1)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, sprint1_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -558,8 +556,7 @@ MACHINE_CONFIG_START(sprint2_state::dominos)
 
 	MCFG_DEVICE_REMOVE("discrete")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(dominos)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, dominos_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

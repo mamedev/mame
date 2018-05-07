@@ -45,6 +45,21 @@ inline DeviceClass &device_type_impl<DeviceClass>::operator()(machine_config &mc
 	return finder = result;
 }
 
+template <class DeviceClass> template <typename... Params>
+inline DeviceClass &device_type_impl<DeviceClass>::operator()(machine_config_replace replace, char const *tag, Params &&... args) const
+{
+	return dynamic_cast<DeviceClass &>(*replace.config.device_replace(tag, *this, std::forward<Params>(args)...));
+}
+
+template <class DeviceClass> template <typename Exposed, bool Required, typename... Params>
+inline DeviceClass &device_type_impl<DeviceClass>::operator()(machine_config_replace replace, device_finder<Exposed, Required> &finder, Params &&... args) const
+{
+	std::pair<device_t &, char const *> const target(finder.finder_target());
+	assert(&replace.config.current_device() == &target.first);
+	DeviceClass &result(dynamic_cast<DeviceClass &>(*replace.config.device_replace(target.second, *this, std::forward<Params>(args)...)));
+	return finder = result;
+}
+
 } } // namespace emu::detail
 
 

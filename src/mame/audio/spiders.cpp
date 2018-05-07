@@ -110,7 +110,7 @@ static const discrete_555_desc spiders_super_web_555a =
 #define SPIDERS_SW          NODE_13
 #define SPIDERS_X           NODE_14
 
-static DISCRETE_SOUND_START(spiders)
+static DISCRETE_SOUND_START(spiders_discrete)
 
 	/************************************************/
 	/* Input register mapping for spiders           */
@@ -208,7 +208,6 @@ WRITE8_MEMBER(spiders_state::spiders_audio_ctrl_w)
 MACHINE_CONFIG_START(spiders_state::spiders_audio)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(spiders)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, spiders_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

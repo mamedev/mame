@@ -1708,10 +1708,8 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "adpcm_outl", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "adpcm_outr", 0.50)
 
-	MCFG_FILTER_VOLUME_ADD("adpcm_outl", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("adpcm_outr", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "adpcm_outl").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "adpcm_outr").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	MCFG_UPD72065_ADD("upd72065", true, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, x68k_state, fdc_irq))

@@ -399,8 +399,7 @@ MACHINE_CONFIG_START(skydiver_state::skydiver)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(skydiver)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, skydiver_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

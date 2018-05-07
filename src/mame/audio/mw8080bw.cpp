@@ -276,7 +276,7 @@ WRITE8_MEMBER(mw8080bw_state::gunfight_audio_w)
 #define TORNBASE_TONE_SND_FILT      NODE_11
 
 
-static DISCRETE_SOUND_START(tornbase)
+static DISCRETE_SOUND_START(tornbase_discrete)
 
 	/* the 3 enable lines coming out of the 74175 flip-flop at G5 */
 	DISCRETE_INPUT_LOGIC(TORNBASE_TONE_240_EN)      /* pin 2 */
@@ -309,8 +309,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::tornbase_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(tornbase)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, tornbase_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
 MACHINE_CONFIG_END
 
@@ -462,7 +461,7 @@ static const discrete_op_amp_osc_info maze_op_amp_osc =
 };
 
 
-static DISCRETE_SOUND_START(maze)
+static DISCRETE_SOUND_START(maze_discrete)
 
 	/************************************************
 	 * Input register mapping
@@ -555,8 +554,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::maze_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(maze)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, maze_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -730,7 +728,7 @@ static const discrete_mixer_desc boothill_r_mixer =
 };
 
 
-static DISCRETE_SOUND_START(boothill)
+static DISCRETE_SOUND_START(boothill_discrete)
 
 	/************************************************
 	 * Input register mapping
@@ -802,8 +800,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::boothill_audio)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(boothill)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, boothill_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -934,7 +931,7 @@ static const discrete_mixer_desc checkmat_mixer =
 	1                   /* gain */
 };
 
-static DISCRETE_SOUND_START(checkmat)
+static DISCRETE_SOUND_START(checkmat_discrete)
 
 	/************************************************
 	 * Input register mapping
@@ -1032,8 +1029,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::checkmat_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(checkmat)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, checkmat_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_CONFIG_END
 
@@ -1173,7 +1169,7 @@ static const discrete_mixer_desc desertgu_mixer =
 };
 
 
-static DISCRETE_SOUND_START(desertgu)
+static DISCRETE_SOUND_START(desertgu_discrete)
 
 	/************************************************
 	 * Input register mapping
@@ -1243,8 +1239,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::desertgu_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(desertgu)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, desertgu_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
 
@@ -1441,7 +1436,7 @@ static const discrete_mixer_desc dplay_mixer =
 };
 
 
-static DISCRETE_SOUND_START(dplay)
+static DISCRETE_SOUND_START(dplay_discrete)
 
 	/************************************************
 	 * Input register mapping
@@ -1508,8 +1503,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::dplay_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(dplay)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, dplay_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
 
@@ -1831,7 +1825,7 @@ static const discrete_mixer_desc clowns_mixer =
 };
 
 
-static DISCRETE_SOUND_START(clowns)
+static DISCRETE_SOUND_START(clowns_discrete)
 
 	/************************************************
 	 * Input register mapping
@@ -1905,8 +1899,7 @@ MACHINE_CONFIG_START(mw8080bw_state::clowns_audio)
 	MCFG_SAMPLES_NAMES(clowns_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(clowns)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, clowns_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2158,7 +2151,7 @@ DISCRETE_FILTER2(NODE_RELATIVE(NODE_37, _num),                                  
 DISCRETE_GAIN(NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_SND, _num - 1),                       \
 	NODE_RELATIVE(NODE_37, _num), 0.5)
 
-	static DISCRETE_SOUND_START(spacwalk)
+	static DISCRETE_SOUND_START(spacwalk_discrete)
 
 	/************************************************
 	 * Input register mapping
@@ -2271,8 +2264,7 @@ DISCRETE_SOUND_END
 MACHINE_CONFIG_START(mw8080bw_state::spacwalk_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(spacwalk)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, spacwalk_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2424,7 +2416,7 @@ static const discrete_mixer_desc shuffle_mixer =
 };
 
 
-static DISCRETE_SOUND_START(shuffle)
+static DISCRETE_SOUND_START(shuffle_discrete)
 	DISCRETE_INPUT_LOGIC(SHUFFLE_ROLLING_1_EN)
 	DISCRETE_INPUT_LOGIC(SHUFFLE_ROLLING_2_EN)
 	DISCRETE_INPUT_LOGIC(SHUFFLE_ROLLING_3_EN)
@@ -2500,8 +2492,7 @@ DISCRETE_SOUND_END
 MACHINE_CONFIG_START(mw8080bw_state::shuffle_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(shuffle)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, shuffle_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2622,7 +2613,7 @@ static const discrete_mixer_desc dogpatch_r_mixer =
 };
 
 
-static DISCRETE_SOUND_START(dogpatch)
+static DISCRETE_SOUND_START(dogpatch_discrete)
 	/************************************************
 	 * Input register mapping
 	 ************************************************/
@@ -2679,8 +2670,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::dogpatch_audio)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(dogpatch)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, dogpatch_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2969,7 +2959,7 @@ static const discrete_mixer_desc spcenctr_mixer =
 };
 
 
-static DISCRETE_SOUND_START(spcenctr)
+static DISCRETE_SOUND_START(spcenctr_discrete)
 
 	/************************************************
 	 * Input register mapping
@@ -3201,8 +3191,7 @@ MACHINE_CONFIG_START(mw8080bw_state::spcenctr_audio)
 	MCFG_SN76477_ENABLE(1)                              // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(spcenctr)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, spcenctr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
@@ -3364,7 +3353,7 @@ static const discrete_op_amp_tvca_info bowler_fowl_tvca =
 };
 
 
-static DISCRETE_SOUND_START(bowler)
+static DISCRETE_SOUND_START(bowler_discrete)
 
 	/************************************************
 	 * Input register mapping
@@ -3401,8 +3390,7 @@ DISCRETE_SOUND_END
 MACHINE_CONFIG_START(mw8080bw_state::bowler_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(bowler)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, bowler_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
 MACHINE_CONFIG_END
 
@@ -4083,7 +4071,7 @@ static const discrete_mixer_desc invaders_mixer =
 
 /* Schematic M051-00739-A005 and M051-00739-B005 */
 /* P.C.      A084-90700-B000 and A084-90700-C000 */
-static DISCRETE_SOUND_START(invaders)
+static DISCRETE_SOUND_START(invaders_discrete)
 	INVADERS_NOISE_GENERATOR
 	INVADERS_SAUCER_HIT(1)
 	INVADERS_FLEET(1)
@@ -4114,8 +4102,7 @@ MACHINE_CONFIG_START(mw8080bw_state::invaders_audio)
 	MCFG_SN76477_ENABLE(1)                              // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(invaders)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, invaders_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -4387,7 +4374,7 @@ static const discrete_mixer_desc blueshrk_mixer =
 	0, 0, 0, BLUESHRK_C900, 0, 1    /* rI, rF, cF, cAmp, vRef, gain */
 };
 
-static DISCRETE_SOUND_START(blueshrk)
+static DISCRETE_SOUND_START(blueshrk_discrete)
 
 	/************************************************
 	 * Input register mapping
@@ -4515,8 +4502,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(mw8080bw_state::blueshrk_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(blueshrk)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, blueshrk_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -4649,7 +4635,7 @@ static const discrete_mixer_desc invad2ct_mixer =
 };
 
 
-static DISCRETE_SOUND_START(invad2ct)
+static DISCRETE_SOUND_START(invad2ct_discrete)
 	/* sound board 1 */
 	/* P.C. A082-90700-A000 */
 	/* Schematic M051-00851-A002 */
@@ -4678,8 +4664,7 @@ DISCRETE_SOUND_END
 MACHINE_CONFIG_START(mw8080bw_state::invad2ct_audio)
 	MCFG_SPEAKER_STANDARD_STEREO("spk1", "spk2")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(invad2ct)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, invad2ct_discrete)
 	MCFG_SOUND_ROUTE(0, "spk1", 0.5)
 	MCFG_SOUND_ROUTE(1, "spk2", 0.5)
 
