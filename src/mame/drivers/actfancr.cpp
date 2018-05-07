@@ -337,7 +337,7 @@ MACHINE_CONFIG_START(actfancr_state::actfancr)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_OKIM6295_ADD("oki", 1024188, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1024188, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
 
@@ -395,7 +395,7 @@ MACHINE_CONFIG_START(actfancr_state::triothep)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'056'000), PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'056'000), okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
 
