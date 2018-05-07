@@ -390,7 +390,7 @@ MACHINE_CONFIG_START(jackal_state::jackal)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK) // verified on pcb
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK) // verified on pcb
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END

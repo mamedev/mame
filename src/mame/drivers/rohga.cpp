@@ -884,7 +884,7 @@ MACHINE_CONFIG_START(rohga_state::rohga)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram1")
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -947,7 +947,7 @@ MACHINE_CONFIG_START(rohga_state::rohga)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, rohga_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.78)
@@ -973,8 +973,8 @@ MACHINE_CONFIG_START(rohga_state::wizdfire)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram1")
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -1041,7 +1041,7 @@ MACHINE_CONFIG_START(rohga_state::wizdfire)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, rohga_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -1067,8 +1067,8 @@ MACHINE_CONFIG_START(rohga_state::nitrobal)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram1")
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -1136,7 +1136,7 @@ MACHINE_CONFIG_START(rohga_state::nitrobal)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, rohga_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -1162,7 +1162,7 @@ MACHINE_CONFIG_START(rohga_state::schmeisr)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram1")
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -1225,7 +1225,7 @@ MACHINE_CONFIG_START(rohga_state::schmeisr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))   /* IRQ 2 */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, rohga_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)

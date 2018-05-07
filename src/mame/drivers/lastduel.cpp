@@ -511,7 +511,7 @@ MACHINE_CONFIG_START(lastduel_state::lastduel)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastduel)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -556,7 +556,7 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", madgear)
 	MCFG_PALETTE_ADD("palette", 1024)

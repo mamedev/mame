@@ -190,7 +190,7 @@ MACHINE_CONFIG_START(mosaicf2_state::mosaicf2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -268,7 +268,7 @@ MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-//  MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* 3.579545 MHz */
+//  MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 //  MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(wsf_80186_sound_device::device_add_mconfig)
 	MCFG_SOUND_ROUTE(0, "dac9", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac9", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* sound hardware */
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(0, "speaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "speaker", 0.40)
 

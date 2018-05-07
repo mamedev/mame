@@ -40,9 +40,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_YM2151_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, YM2151, _clock)
-
 #define MCFG_YM2151_IRQ_HANDLER(_devcb) \
 	devcb = &downcast<ym2151_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 #define MCFG_YM2151_PORT_WRITE_HANDLER(_devcb) \
