@@ -1120,8 +1120,8 @@ MACHINE_CONFIG_START(berzerk_state::berzerk)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TTL74181_ADD("ls181_10c")
-	MCFG_TTL74181_ADD("ls181_12c")
+	MCFG_DEVICE_ADD("ls181_10c", TTL74181)
+	MCFG_DEVICE_ADD("ls181_12c", TTL74181)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

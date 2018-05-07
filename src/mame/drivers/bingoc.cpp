@@ -215,7 +215,7 @@ MACHINE_CONFIG_START(bingoc_state::bingoc)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 7159160/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 7159160/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

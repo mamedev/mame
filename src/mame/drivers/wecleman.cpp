@@ -1078,7 +1078,7 @@ MACHINE_CONFIG_START(wecleman_state::wecleman)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.85)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.85)
 
