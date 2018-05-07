@@ -91,8 +91,8 @@ public:
 		uint16_t x,y;
 		uint8_t col,set;
 	};
-
-	static struct star m_star_seed_tab[];
+	static const int MAX_STARS = 252;
+	struct star m_star_seed_tab[MAX_STARS];
 	void galaga(machine_config &config);
 	void gatsbee(machine_config &config);
 	void galagab(machine_config &config);
