@@ -1353,9 +1353,8 @@ const gfx_layout spritelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ STEP4(0,4) },
-	{ STEP4(0,1), STEP4(16,1),
-	 STEP4(4*8*16,1), STEP4(4*8*16+16,1) }
-	{ STEP16(0,4*8) }
+	{ STEP4(0,1), STEP4(16,1), STEP4(4*8*16,1), STEP4(4*8*16+16,1) },
+	{ STEP16(0,4*8) },
 	128*8
 };
 
