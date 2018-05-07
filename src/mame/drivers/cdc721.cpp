@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:Robbbert,AJR
 /************************************************************************************************************
 
 Control Data Corporation CDC 721 Terminal (Viking)
@@ -10,9 +10,11 @@ Control Data Corporation CDC 721 Terminal (Viking)
 *************************************************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/i8255.h"
+#include "machine/input_merger.h"
 #include "machine/ins8250.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
@@ -43,6 +45,10 @@ private:
 	DECLARE_WRITE8_MEMBER(bank_select_w);
 	DECLARE_WRITE8_MEMBER(nvram_w);
 
+	template<int Line> DECLARE_WRITE_LINE_MEMBER(int_w);
+	TIMER_CALLBACK_MEMBER(update_interrupts);
+	IRQ_CALLBACK_MEMBER(restart_cb);
+
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	void block0_map(address_map &map);
@@ -55,6 +61,10 @@ private:
 
 	u8 m_flashcnt;
 
+	u8 m_pending_interrupts;
+	u8 m_active_interrupts;
+	u8 m_interrupt_mask;
+
 	required_device<cpu_device> m_maincpu;
 	required_device_array<address_map_bank_device, 4> m_bank_16k;
 	required_region_ptr<u8> m_rom_chargen;
@@ -65,7 +75,42 @@ private:
 
 WRITE8_MEMBER(cdc721_state::interrupt_mask_w)
 {
-	logerror("%s: Interrupt mask = %02X\n", machine().describe_context(), data ^ 0xff);
+	m_interrupt_mask = data ^ 0xff;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cdc721_state::update_interrupts), this));
+}
+
+template <int Line>
+WRITE_LINE_MEMBER(cdc721_state::int_w)
+{
+	if (BIT(m_pending_interrupts, Line) == state)
+		return;
+
+	if (state)
+		m_pending_interrupts |= 0x01 << Line;
+	else
+		m_pending_interrupts &= ~(0x01 << Line);
+
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cdc721_state::update_interrupts), this));
+}
+
+TIMER_CALLBACK_MEMBER(cdc721_state::update_interrupts)
+{
+	m_active_interrupts = m_pending_interrupts & m_interrupt_mask;
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_active_interrupts != 0 ? ASSERT_LINE : CLEAR_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(cdc721_state::restart_cb)
+{
+	// IM 2 vector is produced through a SN74LS148N priority encoder plus some buffers and a latch
+	// The CTC vector is not even fetched
+	u8 vector = 0x00;
+	u8 active = m_active_interrupts;
+	while (vector < 0x0e && !BIT(active, 0))
+	{
+		active >>= 1;
+		vector += 0x02;
+	}
+	return vector;
 }
 
 WRITE8_MEMBER(cdc721_state::misc_w)
@@ -132,13 +177,13 @@ void cdc721_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x1f).rw("crtc", FUNC(crt5037_device::read), FUNC(crt5037_device::write));
-	map(0x20, 0x27).rw("uart1", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0x20, 0x27).rw("kbduart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x30, 0x33).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x40, 0x47).rw("uart2", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0x40, 0x47).rw("comuart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x50, 0x50).w(this, FUNC(cdc721_state::lights_w));
 	map(0x70, 0x70).w(this, FUNC(cdc721_state::bank_select_w));
-	map(0x80, 0x87).rw("uart3", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
-	map(0x90, 0x97).rw("uart4", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0x80, 0x87).rw("pauart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0x90, 0x97).rw("pbuart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 }
 
 static INPUT_PORTS_START( cdc721 )
@@ -152,6 +197,13 @@ void cdc721_state::machine_reset()
 
 void cdc721_state::machine_start()
 {
+	m_pending_interrupts = 0;
+	m_active_interrupts = 0;
+	m_interrupt_mask = 0;
+
+	save_item(NAME(m_pending_interrupts));
+	save_item(NAME(m_active_interrupts));
+	save_item(NAME(m_interrupt_mask));
 }
 
 /* F4 Character Displayer */
@@ -226,18 +278,12 @@ uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-static const z80_daisy_config cdc721_daisy_chain[] =
-{
-	{ "ctc" },
-	{ nullptr }
-};
-
 MACHINE_CONFIG_START(cdc721_state::cdc721)
 	// basic machine hardware
 	MCFG_DEVICE_ADD("maincpu", Z80, 6_MHz_XTAL) // Zilog Z8400B (Z80B)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(cdc721_daisy_chain) // FIXME: vector is independently generated
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cdc721_state, restart_cb)
 
 	MCFG_DEVICE_ADD("block0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_ADDRESS_MAP(0, block0_map)
@@ -280,17 +326,59 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_DEVICE_ADD("crtc", CRT5037, 12.936_MHz_XTAL / 8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 6_MHz_XTAL) // Zilog Z8430B
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 6_MHz_XTAL) // Zilog Z8430B (M1 pulled up)
+	MCFG_Z80CTC_INTR_CB(WRITELINE(*this, cdc721_state, int_w<6>))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE("ctc", z80ctc_device, trg2))
+	//MCFG_Z80CTC_ZC2_CB(WRITELINE("comuart", ins8250_device, rclk_w))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, cdc721_state, interrupt_mask_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, cdc721_state, misc_w))
 
-	MCFG_DEVICE_ADD("uart1", INS8250, 1843200)
-	MCFG_DEVICE_ADD("uart2", INS8250, 1843200)
-	MCFG_DEVICE_ADD("uart3", INS8250, 1843200)
-	MCFG_DEVICE_ADD("uart4", INS8250, 1843200)
+	MCFG_DEVICE_ADD("comuart", INS8250, 1.8432_MHz_XTAL)
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, cdc721_state, int_w<0>))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("comm", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("comm", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("comm", rs232_port_device, write_rts))
+
+	MCFG_DEVICE_ADD("comm", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("comuart", ins8250_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("comuart", ins8250_device, dsr_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("comuart", ins8250_device, dcd_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("comuart", ins8250_device, cts_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("comuart", ins8250_device, ri_w))
+
+	MCFG_DEVICE_ADD("kbduart", INS8250, 1.8432_MHz_XTAL)
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, cdc721_state, int_w<5>))
+
+	MCFG_DEVICE_ADD("pauart", INS8250, 1.8432_MHz_XTAL)
+	MCFG_INS8250_OUT_INT_CB(WRITELINE("int2", input_merger_device, in_w<1>))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("cha", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("cha", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("cha", rs232_port_device, write_rts))
+
+	MCFG_DEVICE_ADD("cha", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("pauart", ins8250_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("pauart", ins8250_device, dsr_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("pauart", ins8250_device, dcd_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("pauart", ins8250_device, cts_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("pauart", ins8250_device, ri_w))
+
+	MCFG_DEVICE_ADD("pbuart", INS8250, 1.8432_MHz_XTAL)
+	MCFG_INS8250_OUT_INT_CB(WRITELINE("int2", input_merger_device, in_w<0>))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("chb", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("chb", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("chb", rs232_port_device, write_rts))
+
+	MCFG_DEVICE_ADD("chb", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("pbuart", ins8250_device, rx_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("pbuart", ins8250_device, dsr_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("pbuart", ins8250_device, dcd_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("pbuart", ins8250_device, cts_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("pbuart", ins8250_device, ri_w))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("int2") // 74S05 (open collector)
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, cdc721_state, int_w<2>))
 MACHINE_CONFIG_END
 
 ROM_START( cdc721 )
