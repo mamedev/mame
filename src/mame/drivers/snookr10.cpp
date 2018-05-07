@@ -1065,7 +1065,7 @@ MACHINE_CONFIG_START(snookr10_state::snookr10)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, PIN7_HIGH)   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
+	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_HIGH)   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.8)
 
 MACHINE_CONFIG_END

@@ -1014,7 +1014,7 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_RF5C400_ADD("rfsnd", XTAL(33'868'800)/2)
+	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(33'868'800)/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1143,7 +1143,7 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_RF5C400_ADD("rfsnd", XTAL(33'868'800)/2)
+	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(33'868'800)/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

@@ -3953,7 +3953,7 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	MCFG_SOUND_ROUTE(0, "mono", 0.5)
 	MCFG_SOUND_ROUTE(1, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_LOW) // clock / pin not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_LOW) // clock / pin not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 

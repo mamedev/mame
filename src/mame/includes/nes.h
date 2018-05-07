@@ -80,7 +80,6 @@ public:
 
 
 	int nes_ppu_vidaccess(int address, int data);
-	void ppu_nmi(int *ppu_regs);
 
 
 	DECLARE_READ8_MEMBER(fc_in0_r);
@@ -91,8 +90,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
-	DECLARE_PALETTE_INIT(nes);
-	uint32_t screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nes(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	NESCTRL_BRIGHTPIXEL_CB(bright_pixel);
 
 	DECLARE_DRIVER_INIT(famicom);

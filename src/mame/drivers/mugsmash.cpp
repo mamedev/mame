@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(mugsmash_state::mugsmash)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)   /* music */
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1122000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50) /* sound fx */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END

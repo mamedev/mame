@@ -893,7 +893,7 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	MCFG_K056800_ADD("k056800", XTAL(16'934'400))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
-	MCFG_RF5C400_ADD("rfsnd", XTAL(16'934'400))  // as per Guru readme above
+	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(16'934'400))  // as per Guru readme above
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
