@@ -2,7 +2,7 @@
 // copyright-holders:Bryan McPhail, David Haywood
 /***************************************************************************
 
-	Pop'N Run						(c) 1987 Seibu Kaihatsu & Yukai Tsukai
+    Pop'N Run                       (c) 1987 Seibu Kaihatsu & Yukai Tsukai
     Dead Angle                      (c) 1988 Seibu Kaihatsu
     Gang Hunter                     (c) 1988 Seibu Kaihatsu
 
@@ -14,8 +14,8 @@
 
     - ghunter trackball input is broken
     - coin lockouts
-	- popnrun: inputs, can't coin it up, needs gfxs dumped and sorted out 
-	  (SIP modules like airraid);
+    - popnrun: inputs, can't coin it up, needs gfxs dumped and sorted out 
+      (SIP modules like airraid);
 
 
 Lead Angle
@@ -254,7 +254,7 @@ static const gfx_layout popnrun_charlayout =
 {
 	8,8,        /* 8*8 characters */
 	RGN_FRAC(1,1),
-	2,          /* 4 bits per pixel */
+	2,          /* 2 bits per pixel */
 	{ 4, 0 },
 	{ STEP4(8,1), STEP4(0,1) },
 	{ STEP8(0,16) },
