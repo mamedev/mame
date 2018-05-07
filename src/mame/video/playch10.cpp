@@ -57,10 +57,10 @@ PALETTE_INIT_MEMBER(playch10_state, playch10)
 	}
 }
 
-void playch10_state::ppu_irq(int *ppu_regs)
+WRITE_LINE_MEMBER(playch10_state::int_detect_w)
 {
-	machine().device("cart")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
-	m_pc10_int_detect = 1;
+	if (state)
+		m_pc10_int_detect = 1;
 }
 
 TILE_GET_INFO_MEMBER(playch10_state::get_bg_tile_info)

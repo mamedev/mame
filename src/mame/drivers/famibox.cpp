@@ -116,7 +116,6 @@ public:
 	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
 	void famicombox_bankswitch(uint8_t bank);
 	void famicombox_reset();
-	void ppu_irq(int *ppu_regs);
 	void famibox(machine_config &config);
 	void famibox_map(address_map &map);
 };
@@ -492,11 +491,6 @@ INPUT_PORTS_END
 
 *******************************************************/
 
-void famibox_state::ppu_irq(int *ppu_regs)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 void famibox_state::video_start()
 {
 }
@@ -543,7 +537,7 @@ MACHINE_CONFIG_START(famibox_state::famibox)
 
 	MCFG_PPU2C02_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(famibox_state, ppu_irq)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

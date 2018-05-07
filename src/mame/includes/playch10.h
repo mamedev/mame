@@ -108,7 +108,7 @@ private:
 	void pc10_set_videorom_bank( int first, int count, int bank, int size );
 	void set_videoram_bank( int first, int count, int bank, int size );
 	void gboard_scanline_cb( int scanline, int vblank, int blanked );
-	void ppu_irq(int *ppu_regs);
+	DECLARE_WRITE_LINE_MEMBER(int_detect_w);
 	void mapper9_latch(offs_t offset);
 	void pc10_set_mirroring(int mirroring);
 

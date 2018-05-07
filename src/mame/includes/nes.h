@@ -80,7 +80,6 @@ public:
 
 
 	int nes_ppu_vidaccess(int address, int data);
-	void ppu_nmi(int *ppu_regs);
 
 
 	DECLARE_READ8_MEMBER(fc_in0_r);

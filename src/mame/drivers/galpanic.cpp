@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/6, PIN7_LOW) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/6, okim6295_device::PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, galpanic_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

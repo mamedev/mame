@@ -240,7 +240,7 @@ uint32_t fghthist_state::screen_update_fghthist(screen_device &screen, bitmap_rg
 */
 void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap)
 {
-	const pen_t *pens = m_palette->pens();
+	const pen_t *pens = m_deco_ace->pens();
 	const pen_t *pal0 = &pens[gfx0->colorbase()];
 	const pen_t *pal1 = &pens[gfx1->colorbase()];
 	const pen_t *pal2 = &pens[m_gfxdecode->gfx((m_pri&1) ? 1 : 2)->colorbase()];
@@ -381,7 +381,7 @@ uint32_t nslasher_state::screen_update_nslasher(screen_device &screen, bitmap_rg
 
 	screen.priority().fill(0, cliprect);
 
-	bitmap.fill(m_palette->pen(0x200), cliprect);
+	bitmap.fill(m_deco_ace->pen(0x200), cliprect);
 
 	/* Draw sprites to temporary bitmaps, saving alpha & priority info for later mixing */
 	m_sprgen[0]->set_pix_raw_shift(8);

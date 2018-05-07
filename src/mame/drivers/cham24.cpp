@@ -92,7 +92,6 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void cham24_set_mirroring( int mirroring );
-	void ppu_irq(int *ppu_regs);
 	void cham24(machine_config &config);
 	void cham24_map(address_map &map);
 };
@@ -252,11 +251,6 @@ static INPUT_PORTS_START( cham24 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-void cham24_state::ppu_irq(int *ppu_regs)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 void cham24_state::video_start()
 {
 }
@@ -308,7 +302,7 @@ MACHINE_CONFIG_START(cham24_state::cham24)
 
 	MCFG_PPU2C02_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(cham24_state, ppu_irq)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

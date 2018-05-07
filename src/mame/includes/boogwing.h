@@ -25,10 +25,9 @@ public:
 		, m_deco_ace(*this, "deco_ace")
 		, m_deco_tilegen(*this, "tilegen%u", 1)
 		, m_oki(*this, "oki%u", 1)
+		, m_sprgen(*this, "spritegen%u", 1)
 		, m_spriteram(*this, "spriteram%u", 1)
 		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1)
-		, m_sprgen(*this, "spritegen%u", 1)
-		, m_palette(*this, "palette")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
@@ -39,11 +38,10 @@ public:
 	required_device<deco_ace_device> m_deco_ace;
 	required_device_array<deco16ic_device, 2> m_deco_tilegen;
 	required_device_array<okim6295_device, 2> m_oki;
+	required_device_array<decospr_device, 2> m_sprgen;
 	required_device_array<buffered_spriteram16_device, 2> m_spriteram;
 	/* memory pointers */
 	required_shared_ptr_array<uint16_t, 4> m_pf_rowscroll;
-	required_device_array<decospr_device, 2> m_sprgen;
-	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	uint16_t m_priority;

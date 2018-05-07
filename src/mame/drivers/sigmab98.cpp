@@ -2957,7 +2957,7 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
+	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -3021,7 +3021,7 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
+	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
