@@ -198,9 +198,59 @@ uint32_t deadang_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
+void popnrun_state::popnrun_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int offs,fx,fy,x,y,color,sprite,pri;
+
+	// TODO: might have more bits in either 0x3800-0x3bff or 0x3e00-0x3fff
+	for (offs = 0; offs<0x200/2; offs+=2)
+	{
+		/* Don't draw empty sprite table entries */
+		//if ((m_spriteram[offs+3] & 0xff00)!=0xf00) continue;
+
+		pri = 0;
+		#ifdef UNUSED_FUNCTION
+		switch (m_spriteram[offs+2]&0xc000) {
+		default:
+		case 0xc000: pri=0; break; /* Unknown */
+		case 0x8000: pri=0; break; /* Over all playfields */
+		case 0x4000: pri=0xf0; break; /* Under top playfield */
+		case 0x0000: pri=0xf0|0xcc; break; /* Under middle playfield */
+		}
+		#endif
+
+		fx = m_spriteram[offs+0]&0x4000;
+		fy = m_spriteram[offs+0]&0x8000;
+		y = m_spriteram[offs+1] & 0xff;
+		x = (m_spriteram[offs+1] >> 8) & 0xff;
+		#ifdef UNUSED_FUNCTION
+		if (fy) fy=0; else fy=1;
+		if (m_spriteram[offs+2]&0x100) x=0-(0xff-x);
+		#endif
+		
+		color = (m_spriteram[offs+0]>>12)&0x7;
+		sprite = m_spriteram[offs+0]&0xfff;
+
+		#ifdef UNUSED_FUNCTION
+		if (flip_screen()) {
+			x=240-x;
+			y=240-y;
+			if (fx) fx=0; else fx=1;
+			if (fy) fy=0; else fy=1;
+		}
+		#endif
+		
+		m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+				sprite,
+				color,fx,fy,x,y,
+				screen.priority(),pri,0);
+	}
+}
+
 uint32_t popnrun_state::popnrun_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// TODO: different scroll RAM hookup
+	// 0x18 seems to enable the various layers
 	/* Setup the tilemaps */
 	m_pf3_layer->set_scrolly(0, ((m_scroll_ram[0x01]&0xf0)<<4)+((m_scroll_ram[0x02]&0x7f)<<1)+((m_scroll_ram[0x02]&0x80)>>7) );
 	m_pf3_layer->set_scrollx(0, ((m_scroll_ram[0x09]&0xf0)<<4)+((m_scroll_ram[0x0a]&0x7f)<<1)+((m_scroll_ram[0x0a]&0x80)>>7) );
@@ -219,7 +269,8 @@ uint32_t popnrun_state::popnrun_screen_update(screen_device &screen, bitmap_ind1
 	//m_pf3_layer->draw(screen, bitmap, cliprect, 0,1);
 	//m_pf1_layer->draw(screen, bitmap, cliprect, 0,2);
 	//m_pf2_layer->draw(screen, bitmap, cliprect, 0,4);
-	if (!(m_scroll_ram[0x34]&0x10)) draw_sprites(screen, bitmap,cliprect);
+	if (m_scroll_ram[0x18/2]&0x1)
+		popnrun_draw_sprites(screen, bitmap,cliprect);
 	m_text_layer->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }

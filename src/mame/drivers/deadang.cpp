@@ -89,6 +89,9 @@ void deadang_state::main_map(address_map &map)
 void popnrun_state::popnrun_main_map(address_map &map)
 {
 	main_map(map);
+	map(0x00000, 0x03bff).ram();
+	map(0x03c00, 0x03dff).ram().share("spriteram");
+	map(0x03e00, 0x03fff).ram();
 	map(0x08000, 0x08fff).ram().w(this, FUNC(popnrun_state::popnrun_text_w)).share("videoram");
 	map(0x0e000, 0x0e0ff).ram().share("scroll_ram");
 }
@@ -281,6 +284,18 @@ static const gfx_layout popnrun_charlayout =
 	128
 };
 
+// TODO: this is wrong
+static const gfx_layout popnrun_spritelayout =
+{
+	16,16,  /* 16*16 tiles */
+	RGN_FRAC(1,1),
+	2,      /* 4 bits per pixel */
+	{ 0,4 },
+	{ STEP4(0,1), STEP4(16,1), STEP4(512,1), STEP4(512+16,1) },
+	{ STEP16(0,32) },
+	1024
+};
+
 /* Graphics Decode Information */
 
 static GFXDECODE_START( deadang )
@@ -294,7 +309,7 @@ GFXDECODE_END
 static GFXDECODE_START( popnrun )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, popnrun_charlayout,   0x20, 4 )
 	// TODO: probably runs on ROM based palette or just uses the first three entries?
-	GFXDECODE_ENTRY( "gfx2", 0x000000, spritelayout,  768, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x000000, spritelayout,    0, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0x000000, spritelayout, 1024, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0x000000, spritelayout,  256, 16 )
 	GFXDECODE_ENTRY( "gfx5", 0x000000, spritelayout,    0, 16 )
@@ -437,9 +452,11 @@ ROM_START( popnrun )
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASE00 )
     ROM_LOAD( "popnrun-2764-7-1a.bin", 0x000000, 0x002000, CRC(5e508b8e) SHA1(3e49e8d25a3db83178965382295e7c437441b5fe) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASE00 ) /* Sprites */
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD( "gfx2.bin",  0x0000, 0x80000, NO_DUMP )
-
+	// debugging fill, remove me
+	ROM_FILL(              0x0000, 0x80000, 0x33 ) 
+	
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_ERASE00 ) /* pf1 layer */
 	ROM_LOAD( "gfx3.bin",  0x0000, 0x100000, NO_DUMP )
 
@@ -479,8 +496,10 @@ ROM_START( popnruna )
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASE00 )
     ROM_LOAD( "popnrun-2764-7-1a.bin", 0x000000, 0x002000, CRC(5e508b8e) SHA1(3e49e8d25a3db83178965382295e7c437441b5fe) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASE00 ) /* Sprites */
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD( "gfx2.bin",  0x0000, 0x80000, NO_DUMP )
+	// debugging fill, remove me
+	ROM_FILL(              0x0000, 0x80000, 0x33 ) 
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_ERASE00 ) /* pf1 layer */
 	ROM_LOAD( "gfx3.bin",  0x0000, 0x100000, NO_DUMP )
