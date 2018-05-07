@@ -144,7 +144,7 @@ public:
 	template <typename Creator>
 	device_t *device_replace(const char *tag, Creator &&type, u32 clock)
 	{
-		return device_add(tag, device_type(type), clock);
+		return device_replace(tag, device_type(type), clock);
 	}
 	template <typename Creator, typename... Params>
 	auto device_replace(const char *tag, Creator &&type, Params &&... args)
