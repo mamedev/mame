@@ -305,12 +305,8 @@ device_a2bus_card_interface::~device_a2bus_card_interface()
 
 void device_a2bus_card_interface::interface_validity_check(validity_checker &valid) const
 {
-	if (!m_a2bus_finder && !m_a2bus)
-		osd_printf_error("No bus configured/found\n");
 	if (m_a2bus_finder && m_a2bus && (m_a2bus != m_a2bus_finder))
-		osd_printf_error("Contradictory buses configured\n");
-	if (!m_a2bus_slottag)
-		osd_printf_error("No slot tag configured\n");
+		osd_printf_error("Contradictory buses configured (%s and %s)\n", m_a2bus_finder->tag(), m_a2bus->tag());
 }
 
 void device_a2bus_card_interface::interface_pre_start()
