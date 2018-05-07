@@ -2068,7 +2068,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.32)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
 MACHINE_CONFIG_END
@@ -2088,7 +2088,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151_upd7759)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.32)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
 
@@ -2110,7 +2110,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::datsu_ym2151_msm5205)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.32)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
 
@@ -2458,19 +2458,15 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::system18)
 	MCFG_DEVICE_ADD("3438.0", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.40)
 
 	MCFG_DEVICE_ADD("3438.1", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.40)
 
-	MCFG_RF5C68_ADD("5c68", 8000000)
-	MCFG_DEVICE_ADDRESS_MAP(0, pcm_map)
+	MCFG_DEVICE_ADD("5c68", RF5C68, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, pcm_map)
 MACHINE_CONFIG_END
 
 
@@ -2515,7 +2511,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::astormb2)
 	// 1 OKI M6295 instead of original sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000)/8, PIN7_HIGH) // 1MHz clock and pin verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000)/8, okim6295_device::PIN7_HIGH) // 1MHz clock and pin verified
 	MCFG_DEVICE_ADDRESS_MAP(0, sys18bl_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2608,7 +2604,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::ddcrewbl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 10000000/10, PIN7_HIGH) // clock and pin not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 10000000/10, okim6295_device::PIN7_HIGH) // clock and pin not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

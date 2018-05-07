@@ -846,19 +846,19 @@ MACHINE_CONFIG_START(intellec4_state::intellec4)
 	MCFG_INTELLEC4_UNIV_BUS_RAM_PORTS_SPACE(m_cpu, mcs40_cpu_device_base::AS_RAM_PORTS)
 	MCFG_INTELLEC4_UNIV_BUS_RESET_4002_CB(WRITELINE(*this, intellec4_state, bus_reset_4002))
 	MCFG_INTELLEC4_UNIV_BUS_USER_RESET_CB(WRITELINE(*this, intellec4_state, bus_user_reset))
-	MCFG_DEVICE_ADD("j7",  INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, "imm4_90")
-	MCFG_DEVICE_ADD("j8",  INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, "imm6_26")
-	MCFG_DEVICE_ADD("j9",  INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j10", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j11", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j12", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j13", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j14", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j15", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j16", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j17", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j18", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
-	MCFG_DEVICE_ADD("j19", INTELLEC4_UNIV_SLOT, 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr)
+	INTELLEC4_UNIV_SLOT(config, "j7",  5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, "imm4_90");
+	INTELLEC4_UNIV_SLOT(config, "j8",  5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, "imm6_26");
+	INTELLEC4_UNIV_SLOT(config, "j9",  5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j10", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j11", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j12", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j13", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j14", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j15", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j16", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j17", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j18", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
+	INTELLEC4_UNIV_SLOT(config, "j19", 5.185_MHz_XTAL / 7, m_bus, intellec4_univ_cards, nullptr);
 MACHINE_CONFIG_END
 
 

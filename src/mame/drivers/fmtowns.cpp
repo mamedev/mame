@@ -2789,7 +2789,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_RF5C68_ADD("pcm", 16000000 / 2)  // actual clock speed unknown
+	MCFG_DEVICE_ADD("pcm", RF5C68, 16000000 / 2)  // actual clock speed unknown
 	MCFG_RF5C68_SAMPLE_END_CB(towns_state, towns_pcm_irq)
 	MCFG_DEVICE_ADDRESS_MAP(0, pcm_mem)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 3.00)

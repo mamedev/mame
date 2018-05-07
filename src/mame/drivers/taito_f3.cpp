@@ -585,7 +585,7 @@ MACHINE_CONFIG_START(taito_f3_state::bubsympb)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000 , PIN7_HIGH) // not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000 , okim6295_device::PIN7_HIGH) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

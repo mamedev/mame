@@ -2314,7 +2314,7 @@ MACHINE_CONFIG_START(x1_state::x1turbo)
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, x1_state, fdc_drq_w))
 
-	MCFG_YM2151_ADD("ym", MAIN_CLOCK/8) //option board
+	MCFG_DEVICE_ADD("ym", YM2151, MAIN_CLOCK/8) //option board
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker",  0.50)
 MACHINE_CONFIG_END

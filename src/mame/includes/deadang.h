@@ -49,7 +49,6 @@ public:
 
 	DECLARE_DRIVER_INIT(deadang);
 	DECLARE_DRIVER_INIT(ghunter);
-	virtual void video_start() override;
 
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	TILE_GET_INFO_MEMBER(get_pf3_tile_info);
@@ -67,4 +66,26 @@ public:
 	void sound_decrypted_opcodes_map(address_map &map);
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
+protected:
+	virtual void video_start() override;
+};
+
+class popnrun_state : public deadang_state
+{
+public:
+	popnrun_state(const machine_config &mconfig, device_type type, const char *tag)
+	: deadang_state(mconfig, type, tag)
+	{}
+	
+	DECLARE_DRIVER_INIT(popnrun);
+	TILE_GET_INFO_MEMBER(get_popnrun_text_tile_info);
+	DECLARE_WRITE16_MEMBER(popnrun_text_w);
+	void popnrun_main_map(address_map &map);
+	void popnrun_sub_map(address_map &map);
+
+	void popnrun(machine_config &config);
+	uint32_t popnrun_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	virtual void video_start() override;
 };

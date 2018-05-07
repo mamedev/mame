@@ -14,11 +14,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_RF5C68_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, RF5C68, _clock)
-#define MCFG_RF5C68_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, RF5C68, _clock)
-
 #define MCFG_RF5C68_SAMPLE_END_CB(_class, _method) \
 	downcast<rf5c68_device &>(*device).set_end_callback(rf5c68_device::sample_end_cb_delegate(&_class::_method, #_class "::" #_method, this));
 

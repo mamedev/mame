@@ -82,7 +82,6 @@ cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const 
 	m_nmi_callback(*this),
 	m_halt_callback(*this), m_cart(nullptr)
 {
-	set_default_clock(DERIVED_CLOCK(1, 1));
 }
 
 

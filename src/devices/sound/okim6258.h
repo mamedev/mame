@@ -10,12 +10,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_OKIM6258_ADD(tag, clock) \
-	MCFG_DEVICE_ADD((tag), OKIM6258, (clock))
-
-#define MCFG_OKIM6258_REPLACE(tag, clock) \
-	MCFG_DEVICE_REPLACE((tag), OKIM6258, (clock))
-
 #define MCFG_OKIM6258_DIVIDER(div) \
 	downcast<okim6258_device &>(*device).set_start_div((okim6258_device::div));
 

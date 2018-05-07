@@ -94,15 +94,15 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, apple3_state, ay3600_data_ready_w))
 
 	/* slot bus */
-	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)
+	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
 	MCFG_A2BUS_CPU("maincpu")
 	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, apple3_state, a2bus_irq_w))
 	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, apple3_state, a2bus_nmi_w))
 	//MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, apple3_state, a2bus_inh_w))
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple3_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple3_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple3_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple3_cards, nullptr)
+	A2BUS_SLOT(config, "sl1", m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", m_a2bus, apple3_cards, nullptr);
 
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", APPLEIII_FDC, 1021800*2)

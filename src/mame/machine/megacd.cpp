@@ -311,10 +311,10 @@ MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 
 	MCFG_DEFAULT_LAYOUT( layout_megacd )
 
-	MCFG_RF5C68_ADD("rfsnd", SEGACD_CLOCK) // RF5C164!
-	MCFG_DEVICE_ADDRESS_MAP(0, segacd_pcm_map)
+	MCFG_DEVICE_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
 	MCFG_SOUND_ROUTE( 0, ":lspeaker", 0.50 )
 	MCFG_SOUND_ROUTE( 1, ":rspeaker", 0.50 )
+	MCFG_DEVICE_ADDRESS_MAP(0, segacd_pcm_map)
 
 	MCFG_NVRAM_ADD_0FILL("backupram")
 
