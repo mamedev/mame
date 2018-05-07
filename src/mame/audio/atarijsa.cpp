@@ -706,7 +706,7 @@ MACHINE_CONFIG_START(atari_jsa_i_device::device_add_mconfig)
 	// sound hardware
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
 
-	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
+	MCFG_DEVICE_ADD("ym2151", YM2151, JSA_MASTER_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, atari_jsa_base_device, ym2151_port_w))
 	MCFG_MIXER_ROUTE(0, *this, 0.60, 0)
@@ -836,12 +836,12 @@ MACHINE_CONFIG_START(atari_jsa_ii_device::device_add_mconfig)
 	// sound hardware
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
 
-	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
+	MCFG_DEVICE_ADD("ym2151", YM2151, JSA_MASTER_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, atari_jsa_base_device, ym2151_port_w))
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.60, 0)
 
-	MCFG_OKIM6295_ADD("oki1", JSA_MASTER_CLOCK/3, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, JSA_MASTER_CLOCK/3, okim6295_device::PIN7_HIGH)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.75, 0)
 MACHINE_CONFIG_END
 
@@ -918,12 +918,12 @@ MACHINE_CONFIG_START(atari_jsa_iii_device::device_add_mconfig)
 	// sound hardware
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
 
-	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
+	MCFG_DEVICE_ADD("ym2151", YM2151, JSA_MASTER_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, atari_jsa_base_device, ym2151_port_w))
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.60, 0)
 
-	MCFG_OKIM6295_ADD("oki1", JSA_MASTER_CLOCK/3, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, JSA_MASTER_CLOCK/3, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, jsa3_oki1_map)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.75, 0)
 MACHINE_CONFIG_END
@@ -969,7 +969,7 @@ MACHINE_CONFIG_START(atari_jsa_iiis_device::device_add_mconfig)
 	MCFG_MIXER_ROUTE(0, *this, 0.60, 0)
 	MCFG_MIXER_ROUTE(1, *this, 0.60, 1)
 
-	MCFG_OKIM6295_ADD("oki2", JSA_MASTER_CLOCK/3, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, JSA_MASTER_CLOCK/3, okim6295_device::PIN7_HIGH)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.75, 1)
 	MCFG_DEVICE_ADDRESS_MAP(0, jsa3_oki2_map)
 MACHINE_CONFIG_END

@@ -1637,6 +1637,8 @@ files {
 	MAME_DIR .. "src/mame/includes/stadhero.h",
 	MAME_DIR .. "src/mame/video/stadhero.cpp",
 	MAME_DIR .. "src/mame/drivers/supbtime.cpp",
+	MAME_DIR .. "src/mame/includes/supbtime.h",
+	MAME_DIR .. "src/mame/video/supbtime.cpp",
 	MAME_DIR .. "src/mame/drivers/tryout.cpp",
 	MAME_DIR .. "src/mame/includes/tryout.h",
 	MAME_DIR .. "src/mame/video/tryout.cpp",
@@ -1759,6 +1761,7 @@ files {
 	MAME_DIR .. "src/mame/video/excellent_spr.h",
 	MAME_DIR .. "src/mame/drivers/lastbank.cpp",
 	MAME_DIR .. "src/mame/drivers/witch.cpp",
+	MAME_DIR .. "src/mame/includes/witch.h",
 }
 
 createMAMEProjects(_target, _subtarget, "exidy")
@@ -2963,7 +2966,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/vsnes.cpp",
 	MAME_DIR .. "src/mame/includes/vsnes.h",
 	MAME_DIR .. "src/mame/machine/vsnes.cpp",
-	MAME_DIR .. "src/mame/video/vsnes.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "nix")
@@ -3541,6 +3543,8 @@ files {
 	MAME_DIR .. "src/mame/includes/spiders.h",
 	MAME_DIR .. "src/mame/audio/spiders.cpp",
 	MAME_DIR .. "src/mame/drivers/sub.cpp",
+	MAME_DIR .. "src/mame/includes/sub.h",
+	MAME_DIR .. "src/mame/video/sub.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "snk")

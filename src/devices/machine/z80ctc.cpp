@@ -30,7 +30,7 @@
 // these are the bits of the incoming commands to the CTC
 constexpr u16 INTERRUPT         = 0x80;
 constexpr u16 INTERRUPT_ON      = 0x80;
-//constexpr u16 INTERRUPT_OFF     = 0x00;
+constexpr u16 INTERRUPT_OFF     = 0x00;
 
 constexpr u16 MODE              = 0x40;
 constexpr u16 MODE_TIMER        = 0x00;
@@ -446,6 +446,14 @@ void z80ctc_channel_device::write(u8 data)
 		// set the new mode
 		m_mode = data;
 		LOG("Channel mode = %02x\n", data);
+
+		// clearing this bit resets the interrupt state regardless of M1 activity (or lack thereof)
+		if ((data & INTERRUPT) == INTERRUPT_OFF && (m_int_state & Z80_DAISY_INT))
+		{
+			m_int_state &= ~Z80_DAISY_INT;
+			LOG("Interrupt forced off\n");
+			m_device->interrupt_check();
+		}
 
 		// if we're being reset, clear out any pending timers for this channel
 		if ((data & RESET) == RESET_ACTIVE)

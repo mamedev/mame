@@ -1811,7 +1811,7 @@ MACHINE_CONFIG_START(snowbros_state::semicom)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* 1MHz & pin 7 High - Confirmed */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* 1MHz & pin 7 High - Confirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1869,7 +1869,7 @@ MACHINE_CONFIG_START(snowbros_state::honeydol)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* freq? */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* freq? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1908,7 +1908,7 @@ MACHINE_CONFIG_START(snowbros_state::twinadv)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	/* sound hardware */
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* freq? */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* freq? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1948,7 +1948,7 @@ MACHINE_CONFIG_START(snowbros_state::finalttr)
 	MCFG_SOUND_ROUTE(0, "mono", 0.08)
 	MCFG_SOUND_ROUTE(1, "mono", 0.08)
 
-	MCFG_OKIM6295_REPLACE("oki", 999900, PIN7_HIGH)
+	MCFG_OKIM6295_REPLACE("oki", 999900, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -1984,7 +1984,7 @@ MACHINE_CONFIG_START(snowbros_state::snowbro3) /* PCB has 16MHz & 12MHz OSCs */
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2019,10 +2019,10 @@ MACHINE_CONFIG_START(snowbros_state::yutnori)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/16, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(16'000'000)/16, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

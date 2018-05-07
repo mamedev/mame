@@ -613,7 +613,7 @@ MACHINE_CONFIG_START(ti85_state::ti85)
 	MCFG_SCREEN_SIZE(128, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 64-1)
 
-	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
+	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
 MACHINE_CONFIG_END
 
 
@@ -642,7 +642,7 @@ MACHINE_CONFIG_START(ti85_state::ti82)
 	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
 	MCFG_T6A04_SIZE(96, 64)
 
-	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
+	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti81v2)
@@ -728,7 +728,7 @@ MACHINE_CONFIG_START(ti85_state::ti83p)
 	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
 	MCFG_T6A04_SIZE(96, 64)
 
-	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
+	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
 
 	MCFG_AMD_29F400T_ADD("flash")
 MACHINE_CONFIG_END

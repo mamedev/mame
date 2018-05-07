@@ -3749,7 +3749,7 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ym2151", MASTER_CLOCK_8MHz/2)
+	MCFG_DEVICE_ADD("ym2151", YM2151, MASTER_CLOCK_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
 	MCFG_DEVICE_ADD("upd", UPD7759)
@@ -3948,12 +3948,12 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4) // ??
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4) // ??
 //  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0)) // does set up the timer, but end up with no sound?
 	MCFG_SOUND_ROUTE(0, "mono", 0.5)
 	MCFG_SOUND_ROUTE(1, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_LOW) // clock / pin not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_LOW) // clock / pin not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 

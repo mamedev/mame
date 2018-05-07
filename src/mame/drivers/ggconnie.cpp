@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", PCE_MAIN_CLOCK/12, PIN7_HIGH) /* unknown clock / pin 7 */
+	MCFG_DEVICE_ADD("oki", OKIM6295, PCE_MAIN_CLOCK/12, okim6295_device::PIN7_HIGH) /* unknown clock / pin 7 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_CONFIG_END
