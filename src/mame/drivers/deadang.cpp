@@ -133,11 +133,31 @@ void deadang_state::sound_map(address_map &map)
 	map(0x8000, 0xffff).bankr("seibu_bank1");
 }
 
+// Air Raid sound config with extra ROM bank
+void popnrun_state::popnrun_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).r("sei80bu", FUNC(sei80bu_device::data_r));
+	map(0x2000, 0x27ff).ram();
+	map(0x4000, 0x4000).w(m_seibu_sound, FUNC(seibu_sound_device::pending_w));
+	map(0x4001, 0x4001).w(m_seibu_sound, FUNC(seibu_sound_device::irq_clear_w));
+	map(0x4002, 0x4002).w(m_seibu_sound, FUNC(seibu_sound_device::rst10_ack_w));
+	map(0x4003, 0x4003).w(m_seibu_sound, FUNC(seibu_sound_device::rst18_ack_w));
+	map(0x4007, 0x4007).w(m_seibu_sound, FUNC(seibu_sound_device::bank_w));
+	map(0x4008, 0x4009).rw(m_seibu_sound, FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
+	map(0x4010, 0x4011).r(m_seibu_sound, FUNC(seibu_sound_device::soundlatch_r));
+	map(0x4012, 0x4012).r(m_seibu_sound, FUNC(seibu_sound_device::main_data_pending_r));
+	map(0x4013, 0x4013).portr("COIN");
+	map(0x4018, 0x4019).w(m_seibu_sound, FUNC(seibu_sound_device::main_data_w));
+	map(0x401b, 0x401b).w(m_seibu_sound, FUNC(seibu_sound_device::coin_w));
+	map(0x8000, 0xffff).bankr("seibu_bank1");
+}
+
 void deadang_state::sound_decrypted_opcodes_map(address_map &map)
 {
 	map(0x0000, 0x1fff).r("sei80bu", FUNC(sei80bu_device::opcode_r));
 	map(0x8000, 0xffff).bankr("seibu_bank1");
 }
+
 
 /* Input Ports */
 
@@ -373,10 +393,30 @@ MACHINE_CONFIG_START(popnrun_state::popnrun)
 	MCFG_DEVICE_MODIFY("sub")
 	MCFG_DEVICE_PROGRAM_MAP(popnrun_sub_map)
 	
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(popnrun_sound_map)
+	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(popnrun_state, popnrun_screen_update)
 	
 	MCFG_GFXDECODE_MODIFY("gfxdecode", popnrun)
+	
+	MCFG_DEVICE_REMOVE("ym1")
+	MCFG_DEVICE_REMOVE("ym2")
+	MCFG_DEVICE_REMOVE("adpcm1")
+	MCFG_DEVICE_REMOVE("adpcm2")
+	
+	MCFG_DEVICE_MODIFY("seibu_sound")
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
+	
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -456,10 +496,6 @@ ROM_START( popnruna )
 
 	ROM_REGION16_BE( 0x10000, "gfx7", ROMREGION_ERASE00 )   /* background map data */
 	ROM_LOAD( "gfx7.bin",  0x0000, 0x10000, NO_DUMP )
-
-	ROM_REGION( 0x10000, "adpcm1", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x10000, "adpcm2", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0100, "prom", ROMREGION_ERASE00 )
     ROM_LOAD( "popnrun-63s281-9b.bin", 0x000000, 0x000100, CRC(208d17ca) SHA1(a77d56337bcac8d9a7bc3411239dfb3045e069ec) )
