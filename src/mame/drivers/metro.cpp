@@ -3258,7 +3258,7 @@ MACHINE_CONFIG_START(metro_state::daitorid)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3.579545_MHz_XTAL)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579545_MHz_XTAL)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
@@ -3598,7 +3598,7 @@ MACHINE_CONFIG_START(metro_state::pururun)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3.579545_MHz_XTAL)  /* Confirmed match to reference video */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579545_MHz_XTAL)  /* Confirmed match to reference video */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 

@@ -17,7 +17,7 @@
 
 device_slot_interface::device_slot_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "slot"),
-	m_default_clock(0), // FIXME: zero to preserve behaviour - should probably be DERIVED_CLOCK(1, 1)
+	m_default_clock(DERIVED_CLOCK(1, 1)),
 	m_default_option(nullptr),
 	m_fixed(false),
 	m_card_device(nullptr)

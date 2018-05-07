@@ -1368,7 +1368,7 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", 14318180/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
@@ -1421,7 +1421,7 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", 14318180/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
@@ -1474,7 +1474,7 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", 14318180/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)

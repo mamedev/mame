@@ -631,7 +631,7 @@ MACHINE_CONFIG_START(topspeed_state::topspeed)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000) / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, topspeed_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "filter1l", 1.0)

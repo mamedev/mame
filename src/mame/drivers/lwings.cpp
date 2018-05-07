@@ -940,7 +940,7 @@ MACHINE_CONFIG_START(lwings_state::lwings)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -976,12 +976,6 @@ MACHINE_CONFIG_END
 
 
 
-
-
-
-
-
-
 MACHINE_CONFIG_START(lwings_state::fball)
 
 	/* basic machine hardware */
@@ -996,7 +990,7 @@ MACHINE_CONFIG_START(lwings_state::fball)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
