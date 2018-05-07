@@ -3534,7 +3534,7 @@ ROM_END
 
 ROM_START( ablast ) // Genuine P0-142A PCB & original ROM labels
 	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
-	ROM_LOAD16_BYTE( "a-blast_twn_u06.u06", 0x000000, 0x080000, CRC(e62156d7) SHA1(509fd41a0109dc5c00d83250383d578fd75502f3) )
+	ROM_LOAD16_BYTE( "a-blast_twn_u06.u06", 0x000000, 0x080000, CRC(e62156d7) SHA1(509fd41a0109dc5c00d83250383d578fd75502f3) ) // 轟天雷/Hōng tiān léi
 	ROM_LOAD16_BYTE( "a-blast_twn_u07.u07", 0x000001, 0x080000, CRC(d4ddc16b) SHA1(63312ce9ec6dffb47aa6aed505f077f20713e5ac) )
 
 	ROM_REGION( 0x1000000, "sprites", 0 )   // Sprites
