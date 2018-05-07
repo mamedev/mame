@@ -459,7 +459,7 @@ DRIVER_INIT_MEMBER(funkyjet_state,funkyjet)
 
 /******************************************************************************/
 
-GAME( 1992, funkyjet,  0,        funkyjet, funkyjet,  funkyjet_state, funkyjet, ROT0, "Data East (Mitchell license)", "Funky Jet (World, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, funkyjeta, funkyjet, funkyjet, funkyjet,  funkyjet_state, funkyjet, ROT0, "Data East (Mitchell license)", "Funky Jet (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, funkyjetj, funkyjet, funkyjet, funkyjetj, funkyjet_state, funkyjet, ROT0, "Data East Corporation", "Funky Jet (Japan, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, funkyjet,  0,        funkyjet, funkyjet,  funkyjet_state, funkyjet, ROT0, "Mitchell", "Funky Jet (World, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, funkyjeta, funkyjet, funkyjet, funkyjet,  funkyjet_state, funkyjet, ROT0, "Mitchell", "Funky Jet (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, funkyjetj, funkyjet, funkyjet, funkyjetj, funkyjet_state, funkyjet, ROT0, "Mitchell (Data East Corporation license)", "Funky Jet (Japan, rev 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sotsugyo,  0,        funkyjet, sotsugyo,  funkyjet_state, funkyjet, ROT0, "Mitchell (Atlus license)", "Sotsugyo Shousho", MACHINE_SUPPORTS_SAVE )
