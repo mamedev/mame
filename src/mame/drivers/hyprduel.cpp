@@ -512,7 +512,7 @@ MACHINE_CONFIG_START(hyprduel_state::hyprduel)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("sub", 1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 4000000/16/16*132, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000/16/16*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.57)
 MACHINE_CONFIG_END
 
@@ -539,7 +539,7 @@ MACHINE_CONFIG_START(hyprduel_state::magerror)
 	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", 4000000/16/16*132, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000/16/16*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.57)
 MACHINE_CONFIG_END
 

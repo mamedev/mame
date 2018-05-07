@@ -27,7 +27,6 @@
 #include "emu.h"
 #include "bus/centronics/ctronics.h"
 #include "cpu/i86/i86.h"
-#include "cpu/z80/z80daisy.h"
 #include "formats/apridisk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/apricotkb.h"
@@ -95,11 +94,12 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER( palette_r );
-	DECLARE_WRITE16_MEMBER( palette_w );
-	DECLARE_WRITE8_MEMBER( system_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
+	DECLARE_READ16_MEMBER(palette_r);
+	DECLARE_WRITE16_MEMBER(palette_w);
+	DECLARE_WRITE8_MEMBER(system_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
+	DECLARE_WRITE8_MEMBER(m1_w);
 
 	int m_40_80;
 	int m_200_256;
@@ -157,12 +157,12 @@ uint32_t f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	return 0;
 }
 
-READ16_MEMBER( f1_state::palette_r )
+READ16_MEMBER(f1_state::palette_r)
 {
 	return m_p_paletteram[offset];
 }
 
-WRITE16_MEMBER( f1_state::palette_w )
+WRITE16_MEMBER(f1_state::palette_w)
 {
 	uint8_t i,r,g,b;
 	COMBINE_DATA(&m_p_paletteram[offset]);
@@ -196,7 +196,7 @@ static GFXDECODE_START( act_f1 )
 GFXDECODE_END
 
 
-WRITE8_MEMBER( f1_state::system_w )
+WRITE8_MEMBER(f1_state::system_w)
 {
 	switch(offset)
 	{
@@ -272,7 +272,7 @@ void f1_state::act_f1_io(address_map &map)
 	map(0x0000, 0x000f).w(this, FUNC(f1_state::system_w));
 	map(0x0010, 0x0017).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
 	map(0x0020, 0x0027).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
-//  AM_RANGE(0x0030, 0x0031) AM_WRITE8(ctc_ack_w, 0x00ff)
+	map(0x0030, 0x0030).w(this, FUNC(f1_state::m1_w));
 	map(0x0040, 0x0047).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x01e0, 0x01ff) winchester
 }
@@ -300,15 +300,21 @@ INPUT_PORTS_END
 //  Z80CTC
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( f1_state::ctc_z1_w )
+WRITE_LINE_MEMBER(f1_state::ctc_z1_w)
 {
 	m_sio->rxcb_w(state);
 	m_sio->txcb_w(state);
 }
 
-WRITE_LINE_MEMBER( f1_state::ctc_z2_w )
+WRITE_LINE_MEMBER(f1_state::ctc_z2_w)
 {
 	m_sio->txca_w(state);
+}
+
+WRITE8_MEMBER(f1_state::m1_w)
+{
+	m_ctc->z80daisy_decode(data);
+	m_sio->z80daisy_decode(data);
 }
 
 //-------------------------------------------------

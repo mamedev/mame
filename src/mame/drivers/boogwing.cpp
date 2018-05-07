@@ -355,14 +355,12 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248) // same as robocop2(cninja.cpp)? verify this from real pcb.
 	MCFG_SCREEN_UPDATE_DRIVER(boogwing_state, screen_update_boogwing)
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", boogwing)
+	MCFG_GFXDECODE_ADD("gfxdecode", "deco_ace", boogwing)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	MCFG_DECO_ACE_ADD("deco_ace")
-	MCFG_DECO_ACE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -421,11 +419,11 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", SOUND_XTAL/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, SOUND_XTAL/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.40)
 
-	MCFG_OKIM6295_ADD("oki2", SOUND_XTAL/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, SOUND_XTAL/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END

@@ -460,7 +460,7 @@ WRITE_LINE_MEMBER(hx5102_device::hsklatch_out)
     | TD3 | TD2 | TD1 | TD0 |  0  | TIM | MON | INT |
     +-----+-----+-----+-----+-----+-----+-----+-----+
 
-    TDx = Tracks for drive x; 0 = 40, 1 = 77
+    TDx = Tracks for drive x; 1 = 40, 0 = 77
     TIM = Timeout
     MON = Motor on
     INT = Interrupt from i8272A
@@ -472,6 +472,9 @@ READ8_MEMBER(hx5102_device::cruread)
 	if (m_pending_int) crubits |= 0x01;
 	if (m_motor_on) crubits |= 0x02;
 	if (m_mspeed_on) crubits |= 0x04;
+
+	crubits |= ((ioport("HXDIP")->read())<<4);
+
 	return crubits;
 }
 
@@ -646,6 +649,22 @@ static void hx5102_drive(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
+INPUT_PORTS_START( hx5102 )
+	PORT_START( "HXDIP" )
+	PORT_DIPNAME( 0x01, 0x01, "Drive 1 cylinders" )
+		PORT_DIPSETTING( 0x01, "40")
+		PORT_DIPSETTING( 0x00, "77")
+	PORT_DIPNAME( 0x02, 0x02, "Drive 2 cylinders" )
+		PORT_DIPSETTING( 0x02, "40")
+		PORT_DIPSETTING( 0x00, "77")
+	PORT_DIPNAME( 0x04, 0x04, "Drive 3 cylinders" )
+		PORT_DIPSETTING( 0x04, "40")
+		PORT_DIPSETTING( 0x00, "77")
+	PORT_DIPNAME( 0x08, 0x08, "Drive 4 cylinders" )
+		PORT_DIPSETTING( 0x08, "40")
+		PORT_DIPSETTING( 0x00, "77")
+INPUT_PORTS_END
+
 /*
     HX5102 configuration
 */
@@ -718,6 +737,11 @@ ROM_END
 const tiny_rom_entry *hx5102_device::device_rom_region() const
 {
 	return ROM_NAME( hx5102 );
+}
+
+ioport_constructor hx5102_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( hx5102 );
 }
 
 }   }  // end namespace bus::hexbus

@@ -60,13 +60,21 @@ public:
 	device_z80daisy_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_z80daisy_interface();
 
+	// interface-level overrides
+	virtual void interface_post_start() override;
+	virtual void interface_post_reset() override;
+
 	// required operation overrides
 	virtual int z80daisy_irq_state() = 0;
 	virtual int z80daisy_irq_ack() = 0;
 	virtual void z80daisy_irq_reti() = 0;
 
+	// instruction decoding
+	void z80daisy_decode(uint8_t opcode);
+
 private:
 	device_z80daisy_interface *m_daisy_next;    // next device in the chain
+	uint8_t m_last_opcode;
 };
 
 

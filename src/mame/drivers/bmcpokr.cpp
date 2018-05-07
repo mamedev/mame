@@ -836,7 +836,7 @@ MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(42'000'000) / 40, PIN7_HIGH)   // M6295 @1.05MHz (42/40), pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(42'000'000) / 40, okim6295_device::PIN7_HIGH)   // M6295 @1.05MHz (42/40), pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END

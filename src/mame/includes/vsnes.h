@@ -13,7 +13,6 @@ public:
 		, m_ppu2(*this, "ppu2")
 		, m_work_ram(*this, "work_ram")
 		, m_work_ram_1(*this, "work_ram_1")
-		, m_palette(*this, "palette")
 		, m_gfx1_rom(*this, "gfx1")
 	{
 	}
@@ -25,7 +24,6 @@ public:
 
 	required_shared_ptr<uint8_t> m_work_ram;
 	optional_shared_ptr<uint8_t> m_work_ram_1;
-	required_device<palette_device> m_palette;
 
 	optional_memory_region m_gfx1_rom;
 
@@ -81,20 +79,12 @@ public:
 	DECLARE_DRIVER_INIT(vsdual);
 	DECLARE_MACHINE_START(vsnes);
 	DECLARE_MACHINE_RESET(vsnes);
-	DECLARE_VIDEO_START(vsnes);
-	DECLARE_PALETTE_INIT(vsnes);
 	DECLARE_MACHINE_START(vsdual);
 	DECLARE_MACHINE_RESET(vsdual);
-	DECLARE_VIDEO_START(vsdual);
-	DECLARE_PALETTE_INIT(vsdual);
-	uint32_t screen_update_vsnes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_vsnes_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void v_set_videorom_bank(  int start, int count, int vrom_start_bank );
 	void mapper4_set_prg(  );
 	void mapper4_set_chr(  );
 	void mapper4_irq( int scanline, int vblank, int blanked );
-	void ppu_irq_1(int *ppu_regs);
-	void ppu_irq_2(int *ppu_regs);
 
 	DECLARE_READ8_MEMBER( vsnes_bootleg_z80_latch_r );
 	DECLARE_WRITE8_MEMBER(bootleg_sound_write);

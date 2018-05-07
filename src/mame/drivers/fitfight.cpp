@@ -757,7 +757,7 @@ MACHINE_CONFIG_START(fitfight_state::fitfight)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1333333, PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1333333, okim6295_device::PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -784,7 +784,7 @@ MACHINE_CONFIG_START(fitfight_state::bbprot)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1333333, PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1333333, okim6295_device::PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

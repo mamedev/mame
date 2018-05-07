@@ -24,7 +24,8 @@
 
 device_z80daisy_interface::device_z80daisy_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "z80daisy"),
-		m_daisy_next(nullptr)
+		m_daisy_next(nullptr),
+		m_last_opcode(0)
 {
 }
 
@@ -37,6 +38,59 @@ device_z80daisy_interface::~device_z80daisy_interface()
 {
 }
 
+
+//-------------------------------------------------
+//  interface_post_start - work to be done after
+//  actually starting a device
+//-------------------------------------------------
+
+void device_z80daisy_interface::interface_post_start()
+{
+	device().save_item(NAME(m_last_opcode));
+}
+
+
+//-------------------------------------------------
+//  interface_post_reset - work to be done after a
+//  device is reset
+//-------------------------------------------------
+
+void device_z80daisy_interface::interface_post_reset()
+{
+	m_last_opcode = 0;
+}
+
+
+//-------------------------------------------------
+//  z80daisy_decode - handle state machine that
+//  decodes the RETI instruction from M1 fetches
+//-------------------------------------------------
+
+void device_z80daisy_interface::z80daisy_decode(uint8_t opcode)
+{
+	switch (m_last_opcode)
+	{
+	case 0xed:
+		// ED 4D = RETI
+		if (opcode == 0x4d)
+			z80daisy_irq_reti();
+
+		m_last_opcode = 0;
+		break;
+
+	case 0xcb:
+	case 0xdd:
+	case 0xfd:
+		// CB xx, DD xx, FD xx are just two-byte opcodes
+		m_last_opcode = 0;
+		break;
+
+	default:
+		// TODO: ED affects IEO
+		m_last_opcode = opcode;
+		break;
+	}
+}
 
 
 //**************************************************************************
@@ -188,7 +242,8 @@ void z80_daisy_chain_interface::daisy_call_reti_device()
 		int state = intf->z80daisy_irq_state();
 		if (state & Z80_DAISY_IEO)
 		{
-			intf->z80daisy_irq_reti();
+			intf->z80daisy_decode(0xed);
+			intf->z80daisy_decode(0x4d);
 			return;
 		}
 	}
