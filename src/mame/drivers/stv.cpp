@@ -1115,7 +1115,7 @@ MACHINE_CONFIG_START(stv_state::stv)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DEVICE_ADD("scsp", SCSP, 22.5792_MHz_XTAL) // TODO : verify clock; guessed
+	MCFG_DEVICE_ADD("scsp", SCSP, 22579200) // unknown osc/divider
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, saturn_state, scsp_irq))
 	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE("scu", sega_scu_device, sound_req_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
