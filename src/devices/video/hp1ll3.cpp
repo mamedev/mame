@@ -569,17 +569,19 @@ WRITE8_MEMBER( hp1ll3_device::write )
 		switch (m_command)
 		{
 		case CONF:
-			assert((m_conf_ptr >> 1) < ARRAY_LENGTH(m_conf));
-			if (m_conf_ptr & 1) {
-				m_conf[m_conf_ptr >> 1] |= data;
-			} else {
-				m_conf[m_conf_ptr >> 1] = data << 8;
+			if (m_conf_ptr < 2 * ARRAY_LENGTH(m_conf)) {
+				if (m_conf_ptr & 1) {
+					m_conf[m_conf_ptr >> 1] |= data;
+				} else {
+					m_conf[m_conf_ptr >> 1] = data << 8;
+				}
+				m_conf_ptr++;
 			}
-			if (m_conf_ptr++ == 22) {
-				DBG_LOG(2,"HPGPU",("CONF data received: %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X\n",
+			if (m_conf_ptr == 2 * ARRAY_LENGTH(m_conf)) {
+				DBG_LOG(1,"HPGPU",("CONF data received: %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X %04X\n",
 					m_conf[0], m_conf[1], m_conf[2], m_conf[3],
 					m_conf[4], m_conf[5], m_conf[6], m_conf[7],
-					m_conf[8], m_conf[9], m_conf[10]));
+					m_conf[8], m_conf[9], m_conf[10], m_conf[11]));
 			}
 			break;
 
