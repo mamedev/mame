@@ -174,13 +174,13 @@ static INPUT_PORTS_START( ltcasino )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) //off to enter service
+	PORT_DIPNAME( 0x20, 0x00, "Enable Craps" ) //off to enter service
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) //off to enter service
+	PORT_DIPNAME( 0x40, 0x00, "Enable Poker" ) //off to enter service
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) //off to enter service
+	PORT_DIPNAME( 0x80, 0x00, "Enable Black Jack" ) //off to enter service
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -278,7 +278,7 @@ static INPUT_PORTS_START( ltcasino )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH ) //service?
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -544,14 +544,20 @@ static INPUT_PORTS_START( mv4in1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 
-	PORT_DIPNAME( 0x20, 0x00, "Dice" )
+	PORT_DIPNAME( 0x20, 0x00, "Enable Dice" ) // must be off to enter service
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Poker" )
+	PORT_DIPNAME( 0x40, 0x00, "Enable Poker" ) // must be off to enter service
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "21" )
+	PORT_DIPNAME( 0x80, 0x00, "Enable 21" ) // must be off to enter service
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -579,7 +585,7 @@ static INPUT_PORTS_START( mv4in1 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START("IN2")
+	PORT_START("IN2") // Shows as "R" in service mode
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -629,7 +635,7 @@ static INPUT_PORTS_START( mv4in1 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START("IN4")
+	PORT_START("IN4") // Shows as "S" in service mode
 	PORT_DIPNAME( 0x01, 0x01, "Keyboard" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -649,11 +655,11 @@ static INPUT_PORTS_START( mv4in1 )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH ) //service?
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN5")
+	PORT_START("IN5") // Shows as "T" in service mode
 	PORT_DIPNAME( 0x01, 0x00, "5" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
