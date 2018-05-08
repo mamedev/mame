@@ -614,8 +614,7 @@ void namcos21_state::transmit_word_to_slave(uint16_t data)
 	m_mpDspState->slaveActive = 1;
 	if( m_mpDspState->slaveBytesAvailable >= DSP_BUF_MAX )
 	{
-		logerror( "IDC overflow\n" );
-		exit(1);
+		fatalerror( "IDC overflow\n" );
 	}
 }
 
@@ -1061,8 +1060,7 @@ void namcos21_state::render_slave_output(uint16_t data)
 		}
 		else if( count==0 )
 		{
-			if (ENABLE_LOGGING) logerror( "RenderSlaveOutput\n" );
-			exit(1);
+			fatalerrror( "RenderSlaveOutput\n" );
 		}
 	}
 }
