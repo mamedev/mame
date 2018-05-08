@@ -51,9 +51,7 @@ tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, const char *
 	m_out_rxdrqb_cb(*this),
 	m_out_txdrqb_cb(*this),
 
-	m_zc0_cb(*this),
-	m_zc1_cb(*this),
-	m_zc2_cb(*this),
+	m_zc_cb{ {*this}, {*this}, {*this}, {*this} },
 
 	m_in_pa_cb(*this),
 	m_out_pa_cb(*this),
@@ -99,9 +97,8 @@ void tmpz84c015_device::device_start()
 	m_out_rxdrqb_cb.resolve_safe();
 	m_out_txdrqb_cb.resolve_safe();
 
-	m_zc0_cb.resolve_safe();
-	m_zc1_cb.resolve_safe();
-	m_zc2_cb.resolve_safe();
+	for (unsigned i = 0; i < 4; i++)
+		m_zc_cb[i].resolve_safe();
 
 	m_in_pa_cb.resolve_safe(0);
 	m_out_pa_cb.resolve_safe();
@@ -206,9 +203,10 @@ MACHINE_CONFIG_START(tmpz84c015_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("tmpz84c015_ctc", Z80CTC, DERIVED_CLOCK(1,1) )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
 
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, tmpz84c015_device, zc0_cb_trampoline_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, tmpz84c015_device, zc1_cb_trampoline_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, tmpz84c015_device, zc2_cb_trampoline_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, tmpz84c015_device, zc_cb_trampoline_w<0>))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, tmpz84c015_device, zc_cb_trampoline_w<1>))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, tmpz84c015_device, zc_cb_trampoline_w<2>))
+	MCFG_Z80CTC_ZC3_CB(WRITELINE(*this, tmpz84c015_device, zc_cb_trampoline_w<3>))
 
 	MCFG_DEVICE_ADD("tmpz84c015_pio", Z80PIO, DERIVED_CLOCK(1,1) )
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
