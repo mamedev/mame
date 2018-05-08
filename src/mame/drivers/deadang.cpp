@@ -284,6 +284,7 @@ static const gfx_layout popnrun_charlayout =
 	128
 };
 
+#ifdef UNUSED_DEFINITION
 // TODO: this is wrong
 static const gfx_layout popnrun_spritelayout =
 {
@@ -295,6 +296,7 @@ static const gfx_layout popnrun_spritelayout =
 	{ STEP16(0,32) },
 	1024
 };
+#endif
 
 /* Graphics Decode Information */
 
