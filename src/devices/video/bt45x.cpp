@@ -39,12 +39,12 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(BT451, bt451_device, "bt451", "Brooktree 125/135/165 MHz Monolithic CMOS 256 Color Palette RAMDAC")
-DEFINE_DEVICE_TYPE(BT453, bt453_device, "bt453", "Brooktree 66 MHz Monolithic CMOS 256 Color Palette RAMDAC")
-DEFINE_DEVICE_TYPE(BT454, bt454_device, "bt454", "Brooktree 170 MHz Monolithic CMOS 16 Color Palette RAMDAC")
-DEFINE_DEVICE_TYPE(BT455, bt455_device, "bt455", "Brooktree 170 MHz Monolithic CMOS 16 Color Palette RAMDAC")
-DEFINE_DEVICE_TYPE(BT457, bt457_device, "bt457", "Brooktree 125/135/165 MHz Monolithic CMOS 256 Color Palette RAMDAC")
-DEFINE_DEVICE_TYPE(BT458, bt458_device, "bt458", "Brooktree 125/135/165 MHz Monolithic CMOS 256 Color Palette RAMDAC")
+DEFINE_DEVICE_TYPE(BT451, bt451_device, "bt451", "Brooktree Bt451 256 Color RAMDAC")
+DEFINE_DEVICE_TYPE(BT453, bt453_device, "bt453", "Brooktree Bt453 256 Color RAMDAC")
+DEFINE_DEVICE_TYPE(BT454, bt454_device, "bt454", "Brooktree Bt454 16 Color RAMDAC")
+DEFINE_DEVICE_TYPE(BT455, bt455_device, "bt455", "Brooktree Bt455 16 Color RAMDAC")
+DEFINE_DEVICE_TYPE(BT457, bt457_device, "bt457", "Brooktree Bt457 256 Color RAMDAC")
+DEFINE_DEVICE_TYPE(BT458, bt458_device, "bt458", "Brooktree Bt458 256 Color RAMDAC")
 
 void bt45x_device_base::map(address_map &map)
 {
