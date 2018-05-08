@@ -1584,8 +1584,7 @@ MACHINE_CONFIG_START(_8080bw_state::schaser)
 	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(schaser)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, schaser_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1924,8 +1923,7 @@ MACHINE_CONFIG_START(_8080bw_state::lupin3)
 	MCFG_SAMPLES_NAMES(lupin3_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(indianbt)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, indianbt_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2075,8 +2073,7 @@ MACHINE_CONFIG_START(_8080bw_state::polaris)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(polaris)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, polaris_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2203,8 +2200,7 @@ MACHINE_CONFIG_START(_8080bw_state::ballbomb)
 	/* sound hardware */
 	invaders_samples_audio(config);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(ballbomb)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, ballbomb_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2453,8 +2449,7 @@ MACHINE_CONFIG_START(_8080bw_state::indianbt)
 	/* sound hardware */
 	invaders_samples_audio(config);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(indianbt)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, indianbt_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

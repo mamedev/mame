@@ -340,7 +340,7 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 
 	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
@@ -405,7 +405,7 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 

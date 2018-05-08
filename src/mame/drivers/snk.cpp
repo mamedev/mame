@@ -3692,7 +3692,7 @@ MACHINE_CONFIG_START(snk_state::marvins)
 	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)  /* verified on schematics */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MCFG_SNKWAVE_ADD("wave", 8000000)   /* verified on schematics */
+	MCFG_DEVICE_ADD("wave", SNKWAVE, 8000000)   /* verified on schematics */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

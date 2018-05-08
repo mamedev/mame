@@ -1308,7 +1308,7 @@ MACHINE_CONFIG_START(firebeat_state::firebeat_spu)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sputimer", firebeat_state, spu_timer_callback, attotime::from_hz(1000));
 
-	MCFG_RF5C400_ADD("rf5c400", XTAL(16'934'400))
+	MCFG_DEVICE_ADD("rf5c400", RF5C400, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

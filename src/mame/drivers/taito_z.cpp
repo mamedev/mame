@@ -3239,14 +3239,10 @@ MACHINE_CONFIG_START(taitoz_state::contcirc)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 2.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 2.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rear", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rear", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rear", 1.0);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "front", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rear", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "front", 1.0);
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("sub")
@@ -3318,14 +3314,10 @@ MACHINE_CONFIG_START(taitoz_state::chasehq)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 1.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 1.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rear", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rear", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rear", 1.0);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "front", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rear", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "front", 1.0);
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("sub")
@@ -3398,14 +3390,10 @@ MACHINE_CONFIG_START(taitoz_state::enforce)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 20.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 20.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("sub")
@@ -3479,14 +3467,10 @@ MACHINE_CONFIG_START(taitoz_state::bshark)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 28.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 28.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taitoz_state::bsharkjjs)
@@ -3563,14 +3547,10 @@ MACHINE_CONFIG_START(taitoz_state::sci)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 2.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 2.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("sub")
@@ -3651,14 +3631,10 @@ MACHINE_CONFIG_START(taitoz_state::nightstr)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 2.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 2.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rear", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rear", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rear", 1.0);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "front", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rear", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "front", 1.0);
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("sub")
@@ -3731,14 +3707,10 @@ MACHINE_CONFIG_START(taitoz_state::aquajack)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 2.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 2.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("sub")
@@ -3814,14 +3786,10 @@ MACHINE_CONFIG_START(taitoz_state::spacegun)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 8.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 8.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -3888,14 +3856,10 @@ MACHINE_CONFIG_START(taitoz_state::dblaxle)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 8.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 8.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("sub")
@@ -3964,14 +3928,10 @@ MACHINE_CONFIG_START(taitoz_state::racingb)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 8.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 8.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("sub")

@@ -69,9 +69,9 @@ public:
 };
 /*----------- defined in audio/circus.c -----------*/
 
-DISCRETE_SOUND_EXTERN( circus );
-DISCRETE_SOUND_EXTERN( robotbwl );
-DISCRETE_SOUND_EXTERN( crash );
+DISCRETE_SOUND_EXTERN( circus_discrete );
+DISCRETE_SOUND_EXTERN( robotbwl_discrete );
+DISCRETE_SOUND_EXTERN( crash_discrete );
 extern const char *const circus_sample_names[];
 extern const char *const crash_sample_names[];
 extern const char *const ripcord_sample_names[];

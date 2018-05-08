@@ -212,9 +212,7 @@ MACHINE_CONFIG_START(m79amb_state::m79amb)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(m79amb)
-
+	MCFG_DEVICE_ADD("discrete", DISCRETE, m79amb_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(20'000'000)/8)  /* Divisor estimated */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(20'000'000)/8)  /* Divisor estimated */
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 MACHINE_CONFIG_END

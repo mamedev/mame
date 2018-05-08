@@ -341,7 +341,7 @@ static const discrete_mixer_desc phoenix_mixer =
 #define PHOENIX_EFFECT_4_SND        0
 
 
-DISCRETE_SOUND_START(phoenix)
+DISCRETE_SOUND_START(phoenix_discrete)
 	/************************************************/
 	/* Input register mapping for phoenix           */
 	/************************************************/

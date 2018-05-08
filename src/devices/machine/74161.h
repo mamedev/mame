@@ -76,18 +76,6 @@
 #define MCFG_7416x_TC_CB(_devcb) \
 	devcb = &downcast<ttl7416x_device &>(*device).set_tc_cb(DEVCB_##_devcb);
 
-#define MCFG_74160_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TTL74160, 0)
-
-#define MCFG_74161_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TTL74161, 0)
-
-#define MCFG_74162_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TTL74162, 0)
-
-#define MCFG_74163_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TTL74163, 0)
-
 class ttl7416x_device : public device_t
 {
 public:
@@ -154,25 +142,25 @@ private:
 class ttl74160_device : public ttl7416x_device
 {
 public:
-	ttl74160_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl74160_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class ttl74161_device : public ttl7416x_device
 {
 public:
-	ttl74161_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl74161_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class ttl74162_device : public ttl7416x_device
 {
 public:
-	ttl74162_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl74162_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class ttl74163_device : public ttl7416x_device
 {
 public:
-	ttl74163_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl74163_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 // device type definition

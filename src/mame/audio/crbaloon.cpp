@@ -89,7 +89,7 @@ static const discrete_dac_r1_ladder desc_crbaloon_music_dac =
 
 
 
-static DISCRETE_SOUND_START(crbaloon)
+static DISCRETE_SOUND_START(crbaloon_discrete)
 
 	/************************************************
 	* Input register mapping
@@ -158,7 +158,6 @@ MACHINE_CONFIG_START(crbaloon_state::crbaloon_audio)
 	MCFG_SN76477_ENABLE(0)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(crbaloon)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, crbaloon_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

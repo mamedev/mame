@@ -1714,13 +1714,13 @@ MACHINE_CONFIG_START(cps_state::kodb)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("2151", XTAL(3'579'545))  /* verified on pcb */
+	MCFG_DEVICE_ADD("2151", YM2151, XTAL(3'579'545))  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
 	/* CPS PPU is fed by a 16mhz clock,pin 117 outputs a 4mhz clock which is divided by 4 using 2 74ls74 */
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/4/4, PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -1757,7 +1757,7 @@ MACHINE_CONFIG_START(cps_state::sf2mdt)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("2151", 3579545)
+	MCFG_DEVICE_ADD("2151", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
@@ -1812,7 +1812,7 @@ MACHINE_CONFIG_START(cps_state::knightsb)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("2151", 29821000 / 8)
+	MCFG_DEVICE_ADD("2151", YM2151, 29821000 / 8)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
@@ -2197,7 +2197,7 @@ MACHINE_CONFIG_START(cps_state::dinopic)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -2356,13 +2356,13 @@ MACHINE_CONFIG_START(cps_state::sgyxz)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("2151", XTAL(3'579'545))  /* verified on pcb */
+	MCFG_DEVICE_ADD("2151", YM2151, XTAL(3'579'545))  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
 	/* CPS PPU is fed by a 16mhz clock,pin 117 outputs a 4mhz clock which is divided by 4 using 2 74ls74 */
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/4/4, PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -2482,7 +2482,7 @@ MACHINE_CONFIG_START(cps_state::punipic)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -2671,11 +2671,11 @@ MACHINE_CONFIG_START(cps_state::sf2m1)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_YM2151_ADD("2151", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("2151", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/4/4, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -3059,7 +3059,7 @@ MACHINE_CONFIG_START(cps_state::slampic)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -3163,12 +3163,12 @@ MACHINE_CONFIG_START(cps_state::varthb)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("2151", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("2151", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/4/4, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/4/4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

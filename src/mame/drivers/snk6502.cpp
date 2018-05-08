@@ -945,7 +945,7 @@ MACHINE_CONFIG_START(snk6502_state::satansat)
 	MCFG_SAMPLES_NAMES(vanguard_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_REPLACE("sn76477.1", SN76477, 0)
+	MCFG_DEVICE_REPLACE("sn76477.1", SN76477)
 	// ???      GND: 2,26,27        +5V: 15,25
 	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
 	MCFG_SN76477_DECAY_RES(0)                            // decay_res
@@ -1054,7 +1054,7 @@ MACHINE_CONFIG_START(snk6502_state::fantasy)
 	MCFG_SAMPLES_NAMES(fantasy_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_DEVICE_REPLACE("sn76477.1", SN76477, 0)
+	MCFG_DEVICE_REPLACE("sn76477.1", SN76477)
 	// BOMB     GND:    2,9,26,27       +5V: 15,25
 	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
 	MCFG_SN76477_DECAY_RES(0)                            // decay_res
@@ -1073,8 +1073,7 @@ MACHINE_CONFIG_START(snk6502_state::fantasy)
 	MCFG_SN76477_ENABLE(0)                               // enable
 	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(fantasy)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, fantasy_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_DEVICE_REMOVE("sn76477.2")

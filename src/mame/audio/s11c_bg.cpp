@@ -62,7 +62,7 @@ MACHINE_CONFIG_START(s11c_bg_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(s11c_bg_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
-	MCFG_YM2151_ADD("ym2151", XTAL(3'579'545)) // "3.58 MHz" on schematics and parts list
+	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545)) // "3.58 MHz" on schematics and parts list
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, s11c_bg_device, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25)
 

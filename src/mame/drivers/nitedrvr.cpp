@@ -168,8 +168,7 @@ MACHINE_CONFIG_START(nitedrvr_state::nitedrvr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(nitedrvr)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, nitedrvr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

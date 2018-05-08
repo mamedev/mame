@@ -536,7 +536,7 @@ MACHINE_CONFIG_START(cabal_state::cabal)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
@@ -618,7 +618,7 @@ MACHINE_CONFIG_START(cabal_state::cabalbl)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
