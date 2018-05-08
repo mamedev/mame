@@ -102,7 +102,7 @@ static const discrete_mixer_desc sprint2_mixer =
 #define SPRINT2_1V      SPRINT2_HSYNC/2
 #define SPRINT2_2V      SPRINT2_1V/2
 
-DISCRETE_SOUND_START(sprint2)
+DISCRETE_SOUND_START(sprint2_discrete)
 
 	/************************************************/
 	/* Input register mapping for sprint2           */
@@ -227,7 +227,7 @@ DISCRETE_SOUND_START(sprint2)
 DISCRETE_SOUND_END
 
 
-DISCRETE_SOUND_START(sprint1)
+DISCRETE_SOUND_START(sprint1_discrete)
 
 	/************************************************/
 	/* Input register mapping for sprint1           */
@@ -361,7 +361,7 @@ static const discrete_mixer_desc dominos_mixer =
 /* Nodes - Adjusters */
 #define DOMINOS_R23             NODE_15
 
-DISCRETE_SOUND_START(dominos)
+DISCRETE_SOUND_START(dominos_discrete)
 	/************************************************/
 	/* Input register mapping for dominos           */
 	/************************************************/

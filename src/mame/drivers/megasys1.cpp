@@ -1833,11 +1833,11 @@ MACHINE_CONFIG_START(megasys1_state::system_B_hayaosi1)
 
 	/* basic machine hardware */
 
-	MCFG_OKIM6295_REPLACE("oki1", 2000000, okim6295_device::PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
+	MCFG_DEVICE_REPLACE("oki1", OKIM6295, 2000000, okim6295_device::PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_OKIM6295_REPLACE("oki2", 2000000, okim6295_device::PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
+	MCFG_DEVICE_REPLACE("oki2", OKIM6295, 2000000, okim6295_device::PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END

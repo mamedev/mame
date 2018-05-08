@@ -83,6 +83,6 @@ private:
 };
 
 /*----------- defined in audio/nitedrvr.c -----------*/
-DISCRETE_SOUND_EXTERN( nitedrvr );
+DISCRETE_SOUND_EXTERN( nitedrvr_discrete );
 
 #endif // MAME_INCLUDES_NITEDRVR_H

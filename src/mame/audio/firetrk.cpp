@@ -180,7 +180,7 @@ static const discrete_mixer_desc firetrk_mixer =
 #define FIRETRUCK_BELLSND       NODE_17
 #define FIRETRUCK_XTNDPLYSND    NODE_18
 
-DISCRETE_SOUND_START(firetrk)
+DISCRETE_SOUND_START(firetrk_discrete)
 	/************************************************/
 	/* Input register mapping for firetruck         */
 	/************************************************/
@@ -387,7 +387,7 @@ static const discrete_mixer_desc superbug_mixer =
 #define SUPERBUG_SCREECHSND     NODE_13
 #define SUPERBUG_ASRSND         NODE_14
 
-DISCRETE_SOUND_START(superbug)
+DISCRETE_SOUND_START(superbug_discrete)
 	/************************************************/
 	/* Input register mapping for superbug          */
 	/************************************************/
@@ -568,7 +568,7 @@ static const discrete_mixer_desc montecar_mixer =
 #define MONTECAR_BANGSND            NODE_13
 #define MONTECAR_SCREECHSND         NODE_14
 
-DISCRETE_SOUND_START(montecar)
+DISCRETE_SOUND_START(montecar_discrete)
 	/************************************************/
 	/* Input register mapping for montecar          */
 	/************************************************/

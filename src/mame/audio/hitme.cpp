@@ -35,7 +35,7 @@ static const discrete_comp_adder_table desc_hitme_adder =
 #define HITME_FINAL_SND         NODE_90
 
 
-DISCRETE_SOUND_START(hitme)
+DISCRETE_SOUND_START(hitme_discrete)
 
 	/* These are the inputs; PULSE-type inputs are used for oneshot latching signals */
 	DISCRETE_INPUT_DATA (HITME_DOWNCOUNT_VAL)

@@ -248,7 +248,7 @@ static discrete_mixer_desc quantum_mixer = {
 		1.0                         /* gain */
 };
 
-static DISCRETE_SOUND_START(quantum)
+static DISCRETE_SOUND_START(quantum_discrete)
 
 	/************************************************/
 	/* FINAL MIX                                    */
@@ -321,9 +321,7 @@ MACHINE_CONFIG_START(quantum_state::quantum)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
 	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 1)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(quantum)
-
+	MCFG_DEVICE_ADD("discrete", DISCRETE, quantum_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

@@ -244,7 +244,7 @@ static const discrete_op_amp_filt_info galaxian_bandpass_desc =
  *************************************/
 
 
-static DISCRETE_SOUND_START(galaxian)
+static DISCRETE_SOUND_START(galaxian_discrete)
 
 	/************************************************/
 	/* Input register mapping for galaxian          */
@@ -376,8 +376,8 @@ static DISCRETE_SOUND_START(galaxian)
 DISCRETE_SOUND_END
 
 
-static DISCRETE_SOUND_START(mooncrst)
-	DISCRETE_IMPORT(galaxian)
+static DISCRETE_SOUND_START(mooncrst_discrete)
+	DISCRETE_IMPORT(galaxian_discrete)
 
 	/************************************************/
 	/* Moon Cresta mixing stage                     */
@@ -501,8 +501,7 @@ MACHINE_CONFIG_START(galaxold_state::galaxian_audio)
 	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 
-	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE)
-	MCFG_DISCRETE_INTF(galaxian)
+	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, galaxian_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -511,8 +510,7 @@ MACHINE_CONFIG_START(galaxold_state::mooncrst_audio)
 	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 
-	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE)
-	MCFG_DISCRETE_INTF(mooncrst)
+	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, mooncrst_discrete)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -522,8 +520,7 @@ MACHINE_CONFIG_START(galaxian_state::galaxian_audio)
 	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 
-	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE)
-	MCFG_DISCRETE_INTF(galaxian)
+	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, galaxian_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -532,8 +529,6 @@ MACHINE_CONFIG_START(galaxian_state::mooncrst_audio)
 	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 
-	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE)
-	MCFG_DISCRETE_INTF(mooncrst)
-
+	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, mooncrst_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END

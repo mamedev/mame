@@ -312,8 +312,7 @@ MACHINE_CONFIG_START(circus_state::circus)
 	MCFG_SAMPLES_NAMES(circus_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(circus)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, circus_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -347,8 +346,7 @@ MACHINE_CONFIG_START(circus_state::robotbwl)
 	MCFG_SAMPLES_NAMES(robotbwl_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(robotbwl)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, robotbwl_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -389,8 +387,7 @@ MACHINE_CONFIG_START(circus_state::crash)
 	MCFG_SAMPLES_NAMES(crash_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(crash)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, crash_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -423,8 +420,7 @@ MACHINE_CONFIG_START(circus_state::ripcord)
 	MCFG_SAMPLES_NAMES(ripcord_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(circus)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, circus_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

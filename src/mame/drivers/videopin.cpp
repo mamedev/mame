@@ -382,8 +382,7 @@ MACHINE_CONFIG_START(videopin_state::videopin)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(videopin)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, videopin_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

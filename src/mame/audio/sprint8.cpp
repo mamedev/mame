@@ -169,7 +169,7 @@ DISCRETE_555_MSTABLE(NODE_RELATIVE(NODE_60, _car - 1), 1, NODE_RELATIVE(NODE_50,
 DISCRETE_OP_AMP_FILTER(NODE_RELATIVE(SPRINT8_MOTOR1_SND, _car - 1), 1, NODE_RELATIVE(NODE_60, _car - 1), 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &sprint8_motor_filter)
 
 
-DISCRETE_SOUND_START( sprint8 )
+DISCRETE_SOUND_START( sprint8_discrete )
 	/************************************************
 	 * Input register mapping
 	 ************************************************/
@@ -305,8 +305,7 @@ MACHINE_CONFIG_START(sprint8_state::sprint8_audio)
 	MCFG_SPEAKER_ADD("speaker_5_6",  0.0, 0.0, -0.5)    /* back */
 	MCFG_SPEAKER_ADD("speaker_4_8", 0.2, 0.0, 1.0)      /* right */
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(sprint8)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, sprint8_discrete)
 	MCFG_SOUND_ROUTE(0, "speaker_1_2", 1.0)
 	/* volumes on other channels defaulted to off, */
 	/* user can turn them up if needed. */

@@ -136,7 +136,7 @@ static const discrete_mixer_desc m79amb_final_mix =
 	1               /* gain */
 };
 
-DISCRETE_SOUND_START( m79amb )
+DISCRETE_SOUND_START( m79amb_discrete )
 	/************************************************
 	 * Input register mapping
 	 ************************************************/

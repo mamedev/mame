@@ -77,7 +77,7 @@ private:
 
 DECLARE_DEVICE_TYPE(SNK6502, snk6502_sound_device)
 
-DISCRETE_SOUND_EXTERN( fantasy );
+DISCRETE_SOUND_EXTERN( fantasy_discrete );
 
 extern char const *const sasuke_sample_names[];
 extern char const *const vanguard_sample_names[];

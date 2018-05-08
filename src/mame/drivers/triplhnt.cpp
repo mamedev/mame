@@ -333,8 +333,7 @@ MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 	MCFG_SAMPLES_NAMES(triplhnt_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(triplhnt)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, triplhnt_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
