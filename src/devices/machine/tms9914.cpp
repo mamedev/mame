@@ -7,7 +7,7 @@
     Texas Instruments TMS9914(A) GPIB Controller
 
     TODO:
-    - A few minor FSMs only used in non-controller devices (RL,SR,PP)
+    - A few minor FSMs only used in non-controller devices (SR,PP)
     - A few interface commands
     - A few auxiliary commands
 
@@ -438,6 +438,7 @@ void tms9914_device::device_reset()
 	m_swrst = true;
 	m_hdfa = false;
 	m_hdfe = false;
+	m_rtl = false;
 	m_rpp = false;
 	m_sic = false;
 	m_sre = false;
@@ -833,7 +834,14 @@ void tms9914_device::update_fsm()
 		}
 		// No direct L outputs
 
-		// TODO: SR, RL & PP FSMs
+		// TODO: SR & PP FSMs
+
+		// RL FSM
+		if (m_rl_state != FSM_RL_LOCS && (m_swrst || !get_signal(IEEE_488_REN))) {
+			m_rl_state = FSM_RL_LOCS;
+			changed = true;
+		}
+		// No direct RL outputs
 
 		// C outputs
 		prev_state = m_c_state;
@@ -936,9 +944,16 @@ void tms9914_device::do_LAF()
 		m_l_state = FSM_L_LADS;
 		m_ext_state_change = true;
 	}
-	if (m_t_state == FSM_T_TADS) {
+	if (m_t_state != FSM_T_TIDS) {
 		m_t_state = FSM_T_TIDS;
 		m_ext_state_change = true;
+	}
+	if (m_rl_state == FSM_RL_LWLS) {
+		m_rl_state = FSM_RL_RWLS;
+		set_int0_bit(REG_INT0_RLC_BIT);
+	} else if (m_rl_state == FSM_RL_LOCS && !m_rtl && get_signal(IEEE_488_REN)) {
+		m_rl_state = FSM_RL_REMS;
+		set_int0_bit(REG_INT0_RLC_BIT);
 	}
 }
 
@@ -948,7 +963,7 @@ void tms9914_device::do_TAF()
 		m_t_state = FSM_T_TADS;
 		m_ext_state_change = true;
 	}
-	if (m_l_state == FSM_L_LADS) {
+	if (m_l_state != FSM_L_LIDS) {
 		m_l_state = FSM_L_LIDS;
 		m_ext_state_change = true;
 	}
@@ -968,7 +983,15 @@ void tms9914_device::if_cmd_received(uint8_t if_cmd)
 
 	switch (if_cmd) {
 	case IFCMD_GTL:
-		// TODO:
+		if (m_l_state == FSM_L_LADS) {
+			if (m_rl_state == FSM_RL_REMS) {
+				m_rl_state = FSM_RL_LOCS;
+				set_int0_bit(REG_INT0_RLC_BIT);
+			} else if (m_rl_state == FSM_RL_RWLS) {
+				m_rl_state = FSM_RL_LWLS;
+				set_int0_bit(REG_INT0_RLC_BIT);
+			}
+		}
 		break;
 
 	case IFCMD_SDC:
@@ -990,7 +1013,11 @@ void tms9914_device::if_cmd_received(uint8_t if_cmd)
 		break;
 
 	case IFCMD_LLO:
-		// TODO:
+		if (m_rl_state == FSM_RL_LOCS && get_signal(IEEE_488_REN)) {
+			m_rl_state = FSM_RL_LWLS;
+		} else if (m_rl_state == FSM_RL_REMS) {
+			m_rl_state = FSM_RL_RWLS;
+		}
 		break;
 
 	case IFCMD_DCL:
@@ -1177,7 +1204,11 @@ void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
 		break;
 
 	case AUXCMD_RTL:
-		LOG("Unimplemented RTL cmd\n");
+		m_rtl = set_bit;
+		if (m_rtl && m_rl_state == FSM_RL_REMS) {
+			m_rl_state = FSM_RL_LOCS;
+			set_int0_bit(REG_INT0_RLC_BIT);
+		}
 		break;
 
 	case AUXCMD_FEOI:
