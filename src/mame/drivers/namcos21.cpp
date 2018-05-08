@@ -1060,7 +1060,7 @@ void namcos21_state::render_slave_output(uint16_t data)
 		}
 		else if( count==0 )
 		{
-			fatalerrror( "RenderSlaveOutput\n" );
+			fatalerror( "RenderSlaveOutput\n" );
 		}
 	}
 }
