@@ -212,7 +212,7 @@ void megasys1_state::megasys1Z_map(address_map &map)
 	map(0x084200, 0x084205).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x084208, 0x08420d).w("scroll1", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x084300, 0x084301).w(this, FUNC(megasys1_state::screen_flag_w));
-	map(0x084308, 0x084309).w(m_soundlatch_z, FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x084308, 0x084309).w(this, FUNC(megasys1_state::soundlatch_z_w));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08e000, 0x08ffff).ram().share("objectram");
 	map(0x090000, 0x093fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
@@ -228,7 +228,7 @@ void megasys1_state::megasys1A_map(address_map &map)
 	map(0x084000, 0x084001).w(this, FUNC(megasys1_state::active_layers_w));
 	map(0x084008, 0x08400d).w("scroll2", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x084100, 0x084101).rw(this, FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
-	map(0x084308, 0x084309).w(m_soundlatch, FUNC(generic_latch_16_device::write));
+	map(0x084308, 0x084309).w(this, FUNC(megasys1_state::soundlatch_w));
 	map(0x098000, 0x09bfff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");
 }
 
@@ -311,7 +311,7 @@ void megasys1_state::megasys1B_map(address_map &map)
 	map(0x044200, 0x044205).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x044208, 0x04420d).w("scroll1", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x044300, 0x044301).w(this, FUNC(megasys1_state::screen_flag_w));
-	map(0x044308, 0x044309).w(m_soundlatch, FUNC(generic_latch_16_device::write));
+	map(0x044308, 0x044309).w(this, FUNC(megasys1_state::soundlatch_w));
 	map(0x048000, 0x0487ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x04e000, 0x04ffff).ram().share("objectram");
 	map(0x050000, 0x053fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
@@ -331,7 +331,7 @@ void megasys1_state::megasys1B_edfbl_map(address_map &map)
 	map(0x0e0006, 0x0e0007).portr("P2");
 	map(0x0e0008, 0x0e0009).portr("DSW1");
 	map(0x0e000a, 0x0e000b).portr("DSW2");
-	//map(0x0e000e, 0x0e000f).w(m_soundlatch, FUNC(generic_latch_16_device::write));
+	//AM_RANGE(0x0e000e, 0x0e000f) AM_WRITE(soundlatch_w)
 }
 
 void megasys1_state::megasys1B_monkelf_map(address_map &map)
@@ -380,7 +380,7 @@ void megasys1_state::megasys1C_map(address_map &map)
 	map(0x0c2200, 0x0c2201).rw(this, FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
 	map(0x0c2208, 0x0c2209).w(this, FUNC(megasys1_state::active_layers_w));
 	map(0x0c2308, 0x0c2309).w(this, FUNC(megasys1_state::screen_flag_w));
-	map(0x0c8000, 0x0c8001).r(m_soundlatch2, FUNC(generic_latch_16_device::read)).w(m_soundlatch, FUNC(generic_latch_16_device::write));
+	map(0x0c8000, 0x0c8001).r(m_soundlatch2, FUNC(generic_latch_16_device::read)).w(this, FUNC(megasys1_state::soundlatch_c_w));
 	map(0x0d2000, 0x0d3fff).ram().share("objectram");
 	map(0x0d8000, 0x0d8001).rw(this, FUNC(megasys1_state::ip_select_r), FUNC(megasys1_state::ip_select_w));
 	// 64th Street actively uses 0xe4*** for breakable objects.
@@ -416,7 +416,7 @@ void megasys1_state::megasys1D_map(address_map &map)
 	map(0x0e0000, 0x0e0001).portr("DSW");
 	map(0x0e8000, 0x0ebfff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
 	map(0x0f0000, 0x0f0001).portr("SYSTEM");
-	map(0x0f8001, 0x0f8001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x0f8001, 0x0f8001).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  map(0x100000, 0x100001); // protection
 	map(0x1f0000, 0x1fffff).ram() /*.w(this, FUNC(megasys1_state::ram_w))*/ .share("ram");
 }
@@ -484,15 +484,28 @@ void megasys1_state::megasys1D_oki_map(address_map &map)
 
 */
 
-template<int Chip>
-READ8_MEMBER(megasys1_state::oki_status_r)
+/* YM2151 IRQ */
+WRITE_LINE_MEMBER(megasys1_state::sound_irq)
+{
+	if (state)
+		m_audiocpu->set_input_line(4, HOLD_LINE);
+}
+
+READ8_MEMBER(megasys1_state::oki_status_1_r)
 {
 	if (m_ignore_oki_status == 1)
 		return 0;
 	else
-		return m_oki[Chip]->read_status();
+		return m_oki1->read_status();
 }
 
+READ8_MEMBER(megasys1_state::oki_status_2_r)
+{
+	if (m_ignore_oki_status == 1)
+		return 0;
+	else
+		return m_oki2->read_status();
+}
 /***************************************************************************
                             [ Sound CPU - System A ]
 ***************************************************************************/
@@ -504,10 +517,10 @@ void megasys1_state::megasys1A_sound_map(address_map &map)
 	map(0x040000, 0x040001).r(m_soundlatch, FUNC(generic_latch_16_device::read));
 	map(0x060000, 0x060001).w(m_soundlatch2, FUNC(generic_latch_16_device::write));   // to main cpu
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0x0a0001, 0x0a0001).r(this, FUNC(megasys1_state::oki_status_r<0>));
-	map(0x0a0000, 0x0a0003).w(m_oki[0], FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x0c0001, 0x0c0001).r(this, FUNC(megasys1_state::oki_status_r<1>));
-	map(0x0c0000, 0x0c0003).w(m_oki[1], FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0a0001, 0x0a0001).r(this, FUNC(megasys1_state::oki_status_1_r));
+	map(0x0a0000, 0x0a0003).w(m_oki1, FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0c0001, 0x0c0001).r(this, FUNC(megasys1_state::oki_status_2_r));
+	map(0x0c0000, 0x0c0003).w(m_oki2, FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0fffff).ram();
 }
 
@@ -517,8 +530,8 @@ void megasys1_state::kickoffb_sound_map(address_map &map)
 	map(0x040000, 0x040001).r(m_soundlatch, FUNC(generic_latch_16_device::read));
 	map(0x060000, 0x060001).w(m_soundlatch2, FUNC(generic_latch_16_device::write));   // to main cpu
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
-	map(0x0a0001, 0x0a0001).r(this, FUNC(megasys1_state::oki_status_r<0>));
-	map(0x0a0000, 0x0a0003).w(m_oki[0], FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0a0001, 0x0a0001).r(this, FUNC(megasys1_state::oki_status_1_r));
+	map(0x0a0000, 0x0a0003).w(m_oki1, FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0fffff).ram();
 }
 
@@ -534,10 +547,10 @@ void megasys1_state::megasys1B_sound_map(address_map &map)
 	map(0x040000, 0x040001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(m_soundlatch2, FUNC(generic_latch_16_device::write)); /* from/to main cpu */
 	map(0x060000, 0x060001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(m_soundlatch2, FUNC(generic_latch_16_device::write)); /* from/to main cpu */
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0x0a0001, 0x0a0001).r(this, FUNC(megasys1_state::oki_status_r<0>));
-	map(0x0a0000, 0x0a0003).w(m_oki[0], FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x0c0001, 0x0c0001).r(this, FUNC(megasys1_state::oki_status_r<1>));
-	map(0x0c0000, 0x0c0003).w(m_oki[1], FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0a0001, 0x0a0001).r(this, FUNC(megasys1_state::oki_status_1_r));
+	map(0x0a0000, 0x0a0003).w(m_oki1, FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0c0001, 0x0c0001).r(this, FUNC(megasys1_state::oki_status_2_r));
+	map(0x0c0000, 0x0c0003).w(m_oki2, FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0effff).ram();
 }
 
@@ -1604,7 +1617,7 @@ WRITE16_MEMBER(megasys1_state::protection_peekaboo_w)
 	COMBINE_DATA(&m_protection_val);
 
 	if ((m_protection_val & 0x90) == 0x90)
-		m_okibank->set_entry(m_protection_val & 7);
+		membank("okibank")->set_entry(m_protection_val & 7);
 
 	m_maincpu->set_input_line(4, HOLD_LINE);
 }
@@ -1706,12 +1719,10 @@ MACHINE_CONFIG_START(megasys1_state::system_A)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 4))
-
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
-	MCFG_YM2151_IRQ_HANDLER(HOLDLINE("audiocpu", 4)) // INPUTLINE?
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, megasys1_state,sound_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
@@ -1751,7 +1762,7 @@ MACHINE_CONFIG_START(megasys1_state::kickoffb)
 	MCFG_DEVICE_REMOVE("oki2")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, SOUND_CPU_CLOCK / 2)
-	MCFG_YM2203_IRQ_HANDLER(HOLDLINE("audiocpu", 4)) // TODO: needs to be checked
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, megasys1_state, sound_irq)) // TODO: needs to be checked
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -1809,11 +1820,12 @@ MACHINE_CONFIG_START(megasys1_state::system_Bbl)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 256*2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	/* just the one OKI, used for sound and music */
 	MCFG_DEVICE_ADD("oki1", OKIM6295, OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megasys1_state::system_B_hayaosi1)
@@ -1843,9 +1855,6 @@ MACHINE_CONFIG_START(megasys1_state::system_C)
 
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(megasys1B_sound_map)
-	
-	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 2)) // Cybattler reads sound latch on irq 2
 MACHINE_CONFIG_END
 
 
@@ -1943,7 +1952,6 @@ MACHINE_CONFIG_START(megasys1_state::system_Z)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch_z")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 5))
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -4631,10 +4639,13 @@ DRIVER_INIT_MEMBER(megasys1_state,iganinju)
 }
 
 // jitsupro writes oki commands to both the lsb and msb; it works because of byte smearing
-template<int Chip>
-WRITE16_MEMBER(megasys1_state::okim6295_both_w)
+WRITE16_MEMBER(megasys1_state::okim6295_both_1_w)
 {
-	m_oki[Chip]->write_command(data & 0xff);
+	m_oki1->write_command(data & 0xff);
+}
+WRITE16_MEMBER(megasys1_state::okim6295_both_2_w)
+{
+	m_oki2->write_command(data & 0xff);
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,jitsupro)
@@ -4646,8 +4657,8 @@ DRIVER_INIT_MEMBER(megasys1_state,jitsupro)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
 
-	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa0000, 0xa0003, write16_delegate(FUNC(megasys1_state::okim6295_both_w<0>),this));
-	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xc0000, 0xc0003, write16_delegate(FUNC(megasys1_state::okim6295_both_w<1>),this));
+	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa0000, 0xa0003, write16_delegate(FUNC(megasys1_state::okim6295_both_1_w),this));
+	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xc0000, 0xc0003, write16_delegate(FUNC(megasys1_state::okim6295_both_2_w),this));
 
 	m_mcu_hs = 0;
 	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
@@ -4659,9 +4670,10 @@ DRIVER_INIT_MEMBER(megasys1_state,jitsupro)
 DRIVER_INIT_MEMBER(megasys1_state,peekaboo)
 {
 	uint8_t *ROM = memregion("oki1")->base();
+	memory_bank *okibank = membank("okibank");
 
-	m_okibank->configure_entry(7, &ROM[0x20000]);
-	m_okibank->configure_entries(0, 7, &ROM[0x20000], 0x20000);
+	okibank->configure_entry(7, &ROM[0x20000]);
+	okibank->configure_entries(0, 7, &ROM[0x20000], 0x20000);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x100000, 0x100001, read16_delegate(FUNC(megasys1_state::protection_peekaboo_r),this), write16_delegate(FUNC(megasys1_state::protection_peekaboo_w),this));
 
@@ -4832,9 +4844,9 @@ GAME( 1989, lordofk,  astyanax, system_A,          astyanax, megasys1_state, ast
 GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   megasys1_state, astyanax, ROT0,   "Jaleco", "Hachoo!", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, jitsupro, 0,        system_A,          jitsupro, megasys1_state, jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, plusalph, 0,        system_A,          plusalph, megasys1_state, astyanax, ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, stdragon, 0,        system_A,          stdragon, megasys1_state, stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Raster effects aren't implemented
-GAME( 1989, stdragona,stdragon, system_A,          stdragon, megasys1_state, stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // ^^
-GAME( 1989, stdragonb,stdragon, system_A,          stdragon, megasys1_state, stdragonb,ROT0,   "bootleg","Saint Dragon (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // ^^
+GAME( 1989, stdragon, 0,        system_A,          stdragon, megasys1_state, stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, stdragona,stdragon, system_A,          stdragon, megasys1_state, stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, stdragonb,stdragon, system_A,          stdragon, megasys1_state, stdragonb,ROT0,   "bootleg","Saint Dragon (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodland,  0,        system_A,          rodland,  megasys1_state, rodland,  ROT0,   "Jaleco", "Rod-Land (World, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlanda, rodland,  system_A,          rodland,  megasys1_state, rodlandj, ROT0,   "Jaleco", "Rod-Land (World, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rodlandj, rodland,  system_A,          rodland,  megasys1_state, rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", MACHINE_SUPPORTS_SAVE )

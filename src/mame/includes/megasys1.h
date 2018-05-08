@@ -19,35 +19,36 @@ class megasys1_state : public driver_device
 {
 public:
 	megasys1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_objectram(*this, "objectram")
-		, m_tmap(*this, "scroll%u", 0)
-		, m_ram(*this, "ram")
-		, m_maincpu(*this, "maincpu")
-		, m_audiocpu(*this, "audiocpu")
-		, m_oki(*this, "oki%u", 1)
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_palette(*this, "palette")
-		, m_screen(*this, "screen")
-		, m_soundlatch(*this, "soundlatch")
-		, m_soundlatch2(*this, "soundlatch2")
-		, m_soundlatch_z(*this, "soundlatch_z")
-		, m_rom_maincpu(*this, "maincpu")
-		, m_io_system(*this, "SYSTEM")
-		, m_io_p1(*this, "P1")
-		, m_io_p2(*this, "P2")
-		, m_io_dsw(*this, "DSW")
-		, m_io_dsw1(*this, "DSW1")
-		, m_io_dsw2(*this, "DSW2")
-		, m_okibank(*this, "okibank")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_objectram(*this, "objectram"),
+		m_tmap(*this, "scroll%u", 0),
+		m_ram(*this, "ram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_oki1(*this, "oki1"),
+		m_oki2(*this, "oki2"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_soundlatch_z(*this, "soundlatch_z"),
+		m_rom_maincpu(*this, "maincpu"),
+		m_io_system(*this, "SYSTEM"),
+		m_io_p1(*this, "P1"),
+		m_io_p2(*this, "P2"),
+		m_io_dsw(*this, "DSW"),
+		m_io_dsw1(*this, "DSW1"),
+		m_io_dsw2(*this, "DSW2")
+		{ }
 
 	required_shared_ptr<uint16_t> m_objectram;
 	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
 	required_shared_ptr<uint16_t> m_ram;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	optional_device_array<okim6295_device, 2> m_oki;
+	optional_device<okim6295_device> m_oki1;
+	optional_device<okim6295_device> m_oki2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -61,7 +62,6 @@ public:
 	optional_ioport m_io_dsw;
 	optional_ioport m_io_dsw1;
 	optional_ioport m_io_dsw2;
-	optional_memory_bank m_okibank;
 
 	// configuration
 	uint16_t m_ip_select_values[7]; // System B and C
@@ -72,8 +72,10 @@ public:
 	// all
 	bitmap_ind16 m_sprite_buffer_bitmap;
 	uint16_t m_screen_flag;
-	std::unique_ptr<uint16_t[]> m_buffer_objectram[2];
-	std::unique_ptr<uint16_t[]> m_buffer_spriteram16[2];
+	std::unique_ptr<uint16_t[]> m_buffer_objectram;
+	std::unique_ptr<uint16_t[]> m_buffer2_objectram;
+	std::unique_ptr<uint16_t[]> m_buffer_spriteram16;
+	std::unique_ptr<uint16_t[]> m_buffer2_spriteram16;
 
 	// all but System Z
 	uint16_t m_active_layers;
@@ -95,6 +97,7 @@ public:
 	// soldam
 	uint16_t *m_spriteram;
 
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_READ16_MEMBER(ip_select_r);
 	DECLARE_WRITE16_MEMBER(ip_select_w);
 	DECLARE_READ16_MEMBER(protection_peekaboo_r);
@@ -112,11 +115,16 @@ public:
 	DECLARE_READ16_MEMBER(sprite_flag_r);
 	DECLARE_WRITE16_MEMBER(sprite_flag_w);
 	DECLARE_WRITE16_MEMBER(screen_flag_w);
+	DECLARE_WRITE16_MEMBER(soundlatch_w);
+	DECLARE_WRITE16_MEMBER(soundlatch_z_w);
+	DECLARE_WRITE16_MEMBER(soundlatch_c_w);
 	DECLARE_WRITE16_MEMBER(monkelf_scroll0_w);
 	DECLARE_WRITE16_MEMBER(monkelf_scroll1_w);
 	void megasys1_set_vreg_flag(int which, int data);
-	template<int Chip> DECLARE_READ8_MEMBER(oki_status_r);
-	template<int Chip> DECLARE_WRITE16_MEMBER(okim6295_both_w);
+	DECLARE_READ8_MEMBER(oki_status_1_r);
+	DECLARE_READ8_MEMBER(oki_status_2_r);
+	DECLARE_WRITE16_MEMBER(okim6295_both_1_w);
+	DECLARE_WRITE16_MEMBER(okim6295_both_2_w);
 	DECLARE_WRITE16_MEMBER(ram_w);
 
 	DECLARE_DRIVER_INIT(64street);

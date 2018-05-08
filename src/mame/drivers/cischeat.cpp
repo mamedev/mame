@@ -566,10 +566,13 @@ WRITE16_MEMBER(cischeat_state::scudhamm_enable_w)
 }
 
 
-WRITE8_MEMBER(cischeat_state::scudhamm_oki_bank_w)
+WRITE16_MEMBER(cischeat_state::scudhamm_oki_bank_w)
 {
-	m_oki[0]->set_rom_bank((data >> 0) & 0x3);
-	m_oki[1]->set_rom_bank((data >> 4) & 0x3);
+	if (ACCESSING_BITS_0_7)
+	{
+		m_oki1->set_rom_bank((data >> 0) & 0x3);
+		m_oki2->set_rom_bank((data >> 4) & 0x3);
+	}
 }
 
 void cischeat_state::scudhamm_map(address_map &map)
@@ -583,10 +586,10 @@ void cischeat_state::scudhamm_map(address_map &map)
 	map(0x0b0000, 0x0b3fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");   // Scroll RAM 2
 	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");          // Palette
 	map(0x0f0000, 0x0fffff).ram().share("ram");                                         // Work RAM + Spriteram
-	map(0x100001, 0x100001).w(this, FUNC(cischeat_state::scudhamm_oki_bank_w));                                          // Sound
+	map(0x100000, 0x100001).w(this, FUNC(cischeat_state::scudhamm_oki_bank_w));                                          // Sound
 	map(0x100008, 0x100009).portr("IN0").w(this, FUNC(cischeat_state::scudhamm_leds_w));                          // Buttons
-	map(0x100015, 0x100015).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));             // Sound
-	map(0x100019, 0x100019).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));             //
+	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));             // Sound
+	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));             //
 	map(0x10001c, 0x10001d).w(this, FUNC(cischeat_state::scudhamm_enable_w));                                            // ?
 	map(0x100040, 0x100041).r(this, FUNC(cischeat_state::scudhamm_analog_r)).nopw();                         // A / D
 	map(0x100044, 0x100045).r(this, FUNC(cischeat_state::scudhamm_motor_pos_r));                                  // Motor Position
@@ -668,14 +671,13 @@ void cischeat_state::armchmp2_map(address_map &map)
 	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");     // Scroll ram 2
 	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");              // Palette
 	map(0x0f0000, 0x0fffff).ram().share("ram");                                         // Work RAM + Spriteram
-	map(0x100000, 0x100001).portr("IN2")                      // DSW
-	map(0x100001, 0x100001).w(this, FUNC(cischeat_state::scudhamm_oki_bank_w));                      // Sound
+	map(0x100000, 0x100001).portr("IN2").w(this, FUNC(cischeat_state::scudhamm_oki_bank_w));                      // DSW + Sound
 	map(0x100004, 0x100005).portr("IN3");                                                    // DSW
 	map(0x100008, 0x100009).rw(this, FUNC(cischeat_state::armchmp2_buttons_r), FUNC(cischeat_state::armchmp2_leds_w));                      // Leds + Coin Counters + Buttons + Sensors
 	map(0x10000c, 0x10000d).r(this, FUNC(cischeat_state::armchmp2_analog_r)).nopw();                         // A / D
 	map(0x100010, 0x100011).rw(this, FUNC(cischeat_state::armchmp2_motor_status_r), FUNC(cischeat_state::armchmp2_motor_command_w));        // Motor Limit Switches?
-	map(0x100015, 0x100015).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));           // Sound
-	map(0x100019, 0x100019).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));           //
+	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));           // Sound
+	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));           //
 }
 
 
@@ -707,8 +709,8 @@ WRITE16_MEMBER(cischeat_state::captflag_oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki_bank[0]->set_entry(((data >> 0) + 1) & 0x7);
-		m_oki_bank[1]->set_entry(((data >> 4) + 1) & 0x7);
+		m_oki1_bank->set_entry(((data >> 0) + 1) & 0x7);
+		m_oki2_bank->set_entry(((data >> 4) + 1) & 0x7);
 	}
 }
 
@@ -817,8 +819,8 @@ void cischeat_state::captflag_map(address_map &map)
 	map(0x0f0000, 0x0fffff).ram().share("ram");                                                 // Work RAM + Spriteram
 	map(0x100000, 0x100001).portr("SW1_2").w(this, FUNC(cischeat_state::captflag_oki_bank_w));                    // 2 x DSW + Sound
 	map(0x100008, 0x100009).portr("Buttons").w(this, FUNC(cischeat_state::captflag_leds_w));                      // Buttons + Leds
-	map(0x100015, 0x100015).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));         // Sound
-	map(0x100019, 0x100019).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));         //
+	map(0x100015, 0x100015).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));         // Sound
+	map(0x100019, 0x100019).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));         //
 	map(0x10001c, 0x10001d).w(this, FUNC(cischeat_state::scudhamm_enable_w));                                            // ?
 	map(0x100040, 0x100041).portr("SW01");                                                   // DSW + Motor
 	map(0x100044, 0x100045).w(this, FUNC(cischeat_state::captflag_motor_command_left_w));                                // Motor Command (Left)
@@ -932,20 +934,23 @@ void cischeat_state::f1gpstar_map3(address_map &map)
                                 Big Run
 **************************************************************************/
 
-WRITE8_MEMBER(cischeat_state::bigrun_soundbank_w)
+WRITE16_MEMBER(cischeat_state::bigrun_soundbank_w)
 {
-	m_oki[0]->set_rom_bank((data >> 0) & 1);
-	m_oki[1]->set_rom_bank((data >> 4) & 1);
+	if (ACCESSING_BITS_0_7)
+	{
+		m_oki1->set_rom_bank((data >> 0) & 1);
+		m_oki2->set_rom_bank((data >> 4) & 1);
+	}
 }
 
 void cischeat_state::bigrun_sound_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040001, 0x040001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(this, FUNC(cischeat_state::bigrun_soundbank_w));    // From Main CPU
+	map(0x040000, 0x040001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(this, FUNC(cischeat_state::bigrun_soundbank_w));    // From Main CPU
 	map(0x060000, 0x060001).w(m_soundlatch2, FUNC(generic_latch_16_device::write));                           // To Main CPU
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0x0a0000, 0x0a0003).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x0c0000, 0x0c0003).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0a0000, 0x0a0003).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0c0000, 0x0c0003).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0f0000, 0x0fffff).ram();                                                 // RAM
 }
 
@@ -954,22 +959,26 @@ void cischeat_state::bigrun_sound_map(address_map &map)
                                 Cisco Heat
 **************************************************************************/
 
-template<int Chip>
-WRITE8_MEMBER(cischeat_state::cischeat_soundbank_w)
+WRITE16_MEMBER(cischeat_state::cischeat_soundbank_1_w)
 {
-	m_oki[Chip]->set_rom_bank(data & 1);
+	if (ACCESSING_BITS_0_7) m_oki1->set_rom_bank(data & 1);
+}
+
+WRITE16_MEMBER(cischeat_state::cischeat_soundbank_2_w)
+{
+	if (ACCESSING_BITS_0_7) m_oki2->set_rom_bank(data & 1);
 }
 
 void cischeat_state::cischeat_sound_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040003, 0x040003).w(this, FUNC(cischeat_state::cischeat_soundbank_w<0>));               // Sample Banking
-	map(0x040005, 0x040005).w(this, FUNC(cischeat_state::cischeat_soundbank_w<1>));               // Sample Banking
+	map(0x040002, 0x040003).w(this, FUNC(cischeat_state::cischeat_soundbank_1_w));               // Sample Banking
+	map(0x040004, 0x040005).w(this, FUNC(cischeat_state::cischeat_soundbank_2_w));               // Sample Banking
 	map(0x060002, 0x060003).w(m_soundlatch2, FUNC(generic_latch_16_device::write));                          // To Main CPU
 	map(0x060004, 0x060005).r(m_soundlatch, FUNC(generic_latch_16_device::read));                             // From Main CPU
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0x0a0000, 0x0a0003).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x0c0000, 0x0c0003).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0a0000, 0x0a0003).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0c0000, 0x0c0003).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0f0000, 0x0fffff).ram();                                                 // RAM
 }
 
@@ -981,12 +990,12 @@ void cischeat_state::cischeat_sound_map(address_map &map)
 void cischeat_state::f1gpstar_sound_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040005, 0x040005).w(this, FUNC(cischeat_state::cischeat_soundbank_w<0>));               // Sample Banking   (cischeat: 40002)
-	map(0x040009, 0x040009).w(this, FUNC(cischeat_state::cischeat_soundbank_w<1>));               // Sample Banking   (cischeat: 40004)
+	map(0x040004, 0x040005).w(this, FUNC(cischeat_state::cischeat_soundbank_1_w));               // Sample Banking   (cischeat: 40002)
+	map(0x040008, 0x040009).w(this, FUNC(cischeat_state::cischeat_soundbank_2_w));               // Sample Banking   (cischeat: 40004)
 	map(0x060000, 0x060001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(m_soundlatch2, FUNC(generic_latch_16_device::write));   // From Main CPU    (cischeat: 60004)
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0x0a0000, 0x0a0003).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x0c0000, 0x0c0003).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0a0000, 0x0a0003).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0c0000, 0x0c0003).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0fffff).ram();                                                 // RAM              (cischeat: f0000-fffff)
 }
 
@@ -998,14 +1007,14 @@ void cischeat_state::f1gpstar_sound_map(address_map &map)
 void cischeat_state::f1gpstr2_sound_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom(); // ROM
-	map(0x040005, 0x040005).w(this, FUNC(cischeat_state::cischeat_soundbank_w<0>));                   // Sample Banking
-	map(0x040009, 0x040009).w(this, FUNC(cischeat_state::cischeat_soundbank_w<1>));                   // Sample Banking
+	map(0x040004, 0x040005).w(this, FUNC(cischeat_state::cischeat_soundbank_1_w));                   // Sample Banking
+	map(0x040008, 0x040009).w(this, FUNC(cischeat_state::cischeat_soundbank_2_w));                   // Sample Banking
 	map(0x04000e, 0x04000f).nopw();                                            // ? 0              (f1gpstar: no)
 	map(0x060002, 0x060003).w(m_soundlatch2, FUNC(generic_latch_16_device::write));                          // To Main CPU
 	map(0x060004, 0x060005).r(m_soundlatch, FUNC(generic_latch_16_device::read));                             // From Main CPU
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0x0a0000, 0x0a0003).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x0c0000, 0x0c0003).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0a0000, 0x0a0003).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x0c0000, 0x0c0003).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0fffff).ram();                                                     // RAM
 }
 
@@ -3606,8 +3615,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cischeat_state, captflag)
 {
-	m_oki_bank[0]->configure_entries(0, 0x100000 / 0x20000, memregion("oki1")->base(), 0x20000);
-	m_oki_bank[1]->configure_entries(0, 0x100000 / 0x20000, memregion("oki2")->base(), 0x20000);
+	m_oki1_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki1")->base(), 0x20000);
+	m_oki2_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki2")->base(), 0x20000);
 }
 
 
