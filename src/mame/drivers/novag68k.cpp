@@ -11,7 +11,6 @@
     such as Arena(in editmode).
 
     TODO:
-	- improve scorpio68 internal artwork (sidepanel buttons look different)
     - RS232 port
 
 ******************************************************************************
