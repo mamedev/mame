@@ -252,20 +252,52 @@ uint32_t popnrun_state::popnrun_screen_update(screen_device &screen, bitmap_ind1
 	// TODO: different scroll RAM hookup
 	// 0x18 seems to enable the various layers
 	/* Setup the tilemaps */
-	m_pf3_layer->set_scrolly(0, ((m_scroll_ram[0x01]&0xf0)<<4)+((m_scroll_ram[0x02]&0x7f)<<1)+((m_scroll_ram[0x02]&0x80)>>7) );
-	m_pf3_layer->set_scrollx(0, ((m_scroll_ram[0x09]&0xf0)<<4)+((m_scroll_ram[0x0a]&0x7f)<<1)+((m_scroll_ram[0x0a]&0x80)>>7) );
-	m_pf1_layer->set_scrolly(0, ((m_scroll_ram[0x11]&0x10)<<4)+((m_scroll_ram[0x12]&0x7f)<<1)+((m_scroll_ram[0x12]&0x80)>>7) );
-	m_pf1_layer->set_scrollx(0, ((m_scroll_ram[0x19]&0x10)<<4)+((m_scroll_ram[0x1a]&0x7f)<<1)+((m_scroll_ram[0x1a]&0x80)>>7) );
-	m_pf2_layer->set_scrolly(0, ((m_scroll_ram[0x21]&0xf0)<<4)+((m_scroll_ram[0x22]&0x7f)<<1)+((m_scroll_ram[0x22]&0x80)>>7) );
-	m_pf2_layer->set_scrollx(0, ((m_scroll_ram[0x29]&0xf0)<<4)+((m_scroll_ram[0x2a]&0x7f)<<1)+((m_scroll_ram[0x2a]&0x80)>>7) );
+//	m_pf3_layer->set_scrolly(0, ((m_scroll_ram[0x01]&0xf0)<<4)+((m_scroll_ram[0x02]&0x7f)<<1)+((m_scroll_ram[0x02]&0x80)>>7) );
+//	m_pf3_layer->set_scrollx(0, ((m_scroll_ram[0x09]&0xf0)<<4)+((m_scroll_ram[0x0a]&0x7f)<<1)+((m_scroll_ram[0x0a]&0x80)>>7) );
+//	m_pf1_layer->set_scrolly(0, ((m_scroll_ram[0x11]&0x10)<<4)+((m_scroll_ram[0x12]&0x7f)<<1)+((m_scroll_ram[0x12]&0x80)>>7) );
+//	m_pf1_layer->set_scrollx(0, ((m_scroll_ram[0x19]&0x10)<<4)+((m_scroll_ram[0x1a]&0x7f)<<1)+((m_scroll_ram[0x1a]&0x80)>>7) );
+//	m_pf2_layer->set_scrolly(0, ((m_scroll_ram[0x21]&0xf0)<<4)+((m_scroll_ram[0x22]&0x7f)<<1)+((m_scroll_ram[0x22]&0x80)>>7) );
+//	m_pf2_layer->set_scrollx(0, ((m_scroll_ram[0x29]&0xf0)<<4)+((m_scroll_ram[0x2a]&0x7f)<<1)+((m_scroll_ram[0x2a]&0x80)>>7) );
 
 	m_pf3_layer->enable(!(m_scroll_ram[0x34]&1));
 	m_pf1_layer->enable(!(m_scroll_ram[0x34]&2));
 	m_pf2_layer->enable(!(m_scroll_ram[0x34]&4));
-	flip_screen_set(m_scroll_ram[0x34]&0x40 );
+//	flip_screen_set(m_scroll_ram[0x34]&0x40 );
 
 	bitmap.fill(1, cliprect);
 	screen.priority().fill(0, cliprect);
+	// 32 pixels?
+//	int scrollx = (m_scroll_ram[0x4/2] & 0x0f);
+	
+	// debug tilemap code
+	// this is likely to be collision data
+	for(int x=0;x<16;x++)
+	{
+		for(int y=0;y<8;y++)
+		{
+			int tile = m_video_data[y+x*8+0xc0] & 0xff;
+			int res_x, res_y;
+			
+			if(tile != 0)
+			{
+				res_x = (x*16) & 0xff;
+				res_y = y*32;
+				//if(cliprect.contains(res_x,res_y))
+				bitmap.plot_box(res_x,res_y,16,16,tile+0x10);
+			}
+
+			tile = m_video_data[y+x*8+0xc0] >> 8;
+			
+			if(tile != 0)
+			{
+				res_x = (x*16) & 0xff;
+				res_y = y*32+16;
+				//if(cliprect.contains(res_x,res_y))
+				bitmap.plot_box(res_x,res_y,16,16,tile+0x10);
+			}
+		}
+	}
+	
 	//m_pf3_layer->draw(screen, bitmap, cliprect, 0,1);
 	//m_pf1_layer->draw(screen, bitmap, cliprect, 0,2);
 	//m_pf2_layer->draw(screen, bitmap, cliprect, 0,4);
