@@ -614,8 +614,7 @@ void namcos21_state::transmit_word_to_slave(uint16_t data)
 	m_mpDspState->slaveActive = 1;
 	if( m_mpDspState->slaveBytesAvailable >= DSP_BUF_MAX )
 	{
-		logerror( "IDC overflow\n" );
-		exit(1);
+		fatalerror( "IDC overflow\n" );
 	}
 }
 
@@ -1061,8 +1060,7 @@ void namcos21_state::render_slave_output(uint16_t data)
 		}
 		else if( count==0 )
 		{
-			if (ENABLE_LOGGING) logerror( "RenderSlaveOutput\n" );
-			exit(1);
+			fatalerror( "RenderSlaveOutput\n" );
 		}
 	}
 }
@@ -1971,7 +1969,7 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_YM2151_ADD("ymsnd", 3579580)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -2032,7 +2030,7 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_YM2151_ADD("ymsnd", 3579580)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -2095,7 +2093,7 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_YM2151_ADD("ymsnd", 3579580)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END

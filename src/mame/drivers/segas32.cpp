@@ -2242,7 +2242,7 @@ MACHINE_CONFIG_START(segas32_state::device_add_mconfig)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_RF5C68_ADD("rfsnd", RFC_CLOCK/4)
+	MCFG_DEVICE_ADD("rfsnd", RF5C68, RFC_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
 

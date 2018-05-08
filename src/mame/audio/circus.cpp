@@ -47,7 +47,7 @@ const char *const robotbwl_sample_names[] =
 /* Nodes - Sounds */
 #define CIRCUS_MUSIC_SND    NODE_10
 
-DISCRETE_SOUND_START(circus)
+DISCRETE_SOUND_START(circus_discrete)
 	/************************************************/
 	/* Input register mapping for circus            */
 	/************************************************/
@@ -94,7 +94,7 @@ static const discrete_555_desc crash_beeper_555a =
 #define CRASH_MUSIC_SND     NODE_20
 #define CRASH_BEEPER_SND    NODE_21
 
-DISCRETE_SOUND_START(crash)
+DISCRETE_SOUND_START(crash_discrete)
 	/************************************************/
 	/* Input register mapping for crash             */
 	/************************************************/
@@ -129,7 +129,7 @@ DISCRETE_SOUND_END
 /* Nodes - Sounds */
 #define ROBOTBWL_MUSIC_SND      NODE_10
 
-DISCRETE_SOUND_START(robotbwl)
+DISCRETE_SOUND_START(robotbwl_discrete)
 	/************************************************/
 	/* Input register mapping for robotbwl          */
 	/************************************************/

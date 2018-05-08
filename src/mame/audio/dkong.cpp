@@ -342,7 +342,7 @@ DISCRETE_RESET( dkong_custom_mixer )
 
 #endif
 
-static DISCRETE_SOUND_START(dkong2b)
+static DISCRETE_SOUND_START(dkong2b_discrete)
 
 	/************************************************/
 	/* Input register mapping for dkong             */
@@ -620,7 +620,7 @@ static const discrete_dss_inverter_osc_node::description radarscp_inverter_osc_d
 	discrete_dss_inverter_osc_node::IS_TYPE3
 	};
 
-static DISCRETE_SOUND_START(radarscp)
+static DISCRETE_SOUND_START(radarscp_discrete)
 
 	/************************************************/
 	/* Input register mapping for radarscp          */
@@ -853,7 +853,7 @@ static const discrete_lfsr_desc dkongjr_lfsr =
 
 #define DS_SOUND9_EN    DS_SOUND9_INV
 
-static DISCRETE_SOUND_START(dkongjr)
+static DISCRETE_SOUND_START(dkongjr_discrete)
 
 	/************************************************/
 	/* Input register mapping for dkongjr           */
@@ -1353,14 +1353,14 @@ MACHINE_CONFIG_START(dkong_state::dkong2b_audio)
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE("ls259.6h", latch8_device, bit4_q_r))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DISCRETE_ADD("discrete", 0, dkong2b)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, dkong2b_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dkong_state::radarscp_audio)
 	dkong2b_audio(config);
 
-	MCFG_DISCRETE_REPLACE("discrete", 0, radarscp)
+	MCFG_DEVICE_REPLACE("discrete", DISCRETE, radarscp_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
 MACHINE_CONFIG_END
 
@@ -1427,7 +1427,7 @@ MACHINE_CONFIG_START(dkong_state::dkongjr_audio)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_DISCRETE_ADD("discrete", 0, dkongjr)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, dkongjr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

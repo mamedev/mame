@@ -336,8 +336,7 @@ MACHINE_CONFIG_START(hitme_state::hitme)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(hitme)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, hitme_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

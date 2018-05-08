@@ -36,14 +36,18 @@ void univ_slot_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("Card device %s (%s) does not implement device_univ_card_interface\n", card->tag(), card->name());
 }
 
-void univ_slot_device::device_start()
+void univ_slot_device::device_resolve_objects()
 {
-	device_t *const card_device(get_card_device());
-	device_univ_card_interface *const univ_card(dynamic_cast<device_univ_card_interface *>(card_device));
-	if (card_device && !univ_card)
-		throw emu_fatalerror("univ_slot_device: card device %s (%s) does not implement device_univ_card_interface\n", card_device->tag(), card_device->name());
+	device_univ_card_interface *const univ_card(dynamic_cast<device_univ_card_interface *>(get_card_device()));
 	if (univ_card)
 		univ_card->set_bus(*m_bus);
+}
+
+void univ_slot_device::device_start()
+{
+	device_t *const card(get_card_device());
+	if (card && !dynamic_cast<device_univ_card_interface *>(card))
+		throw emu_fatalerror("univ_slot_device: card device %s (%s) does not implement device_univ_card_interface\n", card->tag(), card->name());
 }
 
 

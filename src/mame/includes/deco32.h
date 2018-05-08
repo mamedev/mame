@@ -54,7 +54,7 @@ public:
 	required_device_array<deco16ic_device, 2> m_deco_tilegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	optional_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 	// we use the pointers below to store a 32-bit copy..

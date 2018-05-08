@@ -413,8 +413,7 @@ MACHINE_CONFIG_START(sprint4_state::sprint4)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_3>))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_4>))
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(sprint4)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, sprint4_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

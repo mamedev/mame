@@ -148,7 +148,7 @@
 
 #define LS629_FREQ_R_IN     RES_K(90)
 
-static DISCRETE_SOUND_START(mario)
+static DISCRETE_SOUND_START(mario_discrete)
 
 	/************************************************
 	 * Input register mapping for mario

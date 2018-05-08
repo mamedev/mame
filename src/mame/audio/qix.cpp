@@ -59,7 +59,7 @@ static const discrete_comp_adder_table qix_attn_table =
 	{RES_K(22)+250, RES_K(10)+250, RES_K(5.6)+250, RES_K(3.3)+250}
 };
 
-static DISCRETE_SOUND_START(qix)
+static DISCRETE_SOUND_START(qix_discrete)
 	/*                    NODE                      */
 	DISCRETE_INPUTX_DATA(QIX_DAC_DATA, 128, -128*128, 128)
 	DISCRETE_INPUT_DATA (QIX_VOL_DATA)
@@ -198,8 +198,7 @@ MACHINE_CONFIG_START(qix_state::qix_audio)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(qix)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, qix_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

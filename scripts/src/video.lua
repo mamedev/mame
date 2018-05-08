@@ -1057,3 +1057,15 @@ if (VIDEOS["DP8510"]~=null) then
 		MAME_DIR .. "src/devices/video/dp8510.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/bt45x.h,VIDEOS["BT45X"] = true
+--------------------------------------------------
+
+if (VIDEOS["BT45X"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/bt45x.cpp",
+		MAME_DIR .. "src/devices/video/bt45x.h",
+	}
+end

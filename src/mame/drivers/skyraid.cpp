@@ -249,8 +249,7 @@ MACHINE_CONFIG_START(skyraid_state::skyraid)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(skyraid)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, skyraid_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

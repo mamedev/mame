@@ -511,7 +511,7 @@ MACHINE_CONFIG_START(lastduel_state::lastduel)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastduel)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -556,7 +556,7 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", madgear)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -575,7 +575,7 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(10'000'000)/10, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(10'000'000)/10, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.98)
 MACHINE_CONFIG_END
 

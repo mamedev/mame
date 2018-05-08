@@ -57,6 +57,6 @@ private:
 
 DECLARE_DEVICE_TYPE(PHOENIX_SOUND, phoenix_sound_device)
 
-DISCRETE_SOUND_EXTERN(phoenix);
+DISCRETE_SOUND_EXTERN(phoenix_discrete);
 
 #endif // MAME_AUDIO_PHOENIX_H

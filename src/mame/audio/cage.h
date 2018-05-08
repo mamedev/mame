@@ -26,8 +26,8 @@ class atari_cage_device : public device_t
 public:
 	enum
 	{
-		CAGE_IRQ_REASON_DATA_READY = 0x01;
-		CAGE_IRQ_REASON_BUFFER_EMPTY = 0x02;
+		CAGE_IRQ_REASON_DATA_READY = 0x01,
+		CAGE_IRQ_REASON_BUFFER_EMPTY = 0x02
 	};
 	// construction/destruction
 	atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
