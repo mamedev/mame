@@ -95,7 +95,7 @@ VIDEO_START_MEMBER(atarigt_state,atarigt)
 	save_item(NAME(m_playfield_xscroll));
 	save_item(NAME(m_playfield_yscroll));
 	save_item(NAME(m_tram_checksum));
-	save_pointer(NAME(m_expanded_mram), MRAM_ENTRIES * 3);
+	save_pointer(NAME(m_expanded_mram.get()), MRAM_ENTRIES * 3);
 }
 
 
