@@ -132,7 +132,7 @@ protected:
 	void lower_slot_nmi() { m_a1bus->set_nmi_line(CLEAR_LINE); }
 
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
-	void install_bank(offs_t start, offs_t end, char *tag, uint8_t *data);
+	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
 
 	device_a1bus_card_interface(const machine_config &mconfig, device_t &device);
 

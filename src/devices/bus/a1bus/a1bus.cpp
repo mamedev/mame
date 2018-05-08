@@ -205,7 +205,7 @@ void device_a1bus_card_interface::install_device(offs_t start, offs_t end, read8
 	m_a1bus->install_device(start, end, rhandler, whandler);
 }
 
-void device_a1bus_card_interface::install_bank(offs_t start, offs_t end, char *tag, uint8_t *data)
+void device_a1bus_card_interface::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
 {
 	m_a1bus->install_bank(start, end, tag, data);
 }
