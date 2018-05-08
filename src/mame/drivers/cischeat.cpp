@@ -668,7 +668,7 @@ void cischeat_state::armchmp2_map(address_map &map)
 	map(0x0b0000, 0x0b7fff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");     // Scroll ram 2
 	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");              // Palette
 	map(0x0f0000, 0x0fffff).ram().share("ram");                                         // Work RAM + Spriteram
-	map(0x100000, 0x100001).portr("IN2")                      // DSW
+	map(0x100000, 0x100001).portr("IN2");                      // DSW
 	map(0x100001, 0x100001).w(this, FUNC(cischeat_state::scudhamm_oki_bank_w));                      // Sound
 	map(0x100004, 0x100005).portr("IN3");                                                    // DSW
 	map(0x100008, 0x100009).rw(this, FUNC(cischeat_state::armchmp2_buttons_r), FUNC(cischeat_state::armchmp2_leds_w));                      // Leds + Coin Counters + Buttons + Sensors
