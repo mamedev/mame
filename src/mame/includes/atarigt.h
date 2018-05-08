@@ -50,7 +50,7 @@ public:
 
 	uint32_t          m_tram_checksum;
 
-	std::unique_ptr<uint32_t[]> m_expanded_mram[MRAM_ENTRIES * 3];
+	std::unique_ptr<uint32_t[]> m_expanded_mram;
 
 	required_shared_ptr<uint32_t> m_mo_command;
 	optional_device<atari_cage_device> m_cage;
