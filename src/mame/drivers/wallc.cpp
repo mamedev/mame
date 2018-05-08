@@ -653,13 +653,13 @@ DRIVER_INIT_MEMBER(wallc_state, sidam)
 		uint8_t x = ROM[i];
 		switch(i & 0x4a) // preliminary, every case needs to be verified. Plaintext available in the 0x1150-0x1550 range. First 0x50 of code are very similar if not identical to unkitpkt.
 		{
-			case 0x00: x = bitswap<8>(x ^ 0x03, 7, 3, 5, 2, 6, 4, 1, 0); break;
+			case 0x00: x = bitswap<8>(x ^ (BIT(x, 6) ? 0xaf : 0x03), 7, 3, 5, 2, 6, 4, 1, 0); break;
 			case 0x02: x = bitswap<8>(x ^ 0x77, 4, 6, 2, 5, 3, 7, 1, 0); break;
 			case 0x08: x = bitswap<8>(x ^ 0x5f, 2, 4, 6, 3, 7, 5, 1, 0); break;
 			case 0x0a: x = bitswap<8>(x ^ 0xd7, 6, 2, 4, 7, 5, 3, 1, 0); break;
-			case 0x40: x = bitswap<8>(x ^ 0x03, 7, 3, 5, 2, 6, 4, 1, 0); break;
+			case 0x40: x = bitswap<8>(x ^ (BIT(x, 6) ? 0xaf : 0x03), 7, 3, 5, 2, 6, 4, 1, 0); break;
 			case 0x42: x = bitswap<8>(x ^ 0xeb, 5, 7, 3, 6, 4, 2, 1, 0); break;
-			case 0x48: x = bitswap<8>(x ^ 0x03, 3, 5, 6, 4, 2, 7, 1, 0); break;
+			case 0x48: x = bitswap<8>(x ^ (BIT(x, 6) ? 0xbb : 0x03), 3, 5, 7, 4, 2, 6, 1, 0); break;
 			case 0x4a: x = bitswap<8>(x ^ 0xd7, 6, 2, 4, 7, 5, 3, 1, 0); break;
 		}
 
