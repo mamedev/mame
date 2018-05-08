@@ -10,9 +10,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_ICS2115_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, ICS2115, _clock)
-
 #define MCFG_ICS2115_IRQ_CB(_devcb) \
 	devcb = &downcast<ics2115_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
@@ -22,9 +19,11 @@
 
 // ======================> ics2115_device
 
-class ics2115_device : public device_t, public device_sound_interface
+class ics2115_device : public device_t, public device_sound_interface, public device_rom_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 	// construction/destruction
 	ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -32,6 +31,8 @@ public:
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ16_MEMBER(read16);
+	DECLARE_WRITE16_MEMBER(write16);
 	//uint8_t read(offs_t offset);
 	//void write(offs_t offset, uint8_t data);
 	TIMER_CALLBACK_MEMBER(timer_cb_0);
@@ -107,6 +108,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
+	virtual void device_clock_changed() override;
 
 	// internal callbacks
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -117,6 +120,7 @@ protected:
 	void recalc_timer(int timer);
 	void keyon();
 	void recalc_irq();
+	void recalc_rate();
 
 	//stream helper functions
 	int fill_output(ics2115_voice& voice, stream_sample_t *outputs[2], int samples);
@@ -125,9 +129,9 @@ protected:
 	sound_stream *m_stream;
 
 	// internal state
-	required_region_ptr<uint8_t> m_rom;
 	devcb_write_line m_irq_cb;
 
+	uint32_t m_sample_rate;
 	int16_t m_ulaw[256];
 	uint16_t m_volume[4096];
 	static const int volume_bits = 15;
