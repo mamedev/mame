@@ -214,6 +214,18 @@ WRITE_LINE_MEMBER( generic_latch_16_device::clear_w )
 	m_latched_value = 0x0000;
 }
 
+READ16_MEMBER( generic_latch_16_device::acknowledge_r )
+{
+	if (!machine().side_effects_disabled())
+		set_latch_written(false);
+	return space.unmap();
+}
+
+WRITE16_MEMBER( generic_latch_16_device::acknowledge_w )
+{
+	set_latch_written(false);
+}
+
 //-------------------------------------------------
 //  soundlatch_sync_callback - time-delayed
 //  callback to set a latch value

@@ -121,6 +121,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( preset_w );
 	DECLARE_WRITE_LINE_MEMBER( clear_w );
 
+	DECLARE_READ8_MEMBER( acknowledge_r );
+	DECLARE_WRITE8_MEMBER( acknowledge_w );
+
 	void preset_w(u16 value) { m_latched_value = value; }
 
 protected:

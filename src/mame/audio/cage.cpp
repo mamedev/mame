@@ -127,7 +127,6 @@ atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type 
 	m_soundlatch(*this, "soundlatch%u", 1U),
 	m_dma_timer(*this, "cage_dma_timer"),
 	m_timer(*this, "cage_timer%u", 0U),
-	m_dmadac(*this, "dac%u", 1U),
 	m_bootbank(*this, "bootbank"),
 	m_mainbank(*this, "mainbank"),
 	m_bootrom(*this, "boot"),
@@ -143,7 +142,6 @@ atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type 
 void atari_cage_device::device_start()
 {
 	attotime cage_cpu_clock_period;
-	int chan;
 
 	// resolve callbacks
 	m_irqhandler.resolve_safe();
@@ -157,6 +155,13 @@ void atari_cage_device::device_start()
 	if (m_speedup) {
 		m_cpu->space(AS_PROGRAM).install_write_handler(m_speedup, m_speedup, write32_delegate(FUNC(atari_cage_device::speedup_w),this));
 		m_speedup_ram = m_cageram + m_speedup;
+	}
+
+	for (int chan = 0; chan < DAC_BUFFER_CHANNELS; chan++)
+	{
+		char buffer[10];
+		sprintf(buffer, "dac%d", chan + 1);
+		m_dmadac[chan] = subdevice<dmadac_sound_device>(buffer);
 	}
 
 	save_item(NAME(m_serial_period_per_word));
@@ -499,7 +504,7 @@ uint16_t atari_cage_device::main_r()
 
 TIMER_CALLBACK_MEMBER( atari_cage_device::cage_deferred_w )
 {
-	m_soundlatch[1]->write(space, 0, param);
+	m_soundlatch[1]->write(machine().dummy_space(), 0, param);
 	update_control_lines();
 }
 
