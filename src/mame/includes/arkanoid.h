@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver,Stephane Humbert
+#ifndef MAME_INCLUDES_ARKANOID_H
+#define MAME_INCLUDES_ARKANOID_H
+
+#pragma once
+
 #include "machine/taito68705interface.h"
 
 /* This it the best way to allow game specific kludges until the system is fully understood */
@@ -112,3 +117,5 @@ public:
 	void hexaa_sub_iomap(address_map &map);
 	void hexaa_sub_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_ARKANOID_H

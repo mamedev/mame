@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(itgamble_state::mnumber)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(MNUMBER_MAIN_CLOCK/2)    /* probably the wrong CPU */
 
-	MCFG_OKIM6295_REPLACE("oki", MNUMBER_SND_CLOCK/16, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, MNUMBER_SND_CLOCK/16, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -254,7 +254,7 @@ static MACHINE_CONFIG_START( ejollyx5 )
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(EJOLLYX5_MAIN_CLOCK/2)   /* up to 10MHz.*/
 
-	MCFG_OKIM6295_REPLACE("oki", MNUMBER_SND_CLOCK/16, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, MNUMBER_SND_CLOCK/16, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 #endif

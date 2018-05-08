@@ -69,6 +69,6 @@ private:
 
 
 /*----------- defined in audio/poolshrk.c -----------*/
-DISCRETE_SOUND_EXTERN( poolshrk );
+DISCRETE_SOUND_EXTERN( poolshrk_discrete );
 
 #endif // MAME_INCLUDES_POOLSHRK_H

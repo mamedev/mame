@@ -616,7 +616,7 @@ static const discrete_555_desc turbo_alarm_555 =
 	DEFAULT_555_VALUES,
 };
 
-DISCRETE_SOUND_START(turbo)
+DISCRETE_SOUND_START(turbo_discrete)
 	/************************************************/
 	/* Input register mapping for turbo             */
 	/************************************************/

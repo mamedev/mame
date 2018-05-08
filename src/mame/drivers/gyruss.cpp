@@ -386,7 +386,7 @@ static const discrete_mixer_desc konami_left_mixer_desc =
 	CAP_U(1),       /* DC - Removal, not in schematics */
 	0, 1};
 
-static DISCRETE_SOUND_START( gyruss_sound )
+static DISCRETE_SOUND_START( gyruss_sound_discrete )
 
 	/* Chip 1 right */
 	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
@@ -557,8 +557,7 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 13)
 	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 14)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(gyruss_sound)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, gyruss_sound_discrete)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
 MACHINE_CONFIG_END

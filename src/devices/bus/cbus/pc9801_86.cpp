@@ -273,8 +273,9 @@ WRITE8_MEMBER(pc9801_86_device::pcm_w)
 					m_head = m_tail = m_count = 0;
 				if(!(data & 0x10))
 				{
-					m_pcmirq = false;
 					machine().device<pic8259_device>(":pic8259_slave")->ir4_w(m_fmirq ? ASSERT_LINE : CLEAR_LINE);
+					if(!(queue_count() < m_irq_rate))
+						m_pcmirq = false;
 				}
 				m_init = true;
 				m_pcm_ctrl = data & ~0x10;

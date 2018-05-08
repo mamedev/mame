@@ -591,7 +591,7 @@ MACHINE_CONFIG_START(bloodbro_state::weststry)
 
 	// Bootleg sound hardware is close copy of Seibu, but uses different interrupts
 
-	MCFG_OKIM6295_REPLACE("oki", XTAL(20'000'000)/16, PIN7_HIGH) /* 1.25MHz - verified on PCB */
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, XTAL(20'000'000)/16, okim6295_device::PIN7_HIGH) /* 1.25MHz - verified on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_REPLACE("ymsnd", YM3812, XTAL(20'000'000)/4) /* ~4.9MHz - see notes at top */

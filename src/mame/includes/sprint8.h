@@ -81,6 +81,6 @@ private:
 };
 
 /*----------- defined in audio/sprint8.c -----------*/
-DISCRETE_SOUND_EXTERN( sprint8 );
+DISCRETE_SOUND_EXTERN( sprint8_discrete );
 
 #endif // MAME_INCLUDES_SPRINT8_H

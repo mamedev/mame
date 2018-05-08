@@ -279,6 +279,7 @@ SOUNDS["UPD934G"] = true
 VIDEOS["SEGA315_5124"] = true
 VIDEOS["SEGA315_5313"] = true
 --VIDEOS+= BUFSPRITE"] = true
+VIDEOS["BT45X"] = true
 VIDEOS["BT459"] = true
 VIDEOS["CDP1861"] = true
 VIDEOS["CDP1862"] = true
