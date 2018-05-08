@@ -3,8 +3,9 @@
 #include "hlekbd.h"
 
 #include "machine/keyboard.ipp"
+//#define VERBOSE 1
+#include "logmacro.h"
 
-#define LOG 0
 /***************************************************************************
     DEVICE TYPE GLOBALS
 ***************************************************************************/
@@ -284,10 +285,8 @@ bool hle_device_base::hil_write(uint16_t *pdata)
 	uint8_t data = *pdata & 0xff;
 	bool command = BIT(*pdata, 11);
 
-	if (LOG) {
-		logerror("rx from mlc %04X (%s addr %d, data %02X)\n", *pdata, \
-		 command ? "command" : "data", addr, data);
-	}
+	LOG("rx from mlc %04X (%s addr %d, data %02X)\n", *pdata,
+		command ? "command" : "data", addr, data);
 	if (!command)
 		goto out;
 
@@ -344,8 +343,7 @@ bool hle_device_base::hil_write(uint16_t *pdata)
 		break;
 
 	case HPHIL_IDD:
-		logerror("IDD\n");
-		m_hp_hil_mlc->hil_write(0x01cf);
+		m_hp_hil_mlc->hil_write(0x0100 | ioport("COL0")->read());
 		m_hp_hil_mlc->hil_write(m_device_id16 | 0);
 		break;
 
@@ -357,7 +355,7 @@ bool hle_device_base::hil_write(uint16_t *pdata)
 		break;
 
 	default:
-		logerror("command %02X unknown\n", data);
+		LOG("command %02X unknown\n", data);
 		break;
 	}
 out:
