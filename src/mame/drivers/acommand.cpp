@@ -72,16 +72,15 @@ class acommand_state : public driver_device
 {
 public:
 	acommand_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu"),
-		m_oki1(*this, "oki1"),
-		m_oki2(*this, "oki2"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_bgtmap(*this, "bgtmap"),
-		m_txtmap(*this, "txtmap"),
-		m_digits(*this, "digit%u", 0U)
+		: driver_device(mconfig, type, tag)
+		, m_spriteram(*this, "spriteram")
+		, m_maincpu(*this, "maincpu")
+		, m_oki(*this, "oki%u", 1U)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_bgtmap(*this, "bgtmap")
+		, m_txtmap(*this, "txtmap")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
@@ -109,8 +108,7 @@ protected:
 private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<cpu_device> m_maincpu;
-	required_device<okim6295_device> m_oki1;
-	required_device<okim6295_device> m_oki2;
+	required_device_array<okim6295_device, 2> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<megasys1_tilemap_device> m_bgtmap;
@@ -222,8 +220,8 @@ WRITE16_MEMBER(acommand_state::ac_unk2_w)
 
 WRITE8_MEMBER(acommand_state::oki_bank_w)
 {
-	m_oki1->set_rom_bank(data & 0x3);
-	m_oki2->set_rom_bank((data & 0x30) >> 4);
+	m_oki[0]->set_rom_bank(data & 0x3);
+	m_oki[1]->set_rom_bank((data & 0x30) >> 4);
 }
 
 
@@ -341,8 +339,8 @@ void acommand_state::acommand_map(address_map &map)
 
 	map(0x100001, 0x100001).w(this, FUNC(acommand_state::oki_bank_w));
 	map(0x100008, 0x100009).portr("IN0").w(this, FUNC(acommand_state::output_lamps_w));
-	map(0x100014, 0x100017).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x100018, 0x10001b).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x100014, 0x100017).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x100018, 0x10001b).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 
 	map(0x100040, 0x100041).rw(this, FUNC(acommand_state::ext_devices_0_r), FUNC(acommand_state::ext_devices_0_w));
 	map(0x100044, 0x100045).rw(this, FUNC(acommand_state::ext_devices_1_r), FUNC(acommand_state::ext_devices_1_w));
@@ -444,12 +442,10 @@ static const gfx_layout tilelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			16*32+0*4, 16*32+1*4, 16*32+2*4, 16*32+3*4, 16*32+4*4, 16*32+5*4, 16*32+6*4, 16*32+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	32*32
+	{ STEP4(0,1) },
+	{ STEP8(0,4), STEP8(4*8*16,4) },
+	{ STEP16(0,4*8) },
+	16*16*4
 };
 
 static GFXDECODE_START( acommand )

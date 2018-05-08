@@ -196,30 +196,29 @@ actual code sent to the hardware.
 #include "emu.h"
 #include "includes/megasys1.h"
 
-
+#include <algorithm>
 
 VIDEO_START_MEMBER(megasys1_state,megasys1)
 {
 	m_spriteram = &m_ram[0x8000/2];
 
-	m_buffer_objectram = std::make_unique<uint16_t[]>(0x2000);
-	m_buffer_spriteram16 = std::make_unique<uint16_t[]>(0x2000);
-	m_buffer2_objectram = std::make_unique<uint16_t[]>(0x2000);
-	m_buffer2_spriteram16 = std::make_unique<uint16_t[]>(0x2000);
+	m_buffer_objectram[0] = std::make_unique<uint16_t[]>(0x2000/2);
+	m_buffer_spriteram16[0] = std::make_unique<uint16_t[]>(0x2000/2);
+	m_buffer_objectram[1] = std::make_unique<uint16_t[]>(0x2000/2);
+	m_buffer_spriteram16[1] = std::make_unique<uint16_t[]>(0x2000/2);
 
 	m_active_layers = m_sprite_bank = m_screen_flag = m_sprite_flag = 0;
 
 	m_hardware_type_z = 0;
-	if (strcmp(machine().system().name, "lomakai") == 0 ||
-		strcmp(machine().system().name, "makaiden") == 0)
+	if (m_soundlatch_z.found())
 		m_hardware_type_z = 1;
 
 	m_screen->register_screen_bitmap(m_sprite_buffer_bitmap);
 
-	save_pointer(NAME(m_buffer_objectram.get()), 0x2000);
-	save_pointer(NAME(m_buffer_spriteram16.get()), 0x2000);
-	save_pointer(NAME(m_buffer2_objectram.get()), 0x2000);
-	save_pointer(NAME(m_buffer2_spriteram16.get()), 0x2000);
+	save_pointer(NAME(m_buffer_objectram[0].get()), 0x2000/2);
+	save_pointer(NAME(m_buffer_spriteram16[0].get()), 0x2000/2);
+	save_pointer(NAME(m_buffer_objectram[1].get()), 0x2000/2);
+	save_pointer(NAME(m_buffer_spriteram16[1].get()), 0x2000/2);
 	save_item(NAME(m_screen_flag));
 	save_item(NAME(m_active_layers));
 	save_item(NAME(m_sprite_flag));
@@ -264,25 +263,6 @@ WRITE16_MEMBER(megasys1_state::screen_flag_w)
 		else
 			m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
-}
-
-WRITE16_MEMBER(megasys1_state::soundlatch_w)
-{
-	m_soundlatch->write(space, 0, data, mem_mask);
-	m_audiocpu->set_input_line(4, HOLD_LINE);
-}
-
-WRITE16_MEMBER(megasys1_state::soundlatch_z_w)
-{
-	m_soundlatch_z->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(5, HOLD_LINE);
-}
-
-WRITE16_MEMBER(megasys1_state::soundlatch_c_w)
-{
-	// Cybattler reads sound latch on irq 2
-	m_soundlatch->write(space, 0, data, mem_mask);
-	m_audiocpu->set_input_line(2, HOLD_LINE);
 }
 
 WRITE16_MEMBER(megasys1_state::monkelf_scroll0_w)
@@ -391,7 +371,6 @@ inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bi
 
 	color = color * 16;
 
-
 	for (int32_t y = 0; y < 16; y++, sy++, sx-=16)
 	{
 	//  uint16_t *dest = &bitmap.pix16(sy)+ sx;
@@ -419,14 +398,11 @@ inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bi
 			}
 		}
 	}
-
 }
 
 void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int color,code,sx,sy,flipx,flipy,attr,sprite;
-
-
 
 /* objram: 0x100*4 entries      spritedata: 0x80 entries */
 
@@ -448,8 +424,8 @@ void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 		int32_t color_mask = (m_sprite_flag & 0x100) ? 0x07 : 0x0f;
 
-		uint16_t *objectram = (uint16_t*)m_buffer2_objectram.get();
-		uint16_t *spriteram = (uint16_t*)m_buffer2_spriteram16.get();
+		uint16_t *objectram = (uint16_t*)m_buffer_objectram[1].get();
+		uint16_t *spriteram = (uint16_t*)m_buffer_spriteram16[1].get();
 
 		for (int32_t offs = (0x800-8)/2; offs >= 0; offs -= 4)
 		{
@@ -493,13 +469,11 @@ void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 	}   /* non Z hw */
 	else
 	{
-		uint16_t *spriteram16 = m_spriteram;
-
 		/* MS1-Z just draws Sprite Data, and in reverse order */
 
 		for (sprite = 0x80-1;sprite >= 0;sprite--)
 		{
-			uint16_t *spritedata = &spriteram16[ sprite * 0x10/2];
+			uint16_t *spritedata = &m_spriteram[ sprite * 0x10/2];
 
 			attr = spritedata[ 8/2 ];
 
@@ -534,8 +508,6 @@ void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 }
 
 
-
-
 /***************************************************************************
                         Convert the Priority Prom
 ***************************************************************************/
@@ -545,7 +517,6 @@ struct priority
 	const char *driver;
 	int priorities[16];
 };
-
 
 /*
     Layers order encoded as an int like: 0x01234, where
@@ -565,8 +536,6 @@ struct priority
     (the default value, 0x04132, will be used in those cases)
 
 */
-
-
 
 /*
     Convert the 512 bytes in the Priority Prom into 16 ints, encoding
@@ -741,24 +710,17 @@ void megasys1_state::priority_create()
 
 	}   // pri_code
 
-
-
 #if 0
 	/* log the priority schemes */
 	for (i = 0; i < 16; i++)
 		logerror("PROM %X] %05x\n", i, m_layers_order[i]);
 #endif
-
-
 }
 
 PALETTE_INIT_MEMBER(megasys1_state,megasys1)
 {
 	priority_create();
 }
-
-
-
 
 
 /***************************************************************************
@@ -871,11 +833,11 @@ WRITE_LINE_MEMBER(megasys1_state::screen_vblank)
 	{
 		/* Sprite are TWO frames ahead, like NMK16 HW. */
 	//m_objectram
-		memcpy(m_buffer2_objectram.get(),m_buffer_objectram.get(), 0x2000);
-		memcpy(m_buffer_objectram.get(), m_objectram, 0x2000);
+		std::copy_n(&m_buffer_objectram[0][0], 0x2000/2, &m_buffer_objectram[1][0]);
+		std::copy_n(&m_objectram[0], 0x2000/2, &m_buffer_objectram[0][0]);
 	//spriteram16
-		memcpy(m_buffer2_spriteram16.get(), m_buffer_spriteram16.get(), 0x2000);
-		memcpy(m_buffer_spriteram16.get(), m_spriteram, 0x2000);
+		std::copy_n(&m_buffer_spriteram16[0][0], 0x2000/2, &m_buffer_spriteram16[1][0]);
+		std::copy_n(&m_spriteram[0], 0x2000/2, &m_buffer_spriteram16[0][0]);
 	}
 
 }
