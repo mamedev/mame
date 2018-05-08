@@ -145,8 +145,8 @@ a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, devic
 
 a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_maincpu(*this, finder_base::DUMMY_TAG) , m_maincpu_space(nullptr)
-	, m_out_irq_cb(*this) , m_out_nmi_cb(*this) , m_out_inh_cb(*this)
+	, m_maincpu(*this, finder_base::DUMMY_TAG), m_maincpu_space(nullptr)
+	, m_out_irq_cb(*this) , m_out_nmi_cb(*this), m_out_inh_cb(*this)
 	, m_slot_irq_mask(0), m_slot_nmi_mask(0)
 {
 }
@@ -320,6 +320,9 @@ void device_a2bus_card_interface::interface_pre_start()
 
 	if (0 > m_slot)
 	{
+		if (!m_a2bus->started())
+			throw device_missing_dependencies();
+
 		// extract the slot number from the last digit of the slot tag
 		size_t const tlen = strlen(m_a2bus_slottag);
 
