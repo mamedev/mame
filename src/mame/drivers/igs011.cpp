@@ -208,6 +208,8 @@ public:
 	uint16_t igs_dips_r(int NUM);
 	DECLARE_CUSTOM_INPUT_MEMBER(igs_hopper_r);
 	DECLARE_WRITE16_MEMBER(lhb_okibank_w);
+	DECLARE_READ16_MEMBER(ics2115_word_r);
+	DECLARE_WRITE16_MEMBER(ics2115_word_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_DRIVER_INIT(lhbv33c);
 	DECLARE_DRIVER_INIT(drgnwrldv21j);
@@ -2848,6 +2850,37 @@ void igs011_state::nkishusp(address_map &map)
 }
 
 
+
+/* trap15's note:
+ * TODO: change this horrible device-> chain to be proper.
+ */
+READ16_MEMBER(igs011_state::ics2115_word_r)
+{
+	ics2115_device* ics2115 = machine().device<ics2115_device>("ics");
+	switch(offset)
+	{
+		case 0: return ics2115->read(space, (offs_t)0);
+		case 1: return ics2115->read(space, (offs_t)1);
+		case 2: return (ics2115->read(space, (offs_t)3) << 8) | ics2115->read(space, (offs_t)2);
+	}
+	return 0xff;
+}
+
+WRITE16_MEMBER(igs011_state::ics2115_word_w)
+{
+	ics2115_device* ics2115 = machine().device<ics2115_device>("ics");
+	switch(offset)
+	{
+		case 1:
+			if (ACCESSING_BITS_0_7)     ics2115->write(space, 1,data);
+			break;
+		case 2:
+			if (ACCESSING_BITS_0_7)     ics2115->write(space, 2,data);
+			if (ACCESSING_BITS_8_15)    ics2115->write(space, 3,data>>8);
+			break;
+	}
+}
+
 READ16_MEMBER(igs011_state::vbowl_unk_r)
 {
 	return 0xffff;
@@ -2915,7 +2948,7 @@ void igs011_state::vbowl(address_map &map)
 	map(0x300000, 0x3fffff).rw(this, FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
 	map(0x400000, 0x401fff).ram().w(this, FUNC(igs011_state::igs011_palette)).share("paletteram");
 	map(0x520000, 0x520001).portr("COIN");
-	map(0x600000, 0x600007).rw("ics", FUNC(ics2115_device::read16), FUNC(ics2115_device::write16));
+	map(0x600000, 0x600007).rw(this, FUNC(igs011_state::ics2115_word_r), FUNC(igs011_state::ics2115_word_w));
 	map(0x700000, 0x700003).ram().share("vbowl_trackball");
 	map(0x700004, 0x700005).w(this, FUNC(igs011_state::vbowl_pen_hi_w));
 	map(0x800000, 0x800003).w(this, FUNC(igs011_state::vbowl_igs003_w));
@@ -4291,8 +4324,7 @@ MACHINE_CONFIG_START(igs011_state::vbowl)
 //  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
 
 	MCFG_DEVICE_REMOVE("oki")
-
-	MCFG_DEVICE_ADD("ics", ICS2115, 33.8688_MHz_XTAL) // Unknown clock
+	MCFG_ICS2115_ADD("ics", 0)
 	MCFG_ICS2115_IRQ_CB(WRITELINE(*this, igs011_state, sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END

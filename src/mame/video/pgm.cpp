@@ -669,6 +669,5 @@ WRITE_LINE_MEMBER(pgm_state::screen_vblank_pgm)
 	{
 		/* first 0xa00 of main ram = sprites, seems to be buffered, DMA? */
 		memcpy(m_spritebufferram.get(), m_mainram, 0xa00);
-		m_maincpu->set_input_line(6, HOLD_LINE);
 	}
 }
