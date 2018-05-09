@@ -66,6 +66,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram") { }
 
+	void sidampkr(machine_config &config);
 	void unkitpkr(machine_config &config);
 	void wallc(machine_config &config);
 	void wallca(machine_config &config);
@@ -104,6 +105,7 @@ private:
 	DECLARE_PALETTE_INIT(wallc);
 	DECLARE_PALETTE_INIT(unkitpkr);
 	DECLARE_VIDEO_START(unkitpkr);
+	DECLARE_VIDEO_START(sidampkr);
 };
 
 
@@ -239,6 +241,11 @@ void wallc_state::video_start()
 VIDEO_START_MEMBER(wallc_state, unkitpkr)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info_unkitpkr), this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
+}
+
+VIDEO_START_MEMBER(wallc_state, sidampkr)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info_unkitpkr), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t wallc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -428,6 +435,21 @@ static INPUT_PORTS_START( unkitpkr )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sidampkr )
+	PORT_INCLUDE(unkitpkr)
+
+	PORT_MODIFY("IN0")    /* b000 */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
@@ -532,6 +554,11 @@ MACHINE_CONFIG_START(wallc_state::unkitpkr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(wallc_state::sidampkr)
+	unkitpkr(config);
+
+	MCFG_VIDEO_START_OVERRIDE(wallc_state, sidampkr)
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -744,5 +771,5 @@ GAME( 1984, wallc,    0,      wallc,    wallc,    wallc_state, wallc,    ROT0,  
 GAME( 1984, wallca,   wallc,  wallca,   wallc,    wallc_state, wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1984, brkblast, wallc,  wallc,    wallc,    wallc_state, wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
-GAME( 1984, sidampkr, 0,      unkitpkr, unkitpkr, wallc_state, sidam,    ROT270, "Sidam",            "unknown Sidam Poker",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // strings in English and French, same codebase as unkitpkr
+GAME( 1984, sidampkr, 0,      sidampkr, sidampkr, wallc_state, sidam,    ROT270, "Sidam",            "unknown Sidam Poker",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // strings in English and French, same codebase as unkitpkr
 GAME( 198?, unkitpkr, 0,      unkitpkr, unkitpkr, wallc_state, unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_SUPPORTS_SAVE )
