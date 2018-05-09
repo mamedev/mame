@@ -207,7 +207,8 @@ MACHINE_CONFIG_START(subs_state::subs)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, subs_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

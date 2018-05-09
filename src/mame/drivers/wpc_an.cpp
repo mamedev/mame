@@ -342,7 +342,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(wpc_an_state::wpc_an)
 	wpc_an_base(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("wpcsnd", WPCSND)
 	MCFG_WPC_ROM_REGION("sound1")
 	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_an_state,wpcsnd_reply_w))
@@ -352,7 +352,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(wpc_an_state::wpc_an_dd)
 	wpc_an_base(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("bg", S11C_BG)
 	MCFG_S11C_BG_ROM_REGION(":sound1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

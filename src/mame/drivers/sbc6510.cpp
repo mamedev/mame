@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(sbc6510_state::sbc6510)
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(1'000'000))
 	// Ports A and B connect to the IDE socket
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, sbc6510_state, psg_a_r))        // port A read

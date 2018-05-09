@@ -494,7 +494,7 @@ MACHINE_CONFIG_START(pc8001_state::pc8001)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -544,7 +544,7 @@ MACHINE_CONFIG_START(pc8001mk2_state::pc8001mk2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

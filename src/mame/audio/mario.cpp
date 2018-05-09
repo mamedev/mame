@@ -652,7 +652,7 @@ MACHINE_CONFIG_START(mario_state::mario_audio)
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, mario_state, mario_sh_t0_r))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, mario_state, mario_sh_t1_r))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -684,7 +684,7 @@ MACHINE_CONFIG_START(mario_state::masao_audio)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 24576000/16)  /* ???? */
 	MCFG_DEVICE_PROGRAM_MAP(masao_sound_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

@@ -508,7 +508,7 @@ MACHINE_CONFIG_START(notechan_state::notechan)
 	/* NO VIDEO */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, SND_CLOCK, okim6295_device::PIN7_HIGH)  // match the real sounds
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

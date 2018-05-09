@@ -304,7 +304,7 @@ static const char *const safarir_sample_names[] =
 
 
 MACHINE_CONFIG_START(safarir_state::safarir_audio)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(safarir_sample_names)

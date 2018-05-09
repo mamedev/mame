@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(zx_state::zx81_spk )
 	zx81(config);
 	/* sound hardware */
 	/* Used by pc8300/lambda/pow3000 */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")

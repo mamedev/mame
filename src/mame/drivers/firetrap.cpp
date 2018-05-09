@@ -646,7 +646,7 @@ MACHINE_CONFIG_START(firetrap_state::firetrap)
 	MCFG_PALETTE_INIT_OWNER(firetrap_state, firetrap)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -691,7 +691,7 @@ MACHINE_CONFIG_START(firetrap_state::firetrapbl)
 	MCFG_PALETTE_INIT_OWNER(firetrap_state, firetrap)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))

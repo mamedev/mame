@@ -712,7 +712,7 @@ MACHINE_CONFIG_START(bingor_state::bingor)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBIIII)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SAA1099_ADD("saa", 6000000 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -804,7 +804,7 @@ MACHINE_CONFIG_START(bingor_state::vip2000)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBIIII)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymz", YMZ284, 1250000) // probably clocked by square wave output of 80186 timer 0
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

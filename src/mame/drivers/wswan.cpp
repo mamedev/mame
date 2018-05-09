@@ -143,7 +143,8 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	MCFG_PALETTE_INIT_OWNER(wswan_state, wswan)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD(m_sound, WSWAN_SND, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)

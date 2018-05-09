@@ -873,7 +873,7 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	MCFG_DEFAULT_LAYOUT(layout_bbc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("sn76489", SN76489, 16_MHz_XTAL/4) /* 4 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -1338,7 +1338,7 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("sn76489", SN76489, 16_MHz_XTAL/4) /* 4 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

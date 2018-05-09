@@ -3102,7 +3102,7 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay8910", AY8910, SND_CLOCK)    /* 2MHz */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, funworld_state, funworld_lamp_a_w))  /* portA out */

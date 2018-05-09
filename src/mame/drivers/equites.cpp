@@ -1054,7 +1054,7 @@ MACHINE_CONFIG_START(equites_state::common_sound)
 	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, equites_state, equites_8155_timer_pulse))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

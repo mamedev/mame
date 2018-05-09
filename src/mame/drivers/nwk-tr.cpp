@@ -888,7 +888,8 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	MCFG_K001604_ROZ_OFFSET(0)  // correct?
 	MCFG_K001604_PALETTE("palette")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_K056800_ADD("k056800", XTAL(16'934'400))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))

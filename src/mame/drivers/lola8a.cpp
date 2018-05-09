@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(lola8a_state::lola8a)
 	MCFG_I8085A_SID(READLINE(*this, lola8a_state, cass_r))
 	MCFG_I8085A_SOD(WRITELINE(*this, lola8a_state, cass_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(4'915'200) / 4)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, lola8a_state, lola8a_port_a_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lola8a_state, lola8a_port_b_w))

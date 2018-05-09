@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(twins_state::twins)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
@@ -456,7 +456,7 @@ MACHINE_CONFIG_START(twins_state::twinsa)
 	MCFG_24C02_ADD("i2cmem")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(16'000'000)/8) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
@@ -581,7 +581,7 @@ MACHINE_CONFIG_START(twins_state::spider)
 	MCFG_24C02_ADD("i2cmem")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))

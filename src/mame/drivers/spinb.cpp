@@ -665,12 +665,12 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("msmavol")
+	SPEAKER(config, "msmavol").front_center();
 	MCFG_DEVICE_ADD("msm_a", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCK_CALLBACK(WRITELINE("ic5a", ttl7474_device, clock_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmavol", 1.0)
-	MCFG_SPEAKER_STANDARD_MONO("msmmvol")
+	SPEAKER(config, "msmmvol").front_center();
 	MCFG_DEVICE_ADD("msm_m", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCK_CALLBACK(WRITELINE("ic5m", ttl7474_device, clock_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */

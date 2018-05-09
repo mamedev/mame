@@ -588,7 +588,7 @@ MACHINE_CONFIG_START(chinagat_state::chinagat)
 	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
@@ -642,7 +642,7 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub1)
 	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
@@ -689,7 +689,7 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub2)
 	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))

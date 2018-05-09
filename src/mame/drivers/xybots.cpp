@@ -208,7 +208,8 @@ MACHINE_CONFIG_START(xybots_state::xybots)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xybots_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_2))
 	MCFG_ATARI_JSA_TEST_PORT("FFE200", 8)

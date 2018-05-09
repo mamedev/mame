@@ -509,7 +509,7 @@ MACHINE_CONFIG_START(mirax_state::mirax)
 	MCFG_PALETTE_INIT_OWNER(mirax_state, mirax)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirax)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

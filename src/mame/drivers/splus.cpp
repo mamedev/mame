@@ -697,7 +697,7 @@ MACHINE_CONFIG_START(splus_state::splus)   // basic machine hardware
 	MCFG_X2404P_ADD("i2cmem")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8912, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)

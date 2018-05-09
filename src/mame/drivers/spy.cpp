@@ -529,7 +529,7 @@ MACHINE_CONFIG_START(spy_state::spy)
 	MCFG_K051960_CB(spy_state, sprite_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

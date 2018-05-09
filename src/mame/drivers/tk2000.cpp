@@ -593,7 +593,7 @@ MACHINE_CONFIG_START(tk2000_state::tk2000)
 	MCFG_PALETTE_INIT_OWNER(tk2000_state, tk2000)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

@@ -1818,7 +1818,7 @@ MACHINE_CONFIG_START(aristmk4_state::aristmk4)
 
 	MCFG_MC146818_ADD( "rtc", XTAL(4'194'304) )
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// the Mark IV has X 2 AY8910 sound chips which are tied to the VIA
 	MCFG_DEVICE_ADD("ay1", AY8910 , MAIN_CLOCK/8)

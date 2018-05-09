@@ -211,7 +211,8 @@ MACHINE_CONFIG_START(bingoc_state::bingoc)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") //might just be mono...
+	SPEAKER(config, "lspeaker").front_left(); //might just be mono...
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

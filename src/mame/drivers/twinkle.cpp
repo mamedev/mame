@@ -1127,7 +1127,8 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("speakerleft", "speakerright")
+	SPEAKER(config, "speakerleft").front_left();
+	SPEAKER(config, "speakerright").front_right();
 
 	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE( 0, "speakerleft", 0.75 )

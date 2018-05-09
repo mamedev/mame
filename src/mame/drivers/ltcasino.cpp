@@ -729,7 +729,7 @@ MACHINE_CONFIG_START(ltcasino_state::ltcasino)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000)/18) /* 1.024MHz ?? (or 18.432MHz/16 = 1.152MHz) - not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)

@@ -388,7 +388,8 @@ MACHINE_CONFIG_START(jackal_state::jackal)
 	MCFG_PALETTE_INIT_OWNER(jackal_state, jackal)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK) // verified on pcb
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)

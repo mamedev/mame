@@ -716,7 +716,7 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	MCFG_PALETTE_INIT_OWNER(alphatro_state, alphatro)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 950) /* piezo-device needs to be measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")

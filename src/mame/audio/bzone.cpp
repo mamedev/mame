@@ -399,7 +399,7 @@ WRITE8_MEMBER(bzone_state::bzone_sounds_w)
 
 MACHINE_CONFIG_START(bzone_state::bzone_audio)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey", POKEY, BZONE_MASTER_CLOCK / 8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("IN3"))

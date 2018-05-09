@@ -700,7 +700,7 @@ MACHINE_CONFIG_START(victor9k_state::victor9k)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, victor9k_state, vert_w))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(HC55516_TAG, HC55516, 0)
 	//MCFG_HC55516_DIG_OUT_CB(WRITELINE(MC6852_TAG, mc6852_device, rx_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

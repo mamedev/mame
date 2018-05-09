@@ -70,7 +70,7 @@ MACHINE_CONFIG_START(nes_state::nes)
 	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	// note APU sound level here was specified as 0.90, not 0.50 like the others
 	// not sure how to adjust it when it's inside the CPU?
 

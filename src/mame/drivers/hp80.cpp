@@ -1356,7 +1356,7 @@ MACHINE_CONFIG_START(hp85_state::hp85)
 	MCFG_TIMER_DRIVER_ADD("prt_busy_timer", hp85_state, prt_busy_timer)
 
 	// Beeper
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("dac" , DAC_1BIT , 0)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0)

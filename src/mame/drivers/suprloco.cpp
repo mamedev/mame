@@ -203,7 +203,7 @@ MACHINE_CONFIG_START(suprloco_state::suprloco)
 	MCFG_PALETTE_INIT_OWNER(suprloco_state, suprloco)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76496, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

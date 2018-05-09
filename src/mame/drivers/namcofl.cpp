@@ -612,7 +612,8 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 
 	MCFG_VIDEO_START_OVERRIDE(namcofl_state,namcofl)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_C352_ADD("c352", 48384000/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)

@@ -1188,7 +1188,8 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)

@@ -1161,7 +1161,7 @@ MACHINE_CONFIG_START(abc800c_state::abc800c)
 	abc800c_video(config);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, abc800_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
@@ -1236,7 +1236,7 @@ MACHINE_CONFIG_START(abc800m_state::abc800m)
 	abc800m_video(config);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, abc800_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
@@ -1313,7 +1313,7 @@ MACHINE_CONFIG_START(abc802_state::abc802)
 	abc802_video(config);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, abc800_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 

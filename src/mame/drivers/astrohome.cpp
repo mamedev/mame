@@ -215,7 +215,7 @@ MACHINE_CONFIG_START(astrocde_mess_state::astrocde)
 	MCFG_PALETTE_INIT_OWNER(astrocde_state, astrocde)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("astrocade1", ASTROCADE, ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

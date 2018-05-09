@@ -447,7 +447,7 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 12000000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)

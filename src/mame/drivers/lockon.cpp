@@ -504,7 +504,8 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	MCFG_PALETTE_ADD("palette", 1024 + 2048)
 	MCFG_PALETTE_INIT_OWNER(lockon_state, lockon)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, lockon_state, ym2203_irq))

@@ -2564,7 +2564,8 @@ MACHINE_CONFIG_START(ssv_state::ssv)
 	MCFG_PALETTE_FORMAT(XRGB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ensoniq", ES5506, SSV_MASTER_CLOCK)
 	MCFG_ES5506_REGION0("ensoniq.0")

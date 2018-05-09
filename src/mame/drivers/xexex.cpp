@@ -518,7 +518,8 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 	MCFG_DEVICE_ADD("k054338", K054338, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 

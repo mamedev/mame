@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(battlane_state::battlane)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, 3000000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))

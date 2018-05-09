@@ -84,7 +84,7 @@ MACHINE_CONFIG_START(amerihok_state::amerihok)
 	MCFG_DEVICE_DATA_MAP(amerihok_data_map)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6376, 1000000) // 64-pin QFP (probably actually MSM6650)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

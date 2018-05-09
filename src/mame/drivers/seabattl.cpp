@@ -513,7 +513,7 @@ MACHINE_CONFIG_START(seabattl_state::seabattl)
 	MCFG_PALETTE_INIT_OWNER(seabattl_state, seabattl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* discrete sound */
 MACHINE_CONFIG_END

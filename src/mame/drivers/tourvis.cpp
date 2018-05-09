@@ -423,7 +423,8 @@ MACHINE_CONFIG_START(tourvision_state::tourvision)
 	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, tourvision_state, tourvision_i8155_c_w))
 	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, tourvision_state, tourvision_timer_out))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
 	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)

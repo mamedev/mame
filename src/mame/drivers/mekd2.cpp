@@ -381,7 +381,7 @@ MACHINE_CONFIG_START(mekd2_state::mekd2)
 	MCFG_DEFAULT_LAYOUT(layout_mekd2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

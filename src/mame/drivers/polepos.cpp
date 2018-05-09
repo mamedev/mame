@@ -923,7 +923,8 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_VIDEO_START_OVERRIDE(polepos_state,polepos)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/512)
 	MCFG_NAMCO_AUDIO_VOICES(8)
@@ -1035,7 +1036,8 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	MCFG_VIDEO_START_OVERRIDE(polepos_state,polepos)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/512)
 	MCFG_NAMCO_AUDIO_VOICES(8)

@@ -1434,7 +1434,7 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)
 	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, hp64k_state , hp64k_floppy1_rdy));
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper" , BEEP , 2500)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
 

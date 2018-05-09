@@ -392,7 +392,7 @@ MACHINE_CONFIG_START(jr100_state::jr100)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, jr100_state,jr100_via_write_b))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, jr100_state, jr100_via_write_cb2))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)

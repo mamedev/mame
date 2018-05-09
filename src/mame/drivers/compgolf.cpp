@@ -243,7 +243,7 @@ MACHINE_CONFIG_START(compgolf_state::compgolf)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", compgolf)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))

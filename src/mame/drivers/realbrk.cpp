@@ -786,7 +786,8 @@ MACHINE_CONFIG_START(realbrk_state::realbrk)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(33'868'800) / 2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)

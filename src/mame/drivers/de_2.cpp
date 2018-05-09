@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(de_2_state::de_bg_audio)
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
 	MCFG_DEVICE_PROGRAM_MAP(de_2_audio_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("bg")
+	SPEAKER(config, "bg").front_center();
 
 	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, de_2_state, ym2151_irq_w))

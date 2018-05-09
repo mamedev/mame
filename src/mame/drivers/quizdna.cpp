@@ -462,7 +462,7 @@ MACHINE_CONFIG_START(quizdna_state::quizdna)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, MCLK/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))

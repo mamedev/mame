@@ -496,7 +496,7 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	abc80_video(config);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76477_TAG, SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(390)) // noise + filter: R26 47k - R24 330k - C52 390p
 	MCFG_SN76477_DECAY_RES(RES_K(47))                   //  decay_res: R23 47k

@@ -775,7 +775,7 @@ static const char *const jf33_sample_names[] =
 MACHINE_CONFIG_START(nes_jf13_device::device_add_mconfig)
 
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(16)
@@ -786,7 +786,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nes_jf17_adpcm_device::device_add_mconfig)
 
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(20)
@@ -797,7 +797,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nes_jf19_adpcm_device::device_add_mconfig)
 
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(20)
@@ -808,7 +808,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nes_jf23_device::device_add_mconfig)
 
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(20)
@@ -819,7 +819,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nes_jf24_device::device_add_mconfig)
 
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(6)
@@ -830,7 +830,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nes_jf29_device::device_add_mconfig)
 
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(20)
@@ -841,7 +841,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nes_jf33_device::device_add_mconfig)
 
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(20)

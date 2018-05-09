@@ -1966,7 +1966,8 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C140_ADD("c140", 8000000/374)
 	MCFG_C140_BANK_TYPE(SYSTEM21)
@@ -2027,7 +2028,8 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C140_ADD("c140", 8000000/374)
 	MCFG_C140_BANK_TYPE(SYSTEM21)
@@ -2090,7 +2092,8 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C140_ADD("c140", 8000000/374)
 	MCFG_C140_BANK_TYPE(SYSTEM21)

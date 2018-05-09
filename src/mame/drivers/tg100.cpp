@@ -77,7 +77,8 @@ MACHINE_CONFIG_START(tg100_state::tg100)
 	MCFG_DEVICE_PROGRAM_MAP( tg100_map )
 	MCFG_DEVICE_IO_MAP( tg100_io_map )
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymw258", MULTIPCM, 9400000)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymw258_map)

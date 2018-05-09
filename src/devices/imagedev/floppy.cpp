@@ -1365,11 +1365,11 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 #define FLOPSPK "flopsndout"
 
-MACHINE_CONFIG_START(floppy_image_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO(FLOPSPK)
-	MCFG_DEVICE_ADD(FLOPSND_TAG, FLOPPYSOUND, 44100)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, FLOPSPK, 0.5)
-MACHINE_CONFIG_END
+void floppy_image_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, FLOPSPK).front_center();
+	FLOPPYSOUND(config, FLOPSND_TAG, 44100).add_route(ALL_OUTPUTS, FLOPSPK, 0.5);
+}
 
 
 DEFINE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device, "flopsnd", "Floppy sound")

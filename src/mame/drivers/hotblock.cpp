@@ -224,7 +224,7 @@ MACHINE_CONFIG_START(hotblock_state::hotblock)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", YM2149, 1000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))

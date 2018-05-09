@@ -795,7 +795,7 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_RAM_EXTRA_OPTIONS("32K")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("custom", TVC_SOUND, 0)
 	MCFG_TVC_SOUND_SNDINT_CALLBACK(WRITELINE(*this, tvc_state, int_ff_set))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)

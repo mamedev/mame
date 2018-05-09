@@ -150,7 +150,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(bwidow_state::bwidow_audio)
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK / 8) /* C/D3 */
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW0"))

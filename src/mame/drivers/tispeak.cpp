@@ -1299,7 +1299,7 @@ MACHINE_CONFIG_START(tispeak_state::snmath)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("tms5100", CD2801, MASTER_CLOCK)
 	tms5110_route(config);
 MACHINE_CONFIG_END
@@ -1404,7 +1404,7 @@ MACHINE_CONFIG_START(tispeak_state::snspellc)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("tms5100", TMC0281D, MASTER_CLOCK)
 	tms5110_route(config);
 
@@ -1440,7 +1440,7 @@ MACHINE_CONFIG_START(tispeak_state::vocaid)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("tms5100", CD2802, MASTER_CLOCK)
 	tms5110_route(config);
 MACHINE_CONFIG_END
@@ -1471,7 +1471,7 @@ MACHINE_CONFIG_START(tispeak_state::k28m2)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("tms5100", TMS5110A, MASTER_CLOCK)
 	tms5110_route(config);
 

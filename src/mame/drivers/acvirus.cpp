@@ -110,7 +110,8 @@ MACHINE_CONFIG_START(acvirus_state::virus)
 	MCFG_DEVICE_ADD("maincpu", I8052, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(virus_map)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( virus )

@@ -668,7 +668,9 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "mono")
+	// FIXME: this makes no sense - "lspeaker" on left and "mono" on right, with nothing routed to "mono"
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "mono").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")

@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(ddribble_state::ddribble)
 	MCFG_PALETTE_INIT_OWNER(ddribble_state, ddribble)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, ddribble_state, ddribble_vlm5030_busy_r))

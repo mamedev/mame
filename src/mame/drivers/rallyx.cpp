@@ -854,7 +854,7 @@ MACHINE_CONFIG_START(rallyx_state::rallyx)
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,rallyx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32) /* 96 KHz */
 	MCFG_NAMCO_AUDIO_VOICES(3)

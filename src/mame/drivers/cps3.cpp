@@ -2557,7 +2557,8 @@ MACHINE_CONFIG_START(cps3_state::cps3)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("cps3sound", CPS3, MASTER_CLOCK / 3)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)

@@ -664,7 +664,7 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,kickgoal)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	//MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -703,7 +703,7 @@ MACHINE_CONFIG_START(kickgoal_state::actionhw)
 	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,actionhw)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	//MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

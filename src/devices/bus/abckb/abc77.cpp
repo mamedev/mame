@@ -144,7 +144,7 @@ MACHINE_CONFIG_START(abc77_device::device_add_mconfig)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(XTAL(4'608'000)/3/5/4096))
 
 	// discrete sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, abc77_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END

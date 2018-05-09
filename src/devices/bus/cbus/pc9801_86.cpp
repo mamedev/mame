@@ -53,7 +53,8 @@ WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pc9801_86_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("opna", YM2608, 7.987_MHz_XTAL)
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(*this, pc9801_86_device, sound_irq))
 	MCFG_AY8910_OUTPUT_TYPE(0)

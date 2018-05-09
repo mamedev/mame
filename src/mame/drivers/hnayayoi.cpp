@@ -576,7 +576,7 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 	MCFG_MC6845_UPDATE_ROW_CB(hnayayoi_state, hnayayoi_update_row)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 20000000/8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, hnayayoi_state, irqhandler))

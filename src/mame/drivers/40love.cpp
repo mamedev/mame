@@ -740,7 +740,7 @@ MACHINE_CONFIG_START(fortyl_state::_40love)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_TA7630_ADD("ta7630")
 
@@ -806,7 +806,7 @@ MACHINE_CONFIG_START(fortyl_state::undoukai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_TA7630_ADD("ta7630")
 

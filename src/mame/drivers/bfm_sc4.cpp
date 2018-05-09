@@ -900,7 +900,7 @@ MACHINE_CONFIG_START(sc4_state::sc4_common)
 	MCFG_MC68307_SERIAL_OUTPORT_CALLBACK(WRITE8(*this, sc4_state, m68307_duart_output_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

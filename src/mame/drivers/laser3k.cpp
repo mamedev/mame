@@ -1024,7 +1024,7 @@ MACHINE_CONFIG_START(laser3k_state::laser3k)
 	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, laser3k_state, ay3600_data_ready_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_DEVICE_ADD("sn76489", SN76489, 1020484)

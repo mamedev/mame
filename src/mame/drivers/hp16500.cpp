@@ -428,7 +428,8 @@ MACHINE_CONFIG_START(hp16500_state::hp1650)
 
 	MCFG_DEVICE_ADD("epci", MC2661, 5000000)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp16500_state::hp1651)
@@ -448,7 +449,8 @@ MACHINE_CONFIG_START(hp16500_state::hp1651)
 
 	MCFG_DEVICE_ADD("epci", MC2661, 5000000)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp16500_state::hp16500a)
@@ -466,7 +468,8 @@ MACHINE_CONFIG_START(hp16500_state::hp16500a)
 	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hp16500_state, vsync_changed))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp16500_state::hp16500)
@@ -492,7 +495,8 @@ MACHINE_CONFIG_START(hp16500_state::hp16500)
 	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")
 	MCFG_HP_HIL_SLOT_ADD("mlc", "hil2", hp_hil_devices, "hp_ipc_kbd")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( hp16500 )

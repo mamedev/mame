@@ -435,7 +435,7 @@ MACHINE_CONFIG_START(gberet_state::gberet)
 	MCFG_VIDEO_START_OVERRIDE(gberet_state,gberet)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76489A, XTAL(18'432'000)/12) /* type verified on real and bootleg pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -476,7 +476,7 @@ MACHINE_CONFIG_START(gberet_state::gberetb)
 	MCFG_VIDEO_START_OVERRIDE(gberet_state,gberet)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76489A, XTAL(20'000'000)/12) // divider guessed
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

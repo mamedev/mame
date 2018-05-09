@@ -483,7 +483,7 @@ MACHINE_CONFIG_START(hitpoker_state::hitpoker)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hitpoker)
 	MCFG_PALETTE_ADD("palette", 0x800)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", YM2149, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))

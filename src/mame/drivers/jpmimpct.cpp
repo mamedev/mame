@@ -866,7 +866,7 @@ MACHINE_CONFIG_START(jpmimpct_state::jpmimpct)
 	MCFG_SCREEN_UPDATE_DEVICE("dsp", tms34010_device, tms340x0_rgb32)
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -1331,7 +1331,7 @@ MACHINE_CONFIG_START(jpmimpct_state::impctawp)
 
 	MCFG_TIMER_DRIVER_ADD("duart_1_timer", jpmimpct_state, duart_1_timer_event)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("upd",UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEFAULT_LAYOUT(layout_jpmimpct)

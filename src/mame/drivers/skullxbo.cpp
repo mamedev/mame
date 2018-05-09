@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(skullxbo_state::skullxbo)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, skullxbo_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_4))
 	MCFG_ATARI_JSA_TEST_PORT("FF5802", 7)

@@ -1006,7 +1006,7 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, CLK_1/8)    /* guess */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kingdrby_state, sound_cmd_r))

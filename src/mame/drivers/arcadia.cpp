@@ -494,7 +494,7 @@ MACHINE_CONFIG_START(arcadia_state::arcadia)
 	MCFG_PALETTE_INIT_OWNER(arcadia_state, arcadia)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("custom", ARCADIA_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

@@ -812,7 +812,7 @@ MACHINE_CONFIG_START(nightgal_state::royalqn)
 	MCFG_PALETTE_INIT_OWNER(nightgal_state, nightgal)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nightgal_state, input_1p_r))

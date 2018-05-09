@@ -398,7 +398,7 @@ MACHINE_CONFIG_START(chessmst_state::chessmst)
 	MCFG_DEFAULT_LAYOUT(layout_chessmst)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(chessmst_state::chessmsta)
 	MCFG_DEFAULT_LAYOUT(layout_chessmst)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -452,7 +452,7 @@ MACHINE_CONFIG_START(chessmst_state::chessmstdm)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, chessmst_state, timer_555_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

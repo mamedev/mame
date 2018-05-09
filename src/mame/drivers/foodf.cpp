@@ -348,7 +348,7 @@ MACHINE_CONFIG_START(foodf_state::foodf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, foodf_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/2/10)
 	MCFG_POKEY_POT0_R_CB(READ8(*this, foodf_state, pot_r))

@@ -1285,7 +1285,7 @@ MACHINE_CONFIG_START(norautp_state::noraut_base)
 	MCFG_PALETTE_INIT_OWNER(norautp_state, norautp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("discrete", DISCRETE, norautp_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

@@ -1501,7 +1501,7 @@ MACHINE_CONFIG_START(socrates_state::socrates)
 	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256)) // this is correct, as strange as it sounds.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -1574,7 +1574,7 @@ MACHINE_CONFIG_START(iqunlimz_state::iqunlimz)
 	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

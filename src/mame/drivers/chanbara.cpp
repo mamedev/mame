@@ -410,7 +410,7 @@ MACHINE_CONFIG_START(chanbara_state::chanbara)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(chanbara_state, chanbara)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 12000000/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))

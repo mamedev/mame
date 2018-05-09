@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(pengadvb_state::pengadvb)
 	MCFG_SCREEN_UPDATE_DEVICE("tms9128", tms9128_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(10'738'635)/6)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pengadvb_state, pengadvb_psg_port_b_w))

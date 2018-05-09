@@ -401,7 +401,8 @@ MACHINE_CONFIG_START(sprint4_state::sprint4)
 	MCFG_PALETTE_INIT_OWNER(sprint4_state, sprint4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("latch", F9334, 0) // at E11
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // START LAMP 1

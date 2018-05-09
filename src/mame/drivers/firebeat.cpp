@@ -1211,7 +1211,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, firebeat_state, sound_irq_callback))
@@ -1279,7 +1280,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, firebeat_state, sound_irq_callback))

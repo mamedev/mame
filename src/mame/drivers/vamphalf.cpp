@@ -1063,7 +1063,8 @@ MACHINE_CONFIG_START(vamphalf_state::common)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_ym_oki)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(28'000'000)/8) /* 3.5MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1082,7 +1083,8 @@ MACHINE_CONFIG_START(vamphalf_state::sound_ym_banked_oki)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_suplup)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1095,7 +1097,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_qs1000)
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))
@@ -1237,7 +1240,8 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vamphalf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

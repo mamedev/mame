@@ -1035,7 +1035,7 @@ MACHINE_CONFIG_START(ti99_4p_state::ti99_4p_60hz)
 	MCFG_RAM_DEFAULT_VALUE(0)
 
 	// Cassette drives
-	MCFG_SPEAKER_STANDARD_MONO("cass_out")
+	SPEAKER(config, "cass_out").front_center();
 	MCFG_CASSETTE_ADD( "cassette" )
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")

@@ -559,7 +559,8 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 	MCFG_K053252_OFFSETS(40, 16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, qdrmfgp_k054539_map)
@@ -604,7 +605,8 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 	MCFG_K053252_OFFSETS(40, 16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, qdrmfgp_k054539_map)
