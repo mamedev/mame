@@ -74,7 +74,8 @@ MACHINE_CONFIG_START(isa16_ide_device::device_add_mconfig)
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, isa16_ide_device, ide_interrupt))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lheadphone", "rheadphone")
+	SPEAKER(config, "lheadphone").front_left();
+	SPEAKER(config, "rheadphone").front_right();
 
 	MCFG_DEVICE_MODIFY("ide:0")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_headphones)

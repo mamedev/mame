@@ -1309,7 +1309,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(astrocde_state::astrocade_mono_sound)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ASTROCADE_ADD("astrocade1", ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1319,7 +1319,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(astrocde_state::astrocade_stereo_sound)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ASTROCADE_ADD("astrocade1", ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -1345,7 +1346,8 @@ MACHINE_CONFIG_START(astrocde_state::seawolf2)
 	MCFG_DEVICE_IO_MAP(port_map)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(10) /* 5*2 channels */
@@ -1399,7 +1401,7 @@ MACHINE_CONFIG_START(astrocde_state::wow)
 //  MCFG_SCREEN_DEFAULT_POSITION(1.066, -0.004, 1.048, -0.026)  /* adjusted to match flyer */
 
 	/* sound hardware */
-	MCFG_SPEAKER_ADD("center", 0.0, 0.0, 1.0)
+	SPEAKER(config, "center").front_center();
 
 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "center", 0.85)
@@ -1419,8 +1421,8 @@ MACHINE_CONFIG_START(astrocde_state::gorf)
 	MCFG_SCREEN_DEFAULT_POSITION(1.0, 0.0, 1.0, 0.0)    /* adjusted to match flyer */
 
 	/* sound hardware */
-	MCFG_SPEAKER_ADD("upper", 0.0, 0.0, 1.0)
-	MCFG_SPEAKER_ADD("lower", 0.0, -0.5, 1.0)
+	SPEAKER(config, "upper", 0.0, 0.0, 1.0);
+	SPEAKER(config, "lower", 0.0, -0.5, 1.0);
 
 	MCFG_ASTROCADE_ADD("astrocade1", ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "upper", 1.0)
@@ -1488,7 +1490,7 @@ MACHINE_CONFIG_START(astrocde_state::tenpindx)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))

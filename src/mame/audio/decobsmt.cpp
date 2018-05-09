@@ -53,7 +53,8 @@ MACHINE_CONFIG_START(decobsmt_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(decobsmt_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(decobsmt_device, decobsmt_firq_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_BSMT2000_ADD(BSMT_TAG, XTAL(24'000'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, bsmt_map)
 	MCFG_BSMT2000_READY_CALLBACK(decobsmt_device, bsmt_ready_callback)

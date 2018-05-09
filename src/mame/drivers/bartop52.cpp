@@ -152,7 +152,7 @@ MACHINE_CONFIG_START(bartop52_state::a5200)
 	MCFG_PALETTE_INIT_OWNER(bartop52_state, atari)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
 	MCFG_POKEY_POT0_R_CB(IOPORT("analog_0"))

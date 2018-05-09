@@ -2231,7 +2231,8 @@ MACHINE_CONFIG_START(segas32_state::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DRIVER(segas32_state, screen_update_system32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ym1", YM3438, MASTER_CLOCK/4)
 	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segas32_state, ym3438_irq_handler))
@@ -2558,7 +2559,8 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DRIVER(segas32_state, screen_update_multi32_right)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3438, MASTER_CLOCK/4)
 	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segas32_state, ym3438_irq_handler))

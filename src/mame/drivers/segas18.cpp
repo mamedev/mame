@@ -1356,7 +1356,7 @@ MACHINE_CONFIG_START(segas18_state::system18)
 	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym1", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

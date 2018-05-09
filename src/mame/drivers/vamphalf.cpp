@@ -1063,7 +1063,8 @@ MACHINE_CONFIG_START(vamphalf_state::common)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_ym_oki)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(28'000'000)/8) /* 3.5MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1082,7 +1083,8 @@ MACHINE_CONFIG_START(vamphalf_state::sound_ym_banked_oki)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_suplup)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1095,7 +1097,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_qs1000)
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))
@@ -1237,7 +1240,8 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vamphalf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1491,7 +1495,7 @@ ROM_START( luplup10 ) /* version 1.05 / 981214 */
 	ROM_LOAD( "p1_rom2.rom2", 0x80000, 0x80000, CRC(1043ce44) SHA1(13a23f35ff2335d837f682761f774a70e298e77a) )
 
 	ROM_REGION( 0x800000, "gfx", 0 ) /* 16x16x8 Sprites */
-	ROM_LOAD32_WORD( "roml00.roml00", 0x000000, 0x200000, BAD_DUMP CRC(1575b2be) SHA1(e4e67ecc15518a1c8ea7ab5cbd0fe9c6f7f64edd) )
+	ROM_LOAD32_WORD( "roml00.roml00", 0x000000, 0x200000, CRC(e2eeb61e) SHA1(5261cf29cd7e10d86c0dd4bc640ad9c3db99cec3) )
 	ROM_LOAD32_WORD( "romu00.romu00", 0x000002, 0x200000, CRC(9ee855b9) SHA1(a51b268a640b667d88a8ceab562607a811602fff) )
 	ROM_LOAD32_WORD( "roml01.roml01", 0x400000, 0x200000, CRC(7182864c) SHA1(48789b20d9b8f41d7c9f5690f4f44bc6f15b8cfe) )
 	ROM_LOAD32_WORD( "romu01.romu01", 0x400002, 0x200000, CRC(44f76640) SHA1(6a49ed4d5584ecd0496b9ce19aefd5f4e0126da7) )
@@ -3335,7 +3339,7 @@ GAME( 1999, newxpang,  0,        newxpang,  common,   vamphalf_state, newxpang, 
 GAME( 1999, suplup,    0,        suplup,    common,   vamphalf_state, suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , MACHINE_SUPPORTS_SAVE )
 GAME( 1999, luplup,    suplup,   suplup,    common,   vamphalf_state, luplup,    ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, luplup29,  suplup,   suplup,    common,   vamphalf_state, luplup29,  ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, luplup10,  suplup,   suplup,    common,   vamphalf_state, luplup10,  ROT0,   "Omega System (Adko license)",   "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 1.05 / 981214)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // graphics ROML00 needs redump
+GAME( 1999, luplup10,  suplup,   suplup,    common,   vamphalf_state, luplup10,  ROT0,   "Omega System (Adko license)",   "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 1.05 / 981214)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, puzlbang,  suplup,   suplup,    common,   vamphalf_state, puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, puzlbanga, suplup,   suplup,    common,   vamphalf_state, puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.8 / 990106)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, vamphalf,  0,        vamphalf,  common,   vamphalf_state, vamphalf,  ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )

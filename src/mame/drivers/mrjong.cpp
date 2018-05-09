@@ -208,7 +208,7 @@ MACHINE_CONFIG_START(mrjong_state::mrjong)
 	MCFG_PALETTE_INIT_OWNER(mrjong_state, mrjong)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489, 15468000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

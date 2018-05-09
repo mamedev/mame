@@ -272,7 +272,8 @@ MACHINE_CONFIG_START(kontest_state::kontest)
 	MCFG_PALETTE_INIT_OWNER(kontest_state, kontest)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("sn1", SN76489A, MAIN_CLOCK/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)

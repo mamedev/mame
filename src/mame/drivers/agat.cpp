@@ -1097,7 +1097,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(A7_SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

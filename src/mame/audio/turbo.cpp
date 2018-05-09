@@ -186,10 +186,10 @@ static const char *const turbo_sample_names[] =
 MACHINE_CONFIG_START(turbo_state::turbo_samples)
 
 	/* this is the cockpit speaker configuration */
-	MCFG_SPEAKER_ADD("fspeaker", 0.0, 0.0, 1.0)     /* front */
-	MCFG_SPEAKER_ADD("bspeaker",  0.0, 0.0, -0.5)   /* back */
-	MCFG_SPEAKER_ADD("lspeaker", -0.2, 0.0, 1.0)    /* left */
-	MCFG_SPEAKER_ADD("rspeaker", 0.2, 0.0, 1.0)     /* right */
+	SPEAKER(config, "fspeaker", 0.0, 0.0, 1.0);     // front
+	SPEAKER(config, "bspeaker",  0.0, 0.0, -0.5);   // back
+	SPEAKER(config, "lspeaker", -0.2, 0.0, 1.0);    // left
+	SPEAKER(config, "rspeaker", 0.2, 0.0, 1.0);     // right
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(10)
@@ -430,7 +430,8 @@ static const char *const subroc3d_sample_names[] =
 };
 
 MACHINE_CONFIG_START(turbo_state::subroc3d_samples)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(12)
@@ -575,7 +576,7 @@ static const char *const buckrog_sample_names[]=
 
 
 MACHINE_CONFIG_START(turbo_state::buckrog_samples)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(buckrog_sample_names)

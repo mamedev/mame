@@ -422,7 +422,8 @@ MACHINE_CONFIG_START(policetr_state::policetr)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_BSMT2000_ADD("bsmt", MASTER_CLOCK/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

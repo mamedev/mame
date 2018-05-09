@@ -376,7 +376,7 @@ MACHINE_CONFIG_START(koikoi_state::koikoi)
 	MCFG_PALETTE_INIT_OWNER(koikoi_state, koikoi)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, KOIKOI_CRYSTAL/8)
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, koikoi_state, input_r))

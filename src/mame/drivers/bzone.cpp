@@ -588,7 +588,7 @@ MACHINE_CONFIG_START(redbaron_state::redbaron)
 	MCFG_SCREEN_VISIBLE_AREA(0, 520, 0, 400)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey", POKEY, 1500000)
 	MCFG_POKEY_ALLPOT_R_CB(READ8(*this, redbaron_state, redbaron_joy_r))

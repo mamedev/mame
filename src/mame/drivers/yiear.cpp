@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(yiear_state::yiear)
 	MCFG_PALETTE_INIT_OWNER(yiear_state, yiear)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 

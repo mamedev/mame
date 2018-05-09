@@ -251,7 +251,7 @@ MACHINE_CONFIG_START(zac2650_state::tinvader)
 	MCFG_PALETTE_INIT_OWNER(zac2650_state, zac2650)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("s2636", S2636, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

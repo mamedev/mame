@@ -452,7 +452,8 @@ MACHINE_CONFIG_START(mu100_state::mu100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 899, 0, 240)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE("maincpu:sci0", h8_sci_device, rx_w))

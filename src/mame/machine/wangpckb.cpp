@@ -121,7 +121,7 @@ MACHINE_CONFIG_START(wangpc_keyboard_device::device_add_mconfig)
 	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, wangpc_keyboard_device, mcs51_rx_callback))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76496_TAG, SN76496, 2000000) // ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END

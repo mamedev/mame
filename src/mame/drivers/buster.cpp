@@ -343,7 +343,7 @@ MACHINE_CONFIG_START(buster_state::buster)
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

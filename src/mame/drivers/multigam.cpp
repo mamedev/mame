@@ -1218,7 +1218,7 @@ MACHINE_CONFIG_START(multigam_state::multigam)
 	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(multigam_state::multigm3)

@@ -815,7 +815,7 @@ MACHINE_CONFIG_START(wiz_state::kungfut)
 	MCFG_PALETTE_INIT_OWNER(wiz_state, wiz)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

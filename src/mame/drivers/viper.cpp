@@ -2413,7 +2413,8 @@ MACHINE_CONFIG_START(viper_state::viper)
 	MCFG_TIMER_ADD_NONE("ds2430_timer2")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_M48T58_ADD( "m48t58" )
 MACHINE_CONFIG_END

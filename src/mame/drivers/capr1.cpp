@@ -220,7 +220,7 @@ MACHINE_CONFIG_START(capr1_state::cspin2)
 	/* no video! */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym", YM2203, 4000000) // clock frequency unknown
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))

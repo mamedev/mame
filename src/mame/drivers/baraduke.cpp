@@ -399,7 +399,7 @@ MACHINE_CONFIG_START(baraduke_state::baraduke)
 	MCFG_PALETTE_INIT_OWNER(baraduke_state, baraduke)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)

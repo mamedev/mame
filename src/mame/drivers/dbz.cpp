@@ -378,7 +378,8 @@ MACHINE_CONFIG_START(dbz_state::dbz)
 	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, dbz_state, dbz_irq2_ack_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

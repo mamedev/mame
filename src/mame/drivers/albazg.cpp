@@ -396,7 +396,7 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/16) /* guessed to use the same xtal as the crtc */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))

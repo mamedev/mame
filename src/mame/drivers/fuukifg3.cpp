@@ -557,7 +557,8 @@ MACHINE_CONFIG_START(fuuki32_state::fuuki32)
 	MCFG_FUUKI_VIDEO_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymf", YMF278B, YMF278B_STD_CLOCK) // 33.8688MHz
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

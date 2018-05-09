@@ -348,7 +348,7 @@ MACHINE_CONFIG_START(chexx_state::chexx83)
 	MCFG_DEFAULT_LAYOUT(layout_chexx)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DIGITALKER_ADD("digitalker", MAIN_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END

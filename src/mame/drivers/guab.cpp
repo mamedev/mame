@@ -493,7 +493,7 @@ MACHINE_CONFIG_START(guab_state::guab)
 	MCFG_TMS34061_INTERRUPT_CB(INPUTLINE("maincpu", 5))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* TODO: Verify clock */
 	MCFG_DEVICE_ADD("snsnd", SN76489, 2000000)

@@ -163,7 +163,7 @@ MACHINE_CONFIG_START(madalien_state::madalien)
 	madalien_video(config);
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0)) // 7400 at 3A used as R/S latch

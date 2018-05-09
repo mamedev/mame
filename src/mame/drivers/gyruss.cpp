@@ -514,7 +514,8 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 	MCFG_PALETTE_INIT_OWNER(gyruss_state, gyruss)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")

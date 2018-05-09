@@ -378,7 +378,8 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_ADC0844_CH1_CB(IOPORT("THROTTLE"))
 	MCFG_ADC0844_CH2_CB(READ8(*this, micro3d_state, adc_volume_r))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	UPD7759(config, m_upd7759)
 			.add_route(ALL_OUTPUTS, "lspeaker", 0.35)

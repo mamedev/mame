@@ -1369,7 +1369,7 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(12'000'000)/4) /* YM2149 clock is 3mhz, pin 26 is low so final clock is 3mhz/2, handled inside the ay core */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | YM2149_PIN26_LOW) // all outputs are tied together with no resistors, and pin 26 is low
@@ -1443,7 +1443,7 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/4/2) /* Imported from arkanoid - correct? */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
@@ -1486,7 +1486,7 @@ MACHINE_CONFIG_START(arkanoid_state::brixian)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/4/2) /* Imported from arkanoid - correct? */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))

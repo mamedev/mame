@@ -435,7 +435,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05) // cass1 speaker
 	MCFG_SOUND_WAVE_ADD(WAVE2_TAG, "cassette2")

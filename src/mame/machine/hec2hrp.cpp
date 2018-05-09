@@ -804,7 +804,7 @@ static DISCRETE_SOUND_START( hec2hrp_discrete )
 DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(hec2hrp_state::hector_audio)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)  /* Sound level for cassette, as it is in mono => output channel=0*/
 

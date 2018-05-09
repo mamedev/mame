@@ -1171,7 +1171,7 @@ MACHINE_CONFIG_START(srmp2_state::srmp2)
 	MCFG_PALETTE_INIT_OWNER(srmp2_state,srmp2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 20000000/16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
@@ -1218,7 +1218,7 @@ MACHINE_CONFIG_START(srmp2_state::srmp3)
 	MCFG_PALETTE_INIT_OWNER(srmp2_state,srmp3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 16000000/16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
@@ -1271,7 +1271,7 @@ MACHINE_CONFIG_START(srmp2_state::mjyuugi)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 16000000/16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))

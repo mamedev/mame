@@ -688,7 +688,8 @@ MACHINE_CONFIG_START(psikyo4_state::ps4big)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymf", YMF278B, MASTER_CLOCK/2)
 	MCFG_DEVICE_ADDRESS_MAP(0, ps4_ymf_map)

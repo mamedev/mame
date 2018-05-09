@@ -543,7 +543,7 @@ MACHINE_CONFIG_START(pturn_state::pturn)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pturn)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

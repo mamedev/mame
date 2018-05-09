@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(hanaawas_state::hanaawas)
 	MCFG_PALETTE_INIT_OWNER(hanaawas_state, hanaawas)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 18432000/12)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))

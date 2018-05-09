@@ -313,7 +313,7 @@ MACHINE_CONFIG_START(battlex_state::battlex)
 	MCFG_PALETTE_ADD("palette", 64 + 128)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(10'000'000)/8)   // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END

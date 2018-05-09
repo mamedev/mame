@@ -454,7 +454,7 @@ MACHINE_CONFIG_START(pv1000_state::pv1000)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pv1000 )
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "pv1000_sound", PV1000, 17897725 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 

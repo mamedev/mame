@@ -2791,7 +2791,8 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_PALETTE_ADD("palette16_1", 16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("fm", YM3438, 16000000 / 2) // actual clock speed unknown
 	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, towns_state, towns_fm_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)

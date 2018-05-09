@@ -114,11 +114,11 @@ static void wswan_cart(device_slot_interface &device)
 
 MACHINE_CONFIG_START(wswan_state::wswan)
 	/* Basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30MZ, XTAL(3'072'000))
+	MCFG_DEVICE_ADD(m_maincpu, V30MZ, 3.072_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(wswan_mem)
 	MCFG_DEVICE_IO_MAP(wswan_io)
 
-	MCFG_DEVICE_ADD("vdp", WSWAN_VIDEO, 0)
+	MCFG_DEVICE_ADD(m_vdp, WSWAN_VIDEO, 0)
 	MCFG_WSWAN_VIDEO_TYPE(VDP_TYPE_WSWAN)
 	MCFG_WSWAN_VIDEO_IRQ_CB(wswan_state, set_irq_line)
 	MCFG_WSWAN_VIDEO_DMASND_CB(wswan_state, dma_sound_cb)
@@ -129,7 +129,7 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", wswan_video_device, screen_update)
 //  MCFG_SCREEN_SIZE(WSWAN_X_PIXELS, WSWAN_Y_PIXELS)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, WSWAN_X_PIXELS - 1, 0, WSWAN_Y_PIXELS - 1)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(3'072'000),256,0,WSWAN_X_PIXELS,159,0,WSWAN_Y_PIXELS)
+	MCFG_SCREEN_RAW_PARAMS(3.072_MHz_XTAL, 256, 0, WSWAN_X_PIXELS, 159, 0, WSWAN_Y_PIXELS)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_wswan)
@@ -143,13 +143,14 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 	MCFG_PALETTE_INIT_OWNER(wswan_state, wswan)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_DEVICE_ADD("custom", WSWAN_SND, 0)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD(m_sound, WSWAN_SND, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* cartridge */
-	MCFG_WSWAN_CARTRIDGE_ADD("cartslot", wswan_cart, nullptr)
+	MCFG_DEVICE_ADD(m_cart, WS_CART_SLOT, 3.072_MHz_XTAL / 8, wswan_cart, nullptr)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","wswan")

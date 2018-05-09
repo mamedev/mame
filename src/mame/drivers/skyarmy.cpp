@@ -349,7 +349,7 @@ MACHINE_CONFIG_START(skyarmy_state::skyarmy)
 	MCFG_PALETTE_INIT_OWNER(skyarmy_state, skyarmy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay0", AY8910, 2500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 	MCFG_DEVICE_ADD("ay1", AY8910, 2500000)

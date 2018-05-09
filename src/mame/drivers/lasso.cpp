@@ -515,7 +515,7 @@ MACHINE_CONFIG_START(lasso_state::base)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lasso)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

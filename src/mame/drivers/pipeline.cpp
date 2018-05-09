@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(pipeline_state::pipeline)
 	MCFG_PALETTE_ADD("palette", 0x100+0x100)
 	MCFG_PALETTE_INIT_OWNER(pipeline_state, pipeline)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 7372800/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

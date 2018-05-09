@@ -2863,7 +2863,8 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)    // clock @X2?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -2956,7 +2957,8 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 //  MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8) // same as sammymdl?
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
@@ -3019,7 +3021,8 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 //  MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8) // not on sammymdl?
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)

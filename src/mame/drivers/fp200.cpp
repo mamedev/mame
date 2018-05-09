@@ -608,7 +608,7 @@ MACHINE_CONFIG_START(fp200_state::fp200)
 	MCFG_PALETTE_INIT_OWNER(fp200_state, fp200)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 //  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END

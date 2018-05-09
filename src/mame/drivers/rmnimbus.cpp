@@ -194,7 +194,7 @@ MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO(MONO_TAG)
+	SPEAKER(config, MONO_TAG).front_center();
 	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, 2000000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, rmnimbus_state, nimbus_sound_ay8910_porta_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, rmnimbus_state, nimbus_sound_ay8910_portb_w))

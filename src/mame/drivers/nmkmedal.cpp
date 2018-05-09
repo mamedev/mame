@@ -59,7 +59,7 @@ MACHINE_CONFIG_START(nmkmedal_state::trocana)
 	MCFG_DEVICE_ADD("maincpu", TMP90841, 16500000 / 2) // actually TMP90C041AN
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6376, 16500000 / 16) // actually MSM6650
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

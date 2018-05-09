@@ -621,7 +621,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9129_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(IC_I030, AY8910, XTAL_X002 / 4)
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, einstein_state, keyboard_data_read))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, einstein_state, keyboard_line_write))

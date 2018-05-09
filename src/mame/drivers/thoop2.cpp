@@ -299,7 +299,7 @@ MACHINE_CONFIG_START(thoop2_state::thoop2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) // 1MHz resonator - pin 7 not connected
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)

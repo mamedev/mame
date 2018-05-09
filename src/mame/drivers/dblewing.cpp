@@ -411,7 +411,7 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("soundirq", input_merger_device, in_w<0>))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000)/9)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<1>))

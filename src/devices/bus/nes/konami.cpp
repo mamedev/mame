@@ -641,7 +641,7 @@ WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
 MACHINE_CONFIG_START(nes_konami_vrc6_device::device_add_mconfig)
 
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
 	// TODO: this is not how VRC6 clock signaling works!
 	// The board uses the CLK pin in reality, not hardcoded NTSC values!
@@ -765,7 +765,7 @@ WRITE8_MEMBER(nes_konami_vrc7_device::write_h)
 MACHINE_CONFIG_START(nes_konami_vrc7_device::device_add_mconfig)
 
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
 	// TODO: this is not how VRC7 clock signaling works!
 	// The board uses the CLK pin in reality, not hardcoded NTSC values!

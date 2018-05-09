@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("segapsg", SEGAPSG, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

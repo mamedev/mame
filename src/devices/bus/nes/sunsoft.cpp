@@ -613,7 +613,7 @@ WRITE8_MEMBER(nes_sunsoft_5_device::write_h)
 MACHINE_CONFIG_START(nes_sunsoft_5_device::device_add_mconfig)
 
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
 	// TODO: this is not how Sunsoft 5B clock signaling works!
 	// The board uses the CLK pin in reality, not hardcoded NTSC values!

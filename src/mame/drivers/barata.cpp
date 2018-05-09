@@ -317,7 +317,7 @@ MACHINE_CONFIG_START(barata_state::barata)
 	MCFG_DEFAULT_LAYOUT( layout_barata )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	/* TODO: add sound samples */
 MACHINE_CONFIG_END

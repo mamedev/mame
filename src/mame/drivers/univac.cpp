@@ -351,7 +351,7 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", z80sio_device, ctsb_w)) // FIXME: hacked in permanent loopback to pass test
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END

@@ -2399,7 +2399,8 @@ MACHINE_CONFIG_START(model2_state::model2_scsp)
 	MCFG_DEVICE_ADD("audiocpu", M68000, 12000000)
 	MCFG_DEVICE_PROGRAM_MAP(model2_snd)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("scsp", SCSP)
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, model2_state,scsp_irq))

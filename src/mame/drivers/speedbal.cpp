@@ -291,7 +291,7 @@ MACHINE_CONFIG_START(speedbal_state::speedbal)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000)) // 4 MHz(?)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

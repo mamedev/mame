@@ -823,7 +823,7 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189)
 	MCFG_DEFAULT_LAYOUT(layout_tm990189)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
@@ -884,7 +884,7 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	MCFG_DEFAULT_LAYOUT(layout_tm990189v)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)   /* one two-level buzzer */

@@ -604,7 +604,8 @@ MACHINE_CONFIG_START(esq1_state::esq1)
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("filters", ESQ1_FILTERS, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

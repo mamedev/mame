@@ -793,7 +793,7 @@ MACHINE_CONFIG_START(m63_state::m63)
 	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono") /* ????? */
+	SPEAKER(config, "mono").front_center(); /* ????? */
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -844,7 +844,7 @@ MACHINE_CONFIG_START(m63_state::fghtbskt)
 	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

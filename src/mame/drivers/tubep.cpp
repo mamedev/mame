@@ -864,7 +864,7 @@ MACHINE_CONFIG_START(tubep_state::tubep)
 	MCFG_PALETTE_INIT_OWNER(tubep_state,tubep)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 19968000 / 8 / 2)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_0_w)) /* write port A */
@@ -937,7 +937,7 @@ MACHINE_CONFIG_START(tubep_state::rjammer)
 	MCFG_PALETTE_INIT_OWNER(tubep_state,rjammer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 19968000 / 8 / 2)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tubep_state, ay8910_portA_0_w)) /* write port A */

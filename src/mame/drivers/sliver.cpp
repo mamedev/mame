@@ -536,7 +536,8 @@ MACHINE_CONFIG_START(sliver_state::sliver)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

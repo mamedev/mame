@@ -398,7 +398,7 @@ MACHINE_CONFIG_START(re900_state::re900)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware   */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay_re900", AY8910, TMS_CLOCK) /* From TMS9128NL - Pin 37 (GROMCLK) */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, re900_state, re_psg_portA_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, re900_state, re_psg_portB_r))

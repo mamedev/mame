@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(mosaic_state::mosaic)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'288'000)/4) /* 3.072MHz or 3.579545MHz (14.31818MHz/4)? */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))

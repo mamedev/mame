@@ -806,7 +806,8 @@ MACHINE_CONFIG_START(pgm2_state::pgm2)
 
 	MCFG_NVRAM_ADD_0FILL("sram")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ymz774", YMZ774, 16384000) // is clock correct ?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

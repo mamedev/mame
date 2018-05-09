@@ -108,7 +108,7 @@ MACHINE_CONFIG_START(alien_state::alien)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 MACHINE_CONFIG_END
 

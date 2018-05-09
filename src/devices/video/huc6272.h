@@ -20,9 +20,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_HUC6272_ADD(tag, freq) \
-		MCFG_DEVICE_ADD((tag), HUC6272, (freq))
-
 #define MCFG_HUC6272_IRQ_CHANGED_CB(cb) \
 		devcb = &downcast<huc6272_device &>(*device).set_irq_changed_callback((DEVCB_##cb));
 

@@ -418,7 +418,8 @@ MACHINE_CONFIG_START(vball_state::vball)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	// The sound system comes all but verbatim from Double Dragon
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")

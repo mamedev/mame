@@ -291,7 +291,8 @@ MACHINE_CONFIG_START(pentagon_state::pentagon)
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pentagon)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_REPLACE("ay8912", AY8912, XTAL(14'000'000) / 8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)

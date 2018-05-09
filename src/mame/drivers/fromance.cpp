@@ -934,7 +934,7 @@ MACHINE_CONFIG_START(fromance_state::nekkyoku)
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,nekkyoku)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/6) // type not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
@@ -980,7 +980,7 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(12'000'000) / 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
@@ -1026,7 +1026,7 @@ MACHINE_CONFIG_START(fromance_state::fromance)
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)

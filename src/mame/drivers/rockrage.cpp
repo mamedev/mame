@@ -287,7 +287,8 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 	MCFG_PALETTE_INIT_OWNER(rockrage_state, rockrage)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

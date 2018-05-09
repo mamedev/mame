@@ -75,7 +75,7 @@ MACHINE_CONFIG_START(system_board_y2_state::system_board_y2)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 ROM_START( kof2002um )

@@ -224,7 +224,7 @@ MACHINE_CONFIG_START(klax_state::klax)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, klax_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, ATARI_CLOCK_14MHz/4/4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

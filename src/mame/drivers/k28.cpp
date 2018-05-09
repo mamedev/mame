@@ -466,7 +466,7 @@ MACHINE_CONFIG_START(k28_state::k28)
 	MCFG_DEFAULT_LAYOUT(layout_k28)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speech", VOTRAX_SC01, 760000) // measured 760kHz on its RC pin
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END

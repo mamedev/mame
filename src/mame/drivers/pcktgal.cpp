@@ -254,7 +254,7 @@ MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

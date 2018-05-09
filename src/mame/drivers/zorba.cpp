@@ -149,7 +149,7 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT(m_palette)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(m_beep, BEEP, 800) // should be horizontal frequency / 16, so depends on CRTC parameters
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

@@ -1786,7 +1786,7 @@ MACHINE_CONFIG_START(taitosj_state::nomcu)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("soundnmi2", input_merger_device, in_w<0>))

@@ -997,7 +997,7 @@ MACHINE_CONFIG_START(luckgrln_state::luckgrln)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", luckgrln)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 MACHINE_CONFIG_END
 

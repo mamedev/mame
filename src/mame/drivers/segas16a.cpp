@@ -2015,7 +2015,7 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

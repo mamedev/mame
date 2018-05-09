@@ -224,7 +224,8 @@ MACHINE_CONFIG_START(ultraman_state::ultraman)
 	MCFG_K051316_CB(ultraman_state, zoom_callback_3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

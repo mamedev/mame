@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(atarifb_state::atarifb)
 	MCFG_PALETTE_INIT_OWNER(atarifb_state, atarifb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, atarifb_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.18)

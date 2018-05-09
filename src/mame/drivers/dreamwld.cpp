@@ -118,7 +118,6 @@ public:
 		, m_spritelut(*this, "spritelut")
 		, m_okibank(*this, "oki%ubank", 1)
 		, m_maincpu(*this, "maincpu")
-		, m_mcu(*this, "mcu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 	{
@@ -161,7 +160,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_dreamwld);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
-	required_device<i80c52_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void baryon(machine_config &config);
@@ -774,7 +772,7 @@ MACHINE_CONFIG_START(dreamwld_state::baryon)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dreamwld)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

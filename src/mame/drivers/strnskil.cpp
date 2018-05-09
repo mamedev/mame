@@ -374,7 +374,7 @@ MACHINE_CONFIG_START(strnskil_state::strnskil)
 	MCFG_PALETTE_INIT_OWNER(strnskil_state, strnskil)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76496, 8000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)

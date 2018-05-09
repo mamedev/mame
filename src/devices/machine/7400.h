@@ -46,14 +46,12 @@
 #define MCFG_7400_Y4_CB(_devcb) \
 	devcb = &downcast<ttl7400_device &>(*device).set_y4_cb(DEVCB_##_devcb);
 
-#define MCFG_7400_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TTL7400, 0)
 
 class ttl7400_device : public device_t
 {
 public:
 	// construction/destruction
-	ttl7400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl7400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// static configuration helpers
 	template <class Object> devcb_base &set_y1_cb(Object &&cb) { return m_y1_func.set_callback(std::forward<Object>(cb)); }

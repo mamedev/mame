@@ -340,7 +340,7 @@ MACHINE_CONFIG_START(trs80dt1_state::trs80dt1)
 	MCFG_7474_COMP_OUTPUT_CB(INPUTLINE("maincpu", MCS51_INT1_LINE)) MCFG_DEVCB_INVERT // /Q connects directly to /INT1, so we need to invert?
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
