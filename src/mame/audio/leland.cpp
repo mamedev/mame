@@ -642,9 +642,8 @@ READ16_MEMBER( leland_80186_sound_device::peripheral_r )
 				return ((m_clock_active << 1) & 0x7e);
 
 		case 1:
-			uint16_t sound_command = m_soundlatch->read(space, offset);
-			if (LOG_COMM) logerror("%s:Read sound command latch = %02X\n", machine().describe_context(), sound_command);
-			return sound_command;
+			if (LOG_COMM) logerror("%s:Read sound command latch = %02X\n", machine().describe_context(), m_soundlatch->read(space, offset));
+			return m_soundlatch->read(space, offset);
 
 		case 2:
 			if (ACCESSING_BITS_0_7)
