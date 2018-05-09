@@ -651,7 +651,7 @@ void cps_state::knightsb_map(address_map &map)
 	map(0x800030, 0x800037).nopw(); //AM_WRITE(cps1_coinctrl_w) only writes bit 15
 	map(0x800100, 0x80013f).ram().share("cps_a_regs");  /* CPS-A custom */
 	map(0x800140, 0x80017f).ram().share("cps_b_regs");  /* CPS-B custom */
-	map(0x800181, 0x800181).nopw(); //.w(m_soundlatch[1], FUNC(generic_latch_8_device::write));   /* Sound timer fade */
+	map(0x800180, 0x800181).nopw(); //0x800181, 0x800181).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));   /* Sound timer fade */
 	map(0x880000, 0x880001).nopw(); // unknown
 	map(0x900000, 0x93ffff).ram().w(this, FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
 	map(0x980000, 0x98002f).w(this, FUNC(cps_state::knightsb_layer_w));
@@ -828,7 +828,7 @@ void cps_state::wofabl_map(address_map &map)
 void cps_state::slampic_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
-	map(0x800007, 0x800007).nopw(); //.w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
+	map(0x800006, 0x800007).nopw(); //0x800007, 0x800007).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
 	map(0x800000, 0x800007).portr("IN1");            /* Player input ports */
 	map(0x800018, 0x80001f).r(this, FUNC(cps_state::cps1_dsw_r));            /* System input ports / Dip Switches */
 	map(0x800030, 0x800037).w(this, FUNC(cps_state::cps1_coinctrl_w));
