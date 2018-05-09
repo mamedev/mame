@@ -768,8 +768,7 @@ MACHINE_CONFIG_START(crvision_state::creativision)
 	MCFG_SN76496_READY_HANDLER(WRITELINE(PIA6821_TAG, pia6821_device, cb1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(1, "mono", 0.25);
 
 	// cartridge
 	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
@@ -852,8 +851,7 @@ MACHINE_CONFIG_START(laser2001_state::lasr2001)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(1, "mono", 0.25);
 
 	// cartridge
 	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)

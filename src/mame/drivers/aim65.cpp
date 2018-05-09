@@ -207,8 +207,7 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 
 	/* Sound - wave sound only */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* other devices */
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, AIM65_CLOCK)

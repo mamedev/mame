@@ -232,8 +232,7 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 	MCFG_DEVICE_ADD("ay8910.1", AY8910, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("ay8910.2", AY8910, 1000000)

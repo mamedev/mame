@@ -105,8 +105,7 @@ MACHINE_CONFIG_START(comx35_state::comx35_pal_video)
 	MCFG_CDP1869_SET_SCREEN(SCREEN_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(comx35_state::comx35_ntsc_video)
@@ -125,6 +124,5 @@ MACHINE_CONFIG_START(comx35_state::comx35_ntsc_video)
 	MCFG_CDP1869_SET_SCREEN(SCREEN_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END

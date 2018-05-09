@@ -1529,8 +1529,7 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-//  MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+//  WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* TODO: accurate timing on this */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", pc6001_state, keyboard_callback, attotime::from_hz(250))
