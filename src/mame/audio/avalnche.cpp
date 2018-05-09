@@ -104,7 +104,7 @@ DISCRETE_SOUND_END
 
 
 MACHINE_CONFIG_START(avalnche_state::avalnche_sound)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, avalnche_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -518,7 +518,8 @@ MACHINE_CONFIG_START(voyager_state::voyager)
 	pcvideo_trident_vga(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(voyager_state,voyager)

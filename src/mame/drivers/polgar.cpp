@@ -556,7 +556,7 @@ MACHINE_CONFIG_START(mephisto_modena_state::modena)
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_modena)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

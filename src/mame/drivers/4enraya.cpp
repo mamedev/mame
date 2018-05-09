@@ -492,7 +492,7 @@ MACHINE_CONFIG_START(_4enraya_state::_4enraya )
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
 MACHINE_CONFIG_END
@@ -508,7 +508,7 @@ MACHINE_CONFIG_START(_4enraya_state::unkpacg)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware */
-//  MCFG_SPEAKER_STANDARD_MONO("mono")
+//  SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_REPLACE("aysnd", AY8910, MAIN_CLOCK/4) /* guess */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

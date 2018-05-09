@@ -881,7 +881,7 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	MCFG_PALETTE_INIT_OWNER(amaticmg_state, amaticmg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, SND_CLOCK) /* Y3014B DAC */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)

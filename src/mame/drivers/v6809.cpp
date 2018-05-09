@@ -295,7 +295,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", v6809)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

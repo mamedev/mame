@@ -296,7 +296,8 @@ MACHINE_CONFIG_START(dragrace_state::dragrace)
 	MCFG_PALETTE_INIT_OWNER(dragrace_state, dragrace)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, dragrace_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

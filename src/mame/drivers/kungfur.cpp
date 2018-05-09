@@ -315,7 +315,8 @@ MACHINE_CONFIG_START(kungfur_state::kungfur)
 	/* no video! */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("adpcm1", MSM5205, XTAL(384'000))  // clock verified with recording
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, kungfur_state, kfr_adpcm1_int))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)

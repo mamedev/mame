@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(cloak_state::cloak)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* more low pass filters ==> DISCRETE processing */
 	MCFG_DEVICE_ADD("pokey1", POKEY, XTAL(10'000'000)/8)      /* Accurate to recording */

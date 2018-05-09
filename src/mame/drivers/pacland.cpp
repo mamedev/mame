@@ -452,7 +452,7 @@ MACHINE_CONFIG_START(pacland_state::pacland)
 	MCFG_PALETTE_INIT_OWNER(pacland_state, pacland)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2/1024)
 	MCFG_NAMCO_AUDIO_VOICES(8)

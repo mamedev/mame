@@ -522,7 +522,7 @@ MACHINE_CONFIG_START(exelv_state::exl100)
 	// MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("tms5220c", TMS5220C, 640000)
 	// MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -578,7 +578,7 @@ MACHINE_CONFIG_START(exelv_state::exeltel)
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("tms5220c", TMS5220C, 640000)
 	MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

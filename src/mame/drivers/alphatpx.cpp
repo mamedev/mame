@@ -1240,7 +1240,7 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alphatp3)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 1060 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
@@ -1321,7 +1321,7 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alphatp3)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 1060 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 

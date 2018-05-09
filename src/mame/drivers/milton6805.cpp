@@ -127,7 +127,7 @@ MACHINE_CONFIG_START(milton_state::milton)
 	MCFG_DEVICE_ADD("grom4", TMC0430, 3120000 / 8)
 	downcast<tmc0430_device &>(*device).set_region_and_ident("groms", 0x2000, 1);
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("sp0250", SP0250, 3120000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END

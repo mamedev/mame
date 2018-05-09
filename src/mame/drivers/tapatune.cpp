@@ -529,7 +529,8 @@ MACHINE_CONFIG_START(tapatune_state::tapatune_base)
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("bsmt", BSMT2000, XTAL(24'000'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

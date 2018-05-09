@@ -196,7 +196,8 @@ MACHINE_CONFIG_START(jedi_state::jedi_audio)
 	MCFG_DEVICE_ADD("audiocpu", M6502, JEDI_AUDIO_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, JEDI_POKEY_CLOCK)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)

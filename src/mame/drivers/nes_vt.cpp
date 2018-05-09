@@ -1382,7 +1382,7 @@ MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 	//MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* this should actually be a custom *almost* doubled up APU, however requires more thought
 	   than just using 2 APUs as registers in the 2nd one affect the PCM channel mode but the

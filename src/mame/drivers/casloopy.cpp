@@ -551,7 +551,7 @@ MACHINE_CONFIG_START(casloopy_state::casloopy)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","casloopy")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 /***************************************************************************

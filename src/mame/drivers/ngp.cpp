@@ -841,7 +841,8 @@ MACHINE_CONFIG_START(ngp_state::ngp_common)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO( "lspeaker","rspeaker" )
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD( "t6w28", T6W28, 6.144_MHz_XTAL/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )

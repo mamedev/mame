@@ -208,7 +208,7 @@ MACHINE_CONFIG_START(mastboyo_state::mastboyo)
 	MCFG_PALETTE_INIT_OWNER(mastboyo_state, mastboyo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 20_MHz_XTAL/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0")) // DSW

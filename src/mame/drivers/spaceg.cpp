@@ -526,7 +526,7 @@ MACHINE_CONFIG_START(spaceg_state::spaceg)
 	MCFG_PALETTE_INIT_OWNER(spaceg_state, spaceg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// HACK: SN76477 parameters copied from space invaders
 	MCFG_DEVICE_ADD("snsnd", SN76477)

@@ -3314,7 +3314,8 @@ MACHINE_CONFIG_START(cobra_state::cobra)
 	MCFG_SCREEN_UPDATE_DRIVER(cobra_state, screen_update_cobra)
 	MCFG_PALETTE_ADD("palette", 65536)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

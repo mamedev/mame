@@ -1501,7 +1501,7 @@ MACHINE_CONFIG_START(x07_state::x07)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x07)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.50 )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")

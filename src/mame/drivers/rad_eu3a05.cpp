@@ -1177,7 +1177,7 @@ MACHINE_CONFIG_START(radica_eu3a05_state::radicasi)
 	MCFG_RADICA6502_GPIO_READ_PORT0_CB(IOPORT("IN0"))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("6ch_sound", RADICA6502_SOUND, 8000)
 	MCFG_RADICA6502_SOUND_SPACE_READ_CB(READ8(*this, radica_eu3a05_state, read_full_space))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

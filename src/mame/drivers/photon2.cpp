@@ -374,7 +374,7 @@ MACHINE_CONFIG_START(photon2_state::photon2)
 	MCFG_PALETTE_INIT_OWNER(photon2_state, photon2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

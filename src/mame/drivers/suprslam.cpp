@@ -309,7 +309,8 @@ MACHINE_CONFIG_START(suprslam_state::suprslam)
 	MCFG_K053936_WRAP(1)
 	MCFG_K053936_OFFSETS(-45, -21)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))

@@ -805,7 +805,8 @@ MACHINE_CONFIG_START(cdi_state::cdimono1_base)
 	MCFG_CDISLAVE_ADD("slave_hle")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD( "dac1", DMADAC )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
@@ -860,7 +861,8 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD( "dac1", DMADAC )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
@@ -914,7 +916,8 @@ MACHINE_CONFIG_START(cdi_state::cdi910)
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD( "dac1", DMADAC )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )

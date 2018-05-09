@@ -1733,7 +1733,7 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	MCFG_GFXDECODE_ADD("gfxdecode", MOS8563_TAG":palette", c128)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(14'318'181)*2/3.5/8)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, c128_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, c128_state, sid_poty_r))
@@ -1907,7 +1907,7 @@ MACHINE_CONFIG_START(c128_state::pal)
 	MCFG_GFXDECODE_ADD("gfxdecode", MOS8563_TAG":palette", c128)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(17'734'472)*2/4.5/8)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, c128_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, c128_state, sid_poty_r))

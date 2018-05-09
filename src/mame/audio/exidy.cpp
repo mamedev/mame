@@ -765,7 +765,7 @@ MACHINE_CONFIG_START(exidy_state::venture_audio)
 	MCFG_PIA_CB2_HANDLER(WRITELINE("pia0", pia6821_device, ca1_w))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE("custom", exidy_sound_device, update_irq_state))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("custom", EXIDY_VENTURE, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -1014,7 +1014,7 @@ MACHINE_CONFIG_START(victory_state::victory_audio)
 	MCFG_PIA_CB2_HANDLER(WRITELINE("custom", victory_sound_device, main_ack_w))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE("custom", exidy_sound_device, update_irq_state))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("custom", EXIDY_VICTORY, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

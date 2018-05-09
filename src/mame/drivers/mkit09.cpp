@@ -204,7 +204,7 @@ MACHINE_CONFIG_START(mkit09_state::mkit09)
 	MCFG_DEFAULT_LAYOUT(layout_mkit09)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -229,7 +229,7 @@ MACHINE_CONFIG_START(mkit09_state::mkit09a)
 	MCFG_DEFAULT_LAYOUT(layout_mkit09)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

@@ -146,7 +146,7 @@ MACHINE_CONFIG_START(gokidetor_state::gokidetor)
 	MCFG_PC060HA_MASTER_CPU("maincpu")
 	MCFG_PC060HA_SLAVE_CPU("soundcpu")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

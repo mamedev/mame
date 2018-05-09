@@ -737,7 +737,7 @@ MACHINE_CONFIG_START(vip_state::vip)
 	MCFG_SCREEN_UPDATE_DRIVER(vip_state, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, vip_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

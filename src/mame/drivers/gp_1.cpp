@@ -458,7 +458,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gp_1_state::gp_1s)
 	gp_1(config);
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(0)                         // decay_res: N/C

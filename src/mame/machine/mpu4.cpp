@@ -3097,7 +3097,8 @@ MACHINE_CONFIG_START(mpu4_state::mpu4base)
 
 	mpu4_common(config);
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

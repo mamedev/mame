@@ -529,7 +529,7 @@ MACHINE_CONFIG_START(_4enlinea_state::_4enlinea)
 */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, SND_AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN-P2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN-P1"))

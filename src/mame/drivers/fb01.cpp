@@ -217,7 +217,8 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 
 	MCFG_MIDI_PORT_ADD("mdthru", midiout_slot, "midiout")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ym2164", YM2151, XTAL(4'000'000))
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, fb01_state, ym2164_irq_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)

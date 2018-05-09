@@ -255,32 +255,30 @@ Stephh's log (2006.09.20) :
 
 READ16_MEMBER(cps_state::cps1_dsw_r)
 {
-	ioport *dsw = nullptr;
+	uint8_t dsw;
 	switch (offset)
 	{
-		case 0: dsw = m_io_in0; break;
+		case 0: dsw = m_io_in0->read(); break;
 		case 1:
 		case 2:
-		case 3: dsw = m_io_dsw[offset-1]; break;
+		case 3: dsw = m_io_dsw[offset-1]->read(); break;
 		default: return;
 	}
-	int in = dsw->read();
-	return (in << 8) | 0xff;
+	return (dsw << 8) | 0xff;
 }
 
 READ16_MEMBER(cps_state::cps1_hack_dsw_r)
 {
-	ioport *dsw = nullptr;
+	uint8_t dsw;
 	switch (offset)
 	{
-		case 0: dsw = m_io_in0; break;
+		case 0: dsw = m_io_in0->read(); break;
 		case 1:
 		case 2:
-		case 3: dsw = m_io_dsw[offset-1]; break;
+		case 3: dsw = m_io_dsw[offset-1]->read(); break;
 		default: return;
 	}
-	int in = dsw->read();
-	return (in << 8) | in;
+	return (dsw << 8) | dsw;
 }
 
 READ16_MEMBER(cps_state::cps1_in1_r)
@@ -3380,7 +3378,7 @@ MACHINE_CONFIG_START(cps_state::cps1_10MHz)
 	MCFG_VIDEO_START_OVERRIDE(cps_state, cps1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -3450,7 +3448,8 @@ MACHINE_CONFIG_START(cps_state::qsound)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("mono")
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_REMOVE("soundlatch1")
 	MCFG_DEVICE_REMOVE("soundlatch2")
@@ -5274,7 +5273,7 @@ ROM_START( ffightj2 )
 	ROM_LOAD( "lwio.12c",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )
 ROM_END
 
-/* B-Board 88622B-3 */
+/* B-Board 88622B-2 */
 ROM_START( ffightj3 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "ffj_36.12f",             0x00000, 0x20000, CRC(e619eb30) SHA1(41c2589a1b2cab2d0ded527a89f8e0e39e61efe1) ) // == ffu_30_3.11f - labeld FFJ 36 but had blue stripe across label like USA sets
@@ -5321,7 +5320,7 @@ ROM_START( ffightj3 )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
 	ROM_LOAD( "s222b.1a",     0x0000, 0x0117, CRC(6d86b45e) SHA1(2b27646adaf1ca2f58e14754d6f7ef4fdca77fbe) )
-	ROM_LOAD( "lwio.12e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )    // pal verification required
+	ROM_LOAD( "lwio.12e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )
 ROM_END
 
 /* B-Board 89625B-1 */
@@ -12304,14 +12303,8 @@ ROM_START( sfzbch )
 	ROM_REGION( 0x8000, "stars", 0 )
 	ROM_COPY( "gfx", 0x000000, 0x000000, 0x8000 )   /* stars */
 
-<<<<<<< HEAD
 	ROM_REGION( 0x10000, "audiocpu",0 ) /* 64k for the audio CPU (+banks) */
-	ROM_LOAD( "sfz_09.12a",  0x00000, 0x10000, CRC(c772628b) SHA1(ebc5b7c173caf1e151f733f23c1b20abec24e16d))
-=======
-	ROM_REGION( 0x18000, "audiocpu",0 ) /* 64k for the audio CPU (+banks) */
-	ROM_LOAD( "sfz_09.12a",  0x00000, 0x08000, CRC(c772628b) SHA1(ebc5b7c173caf1e151f733f23c1b20abec24e16d) )
-	ROM_CONTINUE(            0x10000, 0x08000 )
->>>>>>> upstream/master
+	ROM_LOAD( "sfz_09.12a",  0x00000, 0x10000, CRC(c772628b) SHA1(ebc5b7c173caf1e151f733f23c1b20abec24e16d) )
 
 	ROM_REGION( 0x40000, "oki",0 )  /* Samples */
 	ROM_LOAD( "sfz_18.11c",  0x00000, 0x20000, CRC(61022b2d) SHA1(6369d0c1d08a30ee19b94e52ab1463a7784b9de5) )

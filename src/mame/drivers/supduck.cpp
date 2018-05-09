@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(supduck_state::supduck)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

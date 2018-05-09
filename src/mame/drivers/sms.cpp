@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(sms_state::sms_base)
 	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
 
 	/* basic machine hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_SMS_CARTRIDGE_ADD("slot", sms_cart, nullptr)
 
@@ -968,7 +968,8 @@ MACHINE_CONFIG_START(sms_state::gamegear)
 	MCFG_SEGA315_5378_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	/* actually, PSG is embedded in the VDP chip */
 	MCFG_DEVICE_ADD("gamegear", GAMEGEAR, MASTER_CLOCK_GG/9)

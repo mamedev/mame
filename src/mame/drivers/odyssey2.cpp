@@ -694,7 +694,7 @@ MACHINE_CONFIG_START(odyssey2_state::odyssey2)
 	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_I8244_ADD( "i8244", XTAL(7'159'090)/2 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, odyssey2_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
@@ -720,7 +720,7 @@ MACHINE_CONFIG_START(odyssey2_state::videopac)
 	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_I8245_ADD( "i8244", XTAL(17'734'470)/5 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, odyssey2_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
@@ -758,7 +758,7 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 
 	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_I8245_ADD( "i8244", 3540000 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, g7400_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
@@ -799,7 +799,7 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 
 	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_I8244_ADD( "i8244", 3540000 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, g7400_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 

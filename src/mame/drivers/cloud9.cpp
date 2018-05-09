@@ -436,7 +436,7 @@ MACHINE_CONFIG_START(cloud9_state::cloud9)
 	MCFG_DEVICE_ADD("videolatch", LS259, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

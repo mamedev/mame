@@ -210,7 +210,7 @@ MACHINE_CONFIG_START(mk2_state::mk2)
 	MCFG_MOS6530_OUT_PB_CB(WRITE8(*this, mk2_state, mk2_write_b))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

@@ -140,7 +140,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(crbaloon_state::crbaloon_audio)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(470)) // noise + filter

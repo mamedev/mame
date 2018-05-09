@@ -3799,7 +3799,8 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos22)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
@@ -3809,7 +3810,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos22_state::cybrcomm)
 	namcos22(config);
 
-	MCFG_SPEAKER_STANDARD_STEREO("rear_left","rear_right")
+	SPEAKER(config, "rear_left", -0.2, 0.0, -0.5);
+	SPEAKER(config, "rear_right", 0.2, 0.0, -0.5);
 
 	MCFG_DEVICE_MODIFY("c352")
 	MCFG_SOUND_ROUTE(2, "rear_left", 1.00)
@@ -3865,7 +3867,8 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
@@ -3875,7 +3878,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos22_state::airco22b)
 	namcos22s(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("bodysonic")
+	SPEAKER(config, "bodysonic").front_center();
 
 	MCFG_DEVICE_MODIFY("c352")
 	MCFG_SOUND_ROUTE(2, "bodysonic", 0.50)
@@ -3902,7 +3905,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos22_state::cybrcycc)
 	namcos22s(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("tank")
+	SPEAKER(config, "tank").front_center();
 
 	MCFG_DEVICE_MODIFY("c352")
 	MCFG_SOUND_ROUTE(2, "tank", 1.00)
@@ -3911,8 +3914,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos22_state::dirtdash)
 	namcos22s(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("road")
-	MCFG_SPEAKER_STANDARD_MONO("under")
+	SPEAKER(config, "road").front_center();
+	SPEAKER(config, "under").front_center();
 
 	MCFG_DEVICE_MODIFY("c352")
 	MCFG_SOUND_ROUTE(2, "road", 1.00)
@@ -3930,8 +3933,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos22_state::tokyowar)
 	namcos22s(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("seat")
-	MCFG_SPEAKER_STANDARD_MONO("vibration")
+	SPEAKER(config, "seat", 0.0, 0.0, 0.0);
+	SPEAKER(config, "vibration", 0.0, 0.0, 0.0);
 
 	MCFG_DEVICE_MODIFY("c352")
 	MCFG_SOUND_ROUTE(3, "seat", 1.00)

@@ -501,7 +501,7 @@ MACHINE_CONFIG_START(superwng_state::superwng)
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(superwng_state, superwng)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, MASTER_CLOCK/12)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, superwng_state, superwng_sound_byte_r))

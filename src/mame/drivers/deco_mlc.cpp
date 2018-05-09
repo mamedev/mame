@@ -537,7 +537,8 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 	MCFG_VIDEO_START_OVERRIDE(deco_mlc_state,mlc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 42000000 / 3)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -575,7 +576,8 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 42000000 / 3)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

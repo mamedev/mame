@@ -519,7 +519,7 @@ MACHINE_CONFIG_START(jantotsu_state::jantotsu)
 	MCFG_PALETTE_INIT_OWNER(jantotsu_state, jantotsu)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489A, MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

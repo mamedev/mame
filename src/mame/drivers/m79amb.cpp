@@ -210,7 +210,7 @@ MACHINE_CONFIG_START(m79amb_state::m79amb)
 	MCFG_SCREEN_UPDATE_DRIVER(m79amb_state, screen_update_ramtek)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, m79amb_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

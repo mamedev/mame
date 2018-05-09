@@ -435,7 +435,7 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -472,7 +472,7 @@ MACHINE_CONFIG_START(pt68k4_state::pt68k4)
 	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa7", ISA8_SLOT, 0, ISABUS_TAG, pt68k4_isa8_cards, nullptr, false)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

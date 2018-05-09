@@ -5799,7 +5799,7 @@ MACHINE_CONFIG_START(galaxian_state::galaxian_base)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
 

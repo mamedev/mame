@@ -238,7 +238,7 @@ MACHINE_CONFIG_START(poolshrk_state::poolshrk)
 	MCFG_PALETTE_INIT_OWNER(poolshrk_state, poolshrk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, poolshrk_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

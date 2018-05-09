@@ -501,7 +501,7 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900)
 	cgc7900_video(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(28'480'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

@@ -979,7 +979,7 @@ MACHINE_CONFIG_START(gameplan_state::gameplan)
 	gameplan_video(config);
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

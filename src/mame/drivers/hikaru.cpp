@@ -525,7 +525,8 @@ MACHINE_CONFIG_START(hikaru_state::hikaru)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 
-//  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+//  SPEAKER(config, "lspeaker").front_left();
+//  SPEAKER(config, "rspeaker").front_right();
 //  MCFG_DEVICE_ADD("aica", AICA, 0)
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 //  MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)

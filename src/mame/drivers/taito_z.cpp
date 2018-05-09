@@ -3227,9 +3227,9 @@ MACHINE_CONFIG_START(taitoz_state::contcirc)
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_ADD("front", 0.0, 0.0,  0.7)
-	MCFG_SPEAKER_ADD("rear",  0.0, 0.0,  1.3)
-	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
+	SPEAKER(config, "front",     0.0, 0.0,  1.0);
+	SPEAKER(config, "rear",      0.0, 0.0, -0.5);
+	SPEAKER(config, "subwoofer", 0.0, 0.0,  1.0);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -3302,9 +3302,9 @@ MACHINE_CONFIG_START(taitoz_state::chasehq)
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_ADD("front",  0.0, 0.0, 0.7)
-	MCFG_SPEAKER_ADD("rear",   0.0, 0.0, 1.3)
-	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
+	SPEAKER(config, "front",     0.0, 0.0,  1.0);
+	SPEAKER(config, "rear",      0.0, 0.0, -0.5);
+	SPEAKER(config, "subwoofer", 0.0, 0.0,  0.5);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -3379,7 +3379,8 @@ MACHINE_CONFIG_START(taitoz_state::enforce)
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -3456,7 +3457,8 @@ MACHINE_CONFIG_START(taitoz_state::bshark)
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	//MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) // DG: this is probably specific to Z80 and wrong?
@@ -3536,7 +3538,8 @@ MACHINE_CONFIG_START(taitoz_state::sci)
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -3619,9 +3622,9 @@ MACHINE_CONFIG_START(taitoz_state::nightstr)
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_ADD("front",  0.0, 0.0, 0.7)
-	MCFG_SPEAKER_ADD("rear",   0.0, 0.0, 1.3)
-	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
+	SPEAKER(config, "front",     0.0, 0.0,  1.0);
+	SPEAKER(config, "rear",      0.0, 0.0, -0.5);
+	SPEAKER(config, "subwoofer", 0.0, 0.0,  0.5);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -3696,7 +3699,8 @@ MACHINE_CONFIG_START(taitoz_state::aquajack)
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -3775,7 +3779,8 @@ MACHINE_CONFIG_START(taitoz_state::spacegun)
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	//MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) // DG: this is probably specific to Z80 and wrong?
@@ -3845,7 +3850,8 @@ MACHINE_CONFIG_START(taitoz_state::dblaxle)
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(32'000'000)/4)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -3917,7 +3923,8 @@ MACHINE_CONFIG_START(taitoz_state::racingb)
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(32'000'000)/4)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

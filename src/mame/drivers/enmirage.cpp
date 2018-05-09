@@ -220,7 +220,8 @@ MACHINE_CONFIG_START(enmirage_state::mirage)
 
 	MCFG_DEFAULT_LAYOUT( layout_mirage )
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_ES5503_ADD("es5503", 7000000)
 	MCFG_ES5503_OUTPUT_CHANNELS(2)
 	MCFG_ES5503_IRQ_FUNC(WRITELINE(*this, enmirage_state, mirage_doc_irq))

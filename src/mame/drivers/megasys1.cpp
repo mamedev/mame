@@ -1716,7 +1716,8 @@ MACHINE_CONFIG_START(megasys1_state::system_A)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 256*2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
@@ -1820,7 +1821,8 @@ MACHINE_CONFIG_START(megasys1_state::system_Bbl)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 256*2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	/* just the one OKI, used for sound and music */
 	MCFG_DEVICE_ADD("oki1", OKIM6295, OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH)
@@ -1898,7 +1900,7 @@ MACHINE_CONFIG_START(megasys1_state::system_D)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, SYS_D_CPU_CLOCK/4, okim6295_device::PIN7_HIGH)    /* 2MHz (8MHz / 4) */
 	MCFG_DEVICE_ADDRESS_MAP(0, megasys1D_oki_map)
@@ -1949,7 +1951,7 @@ MACHINE_CONFIG_START(megasys1_state::system_Z)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch_z")
 

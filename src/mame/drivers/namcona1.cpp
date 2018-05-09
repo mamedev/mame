@@ -988,7 +988,8 @@ MACHINE_CONFIG_START(namcona1_state::namcona1)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcona1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C140_ADD("c140", 44100)
 	MCFG_C140_BANK_TYPE(ASIC219)

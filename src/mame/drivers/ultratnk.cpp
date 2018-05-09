@@ -318,7 +318,7 @@ MACHINE_CONFIG_START(ultratnk_state::ultratnk)
 	MCFG_PALETTE_INIT_OWNER(ultratnk_state, ultratnk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, ultratnk_discrete)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)

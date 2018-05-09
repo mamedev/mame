@@ -2808,7 +2808,7 @@ MACHINE_CONFIG_START(subsino_state::victor21)
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2852,7 +2852,7 @@ MACHINE_CONFIG_START(subsino_state::crsbingo)
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))   /* Unknown clock */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2894,7 +2894,7 @@ MACHINE_CONFIG_START(subsino_state::srider)
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2947,7 +2947,7 @@ MACHINE_CONFIG_START(subsino_state::tisub)
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino_reels)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))   /* Unknown clock */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2990,7 +2990,7 @@ MACHINE_CONFIG_START(subsino_state::stbsub)
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,stbsub)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

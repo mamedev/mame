@@ -266,7 +266,7 @@ MACHINE_CONFIG_START(dogfgt_state::dogfgt)
 	MCFG_PALETTE_INIT_OWNER(dogfgt_state, dogfgt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

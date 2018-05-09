@@ -310,7 +310,7 @@ MACHINE_CONFIG_START(fcombat_state::fcombat)
 	MCFG_PALETTE_INIT_OWNER(fcombat_state, fcombat)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

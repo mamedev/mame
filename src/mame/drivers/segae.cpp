@@ -903,7 +903,7 @@ MACHINE_CONFIG_START(systeme_state::systeme)
 	MCFG_DEVICE_ADDRESS_MAP(0, vdp2_map)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SEGAPSG, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

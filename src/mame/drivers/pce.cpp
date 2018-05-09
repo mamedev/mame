@@ -340,7 +340,8 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
 	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD(C6280_TAG, C6280, MAIN_CLOCK/6)
 	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
@@ -407,7 +408,8 @@ MACHINE_CONFIG_START(pce_state::sgx)
 	MCFG_HUC6202_READ_1_CB(READ8("huc6270_1", huc6270_device, read))
 	MCFG_HUC6202_WRITE_1_CB(WRITE8("huc6270_1", huc6270_device, write))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD(C6280_TAG, C6280, MAIN_CLOCK/6)
 	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)

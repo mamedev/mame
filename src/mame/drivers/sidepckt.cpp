@@ -393,7 +393,7 @@ MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 	MCFG_PALETTE_INIT_OWNER(sidepckt_state, sidepckt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))

@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(skyraid_state::skyraid)
 	MCFG_PALETTE_INIT_OWNER(skyraid_state, skyraid)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, skyraid_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -1337,7 +1337,7 @@ MACHINE_CONFIG_START(balsente_state::balsente)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_CEM3394_ADD("cem1", 0)
 	MCFG_CEM3394_EXT_INPUT_CB(balsente_state, noise_gen_0)

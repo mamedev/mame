@@ -69,7 +69,7 @@ MACHINE_CONFIG_START(clowndwn_state::clowndwn)
 	MCFG_DEVICE_ADD("pia4", PIA6821, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 

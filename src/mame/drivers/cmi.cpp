@@ -2325,7 +2325,7 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_PIA_READPA_HANDLER(READ8(*this, cmi_state, cmi10_u21_a_r))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, cmi_state, cmi10_u21_cb2_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// Channel cards
 	MCFG_DEVICE_ADD("cmi01a_0", CMI01A_CHANNEL_CARD, 0)

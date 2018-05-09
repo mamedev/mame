@@ -252,7 +252,7 @@ MACHINE_CONFIG_START(votrpss_state::votrpss)
 	//MCFG_DEFAULT_LAYOUT(layout_votrpss)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay", AY8910, XTAL(8'000'000)/4) /* 2.000 MHz, verified */
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))        // port B read
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("votrax", votrax_sc01_device, write))     // port A write

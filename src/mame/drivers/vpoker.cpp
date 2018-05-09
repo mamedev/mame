@@ -657,7 +657,7 @@ MACHINE_CONFIG_START(vpoker_state::vpoker)
 	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, vpoker_state, ptm_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 //  MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/4 /* guess */)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END

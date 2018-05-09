@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(nyny_state::nyny)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, nyny_state,main_cpu_irq))
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")

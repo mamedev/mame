@@ -420,7 +420,7 @@ MACHINE_CONFIG_START(dai3wksi_state::dai3wksi)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 #if (USE_SAMPLES)
 	MCFG_DEVICE_ADD("samples", SAMPLES)
