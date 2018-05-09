@@ -805,8 +805,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(hec2hrp_state::hector_audio)
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)  /* Sound level for cassette, as it is in mono => output channel=0*/
+	WAVE(config, "wave", "cassette").add_route(0, "mono", 0.25);  /* Sound level for cassette, as it is in mono => output channel=0*/
 
 	MCFG_DEVICE_ADD("sn76477", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(390)) // noise + filter

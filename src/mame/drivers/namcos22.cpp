@@ -3810,8 +3810,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos22_state::cybrcomm)
 	namcos22(config);
 
-	SPEAKER(config, "rear_left").front_left();
-	SPEAKER(config, "rear_right").front_right();
+	SPEAKER(config, "rear_left", -0.2, 0.0, -0.5);
+	SPEAKER(config, "rear_right", 0.2, 0.0, -0.5);
 
 	MCFG_DEVICE_MODIFY("c352")
 	MCFG_SOUND_ROUTE(2, "rear_left", 1.00)
@@ -3933,8 +3933,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos22_state::tokyowar)
 	namcos22s(config);
 
-	SPEAKER(config, "seat").front_center();
-	SPEAKER(config, "vibration").front_center();
+	SPEAKER(config, "seat", 0.0, 0.0, 0.0);
+	SPEAKER(config, "vibration", 0.0, 0.0, 0.0);
 
 	MCFG_DEVICE_MODIFY("c352")
 	MCFG_SOUND_ROUTE(3, "seat", 1.00)

@@ -927,11 +927,9 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("beeper", BEEP, 4096)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
+	BEEP(config, "beeper", 4096).add_route(ALL_OUTPUTS,"mono",0.15);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mz2000_state::mz80b)

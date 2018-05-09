@@ -717,10 +717,8 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 950) /* piezo-device needs to be measured */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	BEEP(config, "beeper", 950).add_route(ALL_OUTPUTS, "mono", 1.00); /* piezo-device needs to be measured */
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	MCFG_UPD765A_ADD("fdc", true, true)

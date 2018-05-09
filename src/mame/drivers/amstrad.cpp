@@ -948,8 +948,7 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	MCFG_DEVICE_ADD("ay", AY8912, XTAL(16'000'000) / 16)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, amstrad_state, amstrad_psg_porta_read)) /* portA read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -1076,8 +1075,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	MCFG_DEVICE_ADD("ay", AY8912, XTAL(40'000'000) / 40)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, amstrad_state, amstrad_psg_porta_read)) /* portA read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
