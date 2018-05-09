@@ -274,8 +274,8 @@ WRITE8_MEMBER(pc9801_86_device::pcm_w)
 				if(!(data & 0x10))
 				{
 					machine().device<pic8259_device>(":pic8259_slave")->ir4_w(m_fmirq ? ASSERT_LINE : CLEAR_LINE);
-					if(!(queue_count() < m_irq_rate))
-						m_pcmirq = false;
+					if(!(queue_count() < m_irq_rate) || !(data & 0x80))
+						m_pcmirq = false; //TODO: this needs research
 				}
 				m_init = true;
 				m_pcm_ctrl = data & ~0x10;

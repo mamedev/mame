@@ -21,9 +21,7 @@
     - EAG missing bankswitch? where is the 2nd half of the 32KB ROM used, if at all?
     - granits gives error beeps at start, need to press clear to play
     - finish fphantom emulation
-	- PC reset button maps where?
 	- PC has 14KB RAM. 0000-0fff and 8000-9fff is certain, where does the remaining map to?
-	- PC add its own internal layout(panel is on the right side instead of bottom)
 
 ******************************************************************************
 
@@ -461,6 +459,7 @@ I/O is via TTL, very similar to Designer Display
 #include "fidel_eas.lh" // clickable
 #include "fidel_ex.lh" // clickable
 #include "fidel_exd.lh" // clickable
+#include "fidel_pc.lh" // clickable
 #include "fidel_playmatic.lh" // clickable
 #include "fidel_rsc_v2.lh" // clickable
 #include "fidel_sc9.lh" // clickable
@@ -1467,7 +1466,7 @@ static INPUT_PORTS_START( eas )
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
 
 	PORT_START("IN.8")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Game Control")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Game Control") // labeled RESET on the Prestige, but led display still says - G C -
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Speaker")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("PB / King")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("PV / Queen")
@@ -1807,7 +1806,7 @@ MACHINE_CONFIG_START(fidel6502_state::pc)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_eas)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_pc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
