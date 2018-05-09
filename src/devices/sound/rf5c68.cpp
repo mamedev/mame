@@ -61,6 +61,14 @@ void rf5c68_device::device_start()
 	save_item(NAME(m_enable));
 }
 
+//-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void rf5c68_device::rom_bank_updated()
+{
+	m_stream->update();
+}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
