@@ -299,6 +299,7 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_I8085A_SID(GND) // used to time NVR reads
 	MCFG_I8085A_SOD(WRITELINE(*this, cit101_state, blink_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
