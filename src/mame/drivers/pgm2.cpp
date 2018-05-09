@@ -1507,7 +1507,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kof98umh)
 
 // Oriental Legend 2 - should be a V102 and V100 too
 //西游释厄传2/Xīyóu shì è chuán 2 (China; Simplified Chinese)
-//西遊釋厄傳2/Saiyuu Syakuyakuden 2 (Japan; Traditional Chinese)
+//西遊釋厄傳2/Saiyuu Shakuyakuden 2 (Japan; Traditional Chinese)
 GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_SUPPORTS_SAVE ) /* Overseas sets of OL2 do not use the card reader */
 GAME( 2007, orleg2_103,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", MACHINE_SUPPORTS_SAVE )
 GAME( 2007, orleg2_101,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", MACHINE_SUPPORTS_SAVE )
@@ -1516,9 +1516,9 @@ GAME( 2007, orleg2_104cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,     
 GAME( 2007, orleg2_103cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS (Huatong license)", "Xiyou Shi E Chuan 2 (V103, China)", MACHINE_SUPPORTS_SAVE )
 GAME( 2007, orleg2_101cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS (Huatong license)", "Xiyou Shi E Chuan 2 (V101, China)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2007, orleg2_104jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS (Alta license)", "Saiyuu Syakuyakuden 2 (V104, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_103jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS (Alta license)", "Saiyuu Syakuyakuden 2 (V103, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_101jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS (Alta license)", "Saiyuu Syakuyakuden 2 (V101, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_104jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V104, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_103jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V103, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V101, Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Knights of Valour 2 New Legend
 //三國戰紀2撗掃于軍 New Legend/Sānguó zhàn jì 2 Guàng sǎo yú jūn New Legend (Oversea; Mixed Traditional and Simplified Chinese)
