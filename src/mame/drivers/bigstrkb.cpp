@@ -220,7 +220,8 @@ MACHINE_CONFIG_START(bigstrkb_state::bigstrkb)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 //  MCFG_DEVICE_ADD("ymsnd", YM2151, ym2151_config)
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000, okim6295_device::PIN7_HIGH)

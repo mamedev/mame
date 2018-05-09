@@ -378,7 +378,7 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 	MCFG_PALETTE_INIT_OWNER(blueprnt_state, blueprnt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

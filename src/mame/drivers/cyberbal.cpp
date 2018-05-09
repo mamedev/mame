@@ -453,7 +453,8 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_1))
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
@@ -509,7 +510,7 @@ MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cyberbal2p_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_3))
 	MCFG_ATARI_JSA_TEST_PORT("IN2", 15)

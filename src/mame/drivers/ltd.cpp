@@ -556,7 +556,7 @@ MACHINE_CONFIG_START(ltd_state::ltd4)
 	/* Sound */
 	genpin_audio(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd_0", AY8910, XTAL(3'579'545)/2) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
 	MCFG_DEVICE_ADD("aysnd_1", AY8910, XTAL(3'579'545)/2) /* guess */

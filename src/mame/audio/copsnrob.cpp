@@ -590,7 +590,7 @@ DISCRETE_RESET(copsnrob_zings_555_astable)
  ************************************************/
 
 
-static DISCRETE_SOUND_START(copsnrob)
+static DISCRETE_SOUND_START(copsnrob_discrete)
 
 	/************************************************
 	 * Input register mapping
@@ -697,10 +697,10 @@ WRITE_LINE_MEMBER(copsnrob_state::one_start_w)
 
 MACHINE_CONFIG_START(copsnrob_state::copsnrob_audio)
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(copsnrob)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, copsnrob_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

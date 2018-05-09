@@ -903,7 +903,7 @@ MACHINE_CONFIG_START(pc2000_state::pc2000)
 	MCFG_HD44780_LCD_SIZE(2, 20)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 

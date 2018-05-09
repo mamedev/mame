@@ -844,7 +844,7 @@ MACHINE_CONFIG_START(imds2_state::imds2)
 		MCFG_GFXDECODE_ADD("gfxdecode" , "palette" , imds2)
 		MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-		MCFG_SPEAKER_STANDARD_MONO("mono")
+		SPEAKER(config, "mono").front_center();
 		MCFG_DEVICE_ADD("iocbeep" , BEEP , IOC_BEEP_FREQ)
 		MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
 

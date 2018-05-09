@@ -1760,7 +1760,8 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1947,7 +1948,8 @@ MACHINE_CONFIG_START(segaxbd_smgp_fd1094_state::device_add_mconfig)
 	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(*this, segaxbd_state, smgp_motor_w))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
+	SPEAKER(config, "rearleft").front_left();
+	SPEAKER(config, "rearright").front_right();
 
 	MCFG_DEVICE_ADD("pcm2", SEGAPCM, SOUND_CLOCK/4)
 	MCFG_SEGAPCM_BANK(BANK_512)
@@ -1988,7 +1990,8 @@ MACHINE_CONFIG_START(segaxbd_smgp_state::device_add_mconfig)
 	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(*this, segaxbd_state, smgp_motor_w))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
+	SPEAKER(config, "rearleft").front_left();
+	SPEAKER(config, "rearright").front_right();
 
 	MCFG_DEVICE_ADD("pcm2", SEGAPCM, SOUND_CLOCK/4)
 	MCFG_SEGAPCM_BANK(BANK_512)

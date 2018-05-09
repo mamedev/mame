@@ -621,7 +621,7 @@ MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 	MCFG_PALETTE_ADD("palette", 0x200+4)
 	MCFG_PALETTE_INIT_OWNER(ddayjlc_state, ddayjlc)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

@@ -181,7 +181,7 @@ MACHINE_CONFIG_START(eva_state::eva24)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, 640_kHz_XTAL/4)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("tms5100", TMS5110A, 640_kHz_XTAL)
 	tms5110_route(config);
 MACHINE_CONFIG_END
@@ -197,7 +197,7 @@ MACHINE_CONFIG_START(eva_state::eva11)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("tms6100", TMS6100, 640_kHz_XTAL/4)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("tms5100", TMS5110A, 640_kHz_XTAL)
 	tms5110_route(config);
 MACHINE_CONFIG_END

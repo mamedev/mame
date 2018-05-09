@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(touchme_state::touchme)
 	MCFG_DEFAULT_LAYOUT(layout_touchme)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, touchme_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -500,7 +500,7 @@ MACHINE_CONFIG_START(pabball_state::pabball)
 	MCFG_DEFAULT_LAYOUT(layout_hh_pic16_test)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(melodym_state::melodym)
 	MCFG_DEFAULT_LAYOUT(layout_melodym)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -714,7 +714,7 @@ MACHINE_CONFIG_START(maniac_state::maniac)
 	MCFG_DEFAULT_LAYOUT(layout_maniac)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, maniac_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -864,7 +864,7 @@ MACHINE_CONFIG_START(matchme_state::matchme)
 	MCFG_DEFAULT_LAYOUT(layout_matchme)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1020,7 +1020,7 @@ MACHINE_CONFIG_START(leboom_state::leboom)
 	MCFG_DEFAULT_LAYOUT(layout_leboom)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", leboom_state, speaker_decay_sim, attotime::from_msec(25))
@@ -1130,7 +1130,7 @@ MACHINE_CONFIG_START(tbaskb_state::tbaskb)
 	MCFG_DEFAULT_LAYOUT(layout_tbaskb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1246,7 +1246,7 @@ MACHINE_CONFIG_START(rockpin_state::rockpin)
 	MCFG_DEFAULT_LAYOUT(layout_rockpin)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, rockpin_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -1357,7 +1357,7 @@ MACHINE_CONFIG_START(hccbaskb_state::hccbaskb)
 	MCFG_DEFAULT_LAYOUT(layout_hccbaskb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1509,7 +1509,7 @@ MACHINE_CONFIG_START(ttfball_state::ttfball)
 	MCFG_DEFAULT_LAYOUT(layout_ttfball)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1620,7 +1620,7 @@ MACHINE_CONFIG_START(uspbball_state::uspbball)
 	MCFG_DEFAULT_LAYOUT(layout_hh_pic16_test)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1755,7 +1755,7 @@ MACHINE_CONFIG_START(us2pfball_state::us2pfball)
 	MCFG_DEFAULT_LAYOUT(layout_us2pfball)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

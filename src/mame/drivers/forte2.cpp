@@ -141,7 +141,7 @@ MACHINE_CONFIG_START(forte2_state::pesadelo)
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(3'579'545)/2)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, forte2_state, forte2_ay8910_read_input))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, forte2_state, forte2_ay8910_set_input_mask))

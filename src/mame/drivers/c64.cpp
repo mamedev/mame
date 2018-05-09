@@ -1350,7 +1350,7 @@ MACHINE_CONFIG_START(c64_state::ntsc)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS6567_TAG, mos6567_device, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(14'318'181)/14)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, c64_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, c64_state, sid_poty_r))
@@ -1508,7 +1508,7 @@ MACHINE_CONFIG_START(c64_state::pal)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS6569_TAG, mos6569_device, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(17'734'472)/18)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, c64_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, c64_state, sid_poty_r))
@@ -1644,7 +1644,7 @@ MACHINE_CONFIG_START(c64gs_state::pal_gs)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS6569_TAG, mos8565_device, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(MOS6581_TAG, MOS8580, XTAL(17'734'472)/18)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, c64_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, c64_state, sid_poty_r))

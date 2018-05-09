@@ -155,7 +155,7 @@ MACHINE_CONFIG_START(tamag1_state::tama)
 	MCFG_PALETTE_INIT_OWNER(tamag1_state, tama)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

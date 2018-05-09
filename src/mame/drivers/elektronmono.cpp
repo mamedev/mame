@@ -159,7 +159,8 @@ MACHINE_CONFIG_START(elekmono_state::elektron)
 	MCFG_DEVICE_ADD("maincpu", MCF5206E, XTAL(25'447'000))
 	MCFG_DEVICE_PROGRAM_MAP(elektron_map)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( elektron )

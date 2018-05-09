@@ -577,10 +577,9 @@ MACHINE_CONFIG_START(atarifb_state::atarifb)
 	MCFG_PALETTE_INIT_OWNER(atarifb_state, atarifb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(atarifb)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, atarifb_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.18)
 MACHINE_CONFIG_END
 
@@ -606,8 +605,7 @@ MACHINE_CONFIG_START(atarifb_state::abaseb)
 	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_abaseb)
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(abaseb)
+	MCFG_DEVICE_REPLACE("discrete", DISCRETE, abaseb_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.24)
 MACHINE_CONFIG_END
 

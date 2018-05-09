@@ -37,8 +37,9 @@ class controlidx628_state : public driver_device
 {
 public:
 	controlidx628_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_lcdc(*this, "nt7534") { }
+		: driver_device(mconfig, type, tag)
+		, m_lcdc(*this, "nt7534")
+	{ }
 
 	void controlidx628(machine_config &config);
 private:
@@ -113,26 +114,26 @@ PALETTE_INIT_MEMBER(controlidx628_state, controlidx628)
 
 MACHINE_CONFIG_START(controlidx628_state::controlidx628)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", I80C32, XTAL(11'059'200)) /* Actually the board has an Atmel AT89S52 mcu. */
+	MCFG_DEVICE_ADD("maincpu", I80C32, XTAL(11'059'200)) // Actually the board has an Atmel AT89S52 MCU.
 	MCFG_DEVICE_PROGRAM_MAP(prog_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, controlidx628_state, p0_w))
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, controlidx628_state, p1_w))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, controlidx628_state, p3_w))
 
-		/* video hardware */
-		MCFG_SCREEN_ADD("screen", LCD)
-		MCFG_SCREEN_REFRESH_RATE(50)
-		MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-		MCFG_SCREEN_SIZE(132, 65)
-		MCFG_SCREEN_VISIBLE_AREA(3, 130, 0, 63)
-		MCFG_SCREEN_UPDATE_DEVICE("nt7534", nt7534_device, screen_update)
-		MCFG_SCREEN_PALETTE("palette")
+	// video hardware
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
+	MCFG_SCREEN_SIZE(132, 65)
+	MCFG_SCREEN_VISIBLE_AREA(3, 130, 0, 63)
+	MCFG_SCREEN_UPDATE_DEVICE("nt7534", nt7534_device, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-		MCFG_PALETTE_ADD("palette", 2)
-		MCFG_PALETTE_INIT_OWNER(controlidx628_state, controlidx628)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(controlidx628_state, controlidx628)
 
-		MCFG_NT7534_ADD("nt7534")
+	NT7534(config, m_lcdc);
 MACHINE_CONFIG_END
 
 

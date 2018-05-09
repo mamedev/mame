@@ -1510,7 +1510,8 @@ MACHINE_CONFIG_START(crystal_state::crystal)
 
 	MCFG_DS1302_ADD("rtc", XTAL(32'768))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_SOUND_VRENDER0_ADD("vrender", 0)
 	MCFG_VR0_REGBASE(0x04800000)

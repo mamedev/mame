@@ -185,7 +185,8 @@ MACHINE_CONFIG_START(gamate_state::gamate)
 	MCFG_GAMATE_VIDEO_ADD("video")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") // Stereo headphone output
+	SPEAKER(config, "lspeaker").front_left(); // Stereo headphone output
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ay8910", AY8910, 4433000 / 4) // AY compatible, no actual AY chip present
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)

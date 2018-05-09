@@ -1012,7 +1012,8 @@ MACHINE_CONFIG_START(gticlub_state::gticlub)
 	MCFG_K056800_ADD("k056800", XTAL(33'868'800)/2)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(33'868'800)/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1141,7 +1142,8 @@ MACHINE_CONFIG_START(gticlub_state::hangplt)
 	MCFG_K056800_ADD("k056800", XTAL(33'868'800)/2)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(33'868'800)/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

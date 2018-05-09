@@ -1723,7 +1723,7 @@ MACHINE_CONFIG_START(vsnes_state::vsnes)
 	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vsnes_state::jajamaru)
@@ -1803,7 +1803,7 @@ MACHINE_CONFIG_START(vsnes_state::vsdual)
 	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("sub", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vsnes_state::vsdual_pi)
@@ -1843,7 +1843,7 @@ MACHINE_CONFIG_START(vsnes_state::vsnes_bootleg)
 	MCFG_PPU2C0X_IGNORE_SPRITE_WRITE_LIMIT // bootleg seems to need this - code to set the sprite address is replaced with complete copy loops??
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// PCB has 2, code accesses 3? which 2 really exist?
 	MCFG_DEVICE_ADD("sn1", SN76489, XTAL(16'000'000)/4)

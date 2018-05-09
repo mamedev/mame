@@ -529,9 +529,8 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	MCFG_PALETTE_ADD_MONOCHROME("f4palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 	MCFG_DEVICE_ADD("psg", AY8910, XTAL(7'159'090)/3/2)  /* AY-3-8910 - clock not verified */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("JOY1"))

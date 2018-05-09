@@ -213,7 +213,7 @@ MACHINE_CONFIG_START(jeutel_state::jeutel)
 	genpin_audio(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 639450)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, jeutel_state,porta_w))

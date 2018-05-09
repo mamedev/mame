@@ -107,7 +107,8 @@ MACHINE_CONFIG_START(macpci_state::pippin)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD( "cdda", CDDA )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )

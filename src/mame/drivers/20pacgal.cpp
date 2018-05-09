@@ -408,7 +408,7 @@ MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
 	_20pacgal_video(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, NAMCO_AUDIO_CLOCK)
 	MCFG_NAMCO_AUDIO_VOICES(3)

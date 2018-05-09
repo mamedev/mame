@@ -744,7 +744,7 @@ MACHINE_CONFIG_START(warpwarp_state::geebee)
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,geebee)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("geebee_custom", GEEBEE_SOUND, MASTER_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -812,7 +812,7 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,warpwarp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("warpwarp_custom", WARPWARP_SOUND, MASTER_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

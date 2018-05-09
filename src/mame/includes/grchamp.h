@@ -137,4 +137,4 @@ private:
 
 /*----------- defined in audio/grchamp.c -----------*/
 
-DISCRETE_SOUND_EXTERN( grchamp );
+DISCRETE_SOUND_EXTERN( grchamp_discrete );

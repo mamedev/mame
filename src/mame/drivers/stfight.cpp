@@ -476,7 +476,7 @@ MACHINE_CONFIG_START(stfight_state::stfight_base)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// YM2203_PITCH_HACK - These should be clocked at 1.5Mhz (see TODO list)
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000) / 8 * 3)

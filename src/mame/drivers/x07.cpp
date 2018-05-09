@@ -1501,11 +1501,9 @@ MACHINE_CONFIG_START(x07_state::x07)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x07)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.50 )
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 0).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)

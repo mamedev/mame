@@ -318,7 +318,7 @@ MACHINE_CONFIG_START(mmagic_state::mmagic)
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(mmagic_sample_names)

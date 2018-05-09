@@ -490,7 +490,8 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 
 	/* sound hardware */
 	/* TODO: mixing */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")

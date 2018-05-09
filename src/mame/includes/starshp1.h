@@ -140,7 +140,7 @@ private:
 
 /*----------- defined in audio/starshp1.c -----------*/
 
-DISCRETE_SOUND_EXTERN( starshp1 );
+DISCRETE_SOUND_EXTERN( starshp1_discrete );
 
 /* Discrete Sound Input Nodes */
 #define STARSHP1_NOISE_AMPLITUDE    NODE_01

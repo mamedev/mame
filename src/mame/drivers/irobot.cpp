@@ -324,7 +324,7 @@ MACHINE_CONFIG_START(irobot_state::irobot)
 	MCFG_TIMER_DRIVER_ADD("irmb_timer", irobot_state, irobot_irmb_done_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* FIXME: I-Robot has all channels of the quad-pokey tied together
 	 *        This needs to be taken into account in the design.

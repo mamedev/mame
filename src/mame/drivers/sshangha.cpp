@@ -434,7 +434,8 @@ MACHINE_CONFIG_START(sshangha_state::sshangha)
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") /* sure it's stereo? */
+	SPEAKER(config, "lspeaker").front_left(); // sure it's stereo?
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 16000000/4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

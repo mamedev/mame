@@ -226,7 +226,7 @@ MACHINE_CONFIG_START(myvision_state::myvision)
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9918", tms9918a_device, screen_update )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(10'738'635)/3/2)  /* Exact model and clock not verified */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, myvision_state, ay_port_a_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, myvision_state, ay_port_b_r))

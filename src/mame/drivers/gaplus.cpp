@@ -576,7 +576,7 @@ MACHINE_CONFIG_START(gaplus_state::gaplus)
 	MCFG_PALETTE_INIT_OWNER(gaplus_state, gaplus)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO_15XX, XTAL(24'576'000)/1024)
 	MCFG_NAMCO_AUDIO_VOICES(8)

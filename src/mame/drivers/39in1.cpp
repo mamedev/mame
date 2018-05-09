@@ -1600,7 +1600,8 @@ MACHINE_CONFIG_START(_39in1_state::_39in1)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)

@@ -172,7 +172,7 @@ MACHINE_CONFIG_START(subhuntr_state::subhuntr)
 	MCFG_PALETTE_INIT_OWNER(subhuntr_state, subhuntr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* discrete sound */
 MACHINE_CONFIG_END

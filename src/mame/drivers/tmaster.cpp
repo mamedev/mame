@@ -393,7 +393,7 @@ MACHINE_CONFIG_START(tmaster_state::tm)
 	MCFG_CESBLIT_IRQ_CB(WRITELINE(*this, tmaster_state, blitter_irq_callback))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(24'000'000) / 16, okim6295_device::PIN7_HIGH)  /* 1.5Mhz? clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

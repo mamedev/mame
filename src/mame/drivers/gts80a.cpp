@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(gts80a_state::gts80a)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gts80a_state::gts80a_s)

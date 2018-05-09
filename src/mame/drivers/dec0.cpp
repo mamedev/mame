@@ -1657,7 +1657,7 @@ MACHINE_CONFIG_START(dec0_state::dec0)
 	MCFG_PALETTE_FORMAT(XBGR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000) / 8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
@@ -1686,7 +1686,7 @@ MACHINE_CONFIG_START(dec0_state::dec1)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
@@ -1771,7 +1771,7 @@ MACHINE_CONFIG_START(dec0_automat_state::automat)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", automat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
@@ -1846,7 +1846,7 @@ MACHINE_CONFIG_START(dec0_automat_state::secretab)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", secretab)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))

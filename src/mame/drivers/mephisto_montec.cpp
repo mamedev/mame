@@ -461,7 +461,7 @@ MACHINE_CONFIG_START(mephisto_montec_state::montec)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

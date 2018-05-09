@@ -567,7 +567,7 @@ MACHINE_CONFIG_START(argus_state::argus)
 	MCFG_VIDEO_RESET_OVERRIDE(argus_state,argus)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(argus_state::valtric)
 	MCFG_VIDEO_RESET_OVERRIDE(argus_state,valtric)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(argus_state::butasan)
 	MCFG_VIDEO_RESET_OVERRIDE(argus_state,butasan)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

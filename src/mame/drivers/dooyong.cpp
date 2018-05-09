@@ -1431,7 +1431,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1447,7 +1447,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1461,7 +1461,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_state::sound_2151_4mhz)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1512,7 +1512,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

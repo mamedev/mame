@@ -1757,7 +1757,7 @@ MACHINE_CONFIG_START(centiped_state::centiped)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey", POKEY, 12096000/8)
 	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(3.3), CAP_U(0.01), 5.0)
@@ -1784,7 +1784,7 @@ MACHINE_CONFIG_START(centiped_state::caterplr)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 12096000/8)
 
@@ -1803,7 +1803,7 @@ MACHINE_CONFIG_START(centiped_state::centipdb)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 12096000/8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, centiped_state, caterplr_unknown_r))
@@ -1823,7 +1823,7 @@ MACHINE_CONFIG_START(centiped_state::magworm)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8912, 12096000/8) // AY-3-8912 at 2/3H
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
@@ -1853,7 +1853,7 @@ MACHINE_CONFIG_START(centiped_state::milliped)
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_milliped)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey", POKEY, 12096000/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
@@ -1900,7 +1900,7 @@ MACHINE_CONFIG_START(centiped_state::warlords)
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_warlords)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey", POKEY, 12096000/8)
 	MCFG_POKEY_POT0_R_CB(IOPORT("PADDLE0"))
@@ -1958,7 +1958,7 @@ MACHINE_CONFIG_START(centiped_state::bullsdrt)
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,bullsdrt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76496, 12096000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

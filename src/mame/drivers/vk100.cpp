@@ -1072,7 +1072,7 @@ MACHINE_CONFIG_START(vk100_state::vk100)
 
 	MCFG_DEFAULT_LAYOUT( layout_vk100 )
 
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 116 ) // 116 hz (page 172 of TM), but duty cycle is wrong here!
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.25 )
 MACHINE_CONFIG_END

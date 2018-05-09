@@ -68,13 +68,16 @@
 
 // CTC callbacks
 #define MCFG_TMPZ84C015_ZC0_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_zc0_callback(DEVCB_##_devcb);
+	devcb = &downcast<tmpz84c015_device &>(*device).set_zc_callback<0>(DEVCB_##_devcb);
 
 #define MCFG_TMPZ84C015_ZC1_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_zc1_callback(DEVCB_##_devcb);
+	devcb = &downcast<tmpz84c015_device &>(*device).set_zc_callback<1>(DEVCB_##_devcb);
 
 #define MCFG_TMPZ84C015_ZC2_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_zc2_callback(DEVCB_##_devcb);
+	devcb = &downcast<tmpz84c015_device &>(*device).set_zc_callback<2>(DEVCB_##_devcb);
+
+#define MCFG_TMPZ84C015_ZC3_CB(_devcb) \
+	devcb = &downcast<tmpz84c015_device &>(*device).set_zc_callback<3>(DEVCB_##_devcb);
 
 
 // PIO callbacks
@@ -124,9 +127,7 @@ public:
 	template<class Object> devcb_base &set_out_rxdrqb_callback(Object &&cb) { return m_out_rxdrqb_cb.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_out_txdrqb_callback(Object &&cb) { return m_out_txdrqb_cb.set_callback(std::forward<Object>(cb)); }
 
-	template<class Object> devcb_base &set_zc0_callback(Object &&cb) { return m_zc0_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_zc1_callback(Object &&cb) { return m_zc1_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_zc2_callback(Object &&cb) { return m_zc2_cb.set_callback(std::forward<Object>(cb)); }
+	template<unsigned N, class Object> devcb_base &set_zc_callback(Object &&cb) { return m_zc_cb[N].set_callback(std::forward<Object>(cb)); }
 
 	template<class Object> devcb_base &set_in_pa_callback(Object &&cb) { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
 	template<class Object> devcb_base &set_out_pa_callback(Object &&cb) { return m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
@@ -229,9 +230,7 @@ private:
 	devcb_write_line m_out_rxdrqb_cb;
 	devcb_write_line m_out_txdrqb_cb;
 
-	devcb_write_line m_zc0_cb;
-	devcb_write_line m_zc1_cb;
-	devcb_write_line m_zc2_cb;
+	devcb_write_line m_zc_cb[4];
 
 	devcb_read8 m_in_pa_cb;
 	devcb_write8 m_out_pa_cb;
@@ -258,9 +257,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( out_rxdrqb_cb_trampoline_w ) { m_out_rxdrqb_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER( out_txdrqb_cb_trampoline_w ) { m_out_txdrqb_cb(state); }
 
-	DECLARE_WRITE_LINE_MEMBER( zc0_cb_trampoline_w ) { m_zc0_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( zc1_cb_trampoline_w ) { m_zc1_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( zc2_cb_trampoline_w ) { m_zc2_cb(state); }
+	template<unsigned N> DECLARE_WRITE_LINE_MEMBER( zc_cb_trampoline_w ) { m_zc_cb[N](state); }
 
 	DECLARE_READ8_MEMBER( in_pa_cb_trampoline_r ) { return m_in_pa_cb(); }
 	DECLARE_WRITE8_MEMBER( out_pa_cb_trampoline_w ) { m_out_pa_cb(data); }

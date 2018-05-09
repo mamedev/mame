@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(xxmissio_state::xxmissio)
 	MCFG_PALETTE_FORMAT_CLASS(1, xxmissio_state, BBGGRRII)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 12000000/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))

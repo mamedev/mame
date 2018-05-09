@@ -1051,7 +1051,7 @@ MACHINE_CONFIG_START(cosmic_state::panic)
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_panic)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(9)
@@ -1081,7 +1081,7 @@ MACHINE_CONFIG_START(cosmic_state::cosmica)
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_cosmica)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(13)
@@ -1113,7 +1113,7 @@ MACHINE_CONFIG_START(cosmic_state::cosmicg)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,cosmicg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(9)
@@ -1144,7 +1144,7 @@ MACHINE_CONFIG_START(cosmic_state::magspot)
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_magspot)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -1180,7 +1180,7 @@ MACHINE_CONFIG_START(cosmic_state::nomnlnd)
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_nomnlnd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

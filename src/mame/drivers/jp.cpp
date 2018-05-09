@@ -374,7 +374,7 @@ MACHINE_CONFIG_START(jp_state::jp)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("ayvol")
+	SPEAKER(config, "ayvol").front_center();
 	MCFG_DEVICE_ADD("ay", AY8910, 8_MHz_XTAL / 4)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, jp_state, porta_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jp_state, portb_r))
@@ -417,7 +417,7 @@ MACHINE_CONFIG_START(jp_state::jps)
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0) // not labeled in manual; might even be a CD4019
 	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("msmvol")
+	SPEAKER(config, "msmvol").front_center();
 	MCFG_DEVICE_ADD("msm", MSM5205, 384'000) // not labeled in manual; clock unknown
 	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, jp_state, vck_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B) // unknown

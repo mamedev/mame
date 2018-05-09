@@ -680,7 +680,7 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,15M,16M")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

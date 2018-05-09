@@ -957,7 +957,7 @@ MACHINE_CONFIG_START(zaxxon_state::zaxxon)
 	root(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	zaxxon_samples(config);
 MACHINE_CONFIG_END
 
@@ -995,7 +995,7 @@ MACHINE_CONFIG_START(zaxxon_state::futspye)
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_futspy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	zaxxon_samples(config);
 
 MACHINE_CONFIG_END
@@ -1019,7 +1019,7 @@ MACHINE_CONFIG_START(zaxxon_state::razmataze)
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_razmataz)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_SEGAUSBROM_ADD("usbsnd")
 MACHINE_CONFIG_END
 
@@ -1070,7 +1070,7 @@ MACHINE_CONFIG_START(zaxxon_state::congo)
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_congo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

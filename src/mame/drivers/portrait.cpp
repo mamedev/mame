@@ -274,7 +274,7 @@ MACHINE_CONFIG_START(portrait_state::portrait)
 	MCFG_PALETTE_INIT_OWNER(portrait_state, portrait)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

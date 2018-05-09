@@ -753,7 +753,7 @@ MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,tsamurai)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(24'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
@@ -801,7 +801,7 @@ MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,vsgongf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -857,7 +857,7 @@ MACHINE_CONFIG_START(tsamurai_state::m660)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,m660)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(24'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)

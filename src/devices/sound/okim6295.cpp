@@ -203,6 +203,7 @@ void okim6295_device::rom_bank_updated()
 
 void okim6295_device::set_pin7(int pin7)
 {
+	assert(started());
 	m_pin7_state = pin7 ? 1 : 0;
 	device_clock_changed();
 }

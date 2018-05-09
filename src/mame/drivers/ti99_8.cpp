@@ -777,7 +777,7 @@ MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	MCFG_HEXBUS_ADD( TI_HEXBUS_TAG )
 
 	// Sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("sound_out")
+	SPEAKER(config, "sound_out").front_center();
 	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN76496, 3579545)   /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
 	MCFG_SN76496_READY_HANDLER(WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, sound_ready))
@@ -785,17 +785,16 @@ MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	// Speech hardware
 	// Note: SPEECHROM uses its tag for referencing the region
 	MCFG_DEVICE_ADD(TI998_SPEECHROM_REG, SPEECHROM, 0)
-	MCFG_SPEAKER_STANDARD_MONO("speech_out")
+	SPEAKER(config, "speech_out").front_center();
 	MCFG_DEVICE_ADD(TI998_SPEECHSYN_TAG, CD2501ECD, 640000L)
 	MCFG_TMS52XX_READYQ_HANDLER(WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, speech_ready))
 	MCFG_TMS52XX_SPEECHROM(TI998_SPEECHROM_REG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech_out", 0.50)
 
 	// Cassette drive
-	MCFG_SPEAKER_STANDARD_MONO("cass_out")
+	SPEAKER(config, "cass_out").front_center();
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// GROM library
 	MCFG_GROM_ADD( TI998_SYSGROM0_TAG, 0, TI998_SYSGROM_REG, 0x0000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready))

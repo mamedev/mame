@@ -2139,7 +2139,7 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz2500)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym", YM2203, 2000000) //unknown clock / divider
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, mz2500_state, opn_porta_r))  // read A

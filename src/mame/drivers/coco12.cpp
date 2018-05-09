@@ -382,7 +382,7 @@ void t4426_cart(device_slot_interface &device)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(coco_state::coco_sound)
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks
 	MCFG_DEVICE_ADD("dac", DAC_6BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
@@ -390,11 +390,9 @@ MACHINE_CONFIG_START(coco_state::coco_sound)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	// Single-bit sound: R22 = 10K
-	MCFG_DEVICE_ADD("sbs", DAC_1BIT, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
+	DAC_1BIT(config, "sbs", 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 MACHINE_CONFIG_END
 
 

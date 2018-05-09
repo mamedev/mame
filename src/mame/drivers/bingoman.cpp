@@ -398,7 +398,7 @@ MACHINE_CONFIG_START(bingoman_state::bingoman)
 	MCFG_PALETTE_INIT_OWNER(bingoman_state, bingoman)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 

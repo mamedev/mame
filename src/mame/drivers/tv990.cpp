@@ -414,7 +414,7 @@ MACHINE_CONFIG_START(tv990_state::tv990)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 1000); //whats the freq?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

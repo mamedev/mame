@@ -416,7 +416,7 @@ MACHINE_CONFIG_START(thief_state::thief)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(8'000'000)/2/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

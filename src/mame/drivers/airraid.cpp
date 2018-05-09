@@ -404,7 +404,7 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 	MCFG_AIRRAID_VIDEO_ADD("airraid_vid")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))

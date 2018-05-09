@@ -556,11 +556,9 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9929a_device, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	MCFG_DEVICE_ADD("psg", AY8910, XTAL(10'738'635) / 6)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, svi3x8_state, bank_w))

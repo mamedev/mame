@@ -266,7 +266,7 @@ MACHINE_CONFIG_START(drmicro_state::drmicro)
 	MCFG_PALETTE_INIT_OWNER(drmicro_state, drmicro)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76496, MCLK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

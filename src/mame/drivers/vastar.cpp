@@ -452,7 +452,7 @@ MACHINE_CONFIG_START(vastar_state::vastar)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000)/12)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))

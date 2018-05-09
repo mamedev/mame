@@ -95,7 +95,7 @@ void intv_ecs_device::late_subslot_setup()
 
 
 MACHINE_CONFIG_START(intv_ecs_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono_ecs")
+	SPEAKER(config, "mono_ecs").front_center();
 
 	MCFG_DEVICE_ADD("ay8914", AY8914, XTAL(3'579'545)/2)
 	MCFG_AY8910_PORT_A_READ_CB(READ8("ctrl_port", intvecs_control_port_device, portA_r))

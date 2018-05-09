@@ -159,6 +159,8 @@ private:
 	bool m_swrst;
 	bool m_hdfa;
 	bool m_hdfe;
+	bool m_rtl;
+	bool m_gts;
 	bool m_rpp;
 	bool m_sic;
 	bool m_sre;

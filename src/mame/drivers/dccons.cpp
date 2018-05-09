@@ -618,7 +618,8 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_POWERVR2_ADD("powervr2", WRITE8(*this, dc_state, pvr_irq))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("aica", AICA, 0)
 	MCFG_AICA_MASTER
 	MCFG_AICA_IRQ_CB(WRITELINE(*this, dc_state, aica_irq))

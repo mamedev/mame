@@ -322,7 +322,8 @@ MACHINE_CONFIG_START(arcadia_amiga_state::arcadia)
 	MCFG_VIDEO_START_OVERRIDE(arcadia_amiga_state,amiga)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_NTSC)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)

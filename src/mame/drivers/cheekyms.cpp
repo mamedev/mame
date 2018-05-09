@@ -146,7 +146,7 @@ MACHINE_CONFIG_START(cheekyms_state::cheekyms)
 	/* audio hardware */
 	MCFG_DEVICE_ADD("soundboard", CHEEKY_MOUSE_AUDIO, 0)
 #if 0
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("dac0", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("dac1", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)

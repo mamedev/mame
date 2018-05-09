@@ -662,7 +662,7 @@ MACHINE_CONFIG_START(ttchamp_state::ttchamp)
 
 	MCFG_NVRAM_ADD_0FILL("backram")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

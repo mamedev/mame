@@ -690,7 +690,7 @@ MACHINE_CONFIG_START(astinvad_state::kamikaze)
 	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
@@ -738,7 +738,7 @@ MACHINE_CONFIG_START(astinvad_state::spaceint)
 	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)

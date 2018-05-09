@@ -250,7 +250,7 @@ MACHINE_CONFIG_START(spectra_state::spectra)
 	/* Sound */
 	genpin_audio(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(RES_M(1000), RES_M(1000), CAP_N(0)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_K(470))                    // decay_res

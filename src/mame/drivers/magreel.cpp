@@ -140,7 +140,7 @@ MACHINE_CONFIG_START(magreel_state::magreel)
 //  MCFG_PALETTE_INIT_OWNER(magreel_state, magreel)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 

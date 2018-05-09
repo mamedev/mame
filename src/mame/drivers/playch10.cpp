@@ -693,7 +693,7 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("cart", INPUT_LINE_NMI))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, playch10_state, int_detect_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_RP5H01_ADD("rp5h01")
 MACHINE_CONFIG_END

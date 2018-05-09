@@ -51,7 +51,7 @@ const tiny_rom_entry *v1050_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  DISCRETE_SOUND_START( v1050kb )
+//  DISCRETE_SOUND_START( v1050kb_discrete )
 //-------------------------------------------------
 
 static const discrete_555_desc v1050_ne555 =
@@ -61,7 +61,7 @@ static const discrete_555_desc v1050_ne555 =
 	DEFAULT_555_VALUES
 };
 
-static DISCRETE_SOUND_START( v1050kb )
+static DISCRETE_SOUND_START( v1050kb_discrete )
 	DISCRETE_INPUT_LOGIC(NODE_01)
 	DISCRETE_555_ASTABLE(NODE_02, NODE_01, (int) RES_K(68) /* can't read on schematic */ , (int) RES_K(3), (int) CAP_N(10), &v1050_ne555)
 	DISCRETE_OUTPUT(NODE_02, 5000)
@@ -80,9 +80,8 @@ MACHINE_CONFIG_START(v1050_keyboard_device::device_add_mconfig)
 	MCFG_DEVICE_DISABLE() // TODO
 
 	// discrete sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
-	MCFG_DISCRETE_INTF(v1050kb)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, v1050kb_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

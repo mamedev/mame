@@ -43,18 +43,7 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_bank4000(*this, "bank4000"),
 		m_bank8000(*this, "bank8000"),
-		m_p1handle(*this, "P1HANDLE"),
-		m_p2handle(*this, "P2HANDLE"),
-		m_p3handle(*this, "P3HANDLE"),
-		m_p4handle(*this, "P4HANDLE"),
-		m_keypad0(*this, "KEYPAD0"),
-		m_keypad1(*this, "KEYPAD1"),
-		m_keypad2(*this, "KEYPAD2"),
-		m_keypad3(*this, "KEYPAD3"),
-		m_p1_knob(*this, "P1_KNOB"),
-		m_p2_knob(*this, "P2_KNOB"),
-		m_p3_knob(*this, "P3_KNOB"),
-		m_p4_knob(*this, "P4_KNOB"),
+		m_handle(*this, "P%uHANDLE", 1U),
 		m_trackball(*this, { { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" } }),
 		m_joystick(*this, { { "MOVEX", "MOVEY" } }),
 		m_interrupt_scanline(0xff)
@@ -64,25 +53,14 @@ public:
 	optional_device<cpu_device> m_subcpu;
 	optional_device<samples_device> m_samples;
 	optional_device<votrax_sc01_device> m_votrax;
-	optional_device<astrocade_device> m_astrocade_sound1;
+	optional_device<astrocade_io_device> m_astrocade_sound1;
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_protected_ram;
 	required_device<screen_device> m_screen;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<address_map_bank_device> m_bank4000;
 	optional_memory_bank m_bank8000;
-	optional_ioport m_p1handle;
-	optional_ioport m_p2handle;
-	optional_ioport m_p3handle;
-	optional_ioport m_p4handle;
-	optional_ioport m_keypad0;
-	optional_ioport m_keypad1;
-	optional_ioport m_keypad2;
-	optional_ioport m_keypad3;
-	optional_ioport m_p1_knob;
-	optional_ioport m_p2_knob;
-	optional_ioport m_p3_knob;
-	optional_ioport m_p4_knob;
+	optional_ioport_array<4> m_handle;
 	optional_ioport_array<4> m_trackball;
 	optional_ioport_array<2> m_joystick;
 
@@ -136,28 +114,25 @@ public:
 	DECLARE_WRITE8_MEMBER(protected_ram_enable_w);
 	DECLARE_READ8_MEMBER(protected_ram_r);
 	DECLARE_WRITE8_MEMBER(protected_ram_w);
-	DECLARE_WRITE8_MEMBER(seawolf2_lamps_w);
 	DECLARE_WRITE8_MEMBER(seawolf2_sound_1_w);
 	DECLARE_WRITE8_MEMBER(seawolf2_sound_2_w);
 	DECLARE_WRITE8_MEMBER(ebases_trackball_select_w);
 	DECLARE_WRITE8_MEMBER(ebases_coin_w);
-	DECLARE_READ8_MEMBER(spacezap_io_r);
-	DECLARE_READ8_MEMBER(wow_io_r);
-	DECLARE_READ8_MEMBER(gorf_io_1_r);
-	DECLARE_READ8_MEMBER(gorf_io_2_r);
-	DECLARE_READ8_MEMBER(robby_io_r);
-	DECLARE_READ8_MEMBER(profpac_io_1_r);
-	DECLARE_READ8_MEMBER(profpac_io_2_r);
+	DECLARE_READ8_MEMBER(input_mux_r);
+	template<int Coin> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
+	template<int Bit> DECLARE_WRITE_LINE_MEMBER(sparkle_w);
+	DECLARE_WRITE_LINE_MEMBER(gorf_sound_switch_w);
 	DECLARE_WRITE8_MEMBER(profpac_banksw_w);
 	DECLARE_WRITE8_MEMBER(demndrgn_banksw_w);
-	DECLARE_READ8_MEMBER(demndrgn_io_r);
+	DECLARE_WRITE_LINE_MEMBER(demndrgn_input_select_w);
 	DECLARE_WRITE8_MEMBER(demndrgn_sound_w);
 	DECLARE_WRITE8_MEMBER(tenpindx_lamp_w);
 	DECLARE_WRITE8_MEMBER(tenpindx_counter_w);
 	DECLARE_WRITE8_MEMBER(tenpindx_lights_w);
-	DECLARE_READ8_MEMBER(astrocade_data_chip_register_r);
-	DECLARE_WRITE8_MEMBER(astrocade_data_chip_register_w);
+	DECLARE_READ8_MEMBER(video_register_r);
+	DECLARE_WRITE8_MEMBER(video_register_w);
 	DECLARE_WRITE8_MEMBER(astrocade_funcgen_w);
+	DECLARE_WRITE8_MEMBER(expand_register_w);
 	DECLARE_WRITE8_MEMBER(astrocade_pattern_board_w);
 	DECLARE_WRITE8_MEMBER(profpac_page_select_w);
 	DECLARE_READ8_MEMBER(profpac_intercept_r);
@@ -193,7 +168,7 @@ public:
 	void init_sparklestar();
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( votrax_speech_r );
+	DECLARE_WRITE8_MEMBER(votrax_speech_w);
 	CUSTOM_INPUT_MEMBER( votrax_speech_status_r );
 
 	void astrocade_base(machine_config &config);
@@ -213,8 +188,11 @@ public:
 	void demndrgn_map(address_map &map);
 	void ebases_map(address_map &map);
 	void port_map(address_map &map);
+	void port_map_discrete(address_map &map);
+	void port_map_ebases(address_map &map);
 	void port_map_16col_pattern(address_map &map);
 	void port_map_16col_pattern_nosound(address_map &map);
+	void port_map_16col_pattern_demndrgn(address_map &map);
 	void port_map_16col_pattern_tenpindx(address_map &map);
 	void port_map_mono_pattern(address_map &map);
 	void port_map_stereo_pattern(address_map &map);

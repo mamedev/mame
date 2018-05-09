@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(wiping_state::wiping)
 	MCFG_PALETTE_INIT_OWNER(wiping_state, wiping)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("wiping", WIPING_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

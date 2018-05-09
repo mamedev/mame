@@ -422,7 +422,7 @@ MACHINE_CONFIG_START(bking_state::bking)
 	MCFG_PALETTE_INIT_OWNER(bking_state, bking)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))

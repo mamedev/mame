@@ -1145,7 +1145,7 @@ MACHINE_CONFIG_START(cclimber_state::cclimber)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("cclimber_audio", cclimber_audio_device, sample_trigger_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_CCLIMBER_AUDIO_ADD("cclimber_audio")
 MACHINE_CONFIG_END
@@ -1213,7 +1213,7 @@ MACHINE_CONFIG_START(cclimber_state::yamato)
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_yamato)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 1536000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -1285,7 +1285,7 @@ MACHINE_CONFIG_START(cclimber_state::swimmer)
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,swimmer)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

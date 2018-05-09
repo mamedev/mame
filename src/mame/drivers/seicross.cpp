@@ -425,7 +425,7 @@ MACHINE_CONFIG_START(seicross_state::no_nvram)
 	MCFG_PALETTE_INIT_OWNER(seicross_state, seicross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000) / 12)
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, seicross_state, portB_r))

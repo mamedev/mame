@@ -46,7 +46,8 @@ DEFINE_DEVICE_TYPE(PC9801_AMD98, pc9801_amd98_device, "pc9801_amd98", "pc9801_am
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pc9801_amd98_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK_X1*2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("OPN_PA1"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pc9801_amd98_device,ay3_address_w))

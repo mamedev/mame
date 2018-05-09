@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(blockhl_state::blockhl)
 	MCFG_K051960_CB(blockhl_state, sprite_callback)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

@@ -344,7 +344,8 @@ MACHINE_CONFIG_START(idsa_state::idsa)
 
 	/* sound hardware */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("speech", SP0256, 3120000) // unknown variant
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.5)
 

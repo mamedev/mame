@@ -468,7 +468,7 @@ MACHINE_CONFIG_START(bagman_state::bagman)
 	MCFG_TMSPROM_CTL_CB(WRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, BAGMAN_H0 / 2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(bagman_state::pickin)
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
@@ -594,7 +594,7 @@ MACHINE_CONFIG_START(bagman_state::botanic)
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))

@@ -819,7 +819,8 @@ MACHINE_CONFIG_START(thayers_state::thayers)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	// SSI 263 @ 2MHz
 
 	MCFG_DEVICE_MODIFY("laserdisc")

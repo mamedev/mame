@@ -63,7 +63,7 @@ MACHINE_CONFIG_START(ice_bozopail_state::ice_bozo)
 	MCFG_DEVICE_PROGRAM_MAP(ice_bozo_map)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 

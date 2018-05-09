@@ -363,10 +363,11 @@ MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, apple2_state, ay3600_iie_data_ready_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("a2speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ES5503_ADD("es5503", APPLE2GS_7M)
 	MCFG_ES5503_OUTPUT_CHANNELS(2)

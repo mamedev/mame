@@ -351,7 +351,7 @@ MACHINE_CONFIG_START(dreambal_state::dreambal)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 9830400/8, okim6295_device::PIN7_HIGH)
 

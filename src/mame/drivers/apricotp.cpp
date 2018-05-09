@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(fp_state::fp)
 	MCFG_MC6845_UPDATE_ROW_CB(fp_state, update_row)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
