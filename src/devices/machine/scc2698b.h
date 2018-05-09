@@ -7,6 +7,8 @@
 
 class scc2698b_device;
 
+#define SCC2698B_RX_FIFO_SIZE	3
+
 class scc2698b_channel : public device_t, public device_serial_interface
 {
 	friend class scc2698b_device;
@@ -21,6 +23,22 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mpi0_w);
 	DECLARE_WRITE_LINE_MEMBER(mpi1_w);
 
+	virtual void rcv_complete() override;    // Rx completed receiving byte
+	virtual void tra_complete() override;    // Tx completed sending byte
+	virtual void tra_callback() override;    // Tx send bit
+
+	void write_TXH(int txh);
+	int read_RXH();
+
+	void reset_all();
+	void reset_tx();
+	void reset_rx();
+
+	void update_serial_configuration();
+
+	void set_tx_bittime(const attotime &bittime);
+	void set_rx_bittime(const attotime &bittime);
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -28,6 +46,14 @@ protected:
 	devcb_write_line write_tx, write_mpp1, write_mpp2, write_mpo;
 
 	int moderegister_ptr;
+
+	int tx_transmitting;
+	int tx_fifo;
+	int tx_bytecount;
+	u8 rx_fifo[SCC2698B_RX_FIFO_SIZE];
+	int rx_bytecount;
+
+	u8 MR1, MR2, SR, CR, CSR;
 
 };
 
@@ -81,10 +107,18 @@ protected:
 	void write_CR(int port, int value);
 	void write_THR(int port, int value);
 
+	int read_MR(int port);
+	int read_SR(int port);
+	int read_RHR(int port);
+
+	void update_block_baudrate(int block);
+	void update_port_baudrate(int port);
+	attotime generate_baudrate(int block, int tx, int table_index);
+
 
 private:
 	struct Block {
-
+		u8 ACR;
 	};
 
 	Block m_blocks[4];

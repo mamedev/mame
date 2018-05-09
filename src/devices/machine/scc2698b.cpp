@@ -31,6 +31,17 @@ DEFINE_DEVICE_TYPE(SCC2698B_CHANNEL, scc2698b_channel, "scc2698b_channel", "UART
 #define TRACE_REGISTER_READ(ofs, data, reg_name)	if(TRACE_ENABLE) { log_register_access((ofs), (data), ">>", (reg_name)); }
 
 
+// Divider values for baud rate generation
+// Expecting a crystal of 3.6864MHz, baud rate is crystal frequency / (divider value * 8)
+static const int BAUD_DIVIDER_ACR7_0[16] =
+{
+	9216,4189,3426,2304,1536,768,384,439,192,96,64,48,12,0,0,0
+};
+static const int BAUD_DIVIDER_ACR7_1[16] =
+{
+	6144,4189,12,3072,1536,768,384,230,192,96,256,48,24,0,0,0
+};
+
 void scc2698b_device::map(address_map &map)
 {
 	map(0x0, 0x3F).rw(this, FUNC(scc2698b_device::read), FUNC(scc2698b_device::write));
@@ -68,7 +79,122 @@ void scc2698b_channel::device_start()
 
 void scc2698b_channel::device_reset()
 {
+	reset_all();
+}
 
+void scc2698b_channel::rcv_complete()
+{
+	// Completed Byte Receive
+	receive_register_extract();
+	int byte = get_received_char();
+	if (rx_bytecount >= SCC2698B_RX_FIFO_SIZE)
+	{
+		logerror("Warning: Received byte lost, RX FIFO Full.\n");
+	}
+	else
+	{
+		rx_fifo[rx_bytecount++] = byte;
+	}
+}
+void scc2698b_channel::tra_complete()
+{
+	// Completed Byte Transmit
+	if (tx_bytecount > 0)
+	{
+		transmit_register_setup(tx_fifo);
+		tx_bytecount = 0;
+	}
+	else
+	{
+		tx_transmitting = 0;
+	}
+}
+void scc2698b_channel::tra_callback()
+{
+	// Started bit transmit - Update output line
+	int bit = transmit_register_get_data_bit();
+	write_tx(bit);
+}
+
+void scc2698b_channel::write_TXH(int txh)
+{
+	if (tx_transmitting)
+	{
+		if (tx_bytecount == 0)
+		{
+			tx_fifo = txh;
+			tx_bytecount = 1;
+		}
+		else
+		{
+			// Lost byte
+			logerror("Warning: TX Holding byte written to full FIFO - Data lost.\n");
+		}
+	}
+	else
+	{
+		if (tx_bytecount != 0)
+		{
+			logerror("Unexpected: TX FIFO should not contain bytes when UART is not transmitting\n");
+		}
+		transmit_register_setup(txh);
+		tx_transmitting = 1;
+	}
+}
+
+int scc2698b_channel::read_RXH()
+{
+	if (rx_bytecount == 0)
+	{
+		logerror("Warning: RX Holding read with empty RX FIFO");
+		return 0;
+	}
+	else
+	{
+		int byte = rx_fifo[0];
+		for (int i = 1; i < rx_bytecount; i++)
+		{
+			rx_fifo[i - 1] = rx_fifo[i];
+		}
+		rx_bytecount--;
+		return byte;
+	}
+}
+
+
+void scc2698b_channel::reset_all()
+{
+	reset_tx();
+	reset_rx();
+}
+void scc2698b_channel::reset_tx()
+{
+	tx_transmitting = 0;
+	tx_fifo = 0;
+	tx_bytecount = 0;
+	transmit_register_reset();
+}
+void scc2698b_channel::reset_rx()
+{
+	rx_bytecount = 0;
+	receive_register_reset();
+}
+
+
+void scc2698b_channel::update_serial_configuration()
+{
+
+}
+
+
+
+void scc2698b_channel::set_tx_bittime(const attotime &bittime)
+{
+	set_tra_rate(bittime);
+}
+void scc2698b_channel::set_rx_bittime(const attotime &bittime)
+{
+	set_rcv_rate(bittime);
 }
 
 
@@ -142,10 +268,51 @@ void scc2698b_device::log_register_access(int offset, int value, const char* dir
 
 uint8_t scc2698b_device::read_reg(int offset)
 {
-	uint8_t data = 0;
+	int device = (offset >> 4) & 3;
+	int reg = (offset & 15);
+	// Port index for port register accesses
+	int port = device * 2 + (reg >> 3);
+	int data = 0;
 
+	switch (reg)
+	{
+	case 0: // MR1a, MR2a (Mode Register)
+		data = read_MR(port);
+		TRACE_REGISTER_READ(offset, data, "MR1a/MR2a");
+		break;
+	case 1: // SRa (Status Register)
+		data = read_SR(port);
+		TRACE_REGISTER_READ(offset, data, "SRa");
+		break;
+	case 2: // BRG Test
+		data = 0;
+		TRACE_REGISTER_READ(offset, data, "BRG Test");
+		break;
+	case 3: // RHRa (Receive Holding Register)
+		data = read_RHR(port);
+		TRACE_REGISTER_READ(offset, data, "RHRa");
+		break;
 
-	TRACE_REGISTER_READ(offset, data, "");
+	case 8: // MR1b, MR2b (Mode Register)
+		data = read_MR(port);
+		TRACE_REGISTER_READ(offset, data, "MR1b/MR2b");
+		break;
+	case 9: // SRb (Status Register)
+		data = read_SR(port);
+		TRACE_REGISTER_READ(offset, data, "SRb");
+		break;
+	case 10: // 1X/16X Test
+		data = 0;
+		TRACE_REGISTER_READ(offset, data, "1X/16X Test");
+		break;
+	case 11: // RHRb (Receive Holding Register)
+		data = read_RHR(port);
+		TRACE_REGISTER_READ(offset, data, "RHRb");
+		break;
+
+	default:
+		TRACE_REGISTER_READ(offset, data, "");
+	}
 	return data;
 }
 
@@ -176,7 +343,8 @@ void scc2698b_device::write_reg(int offset, uint8_t data)
 		break;
 	case 4: // ACRA
 		TRACE_REGISTER_WRITE(offset, data, "ACRA");
-
+		m_blocks[device].ACR = data;
+		update_block_baudrate(device);
 		break;
 	case 5: // IMRA
 		TRACE_REGISTER_WRITE(offset, data, "IMRA");
@@ -248,11 +416,13 @@ void scc2698b_device::reset_port(int port)
 }
 void scc2698b_device::reset_port_tx(int port)
 {
-
+	scc2698b_channel* channel = get_channel(port);
+	channel->reset_tx();
 }
 void scc2698b_device::reset_port_rx(int port)
 {
-
+	scc2698b_channel* channel = get_channel(port);
+	channel->reset_rx();
 }
 
 
@@ -262,17 +432,23 @@ void scc2698b_device::write_MR(int port, int value)
 	if (channel->moderegister_ptr == 0)
 	{
 		// Write MR1
+		channel->MR1 = value;
 	}
 	else
 	{
 		// Write MR2
+		channel->MR2 = value;
 	}
-
 	channel->moderegister_ptr = !channel->moderegister_ptr;
+
+	// todo: Change channel serial configuration
 }
 void scc2698b_device::write_CSR(int port, int value)
 {
-
+	scc2698b_channel* channel = get_channel(port);
+	
+	channel->CSR = value;
+	update_port_baudrate(port);
 }
 void scc2698b_device::write_CR(int port, int value)
 {
@@ -292,7 +468,9 @@ void scc2698b_device::write_CR(int port, int value)
 	case 3: // Reset Transmitter
 		reset_port_tx(port);
 		break;
-
+	case 4: // Reset status register error bits
+		channel->SR &= 0x0F;
+		break;
 	default:
 		logerror("Unimplemented Command Register write");
 
@@ -300,7 +478,95 @@ void scc2698b_device::write_CR(int port, int value)
 }
 void scc2698b_device::write_THR(int port, int value)
 {
+	scc2698b_channel* channel = get_channel(port);
+	channel->write_TXH(value);
+}
 
+int scc2698b_device::read_MR(int port)
+{
+	scc2698b_channel* channel = get_channel(port);
+	int data = 0;
+	if (channel->moderegister_ptr == 0)
+	{
+		// Write MR1
+		data = channel->MR1;
+	}
+	else
+	{
+		// Write MR2
+		data = channel->MR2;
+	}
+
+	channel->moderegister_ptr = !channel->moderegister_ptr;
+	return data;
+}
+int scc2698b_device::read_SR(int port)
+{
+	scc2698b_channel* channel = get_channel(port);
+
+	int data = channel->SR;
+
+	// Compute dynamic bits of SR
+	data &= 0xF0; // Clear dynamic bits
+
+	// SR(3) TxEMT Transmitter empty
+	if (channel->tx_transmitting == 0) data |= 0x08;
+	// SR(2) TxRDY Transmitter Ready
+	if (channel->tx_bytecount == 0) data |= 0x04;
+	// SR(1) FFULL RX Fifo Full
+	if (channel->rx_bytecount == SCC2698B_RX_FIFO_SIZE) data |= 0x02;
+	// SR(0) RxRDY Receiver Ready (Data has been received)
+	if (channel->rx_bytecount > 0) data |= 0x01;
+
+	return data;
+}
+int scc2698b_device::read_RHR(int port)
+{
+	scc2698b_channel* channel = get_channel(port);
+	return channel->read_RXH();
+}
+
+void scc2698b_device::update_block_baudrate(int block)
+{
+	update_port_baudrate(block * 2);
+	update_port_baudrate(block * 2 + 1);
+}
+
+void scc2698b_device::update_port_baudrate(int port)
+{
+	scc2698b_channel* channel = get_channel(port);
+	channel->set_tx_bittime(generate_baudrate(port / 2, 1, channel->CSR & 15));
+	channel->set_rx_bittime(generate_baudrate(port / 2, 0, channel->CSR >> 4));
+}
+
+attotime scc2698b_device::generate_baudrate(int block, int tx, int table_index)
+{
+	if (table_index < 13)
+	{
+		// Table based bit time calculation
+		int divider = 0;
+		if (m_blocks[block].ACR & 0x80)
+		{
+			divider = BAUD_DIVIDER_ACR7_1[table_index];
+		}
+		else
+		{
+			divider = BAUD_DIVIDER_ACR7_0[table_index];
+		}
+
+		if (divider == 0)
+		{
+			return attotime::never;
+		}
+
+		return attotime::from_hz(configured_clock()) / (divider * 8);
+	}
+	else
+	{
+		// todo: Actually do timer based and more advanced baud rate generation.
+		logerror("Warning: Unimplemented baud rate mode");
+		return attotime::never;
+	}
 }
 
 
