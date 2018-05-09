@@ -766,7 +766,7 @@ protected:
 	uint32_t              m_bkmask;
 
 	// internal peripheral registers
-	enum primary_bus_control_mask : u32
+	enum primary_bus_control_mask : uint32_t
 	{
 		HOLDST = 0x00000001, // hold status
 		NOHOLD = 0x00000002, // external hold disable
@@ -777,7 +777,7 @@ protected:
 
 		WMASK  = 0x00001ffe
 	};
-	u32                 m_primary_bus_control;
+	uint32_t            m_primary_bus_control;
 
 	// internal stuff
 	uint16_t              m_irq_state;
@@ -792,7 +792,7 @@ protected:
 	uint32_t *            m_bootrom;
 
 	bool                m_mcbl_mode;
-	bool				m_hold_state;
+	bool                m_hold_state;
 
 	devcb_write8        m_xf0_cb;
 	devcb_write8        m_xf1_cb;
