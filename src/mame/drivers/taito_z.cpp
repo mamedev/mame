@@ -3304,7 +3304,7 @@ MACHINE_CONFIG_START(taitoz_state::chasehq)
 	/* sound hardware */
 	SPEAKER(config, "front",     0.0, 0.0,  1.0);
 	SPEAKER(config, "rear",      0.0, 0.0, -0.5);
-	SPEAKER(config, "subwoofer", 0.0, 0.0,  1.0);
+	SPEAKER(config, "subwoofer", 0.0, 0.0,  0.5);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -3624,7 +3624,7 @@ MACHINE_CONFIG_START(taitoz_state::nightstr)
 	/* sound hardware */
 	SPEAKER(config, "front",     0.0, 0.0,  1.0);
 	SPEAKER(config, "rear",      0.0, 0.0, -0.5);
-	SPEAKER(config, "subwoofer", 0.0, 0.0,  1.0);
+	SPEAKER(config, "subwoofer", 0.0, 0.0,  0.5);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
