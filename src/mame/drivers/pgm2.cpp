@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:David Haywood, Xing Xing, Andreas Naive
 /* PGM 2 hardware.
 
