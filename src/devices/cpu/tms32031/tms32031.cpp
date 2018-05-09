@@ -887,7 +887,7 @@ WRITE32_MEMBER(tms3203x_device::primary_bus_control_w)
 	}
 
 	// enable of external hold with hold pending
-	if (m_primary_bus_control & NOHOLD && !(data & NOHOLD) && m_hold_state)
+	if ((m_primary_bus_control & NOHOLD) && !(data & NOHOLD) && m_hold_state)
 	{
 		m_primary_bus_control |= HOLDST;
 		m_holda_cb(ASSERT_LINE);
