@@ -255,28 +255,28 @@ Stephh's log (2006.09.20) :
 
 READ16_MEMBER(cps_state::cps1_dsw_r)
 {
-	uint8_t dsw;
+	uint8_t dsw = 0xff; // unknown
 	switch (offset)
 	{
 		case 0: dsw = m_io_in0->read(); break;
 		case 1:
 		case 2:
 		case 3: dsw = m_io_dsw[offset-1]->read(); break;
-		default: return;
+		default: break;
 	}
 	return (dsw << 8) | 0xff;
 }
 
 READ16_MEMBER(cps_state::cps1_hack_dsw_r)
 {
-	uint8_t dsw;
+	uint8_t dsw = 0xff; // unknown
 	switch (offset)
 	{
 		case 0: dsw = m_io_in0->read(); break;
 		case 1:
 		case 2:
 		case 3: dsw = m_io_dsw[offset-1]->read(); break;
-		default: return;
+		default: break;
 	}
 	return (dsw << 8) | dsw;
 }
