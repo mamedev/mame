@@ -815,7 +815,7 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_TIMER_DRIVER_ADD("vidldsh", tandy2k_state, vidldsh_tick)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

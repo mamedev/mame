@@ -614,7 +614,7 @@ MACHINE_CONFIG_START(sfkick_state::sfkick)
 	MCFG_I8255_IN_PORTB_CB(READ8(*this, sfkick_state, ppi_port_b_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sfkick_state, ppi_port_c_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

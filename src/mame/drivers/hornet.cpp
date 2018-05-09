@@ -1065,9 +1065,10 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	MCFG_K056800_ADD("k056800", XTAL(16'934'400))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_RF5C400_ADD("rfsnd", XTAL(16'934'400))  // value from Guru readme, gives 44100 Hz sample rate
+	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(16'934'400))  // value from Guru readme, gives 44100 Hz sample rate
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

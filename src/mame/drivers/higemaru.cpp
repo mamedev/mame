@@ -186,7 +186,7 @@ MACHINE_CONFIG_START(higemaru_state::higemaru)
 	MCFG_PALETTE_INIT_OWNER(higemaru_state, higemaru)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

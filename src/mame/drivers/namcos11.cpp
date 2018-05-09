@@ -624,7 +624,8 @@ MACHINE_CONFIG_START(namcos11_state::coh110)
 
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C352_ADD("c352", 25401600, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)

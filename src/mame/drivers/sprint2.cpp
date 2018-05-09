@@ -515,7 +515,8 @@ MACHINE_CONFIG_START(sprint2_state::sprint2)
 	MCFG_PALETTE_INIT_OWNER(sprint2_state, sprint2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("outlatch", F9334, 0) // at H8
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT2_ATTRACT_EN>)) // also DOMINOS_ATTRACT_EN
@@ -525,8 +526,7 @@ MACHINE_CONFIG_START(sprint2_state::sprint2)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led1")) // START LAMP2
 	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, sprint2_state, sprint2_spare_w))
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(sprint2)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, sprint2_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -538,12 +538,11 @@ MACHINE_CONFIG_START(sprint2_state::sprint1)
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("lspeaker")
 	MCFG_DEVICE_REMOVE("rspeaker")
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_REMOVE("discrete")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(sprint1)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, sprint1_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -554,12 +553,11 @@ MACHINE_CONFIG_START(sprint2_state::dominos)
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("lspeaker")
 	MCFG_DEVICE_REMOVE("rspeaker")
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_REMOVE("discrete")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(dominos)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, dominos_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -251,7 +251,7 @@ MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -261,7 +261,7 @@ MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(24'000'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/16, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(24'000'000)/16, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) /* sound fx */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(0, pokechmp_oki_map)

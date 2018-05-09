@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(sprcros2_state::sprcros2)
 	MCFG_PALETTE_INIT_OWNER(sprcros2_state, sprcros2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("sn1", SN76489, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

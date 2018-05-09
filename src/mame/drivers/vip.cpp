@@ -556,7 +556,7 @@ static const discrete_555_desc vip_ca555_a =
 	DEFAULT_555_VALUES
 };
 
-static DISCRETE_SOUND_START( vip )
+static DISCRETE_SOUND_START( vip_discrete )
 	DISCRETE_INPUT_LOGIC(NODE_01)
 	DISCRETE_555_ASTABLE_CV(NODE_02, NODE_01, 470, (int) RES_M(1), (int) CAP_P(470), NODE_01, &vip_ca555_a)
 	DISCRETE_OUTPUT(NODE_02, 5000)
@@ -737,10 +737,9 @@ MACHINE_CONFIG_START(vip_state::vip)
 	MCFG_SCREEN_UPDATE_DRIVER(vip_state, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
-	MCFG_DISCRETE_INTF(vip)
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, vip_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_VIP_BYTEIO_PORT_ADD(VIP_BYTEIO_PORT_TAG, vip_byteio_cards, nullptr, WRITELINE(*this, vip_state, byteio_inst_w))

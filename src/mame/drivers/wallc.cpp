@@ -66,27 +66,22 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram") { }
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(unkitpkr_out0_w);
-	DECLARE_WRITE8_MEMBER(unkitpkr_out1_w);
-	DECLARE_WRITE8_MEMBER(unkitpkr_out2_w);
+	void unkitpkr(machine_config &config);
+	void wallc(machine_config &config);
+	void wallca(machine_config &config);
 
 	DECLARE_DRIVER_INIT(wallc);
 	DECLARE_DRIVER_INIT(wallca);
 	DECLARE_DRIVER_INIT(sidam);
 	DECLARE_DRIVER_INIT(unkitpkr);
 
-	void unkitpkr(machine_config &config);
-	void wallc(machine_config &config);
-	void wallca(machine_config &config);
-
-	void unkitpkr_map(address_map &map);
-	void wallc_map(address_map &map);
 protected:
 	virtual void video_start() override;
 
 private:
+	void unkitpkr_map(address_map &map);
+	void wallc_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -95,6 +90,12 @@ private:
 	tilemap_t *m_bg_tilemap;
 
 	bool m_bookkeeping_mode;
+
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(unkitpkr_out0_w);
+	DECLARE_WRITE8_MEMBER(unkitpkr_out1_w);
+	DECLARE_WRITE8_MEMBER(unkitpkr_out2_w);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info_unkitpkr);
@@ -504,7 +505,7 @@ MACHINE_CONFIG_START(wallc_state::wallc)
 	MCFG_PALETTE_INIT_OWNER(wallc_state, wallc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8912, 12288000 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -645,46 +646,24 @@ ROM_END
 
 DRIVER_INIT_MEMBER(wallc_state, sidam)
 {
-	uint8_t c;
-	uint32_t i;
-
 	uint8_t *ROM = memregion("maincpu")->base();
-	int count = 0;
 
-	for (i=0; i<0x2000; i++)
+	for (int i = 0; i < 0x2000; i++)
 	{
-		switch (i & 0x4a)  // A1, A3, A6
+		uint8_t x = ROM[i];
+		switch(i & 0x4a) // seems correct. Plaintext available in the 0x1150-0x1550 range. First 0x50 of code are very similar if not identical to unkitpkr.
 		{
-			case 0x00:
-				logerror("%02x ", ROM[i]);
-				count++;
-				break;
-			case 0x02:
-				break;
-			case 0x08:
-				break;
-			case 0x0a:
-				break;
-			case 0x40:
-				break;
-			case 0x42:
-				break;
-			case 0x48:
-				break;
-			case 0x4a:
-				break;
+			case 0x00: x = bitswap<8>(x ^ (BIT(x, 6) ? 0xaf : 0x03), 7, 3, 5, 2, 6, 4, 1, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0x77, 4, 6, 2, 5, 3, 7, 1, 0); break;
+			case 0x08: x = bitswap<8>(x ^ 0x5f, 2, 4, 6, 3, 7, 5, 1, 0); break;
+			case 0x0a: x = bitswap<8>(x ^ 0xd7, 6, 2, 4, 7, 5, 3, 1, 0); break;
+			case 0x40: x = bitswap<8>(x ^ (BIT(x, 6) ? 0xaf : 0x03), 7, 3, 5, 2, 6, 4, 1, 0); break;
+			case 0x42: x = bitswap<8>(x ^ 0xeb, 5, 7, 3, 6, 4, 2, 1, 0); break;
+			case 0x48: x = bitswap<8>(x ^ (BIT(x, 6) ? 0xbb : 0x03), 3, 5, 7, 4, 2, 6, 1, 0); break;
+			case 0x4a: x = bitswap<8>(x ^ 0xd7, 6, 2, 4, 7, 5, 3, 1, 0); break;
 		}
 
-
-
-		if (count==16)
-		{
-			count = 0;
-			logerror("\n");
-		}
-
-		c = ROM[ i ] ^ 0x0f;
-		ROM[ i ] = c;
+		ROM[i] = x;
 	}
 }
 
@@ -765,5 +744,5 @@ GAME( 1984, wallc,    0,      wallc,    wallc,    wallc_state, wallc,    ROT0,  
 GAME( 1984, wallca,   wallc,  wallca,   wallc,    wallc_state, wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1984, brkblast, wallc,  wallc,    wallc,    wallc_state, wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
-GAME( 1984, sidampkr, 0,      wallc,    wallc,    wallc_state, sidam,    ROT270, "Sidam",            "unknown Sidam Poker",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sidampkr, 0,      unkitpkr, unkitpkr, wallc_state, sidam,    ROT270, "Sidam",            "unknown Sidam Poker",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // strings in English and French, same codebase as unkitpkr
 GAME( 198?, unkitpkr, 0,      unkitpkr, unkitpkr, wallc_state, unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_SUPPORTS_SAVE )

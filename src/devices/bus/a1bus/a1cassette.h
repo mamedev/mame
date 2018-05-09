@@ -46,7 +46,7 @@ protected:
 	optional_device<cassette_image_device> m_cassette;
 
 private:
-	uint8_t *m_rom;
+	required_region_ptr<uint8_t> m_rom;
 	int m_cassette_output_flipflop;
 };
 

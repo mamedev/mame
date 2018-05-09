@@ -238,7 +238,7 @@ MACHINE_CONFIG_START(tonton_state::tonton)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", YM2149, YM2149_CLOCK)   /* Guess. According to other MSX2 based gambling games */
 	/*
 	  AY8910: Port A out: FF

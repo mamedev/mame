@@ -652,7 +652,8 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 
 	MCFG_VIDEO_START_OVERRIDE(gal3_state,gal3)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C140_ADD("c140_16g", 8000000/374)
 	MCFG_C140_BANK_TYPE(SYSTEM21)    //to be verified

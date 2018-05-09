@@ -519,7 +519,7 @@ MACHINE_CONFIG_START(lastduel_state::lastduel)
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,lastduel)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -564,7 +564,7 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,madgear)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -575,7 +575,7 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(10'000'000)/10, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(10'000'000)/10, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.98)
 MACHINE_CONFIG_END
 

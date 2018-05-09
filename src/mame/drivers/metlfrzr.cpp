@@ -388,7 +388,7 @@ MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181) / 4)    /* 3.579545 MHz */
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("t5182", t5182_device, ym2151_irq_handler))

@@ -819,7 +819,7 @@ MACHINE_CONFIG_START(clcd_state::clcd)
 	MCFG_PALETTE_INIT_OWNER(clcd_state, clcd)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

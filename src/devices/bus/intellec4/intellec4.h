@@ -171,6 +171,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 private:

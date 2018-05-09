@@ -268,7 +268,7 @@ MACHINE_CONFIG_START(rgum_state::rgum)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rgum)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 24000000/16) /* guessed to use the same xtal as the crtc */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

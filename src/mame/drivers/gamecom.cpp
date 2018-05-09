@@ -274,7 +274,7 @@ MACHINE_CONFIG_START(gamecom_state::gamecom)
 	MCFG_PALETTE_INIT_OWNER(gamecom_state, gamecom)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "speaker" )
+	SPEAKER(config, "speaker").front_center();
 	/* TODO: much more complex than this */
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC (Digital audio)
 	MCFG_DEVICE_ADD("dac0", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC (Frequency modulation)

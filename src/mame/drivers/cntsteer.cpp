@@ -956,7 +956,7 @@ MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,cntsteer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1008,7 +1008,7 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,zerotrgt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

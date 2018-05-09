@@ -3309,7 +3309,8 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("scsp1", SCSP)
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, coolridr_state, scsp_irq))
 	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(*this, coolridr_state, scsp1_to_sh1_irq))

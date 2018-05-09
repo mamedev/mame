@@ -304,12 +304,12 @@ MACHINE_CONFIG_START(patapata_state::patapata)
 	MCFG_PALETTE_ADD("palette", 0x600/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", 16_MHz_XTAL / 4, PIN7_LOW) // not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki2", 16_MHz_XTAL / 4, PIN7_LOW) // not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0) // or 212? difficult to read (maybe 212 is 2* 112?)

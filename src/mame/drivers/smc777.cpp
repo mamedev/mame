@@ -1060,7 +1060,7 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	MCFG_QUICKLOAD_ADD("quickload", smc777_state, smc777, "com,cpm", 3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

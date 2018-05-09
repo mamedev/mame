@@ -551,13 +551,13 @@ MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(7'159'090)/2)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -591,7 +591,7 @@ MACHINE_CONFIG_START(bloodbro_state::weststry)
 
 	// Bootleg sound hardware is close copy of Seibu, but uses different interrupts
 
-	MCFG_OKIM6295_REPLACE("oki", XTAL(20'000'000)/16, PIN7_HIGH) /* 1.25MHz - verified on PCB */
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, XTAL(20'000'000)/16, okim6295_device::PIN7_HIGH) /* 1.25MHz - verified on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_REPLACE("ymsnd", YM3812, XTAL(20'000'000)/4) /* ~4.9MHz - see notes at top */

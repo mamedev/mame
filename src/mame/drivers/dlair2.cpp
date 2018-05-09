@@ -203,7 +203,7 @@ MACHINE_CONFIG_START(dlair2_state::dlair2)
 	MCFG_PALETTE_INIT_OWNER(dlair2_state, dlair2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 

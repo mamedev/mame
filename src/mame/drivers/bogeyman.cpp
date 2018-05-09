@@ -254,7 +254,7 @@ MACHINE_CONFIG_START(bogeyman_state::bogeyman)
 	MCFG_PALETTE_INIT_OWNER(bogeyman_state, bogeyman)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// verified to be YM2149s from PCB pic
 	MCFG_DEVICE_ADD("ay1", YM2149, 1500000)  /* Verified */

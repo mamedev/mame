@@ -576,7 +576,7 @@ MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 	MCFG_PALETTE_ADD("palette", 0x400)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd",AY8910, SND_CLOCK)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))

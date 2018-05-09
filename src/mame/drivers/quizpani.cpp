@@ -213,9 +213,9 @@ MACHINE_CONFIG_START(quizpani_state::quizpani)
 	MCFG_SCREEN_PALETTE("palette")
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)

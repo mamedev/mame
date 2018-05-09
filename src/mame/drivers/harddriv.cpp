@@ -1624,7 +1624,8 @@ MACHINE_CONFIG_START(harddriv_state::ds3)
 	MCFG_DEVICE_DATA_MAP(ds3xdsp_data_map)
 	MCFG_TIMER_DRIVER_ADD("ds3xdsp_timer", harddriv_state, ds3xdsp_internal_timer_callback)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
@@ -1868,7 +1869,7 @@ MACHINE_CONFIG_START(stunrun_board_device_state::device_add_mconfig)
 	MCFG_SCREEN_RAW_PARAMS(5000000*2, 317*2, 0, 256*2, 262, 0, 228)
 
 	/* sund hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(*this, harddriv_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)
@@ -1935,7 +1936,7 @@ MACHINE_CONFIG_START(steeltal_board_device_state::device_add_mconfig)
 	MCFG_ASIC65_ADD("asic65", ASIC65_STEELTAL)         /* ASIC65 on DSPCOM board */
 
 	/* sund hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(*this, harddriv_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 5)

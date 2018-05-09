@@ -1745,7 +1745,7 @@ static const discrete_dac_r1_ladder taitosj_dacvol_ladder =
 	0           // no cap
 };
 
-DISCRETE_SOUND_START(taitosj_dacvol)
+DISCRETE_SOUND_START(taitosj_dacvol_discrete)
 	DISCRETE_INPUT_DATA(NODE_01)
 	DISCRETE_DAC_R1(NODE_02, NODE_01, DEFAULT_TTL_V_LOGIC_1, &taitosj_dacvol_ladder)
 	DISCRETE_OUTPUT(NODE_02, 9637)
@@ -1786,7 +1786,7 @@ MACHINE_CONFIG_START(taitosj_state::nomcu)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("soundnmi2", input_merger_device, in_w<0>))
@@ -1825,7 +1825,7 @@ MACHINE_CONFIG_START(taitosj_state::nomcu)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // 30k r-2r network
-	MCFG_DEVICE_ADD("dacvol", DISCRETE) MCFG_DISCRETE_INTF(taitosj_dacvol)
+	MCFG_DEVICE_ADD("dacvol", DISCRETE, taitosj_dacvol_discrete)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 

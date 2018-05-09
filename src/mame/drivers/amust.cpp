@@ -395,7 +395,7 @@ MACHINE_CONFIG_START(amust_state::amust)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amust)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

@@ -906,7 +906,7 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz", spc1500_state, timer, attotime::from_hz(1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(4'000'000) / 2)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spc1500_state, psga_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, spc1500_state, psgb_w))

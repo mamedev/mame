@@ -660,7 +660,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	// sound is PCM
 MACHINE_CONFIG_END
 

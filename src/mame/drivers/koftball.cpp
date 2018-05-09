@@ -252,13 +252,14 @@ MACHINE_CONFIG_START(koftball_state::koftball)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", koftball)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))  // guessed chip type, clock not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_LOW) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1122000, okim6295_device::PIN7_LOW) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END

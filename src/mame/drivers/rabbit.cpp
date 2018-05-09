@@ -923,7 +923,8 @@ MACHINE_CONFIG_START(rabbit_state::rabbit)
 	MCFG_PALETTE_FORMAT(XGRB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_I5000_SND_ADD("i5000snd", XTAL(40'000'000))
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)

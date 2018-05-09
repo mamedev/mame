@@ -521,7 +521,7 @@ MACHINE_CONFIG_START(a2600_state::a2600)
 	MCFG_SCREEN_PALETTE("tia_video:palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK_NTSC/114)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
@@ -569,7 +569,7 @@ MACHINE_CONFIG_START(a2600_state::a2600p)
 	MCFG_SCREEN_PALETTE("tia_video:palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK_PAL/114)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 

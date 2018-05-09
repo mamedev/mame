@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(_4roses_state::_4roses)
 	//MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* 2MHz, guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)

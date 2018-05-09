@@ -62,7 +62,7 @@ public:
 		m_lamps(*this, "lamp%u", 1U),
 		m_bg3_xscroll(8),
 		m_bg3_yscroll(0)
-		{ }
+	{ }
 
 	void galaxi(machine_config &config);
 	void lastfour(machine_config &config);
@@ -485,9 +485,9 @@ MACHINE_CONFIG_START(galaxi_state::galaxi)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", SND_CLOCK, PIN7_LOW)  // ?
+	MCFG_DEVICE_ADD("oki", OKIM6295, SND_CLOCK, okim6295_device::PIN7_LOW)  // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

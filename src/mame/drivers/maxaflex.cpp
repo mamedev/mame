@@ -361,7 +361,7 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 	MCFG_DEFAULT_LAYOUT(layout_maxaflex)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
 	MCFG_POKEY_INTERRUPT_CB(maxaflex_state, interrupt_cb)

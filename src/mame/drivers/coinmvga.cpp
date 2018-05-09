@@ -664,7 +664,8 @@ MACHINE_CONFIG_START(coinmvga_state::coinmvga)
 	MCFG_RAMDAC_ADD("ramdac2", ramdac2_map, "palette2")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, SND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

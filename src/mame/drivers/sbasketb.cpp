@@ -230,7 +230,7 @@ MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 	MCFG_PALETTE_INIT_OWNER(sbasketb_state, sbasketb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

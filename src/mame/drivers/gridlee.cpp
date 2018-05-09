@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(gridlee_state::gridlee)
 	MCFG_PALETTE_INIT_OWNER(gridlee_state,gridlee)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("gridlee", GRIDLEE, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

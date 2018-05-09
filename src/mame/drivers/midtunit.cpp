@@ -626,7 +626,7 @@ MACHINE_CONFIG_START(midtunit_state::tunit_adpcm)
 	tunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("adpcm", WILLIAMS_ADPCM_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END

@@ -553,7 +553,8 @@ MACHINE_CONFIG_START(cubeqst_state::cubeqst)
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cubeqst_state, vblank_irq))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

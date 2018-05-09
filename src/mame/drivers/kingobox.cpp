@@ -506,7 +506,7 @@ MACHINE_CONFIG_START(kingofb_state::kingofb)
 	MCFG_VIDEO_START_OVERRIDE(kingofb_state,kingofb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -565,7 +565,7 @@ MACHINE_CONFIG_START(kingofb_state::ringking)
 	MCFG_VIDEO_START_OVERRIDE(kingofb_state,ringking)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

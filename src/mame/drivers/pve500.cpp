@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(pve500_state::pve500)
 	MCFG_DEFAULT_LAYOUT(layout_pve500)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("buzzer", BEEP, 12_MHz_XTAL / 3200) // 3.75 kHz CLK2 coming out of IC D4 (frequency divider circuitry)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 

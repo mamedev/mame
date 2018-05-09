@@ -1051,7 +1051,7 @@ MACHINE_CONFIG_START(psikyo_state::sngkace)
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,sngkace)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(32'000'000)/4) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1097,7 +1097,7 @@ MACHINE_CONFIG_START(psikyo_state::gunbird)
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1138,9 +1138,9 @@ MACHINE_CONFIG_START(psikyo_state::s1945bl) /* Bootleg hardware based on the unp
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_LOW) // ?? clock
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_LOW) // ?? clock
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, s1945bl_oki_map)
 MACHINE_CONFIG_END
@@ -1183,7 +1183,7 @@ MACHINE_CONFIG_START(psikyo_state::s1945)
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

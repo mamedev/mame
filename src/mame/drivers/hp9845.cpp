@@ -3751,7 +3751,7 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer" , hp9845_base_state , kb_scan , attotime::from_hz(100))
 
 	// Beeper
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper" , BEEP , KEY_SCAN_OSCILLATOR / 512)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 0.50)
 

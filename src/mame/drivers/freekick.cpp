@@ -756,7 +756,7 @@ MACHINE_CONFIG_START(freekick_state::omega)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x200)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(18'432'000)/6) // unknown divisor
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -794,7 +794,7 @@ MACHINE_CONFIG_START(freekick_state::base)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x200)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(12'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

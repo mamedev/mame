@@ -483,7 +483,8 @@ MACHINE_CONFIG_START(tecmosys_state::tecmosys)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
@@ -498,7 +499,7 @@ MACHINE_CONFIG_START(tecmosys_state::tecmosys)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)

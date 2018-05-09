@@ -399,7 +399,7 @@ MACHINE_CONFIG_START(mainsnk_state::mainsnk)
 	MCFG_PALETTE_INIT_OWNER(mainsnk_state, mainsnk)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))

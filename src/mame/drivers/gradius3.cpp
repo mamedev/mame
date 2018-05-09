@@ -322,7 +322,8 @@ MACHINE_CONFIG_START(gradius3_state::gradius3)
 	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_GRADIUS3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

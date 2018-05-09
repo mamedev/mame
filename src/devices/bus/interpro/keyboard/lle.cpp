@@ -153,7 +153,7 @@ WRITE_LINE_MEMBER(lle_device_base::input_txd)
 MACHINE_CONFIG_START(lle_device_base::device_add_mconfig)
 	MCFG_DEVICE_ADD("mcu", I8049, 11_MHz_XTAL)
 
-	MCFG_SPEAKER_STANDARD_MONO("keyboard")
+	SPEAKER(config, "keyboard").front_center();
 	MCFG_DEVICE_ADD("bell", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "keyboard", 0.25)
 MACHINE_CONFIG_END

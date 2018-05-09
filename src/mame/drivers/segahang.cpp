@@ -844,7 +844,8 @@ MACHINE_CONFIG_START(segahang_state::sound_board_2203)
 	MCFG_DEVICE_IO_MAP(sound_portmap_2203)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK_8MHz/2)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
@@ -872,7 +873,8 @@ MACHINE_CONFIG_START(segahang_state::sound_board_2203x2)
 	MCFG_DEVICE_IO_MAP(sound_portmap_2203x2)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK_8MHz/2)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
@@ -910,7 +912,8 @@ MACHINE_CONFIG_START(segahang_state::sound_board_2151)
 	MCFG_DEVICE_IO_MAP(sound_portmap_2151)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, MASTER_CLOCK_8MHz/2)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

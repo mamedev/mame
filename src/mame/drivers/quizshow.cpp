@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(quizshow_state::quizshow)
 	MCFG_PALETTE_INIT_OWNER(quizshow_state, quizshow)
 
 	/* sound hardware (discrete) */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

@@ -225,7 +225,7 @@ MACHINE_CONFIG_START(mouser_state::mouser)
 	MCFG_PALETTE_INIT_OWNER(mouser_state, mouser)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 4000000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

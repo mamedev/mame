@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(beathead_state::beathead)
 	MCFG_PALETTE_MEMBITS(16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_III_ADD("jsa", NOOP)
 	MCFG_ATARI_JSA_TEST_PORT("IN2", 6)

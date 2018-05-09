@@ -426,7 +426,8 @@ MACHINE_CONFIG_START(spdodgeb_state::spdodgeb)
 	MCFG_PALETTE_INIT_OWNER(spdodgeb_state, spdodgeb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))

@@ -1023,7 +1023,7 @@ MACHINE_CONFIG_START(leland_state::leland)
 	/* video hardware */
 	leland_video(config);
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	// only one of the AY sockets is populated
 	MCFG_DEVICE_ADD("ay8910", AY8910, 10000000/6)

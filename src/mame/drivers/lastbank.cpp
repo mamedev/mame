@@ -546,12 +546,12 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 //  MCFG_VIDEO_START_OVERRIDE(lastbank_state,lastbank)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_ES8712_ADD("essnd", 0)

@@ -330,7 +330,7 @@ void bublbobl_state::subcpu_map(address_map &map)
  1  0  1  0  x  x  x  x  x  x  x  x  x  x  x  *  RW YM3526 OPL chip
  1  0  1  1                                *  *  decoded by 74ls155@ic33
  1  0  1  1  x  x  x  x  x  x  x  x  x  x  0  0  R maincpu_to_sound latch 74ls374 @ic24 and clear maincpu_has_written semaphore
- 1  0  1  1  x  x  x  x  x  x  x  x  x  x  0  0  W sound_to_maincpu latch 74ls374 @ic25 and set sound_has_written sempaphore
+ 1  0  1  1  x  x  x  x  x  x  x  x  x  x  0  0  W sound_to_maincpu latch 74ls374 @ic25 and set sound_has_written semaphore
  1  0  1  1  x  x  x  x  x  x  x  x  x  x  0  1  R read semaphores in d0 and d1
  1  0  1  1  x  x  x  x  x  x  x  x  x  x  0  1  W set latch to enable sound cpu nmi on maincpu_has_written semaphore active
  1  0  1  1  x  x  x  x  x  x  x  x  x  x  1  x  R OPEN BUS
@@ -339,7 +339,7 @@ void bublbobl_state::subcpu_map(address_map &map)
  1  0  1  1  x  x  x  x  x  x  x  x  x  x  x  0  RW sound latch[2]
  1  1  x  x  x  x  x  x  x  x  x  x  x  x  x  x  OPEN BUS
 (1  1  *  *  *  *  *  *  *  *  *  *  *  *  *  *  R  DIAGNOSTIC ROM[4])
-   [1] Technicaly A12 is conencted to the 6264 SRAM too, but the 74ls138 disables the SRAM when A12 is high, so only half is usable
+   [1] Technicaly A12 is connected to the 6264 SRAM too, but the 74ls138 disables the SRAM when A12 is high, so only half is usable
    [4] While normally not populated (or even present? not shown on the schematic at all? possibly a holdover from tokio?)
        the sound code probes for a ROM here, and will use it if found.
 Sound cpu semaphores are both active low:
@@ -880,7 +880,7 @@ MACHINE_CONFIG_START(bublbobl_state::tokio)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -993,7 +993,7 @@ MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))

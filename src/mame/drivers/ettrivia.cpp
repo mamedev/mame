@@ -316,7 +316,7 @@ MACHINE_CONFIG_START(ettrivia_state::ettrivia)
 	MCFG_PALETTE_INIT_OWNER(ettrivia_state, ettrivia)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

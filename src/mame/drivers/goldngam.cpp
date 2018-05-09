@@ -619,7 +619,7 @@ MACHINE_CONFIG_START(goldngam_state::swisspkr)
 	MCFG_PALETTE_INIT_OWNER(goldngam_state, goldngam)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8912, MASTER_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

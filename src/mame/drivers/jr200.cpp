@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(jr200_state::jr200)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jr200)
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// AY-8910 ?
 

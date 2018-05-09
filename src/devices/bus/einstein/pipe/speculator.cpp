@@ -44,7 +44,7 @@ MACHINE_CONFIG_START(einstein_speculator_device::device_add_mconfig)
 	MCFG_TTL74123_CLEAR_PIN_VALUE(0)
 	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, einstein_speculator_device, ic5b_q_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND, 0)

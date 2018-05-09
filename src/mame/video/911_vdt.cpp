@@ -812,7 +812,7 @@ MACHINE_CONFIG_START(vdt911_device::device_add_mconfig)
 	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.50)
 

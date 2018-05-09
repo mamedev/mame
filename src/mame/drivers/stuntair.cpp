@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	MCFG_PALETTE_INIT_OWNER(stuntair_state, stuntair)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono") // stereo?
+	SPEAKER(config, "mono").front_center(); // stereo?
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

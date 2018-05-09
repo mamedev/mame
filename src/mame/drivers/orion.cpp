@@ -125,7 +125,7 @@ MACHINE_CONFIG_START(orion_state::orion128)
 
 	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -201,7 +201,7 @@ MACHINE_CONFIG_START(orion_state::orionz80)
 
 	MCFG_MC146818_ADD( "rtc", XTAL(4'194'304) )
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
@@ -277,7 +277,7 @@ MACHINE_CONFIG_START(orion_state::orionpro)
 
 	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")

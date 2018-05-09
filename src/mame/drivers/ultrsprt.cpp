@@ -268,7 +268,8 @@ MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_6))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_5))

@@ -248,7 +248,7 @@ MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 	MCFG_TECMO_SPRITE_BOOTLEG(1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -256,7 +256,7 @@ MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH) /* Use value from Super Pinball Action - clock frequency & pin 7 not verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) /* Use value from Super Pinball Action - clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

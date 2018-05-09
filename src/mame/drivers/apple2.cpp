@@ -96,7 +96,6 @@ II Plus: RAM options reduced to 16/32/48 KB.
 
 #define A2_CPU_TAG "maincpu"
 #define A2_KBDC_TAG "ay3600"
-#define A2_BUS_TAG "a2bus"
 #define A2_SPEAKER_TAG "speaker"
 #define A2_CASSETTE_TAG "tape"
 #define A2_UPPERBANK_TAG "inhbank"
@@ -112,7 +111,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_ay3600(*this, A2_KBDC_TAG),
 		m_video(*this, A2_VIDEO_TAG),
-		m_a2bus(*this, A2_BUS_TAG),
+		m_a2bus(*this, "a2bus"),
 		m_joy1x(*this, "joystick_1_x"),
 		m_joy1y(*this, "joystick_1_y"),
 		m_joy2x(*this, "joystick_2_x"),
@@ -1392,7 +1391,7 @@ MACHINE_CONFIG_START(napple2_state::apple2_common)
 	MCFG_PALETTE_INIT_OWNER(napple2_state, apple2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1434,19 +1433,19 @@ MACHINE_CONFIG_START(napple2_state::apple2_common)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", napple2_state, ay3600_repeat, attotime::from_hz(15))
 
 	/* slot devices */
-	MCFG_DEVICE_ADD(A2_BUS_TAG, A2BUS, 0)
+	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
 	MCFG_A2BUS_CPU(A2_CPU_TAG)
 	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, napple2_state, a2bus_irq_w))
 	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, napple2_state, a2bus_nmi_w))
 	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, napple2_state, a2bus_inh_w))
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl0", apple2_slot0_cards, "lang")
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl1", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl2", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl3", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl4", apple2_cards, "mockingboard")
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl5", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl6", apple2_cards, "diskiing")
-	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl7", apple2_cards, nullptr)
+	A2BUS_SLOT(config, "sl0", m_a2bus, apple2_slot0_cards, "lang");
+	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", m_a2bus, apple2_cards, "mockingboard");
+	A2BUS_SLOT(config, "sl5", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, "diskiing");
+	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "apple2_cass")
@@ -1489,12 +1488,12 @@ static MACHINE_CONFIG_START( laba2p )
 	apple2p(config);
 	MCFG_MACHINE_START_OVERRIDE(napple2_state,laba2p)
 
-	MCFG_A2BUS_SLOT_REMOVE("sl0")
-	MCFG_A2BUS_SLOT_REMOVE("sl3")
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
+	MCFG_DEVICE_REMOVE("sl0")
+	MCFG_DEVICE_REMOVE("sl3")
+	MCFG_DEVICE_REMOVE("sl6")
 
-//  MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl3", A2BUS_LAB_80COL, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NOOP)
+//  A2BUS_LAB_80COL("sl3", A2BUS_LAB_80COL).set_onboard(m_a2bus);
+	A2BUS_IWM_FDC("sl6", A2BUS_IWM_FDC).set_onboard(m_a2bus);
 
 MACHINE_CONFIG_END
 #endif

@@ -724,7 +724,8 @@ MACHINE_CONFIG_START(limenko_state::limenko)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))
@@ -769,11 +770,11 @@ MACHINE_CONFIG_START(limenko_state::spotty)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 4000000 / 4 , PIN7_HIGH) //?
+	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000 / 4 , okim6295_device::PIN7_HIGH) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

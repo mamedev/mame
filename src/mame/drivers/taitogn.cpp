@@ -748,7 +748,8 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_SPU_ADD("spu", XTAL(67'737'600)/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)

@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 	MCFG_VIDEO_START_OVERRIDE(jrpacman_state,jrpacman)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO, 3072000/32)
 	MCFG_NAMCO_AUDIO_VOICES(3)

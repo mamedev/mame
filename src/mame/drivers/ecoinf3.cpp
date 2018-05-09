@@ -670,7 +670,7 @@ MACHINE_CONFIG_START(ecoinf3_state::ecoinf3_pyramid)
 
 	MCFG_DEFAULT_LAYOUT(layout_ecoinf3)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 
 	MCFG_DEVICE_ADD("sn1", SN76489, 4000000) // no idea what the sound chip is, this sounds terrible

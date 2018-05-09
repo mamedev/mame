@@ -31,9 +31,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_LC7535_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, LC7535, 0)
-
 #define MCFG_LC7535_SELECT_CB(_read) \
 	devcb = &downcast<lc7535_device &>(*device).set_select_callback(DEVCB_##_read);
 
@@ -51,7 +48,7 @@ class lc7535_device : public device_t
 {
 public:
 	// construction/destruction
-	lc7535_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	lc7535_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	typedef device_delegate<void (int attenuation_right, int attenuation_left, bool loudness)> volume_delegate;
 

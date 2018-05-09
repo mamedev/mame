@@ -481,7 +481,7 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 	// other lines not connected
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(4'000'000) / 1)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spc1000_state, porta_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, write))

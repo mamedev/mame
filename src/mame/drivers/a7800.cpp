@@ -1395,7 +1395,7 @@ MACHINE_CONFIG_START(a7800_state::a7800_ntsc)
 	MCFG_MARIA_SCREEN("screen")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_TIA_ADD("tia", 31400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

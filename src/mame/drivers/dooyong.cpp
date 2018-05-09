@@ -1352,11 +1352,9 @@ const gfx_layout spritelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0*4, 1*4, 2*4, 3*4 },
-	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
-			16*32+0, 16*32+1, 16*32+2, 16*32+3, 16*32+16+0, 16*32+16+1, 16*32+16+2, 16*32+16+3 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP4(0,4) },
+	{ STEP4(0,1), STEP4(16,1), STEP4(4*8*16,1), STEP4(4*8*16+16,1) },
+	{ STEP16(0,4*8) },
 	128*8
 };
 
@@ -1365,11 +1363,9 @@ const gfx_layout rshark_spritelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			16*32+0*4, 16*32+1*4, 16*32+2*4, 16*32+3*4, 16*32+4*4, 16*32+5*4, 16*32+6*4, 16*32+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP4(0,1) },
+	{ STEP8(0,4), STEP8(4*8*16,4) },
+	{ STEP16(0,4*8) },
 	128*8
 };
 
@@ -1435,7 +1431,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1451,7 +1447,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1460,12 +1456,12 @@ MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1_MHz_XTAL, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1_MHz_XTAL, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_state::sound_2151_4mhz)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1474,7 +1470,7 @@ MACHINE_CONFIG_START(dooyong_state::sound_2151_4mhz)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 16_MHz_XTAL/16, PIN7_HIGH)  /* 1MHz (16MHz/16 for most, 8Mhz/8 for Super-X) */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 16_MHz_XTAL/16, okim6295_device::PIN7_HIGH)  /* 1MHz (16MHz/16 for most, 8Mhz/8 for Super-X) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -1516,7 +1512,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

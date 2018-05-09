@@ -256,7 +256,7 @@ MACHINE_CONFIG_START(pes_state::pes)
 	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, pes_state, data_to_i8031))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("tms5220", TMS5220C, 720000) /* 720Khz clock, 10khz output */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

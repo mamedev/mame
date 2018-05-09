@@ -465,7 +465,7 @@ MACHINE_CONFIG_START(galivan_state::galivan)
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,galivan)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -525,7 +525,7 @@ MACHINE_CONFIG_START(galivan_state::ninjemak)
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,ninjemak)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

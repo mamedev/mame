@@ -268,7 +268,7 @@ MACHINE_CONFIG_START(xyonix_state::xyonix)
 	MCFG_PALETTE_INIT_OWNER(xyonix_state, xyonix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76496, 16000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

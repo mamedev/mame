@@ -630,7 +630,7 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	MCFG_PALETTE_INIT_OWNER(statriv2_state, statriv2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

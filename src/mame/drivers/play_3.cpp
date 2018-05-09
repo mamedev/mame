@@ -514,7 +514,8 @@ MACHINE_CONFIG_START(play_3_state::play_3)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
 	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, play_3_state, clear_a_r))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("aysnd1", AY8910, XTAL(3'579'545) / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_DEVICE_ADD("aysnd2", AY8910, XTAL(3'579'545) / 2)

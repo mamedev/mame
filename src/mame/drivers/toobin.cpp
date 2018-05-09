@@ -230,7 +230,8 @@ MACHINE_CONFIG_START(toobin_state::toobin)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(*this, toobin_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("FF9000", 12)

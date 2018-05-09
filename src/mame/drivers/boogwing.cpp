@@ -411,7 +411,8 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_XTAL/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
@@ -419,11 +420,11 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", SOUND_XTAL/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, SOUND_XTAL/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.40)
 
-	MCFG_OKIM6295_ADD("oki2", SOUND_XTAL/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, SOUND_XTAL/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END

@@ -231,8 +231,8 @@ MACHINE_CONFIG_START(itgamble_state::itgamble)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", SND_CLOCK, PIN7_HIGH) /* 1MHz resonator */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, SND_CLOCK, okim6295_device::PIN7_HIGH) /* 1MHz resonator */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(itgamble_state::mnumber)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(MNUMBER_MAIN_CLOCK/2)    /* probably the wrong CPU */
 
-	MCFG_OKIM6295_REPLACE("oki", MNUMBER_SND_CLOCK/16, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, MNUMBER_SND_CLOCK/16, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -254,7 +254,7 @@ static MACHINE_CONFIG_START( ejollyx5 )
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(EJOLLYX5_MAIN_CLOCK/2)   /* up to 10MHz.*/
 
-	MCFG_OKIM6295_REPLACE("oki", MNUMBER_SND_CLOCK/16, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, MNUMBER_SND_CLOCK/16, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 #endif

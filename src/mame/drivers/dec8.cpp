@@ -1985,7 +1985,7 @@ MACHINE_CONFIG_START(dec8_state::lastmisn)
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -2050,7 +2050,7 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,shackled)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -2111,7 +2111,7 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,gondo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -2172,7 +2172,7 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,garyoret)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -2232,7 +2232,7 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,ghostb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -2292,7 +2292,7 @@ MACHINE_CONFIG_START(dec8_state::csilver)
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -2356,7 +2356,7 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,oscar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", m6502_device::NMI_LINE))
@@ -2410,7 +2410,7 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,srdarwin)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -2467,7 +2467,7 @@ MACHINE_CONFIG_START(dec8_state::cobracom)
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,cobracom)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

@@ -769,7 +769,7 @@ MACHINE_CONFIG_START(flstory_state::flstory)
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
@@ -838,7 +838,7 @@ MACHINE_CONFIG_START(flstory_state::onna34ro)
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
@@ -918,7 +918,7 @@ MACHINE_CONFIG_START(flstory_state::victnine)
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,victnine)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
@@ -991,7 +991,7 @@ MACHINE_CONFIG_START(flstory_state::rumba)
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,rumba)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))

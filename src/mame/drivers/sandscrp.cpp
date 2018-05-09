@@ -504,14 +504,14 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_OKIM6295_ADD("oki", 12000000/6, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/6, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	/* YM3014B + YM2203C */

@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(p2000t_state::p2000t)
 	MCFG_SAA5050_SCREEN_SIZE(40, 24, 80)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -271,7 +271,7 @@ MACHINE_CONFIG_START(p2000m_state::p2000m)
 	MCFG_PALETTE_INIT_OWNER(p2000m_state,p2000m)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

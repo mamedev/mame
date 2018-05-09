@@ -429,7 +429,7 @@ MACHINE_CONFIG_START(naughtyb_state::naughtyb)
 
 	/* sound hardware */
 	/* uses the TMS3615NS for sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_TMS36XX_ADD("tms", 350)
 	MCFG_TMS36XX_TYPE(TMS3615)
@@ -466,7 +466,7 @@ MACHINE_CONFIG_START(naughtyb_state::popflame)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_TMS36XX_ADD("tms", 350)
 	MCFG_TMS36XX_TYPE(TMS3615)

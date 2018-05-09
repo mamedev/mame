@@ -221,7 +221,7 @@ MACHINE_CONFIG_START(teleprinter_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(generic_terminal_device, kbd_put))
 
-	MCFG_SPEAKER_STANDARD_MONO("bell")
+	SPEAKER(config, "bell").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 2'000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 0.50)
 MACHINE_CONFIG_END

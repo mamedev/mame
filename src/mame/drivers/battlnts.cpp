@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(battlnts_state::battlnts)
 	MCFG_K007420_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

@@ -490,7 +490,7 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, MASTER_CLOCK/4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<1>))
@@ -542,7 +542,7 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 
 	/* sound hardware */
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, MASTER_CLOCK/4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<1>))

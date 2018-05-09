@@ -108,6 +108,6 @@ private:
 
 /*----------- defined in audio/tank8.c -----------*/
 
-DISCRETE_SOUND_EXTERN( tank8 );
+DISCRETE_SOUND_EXTERN( tank8_discrete );
 
 #endif // MAME_INCLUDES_TANK8_H

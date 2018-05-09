@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(cd2650_state::cd2650)
 	MCFG_QUICKLOAD_ADD("quickload", cd2650_state, cd2650, "pgm", 1)
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess

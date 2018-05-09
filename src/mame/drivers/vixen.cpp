@@ -486,7 +486,7 @@ uint32_t vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 //  DISCRETE_SOUND( vixen )
 //-------------------------------------------------
 
-static DISCRETE_SOUND_START( vixen )
+static DISCRETE_SOUND_START( vixen_discrete )
 	DISCRETE_INPUT_LOGIC(NODE_01)
 	DISCRETE_SQUAREWAVE(NODE_02, NODE_01, (XTAL(23'961'600)/15360).dvalue(), 100, 50, 0, 90)
 	DISCRETE_OUTPUT(NODE_02, 2000)
@@ -759,9 +759,8 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
-	MCFG_DISCRETE_INTF(vixen)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, vixen_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	// devices

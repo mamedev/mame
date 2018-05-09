@@ -229,7 +229,7 @@ MACHINE_CONFIG_START(sc2_state::sc2)
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, sc2_state, pio_port_b_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.50 )
 MACHINE_CONFIG_END

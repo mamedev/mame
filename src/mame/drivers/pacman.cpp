@@ -3555,7 +3555,7 @@ MACHINE_CONFIG_START(pacman_state::pacman)
 	MCFG_VIDEO_START_OVERRIDE(pacman_state,pacman)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MCFG_NAMCO_AUDIO_VOICES(3)

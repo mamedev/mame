@@ -3,6 +3,7 @@
 
 #include "audio/seibu.h"
 #include "machine/timer.h"
+#include "sound/ym2151.h"
 
 class deadang_state : public driver_device
 {
@@ -24,8 +25,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<seibu_sound_device> m_seibu_sound;
-	required_device<seibu_adpcm_device> m_adpcm1;
-	required_device<seibu_adpcm_device> m_adpcm2;
+	optional_device<seibu_adpcm_device> m_adpcm1;
+	optional_device<seibu_adpcm_device> m_adpcm2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -82,9 +83,11 @@ public:
 	DECLARE_WRITE16_MEMBER(popnrun_text_w);
 	void popnrun_main_map(address_map &map);
 	void popnrun_sub_map(address_map &map);
+	void popnrun_sound_map(address_map &map);
 
 	void popnrun(machine_config &config);
 	uint32_t popnrun_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void popnrun_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual void video_start() override;

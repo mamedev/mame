@@ -1945,7 +1945,8 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	MCFG_VIDEO_START_OVERRIDE(captaven_state, captaven)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000)/9) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
@@ -1953,11 +1954,11 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(32'220'000)/32, PIN7_HIGH)  /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH)  /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(32'220'000)/16, PIN7_HIGH) /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH) /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
@@ -2026,7 +2027,8 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 	MCFG_VIDEO_START_OVERRIDE(fghthist_state, fghthist)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
@@ -2037,11 +2039,11 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
@@ -2158,7 +2160,8 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
@@ -2166,24 +2169,24 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 
-	MCFG_SPEAKER_STANDARD_MONO("gun_speaker")
+	SPEAKER(config, "gun_speaker").front_center();
 
-	MCFG_OKIM6295_ADD("oki3", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki3", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "gun_speaker", 1.0)
 
-	MCFG_LC7535_ADD("vol_main")
+	MCFG_DEVICE_ADD("vol_main", LC7535)
 	MCFG_LC7535_SELECT_CB(VCC)
 	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_main_changed)
 
-	MCFG_LC7535_ADD("vol_gun")
+	MCFG_DEVICE_ADD("vol_gun", LC7535)
 	MCFG_LC7535_SELECT_CB(GND)
 	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_gun_changed)
 MACHINE_CONFIG_END
@@ -2290,7 +2293,8 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
@@ -2298,15 +2302,15 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 
-	MCFG_LC7535_ADD("vol_main")
+	MCFG_DEVICE_ADD("vol_main", LC7535)
 	MCFG_LC7535_SELECT_CB(VCC)
 	MCFG_LC7535_VOLUME_CB(dragngun_state, volume_main_changed)
 MACHINE_CONFIG_END
@@ -2457,7 +2461,8 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
@@ -2465,11 +2470,11 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32220000/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 MACHINE_CONFIG_END

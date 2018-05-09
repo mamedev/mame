@@ -676,7 +676,7 @@ MACHINE_CONFIG_START(wyvernf0_state::wyvernf0)
 	MCFG_VIDEO_START_OVERRIDE(wyvernf0_state,wyvernf0)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

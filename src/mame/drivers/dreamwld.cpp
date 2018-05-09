@@ -768,9 +768,10 @@ MACHINE_CONFIG_START(dreamwld_state::baryon)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dreamwld)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(32'000'000)/32, PIN7_LOW) /* 1MHz verified */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
@@ -785,7 +786,7 @@ MACHINE_CONFIG_START(dreamwld_state::dreamwld)
 	MCFG_DEVICE_PROGRAM_MAP(dreamwld_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(32'000'000)/32, PIN7_LOW) /* 1MHz verified */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)

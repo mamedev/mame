@@ -658,7 +658,7 @@ MACHINE_CONFIG_START(studio2_state::studio2)
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, 1760000)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -686,7 +686,7 @@ MACHINE_CONFIG_START(visicom_state::visicom)
 	MCFG_SCREEN_UPDATE_DRIVER(visicom_state, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -714,7 +714,7 @@ MACHINE_CONFIG_START(mpt02_state::mpt02)
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

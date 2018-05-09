@@ -1121,7 +1121,7 @@ MACHINE_CONFIG_START(attache_state::attache)
 
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("psg", AY8912, XTAL(8'000'000) / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -1205,7 +1205,7 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("psg", AY8912, XTAL(8'000'000) / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

@@ -513,7 +513,7 @@ MACHINE_CONFIG_START(pb1000_state::pb1000)
 	MCFG_NVRAM_ADD_0FILL("nvram2")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END

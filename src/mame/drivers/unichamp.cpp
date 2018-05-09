@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(unichamp_state::unichamp)
 	MCFG_PALETTE_INIT_OWNER(unichamp_state, unichamp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_GIC_ADD( "gic", XTAL(3'579'545), "screen", READ8(*this, unichamp_state, unichamp_gicram_r) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 

@@ -1004,8 +1004,8 @@ MACHINE_CONFIG_START(galgames_state::galgames_base)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000) / 16, PIN7_HIGH) // clock frequency & pin 7 not verified (voices in galgame4 seem ok)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(24'000'000) / 16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified (voices in galgame4 seem ok)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

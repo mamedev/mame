@@ -234,7 +234,7 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "korvet_flop")
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")

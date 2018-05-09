@@ -1710,7 +1710,8 @@ MACHINE_CONFIG_START(itech32_state::timekill)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, itech32_state, generate_int1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ensoniq", ES5506, SOUND_CLOCK)
 	MCFG_ES5506_REGION0("ensoniq.0")
@@ -1774,7 +1775,8 @@ MACHINE_CONFIG_START(itech32_state::drivedge)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(NOOP) // interrupt not used?
 
-	MCFG_SPEAKER_STANDARD_STEREO("left_back", "right_back")
+	SPEAKER(config, "left_back").front_left();
+	SPEAKER(config, "right_back").front_right();
 
 	MCFG_DEVICE_MODIFY("ensoniq")
 	MCFG_ES5506_CHANNELS(2)               /* channels */

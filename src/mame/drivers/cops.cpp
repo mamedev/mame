@@ -945,7 +945,7 @@ MACHINE_CONFIG_START(cops_state::cops)
 	/* acia (really a 65C52)*/
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* TODO: Verify clock */
 	MCFG_DEVICE_ADD("snsnd", SN76489, MAIN_CLOCK/2)
@@ -975,7 +975,7 @@ MACHINE_CONFIG_START(cops_state::revlatns)
 	/* acia (really a 65C52)*/
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* TODO: Verify clock */
 	MCFG_DEVICE_ADD("snsnd", SN76489, MAIN_CLOCK/2)

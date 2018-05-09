@@ -49,7 +49,8 @@ MACHINE_CONFIG_START(a2bus_ayboard_device::device_add_mconfig)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, a2bus_ayboard_device, via2_out_b))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, a2bus_ayboard_device, via2_irq_w))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD(AY1_TAG, AY8913, 1022727)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_DEVICE_ADD(AY2_TAG, AY8913, 1022727)
@@ -67,8 +68,10 @@ MACHINE_CONFIG_START(a2bus_phasor_device::device_add_mconfig)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, a2bus_ayboard_device, via2_out_b))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, a2bus_ayboard_device, via2_irq_w))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker2", "rspeaker2")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "lspeaker2").front_left();
+	SPEAKER(config, "rspeaker2").front_right();
 	MCFG_DEVICE_ADD(AY1_TAG, AY8913, 1022727)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_DEVICE_ADD(AY2_TAG, AY8913, 1022727)
@@ -90,13 +93,14 @@ MACHINE_CONFIG_START(a2bus_echoplus_device::device_add_mconfig)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, a2bus_ayboard_device, via2_out_b))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, a2bus_ayboard_device, via2_irq_w))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD(AY1_TAG, AY8913, 1022727)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_DEVICE_ADD(AY2_TAG, AY8913, 1022727)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SPEAKER_STANDARD_MONO("echosp")
+	SPEAKER(config, "echosp").front_center();
 	MCFG_DEVICE_ADD(E2P_TMS_TAG, TMS5220, 640000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "echosp", 1.0)
 MACHINE_CONFIG_END

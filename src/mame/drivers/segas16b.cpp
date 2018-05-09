@@ -3747,7 +3747,7 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym2151", YM2151, MASTER_CLOCK_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
@@ -3943,7 +3943,7 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
@@ -3953,7 +3953,7 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	MCFG_SOUND_ROUTE(0, "mono", 0.5)
 	MCFG_SOUND_ROUTE(1, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_LOW) // clock / pin not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_LOW) // clock / pin not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 

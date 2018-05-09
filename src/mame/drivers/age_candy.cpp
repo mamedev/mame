@@ -61,7 +61,7 @@ MACHINE_CONFIG_START(age_candy_state::age_candy)
 //  MCFG_DEVICE_IO_MAP(age_candy_io)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 

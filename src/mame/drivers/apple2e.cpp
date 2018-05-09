@@ -3903,7 +3903,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_PALETTE_INIT_OWNER(apple2e_state, apple2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -4020,18 +4020,18 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", apple2e_state, ay3600_repeat, attotime::from_hz(15))
 
 	/* slot devices */
-	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)
+	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
 	MCFG_A2BUS_CPU("maincpu")
 	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, apple2e_state, a2bus_irq_w))
 	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, apple2e_state, a2bus_nmi_w))
 	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, apple2e_state, a2bus_inh_w))
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple2_cards, "mockingboard")
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl6", apple2_cards, "diskiing")
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, nullptr)
+	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", m_a2bus, apple2_cards, "mockingboard");
+	A2BUS_SLOT(config, "sl5", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, "diskiing");
+	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
 	MCFG_DEVICE_ADD(A2_AUXSLOT_TAG, A2EAUXSLOT, 0)
 	MCFG_A2EAUXSLOT_CPU("maincpu")
@@ -4090,13 +4090,13 @@ MACHINE_CONFIG_START(apple2e_state::apple2c)
 	// IIc and friends have no cassette port
 	MCFG_DEVICE_REMOVE(A2_CASSETTE_TAG)
 
-	MCFG_A2BUS_SLOT_REMOVE("sl1")   // IIc has no slots, of course :)
-	MCFG_A2BUS_SLOT_REMOVE("sl2")
-	MCFG_A2BUS_SLOT_REMOVE("sl3")
-	MCFG_A2BUS_SLOT_REMOVE("sl4")
-	MCFG_A2BUS_SLOT_REMOVE("sl5")
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
-	MCFG_A2BUS_SLOT_REMOVE("sl7")
+	MCFG_DEVICE_REMOVE("sl1")   // IIc has no slots, of course :)
+	MCFG_DEVICE_REMOVE("sl2")
+	MCFG_DEVICE_REMOVE("sl3")
+	MCFG_DEVICE_REMOVE("sl4")
+	MCFG_DEVICE_REMOVE("sl5")
+	MCFG_DEVICE_REMOVE("sl6")
+	MCFG_DEVICE_REMOVE("sl7")
 
 	MCFG_DEVICE_ADD(IIC_ACIA1_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(14'318'181) / 8) // ~1.789 MHz
@@ -4119,8 +4119,8 @@ MACHINE_CONFIG_START(apple2e_state::apple2c)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(IIC_ACIA2_TAG, mos6551_device, write_cts))
 
 	// TODO: populate the IIc's other virtual slots with ONBOARD_ADD
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_MOCKINGBOARD, NOOP )   // Mockingboard 4C
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_DISKIING, NOOP)
+	A2BUS_MOCKINGBOARD(config, "sl4", A2BUS_7M_CLOCK).set_onboard(m_a2bus); // Mockingboard 4C
+	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	MCFG_A2EAUXSLOT_SLOT_REMOVE("aux")
 	MCFG_DEVICE_REMOVE(A2_AUXSLOT_TAG)
@@ -4149,8 +4149,8 @@ static const floppy_interface apple2cp_floppy35_floppy_interface =
 
 MACHINE_CONFIG_START(apple2e_state::apple2cp)
 	apple2c(config);
-	MCFG_A2BUS_SLOT_REMOVE("sl4")
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
+	MCFG_DEVICE_REMOVE("sl4")
+	MCFG_DEVICE_REMOVE("sl6")
 	MCFG_IWM_ADD(IICP_IWM_TAG, a2cp_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(apple2cp_floppy35_floppy_interface)
 MACHINE_CONFIG_END
@@ -4158,8 +4158,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(apple2e_state::apple2c_iwm)
 	apple2c(config);
 
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NOOP)
+	MCFG_DEVICE_REMOVE("sl6")
+	A2BUS_IWM_FDC(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::apple2c_mem)
@@ -4167,8 +4167,8 @@ MACHINE_CONFIG_START(apple2e_state::apple2c_mem)
 	MCFG_DEVICE_REPLACE("maincpu", M65C02, 1021800)        /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(apple2c_memexp_map)
 
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_IWM_FDC, NOOP)
+	MCFG_DEVICE_REMOVE("sl6")
+	A2BUS_IWM_FDC(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -4200,16 +4200,16 @@ MACHINE_CONFIG_START(apple2e_state::laser128)
 	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 
-	MCFG_A2BUS_SLOT_REMOVE("sl4")
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
+	MCFG_DEVICE_REMOVE("sl4")
+	MCFG_DEVICE_REMOVE("sl6")
 
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl1", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl2", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl3", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, nullptr)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, nullptr)
+	A2BUS_LASER128(config, "sl1", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl2", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl3", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl4", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_SLOT(config, "sl5", m_a2bus, apple2_cards, nullptr);
+	A2BUS_LASER128(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -4224,16 +4224,16 @@ MACHINE_CONFIG_START(apple2e_state::laser128ex2)
 	MCFG_APPLEFDC_ADD(LASER128_UDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 
-	MCFG_A2BUS_SLOT_REMOVE("sl4")
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
+	MCFG_DEVICE_REMOVE("sl4")
+	MCFG_DEVICE_REMOVE("sl6")
 
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl1", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl2", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl3", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl4", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl5", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_LASER128, NOOP)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl7", A2BUS_LASER128, NOOP)
+	A2BUS_LASER128(config, "sl1", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl2", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl3", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl4", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl5", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_LASER128(config, "sl7", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -4242,15 +4242,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::ceci)
 	apple2e(config);
-	MCFG_A2BUS_SLOT_REMOVE("sl1")
-	MCFG_A2BUS_SLOT_REMOVE("sl2")
-	MCFG_A2BUS_SLOT_REMOVE("sl3")
-	MCFG_A2BUS_SLOT_REMOVE("sl4")
-	MCFG_A2BUS_SLOT_REMOVE("sl5")
-	MCFG_A2BUS_SLOT_REMOVE("sl6")
-	MCFG_A2BUS_SLOT_REMOVE("sl7")
+	MCFG_DEVICE_REMOVE("sl1")
+	MCFG_DEVICE_REMOVE("sl2")
+	MCFG_DEVICE_REMOVE("sl3")
+	MCFG_DEVICE_REMOVE("sl4")
+	MCFG_DEVICE_REMOVE("sl5")
+	MCFG_DEVICE_REMOVE("sl6")
+	MCFG_DEVICE_REMOVE("sl7")
 
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_DISKIING, NOOP)
+	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	// there is no aux slot, the "aux" side of the //e is used for additional ROM
 	MCFG_A2EAUXSLOT_SLOT_REMOVE("aux")

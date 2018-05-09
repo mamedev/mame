@@ -483,9 +483,9 @@ MACHINE_CONFIG_START(mjsenpu_state::mjsenpu)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) /* 1 Mhz? */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) /* 1 Mhz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

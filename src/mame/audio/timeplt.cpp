@@ -195,7 +195,7 @@ MACHINE_CONFIG_START(timeplt_audio_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(timeplt_sound_map)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
 

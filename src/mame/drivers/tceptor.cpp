@@ -370,7 +370,8 @@ MACHINE_CONFIG_START(tceptor_state::tceptor)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

@@ -676,7 +676,7 @@ MACHINE_CONFIG_START(lordgun_state::lordgun)
 	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -685,7 +685,7 @@ MACHINE_CONFIG_START(lordgun_state::lordgun)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000) / 20, PIN7_HIGH)   // ? 5MHz can't be right!
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH)   // ? 5MHz can't be right!
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -728,7 +728,7 @@ MACHINE_CONFIG_START(lordgun_state::aliencha)
 	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -738,10 +738,10 @@ MACHINE_CONFIG_START(lordgun_state::aliencha)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000) / 20, PIN7_HIGH)   // ? 5MHz can't be right
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH)   // ? 5MHz can't be right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(20'000'000) / 20, PIN7_HIGH)  // ? 5MHz can't be right
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH)  // ? 5MHz can't be right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

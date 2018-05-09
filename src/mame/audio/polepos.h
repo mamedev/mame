@@ -52,6 +52,6 @@ private:
 
 DECLARE_DEVICE_TYPE(POLEPOS_SOUND, polepos_sound_device)
 
-DISCRETE_SOUND_EXTERN( polepos );
+DISCRETE_SOUND_EXTERN( polepos_discrete );
 
 #endif // MAME_AUDIO_POLEPOS_H
