@@ -270,7 +270,7 @@ READ16_MEMBER(highvdeo_state::read2_r)
 }
 
 template<int Mask>
-WRITE16_MEMBER(highvdeo_state::bankselect_w<0x03>)
+WRITE16_MEMBER(highvdeo_state::bankselect_w)
 {
 	m_mainbank->set_entry(data & Mask);
 }
