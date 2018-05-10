@@ -434,7 +434,7 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 	MCFG_VIDEO_START_OVERRIDE(atarig1_state,atarig1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_2))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 14)

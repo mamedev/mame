@@ -618,7 +618,7 @@ MACHINE_CONFIG_START(enigma2_state::enigma2)
 	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, AY8910_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, enigma2_state, sound_latch_r))
@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(enigma2_state::enigma2a)
 	MCFG_SCREEN_UPDATE_DRIVER(enigma2_state, screen_update_enigma2a)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, AY8910_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, enigma2_state, sound_latch_r))

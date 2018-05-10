@@ -718,7 +718,7 @@ MACHINE_CONFIG_START(ambush_state::ambush)
 	MCFG_PALETTE_INIT_OWNER(ambush_state, ambush)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay1", AY8912, XTAL(18'432'000)/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("buttons"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)

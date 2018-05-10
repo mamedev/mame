@@ -1060,7 +1060,7 @@ static const discrete_op_amp_filt_info as2888_preamp_info = {
 };
 
 
-static DISCRETE_SOUND_START(as2888)
+static DISCRETE_SOUND_START(as2888_discrete)
 
 	DISCRETE_INPUT_DATA(NODE_08)        // Start Sustain Attenuation from 555 circuit
 	DISCRETE_INPUT_LOGIC(NODE_01)       // Binary Counter B output (divide by 1) T2
@@ -1137,9 +1137,8 @@ MACHINE_CONFIG_START(by35_state::by35)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(as2888_state::as2888_audio)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(as2888)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, as2888_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_MODIFY("pia_u11")

@@ -333,7 +333,7 @@ MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 	MCFG_PALETTE_INIT_OWNER(hyperspt_state, hyperspt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

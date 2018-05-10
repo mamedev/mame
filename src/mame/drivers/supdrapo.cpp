@@ -475,7 +475,7 @@ MACHINE_CONFIG_START(supdrapo_state::supdrapo)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(supdrapo_state, supdrapo)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, SND_CLOCK)  /* guess */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, supdrapo_state, ay8910_outputa_w))

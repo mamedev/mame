@@ -476,7 +476,7 @@ MACHINE_CONFIG_START(ccastles_state::ccastles)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/8)
 	/* NOTE: 1k + 0.2k is not 100% exact, but should not make an audible difference */

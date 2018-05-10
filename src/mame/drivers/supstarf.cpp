@@ -195,7 +195,7 @@ MACHINE_CONFIG_START(supstarf_state::supstarf)
 	MCFG_I8212_INT_CALLBACK(INPUTLINE("soundcpu", MCS48_INPUT_IRQ))
 	//MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("maincpu", I8085_READY_LINE))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("psg1", AY8910, XTAL(5'068'800) / 6) // from 8035 pin 1 (T0)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, supstarf_state, lights_a_w))

@@ -662,7 +662,7 @@ MACHINE_CONFIG_START(tigeroad_state::tigeroad)
 	/* IRQs are triggered by the YM2203 */
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.08)   /* verified on pcb */
@@ -681,7 +681,7 @@ MACHINE_CONFIG_START(tigeroad_state::tigeroad)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -739,7 +739,7 @@ MACHINE_CONFIG_START(tigeroad_state::f1dream_comad)
 	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.08)   /* verified on pcb */
@@ -759,7 +759,7 @@ MACHINE_CONFIG_START(tigeroad_state::f1dream_comad)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

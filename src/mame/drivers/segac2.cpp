@@ -1581,7 +1581,7 @@ MACHINE_CONFIG_START(segac2_state::segac)
 	MCFG_VIDEO_START_OVERRIDE(segac2_state,segac2_new)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3438, XL2_CLOCK/7)
 	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segac2_state, segac2_irq2_interrupt))

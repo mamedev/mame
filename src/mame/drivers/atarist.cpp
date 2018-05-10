@@ -2048,7 +2048,7 @@ MACHINE_CONFIG_START(st_state::st)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(YM2149_TAG, YM2149, Y2/16)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
@@ -2138,7 +2138,7 @@ MACHINE_CONFIG_START(megast_state::megast)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(YM2149_TAG, YM2149, Y2/16)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
@@ -2229,7 +2229,8 @@ MACHINE_CONFIG_START(ste_state::ste)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD(YM2149_TAG, YM2149, Y2/16)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
@@ -2345,7 +2346,7 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(YM3439_TAG, YM3439, U517/8)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)

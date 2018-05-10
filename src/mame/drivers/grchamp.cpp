@@ -771,7 +771,7 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -789,8 +789,7 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, grchamp_state, portB_2_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(grchamp)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, grchamp_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

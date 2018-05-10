@@ -1425,7 +1425,7 @@ MACHINE_CONFIG_START(merit_state::pitboss)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8912, CRTC_CLOCK)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, merit_state, led2_w))

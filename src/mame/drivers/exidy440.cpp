@@ -1038,7 +1038,8 @@ MACHINE_CONFIG_START(exidy440_state::exidy440)
 	MCFG_DEVICE_PROGRAM_MAP(exidy440_audio_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", driver_device, irq0_line_assert)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("custom", EXIDY440, EXIDY440_MC3418_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

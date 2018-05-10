@@ -1102,7 +1102,8 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb1)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_C352_ADD("c352", MASTER_CLOCK/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
@@ -1142,7 +1143,8 @@ MACHINE_CONFIG_START(namconb1_state::namconb2)
 
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb2)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_C352_ADD("c352", MASTER_CLOCK/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)

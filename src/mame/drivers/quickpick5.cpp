@@ -432,11 +432,11 @@ MACHINE_CONFIG_START(quickpick5_state::quickpick5)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_K051649_ADD("k051649", XTAL(32'000'000)/18)  // xtal is verified, divider is not
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(32'000'000)/18, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(32'000'000)/18, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_CONFIG_END

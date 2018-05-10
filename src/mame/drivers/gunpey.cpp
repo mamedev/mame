@@ -1232,9 +1232,10 @@ MACHINE_CONFIG_START(gunpey_state::gunpey)
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'934'400) / 8, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'934'400) / 8, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 

@@ -340,7 +340,7 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 	MCFG_PALETTE_INIT_OWNER(megazone_state, megazone)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

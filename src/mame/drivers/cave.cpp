@@ -2122,7 +2122,7 @@ MACHINE_CONFIG_START(cave_state::dfeveron)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
@@ -2163,7 +2163,7 @@ MACHINE_CONFIG_START(cave_state::ddonpach)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
@@ -2203,12 +2203,12 @@ MACHINE_CONFIG_START(cave_state::donpachi)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", 4.224_MHz_XTAL/4, PIN7_HIGH) // pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 4.224_MHz_XTAL/4, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.60)
 
-	MCFG_OKIM6295_ADD("oki2", 4.224_MHz_XTAL/2, PIN7_HIGH) // pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 4.224_MHz_XTAL/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
@@ -2250,7 +2250,7 @@ MACHINE_CONFIG_START(cave_state::esprade)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
@@ -2291,7 +2291,7 @@ MACHINE_CONFIG_START(cave_state::gaia)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
@@ -2331,7 +2331,7 @@ MACHINE_CONFIG_START(cave_state::guwange)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
@@ -2374,7 +2374,7 @@ MACHINE_CONFIG_START(cave_state::hotdogst)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -2386,7 +2386,7 @@ MACHINE_CONFIG_START(cave_state::hotdogst)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", 32_MHz_XTAL/16, PIN7_HIGH) // pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL/16, okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
@@ -2424,7 +2424,7 @@ MACHINE_CONFIG_START(cave_state::korokoro)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
@@ -2477,7 +2477,7 @@ MACHINE_CONFIG_START(cave_state::mazinger)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -2489,7 +2489,7 @@ MACHINE_CONFIG_START(cave_state::mazinger)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki1", 1.056_MHz_XTAL, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
@@ -2534,20 +2534,20 @@ MACHINE_CONFIG_START(cave_state::metmqstr)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", 16_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 16_MHz_XTAL / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
-	MCFG_OKIM6295_ADD("oki1", 32_MHz_XTAL / 16 , PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL / 16 , okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
-	MCFG_OKIM6295_ADD("oki2", 32_MHz_XTAL / 16 , PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32_MHz_XTAL / 16 , okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 MACHINE_CONFIG_END
@@ -2592,14 +2592,15 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 28_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	// oki2 chip is present but its rom socket is unpopulated
-	MCFG_OKIM6295_ADD("oki2", 28_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2667,9 +2668,10 @@ MACHINE_CONFIG_START(cave_state::ppsatan)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 1.056_MHz_XTAL, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0)
 MACHINE_CONFIG_END
@@ -2713,7 +2715,7 @@ MACHINE_CONFIG_START(cave_state::pwrinst2)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_4_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -2725,10 +2727,10 @@ MACHINE_CONFIG_START(cave_state::pwrinst2)
 	MCFG_SOUND_ROUTE(2, "mono", 0.40)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", 3_MHz_XTAL, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 3_MHz_XTAL, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki2", 3_MHz_XTAL, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 3_MHz_XTAL, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
@@ -2790,20 +2792,20 @@ MACHINE_CONFIG_START(cave_state::sailormn)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,sailormn_3_layers) /* Layer 2 has 1 banked ROM */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", 16_MHz_XTAL/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 16_MHz_XTAL/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 
@@ -2850,9 +2852,10 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 28_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -2905,9 +2908,10 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 28_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -2946,7 +2950,7 @@ MACHINE_CONFIG_START(cave_state::uopoko)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))

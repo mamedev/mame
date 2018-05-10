@@ -477,7 +477,7 @@ MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8912, 20000000/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)

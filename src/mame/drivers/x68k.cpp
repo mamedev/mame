@@ -1694,24 +1694,23 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_DEFAULT_LAYOUT( layout_x68000 )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_YM2151_ADD("ym2151", 4000000)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ym2151", YM2151, 4000000)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, x68k_state,x68k_fm_irq))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, x68k_state,x68k_ct_w))  // CT1, CT2 from YM2151 port 0x1b
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6258_ADD("okim6258", 4000000)
+	MCFG_DEVICE_ADD("okim6258", OKIM6258, 4000000)
 	MCFG_OKIM6258_DIVIDER(FOSC_DIV_BY_512)
 	MCFG_OKIM6258_ADPCM_TYPE(TYPE_4BITS)
 	MCFG_OKIM6258_OUT_BITS(OUTPUT_10BITS)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "adpcm_outl", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "adpcm_outr", 0.50)
 
-	MCFG_FILTER_VOLUME_ADD("adpcm_outl", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("adpcm_outr", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "adpcm_outl").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "adpcm_outr").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	MCFG_UPD72065_ADD("upd72065", true, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, x68k_state, fdc_irq))

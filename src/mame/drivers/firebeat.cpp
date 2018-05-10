@@ -1211,7 +1211,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, firebeat_state, sound_irq_callback))
@@ -1279,7 +1280,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, firebeat_state, sound_irq_callback))
@@ -1308,7 +1310,7 @@ MACHINE_CONFIG_START(firebeat_state::firebeat_spu)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sputimer", firebeat_state, spu_timer_callback, attotime::from_hz(1000));
 
-	MCFG_RF5C400_ADD("rf5c400", XTAL(16'934'400))
+	MCFG_DEVICE_ADD("rf5c400", RF5C400, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

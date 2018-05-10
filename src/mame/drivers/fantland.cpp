@@ -880,11 +880,11 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3000000)
 	MCFG_SOUND_ROUTE(0, "speaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "speaker", 0.35)
 
@@ -928,11 +928,11 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3000000)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, fantland_state, galaxygn_sound_irq))
 	MCFG_SOUND_ROUTE(0, "speaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "speaker", 1.0)
@@ -1008,7 +1008,7 @@ MACHINE_CONFIG_START(fantland_state::borntofi)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1063,7 +1063,7 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

@@ -617,7 +617,7 @@ MACHINE_CONFIG_START(pipedrm_state::pipedrm)
 	MCFG_VIDEO_START_OVERRIDE(pipedrm_state,pipedrm)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
@@ -666,7 +666,7 @@ MACHINE_CONFIG_START(pipedrm_state::hatris)
 	MCFG_VIDEO_START_OVERRIDE(pipedrm_state,hatris)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)

@@ -637,7 +637,8 @@ MACHINE_CONFIG_START(ghosteo_state::ghosteo)
 //  MCFG_I2CMEM_ADD("i2cmem", 0xA0, 0, 0x100, nullptr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))

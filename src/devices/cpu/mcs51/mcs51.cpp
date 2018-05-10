@@ -1770,10 +1770,6 @@ void mcs51_cpu_device::check_irqs()
 		return;
 	}
 
-	/* also break out of jb int0,<self> loops */
-	if (ROP(PC) == 0x20 && ROP_ARG(PC+1) == 0xb2 && ROP_ARG(PC+2) == 0xfd)
-		PC += 3;
-
 	//Save current pc to stack, set pc to new interrupt vector
 	push_pc();
 	PC = int_vec;

@@ -378,23 +378,24 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MCFG_ADC0844_CH1_CB(IOPORT("THROTTLE"))
 	MCFG_ADC0844_CH2_CB(READ8(*this, micro3d_state, adc_volume_r))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("upd7759", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
+	UPD7759(config, m_upd7759)
+			.add_route(ALL_OUTPUTS, "lspeaker", 0.35)
+			.add_route(ALL_OUTPUTS, "rspeaker", 0.35);
 
-	MCFG_YM2151_ADD("ym2151", XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
+	YM2151(config, "ym2151", XTAL(3'579'545))
+			.add_route(0, "lspeaker", 0.35)
+			.add_route(1, "rspeaker", 0.35);
 
-	MCFG_DEVICE_ADD("noise_1", MICRO3D_SOUND)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MICRO3D_SOUND(config, m_noise_1)
+			.add_route(0, "lspeaker", 1.0)
+			.add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("noise_2", MICRO3D_SOUND)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MICRO3D_SOUND(config, m_noise_2)
+			.add_route(0, "lspeaker", 1.0)
+			.add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(micro3d_state::botss11)

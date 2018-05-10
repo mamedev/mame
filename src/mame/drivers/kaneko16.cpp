@@ -1813,7 +1813,8 @@ MACHINE_CONFIG_START(kaneko16_berlwall_state::berlwall)
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_berlwall_state,berlwall)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ym2149_1", YM2149, 1000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
@@ -1823,7 +1824,7 @@ MACHINE_CONFIG_START(kaneko16_berlwall_state::berlwall)
 	MCFG_DEVICE_ADD("ym2149_2", YM2149, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki1", 12000000/6, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 12000000/6, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1885,7 +1886,7 @@ MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym2149_1", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1895,7 +1896,7 @@ MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(12'000'000)/6, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(12'000'000)/6, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, bakubrkr_oki1_map)
 MACHINE_CONFIG_END
@@ -1955,12 +1956,13 @@ MACHINE_CONFIG_START(kaneko16_state::blazeon)
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2010,15 +2012,15 @@ MACHINE_CONFIG_START(kaneko16_state::wingforc)
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, bakubrkr_oki1_map)
 MACHINE_CONFIG_END
@@ -2098,13 +2100,13 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_gtmr_state,kaneko16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/8, PIN7_LOW)  /* verified on pcb */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(16'000'000)/8, okim6295_device::PIN7_LOW)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki1_map)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(16'000'000)/8, PIN7_LOW)  /* verified on pcb */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(16'000'000)/8, okim6295_device::PIN7_LOW)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki2_map)
 MACHINE_CONFIG_END
@@ -2223,7 +2225,7 @@ MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym2149_1", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2233,7 +2235,7 @@ MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(12'000'000)/6, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(12'000'000)/6, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2346,13 +2348,13 @@ MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/8, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(16'000'000)/8, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki1_map)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(16'000'000)/8, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(16'000'000)/8, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki2_map)
 MACHINE_CONFIG_END

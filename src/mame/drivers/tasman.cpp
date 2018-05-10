@@ -682,7 +682,8 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8TASMAN, 0, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 

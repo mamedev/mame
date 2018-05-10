@@ -184,7 +184,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -201,7 +201,8 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -614,7 +615,7 @@ MACHINE_CONFIG_START(gaelco2_state::play2000)
 	// MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -631,7 +632,8 @@ MACHINE_CONFIG_START(gaelco2_state::play2000)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -718,7 +720,7 @@ MACHINE_CONFIG_START(bang_state::bang)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -735,7 +737,8 @@ MACHINE_CONFIG_START(bang_state::bang)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_CG1V, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -955,7 +958,7 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -972,7 +975,8 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -1259,7 +1263,7 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gaelco2_state, coin4_counter_w))
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0400000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
@@ -1286,7 +1290,8 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	/* sound hardware */
 	/* the chip is stereo, but the game sound is mono because the right channel
 	   output is for cabinet 1 and the left channel output is for cabinet 2 */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -1565,7 +1570,7 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -1582,7 +1587,8 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_CG1V, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -1607,7 +1613,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.1)
@@ -1624,7 +1630,8 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -1852,7 +1859,7 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, wrally2_state, wrally2_adc_cs))                              /* ADCs chip select line */
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0200000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
@@ -1880,7 +1887,8 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	/* sound hardware */
 	/* the chip is stereo, but the game sound is mono because the right channel
 	   output is for cabinet 1 and the left channel output is for cabinet 2 */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")

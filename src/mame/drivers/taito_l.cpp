@@ -1516,7 +1516,7 @@ MACHINE_CONFIG_START(fhawk_state::fhawk)
 	l_system_video(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 12_MHz_XTAL/4)       /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1591,7 +1591,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::raimais)
 	l_system_video(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 8_MHz_XTAL)      /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1635,7 +1635,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::kurikint)
 	l_system_video(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 12_MHz_XTAL/4)       /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
@@ -1659,7 +1659,7 @@ MACHINE_CONFIG_START(taitol_1cpu_state::plotting)
 	l_system_video(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(13'330'560)/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(READ8("dswmux", ls157_x2_device, output_r))
@@ -1783,7 +1783,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::evilston)
 	l_system_video(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 12_MHz_XTAL/4)       /* not verified */
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)

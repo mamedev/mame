@@ -466,7 +466,7 @@ MACHINE_CONFIG_START(aces1_state::aces1)
 	MCFG_DEFAULT_LAYOUT(layout_aces1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// 0xadf0 - Dips, Sound
 	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) /* ?? MHz */

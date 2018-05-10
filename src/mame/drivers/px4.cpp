@@ -1500,7 +1500,7 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_PALETTE_INIT_OWNER(px4_state, px4)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

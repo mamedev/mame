@@ -994,7 +994,7 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 	MCFG_AY51013_AUTO_RDAV(true)
 
 	// Beep
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep" , BEEP , BEEP_FREQUENCY)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
 	MCFG_TIMER_DRIVER_ADD("timer_beep" , hp2645_state , timer_beep_exp)

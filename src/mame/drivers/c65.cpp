@@ -721,7 +721,8 @@ MACHINE_CONFIG_START(c65_state::c65)
 	MCFG_PALETTE_INIT_OWNER(c65_state, c65)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	// 2x 8580 SID
 
 	// software list

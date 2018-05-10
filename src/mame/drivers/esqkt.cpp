@@ -237,7 +237,8 @@ MACHINE_CONFIG_START(esqkt_state::kt)
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

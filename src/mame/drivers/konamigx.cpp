@@ -1674,7 +1674,8 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_5bpp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_MODIFY("dasp")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3)

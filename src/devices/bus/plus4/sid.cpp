@@ -65,7 +65,7 @@ const tiny_rom_entry *plus4_sid_cartridge_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(plus4_sid_cartridge_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD(MOS8580_TAG, MOS8580, XTAL(17'734'470)/20)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 

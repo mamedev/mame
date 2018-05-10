@@ -620,7 +620,7 @@ MACHINE_CONFIG_START(sigmab52_state::jwildb52)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

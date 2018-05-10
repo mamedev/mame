@@ -419,7 +419,7 @@ MACHINE_CONFIG_START(shanghai_state::shanghai)
 	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
@@ -454,7 +454,7 @@ MACHINE_CONFIG_START(shanghai_state::shangha2)
 	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
@@ -494,7 +494,7 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 	MCFG_HD63484_EXTERNAL_SKEW(2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* same as standard seibu ym2203, but also reads "DSW" */
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)

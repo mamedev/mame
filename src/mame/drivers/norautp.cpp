@@ -1285,9 +1285,8 @@ MACHINE_CONFIG_START(norautp_state::noraut_base)
 	MCFG_PALETTE_INIT_OWNER(norautp_state, norautp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(norautp)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, norautp_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1310,7 +1309,7 @@ MACHINE_CONFIG_START(norautp_state::norautpl)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(kimble)
+	MCFG_DISCRETE_INTF(kimble_discrete)
 MACHINE_CONFIG_END
 
 
@@ -1366,7 +1365,7 @@ MACHINE_CONFIG_START(norautp_state::kimble)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(kimble)
+	MCFG_DISCRETE_INTF(kimble_discrete)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(norautp_state::newhilop)
@@ -1392,7 +1391,7 @@ MACHINE_CONFIG_START(norautp_state::dphl)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(dphl)
+	MCFG_DISCRETE_INTF(dphl_discrete)
 MACHINE_CONFIG_END
 
 
@@ -1406,7 +1405,7 @@ MACHINE_CONFIG_START(norautp_state::dphla)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(dphl)
+	MCFG_DISCRETE_INTF(dphl_discrete)
 MACHINE_CONFIG_END
 
 
@@ -1420,7 +1419,7 @@ MACHINE_CONFIG_START(norautp_state::kimbldhl)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(kimble)
+	MCFG_DISCRETE_INTF(kimble_discrete)
 MACHINE_CONFIG_END
 
 
@@ -1434,7 +1433,7 @@ MACHINE_CONFIG_START(norautp_state::dphltest)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(dphl)
+	MCFG_DISCRETE_INTF(dphl_discrete)
 MACHINE_CONFIG_END
 
 
@@ -1448,7 +1447,7 @@ MACHINE_CONFIG_START(norautp_state::drhl)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(dphl)
+	MCFG_DISCRETE_INTF(dphl_discrete)
 MACHINE_CONFIG_END
 
 
@@ -1462,7 +1461,7 @@ MACHINE_CONFIG_START(norautp_state::ssjkrpkr)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(dphl)
+	MCFG_DISCRETE_INTF(dphl_discrete)
 MACHINE_CONFIG_END
 
 

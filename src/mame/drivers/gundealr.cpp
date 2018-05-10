@@ -459,7 +459,7 @@ MACHINE_CONFIG_START(gundealr_state::gundealr)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* 1.5Mhz verified for Yam! Yam!? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

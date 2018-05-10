@@ -2643,7 +2643,7 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 //  MCFG_VIDEO_START_OVERRIDE(pc8801_state,pc8801)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("opn", YM2203, MASTER_CLOCK)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, pc8801_state, pc8801_sound_irq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc8801_state, opn_porta_r))

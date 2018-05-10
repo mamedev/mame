@@ -421,7 +421,7 @@ MACHINE_CONFIG_START(tattack_state::tattack)
 	MCFG_PALETTE_INIT_OWNER(tattack_state, tattack)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(tattack_sample_names)

@@ -514,7 +514,7 @@ MACHINE_CONFIG_START(ron_state::ron)
 	MCFG_PALETTE_INIT_OWNER(ron_state, ron)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, 0) // T0 CLK from I8035 (not verified)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ron_state, ay_pa_w))

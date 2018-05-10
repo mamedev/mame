@@ -518,7 +518,8 @@ MACHINE_CONFIG_START(champbwl_state::champbwl)
 	MCFG_PALETTE_INIT_OWNER(champbwl_state,champbwl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -582,7 +583,7 @@ MACHINE_CONFIG_START(champbwl_state::doraemon)
 	MCFG_PALETTE_INIT_OWNER(champbwl_state,champbwl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(14'318'181))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

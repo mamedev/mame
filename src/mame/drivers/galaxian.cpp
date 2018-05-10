@@ -5731,7 +5731,7 @@ static const discrete_mixer_desc konami_sound_mixer_desc =
 		0, /* modelled separately */
 		0, 1};
 
-static DISCRETE_SOUND_START( konami_sound )
+static DISCRETE_SOUND_START( konami_sound_discrete )
 
 	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
 	DISCRETE_INPUTX_STREAM(NODE_02, 1, 1.0, 0)
@@ -5799,7 +5799,7 @@ MACHINE_CONFIG_START(galaxian_state::galaxian_base)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
 
@@ -5840,8 +5840,7 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_1x_ay8910)
 	MCFG_SOUND_ROUTE(1, "konami", 1.0, 1)
 	MCFG_SOUND_ROUTE(2, "konami", 1.0, 2)
 
-	MCFG_DEVICE_ADD("konami", DISCRETE)
-	MCFG_DISCRETE_INTF(konami_sound)
+	MCFG_DEVICE_ADD("konami", DISCRETE, konami_sound_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
 
@@ -5872,8 +5871,7 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_2x_ay8910)
 	MCFG_SOUND_ROUTE(1, "konami", 1.0, 4)
 	MCFG_SOUND_ROUTE(2, "konami", 1.0, 5)
 
-	MCFG_DEVICE_ADD("konami", DISCRETE)
-	MCFG_DISCRETE_INTF(konami_sound)
+	MCFG_DEVICE_ADD("konami", DISCRETE, konami_sound_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 

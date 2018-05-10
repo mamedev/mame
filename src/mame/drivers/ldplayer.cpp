@@ -637,7 +637,8 @@ MACHINE_CONFIG_START(ldv1000_state::ldv1000)
 	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&ldplayer_state::get_disc_static, device))
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -650,7 +651,8 @@ MACHINE_CONFIG_START(pr8210_state::pr8210)
 	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&ldplayer_state::get_disc_static, device))
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

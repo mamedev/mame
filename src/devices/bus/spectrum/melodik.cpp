@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(SPECTRUM_MELODIK, spectrum_melodik_device, "spectrum_melodik"
 
 MACHINE_CONFIG_START(spectrum_melodik_device::device_add_mconfig)
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8912", AY8912, XTAL(3'579'545) / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

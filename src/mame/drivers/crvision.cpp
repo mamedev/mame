@@ -763,13 +763,12 @@ MACHINE_CONFIG_START(crvision_state::creativision)
 	MCFG_OUTPUT_LATCH_BIT4_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76489_TAG, SN76489A, XTAL(2'000'000))
 	MCFG_SN76496_READY_HANDLER(WRITELINE(PIA6821_TAG, pia6821_device, cb1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(1, "mono", 0.25);
 
 	// cartridge
 	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
@@ -846,14 +845,13 @@ MACHINE_CONFIG_START(laser2001_state::lasr2001)
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9929a_device, screen_update )
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76489_TAG, SN76489A, XTAL(17'734'470)/9)
 	MCFG_SN76496_READY_HANDLER(WRITELINE(*this, laser2001_state, write_psg_ready))
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(1, "mono", 0.25);
 
 	// cartridge
 	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)

@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(rollerg_state::rollerg)
 	MCFG_K053252_OFFSETS(14*8, 2*8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

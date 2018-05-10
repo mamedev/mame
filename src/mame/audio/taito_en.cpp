@@ -216,7 +216,8 @@ MACHINE_CONFIG_START(taito_en_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("dpram", MB8421, 0) // host accesses this from the other side
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(30'476'100) / (2 * 16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

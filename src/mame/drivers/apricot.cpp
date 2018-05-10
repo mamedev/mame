@@ -43,28 +43,28 @@ class apricot_state : public driver_device
 {
 public:
 	apricot_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	m_cpu(*this, "ic91"),
-	m_iop(*this, "ic71"),
-	m_ram(*this, RAM_TAG),
-	m_crtc(*this, "ic30"),
-	m_ppi(*this, "ic17"),
-	m_pic(*this, "ic31"),
-	m_pit(*this, "ic16"),
-	m_sio(*this, "ic15"),
-	m_rs232(*this, "rs232"),
-	m_centronics(*this, "centronics"),
-	m_fdc(*this, "ic68"),
-	m_floppy0(*this, "ic68:0"),
-	m_floppy1(*this, "ic68:1"),
-	m_palette(*this, "palette"),
-	m_screen_buffer(*this, "screen_buffer"),
-	m_video_mode(0),
-	m_display_on(1),
-	m_display_enabled(0),
-	m_centronics_fault(1),
-	m_centronics_perror(1),
-	m_bus_locked(0)
+		driver_device(mconfig, type, tag),
+		m_cpu(*this, "ic91"),
+		m_iop(*this, "ic71"),
+		m_ram(*this, RAM_TAG),
+		m_crtc(*this, "ic30"),
+		m_ppi(*this, "ic17"),
+		m_pic(*this, "ic31"),
+		m_pit(*this, "ic16"),
+		m_sio(*this, "ic15"),
+		m_rs232(*this, "rs232"),
+		m_centronics(*this, "centronics"),
+		m_fdc(*this, "ic68"),
+		m_floppy0(*this, "ic68:0"),
+		m_floppy1(*this, "ic68:1"),
+		m_palette(*this, "palette"),
+		m_screen_buffer(*this, "screen_buffer"),
+		m_video_mode(0),
+		m_display_on(1),
+		m_display_enabled(0),
+		m_centronics_fault(1),
+		m_centronics_perror(1),
+		m_bus_locked(0)
 	{ }
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, apricot_state, apricot_hd6845_de))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ic7", SN76489, XTAL(4'000'000) / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -416,7 +416,7 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ic14", ttl153_device, i2a_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ic14", ttl153_device, i2b_w))
 
-	MCFG_TTL153_ADD("ic14")
+	MCFG_DEVICE_ADD("ic14", TTL153)
 	MCFG_TTL153_ZA_CB(WRITELINE("ic15", z80sio_device, rxca_w))
 	MCFG_TTL153_ZB_CB(WRITELINE("ic15", z80sio_device, txca_w))
 

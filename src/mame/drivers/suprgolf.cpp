@@ -524,7 +524,7 @@ MACHINE_CONFIG_START(suprgolf_state::suprgolf)
 	MCFG_PALETTE_ADD("palette", 0x800)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK/4) /* guess */
 	//MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))

@@ -975,12 +975,12 @@ MACHINE_CONFIG_START(ddragon_state::ddragon)
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", M6809_IRQ_LINE))
 
-	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
+	MCFG_DEVICE_ADD("fmsnd", YM2151, SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, ddragon_state, irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
@@ -1047,12 +1047,12 @@ MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", M6809_IRQ_LINE))
 
-	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
+	MCFG_DEVICE_ADD("fmsnd", YM2151, SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, ddragon_state,irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
@@ -1100,17 +1100,17 @@ MACHINE_CONFIG_START(ddragon_state::ddragon2)
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
+	MCFG_DEVICE_ADD("fmsnd", YM2151, SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, ddragon_state,irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 

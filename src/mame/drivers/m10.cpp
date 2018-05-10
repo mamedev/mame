@@ -856,7 +856,7 @@ MACHINE_CONFIG_START(m10_state::m10)
 	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, m10_state, ic8j2_output_changed))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
@@ -900,7 +900,7 @@ MACHINE_CONFIG_START(m10_state::m15)
 	MCFG_VIDEO_START_OVERRIDE(m10_state, m15 )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)

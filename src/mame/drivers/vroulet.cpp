@@ -308,7 +308,7 @@ MACHINE_CONFIG_START(vroulet_state::vroulet)
 	MCFG_PALETTE_ADD("palette", 128*4)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))

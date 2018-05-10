@@ -1044,7 +1044,7 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(PCD3311T_TAG, PCD3311, XTAL(3'578'640))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

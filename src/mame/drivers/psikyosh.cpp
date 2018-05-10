@@ -790,7 +790,7 @@ MACHINE_CONFIG_START(psikyosh_state::psikyo3v1)
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram") /* If using alpha */
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32) /* If using alpha */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -805,7 +805,7 @@ MACHINE_CONFIG_START(psikyosh_state::psikyo3v1)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymf", YMF278B, MASTER_CLOCK/2)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 12))

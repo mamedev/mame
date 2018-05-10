@@ -1076,9 +1076,10 @@ MACHINE_CONFIG_START(namcos1_state::ns1)
 	MCFG_GFX_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", 3579580)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579580)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)

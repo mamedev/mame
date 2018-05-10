@@ -123,10 +123,10 @@ MACHINE_CONFIG_START(stargame_state::stargame)
 
 	/* sound hardware */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("measnd")
+	SPEAKER(config, "measnd").front_center();
 	MCFG_DEVICE_ADD("mea8000", MEA8000, 15000000 / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "measnd", 1.0)
-	MCFG_SPEAKER_STANDARD_MONO("aysnd")
+	SPEAKER(config, "aysnd").front_center();
 	MCFG_DEVICE_ADD("ay", AY8910, 15000000 / 8) // clock line marked as CK2 and derived from 15MHz crystal
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "aysnd", 0.25)
 

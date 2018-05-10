@@ -422,7 +422,7 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 
 	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 32, 14)
 
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram8")
+	MCFG_DEVICE_ADD("spriteram8", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -439,7 +439,7 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	MCFG_VIDEO_START_OVERRIDE(wardner_state,toaplan0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'000'000)/4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

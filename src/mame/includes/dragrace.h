@@ -85,6 +85,6 @@ private:
 };
 
 /*----------- defined in audio/dragrace.c -----------*/
-DISCRETE_SOUND_EXTERN( dragrace );
+DISCRETE_SOUND_EXTERN( dragrace_discrete );
 
 #endif // MAME_INCLUDES_DRAGRACE_H

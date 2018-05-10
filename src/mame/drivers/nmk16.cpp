@@ -3866,7 +3866,7 @@ MACHINE_CONFIG_START(nmk16_state::tharrier)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -3878,11 +3878,11 @@ MACHINE_CONFIG_START(nmk16_state::tharrier)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -3906,7 +3906,7 @@ MACHINE_CONFIG_START(nmk16_state::mustang)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
@@ -3918,11 +3918,11 @@ MACHINE_CONFIG_START(nmk16_state::mustang)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -3949,13 +3949,13 @@ MACHINE_CONFIG_START(nmk16_state::mustangb)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -3987,7 +3987,7 @@ MACHINE_CONFIG_START(nmk16_state::bioship)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bioship)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
@@ -3999,11 +3999,11 @@ MACHINE_CONFIG_START(nmk16_state::bioship)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", BIOSHIP_CRYSTAL2 / 3 , PIN7_LOW) /* 4.0 Mhz, Pin 7 High (verified) */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, BIOSHIP_CRYSTAL2 / 3 , okim6295_device::PIN7_LOW) /* 4.0 Mhz, Pin 7 High (verified) */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", BIOSHIP_CRYSTAL2 / 3 , PIN7_LOW) /* 4.0 Mhz, Pin 7 High (verified) */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, BIOSHIP_CRYSTAL2 / 3 , okim6295_device::PIN7_LOW) /* 4.0 Mhz, Pin 7 High (verified) */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -4027,7 +4027,7 @@ MACHINE_CONFIG_START(nmk16_state::vandyke)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
@@ -4039,11 +4039,11 @@ MACHINE_CONFIG_START(nmk16_state::vandyke)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(12'000'000)/3, PIN7_LOW) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(12'000'000)/3, okim6295_device::PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(12'000'000)/3, PIN7_LOW) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(12'000'000)/3, okim6295_device::PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -4070,9 +4070,9 @@ MACHINE_CONFIG_START(nmk16_state::vandykeb)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", 16000000/16, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 16000000/16, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 MACHINE_CONFIG_END
@@ -4096,7 +4096,7 @@ MACHINE_CONFIG_START(nmk16_state::acrobatm)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
@@ -4108,11 +4108,11 @@ MACHINE_CONFIG_START(nmk16_state::acrobatm)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", 16000000/4, PIN7_LOW) /* (verified on pcb) on the pcb pin7 is not connected to gnd or +5v! */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW) /* (verified on pcb) on the pcb pin7 is not connected to gnd or +5v! */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", 16000000/4, PIN7_LOW) /* (verified on pcb) on the pcb pin7 is not connected to gnd or +5v! */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW) /* (verified on pcb) on the pcb pin7 is not connected to gnd or +5v! */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -4140,13 +4140,13 @@ MACHINE_CONFIG_START(nmk16_state::tdragonb)    /* bootleg using Raiden sound har
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -4175,7 +4175,7 @@ MACHINE_CONFIG_START(nmk16_state::tdragon)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
@@ -4187,11 +4187,11 @@ MACHINE_CONFIG_START(nmk16_state::tdragon)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(8'000'000)/2, PIN7_LOW) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(8'000'000)/2, okim6295_device::PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(8'000'000)/2, PIN7_LOW) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(8'000'000)/2, okim6295_device::PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -4223,12 +4223,12 @@ MACHINE_CONFIG_START(nmk16_state::ssmissin)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_OKIM6295_ADD("oki1", 8000000/8, PIN7_HIGH) /* 1 Mhz, pin 7 high */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH) /* 1 Mhz, pin 7 high */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -4252,7 +4252,7 @@ MACHINE_CONFIG_START(nmk16_state::strahl)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,strahl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
@@ -4264,11 +4264,11 @@ MACHINE_CONFIG_START(nmk16_state::strahl)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -4292,7 +4292,7 @@ MACHINE_CONFIG_START(nmk16_state::hachamf)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
@@ -4304,11 +4304,11 @@ MACHINE_CONFIG_START(nmk16_state::hachamf)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -4338,7 +4338,7 @@ MACHINE_CONFIG_START(nmk16_state::macross)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
@@ -4350,11 +4350,11 @@ MACHINE_CONFIG_START(nmk16_state::macross)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -4378,7 +4378,7 @@ MACHINE_CONFIG_START(nmk16_state::blkheart)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
@@ -4390,11 +4390,11 @@ MACHINE_CONFIG_START(nmk16_state::blkheart)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(8'000'000)/2, PIN7_LOW) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(8'000'000)/2, okim6295_device::PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(8'000'000)/2, PIN7_LOW) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(8'000'000)/2, okim6295_device::PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -4417,7 +4417,7 @@ MACHINE_CONFIG_START(nmk16_state::gunnail)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_NMK004_ADD("nmk004", XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
@@ -4429,11 +4429,11 @@ MACHINE_CONFIG_START(nmk16_state::gunnail)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/4, PIN7_LOW) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(16'000'000)/4, okim6295_device::PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(16'000'000)/4, PIN7_LOW) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(16'000'000)/4, okim6295_device::PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -4461,7 +4461,7 @@ MACHINE_CONFIG_START(nmk16_state::macross2)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -4473,10 +4473,10 @@ MACHINE_CONFIG_START(nmk16_state::macross2)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
@@ -4507,7 +4507,7 @@ MACHINE_CONFIG_START(nmk16_state::tdragon2)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -4519,10 +4519,10 @@ MACHINE_CONFIG_START(nmk16_state::tdragon2)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
@@ -4560,7 +4560,7 @@ MACHINE_CONFIG_START(nmk16_state::raphero)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,raphero)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -4572,10 +4572,10 @@ MACHINE_CONFIG_START(nmk16_state::raphero)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
@@ -4602,12 +4602,12 @@ MACHINE_CONFIG_START(nmk16_state::bjtwin)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bjtwin)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", 16000000/4, PIN7_LOW)  /* verified on pcb */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_OKIM6295_ADD("oki2", 16000000/4, PIN7_LOW) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
@@ -4664,7 +4664,7 @@ MACHINE_CONFIG_START(nmk16_state::manybloc)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -4676,11 +4676,11 @@ MACHINE_CONFIG_START(nmk16_state::manybloc)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -5176,17 +5176,18 @@ MACHINE_CONFIG_START(nmk16_state::stagger1)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,afega)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(4'000'000)) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(4'000'000)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(4'000'000)/4, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.70)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.70)
 MACHINE_CONFIG_END
@@ -5266,15 +5267,15 @@ MACHINE_CONFIG_START(nmk16_state::firehawk)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,firehawk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_OKIM6295_ADD("oki1", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -5307,12 +5308,12 @@ MACHINE_CONFIG_START(nmk16_state::twinactn)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_OKIM6295_ADD("oki1", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

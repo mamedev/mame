@@ -518,11 +518,12 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 	MCFG_DEVICE_ADD("k054338", K054338, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'000'000)/8) // 4MHz
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'000'000)/8) // 4MHz
 	MCFG_SOUND_ROUTE(0, "filter1_l", 0.50)
 	MCFG_SOUND_ROUTE(0, "filter1_r", 0.50)
 	MCFG_SOUND_ROUTE(1, "filter2_l", 0.50)
@@ -535,14 +536,10 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_FILTER_VOLUME_ADD("filter1_l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1_r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter2_l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter2_r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "filter1_l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1_r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter2_l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter2_r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 

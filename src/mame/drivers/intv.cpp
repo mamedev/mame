@@ -488,7 +488,7 @@ MACHINE_CONFIG_START(intv_state::intv)
 	MCFG_INTV_CONTROL_PORT_ADD("iopt_left_ctrl", intv_control_port_devices, "handctrl")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8914", AY8914, XTAL(3'579'545)/2)
 	MCFG_AY8910_PORT_A_READ_CB(READ8("iopt_right_ctrl", intv_control_port_device, ctrl_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8("iopt_left_ctrl",  intv_control_port_device, ctrl_r))

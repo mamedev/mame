@@ -632,9 +632,9 @@ MACHINE_CONFIG_START(panicr_state::panicr)
 	MCFG_PALETTE_INIT_OWNER(panicr_state, panicr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4) /* 3.579545 MHz */
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("t5182", t5182_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)

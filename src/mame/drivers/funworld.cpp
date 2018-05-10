@@ -3102,7 +3102,7 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay8910", AY8910, SND_CLOCK)    /* 2MHz */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, funworld_state, funworld_lamp_a_w))  /* portA out */
@@ -5069,8 +5069,8 @@ ROM_START( royalcrdp )
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "royalcrdp_nvram.bin", 0x0000, 0x0800, BAD_DUMP CRC(553f8c66) SHA1(d2c21786d715f81c537d860d8515fda6d766f630) )
 
-	ROM_REGION( 0x0200, "plds", 0 ) /* correct PAL dump */
-	ROM_LOAD( "palce16v8h_1.bin", 0x0000, 0x0117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "palce16v8h_1.bin", 0x0000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
 ROM_END
 
 

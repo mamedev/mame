@@ -310,7 +310,7 @@ public:
 	virtual void config(machine_config &config) override
 	{
 		T::config(config);
-		config.device_add("eeprom", EEPROM_SERIAL_93C46_8BIT, 0);
+		EEPROM_SERIAL_93C46_8BIT(config, "eeprom");
 	}
 
 protected:
@@ -608,7 +608,7 @@ MACHINE_CONFIG_START(tnx1_state::config)
 	MCFG_PALETTE_INIT_OWNER(tnx1_state, palette_init)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(8'000'000)/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))

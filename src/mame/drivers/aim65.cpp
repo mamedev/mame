@@ -206,9 +206,8 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<5>))
 
 	/* Sound - wave sound only */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* other devices */
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, AIM65_CLOCK)

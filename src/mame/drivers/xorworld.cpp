@@ -186,7 +186,7 @@ MACHINE_CONFIG_START(xorworld_state::xorworld)
 
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SAA1099_ADD("saa", 8000000 /* guess */)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

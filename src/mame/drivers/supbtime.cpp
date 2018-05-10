@@ -60,56 +60,9 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
-#include "machine/decocrpt.h"
-#include "machine/gen_latch.h"
-#include "video/decospr.h"
-#include "video/deco16ic.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
-#include "screen.h"
-#include "speaker.h"
-
+#include "includes/supbtime.h"
 
 #define TUMBLEP_HACK 0
-
-
-class supbtime_state : public driver_device
-{
-public:
-	supbtime_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"),
-		m_pf1_rowscroll(*this, "pf1_rowscroll"),
-		m_pf2_rowscroll(*this, "pf2_rowscroll"),
-		m_maincpu(*this, "maincpu"),
-		m_deco_tilegen1(*this, "tilegen1"),
-		m_sprgen(*this, "spritegen")
-	{ }
-
-	DECLARE_DRIVER_INIT(tumblep);
-
-	DECLARE_WRITE_LINE_MEMBER(vblank_w);
-	DECLARE_READ16_MEMBER(vblank_ack_r);
-	uint32_t screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void chinatwn(machine_config &config);
-	void supbtime(machine_config &config);
-	void tumblep(machine_config &config);
-	void chinatwn_map(address_map &map);
-	void sound_map(address_map &map);
-	void supbtime_map(address_map &map);
-	void tumblep_map(address_map &map);
-private:
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_pf1_rowscroll;
-	required_shared_ptr<uint16_t> m_pf2_rowscroll;
-	required_device<cpu_device> m_maincpu;
-	required_device<deco16ic_device> m_deco_tilegen1;
-	required_device<decospr_device> m_sprgen;
-};
 
 
 //**************************************************************************
@@ -208,61 +161,6 @@ READ16_MEMBER( supbtime_state::vblank_ack_r )
 {
 	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 	return 0xffff;
-}
-
-// End sequence uses rowscroll '98 c0' on pf1 (jmp to 1d61a on supbtimj)
-uint32_t supbtime_state::screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	address_space &space = machine().dummy_space();
-	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-
-	flip_screen_set(BIT(flip, 7));
-	m_sprgen->set_flip_screen(BIT(flip, 7));
-	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
-
-	bitmap.fill(768, cliprect);
-
-	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
-
-	return 0;
-}
-
-// Tumblepop is one of few games to take advantage of the playfields ability
-// to switch between 8*8 tiles and 16*16 tiles.
-uint32_t supbtime_state::screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	address_space &space = machine().dummy_space();
-	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-
-	flip_screen_set(BIT(flip, 7));
-	m_sprgen->set_flip_screen(BIT(flip, 7));
-	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
-
-	bitmap.fill(256+512, cliprect); // not verified
-
-	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-
-	return 0;
-}
-
-
-//**************************************************************************
-//  MACHINE
-//**************************************************************************
-
-DRIVER_INIT_MEMBER( supbtime_state, tumblep )
-{
-	deco56_decrypt_gfx(machine(), "tiles");
-
-#if TUMBLEP_HACK
-	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
-	RAM[(offset + 0)/2] = 0x0240;
-	RAM[(offset + 2)/2] = 0xffff;   // andi.w  #$f3ff, D0
-#endif
 }
 
 
@@ -477,17 +375,17 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000) / 9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000) / 9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ 2
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(21'477'272) / 20, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(21'477'272) / 20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -636,10 +534,24 @@ ROM_END
 
 
 //**************************************************************************
+//  MACHINE
+//**************************************************************************
+
+DRIVER_INIT_MEMBER( supbtime_state, tumblep )
+{
+	deco56_decrypt_gfx(machine(), "tiles");
+
+#if TUMBLEP_HACK
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
+	RAM[(offset + 0)/2] = 0x0240;
+	RAM[(offset + 2)/2] = 0xffff;   // andi.w  #$f3ff, D0
+#endif
+}
+
+//**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT     ROT   COMPANY                  FULLNAME                            FLAGS
 GAME( 1990, supbtime,  0,        supbtime, supbtime, supbtime_state,       0, ROT0, "Data East Corporation", "Super Burger Time (World, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, supbtimea, supbtime, supbtime, supbtime, supbtime_state,       0, ROT0, "Data East Corporation", "Super Burger Time (World, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, supbtimej, supbtime, supbtime, supbtime, supbtime_state,       0, ROT0, "Data East Corporation", "Super Burger Time (Japan)",        MACHINE_SUPPORTS_SAVE )

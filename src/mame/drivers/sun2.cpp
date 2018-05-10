@@ -755,18 +755,30 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 MACHINE_CONFIG_END
 
 /* ROM definition */
-ROM_START( sun2_120 )
-	ROM_REGION( 0x8000, "bootprom", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "sun2-multi-rev-r.bin", 0x0000, 0x8000, CRC(4df0df77) SHA1(4d6bcf09ddc9cc8f5823847b8ea88f98fe4a642e))
+ROM_START( sun2_120 ) // ROMs are located on the '501-1007' PCB at locations B11 and B10
+	ROM_REGION16_BE( 0x10000, "bootprom", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("revr")
+	ROM_SYSTEM_BIOS( 0, "rev10f", "Bootrom Rev 1.0F")
+	ROMX_LOAD( "1.0f.b11", 0x0000, 0x8000, CRC(8fb0050a) SHA1(399cdb894b2a66d847d76d8a5d266906fb1d3430), ROM_SKIP(1) | ROM_BIOS(1)) // actual rom stickers had fallen off
+	ROMX_LOAD( "1.0f.b10", 0x0001, 0x8000, CRC(70de816d) SHA1(67e980497f463dbc529f64ec5f3e0046b3901b7e), ROM_SKIP(1) | ROM_BIOS(1)) // "
+	ROM_SYSTEM_BIOS( 1, "revr", "Bootrom Rev R")
+	ROMX_LOAD( "sun2-multi-rev-r.bin", 0x0000, 0x8000, CRC(4df0df77) SHA1(4d6bcf09ddc9cc8f5823847b8ea88f98fe4a642e), ROM_BIOS(2)) // todo: this should be 2 separate chips, one at b11 and one at b9
+	ROM_SYSTEM_BIOS( 2, "revn", "Bootrom Rev N")
+	ROMX_LOAD( "revn.b11", 0x0000, 0x4000, CRC(b1e70965) SHA1(726b3ed9323750a1ae238cf6dccaed6ff5981ad1), ROM_SKIP(1) | ROM_BIOS(3)) // actual rom stickers had fallen off
+	ROMX_LOAD( "revn.b10", 0x0001, 0x4000, CRC(95fd9242) SHA1(1eee2d291f4b18f6aafdde1a9521d88e454843b9), ROM_SKIP(1) | ROM_BIOS(3)) // "
+	ROM_SYSTEM_BIOS( 3, "revm", "Bootrom Rev M")
+	ROMX_LOAD( "sun2-revm-8.b11", 0x0000, 0x4000, CRC(98b8ae55) SHA1(55485f4d8fd1ebc218aa8527c8bb62752c34abf7), ROM_SKIP(1) | ROM_BIOS(4)) // handwritten label: "SUN2-RevM-8"
+	ROMX_LOAD( "sun2-revm-0.b10", 0x0001, 0x4000, CRC(5117f431) SHA1(fce85c11ada1614152dde35bb329350f6fb2ecd9), ROM_SKIP(1) | ROM_BIOS(4)) // handwritten label: "SUN2-RevM-0"
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun2120-idprom.bin", 0x000000, 0x000020, CRC(eec8cd1d) SHA1(6a78dc0ea6f9cc7687cffea754d65864fb751ebf) )
 ROM_END
 
 ROM_START( sun2_50 )
-	ROM_REGION( 0x8000, "bootprom", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "250_q_8.rom", 0x0001, 0x4000, CRC(5bfacb5c) SHA1(ec7fb3fb0217b0138ba4748b7c79b8ff0cad896b))
-	ROM_LOAD16_BYTE( "250_q_0.rom", 0x0000, 0x4000, CRC(2ee29abe) SHA1(82f52b9f25e92387329581f7c8ba50a171784968))
+	ROM_REGION16_BE( 0x8000, "bootprom", ROMREGION_ERASEFF )
+	// bootrom rev Q
+	ROM_LOAD16_BYTE( "250_q_8.rom", 0x0000, 0x4000, CRC(5bfacb5c) SHA1(ec7fb3fb0217b0138ba4748b7c79b8ff0cad896b))
+	ROM_LOAD16_BYTE( "250_q_0.rom", 0x0001, 0x4000, CRC(2ee29abe) SHA1(82f52b9f25e92387329581f7c8ba50a171784968))
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun250-idprom.bin", 0x000000, 0x000020, CRC(927744ab) SHA1(d29302b69128165e69dd3a79b8c8d45f2163b88a) )

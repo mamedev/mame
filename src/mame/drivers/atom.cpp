@@ -720,7 +720,7 @@ MACHINE_CONFIG_START(atom_state::atom)
 	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, atom_state, vdg_videoram_r))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -830,7 +830,7 @@ MACHINE_CONFIG_START(atom_state::atombb)
 	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, atom_state, vdg_videoram_r))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

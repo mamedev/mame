@@ -692,7 +692,7 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 
 	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 31, 15)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram16")
+	MCFG_DEVICE_ADD("spriteram16", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -709,7 +709,7 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	MCFG_VIDEO_START_OVERRIDE(twincobr_state,toaplan0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

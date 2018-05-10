@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(lola8a_state::lola8a)
 	MCFG_I8085A_SID(READLINE(*this, lola8a_state, cass_r))
 	MCFG_I8085A_SOD(WRITELINE(*this, lola8a_state, cass_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(4'915'200) / 4)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, lola8a_state, lola8a_port_a_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lola8a_state, lola8a_port_b_w))
@@ -294,8 +294,7 @@ MACHINE_CONFIG_START(lola8a_state::lola8a)
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 /* ROM definition */

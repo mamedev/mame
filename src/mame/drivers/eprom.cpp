@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(eprom_state::eprom)
 	MCFG_VIDEO_START_OVERRIDE(eprom_state,eprom)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
@@ -466,7 +466,7 @@ MACHINE_CONFIG_START(eprom_state::klaxp)
 	MCFG_VIDEO_START_OVERRIDE(eprom_state,eprom)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
@@ -514,7 +514,7 @@ MACHINE_CONFIG_START(eprom_state::guts)
 	MCFG_VIDEO_START_OVERRIDE(eprom_state,guts)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)

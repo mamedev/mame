@@ -401,9 +401,9 @@ MACHINE_CONFIG_START(rastan_state::rastan)
 	MCFG_PC090OJ_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, rastan_state,rastan_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)

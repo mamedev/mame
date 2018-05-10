@@ -1649,15 +1649,14 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	MCFG_VIDEO_START_OVERRIDE(bosco_state,bosco)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MCFG_NAMCO_AUDIO_VOICES(3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
 	/* discrete circuit on the 54XX outputs */
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(bosco)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, bosco_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -1725,15 +1724,14 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 	MCFG_VIDEO_START_OVERRIDE(galaga_state,galaga)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MCFG_NAMCO_AUDIO_VOICES(3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
 	/* discrete circuit on the 54XX outputs */
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(galaga)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, galaga_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -1831,15 +1829,14 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	MCFG_VIDEO_START_OVERRIDE(xevious_state,xevious)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MCFG_NAMCO_AUDIO_VOICES(3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
 	/* discrete circuit on the 54XX outputs */
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(galaga)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, galaga_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -1953,7 +1950,7 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 	MCFG_VIDEO_START_OVERRIDE(digdug_state,digdug)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MCFG_NAMCO_AUDIO_VOICES(3)

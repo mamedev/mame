@@ -1716,21 +1716,22 @@ MACHINE_CONFIG_START(megasys1_state::system_A)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 256*2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, megasys1_state,sound_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", OKI4_SOUND_CLOCK, PIN7_HIGH) /* 4MHz verified */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH) /* 4MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_OKIM6295_ADD("oki2", OKI4_SOUND_CLOCK, PIN7_HIGH) /* 4MHz verified */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH) /* 4MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -1820,10 +1821,11 @@ MACHINE_CONFIG_START(megasys1_state::system_Bbl)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 256*2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	/* just the one OKI, used for sound and music */
-	MCFG_OKIM6295_ADD("oki1", OKI4_SOUND_CLOCK, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -1833,11 +1835,11 @@ MACHINE_CONFIG_START(megasys1_state::system_B_hayaosi1)
 
 	/* basic machine hardware */
 
-	MCFG_OKIM6295_REPLACE("oki1", 2000000, PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
+	MCFG_DEVICE_REPLACE("oki1", OKIM6295, 2000000, okim6295_device::PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_OKIM6295_REPLACE("oki2", 2000000, PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
+	MCFG_DEVICE_REPLACE("oki2", OKIM6295, 2000000, okim6295_device::PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -1898,9 +1900,9 @@ MACHINE_CONFIG_START(megasys1_state::system_D)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", SYS_D_CPU_CLOCK/4, PIN7_HIGH)    /* 2MHz (8MHz / 4) */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, SYS_D_CPU_CLOCK/4, okim6295_device::PIN7_HIGH)    /* 2MHz (8MHz / 4) */
 	MCFG_DEVICE_ADDRESS_MAP(0, megasys1D_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1949,7 +1951,7 @@ MACHINE_CONFIG_START(megasys1_state::system_Z)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch_z")
 

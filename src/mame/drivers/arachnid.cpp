@@ -450,7 +450,7 @@ MACHINE_CONFIG_START(arachnid_state::arachnid)
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9118_TAG, tms9118_device, screen_update )
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

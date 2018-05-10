@@ -913,7 +913,7 @@ MACHINE_CONFIG_START(scobra_state::type1)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,scrambold)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1093,7 +1093,7 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,scrambold)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_DEVICE_ADD("aysnd", AY8910, 14318000/8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))

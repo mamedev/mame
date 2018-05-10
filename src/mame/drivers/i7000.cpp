@@ -363,7 +363,7 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 	MCFG_MC6845_ADDR_CHANGED_CB(i7000_state, crtc_addr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

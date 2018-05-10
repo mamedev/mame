@@ -277,7 +277,7 @@ MACHINE_CONFIG_START(deniam_state::deniam16b)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -286,7 +286,7 @@ MACHINE_CONFIG_START(deniam_state::deniam16b)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(25'000'000)/24, PIN7_HIGH) /* 1.041620 measured, = 1.0416666Mhz verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(25'000'000)/24, okim6295_device::PIN7_HIGH) /* 1.041620 measured, = 1.0416666Mhz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -313,12 +313,12 @@ MACHINE_CONFIG_START(deniam_state::deniam16c)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(25'000'000)/24, PIN7_HIGH)  /* 1.041620 measured, = 1.0416666Mhz verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(25'000'000)/24, okim6295_device::PIN7_HIGH)  /* 1.041620 measured, = 1.0416666Mhz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

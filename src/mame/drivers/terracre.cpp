@@ -464,7 +464,7 @@ MACHINE_CONFIG_START(terracre_state::ym3526)
 	MCFG_DEVICE_IO_MAP(sound_3526_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(terracre_state, irq0_line_hold,  XTAL(16'000'000)/4/512) // ?
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(terracre_state::ym3526)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(terracre_state, terracre)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

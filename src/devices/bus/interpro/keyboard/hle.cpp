@@ -278,7 +278,7 @@ WRITE_LINE_MEMBER(hle_device_base::input_txd)
 }
 
 MACHINE_CONFIG_START(hle_device_base::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("bell")
+	SPEAKER(config, "bell").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 1.0)
 MACHINE_CONFIG_END

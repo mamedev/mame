@@ -1334,17 +1334,18 @@ MACHINE_CONFIG_START(segaybd_state::yboard)
 	MCFG_PALETTE_ADD("palette", 8192*3)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/8)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
-	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/8)
+	MCFG_DEVICE_ADD("pcm", SEGAPCM, SOUND_CLOCK/8)
 	MCFG_SEGAPCM_BANK_MASK(BANK_12M, BANK_MASKF8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

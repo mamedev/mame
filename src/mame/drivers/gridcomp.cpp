@@ -64,6 +64,7 @@
 
 #include "emu.h"
 
+#include "bus/ieee488/ieee488.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "machine/gridkeyb.h"
@@ -71,6 +72,7 @@
 #include "machine/i80130.h"
 #include "machine/i8255.h"
 #include "machine/ram.h"
+#include "machine/tms9914.h"
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 
@@ -322,7 +324,7 @@ void gridcomp_state::grid1101_map(address_map &map)
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
 	map(0xdfec0, 0xdfecf).rw(m_modem, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
-	map(0xdff80, 0xdff8f).rw(this, FUNC(gridcomp_state::grid_gpib_r), FUNC(gridcomp_state::grid_gpib_w)); // TMS9914
+	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::reg8_r), FUNC(tms9914_device::reg8_w)).umask16(0x00ff);
 	map(0xdffc0, 0xdffcf).rw(this, FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
 	map(0xfc000, 0xfffff).rom().region("user1", 0);
 }
@@ -339,7 +341,7 @@ void gridcomp_state::grid1121_map(address_map &map)
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
 	map(0xdfec0, 0xdfecf).rw(m_modem, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff40, 0xdff5f).noprw();   // ?? machine ID EAROM, RTC
-	map(0xdff80, 0xdff8f).rw(this, FUNC(gridcomp_state::grid_gpib_r), FUNC(gridcomp_state::grid_gpib_w)); // TMS9914
+	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::reg8_r), FUNC(tms9914_device::reg8_w)).umask16(0x00ff);
 	map(0xdffc0, 0xdffcf).rw(this, FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
 	map(0xfc000, 0xfffff).rom().region("user1", 0);
 }
@@ -374,7 +376,7 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 	MCFG_DEVICE_ADD(I80130_TAG, I80130, XTAL(15'000'000)/3)
 	MCFG_I80130_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -394,6 +396,28 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 	MCFG_I7220_DATA_SIZE(3) // 3 1-Mbit MBM's
 	MCFG_I7220_IRQ_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir1_w))
 	MCFG_I7220_DRQ_CALLBACK(WRITELINE(I80130_TAG, i80130_device, ir1_w))
+
+	MCFG_DEVICE_ADD("hpib", TMS9914, XTAL(4'000'000))
+	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(I80130_TAG, i80130_device, ir5_w))
+	MCFG_TMS9914_DIO_READWRITE_CB(READ8(IEEE488_TAG, ieee488_device, dio_r), WRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_TMS9914_EOI_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, eoi_w))
+	MCFG_TMS9914_DAV_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, dav_w))
+	MCFG_TMS9914_NRFD_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, nrfd_w))
+	MCFG_TMS9914_NDAC_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
+	MCFG_TMS9914_IFC_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, ifc_w))
+	MCFG_TMS9914_SRQ_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, srq_w))
+	MCFG_TMS9914_ATN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, atn_w))
+	MCFG_TMS9914_REN_WRITE_CB(WRITELINE(IEEE488_TAG, ieee488_device, ren_w))
+	MCFG_IEEE488_BUS_ADD()
+	MCFG_IEEE488_EOI_CALLBACK(WRITELINE("hpib", tms9914_device, eoi_w))
+	MCFG_IEEE488_DAV_CALLBACK(WRITELINE("hpib", tms9914_device, dav_w))
+	MCFG_IEEE488_NRFD_CALLBACK(WRITELINE("hpib", tms9914_device, nrfd_w))
+	MCFG_IEEE488_NDAC_CALLBACK(WRITELINE("hpib", tms9914_device, ndac_w))
+	MCFG_IEEE488_IFC_CALLBACK(WRITELINE("hpib", tms9914_device, ifc_w))
+	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE("hpib", tms9914_device, srq_w))
+	MCFG_IEEE488_ATN_CALLBACK(WRITELINE("hpib", tms9914_device, atn_w))
+	MCFG_IEEE488_REN_CALLBACK(WRITELINE("hpib", tms9914_device, ren_w))
+	MCFG_IEEE488_SLOT_ADD("ieee_rem", 0, remote488_devices, nullptr)
 
 	MCFG_DEVICE_ADD("uart8274", I8274_NEW, XTAL(4'032'000))
 

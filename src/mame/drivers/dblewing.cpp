@@ -411,13 +411,13 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("soundirq", input_merger_device, in_w<0>))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000)/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000)/9)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<1>))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(28'000'000)/28, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'000'000)/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

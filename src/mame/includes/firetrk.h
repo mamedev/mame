@@ -162,6 +162,6 @@ public:
 
 /*----------- defined in audio/firetrk.c -----------*/
 
-DISCRETE_SOUND_EXTERN( firetrk );
-DISCRETE_SOUND_EXTERN( superbug );
-DISCRETE_SOUND_EXTERN( montecar );
+DISCRETE_SOUND_EXTERN( firetrk_discrete );
+DISCRETE_SOUND_EXTERN( superbug_discrete );
+DISCRETE_SOUND_EXTERN( montecar_discrete );

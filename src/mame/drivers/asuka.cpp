@@ -888,7 +888,7 @@ MACHINE_CONFIG_START(asuka_state::bonzeadv)
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -951,9 +951,9 @@ MACHINE_CONFIG_START(asuka_state::asuka)
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(MEMBANK("audiobank")) MCFG_DEVCB_MASK(0x03)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
@@ -1027,9 +1027,9 @@ MACHINE_CONFIG_START(asuka_state::cadash)
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(8'000'000)/2)   /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(8'000'000)/2)   /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(MEMBANK("audiobank")) MCFG_DEVCB_MASK(0x03)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
@@ -1090,9 +1090,9 @@ MACHINE_CONFIG_START(asuka_state::mofflott)
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(MEMBANK("audiobank")) MCFG_DEVCB_MASK(0x03)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
@@ -1161,9 +1161,9 @@ MACHINE_CONFIG_START(asuka_state::eto)
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(MEMBANK("audiobank")) MCFG_DEVCB_MASK(0x03)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)

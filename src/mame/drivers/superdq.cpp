@@ -351,7 +351,8 @@ MACHINE_CONFIG_START(superdq_state::superdq)
 	MCFG_PALETTE_INIT_OWNER(superdq_state, superdq)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("snsnd", SN76496, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.8)

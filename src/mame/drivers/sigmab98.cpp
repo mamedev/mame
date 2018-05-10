@@ -2860,10 +2860,11 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)    // clock @X2?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -2931,11 +2932,11 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
 	// 2 x 8-bit parallel/serial converters
-	MCFG_TTL165_ADD("ttl165_1")
+	MCFG_DEVICE_ADD("ttl165_1", TTL165)
 	MCFG_TTL165_DATA_CB(IOPORT("DSW2"))
 	MCFG_TTL165_QH_CB(WRITELINE("ttl165_2", ttl165_device, serial_w))
 
-	MCFG_TTL165_ADD("ttl165_2")
+	MCFG_DEVICE_ADD("ttl165_2", TTL165)
 	MCFG_TTL165_DATA_CB(IOPORT("DSW1"))
 	MCFG_TTL165_QH_CB(WRITELINE(*this, lufykzku_state, dsw_w))
 
@@ -2953,11 +2954,12 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-//  MCFG_BUFFERED_SPRITERAM8_ADD("spriteram") // same as sammymdl?
+//  MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8) // same as sammymdl?
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -3016,12 +3018,13 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-//  MCFG_BUFFERED_SPRITERAM8_ADD("spriteram") // not on sammymdl?
+//  MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8) // not on sammymdl?
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
+	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END

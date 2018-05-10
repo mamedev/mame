@@ -299,7 +299,7 @@ MACHINE_CONFIG_START(konblands_state::konblands)
 	MCFG_PALETTE_INIT_OWNER(konblands_state, konblands)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("sn", SN76496, MASTER_CLOCK/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

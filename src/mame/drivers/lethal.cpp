@@ -535,7 +535,8 @@ MACHINE_CONFIG_START(lethal_state::lethalen)
 	MCFG_K054000_ADD("k054000")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 

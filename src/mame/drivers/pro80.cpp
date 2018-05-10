@@ -183,9 +183,8 @@ MACHINE_CONFIG_START(pro80_state::pro80)
 	MCFG_DEFAULT_LAYOUT(layout_pro80)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )

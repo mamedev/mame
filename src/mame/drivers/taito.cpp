@@ -361,7 +361,7 @@ MACHINE_CONFIG_START(taito_state::taito)
 	/* Sound */
 	genpin_audio(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.475) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -396,7 +396,7 @@ MACHINE_CONFIG_END
 // add vox
 MACHINE_CONFIG_START(taito_state::taito4)
 	taito(config);
-	MCFG_SPEAKER_STANDARD_MONO("voxsnd")
+	SPEAKER(config, "voxsnd").front_center();
 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) // guess
 	MCFG_VOTRAX_SC01_REQUEST_CB(WRITELINE(*this, taito_state, votrax_request))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "voxsnd", 0.15) // todo: fix - it makes noise continuously
@@ -409,7 +409,7 @@ MACHINE_CONFIG_START(taito_state::taito_ay_audio)
 	MCFG_DEVICE_MODIFY( "audiocpu" )
 	MCFG_DEVICE_PROGRAM_MAP(taito_sub_map5)
 
-	MCFG_SPEAKER_STANDARD_MONO("aysnd")
+	SPEAKER(config, "aysnd").front_center();
 	MCFG_DEVICE_ADD("aysnd_0", AY8910, XTAL(3'579'545)/2) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "aysnd", 0.8)
 	MCFG_DEVICE_ADD("aysnd_1", AY8910, XTAL(3'579'545)/2) /* guess */

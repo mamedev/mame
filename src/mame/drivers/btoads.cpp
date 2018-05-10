@@ -329,7 +329,8 @@ MACHINE_CONFIG_START(btoads_state::btoads)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34020_device, tms340x0_rgb32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_BSMT2000_ADD("bsmt", SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

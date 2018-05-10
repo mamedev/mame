@@ -487,8 +487,8 @@ MACHINE_CONFIG_START(cv1k_state::cv1k)
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_YMZ770_ADD("ymz770", 16.384_MHz_XTAL)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ymz770", YMZ770, 16.384_MHz_XTAL)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0) // only Right output used, Left is not connected
 
 	MCFG_EPIC12_ADD("blitter")

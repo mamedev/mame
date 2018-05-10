@@ -376,7 +376,8 @@ MACHINE_CONFIG_START(turrett_state::turrett)
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ttsound", TURRETT, R3041_CLOCK) // ?
 	MCFG_DEVICE_ADDRESS_MAP(0, turrett_sound_map)

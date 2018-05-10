@@ -326,7 +326,7 @@ MACHINE_CONFIG_START(matmania_state::matmania)
 	MCFG_PALETTE_INIT_OWNER(matmania_state, matmania)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -370,7 +370,7 @@ MACHINE_CONFIG_START(matmania_state::maniach)
 	MCFG_PALETTE_INIT_OWNER(matmania_state, matmania)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

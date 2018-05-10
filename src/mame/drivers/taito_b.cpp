@@ -1987,7 +1987,7 @@ MACHINE_CONFIG_START(taitob_state::rastsag2)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2044,7 +2044,7 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(24'000'000)/8)  /* 3 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2122,7 +2122,7 @@ MACHINE_CONFIG_START(taitob_state::ashura)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2179,7 +2179,7 @@ MACHINE_CONFIG_START(taitob_state::crimec)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2238,7 +2238,7 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(24'000'000)/8)  /* 3 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2248,7 +2248,7 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
@@ -2300,7 +2300,7 @@ MACHINE_CONFIG_START(taitob_state::rambo3p)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)   /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2358,7 +2358,7 @@ MACHINE_CONFIG_START(taitob_state::rambo3)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2421,7 +2421,7 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610B, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2484,7 +2484,7 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2541,7 +2541,7 @@ MACHINE_CONFIG_START(taitob_state::spacedxo)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2604,7 +2604,7 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610B, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2661,7 +2661,7 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(24'000'000)/8)   /* 3 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2671,7 +2671,7 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(4'224'000)/4, PIN7_HIGH) // 1.056MHz clock frequency, but pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'224'000)/4, okim6295_device::PIN7_HIGH) // 1.056MHz clock frequency, but pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
@@ -2723,7 +2723,7 @@ MACHINE_CONFIG_START(taitob_state::silentd)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2780,7 +2780,7 @@ MACHINE_CONFIG_START(taitob_state::selfeena)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2846,7 +2846,7 @@ MACHINE_CONFIG_START(taitob_state::ryujin)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2910,7 +2910,7 @@ MACHINE_CONFIG_START(taitob_state::sbm)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610B, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2968,7 +2968,7 @@ MACHINE_CONFIG_START(taitob_c_state::realpunc)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610B, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

@@ -351,10 +351,9 @@ MACHINE_CONFIG_START(tank8_state::tank8)
 	MCFG_PALETTE_INIT_OWNER(tank8_state, tank8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(tank8)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, tank8_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

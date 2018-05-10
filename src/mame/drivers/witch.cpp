@@ -217,130 +217,11 @@ Interesting memory locations
 TODO :
     - Figure out the ports for the "PayOut" stuff (a006/a00c?);
     - Hook up the OKI M5202;
-	- keirinou: sprite colors, controlled by an undumped PROM? 
-	  No data in available palette RAM seems to fit;
-	- merge memory maps;
+	- lagging sprites on witch (especially noticeable when game scrolls up/down)
 */
 
 #include "emu.h"
-
-#include "cpu/z80/z80.h"
-#include "machine/i8255.h"
-#include "machine/nvram.h"
-#include "machine/ticket.h"
-#include "sound/ay8910.h"
-#include "sound/2203intf.h"
-#include "sound/es8712.h"
-
-#include "screen.h"
-#include "speaker.h"
-
-
-#define MAIN_CLOCK        XTAL(12'000'000)
-#define CPU_CLOCK         MAIN_CLOCK / 4
-#define YM2203_CLOCK      MAIN_CLOCK / 4
-#define AY8910_CLOCK      MAIN_CLOCK / 8
-#define MSM5202_CLOCK     384_kHz_XTAL
-
-#define HOPPER_PULSE      50          // time between hopper pulses in milliseconds (not right for attendant pay)
-
-
-class witch_state : public driver_device
-{
-public:
-	witch_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_subcpu(*this, "sub")
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_gfx0_vram(*this, "gfx0_vram")
-		, m_gfx0_cram(*this, "gfx0_cram")
-		, m_gfx1_vram(*this, "gfx1_vram")
-		, m_gfx1_cram(*this, "gfx1_cram")
-		, m_sprite_ram(*this, "sprite_ram")
-		, m_palette(*this, "palette")
-		, m_hopper(*this, "hopper")
-		, m_mainbank(*this, "mainbank")
-	{ }
-
-	tilemap_t *m_gfx0a_tilemap;
-	tilemap_t *m_gfx0b_tilemap;
-	tilemap_t *m_gfx1_tilemap;
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-
-	required_shared_ptr<uint8_t> m_gfx0_vram;
-	required_shared_ptr<uint8_t> m_gfx0_cram;
-	required_shared_ptr<uint8_t> m_gfx1_vram;
-	required_shared_ptr<uint8_t> m_gfx1_cram;
-	required_shared_ptr<uint8_t> m_sprite_ram;
-	required_device<palette_device> m_palette;
-
-	required_device<ticket_dispenser_device> m_hopper;
-
-	optional_memory_bank m_mainbank;
-
-	int m_scrollx;
-	int m_scrolly;
-	uint8_t m_reg_a002;
-	uint8_t m_motor_active;
-	DECLARE_WRITE8_MEMBER(gfx0_vram_w);
-	DECLARE_WRITE8_MEMBER(gfx0_cram_w);
-	DECLARE_WRITE8_MEMBER(gfx1_vram_w);
-	DECLARE_WRITE8_MEMBER(gfx1_cram_w);
-	DECLARE_READ8_MEMBER(gfx1_vram_r);
-	DECLARE_READ8_MEMBER(gfx1_cram_r);
-	DECLARE_READ8_MEMBER(read_a000);
-	DECLARE_WRITE8_MEMBER(write_a002);
-	DECLARE_WRITE8_MEMBER(write_a006);
-	DECLARE_WRITE8_MEMBER(main_write_a008);
-	DECLARE_WRITE8_MEMBER(sub_write_a008);
-	DECLARE_READ8_MEMBER(prot_read_700x);
-	DECLARE_WRITE8_MEMBER(xscroll_w);
-	DECLARE_WRITE8_MEMBER(yscroll_w);
-	DECLARE_DRIVER_INIT(witch);
-	TILE_GET_INFO_MEMBER(get_gfx0b_tile_info);
-	TILE_GET_INFO_MEMBER(get_gfx0a_tile_info);
-	TILE_GET_INFO_MEMBER(get_gfx1_tile_info);
-	virtual void video_start() override;
-	uint32_t screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void machine_reset() override;
-	void witch(machine_config &config);
-	void map_main(address_map &map);
-	void map_sub(address_map &map);
-	
-protected:
-	void video_common_init();
-	bool has_spr_rom_bank;
-	uint8_t m_spr_bank;
-};
-
-class keirinou_state : public witch_state
-{
-public:
-	keirinou_state(const machine_config &mconfig, device_type type, const char *tag)
-		: witch_state(mconfig, type, tag)
-	{ }
-	
-	void keirinou_main_map(address_map &map);
-	void keirinou_sub_map(address_map &map);
-
-	void keirinou(machine_config &config);
-	DECLARE_WRITE8_MEMBER(write_keirinou_a002);
-	TILE_GET_INFO_MEMBER(get_keirinou_gfx1_tile_info);
-
-protected:
-	virtual void video_start() override;
-
-private:
-	uint8_t m_bg_bank;
-};
-
-
-#define UNBANKED_SIZE 0x800
+#include "includes/witch.h"
 
 
 TILE_GET_INFO_MEMBER(witch_state::get_gfx0b_tile_info)
@@ -447,7 +328,8 @@ void witch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i,sx,sy,tileno,flags,color;
 	int flipx=0;
-	int flipy=0;	
+	int flipy=0;
+	int region = has_spr_rom_bank == true ? 2 : 1;
 
 	for(i=0;i<0x800;i+=0x20) {
 		sx     = m_sprite_ram[i+1];
@@ -464,22 +346,22 @@ void witch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			color  =  (flags & 0x0f);
 
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,
 				tileno, color,
 				flipx, flipy,
 				sx+8*flipx,sy+8*flipy,0);
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,
 				tileno+1, color,
 				flipx, flipy,
 				sx+8-8*flipx,sy+8*flipy,0);
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,
 				tileno+2, color,
 				flipx, flipy,
 				sx+8*flipx,sy+8-8*flipy,0);
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,
 				tileno+3, color,
 				flipx, flipy,
 				sx+8-8*flipx,sy+8-8*flipy,0);
@@ -569,7 +451,6 @@ WRITE8_MEMBER(witch_state::write_a002)
 WRITE8_MEMBER(keirinou_state::write_keirinou_a002)
 {
 	uint8_t new_bg_bank;
-	//A002 bit 7&6 = m_bank ????
 	m_reg_a002 = data;
 
 	m_spr_bank = BIT(data,7);
@@ -641,21 +522,71 @@ WRITE8_MEMBER(witch_state::yscroll_w)
 	m_scrolly=data;
 }
 
-void witch_state::map_main(address_map &map)
+WRITE8_MEMBER(keirinou_state::palette_w)
 {
-	map(0x0000, UNBANKED_SIZE-1).rom();
-	map(UNBANKED_SIZE, 0x7fff).bankr("mainbank");
-	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x8008, 0x8009).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	int r,g,b;
+
+	m_paletteram[offset] = data;
+
+	// TODO: bit 0?
+	r = ((m_paletteram[offset] & 0xe)>>1);
+	g = ((m_paletteram[offset] & 0x30)>>4);
+	b = ((m_paletteram[offset] & 0xc0)>>6);
+
+	m_palette->set_pen_color(offset, pal3bit(r), pal2bit(g), pal2bit(b));
+	
+	// sprite palette uses an indirect table
+	// sprites are only used to draw cyclists, and pens 0x01-0x05 are directly tied to a specific sprite entry.
+	// this probably translates in HW by selecting a specific pen for the lowest bit in GFX roms instead of the typical color entry offset.
+
+	// we do some massaging of the data here, the alternative is to use custom drawing code but that quite doesn't fit with witch
+	if((offset & 0x1f0) == 0x00)
+	{
+		int i;
+		
+		if(offset > 5)
+		{
+			for(i=0;i<0x80;i+=0x10)
+				m_palette->set_pen_color(offset+0x200+i, pal3bit(r), pal2bit(g), pal2bit(b));
+		}
+		else
+		{
+			for(i=(offset & 7) * 0x10;i<((offset & 7) * 0x10)+8;i++)
+				m_palette->set_pen_color(0x200+i, pal3bit(r), pal2bit(g), pal2bit(b));
+		}
+	}
+}
+
+/**********************************************
+ *
+ * Base address map
+ *
+ *********************************************/
+
+void witch_state::common_map(address_map &map)
+{
 	map(0xa000, 0xa003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa004, 0xa007).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa008, 0xa008).w(this, FUNC(witch_state::main_write_a008));
 	map(0xa00c, 0xa00c).portr("SERVICE");    // stats / reset
 	map(0xa00e, 0xa00e).portr("COINS");      // coins/attendant keys
 	map(0xc000, 0xc3ff).ram().w(this, FUNC(witch_state::gfx0_vram_w)).share("gfx0_vram");
 	map(0xc400, 0xc7ff).ram().w(this, FUNC(witch_state::gfx0_cram_w)).share("gfx0_cram");
 	map(0xc800, 0xcbff).rw(this, FUNC(witch_state::gfx1_vram_r), FUNC(witch_state::gfx1_vram_w)).share("gfx1_vram");
 	map(0xcc00, 0xcfff).rw(this, FUNC(witch_state::gfx1_cram_r), FUNC(witch_state::gfx1_cram_w)).share("gfx1_cram");
+}
+
+/************************************
+ *
+ * Witch address maps
+ *
+ ***********************************/
+
+void witch_state::witch_common_map(address_map &map)
+{
+	common_map(map);
+	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x8008, 0x8009).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x8010, 0x8016).rw("essnd", FUNC(es8712_device::read), FUNC(es8712_device::write));
 	map(0xd000, 0xdfff).ram().share("sprite_ram");
 	map(0xe000, 0xe7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xe800, 0xefff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
@@ -664,55 +595,51 @@ void witch_state::map_main(address_map &map)
 	map(0xf200, 0xffff).ram().share("share2");
 }
 
-
-void witch_state::map_sub(address_map &map)
+void witch_state::witch_main_map(address_map &map)
 {
+	witch_common_map(map);
+	map(0x0000, UNBANKED_SIZE-1).rom();
+	map(UNBANKED_SIZE, 0x7fff).bankr("mainbank");
+	map(0xa008, 0xa008).w(this, FUNC(witch_state::main_write_a008));
+}
+
+
+void witch_state::witch_sub_map(address_map &map)
+{
+	witch_common_map(map);
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x8008, 0x8009).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x8010, 0x8016).rw("essnd", FUNC(es8712_device::read), FUNC(es8712_device::write));
-	map(0xa000, 0xa003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa004, 0xa007).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa008, 0xa008).w(this, FUNC(witch_state::sub_write_a008));
-	map(0xa00c, 0xa00c).portr("SERVICE");    // stats / reset
-	map(0xf000, 0xf0ff).ram().share("share1");
-	map(0xf200, 0xffff).ram().share("share2");
+}
+
+/************************************
+ *
+ * Keirin Ou address maps
+ *
+ ***********************************/
+
+void keirinou_state::keirinou_common_map(address_map &map)
+{
+	common_map(map);
+	map(0x8000, 0x8001).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x8002, 0x8003).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0xd000, 0xd7ff).ram().share("sprite_ram");
+	map(0xd800, 0xd9ff).ram().w(this, FUNC(keirinou_state::palette_w)).share("paletteram");
+	map(0xe000, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().share("nvram"); // shared with sub
 }
 
 void keirinou_state::keirinou_main_map(address_map &map)
 {
+	keirinou_common_map(map);
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8001).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-	map(0x8002, 0x8003).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-	map(0xa000, 0xa003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa004, 0xa007).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa008, 0xa008).w(this, FUNC(witch_state::main_write_a008));
-	map(0xa00c, 0xa00c).portr("SERVICE");    // stats / reset
-	map(0xa00e, 0xa00e).portr("COINS");      // coins/attendant keys
-	map(0xc000, 0xc3ff).ram().w(this, FUNC(witch_state::gfx0_vram_w)).share("gfx0_vram");
-	map(0xc400, 0xc7ff).ram().w(this, FUNC(witch_state::gfx0_cram_w)).share("gfx0_cram");
-	map(0xc800, 0xcbff).rw(this, FUNC(witch_state::gfx1_vram_r), FUNC(witch_state::gfx1_vram_w)).share("gfx1_vram");
-	map(0xcc00, 0xcfff).rw(this, FUNC(witch_state::gfx1_cram_r), FUNC(witch_state::gfx1_cram_w)).share("gfx1_cram");
-	map(0xd000, 0xd7ff).ram().share("sprite_ram");
-	map(0xd800, 0xd9ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xe000, 0xe7ff).ram();//.share("share1");
-	map(0xe800, 0xefff).ram().share("nvram");
 }
 
 void keirinou_state::keirinou_sub_map(address_map &map)
 {
+	keirinou_common_map(map);
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8001).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-	map(0x8002, 0x8003).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-	map(0xa000, 0xa003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa004, 0xa007).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa008, 0xa008).w(this, FUNC(witch_state::sub_write_a008));
-	map(0xa00c, 0xa00c).portr("SERVICE");    // stats / reset
-	// shared VRAM used for lower portion of ingame background tilemap
-	map(0xc800, 0xcbff).rw(this, FUNC(witch_state::gfx1_vram_r), FUNC(witch_state::gfx1_vram_w)).share("gfx1_vram");
-	map(0xcc00, 0xcfff).rw(this, FUNC(witch_state::gfx1_cram_r), FUNC(witch_state::gfx1_cram_w)).share("gfx1_cram");
-	map(0xe000, 0xe7ff).ram();//.share("share1");
-	map(0xe800, 0xefff).ram().share("nvram");
 }
 
 static INPUT_PORTS_START( witch )
@@ -915,22 +842,22 @@ static INPUT_PORTS_START( keirinou )
 
 	// TODO: dipswitches
 	PORT_MODIFY("YM_PortA")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07, 0x07, "Game Rate" )
+	PORT_DIPSETTING(    0x02, "70%" )
+	PORT_DIPSETTING(    0x07, "80%" )
+	PORT_DIPSETTING(    0x06, "85%" )
+	PORT_DIPSETTING(    0x05, "90%" )
+	PORT_DIPSETTING(    0x04, "95%" )
+	PORT_DIPSETTING(    0x03, "100%" )
+//	PORT_DIPSETTING(    0x01, "80%" )
+//	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPNAME( 0x08, 0x08, "Double-Up Rate" )
+	PORT_DIPSETTING(    0x08, "90%" )
+	PORT_DIPSETTING(    0x00, "100%" )
 	PORT_DIPNAME( 0x10, 0x00, "Double-Up Game" )
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "DSWA" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
@@ -1010,6 +937,12 @@ static GFXDECODE_START( witch )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
+static GFXDECODE_START( keirinou )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0x200, 8 )
+GFXDECODE_END
+
 void witch_state::machine_reset()
 {
 	// Keep track of the "Hopper Active" DSW value because the program will use it
@@ -1019,12 +952,12 @@ void witch_state::machine_reset()
 MACHINE_CONFIG_START(witch_state::witch)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)    /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(map_main)
+	MCFG_DEVICE_PROGRAM_MAP(witch_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", witch_state,  irq0_line_assert)
 
 	/* 2nd z80 */
 	MCFG_DEVICE_ADD("sub", Z80, CPU_CLOCK)    /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(map_sub)
+	MCFG_DEVICE_PROGRAM_MAP(witch_sub_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", witch_state,  irq0_line_assert)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -1058,7 +991,7 @@ MACHINE_CONFIG_START(witch_state::witch)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ES8712_ADD("essnd", 0)
 	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm5205_device, data_w))
@@ -1090,8 +1023,10 @@ MACHINE_CONFIG_START(keirinou_state::keirinou)
 	MCFG_DEVICE_PROGRAM_MAP(keirinou_sub_map)
 
 	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	MCFG_PALETTE_ADD("palette", 0x200+0x80)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", keirinou)
+
+//	MCFG_PALETTE_FORMAT(IIBBGGRR)
 
 	MCFG_DEVICE_MODIFY("ppi1") // Keirin Ou does have two individual PPIs (NEC D8255AC-2)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, keirinou_state, write_keirinou_a002))
@@ -1232,7 +1167,7 @@ DRIVER_INIT_MEMBER(witch_state,witch)
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
 }
 
-GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, 0,     ROT0, "Excellent System",     "Keirin Ou", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, 0,     ROT0, "Excellent System",     "Keirin Ou", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, witch,    0,     witch,    witch,    witch_state,    witch, ROT0, "Excellent System",     "Witch", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, witchb,   witch, witch,    witch,    witch_state,    witch, ROT0, "Excellent System",     "Witch (With ranking)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1992, witchs,   witch, witch,    witch,    witch_state,    witch, ROT0, "Sega / Vic Tokai",     "Witch (Sega License)",  MACHINE_SUPPORTS_SAVE )

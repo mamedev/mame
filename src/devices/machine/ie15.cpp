@@ -581,7 +581,7 @@ MACHINE_CONFIG_START(ie15_device::ie15core)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, ie15_device, serial_rx_callback))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END

@@ -865,7 +865,7 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sasuke_timer", snk6502_state, sasuke_update_counter, attotime::from_hz(MASTER_CLOCK / 8))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snk6502", SNK6502, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -945,7 +945,7 @@ MACHINE_CONFIG_START(snk6502_state::satansat)
 	MCFG_SAMPLES_NAMES(vanguard_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_REPLACE("sn76477.1", SN76477, 0)
+	MCFG_DEVICE_REPLACE("sn76477.1", SN76477)
 	// ???      GND: 2,26,27        +5V: 15,25
 	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
 	MCFG_SN76477_DECAY_RES(0)                            // decay_res
@@ -997,7 +997,7 @@ MACHINE_CONFIG_START(snk6502_state::vanguard)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snk6502", SNK6502, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -1054,7 +1054,7 @@ MACHINE_CONFIG_START(snk6502_state::fantasy)
 	MCFG_SAMPLES_NAMES(fantasy_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_DEVICE_REPLACE("sn76477.1", SN76477, 0)
+	MCFG_DEVICE_REPLACE("sn76477.1", SN76477)
 	// BOMB     GND:    2,9,26,27       +5V: 15,25
 	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
 	MCFG_SN76477_DECAY_RES(0)                            // decay_res
@@ -1073,8 +1073,7 @@ MACHINE_CONFIG_START(snk6502_state::fantasy)
 	MCFG_SN76477_ENABLE(0)                               // enable
 	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(fantasy)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, fantasy_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_DEVICE_REMOVE("sn76477.2")

@@ -535,9 +535,9 @@ MACHINE_CONFIG_START(astrocorp_state::showhand)
 	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000)/20, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000)/20, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -590,9 +590,9 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/24, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(24'000'000)/24, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -115,9 +115,6 @@ public:
 	/* Misc PPU */
 	DECLARE_WRITE8_MEMBER(nes_vh_sprite_dma_w);
 	DECLARE_WRITE8_MEMBER(vt_hh_sprite_dma_w);
-	void ppu_nmi(int *ppu_regs);
-	uint32_t screen_update_vt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(nesvt);
 
 	/* VT03 extension handling */
 	DECLARE_WRITE8_MEMBER(vt03_410x_w);
@@ -575,13 +572,6 @@ READ8_MEMBER(nes_vt_state::vthh_414a_r)
 }
 
 
-uint32_t nes_vt_state::screen_update_vt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// render the ppu
-	m_ppu->render(bitmap, 0, 0, 0, 0);
-	return 0;
-}
-
 READ8_MEMBER(nes_vt_state::spr_r)
 {
 	if(m_4242 & 0x1 || m_411d & 0x04) {
@@ -627,11 +617,6 @@ WRITE8_MEMBER(nes_vt_state::vtfp_4a00_w) {
 	//  dynamic_cast<m6502_vtscr&>(*m_maincpu).set_scramble(false);
 }
 
-
-PALETTE_INIT_MEMBER(nes_vt_state, nesvt)
-{
-	m_ppu->init_palette(palette, 0);
-}
 
 void nes_vt_state::scanline_irq(int scanline, int vblank, int blanked)
 {
@@ -1325,11 +1310,6 @@ READ8_MEMBER(nes_vt_state::apu_read_mem)
 	return 0x00;//mintf->program->read_byte(offset);
 }
 
-void nes_vt_state::ppu_nmi(int *ppu_regs)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 /* not strictly needed, but helps us see where things are in ROM to aid with figuring out banking schemes*/
 static const gfx_layout helper_layout =
 {
@@ -1379,18 +1359,13 @@ MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nes_vt_state, screen_update_vt)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DEVICE("ppu", ppu2c0x_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vt03_helper)
-
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(nes_vt_state, nesvt)
-	MCFG_PALETTE_INDIRECT_ENTRIES(4*16*8)
+	MCFG_GFXDECODE_ADD("gfxdecode", "ppu", vt03_helper)
 
 	MCFG_PPU_VT03_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(nes_vt_state, ppu_nmi)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_PPU_VT03_READ_BG_CB(READ8(*this, nes_vt_state,chr_r))
 	MCFG_PPU_VT03_READ_SP_CB(READ8(*this, nes_vt_state,spr_r))
 
@@ -1407,7 +1382,7 @@ MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 	//MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* this should actually be a custom *almost* doubled up APU, however requires more thought
 	   than just using 2 APUs as registers in the 2nd one affect the PCM channel mode but the

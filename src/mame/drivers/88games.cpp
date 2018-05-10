@@ -346,11 +346,11 @@ MACHINE_CONFIG_START(_88games_state::_88games)
 	MCFG_K051316_CB(_88games_state, zoom_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "mono", 0.75)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
 

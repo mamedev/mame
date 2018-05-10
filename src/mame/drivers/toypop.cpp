@@ -707,7 +707,7 @@ MACHINE_CONFIG_START(namcos16_state::liblrabl)
 	MCFG_PALETTE_INIT_OWNER(namcos16_state, toypop)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("namco", NAMCO_15XX, 24000)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -220,14 +220,15 @@ MACHINE_CONFIG_START(bigstrkb_state::bigstrkb)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-//  MCFG_YM2151_ADD("ymsnd", ym2151_config)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+//  MCFG_DEVICE_ADD("ymsnd", YM2151, ym2151_config)
 
-	MCFG_OKIM6295_ADD("oki1", 4000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_OKIM6295_ADD("oki2", 4000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END

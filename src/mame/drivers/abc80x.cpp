@@ -161,7 +161,7 @@ Notes:
 //  DISCRETE_SOUND( abc800 )
 //-------------------------------------------------
 
-static DISCRETE_SOUND_START( abc800 )
+static DISCRETE_SOUND_START( abc800_discrete )
 	DISCRETE_INPUT_LOGIC(NODE_01)
 	DISCRETE_OUTPUT(NODE_01, 5000)
 DISCRETE_SOUND_END
@@ -1161,9 +1161,8 @@ MACHINE_CONFIG_START(abc800c_state::abc800c)
 	abc800c_video(config);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
-	MCFG_DISCRETE_INTF(abc800)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, abc800_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// peripheral hardware
@@ -1237,9 +1236,8 @@ MACHINE_CONFIG_START(abc800m_state::abc800m)
 	abc800m_video(config);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
-	MCFG_DISCRETE_INTF(abc800)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, abc800_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// peripheral hardware
@@ -1315,9 +1313,8 @@ MACHINE_CONFIG_START(abc802_state::abc802)
 	abc802_video(config);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
-	MCFG_DISCRETE_INTF(abc800)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, abc800_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// peripheral hardware

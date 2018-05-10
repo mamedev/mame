@@ -599,7 +599,7 @@ MACHINE_CONFIG_START(indigo_state::indigo3k)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("scc", SCC8530, 7000000)
 

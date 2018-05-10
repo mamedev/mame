@@ -1315,13 +1315,13 @@ void vgmplay_state::machine_start()
 					m_okim6295_clock[0] &= ~0x80000000;
 					m_okim6295_pin7[0] = 1;
 				}
-				m_okim6295[0]->config_pin7(m_okim6295_pin7[0]);
+				m_okim6295[0]->config_pin7(m_okim6295_pin7[0] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW); // FIXME: no guarantee this device hasn't started yet - may be better to wait for it to start then use set_pin7
 				m_okim6295[0]->set_unscaled_clock(m_okim6295_clock[0] & ~0xc0000000);
 				if (m_okim6295_clock[0] & 0x40000000) {
 					m_okim6295_clock[0] &= ~0x40000000;
 					m_okim6295_clock[1] = m_okim6295_clock[0];
 					m_okim6295_pin7[1] = m_okim6295_pin7[0];
-					m_okim6295[1]->config_pin7(m_okim6295_pin7[1]);
+					m_okim6295[1]->config_pin7(m_okim6295_pin7[1] ? okim6295_device::PIN7_HIGH : okim6295_device::PIN7_LOW); // FIXME: no guarantee this device hasn't started yet - may be better to wait for it to start then use set_pin7
 					m_okim6295[1]->set_unscaled_clock(m_okim6295_clock[1]);
 				}
 			}
@@ -1417,7 +1417,7 @@ WRITE8_MEMBER(vgmplay_state::okim6295_pin7_w)
 	if ((data & mem_mask) != (m_okim6295_pin7[Chip] & mem_mask))
 	{
 		COMBINE_DATA(&m_okim6295_pin7[Chip]);
-		m_okim6295[Chip]->config_pin7(m_okim6295_pin7[Chip]);
+		m_okim6295[Chip]->set_pin7(m_okim6295_pin7[Chip]);
 	}
 }
 
@@ -1628,7 +1628,8 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_DEVICE_ADD("file", BITBANGER, 0)
 	MCFG_BITBANGER_READONLY(true)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ym2612", YM2612, 7670454)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
@@ -1727,12 +1728,12 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_OKIM6295_ADD("okim6295a", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("okim6295a", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, okim6295a_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_OKIM6295_ADD("okim6295b", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("okim6295b", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, okim6295b_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)

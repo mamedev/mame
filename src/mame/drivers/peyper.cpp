@@ -616,7 +616,7 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("ayvol")
+	SPEAKER(config, "ayvol").front_center();
 	MCFG_DEVICE_ADD("ay1", AY8910, 2500000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, peyper_state, p1a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, peyper_state, p1b_w))

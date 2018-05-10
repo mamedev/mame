@@ -109,7 +109,8 @@ MACHINE_CONFIG_START(yuvomz80_state::goldhexa)
 	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
 	MCFG_DEVICE_ADD("ppi3", I8255A, 0)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
@@ -123,7 +124,7 @@ MACHINE_CONFIG_START(yuvomz80_state::hexapres)
 	MCFG_DEVICE_PROGRAM_MAP(audio_mem_map)
 	MCFG_DEVICE_IO_MAP(hexapres_audio_io_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000) // type guessed
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)

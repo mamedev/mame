@@ -199,8 +199,8 @@ MACHINE_CONFIG_START(hcastle_state::hcastle)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59)
@@ -223,7 +223,7 @@ MACHINE_CONFIG_START(hcastle_state::hcastle)
 	MCFG_K007121_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

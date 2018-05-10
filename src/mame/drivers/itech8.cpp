@@ -1710,7 +1710,7 @@ MACHINE_CONFIG_START(itech8_state::itech8_core_lo)
 	MCFG_TMS34061_INTERRUPT_CB(WRITELINE(*this, itech8_state, generate_tms34061_interrupt))      /* interrupt gen callback */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, CLOCK_8MHz/4)
@@ -1743,7 +1743,7 @@ MACHINE_CONFIG_START(itech8_state::itech8_sound_ym2203)
 	MCFG_SOUND_ROUTE(2, "mono", 0.07)
 	MCFG_SOUND_ROUTE(3, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_8MHz/8, okim6295_device::PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -1778,7 +1778,7 @@ MACHINE_CONFIG_START(itech8_state::itech8_sound_ym3812)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_8MHz/8, okim6295_device::PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -1794,7 +1794,7 @@ MACHINE_CONFIG_START(itech8_state::itech8_sound_ym3812_external)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_8MHz/8, okim6295_device::PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

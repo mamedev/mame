@@ -385,7 +385,7 @@ MACHINE_CONFIG_START(tispellb_state::rev2)
 	MCFG_DEFAULT_LAYOUT(layout_spellb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

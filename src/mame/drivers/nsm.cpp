@@ -133,7 +133,8 @@ MACHINE_CONFIG_START(nsm_state::nsm)
 	MCFG_DEFAULT_LAYOUT(layout_nsm)
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ay1", AY8912, 11052000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_DEVICE_ADD("ay2", AY8912, 11052000/8)

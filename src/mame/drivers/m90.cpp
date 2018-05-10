@@ -43,7 +43,7 @@ void m90_state::machine_start()
 
 /***************************************************************************/
 
-WRITE16_MEMBER(m90_state::m90_coincounter_w)
+WRITE16_MEMBER(m90_state::coincounter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -57,7 +57,7 @@ WRITE16_MEMBER(m90_state::m90_coincounter_w)
 WRITE16_MEMBER(m90_state::quizf1_bankswitch_w)
 {
 	if (ACCESSING_BITS_0_7)
-		membank("bank1")->set_entry(data & 0xf);
+		m_mainbank->set_entry(data & 0xf);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -72,11 +72,16 @@ WRITE16_MEMBER(m90_state::unknown_w)
 void m90_state::m90_main_cpu_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).rom();
-	map(0x80000, 0x8ffff).bankr("bank1");  /* Quiz F1 only */
 	map(0xa0000, 0xa3fff).ram();
 	map(0xd0000, 0xdffff).ram().w(this, FUNC(m90_state::m90_video_w)).share("video_data");
 	map(0xe0000, 0xe03ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffff0, 0xfffff).rom();
+}
+
+void m90_state::quizf1_main_cpu_map(address_map &map)
+{
+	m90_main_cpu_map(map);
+	map(0x80000, 0x8ffff).bankr("mainbank");  /* Quiz F1 only */
 }
 
 void m90_state::dynablsb_main_cpu_map(address_map &map)
@@ -84,7 +89,7 @@ void m90_state::dynablsb_main_cpu_map(address_map &map)
 	map(0x00000, 0x3ffff).rom();
 	map(0x6000e, 0x60fff).ram().share("spriteram");
 	map(0xa0000, 0xa3fff).ram();
-	map(0xd0000, 0xdffff).ram().w(this, FUNC(m90_state::m90_video_w)).share("video_data");
+	map(0xd0000, 0xdffff).ram().w(this, FUNC(m90_state::bootleg_video_w)).share("video_data");
 	map(0xe0000, 0xe03ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffff0, 0xfffff).rom();
 }
@@ -94,7 +99,7 @@ void m90_state::bomblord_main_cpu_map(address_map &map)
 	map(0x00000, 0x7ffff).rom();
 	map(0xa0000, 0xa3fff).ram();
 	map(0xc000e, 0xc0fff).ram().share("spriteram");
-	map(0xd0000, 0xdffff).ram().w(this, FUNC(m90_state::m90_video_w)).share("video_data");
+	map(0xd0000, 0xdffff).ram().w(this, FUNC(m90_state::bootleg_video_w)).share("video_data");
 	map(0xe0000, 0xe03ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffff0, 0xfffff).rom();
 }
@@ -103,23 +108,29 @@ void m90_state::m90_main_cpu_io_map(address_map &map)
 {
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x00, 0x01).portr("P1_P2");
-	map(0x02, 0x03).w(this, FUNC(m90_state::m90_coincounter_w));
+	map(0x02, 0x03).w(this, FUNC(m90_state::coincounter_w));
 	map(0x02, 0x03).portr("SYSTEM");
 	map(0x04, 0x05).portr("DSW");
 	map(0x06, 0x07).portr("P3_P4");
-	map(0x80, 0x8f).w(this, FUNC(m90_state::m90_video_control_w));
+	map(0x80, 0x8f).writeonly().share("video_control");
+}
+
+void m90_state::quizf1_main_cpu_io_map(address_map &map)
+{
+	m90_main_cpu_io_map(map);
+	map(0x04, 0x05).w(this, FUNC(m90_state::quizf1_bankswitch_w));
 }
 
 void m90_state::dynablsb_main_cpu_io_map(address_map &map)
 {
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x00, 0x01).portr("P1_P2");
-	map(0x02, 0x03).w(this, FUNC(m90_state::m90_coincounter_w));
+	map(0x02, 0x03).w(this, FUNC(m90_state::coincounter_w));
 	map(0x02, 0x03).portr("SYSTEM");
 //  AM_RANGE(0x04, 0x05) AM_WRITE(unknown_w)      /* dynablsb: write continuously 0x6000 */
 	map(0x04, 0x05).portr("DSW");
 	map(0x06, 0x07).portr("P3_P4");
-	map(0x80, 0x8f).w(this, FUNC(m90_state::m90_video_control_w));
+	map(0x80, 0x8f).writeonly().share("video_control");
 //  AM_RANGE(0x90, 0x91) AM_WRITE(unknown_w)
 }
 
@@ -666,8 +677,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8
 };
 
@@ -677,10 +688,8 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-		16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(0,1), STEP8(16*8,1) },
+	{ STEP16(0,8) },
 	32*8
 };
 
@@ -749,7 +758,7 @@ MACHINE_CONFIG_START(m90_state::m90)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
@@ -760,7 +769,7 @@ MACHINE_CONFIG_START(m90_state::m90)
 
 	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
 	MCFG_SOUND_ROUTE(0, "speaker", 0.15)
 	MCFG_SOUND_ROUTE(1, "speaker", 0.15)
@@ -780,6 +789,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(m90_state::quizf1)
 	m90(config);
 	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(quizf1_main_cpu_map)
+	MCFG_DEVICE_IO_MAP(quizf1_main_cpu_io_map)
 	MCFG_V25_CONFIG(lethalth_decryption_table)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
@@ -1260,8 +1271,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(m90_state,quizf1)
 {
-	membank("bank1")->configure_entries(0, 16, memregion("user1")->base(), 0x10000);
-	m_maincpu->space(AS_IO).install_write_handler(0x04, 0x05, write16_delegate(FUNC(m90_state::quizf1_bankswitch_w),this));
+	m_mainbank->configure_entries(0, 16, memregion("user1")->base(), 0x10000);
 }
 
 

@@ -182,7 +182,7 @@ MACHINE_CONFIG_START(mmm_state::mmm)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, 1000000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mmm_state, ay_porta_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

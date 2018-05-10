@@ -1120,8 +1120,8 @@ MACHINE_CONFIG_START(berzerk_state::berzerk)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TTL74181_ADD("ls181_10c")
-	MCFG_TTL74181_ADD("ls181_12c")
+	MCFG_DEVICE_ADD("ls181_10c", TTL74181)
+	MCFG_DEVICE_ADD("ls181_12c", TTL74181)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1129,7 +1129,7 @@ MACHINE_CONFIG_START(berzerk_state::berzerk)
 	MCFG_SCREEN_UPDATE_DRIVER(berzerk_state, screen_update)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("speech", S14001A, S14001_CLOCK/16/8) /* placeholder - the clock is software controllable */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

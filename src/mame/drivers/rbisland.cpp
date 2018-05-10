@@ -696,9 +696,9 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	MCFG_PC090OJ_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, rbisland_state,bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
@@ -745,7 +745,7 @@ MACHINE_CONFIG_START(rbisland_state::jumping)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(24'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

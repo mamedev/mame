@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(magnum_state::magnum)
 
 	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 500) /// frequency is guessed
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.50)
 MACHINE_CONFIG_END

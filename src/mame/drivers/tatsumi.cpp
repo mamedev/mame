@@ -898,14 +898,15 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	MCFG_VIDEO_START_OVERRIDE(apache3_state, apache3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", CLOCK_1 / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 4 / 2, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 4 / 2, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
@@ -946,14 +947,15 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	MCFG_VIDEO_START_OVERRIDE(roundup5_state,roundup5)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", CLOCK_1 / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 4 / 2, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 4 / 2, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
@@ -1002,16 +1004,17 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, cyclwarr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", CLOCK_1 / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
@@ -1060,16 +1063,17 @@ MACHINE_CONFIG_START(cyclwarr_state::bigfight)
 	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, bigfight)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", CLOCK_1 / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, CLOCK_1 / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", CLOCK_1 / 8 / 2, PIN7_HIGH) /* 2MHz was too fast. Can the clock be software controlled? */
+	MCFG_DEVICE_ADD("oki", OKIM6295, CLOCK_1 / 8 / 2, okim6295_device::PIN7_HIGH) /* 2MHz was too fast. Can the clock be software controlled? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END

@@ -446,7 +446,7 @@ MACHINE_CONFIG_START(galivan_state::galivan)
 	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,galivan)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -465,7 +465,7 @@ MACHINE_CONFIG_START(galivan_state::galivan)
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,galivan)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -506,7 +506,7 @@ MACHINE_CONFIG_START(galivan_state::ninjemak)
 	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -525,7 +525,7 @@ MACHINE_CONFIG_START(galivan_state::ninjemak)
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,ninjemak)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

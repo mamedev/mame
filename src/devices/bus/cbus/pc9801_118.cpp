@@ -51,7 +51,7 @@ WRITE_LINE_MEMBER(pc9801_118_device::pc9801_sound_irq)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pc9801_118_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("opn3", YM2608, MAIN_CLOCK_X2*4) // actually YMF288, unknown clock / divider, might be X1 x 5 actually
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(*this, pc9801_118_device, pc9801_sound_irq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc9801_118_device, opn_porta_r))

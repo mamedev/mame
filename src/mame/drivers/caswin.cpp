@@ -354,7 +354,7 @@ MACHINE_CONFIG_START(caswin_state::vvillage)
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(caswin_state, caswin)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 4000000 / 4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))

@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(crospang_state::crospang)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(crospang_state::crospang)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(14'318'181)/16, PIN7_HIGH) // 1.789772MHz or 0.894886MHz?? & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/16, okim6295_device::PIN7_HIGH) // 1.789772MHz or 0.894886MHz?? & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

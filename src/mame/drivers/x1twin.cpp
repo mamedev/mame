@@ -491,12 +491,13 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "x1_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
-	MCFG_SPEAKER_ADD("x1_l",-0.2, 0.0, 1.0)
-	MCFG_SPEAKER_ADD("x1_r",0.2, 0.0, 1.0)
-	MCFG_SPEAKER_ADD("pce_l",-0.2, 0.0, 1.0)
-	MCFG_SPEAKER_ADD("pce_r",0.2, 0.0, 1.0)
+	SPEAKER(config, "x1_l").front_left();
+	SPEAKER(config, "x1_r").front_right();
+	SPEAKER(config, "pce_l").front_left();
+	SPEAKER(config, "pce_r").front_right();
 
-//  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+//  SPEAKER(config, "lspeaker").front_left();
+//  SPEAKER(config, "rspeaker").front_right();
 
 	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
 	MCFG_DEVICE_ADD("ay", AY8910, MAIN_CLOCK/8)
@@ -506,9 +507,7 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_SOUND_ROUTE(0, "x1_r", 0.25)
 	MCFG_SOUND_ROUTE(1, "x1_l",  0.5)
 	MCFG_SOUND_ROUTE(2, "x1_r", 0.5)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "x1_l", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "x1_r", 0.10)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "x1_l", 0.25).add_route(ALL_OUTPUTS, "x1_r", 0.10);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(x1_cassette_formats)

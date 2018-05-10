@@ -244,7 +244,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(rzone_state::rzindy500)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL) // no external XTAL
+	MCFG_DEVICE_ADD("maincpu", SM510) // no external XTAL
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, rzone_state, input_r))
@@ -262,7 +262,7 @@ MACHINE_CONFIG_START(rzone_state::rzindy500)
 	MCFG_DEFAULT_LAYOUT(layout_rzone)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -270,7 +270,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(rzone_state::rzbatfor)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM512, 32.768_kHz_XTAL) // no external XTAL
+	MCFG_DEVICE_ADD("maincpu", SM512) // no external XTAL
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, rzone_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, rzone_state, t2_write_s))
@@ -287,7 +287,7 @@ MACHINE_CONFIG_START(rzone_state::rzbatfor)
 	MCFG_DEFAULT_LAYOUT(layout_rzone)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

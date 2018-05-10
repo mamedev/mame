@@ -907,7 +907,7 @@ MACHINE_CONFIG_START(plus4_state::plus4)
 	MCFG_QUANTUM_PERFECT_CPU(MOS7501_TAG)
 
 	// video and sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, MOS7501_TAG, 0, ted_videoram_map, WRITELINE(*this, plus4_state, ted_irq_w), READ8(*this, plus4_state, ted_k_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

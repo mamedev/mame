@@ -230,7 +230,7 @@ MACHINE_CONFIG_START(concept_state::concept)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -261,12 +261,11 @@ MACHINE_CONFIG_START(concept_state::concept)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 
 	/* Apple II bus */
-	MCFG_DEVICE_ADD(A2BUS_TAG, A2BUS, 0)
-	MCFG_A2BUS_CPU("maincpu")
-	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl1", concept_a2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl2", concept_a2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl3", concept_a2_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD(A2BUS_TAG, "sl4", concept_a2_cards, "fdc01")
+	A2BUS(config, m_a2bus, 0).set_cputag(m_maincpu);
+	A2BUS_SLOT(config, "sl1", m_a2bus, concept_a2_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", m_a2bus, concept_a2_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", m_a2bus, concept_a2_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", m_a2bus, concept_a2_cards, "fdc01");
 
 	/* 2x RS232 ports */
 	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)

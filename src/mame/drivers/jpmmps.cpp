@@ -276,7 +276,7 @@ MACHINE_CONFIG_START(jpmmps_state::jpmmps)
 	MCFG_DEVICE_ADD("tms9902_ic10", TMS9902, DUART_CLOCK) // Communication with Reel MCU
 	MCFG_DEVICE_ADD("tms9902_ic5", TMS9902, DUART_CLOCK) // Communication with Security / Printer
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn", SN76489, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

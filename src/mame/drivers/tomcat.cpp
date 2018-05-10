@@ -372,7 +372,8 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_DEVICE_ADD("avg", AVG_TOMCAT, 0)
 	MCFG_AVGDVG_VECTOR("vector")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("pokey1", POKEY, XTAL(14'318'181) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
 
@@ -383,7 +384,7 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181) / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181) / 4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END

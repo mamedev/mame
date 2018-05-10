@@ -94,15 +94,15 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, apple3_state, ay3600_data_ready_w))
 
 	/* slot bus */
-	MCFG_DEVICE_ADD("a2bus", A2BUS, 0)
+	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
 	MCFG_A2BUS_CPU("maincpu")
 	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, apple3_state, a2bus_irq_w))
 	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, apple3_state, a2bus_nmi_w))
 	//MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, apple3_state, a2bus_inh_w))
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple3_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple3_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple3_cards, nullptr)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple3_cards, nullptr)
+	A2BUS_SLOT(config, "sl1", m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", m_a2bus, apple3_cards, nullptr);
 
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", APPLEIII_FDC, 1021800*2)
@@ -146,7 +146,7 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, apple3_state, apple3_via_1_irq_func))
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("bell", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
 	MCFG_DEVICE_ADD("dac", DAC_6BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // 6522.b5(pb0-pb5) + 320k,160k,80k,40k,20k,10k
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

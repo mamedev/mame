@@ -193,7 +193,6 @@ public:
 	DECLARE_MACHINE_START(multigm3);
 	DECLARE_MACHINE_RESET(multigm3);
 	DECLARE_MACHINE_START(supergm3);
-	uint32_t screen_update_multigam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(mmc1_resync_callback);
 	void set_videorom_bank( int start, int count, int bank, int bank_size_in_kb);
 	void set_videoram_bank( int start, int count, int bank, int bank_size_in_kb);
@@ -203,7 +202,6 @@ public:
 	void supergm3_set_bank();
 	void multigm3_decrypt(uint8_t* mem, int memsize, const uint8_t* decode_nibble);
 	void multigam3_mmc3_scanline_cb(int scanline, int vblank, int blanked);
-	void ppu_irq(int *ppu_regs);
 	void multigam(machine_config &config);
 	void supergm3(machine_config &config);
 	void multigmt(machine_config &config);
@@ -1133,30 +1131,9 @@ INPUT_PORTS_END
 
 *******************************************************/
 
-PALETTE_INIT_MEMBER(multigam_state, multigam)
-{
-	m_ppu->init_palette(palette, 0);
-}
-
-void multigam_state::ppu_irq(int *ppu_regs)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 void multigam_state::video_start()
 {
 }
-
-uint32_t multigam_state::screen_update_multigam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	/* render the ppu */
-	m_ppu->render(bitmap, 0, 0, 0, 0);
-	return 0;
-}
-
-static GFXDECODE_START( multigam )
-	/* none, the ppu generates one */
-GFXDECODE_END
 
 /******************************************************
 
@@ -1234,19 +1211,14 @@ MACHINE_CONFIG_START(multigam_state::multigam)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(multigam_state, screen_update_multigam)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DEVICE("ppu", ppu2c0x_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", multigam)
-	MCFG_PALETTE_ADD("palette", 8*4*16)
-	MCFG_PALETTE_INIT_OWNER(multigam_state, multigam)
-
-	MCFG_PPU2C04_ADD("ppu")
+	MCFG_PPU2C02_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(multigam_state, ppu_irq)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(multigam_state::multigm3)

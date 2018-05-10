@@ -670,7 +670,7 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", playch10)
-	MCFG_PALETTE_ADD("palette", 256+8*4*16)
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(playch10_state, playch10)
 	MCFG_DEFAULT_LAYOUT(layout_playch10)
 
@@ -679,7 +679,6 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_top)
-	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, playch10_state, vblank_irq))
 
 	MCFG_SCREEN_ADD("bottom", RASTER)
@@ -687,15 +686,14 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_bottom)
-	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PPU2C03B_ADD("ppu")
 	MCFG_PPU2C0X_SET_SCREEN("bottom")
 	MCFG_PPU2C0X_CPU("cart")
-	MCFG_PPU2C0X_COLORBASE(256)
-	MCFG_PPU2C0X_SET_NMI(playch10_state, ppu_irq)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("cart", INPUT_LINE_NMI))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, playch10_state, int_detect_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_RP5H01_ADD("rp5h01")
 MACHINE_CONFIG_END
@@ -754,7 +752,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "pch1-c-6f.82s129an.6f",    0x0000, 0x0100, CRC(e5414ca3) SHA1(d2878411cda84ffe0afb2e538a67457f51bebffb) )    \
 	ROM_LOAD( "pch1-c-6e.82s129an.6e",    0x0100, 0x0100, CRC(a2625c6e) SHA1(a448b47c9289902e26a3d3c4c7d5a7968c385e81) )    \
 	ROM_LOAD( "pch1-c-6d.82s129an.6d",    0x0200, 0x0100, CRC(1213ebd4) SHA1(0ad386fc3eab5e53c0288ad1de33639a9e461b7c) )    \
-	ROM_REGION( 0xc0, "palette", 0 )                        \
+	ROM_REGION( 0xc0, "ppu:palette", 0 )                    \
 	ROM_LOAD( "rp2c0x.pal", 0x00, 0xc0, CRC(48de65dc) SHA1(d10acafc8da9ff479c270ec01180cca61efe62f5) )
 
 
