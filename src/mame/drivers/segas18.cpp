@@ -567,7 +567,7 @@ WRITE8_MEMBER( segas18_state::lghost_gun_recoil_w )
 {
 	for (int i = 0; i < 3; i++)
 	{
-		m_gun_recoil[i] = (~data & (1<<i))>>i;
+		m_gun_recoil[i] = BIT(~data, i);
 	}
 }
 
@@ -643,7 +643,7 @@ void segas18_state::decrypted_opcodes_map(address_map &map)
 void segas18_state::sound_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x9fff).rom();
+	map(0x0000, 0x9fff).rom().region("soundcpu", 0);
 	map(0xa000, 0xbfff).bankr("soundbank");
 	map(0xc000, 0xc00f).mirror(0x0ff0).w("rfsnd", FUNC(rf5c68_device::rf5c68_w));
 	map(0xd000, 0xdfff).rw("rfsnd", FUNC(rf5c68_device::rf5c68_mem_r), FUNC(rf5c68_device::rf5c68_mem_w));
