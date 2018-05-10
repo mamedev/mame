@@ -376,7 +376,8 @@ MACHINE_CONFIG_START(simpsons_state::simpsons)
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)    /* only left channel is connected */

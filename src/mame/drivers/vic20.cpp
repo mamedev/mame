@@ -865,7 +865,7 @@ MACHINE_CONFIG_START(vic20_state::ntsc)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	// video/sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_MOS6560_ADD(M6560_TAG, SCREEN_TAG, MOS6560_CLOCK, vic_videoram_map, vic_colorram_map)
 	MCFG_MOS6560_POTX_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_x_r))
 	MCFG_MOS6560_POTY_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))
@@ -913,7 +913,7 @@ MACHINE_CONFIG_START(vic20_state::pal)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	// video/sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_MOS6561_ADD(M6560_TAG, SCREEN_TAG, MOS6561_CLOCK, vic_videoram_map, vic_colorram_map)
 	MCFG_MOS6560_POTX_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_x_r))
 	MCFG_MOS6560_POTY_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))

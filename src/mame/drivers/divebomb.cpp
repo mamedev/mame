@@ -454,7 +454,7 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	MCFG_PALETTE_INIT_OWNER(divebomb_state, divebomb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// All frequencies unverified
 	MCFG_DEVICE_ADD("sn0", SN76489, XTAL1/8)

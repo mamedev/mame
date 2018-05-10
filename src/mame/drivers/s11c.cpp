@@ -216,7 +216,7 @@ MACHINE_CONFIG_START(s11c_state::s11c)
 	// generic sound board is not used in System 11C, except for Star Trax
 
 	/* Add the background music card */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("bgm", S11C_BG)
 	MCFG_S11C_BG_ROM_REGION(":bgcpu")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

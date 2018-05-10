@@ -97,7 +97,7 @@ MACHINE_CONFIG_START(igs_fear_state::igs_fear)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs_fear)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_ICS2115_ADD("ics", 0)
 	MCFG_ICS2115_IRQ_CB(WRITELINE(*this, igs_fear_state, sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)

@@ -60,7 +60,8 @@ MACHINE_CONFIG_START(jpmsys7_state::jpmsys7)
 	MCFG_DEVICE_PROGRAM_MAP(jpmsys7_map)
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound (probably DMA driven DAC) */
 MACHINE_CONFIG_END
 

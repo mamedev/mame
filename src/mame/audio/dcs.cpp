@@ -2480,7 +2480,7 @@ MACHINE_CONFIG_START(dcs_audio_device::add_mconfig_dcs )
 	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
 	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("dac", DMADAC) // AD-1851 16bit mono
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2585,7 +2585,8 @@ MACHINE_CONFIG_START(dcs2_audio_device::add_mconfig_dcs2 )
 	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
 	MCFG_TIMER_DEVICE_ADD("dcs_hle_timer", DEVICE_SELF, dcs_audio_device, transfer_watchdog_callback)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -2665,7 +2666,8 @@ MACHINE_CONFIG_START(dcs2_audio_dsio_device::device_add_mconfig)
 	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
 	MCFG_TIMER_DEVICE_ADD("dcs_sport0_timer", DEVICE_SELF, dcs_audio_device, sport0_irq) // roadburn needs this to pass harware test
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -2706,7 +2708,8 @@ MACHINE_CONFIG_START(dcs2_audio_denver_device::device_add_mconfig)
 	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
 	MCFG_TIMER_DEVICE_ADD("dcs_sport0_timer", DEVICE_SELF, dcs_audio_device, sport0_irq) // Atlantis driver waits for sport0 rx interrupts
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)

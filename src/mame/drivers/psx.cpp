@@ -536,7 +536,8 @@ MACHINE_CONFIG_START(psx1_state::psj)
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
@@ -587,7 +588,8 @@ MACHINE_CONFIG_START(psx1_state::pse)
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )

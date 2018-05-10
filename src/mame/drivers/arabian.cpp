@@ -392,7 +392,7 @@ MACHINE_CONFIG_START(arabian_state::arabian)
 	MCFG_PALETTE_INIT_OWNER(arabian_state, arabian)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_OSC/4/2)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, arabian_state, ay8910_porta_w))

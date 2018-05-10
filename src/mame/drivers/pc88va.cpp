@@ -1867,7 +1867,7 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 	MCFG_PIT8253_CLK1(8000000) /* BEEP frequency setting */
 	MCFG_PIT8253_CLK2(8000000) /* RS232C baud rate setting */
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ym", YM2203, 3993600) //unknown clock / divider
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)

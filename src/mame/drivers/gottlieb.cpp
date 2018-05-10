@@ -673,7 +673,7 @@ static const char *const qbert_knocker_names[] =
 };
 
 MACHINE_CONFIG_START(gottlieb_state::qbert_knocker)
-	MCFG_SPEAKER_ADD("knocker", 0.0, 0.0, 1.0)
+	SPEAKER(config, "knocker", 0.0, 0.0, 1.0);
 
 	MCFG_DEVICE_ADD("knocker_sam", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
@@ -1787,7 +1787,7 @@ MACHINE_CONFIG_START(gottlieb_state::gottlieb_core)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	// basic speaker configuration
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
 

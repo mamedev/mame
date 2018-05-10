@@ -836,7 +836,7 @@ MACHINE_CONFIG_START(vega_state::vega)
 
 	/* sound hardware */
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay8910", AY8910, 1500000 )
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, vega_state, ay8910_pa_r))

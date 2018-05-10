@@ -519,7 +519,7 @@ MACHINE_CONFIG_START(lastduel_state::lastduel)
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,lastduel)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -564,7 +564,7 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,madgear)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

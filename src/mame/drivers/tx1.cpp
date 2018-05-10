@@ -664,9 +664,10 @@ MACHINE_CONFIG_START(tx1_state::tx1)
 
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,tx1)
 
-	MCFG_SPEAKER_STANDARD_STEREO("frontleft", "frontright")
-//  MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright") /* Atari TX-1 TM262 manual shows 4 speakers (TX-1 Audio PCB Assembly A042016-01 A) */
-
+	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
+	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
+//  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5); /* Atari TX-1 TM262 manual shows 4 speakers (TX-1 Audio PCB Assembly A042016-01 A) */
+//  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, TX1_PIXEL_CLOCK / 8)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("tx1", tx1_sound_device, ay8910_a_w))
@@ -726,8 +727,10 @@ MACHINE_CONFIG_START(tx1_state::buggyboy)
 	MCFG_PALETTE_INIT_OWNER(tx1_state,buggyboy)
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggyboy)
 
-	MCFG_SPEAKER_STANDARD_STEREO("frontleft", "frontright")
-//  MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
+	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
+	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
+//  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5); /* Atari TX-1 TM262 manual shows 4 speakers (TX-1 Audio PCB Assembly A042016-01 A) */
+//  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
 
 	MCFG_DEVICE_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("buggyboy", buggyboy_sound_device, ym1_a_w))
@@ -772,8 +775,10 @@ MACHINE_CONFIG_START(tx1_state::buggybjr)
 	MCFG_PALETTE_INIT_OWNER(tx1_state,buggyboy)
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggybjr)
 
-	MCFG_SPEAKER_STANDARD_STEREO("frontleft", "frontright")
-//  MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
+	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
+	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
+//  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5);
+//  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
 
 	MCFG_DEVICE_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC19 */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM2149_IC19_A"))

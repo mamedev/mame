@@ -272,13 +272,12 @@ void argus_state::sound_map_b(address_map &map)
 	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
 }
 
-#if 0
 void argus_state::sound_portmap_1(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x80, 0x81).noprw(); // second ym2203 is not implemented on argus but still writes here
 }
-#endif
 
 void argus_state::sound_portmap_2(address_map &map)
 {
@@ -443,97 +442,43 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8x8 characters */
-	1024,   /* 1024 characters */
+	RGN_FRAC(1,1),   /* number of characters */
 	4,      /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
 	32*8
 };
 
-static const gfx_layout tilelayout_256 =
+static const gfx_layout tilelayout =
 {
 	16,16,  /* 16x16 characters */
-	256,    /* 256 characters */
+	RGN_FRAC(1,1),    /* number of characters */
 	4,      /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28,
-		64*8, 64*8+4, 64*8+8, 64*8+12, 64*8+16, 64*8+20, 64*8+24, 64*8+28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8,
-		32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8 },
-	128*8
-};
-
-static const gfx_layout tilelayout_512 =
-{
-	16,16,  /* 16x16 characters */
-	512,    /* 512 characters */
-	4,      /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28,
-		64*8, 64*8+4, 64*8+8, 64*8+12, 64*8+16, 64*8+20, 64*8+24, 64*8+28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8,
-		32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8 },
-	128*8
-};
-
-static const gfx_layout tilelayout_1024 =
-{
-	16,16,  /* 16x16 characters */
-	1024,   /* 1024 characters */
-	4,      /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28,
-		64*8, 64*8+4, 64*8+8, 64*8+12, 64*8+16, 64*8+20, 64*8+24, 64*8+28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8,
-		32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8 },
-	128*8
-};
-
-static const gfx_layout tilelayout_2048 =
-{
-	16,16,  /* 16x16 characters */
-	2048,   /* 2048 characters */
-	4,      /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28,
-		64*8, 64*8+4, 64*8+8, 64*8+12, 64*8+16, 64*8+20, 64*8+24, 64*8+28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8,
-		32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8 },
-	128*8
-};
-
-static const gfx_layout tilelayout_4096 =
-{
-	16,16,  /* 16x16 characters */
-	4096,   /* 4096 characters */
-	4,      /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28,
-		64*8, 64*8+4, 64*8+8, 64*8+12, 64*8+16, 64*8+20, 64*8+24, 64*8+28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8,
-		32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8 },
+	{ STEP4(0,1) },
+	{ STEP8(0,4), STEP8(4*8*16, 4) },
+	{ STEP16(0,4*8) },
 	128*8
 };
 
 static GFXDECODE_START( argus )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout_1024, 0*16,   8 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_1024, 8*16,  16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_256,  24*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, charlayout,      40*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0*16,  8 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  8*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 24*16, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, charlayout, 40*16, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( valtric )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout_1024, 0*16,  16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_2048, 16*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout,      32*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0*16, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 16*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, charlayout, 32*16, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( butasan )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout_4096, 0*16,  16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_1024, 16*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_512,  12*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, charlayout,      32*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0*16, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 16*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 12*16, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, charlayout, 32*16, 16 )
 GFXDECODE_END
 
 
@@ -546,7 +491,7 @@ MACHINE_CONFIG_START(argus_state::argus)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 5000000)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map_a)
-	MCFG_DEVICE_IO_MAP(sound_portmap_2)
+	MCFG_DEVICE_IO_MAP(sound_portmap_1)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -567,18 +512,12 @@ MACHINE_CONFIG_START(argus_state::argus)
 	MCFG_VIDEO_RESET_OVERRIDE(argus_state,argus)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 6000000 / 4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("ym2", YM2203, 6000000 / 4)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -615,7 +554,7 @@ MACHINE_CONFIG_START(argus_state::valtric)
 	MCFG_VIDEO_RESET_OVERRIDE(argus_state,valtric)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -663,7 +602,7 @@ MACHINE_CONFIG_START(argus_state::butasan)
 	MCFG_VIDEO_RESET_OVERRIDE(argus_state,butasan)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -716,10 +655,10 @@ ROM_START( argus )
 	ROM_REGION( 0x08000, "gfx4", 0 )    /* Text */
 	ROM_LOAD( "ag_10.bin",    0x00000, 0x04000, CRC(2de696c4) SHA1(1ad0f1cde127a1618c2ea74a53e522963a79e5ce) )
 
-	ROM_REGION( 0x08000, "user1", 0 )                   /* Map */
+	ROM_REGION( 0x08000, "vrom1", 0 )                   /* Map */
 	ROM_LOAD( "ag_15.bin",    0x00000, 0x08000, CRC(99834c1b) SHA1(330f271771b158493b28bb178c8cda98efd1d90c) )
 
-	ROM_REGION( 0x08000, "user2", 0 )                   /* Pattern */
+	ROM_REGION( 0x08000, "vrom2", 0 )                   /* Pattern */
 	ROM_LOAD( "ag_16.bin",    0x00000, 0x08000, CRC(39a51714) SHA1(ad89a630f1352eb4d8beeeebf909d5e2b5d7cc12) )
 ROM_END
 

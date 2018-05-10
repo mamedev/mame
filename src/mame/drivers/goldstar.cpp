@@ -8121,7 +8121,7 @@ MACHINE_CONFIG_START(goldstar_state::goldstar)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
@@ -8158,7 +8158,7 @@ MACHINE_CONFIG_START(goldstar_state::goldstbl)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
@@ -8206,7 +8206,7 @@ MACHINE_CONFIG_START(sanghopm_state::star100)
 	MCFG_VIDEO_START_OVERRIDE(sanghopm_state, sangho)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW5"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW6"))
@@ -8245,7 +8245,7 @@ MACHINE_CONFIG_START(goldstar_state::super9)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
@@ -8354,7 +8354,7 @@ MACHINE_CONFIG_START(cb3_state::ncb3)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -8428,7 +8428,7 @@ MACHINE_CONFIG_START(goldstar_state::wcherry)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -8475,7 +8475,7 @@ MACHINE_CONFIG_START(cmaster_state::cm)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
@@ -8523,7 +8523,7 @@ MACHINE_CONFIG_START(goldstar_state::cmast91)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
@@ -8580,7 +8580,7 @@ MACHINE_CONFIG_START(wingco_state::lucky8)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -8634,7 +8634,7 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	MCFG_VIDEO_START_OVERRIDE(wingco_state, bingowng)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -8761,7 +8761,7 @@ MACHINE_CONFIG_START(wingco_state::magodds)
 	MCFG_VIDEO_START_OVERRIDE(wingco_state, magical)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.00)  // shut up annoying whine
@@ -8811,7 +8811,7 @@ MACHINE_CONFIG_START(goldstar_state::kkotnoli)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -8852,7 +8852,7 @@ MACHINE_CONFIG_START(goldstar_state::ladylinr)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -8903,7 +8903,7 @@ MACHINE_CONFIG_START(wingco_state::wcat3)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -8954,7 +8954,7 @@ MACHINE_CONFIG_START(cmaster_state::amcoe1)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
@@ -9011,7 +9011,7 @@ MACHINE_CONFIG_START(cmaster_state::amcoe2)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
@@ -9061,7 +9061,7 @@ MACHINE_CONFIG_START(unkch_state::unkch)
 	MCFG_VIDEO_START_OVERRIDE(unkch_state, unkch)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
@@ -9099,7 +9099,7 @@ MACHINE_CONFIG_START(goldstar_state::pkrmast)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
@@ -9136,7 +9136,7 @@ MACHINE_CONFIG_START(unkch_state::megaline)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -9183,7 +9183,7 @@ MACHINE_CONFIG_START(unkch_state::bonusch)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

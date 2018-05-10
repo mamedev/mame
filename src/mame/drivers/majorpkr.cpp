@@ -1034,7 +1034,7 @@ MACHINE_CONFIG_START(majorpkr_state::majorpkr)
 	MCFG_MC6845_CHAR_WIDTH(16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH)  // clock frequency & pin 7 verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

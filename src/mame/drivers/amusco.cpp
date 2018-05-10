@@ -592,7 +592,7 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_MC6845_UPDATE_ROW_CB(amusco_state, update_row)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("sn", SN76489A, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END

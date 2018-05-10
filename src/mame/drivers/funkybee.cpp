@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(funkybee_state::funkybee)
 	MCFG_PALETTE_INIT_OWNER(funkybee_state, funkybee)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8912, 1500000) // AY-3-8912 verified for Sky Lancer
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))

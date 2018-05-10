@@ -558,7 +558,7 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	MCFG_VIDEO_START_OVERRIDE(champbas_state,champbas)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -605,7 +605,7 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	MCFG_VIDEO_START_OVERRIDE(champbas_state,champbas)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -716,7 +716,7 @@ MACHINE_CONFIG_START(champbas_state::exctsccr)
 	MCFG_VIDEO_START_OVERRIDE(champbas_state,exctsccr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -782,7 +782,7 @@ MACHINE_CONFIG_START(champbas_state::exctsccrb)
 	MCFG_VIDEO_START_OVERRIDE(champbas_state,exctsccr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(tankbust_state::tankbust)
 	MCFG_PALETTE_INIT_OWNER(tankbust_state, tankbust)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(14'318'181)/16)  /* Verified on PCB */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, tankbust_state, soundlatch_r))

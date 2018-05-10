@@ -721,7 +721,7 @@ MACHINE_CONFIG_START(sb2m600_state::osi600)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osi)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
 	MCFG_DISCRETE_INTF(osi600_discrete_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -777,7 +777,7 @@ MACHINE_CONFIG_START(c1p_state::c1p)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osi)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
 	MCFG_DISCRETE_INTF(osi600c_discrete_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

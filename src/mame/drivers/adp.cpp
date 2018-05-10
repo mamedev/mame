@@ -583,7 +583,7 @@ MACHINE_CONFIG_START(adp_state::quickjac)
 
 	MCFG_HD63484_ADD("acrtc", 0, adp_hd63484_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, 3686400/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("PA"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)

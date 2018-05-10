@@ -1391,7 +1391,7 @@ MACHINE_CONFIG_START(napple2_state::apple2_common)
 	MCFG_PALETTE_INIT_OWNER(napple2_state, apple2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

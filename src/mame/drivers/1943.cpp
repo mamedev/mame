@@ -339,7 +339,7 @@ MACHINE_CONFIG_START(_1943_state::_1943)
 	MCFG_PALETTE_INIT_OWNER(_1943_state, 1943)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

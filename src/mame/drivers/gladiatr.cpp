@@ -984,7 +984,7 @@ MACHINE_CONFIG_START(ppking_state::ppking)
 	MCFG_VIDEO_START_OVERRIDE(ppking_state, ppking)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -1076,7 +1076,7 @@ MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 	MCFG_VIDEO_START_OVERRIDE(gladiatr_state,gladiatr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

@@ -340,7 +340,7 @@ MACHINE_CONFIG_START(sub_state::sub)
 	MCFG_PALETTE_INIT_OWNER(sub_state, sub)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))

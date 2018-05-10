@@ -306,7 +306,7 @@ MACHINE_CONFIG_START(tankbatt_state::tankbatt)
 	MCFG_PALETTE_INIT_OWNER(tankbatt_state, tankbatt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(3)

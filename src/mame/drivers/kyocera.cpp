@@ -1358,7 +1358,7 @@ MACHINE_CONFIG_START(kc85_state::kc85)
 	kc85_video(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -1408,7 +1408,7 @@ MACHINE_CONFIG_START(pc8201_state::pc8201)
 	kc85_video(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -1469,7 +1469,7 @@ MACHINE_CONFIG_START(trsm100_state::trsm100)
 	kc85_video(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -1528,7 +1528,7 @@ MACHINE_CONFIG_START(tandy200_state::tandy200)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp", tandy200_state, tandy200_tp_tick, attotime::from_hz(XTAL(4'915'200)/2/8192))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 //  MCFG_TCM5089_ADD(TCM5089_TAG, XTAL(3'579'545))

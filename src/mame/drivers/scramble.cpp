@@ -1353,7 +1353,7 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,scrambold)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

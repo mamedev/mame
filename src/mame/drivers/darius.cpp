@@ -764,7 +764,8 @@ MACHINE_CONFIG_START(darius_state::darius)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(8'000'000)/2) /* 4 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) /* assumes Z80 sandwiched between 68Ks */
@@ -797,44 +798,26 @@ MACHINE_CONFIG_START(darius_state::darius)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.l", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.r", 1.0)
 
-	MCFG_FILTER_VOLUME_ADD("filter0.0l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter0.0r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter0.1l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter0.1r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter0.2l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter0.2r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter0.3l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter0.3r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "filter0.0l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter0.0r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter0.1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter0.1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter0.2l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter0.2r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter0.3l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter0.3r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_FILTER_VOLUME_ADD("filter1.0l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1.0r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1.1l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1.1r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1.2l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1.2r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1.3l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("filter1.3r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "filter1.0l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1.0r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1.1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1.1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1.2l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1.2r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1.3l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1.3r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_FILTER_VOLUME_ADD("msm5205.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("msm5205.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "msm5205.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "msm5205.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
 	MCFG_PC060HA_MASTER_CPU("maincpu")

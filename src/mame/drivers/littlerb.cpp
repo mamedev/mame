@@ -293,7 +293,8 @@ MACHINE_CONFIG_START(littlerb_state::littlerb)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("step_timer", littlerb_state, littlerb_sound_step_cb,  attotime::from_hz(7500/150))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sound_timer", littlerb_state, littlerb_sound_cb,  attotime::from_hz(7500))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC

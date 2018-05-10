@@ -376,7 +376,7 @@ MACHINE_CONFIG_START(homerun_state::dynashot)
 	MCFG_PALETTE_ADD("palette", 16*4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(20'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))

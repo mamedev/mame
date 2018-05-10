@@ -921,7 +921,8 @@ MACHINE_CONFIG_START(magictg_state::magictg)
 	MCFG_DEVICE_DATA_MAP(adsp_data_map)
 	MCFG_DEVICE_IO_MAP(adsp_io_map)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)

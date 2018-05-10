@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(bankp_state::bankp)
 	MCFG_PALETTE_INIT_OWNER(bankp_state, bankp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489, MASTER_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

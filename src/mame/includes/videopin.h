@@ -86,6 +86,6 @@ private:
 };
 
 /*----------- defined in audio/videopin.c -----------*/
-DISCRETE_SOUND_EXTERN( videopin );
+DISCRETE_SOUND_EXTERN( videopin_discrete );
 
 #endif // MAME_INCLUDES_VIDEOPIN_H

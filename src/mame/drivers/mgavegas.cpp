@@ -602,7 +602,7 @@ MACHINE_CONFIG_START(mgavegas_state::mgavegas)
 
 	/* sound hardware */
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, mgavegas_state, ay8910_a_r))

@@ -559,7 +559,7 @@ MACHINE_CONFIG_START(h19_state::h19)
 	MCFG_MM5740_DATA_READY_CB(WRITELINE(*this, h19_state, mm5740_data_ready_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, H19_BEEP_FRQ)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END

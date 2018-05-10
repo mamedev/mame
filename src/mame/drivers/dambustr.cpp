@@ -286,7 +286,7 @@ MACHINE_CONFIG_START(dambustr_state::dambustr)
 	MCFG_VIDEO_START_OVERRIDE(dambustr_state,dambustr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	galaxian_audio(config);
 MACHINE_CONFIG_END

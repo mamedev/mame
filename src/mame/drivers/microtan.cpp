@@ -231,9 +231,8 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SPEAKER(config, "speaker").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 	MCFG_DEVICE_ADD("ay8910.1", AY8910, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("ay8910.2", AY8910, 1000000)

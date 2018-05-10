@@ -1565,7 +1565,7 @@ MACHINE_CONFIG_START(tnzs_base_state::tnzs_base)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tnzs_mcu_state::tnzs)

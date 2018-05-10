@@ -447,7 +447,7 @@ MACHINE_CONFIG_START(changela_state::changela)
 	MCFG_PALETTE_ADD("palette", 0x40)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))

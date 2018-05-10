@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(uzebox_state::uzebox)
 	MCFG_SCREEN_UPDATE_DRIVER(uzebox_state, screen_update_uzebox)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(0, "mono", 1.00)
 

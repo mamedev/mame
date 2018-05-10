@@ -297,7 +297,7 @@ MACHINE_CONFIG_START(osborne1_state::osborne1)
 	MCFG_GFXDECODE_ADD(m_gfxdecode, "palette", osborne1)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(m_speaker, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

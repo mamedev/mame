@@ -4187,7 +4187,7 @@ static const discrete_dac_r1_ladder dac_goldnpkr_ladder =
 //  0,                                  /* resistor tied to ground */
 };
 
-static DISCRETE_SOUND_START( goldnpkr )
+static DISCRETE_SOUND_START( goldnpkr_discrete )
 /*
     - bits -
     76543210
@@ -4250,7 +4250,7 @@ static const discrete_dac_r1_ladder dac_pottnpkr_ladder =
 	0                                   /* no filtering cap tied to ground */
 };
 
-static DISCRETE_SOUND_START( pottnpkr )
+static DISCRETE_SOUND_START( pottnpkr_discrete )
 /*
     - bits -
     76543210
@@ -4333,9 +4333,8 @@ MACHINE_CONFIG_START(goldnpkr_state::goldnpkr)
 	goldnpkr_base(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(goldnpkr)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4352,9 +4351,8 @@ MACHINE_CONFIG_START(goldnpkr_state::pottnpkr)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, mux_port_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(pottnpkr)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, pottnpkr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4375,9 +4373,8 @@ MACHINE_CONFIG_START(goldnpkr_state::witchcrd)
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state,witchcrd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(goldnpkr)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4400,7 +4397,7 @@ MACHINE_CONFIG_START(goldnpkr_state::wcfalcon)
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state,witchcrd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/4)    /* guess, seems ok */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -4424,9 +4421,8 @@ MACHINE_CONFIG_START(goldnpkr_state::wildcard)
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(goldnpkr)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4449,9 +4445,8 @@ MACHINE_CONFIG_START(goldnpkr_state::wcrdxtnd)
 	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, wcrdxtnd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(goldnpkr)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4480,7 +4475,7 @@ MACHINE_CONFIG_START(goldnpkr_state::wildcrdb)
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/4)    /* guess, seems ok */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -4502,9 +4497,8 @@ MACHINE_CONFIG_START(goldnpkr_state::genie)
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(goldnpkr)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4525,9 +4519,8 @@ MACHINE_CONFIG_START(goldnpkr_state::geniea)
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(goldnpkr)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4543,9 +4536,8 @@ MACHINE_CONFIG_START(goldnpkr_state::mondial)
 	MCFG_MACHINE_RESET_OVERRIDE(goldnpkr_state, mondial)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(goldnpkr)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4569,9 +4561,8 @@ MACHINE_CONFIG_START(goldnpkr_state::bchancep)
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, goldnpkr_state, pia1_b_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(pottnpkr)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, pottnpkr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4745,9 +4736,8 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(goldnpkr)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, goldnpkr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -548,7 +548,8 @@ MACHINE_CONFIG_START(gstriker_state::gstriker)
 	MCFG_VSYSTEM_SPR_SET_TRANSPEN(0)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))

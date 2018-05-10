@@ -463,7 +463,7 @@ MACHINE_CONFIG_START(skykid_state::skykid)
 	MCFG_PALETTE_INIT_OWNER(skykid_state, skykid)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, 49152000/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)

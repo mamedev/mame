@@ -820,7 +820,8 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 	MCFG_PC090OJ_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK)  /* 4 MHz */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -897,7 +898,8 @@ MACHINE_CONFIG_START(opwolf_state::opwolfb) /* OSC clocks unknown for the bootle
 	MCFG_PC090OJ_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

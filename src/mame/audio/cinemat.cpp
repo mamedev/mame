@@ -159,7 +159,7 @@ MACHINE_CONFIG_START(cinemat_state::spacewar_sound)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, spacewar_sound3_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, spacewar_sound4_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(8)
@@ -211,7 +211,7 @@ MACHINE_CONFIG_START(cinemat_state::barrier_sound)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_state, barrier_sound1_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, cinemat_state, barrier_sound2_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(3)
@@ -268,7 +268,7 @@ MACHINE_CONFIG_START(cinemat_state::speedfrk_sound)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, speedfrk_sound3_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, speedfrk_sound4_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
@@ -353,7 +353,7 @@ MACHINE_CONFIG_START(cinemat_state::starhawk_sound)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, starhawk_sound4_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, cinemat_state, starhawk_sound7_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(5)
@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(cinemat_state::sundance_sound)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, sundance_sound4_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, cinemat_state, sundance_sound7_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
@@ -510,7 +510,7 @@ MACHINE_CONFIG_START(cinemat_state::tailg_sound)
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, tailg_sound_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
@@ -584,7 +584,7 @@ MACHINE_CONFIG_START(cinemat_state::warrior_sound)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, warrior_sound3_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, warrior_sound4_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(5)
@@ -684,7 +684,7 @@ MACHINE_CONFIG_START(cinemat_state::armora_sound)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, armora_sound3_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, armora_sound4_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(7)
@@ -781,7 +781,7 @@ MACHINE_CONFIG_START(cinemat_state::ripoff_sound)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, ripoff_sound4_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, cinemat_state, ripoff_sound7_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
@@ -898,7 +898,7 @@ MACHINE_CONFIG_START(cinemat_state::starcas_sound)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, starcas_sound3_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, starcas_sound4_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(8)
@@ -1030,7 +1030,7 @@ MACHINE_CONFIG_START(cinemat_state::solarq_sound)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, cinemat_state, solarq_sound1_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, solarq_sound4_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(8)
@@ -1170,7 +1170,7 @@ MACHINE_CONFIG_START(cinemat_state::boxingb_sound)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, boxingb_sound3_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, boxingb_sound4_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(12)
@@ -1287,7 +1287,7 @@ MACHINE_CONFIG_START(cinemat_state::wotw_sound)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, cinemat_state, wotw_sound3_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, wotw_sound4_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(8)
@@ -1414,7 +1414,7 @@ MACHINE_CONFIG_START(cinemat_state::demon_sound)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, cinemat_state, demon_sound4_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 3579545)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, cinemat_state, sound_porta_r))

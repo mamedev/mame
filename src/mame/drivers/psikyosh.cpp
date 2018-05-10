@@ -805,7 +805,7 @@ MACHINE_CONFIG_START(psikyosh_state::psikyo3v1)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymf", YMF278B, MASTER_CLOCK/2)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 12))

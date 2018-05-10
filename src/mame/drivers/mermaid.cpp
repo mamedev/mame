@@ -456,7 +456,7 @@ MACHINE_CONFIG_START(mermaid_state::mermaid)
 	MCFG_PALETTE_INIT_OWNER(mermaid_state, mermaid)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

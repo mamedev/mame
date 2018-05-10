@@ -1980,7 +1980,7 @@ MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SAA1099_ADD("saa", XTAL(8'000'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

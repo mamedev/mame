@@ -109,5 +109,5 @@ public:
 };
 
 /*----------- defined in audio/atarifb.c -----------*/
-DISCRETE_SOUND_EXTERN( atarifb );
-DISCRETE_SOUND_EXTERN( abaseb );
+DISCRETE_SOUND_EXTERN( atarifb_discrete );
+DISCRETE_SOUND_EXTERN( abaseb_discrete );

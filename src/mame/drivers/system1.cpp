@@ -583,6 +583,11 @@ WRITE8_MEMBER(system1_state::mcu_control_w)
 	    Bit 1 -> n/c
 	    Bit 0 -> Directly connected to Z80 /INT line
 	*/
+
+	/* boost interleave to ensure that the MCU can break the Z80 out of a HALT */
+	if (!BIT(m_mcu_control, 6) && BIT(data, 6))
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+
 	m_mcu_control = data;
 	m_maincpu->set_input_line(INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
@@ -627,17 +632,6 @@ READ8_MEMBER(system1_state::mcu_io_r)
 						m_mcu->pc(), m_mcu_control, offset);
 			return 0xff;
 	}
-}
-
-
-INTERRUPT_GEN_MEMBER(system1_state::mcu_irq_assert)
-{
-	/* toggle the INT0 line on the MCU */
-	device.execute().set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
-	device.execute().set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
-
-	/* boost interleave to ensure that the MCU can break the Z80 out of a HALT */
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
 
@@ -2192,7 +2186,7 @@ MACHINE_CONFIG_START(system1_state::sys1ppi)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -2455,7 +2449,11 @@ MACHINE_CONFIG_START(system1_state::mcu)
 	MCFG_DEVICE_ADD("mcu", I8751, SOUND_CLOCK)
 	MCFG_DEVICE_IO_MAP(mcu_io_map)
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, system1_state, mcu_control_w))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", system1_state, mcu_irq_assert)
+
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", MCS51_INT0_LINE))
+	// This interrupt is driven by pin 15 of a PAL16R4 (315-5138 on Choplifter), based on the vertical count.
+	// The actual duty cycle likely differs from VBLANK, which is another output from the same PAL.
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_t0", system1_state, mcu_t0_callback, attotime::from_usec(2500))
 MACHINE_CONFIG_END

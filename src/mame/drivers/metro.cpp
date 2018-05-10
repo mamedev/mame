@@ -3160,7 +3160,7 @@ MACHINE_CONFIG_START(metro_state::msgogo)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq)) // timing is off, shaking sprites in intro
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymf278_map)
@@ -3254,7 +3254,7 @@ MACHINE_CONFIG_START(metro_state::daitorid)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3294,7 +3294,7 @@ MACHINE_CONFIG_START(metro_state::dharma)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3321,7 +3321,7 @@ MACHINE_CONFIG_START(metro_state::karatour)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, karatour_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3349,7 +3349,7 @@ MACHINE_CONFIG_START(metro_state::sankokushi)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, karatour_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3377,7 +3377,7 @@ MACHINE_CONFIG_START(metro_state::lastfort)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3403,7 +3403,7 @@ MACHINE_CONFIG_START(metro_state::lastforg)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, karatour_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3428,7 +3428,7 @@ MACHINE_CONFIG_START(metro_state::dokyusei)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -3455,7 +3455,7 @@ MACHINE_CONFIG_START(metro_state::dokyusp)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -3483,7 +3483,7 @@ MACHINE_CONFIG_START(metro_state::gakusai)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -3512,7 +3512,7 @@ MACHINE_CONFIG_START(metro_state::gakusai2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -3538,7 +3538,7 @@ MACHINE_CONFIG_START(metro_state::pangpoms)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3566,7 +3566,7 @@ MACHINE_CONFIG_START(metro_state::poitto)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3594,7 +3594,7 @@ MACHINE_CONFIG_START(metro_state::pururun)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3622,7 +3622,7 @@ MACHINE_CONFIG_START(metro_state::skyalert)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3650,7 +3650,7 @@ MACHINE_CONFIG_START(metro_state::toride2g)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -3678,7 +3678,7 @@ MACHINE_CONFIG_START(metro_state::mouja)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, metro_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 16_MHz_XTAL/1024*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, mouja_okimap)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -3706,7 +3706,7 @@ MACHINE_CONFIG_START(metro_state::vmetal)
 	MCFG_I4100_TILEMAP_YOFFSETS(-16,-16,-16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1_MHz_XTAL, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -3757,7 +3757,8 @@ MACHINE_CONFIG_START(metro_state::blzntrnd)
 
 	/* sound hardware */
 	// HUM-002 PCB Configuration : Stereo output with second speaker connector
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -3784,7 +3785,7 @@ MACHINE_CONFIG_START(metro_state::gstrik2)
 	// HUM-003 PCB Configuration : Mono output only
 	MCFG_DEVICE_REMOVE("lspeaker")
 	MCFG_DEVICE_REMOVE("rspeaker")
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_REPLACE("ymsnd", YM2610, 16_MHz_XTAL/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -3816,7 +3817,7 @@ MACHINE_CONFIG_START(metro_state::puzzlet)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, puzzlet_vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 20_MHz_XTAL/5, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

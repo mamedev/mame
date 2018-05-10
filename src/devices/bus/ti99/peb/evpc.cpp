@@ -485,7 +485,7 @@ MACHINE_CONFIG_START(snug_enhanced_video_device::device_add_mconfig)
 	MCFG_V99X8_SCREEN_ADD_NTSC(TI_SCREEN_TAG, TI_VDP_TAG, XTAL(21'477'272))
 
 	// Sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("sound_out")
+	SPEAKER(config, "sound_out").front_center();
 	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
 	MCFG_SN76496_READY_HANDLER( WRITELINE(*this, snug_enhanced_video_device, ready_line) )

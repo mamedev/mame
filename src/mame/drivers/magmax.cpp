@@ -356,7 +356,7 @@ MACHINE_CONFIG_START(magmax_state::magmax)
 	MCFG_PALETTE_INIT_OWNER(magmax_state, magmax)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(20'000'000)/16) /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, magmax_state, ay8910_portA_0_w))  /*write port A*/

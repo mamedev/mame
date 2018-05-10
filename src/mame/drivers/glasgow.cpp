@@ -321,7 +321,7 @@ MACHINE_CONFIG_START(glasgow_state::glasgow)
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_glasgow)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 44)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

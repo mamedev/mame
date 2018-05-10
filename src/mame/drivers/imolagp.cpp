@@ -541,7 +541,7 @@ MACHINE_CONFIG_START(imolagp_state::imolagp)
 	MCFG_PALETTE_INIT_OWNER(imolagp_state, imolagp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END

@@ -119,7 +119,8 @@ MACHINE_CONFIG_START(hideseek_state::hideseek)
 	MCFG_PALETTE_INIT_OWNER(hideseek_state, hideseek)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hideseek)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	/* sound : M9810 */
 MACHINE_CONFIG_END

@@ -789,9 +789,8 @@ MACHINE_CONFIG_START(oric_state::oric)
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	MCFG_DEVICE_ADD("ay8912", AY8912, XTAL(12'000'000)/12)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(4700, 4700, 4700)

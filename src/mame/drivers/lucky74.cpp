@@ -1509,7 +1509,7 @@ MACHINE_CONFIG_START(lucky74_state::lucky74)
 	MCFG_PALETTE_INIT_OWNER(lucky74_state, lucky74)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

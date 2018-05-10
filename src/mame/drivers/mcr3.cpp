@@ -1097,7 +1097,8 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

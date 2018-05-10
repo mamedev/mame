@@ -504,7 +504,8 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	MCFG_PALETTE_ADD("palette", 1024 + 2048)
 	MCFG_PALETTE_INIT_OWNER(lockon_state, lockon)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, lockon_state, ym2203_irq))
@@ -519,18 +520,12 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	MCFG_SOUND_ROUTE(3, "f2203.3l", 1.0)
 	MCFG_SOUND_ROUTE(3, "f2203.3r", 1.0)
 
-	MCFG_FILTER_VOLUME_ADD("f2203.1l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("f2203.1r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("f2203.2l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("f2203.2r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("f2203.3l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("f2203.3r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "f2203.1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.2l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.2r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.3l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.3r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 

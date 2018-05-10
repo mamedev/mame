@@ -2293,7 +2293,7 @@ MACHINE_CONFIG_START(bfm_sc2_vid_state::scorpion2_vid)
 
 	MCFG_BFM_ADDER2_ADD("adder2")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -3757,7 +3757,7 @@ MACHINE_CONFIG_START(bfm_sc2_awp_state::scorpion2)
 	MCFG_BFMBD1_ADD("vfd0",0)
 	MCFG_BFMBD1_ADD("vfd1",1)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("upd",UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -3814,7 +3814,7 @@ MACHINE_CONFIG_START(bfm_sc2_dmd_state::scorpion2_dm01)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ymsnd",YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

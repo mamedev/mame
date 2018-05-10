@@ -567,7 +567,7 @@ MACHINE_CONFIG_START(ssingles_state::ssingles)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 1500000) /* ? MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)

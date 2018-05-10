@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(vicdual_state::depthch)
 	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_bw)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	depthch_audio(config);
 MACHINE_CONFIG_END
 
@@ -541,7 +541,7 @@ MACHINE_CONFIG_START(vicdual_state::frogs)
 	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_bw)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	frogs_audio(config);
 MACHINE_CONFIG_END
 
@@ -787,7 +787,7 @@ MACHINE_CONFIG_START(vicdual_state::headon)
 	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_bw_or_color)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	headon_audio(config);
 MACHINE_CONFIG_END
 
@@ -1012,7 +1012,7 @@ MACHINE_CONFIG_START(vicdual_state::headon2)
 	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_color)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	headon_audio(config);
 MACHINE_CONFIG_END
 
@@ -2094,7 +2094,7 @@ MACHINE_CONFIG_START(vicdual_state::invho2)
 	MCFG_DEVICE_IO_MAP(invho2_io_map)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	invinco_audio(config);
 	headon_audio(config);
 MACHINE_CONFIG_END
@@ -2109,7 +2109,7 @@ MACHINE_CONFIG_START(vicdual_state::invds)
 	MCFG_DEVICE_IO_MAP(invds_io_map)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	invinco_audio(config);
 MACHINE_CONFIG_END
 
@@ -2131,7 +2131,7 @@ MACHINE_CONFIG_START(vicdual_state::sspacaho)
 	MCFG_DEVICE_IO_MAP(sspacaho_io_map)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	headon_audio(config);
 MACHINE_CONFIG_END
 
@@ -2155,7 +2155,7 @@ MACHINE_CONFIG_START(vicdual_state::carnival)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	carnival_audio(config);
 MACHINE_CONFIG_END
 
@@ -2176,7 +2176,7 @@ MACHINE_CONFIG_START(vicdual_state::tranqgun)
 	MCFG_DEVICE_IO_MAP(tranqgun_io_map)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	tranqgun_audio(config);
 MACHINE_CONFIG_END
 
@@ -2189,7 +2189,7 @@ MACHINE_CONFIG_START(vicdual_state::brdrline)
 	MCFG_DEVICE_IO_MAP(brdrline_io_map)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	brdrline_audio(config);
 MACHINE_CONFIG_END
 
@@ -2202,7 +2202,7 @@ MACHINE_CONFIG_START(vicdual_state::pulsar)
 	MCFG_DEVICE_IO_MAP(pulsar_io_map)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	pulsar_audio(config);
 MACHINE_CONFIG_END
 
@@ -2233,7 +2233,7 @@ MACHINE_CONFIG_START(vicdual_state::headonn)
 	MCFG_DEVICE_IO_MAP(headonn_io_map)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	headon_audio(config);
 MACHINE_CONFIG_END
 
@@ -2667,7 +2667,7 @@ MACHINE_CONFIG_START(vicdual_state::invinco)
 	MCFG_SCREEN_UPDATE_DRIVER(vicdual_state, screen_update_color)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	invinco_audio(config);
 MACHINE_CONFIG_END
 

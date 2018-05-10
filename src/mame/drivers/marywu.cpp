@@ -198,7 +198,7 @@ MACHINE_CONFIG_START(marywu_state::marywu)
 	MCFG_DEFAULT_LAYOUT(layout_marywu)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, marywu_state, ay1_port_a_w))

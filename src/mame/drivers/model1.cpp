@@ -1672,7 +1672,8 @@ MACHINE_CONFIG_START(model1_state::swa)
 	MCFG_MODEL1IO_AN5_CB(IOPORT("STICK2Y"))
 	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, swa_outputs_w))
 
-	MCFG_SPEAKER_STANDARD_STEREO("dleft", "dright")
+	SPEAKER(config, "dleft").front_left();
+	SPEAKER(config, "dright").front_right();
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "dleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "dright", 1.0)

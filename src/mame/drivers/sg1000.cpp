@@ -541,7 +541,7 @@ MACHINE_CONFIG_START(sg1000_state::sg1000)
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -595,7 +595,7 @@ MACHINE_CONFIG_START(sc3000_state::sc3000)
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -633,7 +633,7 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

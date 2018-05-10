@@ -66,27 +66,23 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram") { }
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(unkitpkr_out0_w);
-	DECLARE_WRITE8_MEMBER(unkitpkr_out1_w);
-	DECLARE_WRITE8_MEMBER(unkitpkr_out2_w);
+	void sidampkr(machine_config &config);
+	void unkitpkr(machine_config &config);
+	void wallc(machine_config &config);
+	void wallca(machine_config &config);
 
 	DECLARE_DRIVER_INIT(wallc);
 	DECLARE_DRIVER_INIT(wallca);
 	DECLARE_DRIVER_INIT(sidam);
 	DECLARE_DRIVER_INIT(unkitpkr);
 
-	void unkitpkr(machine_config &config);
-	void wallc(machine_config &config);
-	void wallca(machine_config &config);
-
-	void unkitpkr_map(address_map &map);
-	void wallc_map(address_map &map);
 protected:
 	virtual void video_start() override;
 
 private:
+	void unkitpkr_map(address_map &map);
+	void wallc_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -96,6 +92,12 @@ private:
 
 	bool m_bookkeeping_mode;
 
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(unkitpkr_out0_w);
+	DECLARE_WRITE8_MEMBER(unkitpkr_out1_w);
+	DECLARE_WRITE8_MEMBER(unkitpkr_out2_w);
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info_unkitpkr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -103,6 +105,7 @@ private:
 	DECLARE_PALETTE_INIT(wallc);
 	DECLARE_PALETTE_INIT(unkitpkr);
 	DECLARE_VIDEO_START(unkitpkr);
+	DECLARE_VIDEO_START(sidampkr);
 };
 
 
@@ -240,6 +243,11 @@ VIDEO_START_MEMBER(wallc_state, unkitpkr)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info_unkitpkr), this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
 }
 
+VIDEO_START_MEMBER(wallc_state, sidampkr)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
 uint32_t wallc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -295,7 +303,7 @@ void wallc_state::unkitpkr_map(address_map &map)
 	map(0x8000, 0x83ff).ram().w(this, FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   /* 2114, 2114 */
 	map(0xa000, 0xa3ff).ram();     /* 2114, 2114 */
 
-	map(0xb000, 0xb000).portr("IN0");
+	map(0xb000, 0xb000).portr("DSW1");
 	map(0xb100, 0xb100).portr("IN1");
 	map(0xb200, 0xb200).portr("IN2");
 	map(0xb300, 0xb300).portr("IN3");
@@ -367,15 +375,15 @@ static INPUT_PORTS_START( wallc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( unkitpkr )
-	PORT_START("IN0")    /* b000 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("DSW1")    /* b000 */
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
 
 	PORT_START("IN1")    /* b100 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -407,7 +415,7 @@ static INPUT_PORTS_START( unkitpkr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("DSW")      /* b600 */
+	PORT_START("DSW2")      /* b600 */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW2:1,2") // ok
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
@@ -427,6 +435,27 @@ static INPUT_PORTS_START( unkitpkr )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sidampkr )
+	PORT_INCLUDE(unkitpkr)
+
+	PORT_MODIFY("DSW1")    /* b000 */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPNAME( 0x1c, 0x00, "Min/Max Bet" )  PORT_DIPLOCATION("SW1:3,4,5")
+	PORT_DIPSETTING(   0x00, "Min:1; Max:2" )
+	PORT_DIPSETTING(   0x04, "Min:1; Max:5" )
+	PORT_DIPSETTING(   0x08, "Min:1; Max:8" )
+	PORT_DIPSETTING(   0x0c, "Min:2; Max:10" )
+	PORT_DIPSETTING(   0x10, "Min:5; Max:15" )
+	PORT_DIPSETTING(   0x14, "Min:10; Max:20" )
+	PORT_DIPSETTING(   0x18, "Min:15; Max:30" )
+	PORT_DIPSETTING(   0x1c, "Min:20; Max:40" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
@@ -504,7 +533,7 @@ MACHINE_CONFIG_START(wallc_state::wallc)
 	MCFG_PALETTE_INIT_OWNER(wallc_state, wallc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8912, 12288000 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -527,10 +556,15 @@ MACHINE_CONFIG_START(wallc_state::unkitpkr)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("aysnd")
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(wallc_state::sidampkr)
+	unkitpkr(config);
+
+	MCFG_VIDEO_START_OVERRIDE(wallc_state, sidampkr)
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -645,46 +679,24 @@ ROM_END
 
 DRIVER_INIT_MEMBER(wallc_state, sidam)
 {
-	uint8_t c;
-	uint32_t i;
-
 	uint8_t *ROM = memregion("maincpu")->base();
-	int count = 0;
 
-	for (i=0; i<0x2000; i++)
+	for (int i = 0; i < 0x2000; i++)
 	{
-		switch (i & 0x4a)  // A1, A3, A6
+		uint8_t x = ROM[i];
+		switch(i & 0x4a) // seems correct. Plaintext available in the 0x1150-0x1550 range. First 0x50 of code are very similar if not identical to unkitpkr.
 		{
-			case 0x00:
-				logerror("%02x ", ROM[i]);
-				count++;
-				break;
-			case 0x02:
-				break;
-			case 0x08:
-				break;
-			case 0x0a:
-				break;
-			case 0x40:
-				break;
-			case 0x42:
-				break;
-			case 0x48:
-				break;
-			case 0x4a:
-				break;
+			case 0x00: x = bitswap<8>(x ^ (BIT(x, 6) ? 0xaf : 0x03), 7, 3, 5, 2, 6, 4, 1, 0); break;
+			case 0x02: x = bitswap<8>(x ^ 0x77, 4, 6, 2, 5, 3, 7, 1, 0); break;
+			case 0x08: x = bitswap<8>(x ^ 0x5f, 2, 4, 6, 3, 7, 5, 1, 0); break;
+			case 0x0a: x = bitswap<8>(x ^ 0xd7, 6, 2, 4, 7, 5, 3, 1, 0); break;
+			case 0x40: x = bitswap<8>(x ^ (BIT(x, 6) ? 0xaf : 0x03), 7, 3, 5, 2, 6, 4, 1, 0); break;
+			case 0x42: x = bitswap<8>(x ^ 0xeb, 5, 7, 3, 6, 4, 2, 1, 0); break;
+			case 0x48: x = bitswap<8>(x ^ (BIT(x, 6) ? 0xbb : 0x03), 3, 5, 7, 4, 2, 6, 1, 0); break;
+			case 0x4a: x = bitswap<8>(x ^ 0xd7, 6, 2, 4, 7, 5, 3, 1, 0); break;
 		}
 
-
-
-		if (count==16)
-		{
-			count = 0;
-			logerror("\n");
-		}
-
-		c = ROM[ i ] ^ 0x0f;
-		ROM[ i ] = c;
+		ROM[i] = x;
 	}
 }
 
@@ -765,5 +777,5 @@ GAME( 1984, wallc,    0,      wallc,    wallc,    wallc_state, wallc,    ROT0,  
 GAME( 1984, wallca,   wallc,  wallca,   wallc,    wallc_state, wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1984, brkblast, wallc,  wallc,    wallc,    wallc_state, wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
-GAME( 1984, sidampkr, 0,      wallc,    wallc,    wallc_state, sidam,    ROT270, "Sidam",            "unknown Sidam Poker",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sidampkr, 0,      sidampkr, sidampkr, wallc_state, sidam,    ROT270, "Sidam",            "unknown Sidam Poker",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs correct decoding of the color PROM. Using the unkitpkr one gives correct colors and makes the game playable.
 GAME( 198?, unkitpkr, 0,      unkitpkr, unkitpkr, wallc_state, unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_SUPPORTS_SAVE )

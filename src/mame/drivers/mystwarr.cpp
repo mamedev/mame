@@ -994,7 +994,8 @@ MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, mystwarr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 

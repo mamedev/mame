@@ -1932,7 +1932,8 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	MCFG_VIDEO_START_OVERRIDE(captaven_state, captaven)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000)/9) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
@@ -2013,7 +2014,8 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 	MCFG_VIDEO_START_OVERRIDE(fghthist_state, fghthist)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
@@ -2145,7 +2147,8 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
@@ -2161,7 +2164,7 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 
-	MCFG_SPEAKER_STANDARD_MONO("gun_speaker")
+	SPEAKER(config, "gun_speaker").front_center();
 
 	MCFG_DEVICE_ADD("oki3", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "gun_speaker", 1.0)
@@ -2277,7 +2280,8 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
@@ -2444,7 +2448,8 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))

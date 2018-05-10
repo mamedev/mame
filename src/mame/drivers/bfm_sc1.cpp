@@ -1088,7 +1088,7 @@ MACHINE_CONFIG_START(bfm_sc1_state::scorpion1)
 
 
 	MCFG_BFMBD1_ADD("vfd0",0)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_DEVICE_ADD("aysnd",AY8912, MASTER_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

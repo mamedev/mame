@@ -131,7 +131,8 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 }
 
 MACHINE_CONFIG_START(vis_audio_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ymf262", YMF262, XTAL(14'318'181))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)

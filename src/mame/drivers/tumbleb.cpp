@@ -2050,7 +2050,7 @@ MACHINE_CONFIG_START(tumbleb_state::tumblepb)
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/10, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
@@ -2088,7 +2088,7 @@ MACHINE_CONFIG_START(tumbleb_state::tumbleb2)
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/10, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
@@ -2129,7 +2129,7 @@ MACHINE_CONFIG_START(tumbleb_state::jumpkids)
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -2169,7 +2169,7 @@ MACHINE_CONFIG_START(tumbleb_state::fncywld)
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,fncywld)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
@@ -2229,7 +2229,7 @@ MACHINE_CONFIG_START(tumbleb_state::htchctch)
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
 	/* sound hardware - same as hyperpac */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -2254,9 +2254,7 @@ MACHINE_CONFIG_START(tumbleb_state::chokchok)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	// some PCBs have left factory with a 3.57mhz while some have a 4.096 which matches other games, assuming the former are factory errors
-	// TODO: MAME sound cores doesn't handle on-the-fly sound frequency changes, I guess best action here is to make the sound chip a slot option,
-	//       assuming it's worth emulating a factory error in the first place.
-	MCFG_OKIM6295_REPLACE("oki", 4096000/4, okim6295_device::PIN7_HIGH)
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, 4096000/4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2345,7 +2343,7 @@ MACHINE_CONFIG_START(tumbleb_state::suprtrio)
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,suprtrio)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -2384,7 +2382,7 @@ MACHINE_CONFIG_START(tumbleb_state::pangpang)
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,pangpang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/10, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)

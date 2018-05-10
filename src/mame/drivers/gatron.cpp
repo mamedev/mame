@@ -594,7 +594,7 @@ MACHINE_CONFIG_START(gatron_state::gat)
 	MCFG_PALETTE_INIT_OWNER(gatron_state, gatron)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("snsnd", SN76489, MASTER_CLOCK/8 )   // Present in Bingo PCB. Clock need to be verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_CONFIG_END

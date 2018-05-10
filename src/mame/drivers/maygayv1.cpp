@@ -909,7 +909,7 @@ MACHINE_CONFIG_START(maygayv1_state::maygayv1)
 	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, maygayv1_state, lamp_data_w)) // display A&B
 	MCFG_I8279_IN_RL_CB(READ8(*this, maygayv1_state, kbd_r))                   // kbd RL lines
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd",YM2413, MASTER_CLOCK / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)

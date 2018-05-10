@@ -2562,7 +2562,7 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV1_base)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

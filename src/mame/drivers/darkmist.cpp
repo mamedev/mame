@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(darkmist_state::darkmist)
 	MCFG_PALETTE_INIT_OWNER(darkmist_state, darkmist)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)    /* 3.579545 MHz */
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("t5182", t5182_device, ym2151_irq_handler))

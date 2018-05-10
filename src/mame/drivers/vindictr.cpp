@@ -211,7 +211,8 @@ MACHINE_CONFIG_START(vindictr_state::vindictr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)

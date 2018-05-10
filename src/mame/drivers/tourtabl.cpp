@@ -181,7 +181,7 @@ MACHINE_CONFIG_START(tourtabl_state::tourtabl)
 	MCFG_SCREEN_PALETTE("tia_video:palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK/114)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -2548,7 +2548,7 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(50'000'000)/3)   // clock?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2783,7 +2783,8 @@ MACHINE_CONFIG_START(seta2_state::funcube)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -2837,7 +2838,8 @@ MACHINE_CONFIG_START(seta2_state::namcostr)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
@@ -3448,7 +3450,7 @@ ROM_END
 
 /***************************************************************************
 
-Penguin Brothers / A-Blast
+Penguin Brothers / 轟天雷 (A-Blast)
 (c)2000 Subsino
 
    CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
@@ -4191,8 +4193,8 @@ GAME( 199?, endrichs,  0,        reelquak, endrichs, seta2_state, 0,        ROT0
 GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, 0,     ROT0,   "Namco",                 "Star Audition",                                MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state, 0,        ROT0,   "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                    MACHINE_NO_COCKTAIL )
 GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state, 0,        ROT0,   "Subsino",               "Penguin Brothers (Japan)",                     MACHINE_NO_COCKTAIL )
-GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state, 0,        ROT0,   "Subsino",               "A-Blast (Japan)",                              MACHINE_NO_COCKTAIL )
-GAME( 2000, ablastb,   penbros,  ablastb,  penbros,  seta2_state, 0,        ROT0,   "bootleg",               "A-Blast (bootleg)",                            MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // at least "tilemap sprite" scrolly flag differs, FPGA instead of x1-010
+GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state, 0,        ROT0,   "Subsino",               "Hong Tian Lei (A-Blast) (Japan)",              MACHINE_NO_COCKTAIL ) // 轟天雷/Hōng tiān léi
+GAME( 2000, ablastb,   penbros,  ablastb,  penbros,  seta2_state, 0,        ROT0,   "bootleg",               "Hong Tian Lei (A-Blast) (bootleg)",            MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // at least "tilemap sprite" scrolly flag differs, FPGA instead of x1-010
 GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state, 0,        ROT0,   "Namco",                 "Namco Stars",                                  MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
 GAME( 2000, deerhunt,  0,        samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.3",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhunta, deerhunt, samshoot, deerhunt, seta2_state, 0,        ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.2",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )

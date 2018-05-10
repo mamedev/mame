@@ -297,7 +297,7 @@ MACHINE_CONFIG_START(battlera_state::battlera)
 	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

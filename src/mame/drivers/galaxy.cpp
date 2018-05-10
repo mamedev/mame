@@ -200,9 +200,8 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(gtp_cassette_formats)
@@ -243,10 +242,9 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL/4)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL/4) // FIXME: really no output routes for this AY?
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(gtp_cassette_formats)

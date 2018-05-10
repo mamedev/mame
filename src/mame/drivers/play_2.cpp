@@ -396,7 +396,7 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	/* Sound */
 	genpin_audio(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_CDP1863_ADD("1863", 0, XTAL(2'950'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END

@@ -321,7 +321,8 @@ MACHINE_CONFIG_START(proconn_state::proconn)
 
 	MCFG_DEVICE_ADD("z80sio", Z80SIO, 4000000) /* ?? Mhz */
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 
 	MCFG_DEFAULT_LAYOUT(layout_proconn)

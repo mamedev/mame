@@ -214,7 +214,7 @@ static const discrete_lfsr_desc stinger_lfsr =
 	16          /* Output bit is feedback bit */
 };
 
-static DISCRETE_SOUND_START(stinger)
+static DISCRETE_SOUND_START(stinger_discrete)
 
 #define STINGER_SHOT_OUT    NODE_90
 #define STINGER_BOOM_OUT    NODE_91
@@ -815,7 +815,7 @@ MACHINE_CONFIG_START(wiz_state::kungfut)
 	MCFG_PALETTE_INIT_OWNER(wiz_state, wiz)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -864,8 +864,7 @@ MACHINE_CONFIG_START(wiz_state::stinger)
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("8910.3")
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(stinger)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, stinger_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 

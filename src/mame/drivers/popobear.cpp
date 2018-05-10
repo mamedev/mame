@@ -659,7 +659,7 @@ MACHINE_CONFIG_START(popobear_state::popobear)
 	MCFG_PALETTE_ADD("palette", 256*2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popobear)
 

@@ -1380,7 +1380,7 @@ MACHINE_CONFIG_START(hotsmash_state::pbillian)
 
 	MCFG_VIDEO_START_OVERRIDE(hotsmash_state, pbillian)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) // AY-3-8910A
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("BUTTONS"))
@@ -1426,7 +1426,7 @@ MACHINE_CONFIG_START(superqix_state::sqix)
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) // AY-3-8910A @3P, analog outputs directly tied together
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
@@ -1479,7 +1479,7 @@ MACHINE_CONFIG_START(superqix_state::sqix_nomcu)
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 12000000/8)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT) // ?

@@ -299,7 +299,7 @@ MACHINE_CONFIG_START(mrflea_state::mrflea)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN1"))

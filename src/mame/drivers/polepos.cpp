@@ -923,7 +923,8 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_VIDEO_START_OVERRIDE(polepos_state,polepos)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/512)
 	MCFG_NAMCO_AUDIO_VOICES(8)
@@ -932,8 +933,7 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
 	/* discrete circuit on the 54XX outputs */
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(polepos)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, polepos_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 
@@ -1036,7 +1036,8 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	MCFG_VIDEO_START_OVERRIDE(polepos_state,polepos)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/512)
 	MCFG_NAMCO_AUDIO_VOICES(8)

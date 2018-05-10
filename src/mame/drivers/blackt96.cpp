@@ -507,7 +507,8 @@ MACHINE_CONFIG_START(blackt96_state::blackt96)
 	MCFG_SNK68_SPR_SET_TILE_INDIRECT( blackt96_state, tile_callback )
 	MCFG_SNK68_SPR_NO_PARTIAL
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH) // music
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)

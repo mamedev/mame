@@ -210,9 +210,8 @@ MACHINE_CONFIG_START(mk14_state::mk14)
 	MCFG_DEFAULT_LAYOUT(layout_mk14)
 
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05)
+	SPEAKER(config, "speaker").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.05);
 	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("dac8", ZN425E, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // Ferranti ZN425E
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

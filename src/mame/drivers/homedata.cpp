@@ -1250,7 +1250,7 @@ MACHINE_CONFIG_START(homedata_state::mrokumei)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,mrokumei)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1303,7 +1303,7 @@ MACHINE_CONFIG_START(homedata_state::reikaids)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,reikaids)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
@@ -1361,7 +1361,7 @@ MACHINE_CONFIG_START(homedata_state::pteacher)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,pteacher)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
@@ -1530,7 +1530,7 @@ MACHINE_CONFIG_START(homedata_state::mirderby)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,mirderby)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 2000000)
 	MCFG_SOUND_ROUTE(0, "speaker", 0.25)

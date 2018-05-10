@@ -626,7 +626,7 @@ MACHINE_CONFIG_START(jpmsys5v_state::jpmsys5v)
 
 	MCFG_PALETTE_ADD("palette", 16)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("upd7759", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -834,7 +834,7 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5_ym)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_S16LF01_ADD("vfd",0)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("upd7759", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -890,7 +890,7 @@ MACHINE_CONFIG_START(jpmsys5_state::jpmsys5)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_S16LF01_ADD("vfd",0)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("upd7759", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

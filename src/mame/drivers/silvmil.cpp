@@ -433,7 +433,7 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 	MCFG_DECO_SPRITE_OFFSETS(5, 7)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

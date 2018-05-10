@@ -296,7 +296,7 @@ MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 	MCFG_DEFAULT_LAYOUT(layout_wackygtr)
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000) )
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, wackygtr_state, adpcm_int))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */

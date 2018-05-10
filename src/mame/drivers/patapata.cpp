@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(patapata_state::patapata)
 	MCFG_PALETTE_ADD("palette", 0x600/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

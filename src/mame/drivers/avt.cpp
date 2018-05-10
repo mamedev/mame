@@ -985,7 +985,7 @@ MACHINE_CONFIG_START(avt_state::avt)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, avt_state, avtbingo_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, CPU_CLOCK/2)    /* 1.25 MHz.?? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

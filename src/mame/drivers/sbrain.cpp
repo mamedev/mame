@@ -564,7 +564,7 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 	//MCFG_DEVICE_ADD("crtc", DP8350, XTAL(10'920'000))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

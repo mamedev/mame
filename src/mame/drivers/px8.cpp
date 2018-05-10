@@ -779,9 +779,8 @@ MACHINE_CONFIG_START(px8_state::px8)
 	MCFG_PALETTE_INIT_OWNER(px8_state, px8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(0, "mono", 0.25);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px8_cart")

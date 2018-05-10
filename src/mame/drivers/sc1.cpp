@@ -171,7 +171,7 @@ MACHINE_CONFIG_START(sc1_state::sc1)
 	MCFG_Z80PIO_IN_PB_CB(READ8(*this, sc1_state, pio_port_b_r))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

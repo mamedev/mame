@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(tempest_state::tempest)
 	MCFG_MATHBOX_ADD("mathbox")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
 	MCFG_POKEY_POT0_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))

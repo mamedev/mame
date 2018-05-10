@@ -700,7 +700,7 @@ MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 	MCFG_DEVICE_IO_MAP(spyhuntertec_sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(spyhuntertec_state, irq0_line_assert, 1000)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))

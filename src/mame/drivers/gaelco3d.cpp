@@ -985,7 +985,7 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: front mono */

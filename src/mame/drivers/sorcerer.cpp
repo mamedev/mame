@@ -435,11 +435,9 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05) // cass1 speaker
-	MCFG_SOUND_WAVE_ADD(WAVE2_TAG, "cassette2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05) // cass2 speaker
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
+	WAVE(config, "wave2", "cassette2").add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
 	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(ES_UART_CLOCK)

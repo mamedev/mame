@@ -740,7 +740,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankohs)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", YM2149, 12000000/6)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ojankohs_state, ojankohs_dipsw1_r))
@@ -780,7 +780,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
@@ -821,7 +821,7 @@ MACHINE_CONFIG_START(ojankohs_state::ccasino)
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ccasino)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
@@ -859,7 +859,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoc)
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))

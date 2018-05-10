@@ -190,7 +190,7 @@ MACHINE_CONFIG_START(mrdo_state::mrdo)
 	MCFG_PALETTE_INIT_OWNER(mrdo_state, mrdo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("u8106_1", U8106, MAIN_CLOCK/2)  /* sn76489-equivalent?, Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

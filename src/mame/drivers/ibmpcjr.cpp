@@ -634,7 +634,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_pcjr:palette", pcjr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 	MCFG_DEVICE_ADD("sn76496", SN76496, XTAL(14'318'181)/4)

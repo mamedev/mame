@@ -442,7 +442,7 @@ MACHINE_CONFIG_START(junofrst_state::junofrst)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, junofrst_state, _30hz_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")

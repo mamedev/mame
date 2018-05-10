@@ -567,7 +567,8 @@ MACHINE_CONFIG_START(macrossp_state::macrossp)
 	MCFG_PALETTE_FORMAT(RGBX)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 

@@ -386,7 +386,7 @@ MACHINE_CONFIG_START(chaknpop_state::chaknpop)
 	MCFG_PALETTE_INIT_OWNER(chaknpop_state, chaknpop)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'000'000) / 12)  // Verified on PCB
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))

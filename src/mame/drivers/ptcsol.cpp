@@ -439,9 +439,9 @@ void sol20_state::sol20_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0xf8, 0xf8).rw(this, FUNC(sol20_state::sol20_f8_r), FUNC(sol20_state::sol20_f8_w));
-	map(0xf9, 0xf9).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
+	map(0xf9, 0xf9).rw(m_uart_s, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
 	map(0xfa, 0xfa).rw(this, FUNC(sol20_state::sol20_fa_r), FUNC(sol20_state::sol20_fa_w));
-	map(0xfb, 0xfb).rw(m_uart_s, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
+	map(0xfb, 0xfb).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
 	map(0xfc, 0xfc).r(this, FUNC(sol20_state::sol20_fc_r));
 	map(0xfd, 0xfd).rw(this, FUNC(sol20_state::sol20_fd_r), FUNC(sol20_state::sol20_fd_w));
 	map(0xfe, 0xfe).w(this, FUNC(sol20_state::sol20_fe_w));
@@ -732,13 +732,10 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00) // music board
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05) // cass1 speaker
-	MCFG_SOUND_WAVE_ADD(WAVE2_TAG, "cassette2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05) // cass2 speaker
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 2.00); // music board
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
+	WAVE(config, "wave2", "cassette2").add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
 	// devices
 	MCFG_CASSETTE_ADD("cassette")
@@ -752,8 +749,6 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 	MCFG_CASSETTE_INTERFACE("sol20_cass")
 
 	MCFG_DEVICE_ADD("uart", AY51013, 0) // TMS6011NC
-	MCFG_AY51013_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_AY51013_TX_CLOCK(4800.0)
 	MCFG_AY51013_RX_CLOCK(4800.0)
 	MCFG_AY51013_AUTO_RDAV(true) // ROD (pin 4) tied to RDD (pin 18)
@@ -761,6 +756,8 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 
 	MCFG_DEVICE_ADD("uart_s", AY51013, 0) // TMS6011NC
+	MCFG_AY51013_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_AY51013_TX_CLOCK(4800.0)
 	MCFG_AY51013_RX_CLOCK(4800.0)
 	MCFG_AY51013_AUTO_RDAV(true) // ROD (pin 4) tied to RDD (pin 18)

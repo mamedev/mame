@@ -385,7 +385,7 @@ MACHINE_CONFIG_START(tugboat_state::tugboat)
 	MCFG_PALETTE_INIT_OWNER(tugboat_state, tugboat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(10'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)

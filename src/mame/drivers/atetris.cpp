@@ -356,7 +356,7 @@ MACHINE_CONFIG_START(atetris_state::atetris)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("IN0"))
@@ -395,7 +395,7 @@ MACHINE_CONFIG_START(atetris_state::atetrisb2)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76496, BOOTLEG_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

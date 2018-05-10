@@ -3617,7 +3617,7 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 	MCFG_GFX_PALETTE("palette")
 
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
@@ -3701,7 +3701,7 @@ MACHINE_CONFIG_START(igs017_state::mgcs)
 	MCFG_GFX_PALETTE("palette")
 
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
@@ -3745,7 +3745,7 @@ MACHINE_CONFIG_START(igs017_state::lhzb2)
 	MCFG_GFX_PALETTE("palette")
 
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
@@ -3797,7 +3797,7 @@ MACHINE_CONFIG_START(igs017_state::lhzb2a)
 	MCFG_GFX_PALETTE("palette")
 
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(22'000'000) / 22, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
@@ -3841,7 +3841,7 @@ MACHINE_CONFIG_START(igs017_state::slqz2)
 	MCFG_GFX_PALETTE("palette")
 
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
@@ -3877,7 +3877,7 @@ MACHINE_CONFIG_START(igs017_state::sdmg2)
 	MCFG_GFX_PALETTE("palette")
 
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(22'000'000) / 22, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
@@ -3923,7 +3923,7 @@ MACHINE_CONFIG_START(igs017_state::mgdha)
 	MCFG_GFX_PALETTE("palette")
 
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(22'000'000) / 22, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
@@ -3962,7 +3962,7 @@ MACHINE_CONFIG_START(igs017_state::tjsb)
 	MCFG_GFX_PALETTE("palette")
 
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
@@ -4003,7 +4003,7 @@ MACHINE_CONFIG_START(igs017_state::spkrform)
 	MCFG_GFX_PALETTE("palette")
 
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
