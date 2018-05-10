@@ -3485,8 +3485,8 @@ static INPUT_PORTS_START( firehawk )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Region ) )       PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(      0x0200, DEF_STR( World ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( China ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( World ) ) // Fire Hawk
+	PORT_DIPSETTING(      0x0000, DEF_STR( China ) ) // 火狐傳說/Huǒhú chuánshuō
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Free_Play ) )        PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -3700,9 +3700,9 @@ static const gfx_layout charlayout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
 	32*8
 };
 
@@ -3711,35 +3711,33 @@ static const gfx_layout tilelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			16*32+0*4, 16*32+1*4, 16*32+2*4, 16*32+3*4, 16*32+4*4, 16*32+5*4, 16*32+6*4, 16*32+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP4(0,1) },
+	{ STEP8(0,4), STEP8(4*8*16,4) },
+	{ STEP16(0,4*8) },
 	32*32
 };
 
 static GFXDECODE_START( tharrier )
-	GFXDECODE_ENTRY( "fgtile", 0, charlayout, 0x000, 16 ) /* color 0x200-0x2ff */
-	GFXDECODE_ENTRY( "bgtile", 0, tilelayout, 0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "fgtile",  0, charlayout, 0x000, 16 ) /* color 0x200-0x2ff */
+	GFXDECODE_ENTRY( "bgtile",  0, tilelayout, 0x000, 16 ) /* color 0x000-0x0ff */
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 16 ) /* color 0x100-0x1ff */
 GFXDECODE_END
 
 static GFXDECODE_START( macross )
-	GFXDECODE_ENTRY( "fgtile", 0, charlayout, 0x200, 16 ) /* color 0x200-0x2ff */
-	GFXDECODE_ENTRY( "bgtile", 0, tilelayout, 0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "fgtile",  0, charlayout, 0x200, 16 ) /* color 0x200-0x2ff */
+	GFXDECODE_ENTRY( "bgtile",  0, tilelayout, 0x000, 16 ) /* color 0x000-0x0ff */
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 16 ) /* color 0x100-0x1ff */
 GFXDECODE_END
 
 static GFXDECODE_START( macross2 )
-	GFXDECODE_ENTRY( "fgtile", 0, charlayout, 0x300, 16 ) /* color 0x300-0x3ff */
-	GFXDECODE_ENTRY( "bgtile", 0, tilelayout, 0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "fgtile",  0, charlayout, 0x300, 16 ) /* color 0x300-0x3ff */
+	GFXDECODE_ENTRY( "bgtile",  0, tilelayout, 0x000, 16 ) /* color 0x000-0x0ff */
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 32 ) /* color 0x100-0x2ff */
 GFXDECODE_END
 
 static GFXDECODE_START( bjtwin )
-	GFXDECODE_ENTRY( "fgtile", 0, charlayout, 0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "bgtile", 0, charlayout, 0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "fgtile",  0, charlayout, 0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "bgtile",  0, charlayout, 0x000, 16 ) /* color 0x000-0x0ff */
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 16 ) /* color 0x100-0x1ff */
 GFXDECODE_END
 
@@ -3747,17 +3745,17 @@ GFXDECODE_END
 
 
 static GFXDECODE_START( bioship )
-	GFXDECODE_ENTRY( "fgtile", 0, charlayout, 0x300, 16 ) /* color 0x300-0x3ff */
-	GFXDECODE_ENTRY( "bgtile", 0, tilelayout, 0x100, 16 ) /* color 0x100-0x1ff */
+	GFXDECODE_ENTRY( "fgtile",  0, charlayout, 0x300, 16 ) /* color 0x300-0x3ff */
+	GFXDECODE_ENTRY( "bgtile",  0, tilelayout, 0x100, 16 ) /* color 0x100-0x1ff */
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x200, 16 ) /* color 0x200-0x2ff */
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "gfx4",    0, tilelayout, 0x000, 16 ) /* color 0x000-0x0ff */
 GFXDECODE_END
 
 static GFXDECODE_START( strahl )
-	GFXDECODE_ENTRY( "fgtile", 0, charlayout, 0x000, 16 ) /* color 0x000-0x0ff */
-	GFXDECODE_ENTRY( "bgtile", 0, tilelayout, 0x300, 16 ) /* color 0x300-0x3ff */
+	GFXDECODE_ENTRY( "fgtile",  0, charlayout, 0x000, 16 ) /* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( "bgtile",  0, tilelayout, 0x300, 16 ) /* color 0x300-0x3ff */
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 16 ) /* color 0x100-0x1ff */
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 0x200, 16 ) /* color 0x200-0x2ff */
+	GFXDECODE_ENTRY( "gfx4",    0, tilelayout, 0x200, 16 ) /* color 0x200-0x2ff */
 GFXDECODE_END
 
 
@@ -5128,20 +5126,20 @@ static const gfx_layout layout_16x16x4_swapped =
 };
 
 static GFXDECODE_START( grdnstrm )
-	GFXDECODE_ENTRY( "fgtile", 0, layout_8x8x4,   256*2, 16 ) // [2] Layer 1
-	GFXDECODE_ENTRY( "bgtile", 0, layout_16x16x8, 256*0, 1 ) // [1] Layer 0
+	GFXDECODE_ENTRY( "fgtile",  0, layout_8x8x4,   256*2, 16 ) // [2] Layer 1
+	GFXDECODE_ENTRY( "bgtile",  0, layout_16x16x8, 256*0, 1 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 256*1, 16 ) // [0] Sprites
 GFXDECODE_END
 
 static GFXDECODE_START( stagger1 )
-	GFXDECODE_ENTRY( "fgtile", 0, layout_8x8x4,   256*2, 16 ) // [2] Layer 1
-	GFXDECODE_ENTRY( "bgtile", 0, layout_16x16x4, 256*0, 16 ) // [1] Layer 0
+	GFXDECODE_ENTRY( "fgtile",  0, layout_8x8x4,   256*2, 16 ) // [2] Layer 1
+	GFXDECODE_ENTRY( "bgtile",  0, layout_16x16x4, 256*0, 16 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 256*1, 16 ) // [0] Sprites
 GFXDECODE_END
 
 static GFXDECODE_START( redhawkb )
-	GFXDECODE_ENTRY( "fgtile", 0, layout_8x8x4,           256*2, 16 ) // [2] Layer 1
-	GFXDECODE_ENTRY( "bgtile", 0, layout_16x16x4_swapped, 256*0, 16 ) // [1] Layer 0
+	GFXDECODE_ENTRY( "fgtile",  0, layout_8x8x4,           256*2, 16 ) // [2] Layer 1
+	GFXDECODE_ENTRY( "bgtile",  0, layout_16x16x4_swapped, 256*0, 16 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4_swapped, 256*1, 16 ) // [0] Sprites
 GFXDECODE_END
 
@@ -8047,8 +8045,8 @@ GAME( 2000, mangchi,  0,        popspops, mangchi,  nmk16_state, bubl2000,  ROT0
 // these two are very similar games, but the exact parent/clone relationship is unknown
 GAME( 2000, spec2k,   0,       spec2k,   spec2k,   nmk16_state,  spec2k,    ROT270,             "Yona Tech",             "Spectrum 2000 (vertical)", MACHINE_IMPERFECT_GRAPHICS ) // the ships sometimes scroll off the screen if you insert a coin during the attract demo?  verify it doesn't happen on real hw(!)
 GAME( 2000, spec2kh,  spec2k,  spec2k,   spec2k,   nmk16_state,  spec2k,    ORIENTATION_FLIP_Y, "Yona Tech",             "Spectrum 2000 (horizontal, buggy) (Europe)", 0 ) // this has odd bugs even on real hardware, eg glitchy 3 step destruction sequence of some larger enemies
-GAME( 2001, firehawk, spec2k,  firehawk, firehawk, nmk16_state,  0,         ORIENTATION_FLIP_Y, "ESD",                   "Fire Hawk (horizontal)", 0 )
-GAME( 2001, firehawkv,spec2k,  firehawk, firehawkv,nmk16_state,  0,         ORIENTATION_FLIP_Y, "ESD",                   "Fire Hawk (switchable orientation)", MACHINE_NOT_WORKING ) // incomplete dump, vertical mode gfx not dumped
+GAME( 2001, firehawk, spec2k,  firehawk, firehawk, nmk16_state,  0,         ORIENTATION_FLIP_Y, "ESD",                   "Fire Hawk (World) / Huohu Chuanshuo (China) (horizontal)", 0 )
+GAME( 2001, firehawkv,spec2k,  firehawk, firehawkv,nmk16_state,  0,         ORIENTATION_FLIP_Y, "ESD",                   "Fire Hawk (World) / Huohu Chuanshuo (China) (switchable orientation)", MACHINE_NOT_WORKING ) // incomplete dump, vertical mode gfx not dumped
 
 // bee-oh board - different display / interrupt timing to others?
 GAME( 1991, manybloc, 0,        manybloc, manybloc, nmk16_state, tharrier,  ROT270,             "Bee-Oh",                "Many Block", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
