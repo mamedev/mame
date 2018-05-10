@@ -323,7 +323,7 @@ void highvdeo_state::tv_vcf_map(address_map &map)
 	map(0x00400, 0x03fff).ram().share("nvram");
 	map(0x40000, 0x4ffff).ram().share("blit_ram"); /*blitter ram*/
 	map(0x80000, 0xbffff).bankr("mainbank");
-	map(0xc0000, 0xfffff).rom();
+	map(0xc0000, 0xfffff).rom().region("maincpu", 0xc0000)
 }
 
 void highvdeo_state::tv_vcf_io(address_map &map)
@@ -373,7 +373,7 @@ void highvdeo_state::tv_ncf_map(address_map &map)
 	map(0x00000, 0x003ff).ram(); /*irq vector area*/
 	map(0x00400, 0x03fff).ram().share("nvram");
 	map(0x20000, 0x2ffff).ram().share("blit_ram"); /*blitter ram*/
-	map(0x40000, 0xfffff).rom();
+	map(0x40000, 0xfffff).rom().region("maincpu", 0x40000)
 }
 
 void highvdeo_state::tv_ncf_io(address_map &map)
@@ -395,7 +395,7 @@ void highvdeo_state::nyjoker_map(address_map &map)
 	map(0x00000, 0x003ff).ram(); /*irq vector area*/
 	map(0x00400, 0x03fff).ram().share("nvram");
 	map(0x10000, 0x1ffff).ram().share("blit_ram"); /*blitter ram*/
-	map(0x40000, 0xfffff).rom();
+	map(0x40000, 0xfffff).rom().region("maincpu", 0x40000)
 }
 
 void highvdeo_state::nyjoker_io(address_map &map)
@@ -537,7 +537,7 @@ void highvdeo_state::newmcard_map(address_map &map)
 	map(0x00400, 0x0ffff).ram().share("nvram");
 	map(0x40000, 0x7ffff).ram().share("blit_ram"); /*blitter ram*/
 	map(0x80000, 0xbffff).bankr("mainbank");
-	map(0xc0000, 0xfffff).rom();
+	map(0xc0000, 0xfffff).rom().region("maincpu", 0xc0000)
 }
 
 void highvdeo_state::newmcard_io_base(address_map &map)
