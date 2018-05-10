@@ -316,10 +316,8 @@ MACHINE_CONFIG_START(cd2650_state::cd2650)
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, "beeper", 950).add_route(ALL_OUTPUTS, "mono", 0.50); // guess
 
 	/* Devices */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)

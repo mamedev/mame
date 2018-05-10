@@ -390,11 +390,9 @@ MACHINE_CONFIG_START(coco_state::coco_sound)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	// Single-bit sound: R22 = 10K
-	MCFG_DEVICE_ADD("sbs", DAC_1BIT, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
+	DAC_1BIT(config, "sbs", 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 MACHINE_CONFIG_END
 
 

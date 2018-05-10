@@ -2081,10 +2081,8 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("psg", AY8910, XTAL(4'915'200) / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 1.00)
-	MCFG_DEVICE_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.25)
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
@@ -2134,10 +2132,8 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
@@ -2187,10 +2183,8 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, fm7_state, fm77av_joy_1_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, fm7_state, fm77av_joy_2_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
-	MCFG_DEVICE_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm77av)
 
@@ -2262,10 +2256,8 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 	MCFG_DEVICE_IO_MAP(fm11_x86_io)
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm11)
 
@@ -2327,10 +2319,8 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm16)
 

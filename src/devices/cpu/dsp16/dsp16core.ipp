@@ -165,7 +165,7 @@ inline void dsp16_device_base::core_state::dau_f2(u16 op)
 	d = dau_set_psw_flags(d);
 }
 
-inline s64 &dsp16_device_base::core_state::dau_set_at(u16 op, s16 value)
+inline s64 &dsp16_device_base::core_state::dau_set_atx(u16 op, s16 value)
 {
 	s64 &at(op_dau_at(op));
 	if (op_x(op))
@@ -177,6 +177,13 @@ inline s64 &dsp16_device_base::core_state::dau_set_at(u16 op, s16 value)
 	{
 		return at = (at & ~((s64(1) << 16) - 1)) | u64(u16(value));
 	}
+}
+
+inline s64 &dsp16_device_base::core_state::dau_set_at(u16 op, s16 value)
+{
+	s64 &at(op_dau_at(op));
+	bool const clear(!BIT(dau_psw, 4 + op_d(~op)));
+	return at = s32((u32(u16(value)) << 16) | u32(clear ? u16(0) : u16(u64(at))));
 }
 
 /***********************************************************************

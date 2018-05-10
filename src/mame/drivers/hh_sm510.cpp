@@ -264,7 +264,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kdribble_state::kdribble)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -337,7 +337,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ktopgun_state::ktopgun)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -412,7 +412,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kcontra_state::kcontra)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -485,7 +485,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ktmnt_state::ktmnt)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -555,7 +555,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kgradius_state::kgradius)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -623,7 +623,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kloneran_state::kloneran)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -695,7 +695,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kblades_state::kblades)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -768,7 +768,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(knfl_state::knfl)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -840,7 +840,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kbilly_state::kbilly)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -906,7 +906,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kbucky_state::kbucky)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -976,7 +976,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kgarfld_state::kgarfld)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -1069,7 +1069,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_mmouse_state::gnw_mmouse)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM5A, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM5A)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // ?
 	MCFG_SM500_WRITE_O_CB(WRITE8(*this, hh_sm510_state, sm500_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1104,7 +1104,7 @@ MACHINE_CONFIG_START(gnw_mmouse_state::nupogodi)
 	gnw_mmouse(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", KB1013VK12, 32.768_kHz_XTAL)
+	MCFG_DEVICE_REPLACE("maincpu", KB1013VK12)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM500_WRITE_O_CB(WRITE8(*this, hh_sm510_state, sm500_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1178,7 +1178,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_mickdon_state::gnw_mickdon)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1262,7 +1262,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_dkong2_state::gnw_dkong2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1347,7 +1347,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_mario_state::gnw_mario)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1439,7 +1439,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_dkjr_state::gnw_dkjr)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1521,7 +1521,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_mariocm_state::gnw_mariocm)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1606,7 +1606,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_smb_state::gnw_smb)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -1708,7 +1708,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_boxing_state::gnw_boxing)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -1818,7 +1818,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tgaunt_state::tgaunt)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1921,7 +1921,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tddragon_state::tddragon)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2016,7 +2016,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tkarnov_state::tkarnov)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2110,7 +2110,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tvindictr_state::tvindictr)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2227,7 +2227,7 @@ void tgaiden_state::machine_start()
 MACHINE_CONFIG_START(tgaiden_state::tgaiden)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2317,7 +2317,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tbatman_state::tbatman)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2411,7 +2411,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tsharr2_state::tsharr2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2502,7 +2502,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tstrider_state::tstrider)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2597,7 +2597,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tgoldnaxe_state::tgoldnaxe)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2692,7 +2692,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(trobocop2_state::trobocop2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2791,7 +2791,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(taltbeast_state::taltbeast)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2886,7 +2886,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tsf2010_state::tsf2010)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2977,7 +2977,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tswampt_state::tswampt)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3072,7 +3072,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tspidman_state::tspidman)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3167,7 +3167,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tddragon3_state::tddragon3)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3262,7 +3262,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tflash_state::tflash)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3358,7 +3358,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tmchammer_state::tmchammer)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -3452,7 +3452,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tbtoads_state::tbtoads)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3547,7 +3547,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(thook_state::thook)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3641,7 +3641,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tbttf_state::tbttf)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3738,7 +3738,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(taddams_state::taddams)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3833,7 +3833,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(thalone_state::thalone)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3924,7 +3924,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(txmenpx_state::txmenpx)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4019,7 +4019,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(thalone2_state::thalone2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4138,7 +4138,7 @@ static const s16 tsonic_speaker_levels[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff }
 MACHINE_CONFIG_START(tsonic_state::tsonic)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, tsonic_state, write_s))
@@ -4232,7 +4232,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(trobocop3_state::trobocop3)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4323,7 +4323,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tdummies_state::tdummies)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4418,7 +4418,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tsfight2_state::tsfight2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4509,7 +4509,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tjpark_state::tjpark)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4628,7 +4628,7 @@ static const s16 tsonic2_speaker_levels[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff 
 MACHINE_CONFIG_START(tsonic2_state::tsonic2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, tsonic2_state, write_s))
@@ -4727,7 +4727,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tsddragon_state::tsddragon)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4823,7 +4823,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tdennis_state::tdennis)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4922,7 +4922,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tnmarebc_state::tnmarebc)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5017,7 +5017,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ttransf2_state::ttransf2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5113,7 +5113,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tmkombat_state::tmkombat)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5208,7 +5208,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tshadow_state::tshadow)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5303,7 +5303,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tskelwarr_state::tskelwarr)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5399,7 +5399,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tbatfor_state::tbatfor)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5495,7 +5495,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tjdredd_state::tjdredd)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5591,7 +5591,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tapollo13_state::tapollo13)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5687,7 +5687,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tgoldeye_state::tgoldeye)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5778,7 +5778,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tinday_state::tinday)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5869,7 +5869,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tsjam_state::tsjam)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL) // no external XTAL
+	MCFG_DEVICE_ADD("maincpu", SM510) // no external XTAL
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5974,7 +5974,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tigarden_state::tigarden)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -6075,7 +6075,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(nummunch_state::nummunch)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))

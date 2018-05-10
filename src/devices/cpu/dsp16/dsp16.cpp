@@ -805,7 +805,7 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 					s64 const d(m_core->dau_f1(op));
 					m_core->dau_temp = u16(u64(dau_saturate(op_d(~op))) >> (op_x(op) ? 16 : 0));
 					m_core->op_dau_ad(op) = d;
-					m_core->dau_set_at(op, yaau_read<Debugger>(op));
+					m_core->dau_set_atx(op, yaau_read<Debugger>(op));
 					m_phase = phase::OP2;
 				}
 				break;
@@ -817,7 +817,7 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 
 			case 0x07: // F1 ; aT[l] = Y
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
-				m_core->dau_set_at(op, yaau_read<Debugger>(op));
+				m_core->dau_set_atx(op, yaau_read<Debugger>(op));
 				break;
 
 			case 0x08: // aT = R
@@ -1179,7 +1179,7 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 					s64 const d(m_core->dau_f1(op));
 					m_core->dau_temp = u16(u64(dau_saturate(op_d(~op))) >> (op_x(op) ? 16 : 0));
 					m_core->op_dau_ad(op) = d;
-					m_core->dau_set_at(op, yaau_read<Debugger>(op));
+					m_core->dau_set_atx(op, yaau_read<Debugger>(op));
 					m_phase = phase::OP2;
 				}
 				break;
@@ -1191,7 +1191,7 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 
 			case 0x07: // F1 ; aT[l] = Y
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
-				m_core->dau_set_at(op, yaau_read<Debugger>(op));
+				m_core->dau_set_atx(op, yaau_read<Debugger>(op));
 				break;
 
 			case 0x08: // aT = R

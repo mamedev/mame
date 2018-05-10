@@ -1502,10 +1502,8 @@ MACHINE_CONFIG_START(x07_state::x07)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.50 )
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	BEEP(config, "beeper", 0).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)

@@ -181,8 +181,7 @@ MACHINE_CONFIG_START(vector06_state::vector06)
 	MCFG_PALETTE_INIT_OWNER(vector06_state, vector06)
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
