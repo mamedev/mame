@@ -306,7 +306,8 @@ MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
 	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)

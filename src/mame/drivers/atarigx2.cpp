@@ -1521,7 +1521,8 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarigx2_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ATARI_JSA_IIIS_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_5))
 	MCFG_ATARI_JSA_TEST_PORT("SERVICE", 6)

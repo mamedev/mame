@@ -378,7 +378,7 @@ MACHINE_CONFIG_START(bombjack_state::bombjack)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) /* Confirmed from PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)

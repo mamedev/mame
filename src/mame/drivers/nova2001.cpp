@@ -671,7 +671,7 @@ MACHINE_CONFIG_START(nova2001_state::nova2001)
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,nova2001)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/6) // 2 MHz verified on schematics
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_x_w))
@@ -715,7 +715,7 @@ MACHINE_CONFIG_START(nova2001_state::ninjakun)
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,ninjakun)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/4) // 3 MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
@@ -752,7 +752,7 @@ MACHINE_CONFIG_START(nova2001_state::pkunwar)
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,pkunwar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz (correct?)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
@@ -794,7 +794,7 @@ MACHINE_CONFIG_START(nova2001_state::raiders5)
 	MCFG_VIDEO_START_OVERRIDE(nova2001_state,raiders5)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))

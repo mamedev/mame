@@ -1971,7 +1971,8 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x3600/2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
@@ -2140,7 +2141,8 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x4e00/2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
@@ -2237,7 +2239,8 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_DEFAULT_LAYOUT(layout_captflag)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, captflag_oki1_map)

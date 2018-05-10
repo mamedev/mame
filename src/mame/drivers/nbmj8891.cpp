@@ -2224,7 +2224,7 @@ MACHINE_CONFIG_START(nbmj8891_state::gionbana)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("fmsnd", YM3812, 2500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)

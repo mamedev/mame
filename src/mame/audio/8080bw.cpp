@@ -213,7 +213,7 @@ static const discrete_dac_r1_ladder ballbomb_music_dac =
 /* Nodes - Sounds */
 #define BALLBOMB_MUSIC          NODE_11
 
-DISCRETE_SOUND_START(ballbomb)
+DISCRETE_SOUND_START(ballbomb_discrete)
 
 	DISCRETE_INPUT_DATA (BALLBOMB_MUSIC_DATA)
 
@@ -293,7 +293,7 @@ static const discrete_dac_r1_ladder indianbt_music_dac =
 /* Nodes - Sounds */
 #define INDIANBT_MUSIC          NODE_11
 
-DISCRETE_SOUND_START(indianbt)
+DISCRETE_SOUND_START(indianbt_discrete)
 
 	DISCRETE_INPUT_DATA (INDIANBT_MUSIC_DATA)
 
@@ -504,7 +504,7 @@ static const discrete_mixer_desc polaris_mixer_vr4_desc =
 #define POLARIS_ADJ_VR2         NODE_24
 #define POLARIS_ADJ_VR3         NODE_25
 
-DISCRETE_SOUND_START(polaris)
+DISCRETE_SOUND_START(polaris_discrete)
 
 	/************************************************/
 	/* Polaris sound system: 8 Sound Sources        */
@@ -781,7 +781,7 @@ WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
 #define SCHASER_EXP_SND     NODE_11
 #define SCHASER_MUSIC_SND   NODE_12
 
-DISCRETE_SOUND_START(schaser)
+DISCRETE_SOUND_START(schaser_discrete)
 	/************************************************/
 	/* Input register mapping for schaser           */
 	/************************************************/

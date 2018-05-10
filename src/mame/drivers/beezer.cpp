@@ -530,7 +530,7 @@ MACHINE_CONFIG_START(beezer_state::beezer)
 	MCFG_MM5837_VDD(12)
 	MCFG_MM5837_OUTPUT_CB(WRITELINE(*this, beezer_state, noise_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC76, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END

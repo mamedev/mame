@@ -489,7 +489,7 @@ MACHINE_CONFIG_START(atari_s2_state::atari_s2)
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("dac", DAC_4BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // r23-r26 (68k,33k,18k,8.2k)
 	MCFG_DEVICE_ADD("dac1", DAC_3BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // r18-r20 (100k,47k,100k)

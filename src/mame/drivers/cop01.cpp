@@ -474,7 +474,7 @@ MACHINE_CONFIG_START(cop01_state::cop01)
 	MCFG_PALETTE_INIT_OWNER(cop01_state, cop01)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -518,7 +518,7 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 	MCFG_PALETTE_INIT_OWNER(cop01_state, cop01)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

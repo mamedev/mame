@@ -1188,7 +1188,7 @@ static const discrete_mixer_desc btime_sound_mixer_desc =
 static const discrete_op_amp_filt_info btime_opamp_desc =
 	{BTIME_R51, 0, BTIME_R50, 0, BTIME_R49, CAP_U(0.068), CAP_U(0.068), 0, 0, 5.0, -5.0};
 
-static DISCRETE_SOUND_START( btime_sound )
+static DISCRETE_SOUND_START( btime_sound_discrete )
 
 	DISCRETE_INPUTX_STREAM(NODE_01, 0, 5.0/32767.0, 0)
 	DISCRETE_INPUTX_STREAM(NODE_02, 1, 5.0/32767.0, 0)
@@ -1306,7 +1306,7 @@ MACHINE_CONFIG_START(btime_state::btime)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
@@ -1326,8 +1326,7 @@ MACHINE_CONFIG_START(btime_state::btime)
 	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 4)
 	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 5)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(btime_sound)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, btime_sound_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(istrebiteli_state::istreb)
 	MCFG_PALETTE_INIT_OWNER(istrebiteli_state, istrebiteli)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("custom", ISTREBITELI_SOUND, XTAL(8'000'000) / 2 / 256)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END

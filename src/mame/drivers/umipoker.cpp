@@ -722,7 +722,7 @@ MACHINE_CONFIG_START(umipoker_state::umipoker)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym", YM3812, XTAL(14'318'181)/4) // 3.579545MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

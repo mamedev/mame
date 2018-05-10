@@ -222,7 +222,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::redalert_audio)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	redalert_audio_m37b(config);
 	redalert_audio_voice(config);
@@ -239,7 +239,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redalert_state::ww3_audio)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	redalert_audio_m37b(config);
 
@@ -357,7 +357,7 @@ MACHINE_CONFIG_START(redalert_state::demoneye_audio)
 
 	MCFG_SOUND_START_OVERRIDE( redalert_state, demoneye )
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

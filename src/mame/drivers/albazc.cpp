@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(albazc_state::hanaroku)
 	MCFG_PALETTE_INIT_OWNER(albazc_state, albazc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) /* ? MHz */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))

@@ -552,7 +552,7 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)  /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))

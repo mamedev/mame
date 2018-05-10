@@ -230,7 +230,7 @@ MACHINE_CONFIG_START(channelf_state::channelf)
 	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -257,7 +257,7 @@ MACHINE_CONFIG_START(channelf_state::sabavdpl)
 	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(channelf_state::channlf2)
 	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -313,7 +313,7 @@ MACHINE_CONFIG_START(channelf_state::sabavpl2)
 	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

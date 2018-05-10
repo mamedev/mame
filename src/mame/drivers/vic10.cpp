@@ -718,7 +718,7 @@ MACHINE_CONFIG_START(vic10_state::vic10)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS6566_TAG, mos6566_device, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(8'000'000)/8)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, vic10_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, vic10_state, sid_poty_r))

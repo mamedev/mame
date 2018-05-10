@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(itgambl2_state::itgambl2)
 	MCFG_PALETTE_INIT_OWNER(itgambl2_state, itgambl2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

@@ -544,11 +544,12 @@ void hfe_format::generate_hfe_bitstream_from_track(int cyl, int head, int& sampl
 		bool mfm_recording = false;
 		int time0 = 0;
 		int minflux = 4000;
+		int fluxlen = 0;
 		// Skip the beginning (may have a short cell)
 		for (int i=2; (i < tbuf.size()-1) && (time0 < 2000000) && !mfm_recording; i++)
 		{
-			int time0 = tbuf[i] & floppy_image::TIME_MASK;
-			int fluxlen = (tbuf[i+1] & floppy_image::TIME_MASK) - time0;
+			time0 = tbuf[i] & floppy_image::TIME_MASK;
+			fluxlen = (tbuf[i+1] & floppy_image::TIME_MASK) - time0;
 			if ((fluxlen < 3500) || (fluxlen > 5500 && fluxlen < 6500))
 				mfm_recording = true;
 			if (fluxlen < minflux) minflux = fluxlen;

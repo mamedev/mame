@@ -350,7 +350,7 @@ MACHINE_CONFIG_START(tiamc1_state::tiamc1)
 	MCFG_PALETTE_INIT_OWNER(tiamc1_state, tiamc1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("2x8253", TIAMC1, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

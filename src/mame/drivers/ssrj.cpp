@@ -163,7 +163,7 @@ MACHINE_CONFIG_START(ssrj_state::ssrj)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/5)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN3"))

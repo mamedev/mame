@@ -1127,7 +1127,8 @@ MACHINE_CONFIG_START(midyunit_state::zunit)
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midzunit)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("narcsnd", WILLIAMS_NARC_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -1168,7 +1169,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_core)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
 

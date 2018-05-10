@@ -622,7 +622,7 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(bigbord2_state, kbd_put))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 950) // actual frequency is unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

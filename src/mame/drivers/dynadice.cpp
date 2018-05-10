@@ -273,7 +273,7 @@ MACHINE_CONFIG_START(dynadice_state::dynadice)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dynadice)
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

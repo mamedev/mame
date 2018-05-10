@@ -400,7 +400,7 @@ MACHINE_CONFIG_START(bfmsys85_state::bfmsys85)
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) // What are the correct ACIA clocks ?
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bfmsys85_state, write_acia_clock))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd",AY8912, MASTER_CLOCK/4)          // add AY8912 soundchip
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

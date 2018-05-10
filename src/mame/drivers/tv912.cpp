@@ -903,7 +903,7 @@ MACHINE_CONFIG_START(tv912_state::tv912)
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "loopback")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, XTAL(23'814'000) / 7 / 11 / 256) // nominally 1200 Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

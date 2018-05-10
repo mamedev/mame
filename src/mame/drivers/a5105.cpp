@@ -585,11 +585,9 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 	MCFG_PALETTE_INIT_OWNER(a5105_state, a5105)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("beeper", BEEP, 500)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, "beeper", 500).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(15'000'000) / 16) // unk clock

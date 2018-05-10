@@ -917,7 +917,8 @@ MACHINE_CONFIG_START(md_base_state::md_ntsc)
 	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7) /* 7.67 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
@@ -973,7 +974,8 @@ MACHINE_CONFIG_START(md_base_state::md_pal)
 	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_PAL/7) /* 7.67 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)

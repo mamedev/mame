@@ -857,7 +857,7 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 300)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

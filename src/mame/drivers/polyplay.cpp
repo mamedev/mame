@@ -347,7 +347,7 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	MCFG_PALETTE_INIT_OWNER(polyplay_state, polyplay)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker1", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADD("speaker2", SPEAKER_SOUND)

@@ -806,7 +806,8 @@ MACHINE_CONFIG_START(pgm2_state::pgm2)
 
 	MCFG_NVRAM_ADD_0FILL("sram")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ymz774", YMZ774, 16384000) // is clock correct ?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -879,15 +880,15 @@ MACHINE_CONFIG_END
 
 #define ORLEG2_PROGRAM_104(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( #prefix "_v104" #extension ".u7",  0x000000, 0x800000, CRC(7c24a4f5) SHA1(3cd9f9264ef2aad0869afdf096e88eb8d74b2570) )
+	ROM_LOAD( #prefix "_v104" #extension ".u7",  0x000000, 0x800000, CRC(7c24a4f5) SHA1(3cd9f9264ef2aad0869afdf096e88eb8d74b2570) ) // V104 08-03-03 13:25:37
 
 #define ORLEG2_PROGRAM_103(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( #prefix "_v103" #extension ".u7",  0x000000, 0x800000, CRC(21c1fae8) SHA1(36eeb7a5e8dc8ee7c834f3ff1173c28cf6c2f1a3) )
+	ROM_LOAD( #prefix "_v103" #extension ".u7",  0x000000, 0x800000, CRC(21c1fae8) SHA1(36eeb7a5e8dc8ee7c834f3ff1173c28cf6c2f1a3) ) // V103 08-01-30 14:45:17
 
 #define ORLEG2_PROGRAM_101(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( #prefix "_v101" #extension ".u7",  0x000000, 0x800000, CRC(45805b53) SHA1(f2a8399c821b75fadc53e914f6f318707e70787c) )
+	ROM_LOAD( #prefix "_v101" #extension ".u7",  0x000000, 0x800000, CRC(45805b53) SHA1(f2a8399c821b75fadc53e914f6f318707e70787c) ) // V101 07-12-24 09:32:32
 
 /*
    Internal ROMs for CHINA, JAPAN and OVERSEA are confirmed to differ by just the region byte, other regions not yet verified.
@@ -990,15 +991,15 @@ ROM_END
 
 #define KOV2NL_PROGRAM_302(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( #prefix "_v302" #extension ".u7", 0x00000000, 0x0800000, CRC(b19cf540) SHA1(25da5804bbfd7ef2cdf5cc5aabaa803d18b98929) )
+	ROM_LOAD( #prefix "_v302" #extension ".u7", 0x00000000, 0x0800000, CRC(b19cf540) SHA1(25da5804bbfd7ef2cdf5cc5aabaa803d18b98929) ) // V302 08-12-03 15:27:34
 
 #define KOV2NL_PROGRAM_301(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( #prefix "_v301" #extension ".u7", 0x000000, 0x800000, CRC(c4595c2c) SHA1(09e379556ef76f81a63664f46d3f1415b315f384) )
+	ROM_LOAD( #prefix "_v301" #extension ".u7", 0x000000, 0x800000, CRC(c4595c2c) SHA1(09e379556ef76f81a63664f46d3f1415b315f384) ) // V301 08-09-09 09:44:53
 
 #define KOV2NL_PROGRAM_300(prefix, extension) \
 	ROM_REGION( 0x1000000, "user1", 0 ) \
-	ROM_LOAD( #prefix "_v300" #extension ".u7", 0x000000, 0x800000, CRC(08da7552) SHA1(303b97d7694405474c8133a259303ccb49db48b1) )
+	ROM_LOAD( #prefix "_v300" #extension ".u7", 0x000000, 0x800000, CRC(08da7552) SHA1(303b97d7694405474c8133a259303ccb49db48b1) ) // V300 08-08-06 18:21:23
 
 
 // Region 0x00 - China
@@ -1095,7 +1096,7 @@ ROM_START( ddpdojt )
 	ROM_LOAD( "ddpdoj_igs036_china.rom",       0x00000000, 0x0004000, CRC(5db91464) SHA1(723d8086285805bd815e62120dfa9a4269bcd932) )
 
 	ROM_REGION( 0x0200000, "user1", 0 )
-	ROM_LOAD( "ddpdoj_v201cn.u4",        0x00000000, 0x0200000, CRC(89e4b760) SHA1(9fad1309da31d12a413731b416a8bbfdb304ed9e) )
+	ROM_LOAD( "ddpdoj_v201cn.u4",        0x00000000, 0x0200000, CRC(89e4b760) SHA1(9fad1309da31d12a413731b416a8bbfdb304ed9e) ) // V201 10-03-27 17:45:12
 
 	DDPDOJT_VIDEO_SOUND_ROMS
 ROM_END
@@ -1142,7 +1143,7 @@ ROM_START( kov3 )
 	KOV3_INTERNAL_CHINA
 
 	ROM_REGION( 0x1000000, "user1", 0 )
-	ROM_LOAD( "kov3_v104cn_raw.bin",         0x00000000, 0x0800000, CRC(1b5cbd24) SHA1(6471d4842a08f404420dea2bd1c8b88798c80fd5) )
+	ROM_LOAD( "kov3_v104cn_raw.bin",         0x00000000, 0x0800000, CRC(1b5cbd24) SHA1(6471d4842a08f404420dea2bd1c8b88798c80fd5) ) // V104 11-12-09 14:29:14
 
 	KOV3_VIDEO_SOUND_ROMS
 ROM_END
@@ -1151,7 +1152,7 @@ ROM_START( kov3_102 )
 	KOV3_INTERNAL_CHINA
 
 	ROM_REGION( 0x1000000, "user1", 0 )
-	ROM_LOAD( "kov3_v102cn_raw.bin",         0x00000000, 0x0800000, CRC(61d0dabd) SHA1(959b22ef4e342ca39c2386549ac7274f9d580ab8) )
+	ROM_LOAD( "kov3_v102cn_raw.bin",         0x00000000, 0x0800000, CRC(61d0dabd) SHA1(959b22ef4e342ca39c2386549ac7274f9d580ab8) ) // V102 11-11-01 18:56:07
 
 	KOV3_VIDEO_SOUND_ROMS
 ROM_END
@@ -1160,7 +1161,7 @@ ROM_START( kov3_101 )
 	KOV3_INTERNAL_CHINA
 
 	ROM_REGION( 0x1000000, "user1", 0 )
-	ROM_LOAD( "kov3_v101.bin",         0x00000000, 0x0800000, BAD_DUMP CRC(d6664449) SHA1(64d912425f018c3531951019b33e909657724547) ) // dump was not raw, manually xored with fake value
+	ROM_LOAD( "kov3_v101.bin",         0x00000000, 0x0800000, BAD_DUMP CRC(d6664449) SHA1(64d912425f018c3531951019b33e909657724547) ) // V101 11-10-03 14:37:29; dump was not raw, manually xored with fake value
 
 	KOV3_VIDEO_SOUND_ROMS
 ROM_END
@@ -1169,7 +1170,7 @@ ROM_START( kov3_100 )
 	KOV3_INTERNAL_CHINA
 
 	ROM_REGION( 0x1000000, "user1", 0 )
-	ROM_LOAD( "kov3_v100cn_raw.bin",         0x00000000, 0x0800000, CRC(93bca924) SHA1(ecaf2c4676eb3d9f5e4fdbd9388be41e51afa0e4) )
+	ROM_LOAD( "kov3_v100cn_raw.bin",         0x00000000, 0x0800000, CRC(93bca924) SHA1(ecaf2c4676eb3d9f5e4fdbd9388be41e51afa0e4) ) // V100 11-09-14 15:13:14
 
 	KOV3_VIDEO_SOUND_ROMS
 ROM_END
@@ -1216,7 +1217,7 @@ ROM_START( kof98umh )
 	ROM_LOAD( "kof98umh_internal_rom.bin",       0x00000000, 0x0004000, CRC(3ed2e50f) SHA1(35310045d375d9dda36c325e35257123a7b5b8c7) )
 
 	ROM_REGION( 0x1000000, "user1", 0 )
-	ROM_LOAD( "kof98umh_v100cn.u4",        0x00000000, 0x1000000, CRC(2ea91e3b) SHA1(5a586bb99cc4f1b02e0db462d5aff721512e0640) )
+	ROM_LOAD( "kof98umh_v100cn.u4",        0x00000000, 0x1000000, CRC(2ea91e3b) SHA1(5a586bb99cc4f1b02e0db462d5aff721512e0640) ) // V100 09-08-23 17:52:03
 
 	KOF98UMH_VIDEO_SOUND_ROMS
 ROM_END
@@ -1502,41 +1503,50 @@ DRIVER_INIT_MEMBER(pgm2_state,kof98umh)
 
 /* PGM2 */
 
+//华通电子/Huatong Electronics (distributor of orleg2, kov2nl in china) = 华通科技/Huatong Technology (distributor of kov3 in china),
+//Same company but they changed name.
+
 // Oriental Legend 2 - should be a V102 and V100 too
+//西游释厄传2/Xīyóu shì è chuán 2 (China; Simplified Chinese)
+//西遊釋厄傳2/Saiyū Shakuyakuden 2 (Japan; Traditional Chinese - Taiwan(undumped) too?)
 GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_SUPPORTS_SAVE ) /* Overseas sets of OL2 do not use the card reader */
 GAME( 2007, orleg2_103,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", MACHINE_SUPPORTS_SAVE )
 GAME( 2007, orleg2_101,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2007, orleg2_104cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_103cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_101cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_104cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS (Huatong license)", "Xiyou Shi E Chuan 2 (V104, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_103cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS (Huatong license)", "Xiyou Shi E Chuan 2 (V103, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS (Huatong license)", "Xiyou Shi E Chuan 2 (V101, China)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2007, orleg2_104jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_103jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_101jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_104jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V104, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_103jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V103, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V101, Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Knights of Valour 2 New Legend
-GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, Oversea)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_301,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, Oversea)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_300,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, Oversea)", MACHINE_SUPPORTS_SAVE )
+//三國戰紀2撗掃于軍 New Legend/Sānguó zhàn jì 2 Guàng sǎo yú jūn New Legend (Oversea; Mixed Traditional and Simplified Chinese)
+//三國戰紀2盖世英雄/Sānguó zhàn jì 2 Gàishì yīngxióng (China; Mixed Traditional and Simplified Chinese)
+//三國戰紀2乱世英雄/Sangoku-Senki 2 Ranse Eiyū (Japan; Mixed Traditional and Simplified Chinese - Undumped)
+GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Guang Sao Yu Jun (V302, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_301,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Guang Sao Yu Jun (V301, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_300,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Guang Sao Yu Jun (V300, Oversea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2008, kov2nl_302cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_301cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_300cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V300, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_302cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V302, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_301cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V301, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_300cn, kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V300, China)", MACHINE_SUPPORTS_SAVE )
 
 
 // Dodonpachi Daioujou Tamashii - should be a V200 too
-GAME( 2010, ddpdojt,      0,    pgm2_ramrom,    pgm2, pgm2_state,     ddpdojt,    ROT270, "IGS / Cave", "DoDonPachi Dai-Ou-Jou Tamashii (V201, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2010, ddpdojt,      0,    pgm2_ramrom,    pgm2, pgm2_state,     ddpdojt,    ROT270, "IGS / Cave (Tong Li Animation license)", "DoDonPachi Dai-Ou-Jou Tamashii (V201, China)", MACHINE_SUPPORTS_SAVE )
 
 // Knights of Valour 3 - should be a V103 and V101 too
-GAME( 2011, kov3,         0,    pgm2_hires, pgm2, pgm2_state,     kov3_104,   ROT0, "IGS", "Knights of Valour 3 (V104, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2011, kov3_102,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_102,   ROT0, "IGS", "Knights of Valour 3 (V102, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2011, kov3_101,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_101,   ROT0, "IGS", "Knights of Valour 3 (V101, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2011, kov3_100,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_100,   ROT0, "IGS", "Knights of Valour 3 (V100, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+//三国战纪3/Sānguó zhàn jì 3 (Simplified Chinese)
+GAME( 2011, kov3,         0,    pgm2_hires, pgm2, pgm2_state,     kov3_104,   ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V104, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2011, kov3_102,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_102,   ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V102, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2011, kov3_101,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_101,   ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V101, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2011, kov3_100,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_100,   ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V100, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
 
 // King of Fighters '98: Ultimate Match Hero
 GAME( 2009, kof98umh,     0,    pgm2_lores, pgm2, pgm2_state,  kof98umh,   ROT0, "IGS / SNK Playmore / New Channel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", MACHINE_SUPPORTS_SAVE )
 
 // Jigsaw World Arena
 
-// Puzzle of Ocha / Ochainu No Pazuru
+// お茶犬のパズル/Ochaken no Puzzle (V101JP exists but undumped, Puzzle game of Japanese お茶犬/Ochaken franchises)

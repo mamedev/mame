@@ -1899,7 +1899,8 @@ MACHINE_CONFIG_START(seibuspi_state::spi)
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, seibuspi_state, scroll_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymf", YMF271, XTAL(16'934'400))
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(*this, seibuspi_state, ymf_irqhandler))
@@ -1955,7 +1956,7 @@ MACHINE_CONFIG_START(seibuspi_state::sxx2e)
 	 // Single PCBs only output mono sound, SXX2E : unverified
 	MCFG_DEVICE_REMOVE("lspeaker")
 	MCFG_DEVICE_REMOVE("rspeaker")
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_REPLACE("ymf", YMF271, XTAL(16'934'400))
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(*this, seibuspi_state, ymf_irqhandler))
@@ -2024,7 +2025,7 @@ MACHINE_CONFIG_START(seibuspi_state::sys386i)
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, seibuspi_state, scroll_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(28'636'363)/20, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -2081,7 +2082,7 @@ MACHINE_CONFIG_START(seibuspi_state::sys386f)
 
 	/* sound hardware */
 	 // Single PCBs only output mono sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'384'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

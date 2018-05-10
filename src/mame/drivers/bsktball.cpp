@@ -270,10 +270,9 @@ MACHINE_CONFIG_START(bsktball_state::bsktball)
 	MCFG_PALETTE_INIT_OWNER(bsktball_state, bsktball)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(bsktball)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, bsktball_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -340,7 +340,7 @@ MACHINE_CONFIG_START(bottom9_state::bottom9)
 	MCFG_K051316_CB(bottom9_state, zoom_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

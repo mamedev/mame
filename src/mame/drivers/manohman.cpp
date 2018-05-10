@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(manohman_state::manohman)
 
 	MCFG_NVRAM_ADD_NO_FILL("nvram") // KM6264BL-10 x2 + MAX696CFL + battery
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("saa", SAA1099, XTAL(8'000'000) / 2) // clock not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END

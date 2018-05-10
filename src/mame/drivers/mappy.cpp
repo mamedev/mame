@@ -1357,7 +1357,7 @@ MACHINE_CONFIG_START(mappy_state::superpac_common)
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,superpac)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO_15XX, 18432000/768)
 	MCFG_NAMCO_AUDIO_VOICES(8)
@@ -1485,7 +1485,7 @@ MACHINE_CONFIG_START(mappy_state::phozon)
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,phozon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO_15XX, 18432000/768)
 	MCFG_NAMCO_AUDIO_VOICES(8)
@@ -1535,7 +1535,7 @@ MACHINE_CONFIG_START(mappy_state::mappy_common)
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,mappy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO_15XX, 18432000/768)
 	MCFG_NAMCO_AUDIO_VOICES(8)

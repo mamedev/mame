@@ -876,10 +876,9 @@ MACHINE_CONFIG_START(firetrk_state::firetrk)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firetrk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(firetrk)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, firetrk_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -903,8 +902,7 @@ MACHINE_CONFIG_START(firetrk_state::superbug)
 	MCFG_PALETTE_INIT_OWNER(firetrk_state, firetrk)
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(superbug)
+	MCFG_DEVICE_REPLACE("discrete", DISCRETE, superbug_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -928,8 +926,7 @@ MACHINE_CONFIG_START(firetrk_state::montecar)
 	MCFG_PALETTE_INIT_OWNER(firetrk_state,montecar)
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(montecar)
+	MCFG_DEVICE_REPLACE("discrete", DISCRETE, montecar_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

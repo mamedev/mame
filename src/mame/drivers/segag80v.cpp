@@ -914,7 +914,7 @@ MACHINE_CONFIG_START(segag80v_state::g80v_base)
 	MCFG_VECTOR_ADD("vector")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
 

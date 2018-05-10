@@ -451,7 +451,7 @@ MACHINE_CONFIG_START(supertnk_state::supertnk)
 	MCFG_SCREEN_UPDATE_DRIVER(supertnk_state, screen_update_supertnk)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

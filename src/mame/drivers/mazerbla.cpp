@@ -1046,7 +1046,7 @@ MACHINE_CONFIG_START(mazerbla_state::greatgun)
 	MCFG_PALETTE_INIT_OWNER(mazerbla_state, mazerbla)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, SOUND_CLOCK / 8)
 	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch", generic_latch_8_device, read))

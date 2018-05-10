@@ -754,7 +754,7 @@ MACHINE_CONFIG_START(paradise_state::paradise)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH)    /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

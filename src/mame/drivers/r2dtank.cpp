@@ -488,7 +488,7 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, r2dtank_state, main_cpu_irq))
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")

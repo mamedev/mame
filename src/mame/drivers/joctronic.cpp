@@ -359,7 +359,7 @@ MACHINE_CONFIG_START(joctronic_state::joctronic)
 	MCFG_DEVICE_ADD("drivers4", LS259, 0) // IC1
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// Datasheet suggests YM2203 as a possible replacement for this AY8910
 	MCFG_DEVICE_ADD("aysnd1", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(joctronic_state::slalom03)
 	MCFG_DEVICE_ADD("drivers6", HC259, 0) // IC6
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd1", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, joctronic_state, slalom03_oki_bank_w))

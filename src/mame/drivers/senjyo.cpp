@@ -586,7 +586,7 @@ MACHINE_CONFIG_START(senjyo_state::senjyo)
 	MCFG_PALETTE_INIT_OWNER(senjyo_state, radar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76496, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)

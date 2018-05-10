@@ -2258,7 +2258,8 @@ void pc9801_state::cdrom_headphones(device_t *device)
 }
 
 MACHINE_CONFIG_START(pc9801_state::pc9801_ide)
-	MCFG_SPEAKER_STANDARD_STEREO("lheadphone", "rheadphone")
+	SPEAKER(config, "lheadphone").front_left();
+	SPEAKER(config, "rheadphone").front_right();
 	MCFG_ATA_INTERFACE_ADD("ide1", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("ideirq", input_merger_device, in_w<0>))
 	MCFG_ATA_INTERFACE_ADD("ide2", pc9801_atapi_devices, "pc9801_cd", nullptr, false)
@@ -2347,7 +2348,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)

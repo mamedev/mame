@@ -236,7 +236,7 @@ MACHINE_CONFIG_START(cchance_state::cchance)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", YM2149, 1500000/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))

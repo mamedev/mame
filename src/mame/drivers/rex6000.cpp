@@ -955,7 +955,7 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
@@ -1022,7 +1022,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END

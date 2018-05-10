@@ -260,7 +260,8 @@ MACHINE_CONFIG_START(pluto5_state::pluto5)
 
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound */
 MACHINE_CONFIG_END
 

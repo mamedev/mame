@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(scramble_state::ad2083_audio)
 	MCFG_TMSPROM_PDC_CB(WRITELINE("tms", tms5110_device, pdc_w))        /* tms pdc func */
 	MCFG_TMSPROM_CTL_CB(WRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

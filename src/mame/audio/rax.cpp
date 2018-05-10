@@ -504,7 +504,8 @@ MACHINE_CONFIG_START(acclaim_rax_device::device_add_mconfig)
 	MCFG_GENERIC_LATCH_16_ADD("data_in")
 	MCFG_GENERIC_LATCH_16_ADD("data_out")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("dacl", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)

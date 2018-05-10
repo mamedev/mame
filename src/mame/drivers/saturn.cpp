@@ -836,7 +836,8 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 
 	MCFG_VIDEO_START_OVERRIDE(sat_console_state,stv_vdp2)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("scsp", SCSP)
 	MCFG_SCSP_IRQ_CB(WRITE8(*this, saturn_state, scsp_irq))

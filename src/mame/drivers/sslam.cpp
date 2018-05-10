@@ -717,7 +717,7 @@ MACHINE_CONFIG_START(sslam_state::sslam)
 	MCFG_VIDEO_START_OVERRIDE(sslam_state,sslam)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -751,7 +751,7 @@ MACHINE_CONFIG_START(sslam_state::powerbls)
 	MCFG_VIDEO_START_OVERRIDE(sslam_state,powerbls)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

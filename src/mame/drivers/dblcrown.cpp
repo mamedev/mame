@@ -632,7 +632,7 @@ MACHINE_CONFIG_START(dblcrown_state::dblcrown)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dblcrown_state, mux_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ymz", YMZ284, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END

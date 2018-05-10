@@ -11,7 +11,6 @@
     such as Arena(in editmode).
 
     TODO:
-	- scorpio68 internal artwork
     - RS232 port
 
 ******************************************************************************
@@ -38,6 +37,7 @@ Scorpio 68000 hardware is very similar, but with chessboard buttons and side led
 
 // internal artwork
 #include "novag_diablo68k.lh" // clickable
+#include "novag_scorpio68k.lh" // clickable
 
 
 class novag68k_state : public novagbase_state
@@ -266,7 +266,7 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	MCFG_DEFAULT_LAYOUT(layout_novag_diablo68k)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(novag68k_state::scorpio68k)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(scorpio68k_map)
 
-	//MCFG_DEFAULT_LAYOUT(layout_novag_scorpio68k)
+	MCFG_DEFAULT_LAYOUT(layout_novag_scorpio68k)
 MACHINE_CONFIG_END
 
 

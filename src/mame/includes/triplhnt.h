@@ -105,7 +105,7 @@ private:
 };
 
 /*----------- defined in audio/triplhnt.cpp -----------*/
-DISCRETE_SOUND_EXTERN( triplhnt );
+DISCRETE_SOUND_EXTERN( triplhnt_discrete );
 extern const char *const triplhnt_sample_names[];
 
 #endif // MAME_INCLUDES_TRIPLHNT_H

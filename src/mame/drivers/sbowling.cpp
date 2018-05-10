@@ -429,7 +429,7 @@ MACHINE_CONFIG_START(sbowling_state::sbowling)
 	MCFG_PALETTE_INIT_OWNER(sbowling_state, sbowling)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(19'968'000)/16)  /* ? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)

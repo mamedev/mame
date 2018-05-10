@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(bwing_state::bwing)
 
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

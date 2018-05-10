@@ -1064,7 +1064,7 @@ MACHINE_CONFIG_START(apollo_state::dn3500)
 	apollo(config);
 
 	/* keyboard beeper */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1088,7 +1088,7 @@ MACHINE_CONFIG_START(apollo_state::dsp3500)
 	apollo_terminal(config);
 
 	/* keyboard beeper */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1139,7 +1139,7 @@ MACHINE_CONFIG_START(apollo_state::dsp3000)
 	apollo_terminal(config);
 
 	/* keyboard beeper */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1188,7 +1188,7 @@ MACHINE_CONFIG_START(apollo_state::dsp5500)
 	apollo_terminal(config);
 
 	/* keyboard beeper */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 1000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

@@ -48,7 +48,6 @@ public:
 	required_ioport m_analog_x;
 	required_ioport m_analog_y;
 
-	DECLARE_WRITE_LINE_MEMBER(start_lamp_w);
 	DECLARE_WRITE_LINE_MEMBER(foreground_mode_w);
 	DECLARE_READ16_MEMBER(analogx_r);
 	DECLARE_READ16_MEMBER(analogy_watchdog_r);
@@ -152,11 +151,6 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(xtheball_state::from_shiftreg)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(xtheball_state::start_lamp_w)
-{
-	output().set_led_value(0, state);
-}
-
 WRITE_LINE_MEMBER(xtheball_state::foreground_mode_w)
 {
 	m_foreground_mode = state;
@@ -198,9 +192,9 @@ void xtheball_state::main_map(address_map &map)
 	map(0x02000000, 0x020fffff).ram().share("vrafg");
 	map(0x03000000, 0x030000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
 	map(0x03020000, 0x0302005f).unmaprw(); // looks like a CRTC of some sort
-	map(0x03040000, 0x0304007f).w("latch1", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x03040000, 0x0304007f).w("latch1", FUNC(hc259_device::write_d0)).umask16(0x00ff);
 	map(0x03040080, 0x0304008f).portr("DSW");
-	map(0x03040080, 0x030400ff).w("latch2", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x03040080, 0x030400ff).w("latch2", FUNC(hc259_device::write_d0)).umask16(0x00ff);
 	map(0x03040100, 0x0304010f).r(this, FUNC(xtheball_state::analogx_r));
 	map(0x03040110, 0x0304011f).portr("COIN1");
 	map(0x03040130, 0x0304013f).portr("SERVICE2");
@@ -208,7 +202,7 @@ void xtheball_state::main_map(address_map &map)
 	map(0x03040150, 0x0304015f).portr("BUTTON1");
 	map(0x03040160, 0x0304016f).portr("SERVICE");
 	map(0x03040170, 0x0304017f).portr("SERVICE1");
-	map(0x03040100, 0x0304017f).w("latch3", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x03040100, 0x0304017f).w("latch3", FUNC(hc259_device::write_d0)).umask16(0x00ff);
 	map(0x03040180, 0x0304018f).r(this, FUNC(xtheball_state::analogy_watchdog_r)).nopw();
 	map(0x03060000, 0x0306000f).w("dac", FUNC(dac_byte_interface::write)).umask16(0xff00);
 	map(0x04000000, 0x057fffff).rom().region("user2", 0);
@@ -310,15 +304,15 @@ MACHINE_CONFIG_START(xtheball_state::xtheball)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_DEVICE_ADD("latch1", LS259, 0) // exact type uncertain
+	MCFG_DEVICE_ADD("latch1", HC259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("ticket", ticket_dispenser_device, motor_w))
 	// Q4 = meter, Q6 = tickets, Q7 = tickets?
 
-	MCFG_DEVICE_ADD("latch2", LS259, 0) // exact type uncertain
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, xtheball_state, start_lamp_w))
-	// Q0 = start lamp, Q1-Q7 = more lamps?
+	MCFG_DEVICE_ADD("latch2", HC259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // start lamp
+	// Q1-Q7 = more lamps?
 
-	MCFG_DEVICE_ADD("latch3", LS259, 0) // exact type uncertain
+	MCFG_DEVICE_ADD("latch3", HC259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, xtheball_state, foreground_mode_w))
 	// Q3 = video foreground control?
 
@@ -334,9 +328,9 @@ MACHINE_CONFIG_START(xtheball_state::xtheball)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_rgb32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", ZN428E, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END

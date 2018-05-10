@@ -286,7 +286,7 @@ MACHINE_CONFIG_START(ksayakyu_state::ksayakyu)
 	MCFG_PALETTE_INIT_OWNER(ksayakyu_state, ksayakyu)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

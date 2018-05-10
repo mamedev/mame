@@ -991,7 +991,7 @@ MACHINE_CONFIG_START(witch_state::witch)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ES8712_ADD("essnd", 0)
 	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm5205_device, data_w))

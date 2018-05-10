@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(fresh_state::fresh)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fresh)
 
 	/* sound hw? */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, 4000000) // actual clock and type unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

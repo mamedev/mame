@@ -795,14 +795,12 @@ static INPUT_PORTS_START( karatblz )
 	PORT_DIPSETTING(      0x0000, "Individual" )
 	/* According to Turbo Force manual, here DSW2 starts */
 	PORT_SERVICE_DIPLOC( 0x0100, IP_ACTIVE_LOW, "SW2:1" )
-	/* Default is DEF_STR( Hard ) */
-	PORT_DIPNAME( 0x0600, 0x0200, "Number of Enemies" )         PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPNAME( 0x0600, 0x0600, "Number of Enemies" )         PORT_DIPLOCATION("SW2:2,3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0600, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	/* Default is DEF_STR( Hard ) */
-	PORT_DIPNAME( 0x1800, 0x0800, "Strength of Enemies" )       PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x1800, 0x1800, "Strength of Enemies" )       PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
@@ -817,6 +815,23 @@ static INPUT_PORTS_START( karatblz )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( karatblzu )
+	PORT_INCLUDE( karatblz )
+	
+	PORT_MODIFY("DSW")
+	/* Suggested default in US manual is DEF_STR( Hard ) for these two */
+	PORT_DIPNAME( 0x0600, 0x0200, "Number of Enemies" )         PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0600, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x1800, 0x0800, "Strength of Enemies" )       PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x1800, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spinlbrk )
@@ -891,7 +906,6 @@ static INPUT_PORTS_START( spinlbrk )
 	PORT_DIPSETTING(      0x0010, "1-1-1-1C 1-1-1-2 HPs" )
 	PORT_DIPSETTING(      0x0000, "1-1C 1-2 HPs" )
 	/* According to Spinal Breakers manual, here DSW2 starts */
-	/* Default in US manual is DEF_STR( Hardest ) */
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
@@ -920,6 +934,7 @@ static INPUT_PORTS_START( spinlbrku )
 	PORT_INCLUDE(spinlbrk)
 
 	PORT_MODIFY("DSW")
+	/* Suggested default in US manual is DEF_STR( Hardest ) */
 	PORT_DIPNAME( 0x0300, 0x0000, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
@@ -1484,7 +1499,8 @@ MACHINE_CONFIG_START(aerofgt_state::pspikes)
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -1564,7 +1580,7 @@ MACHINE_CONFIG_START(aerofgt_state::pspikesb)
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_LOW) // clock frequency & pin 7 not verified, pin high causes sound pitch to be too high
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1614,7 +1630,7 @@ MACHINE_CONFIG_START(aerofgt_state::kickball)
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -1661,7 +1677,7 @@ MACHINE_CONFIG_START(aerofgt_state::pspikesc)
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1710,7 +1726,8 @@ MACHINE_CONFIG_START(aerofgt_state::karatblz)
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -1770,7 +1787,7 @@ MACHINE_CONFIG_START(aerofgt_state::karatblzbl)
 
 	/* sound hardware */
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(8'000'000)/2)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1824,7 +1841,8 @@ MACHINE_CONFIG_START(aerofgt_state::spinlbrk)
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,spinlbrk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -1881,7 +1899,8 @@ MACHINE_CONFIG_START(aerofgt_state::turbofrc)
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -1939,7 +1958,8 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgtb)
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -2002,7 +2022,8 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -2048,7 +2069,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerfboot)
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -2088,7 +2109,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerfboo2)
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2129,7 +2150,7 @@ MACHINE_CONFIG_START(aerofgt_state::wbbc97)
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,wbbc97)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -3172,12 +3193,12 @@ GAME( 1991, pspikesc,  pspikes,  pspikesc, pspikesc, aerofgt_state, 0, ROT0,   "
 GAME( 1997, wbbc97,    0,        wbbc97,   wbbc97,   aerofgt_state, 0, ROT0,   "Comad",               "Beach Festival World Championship 1997", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // based on power spikes codebase
 GAME( 1998, kickball,  0,        kickball, pspikes,  aerofgt_state, kickball, ROT0, "Seoung Youn",    "Kick Ball", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // based on power spikes codebase, wrong priorities
 
-GAME( 1991, karatblz,   0,        karatblz,   karatblz, aerofgt_state, 0, ROT0,   "Video System Co.",                 "Karate Blazers (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblza,  karatblz, karatblz,   karatblz, aerofgt_state, 0, ROT0,   "Video System Co.",                 "Karate Blazers (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzt,  karatblz, karatblz,   karatblz, aerofgt_state, 0, ROT0,   "Video System Co. (Tecmo license)", "Karate Blazers (World, Tecmo license)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzu,  karatblz, karatblz,   karatblz, aerofgt_state, 0, ROT0,   "Video System Co.",                 "Karate Blazers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzj,  karatblz, karatblz,   karatblz, aerofgt_state, 0, ROT0,   "Video System Co. (Tecmo license)", "Toushin Blazers (Japan, Tecmo license)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzbl, karatblz, karatblzbl, karatblz, aerofgt_state, 0, ROT0,   "bootleg",                          "Karate Blazers (bootleg with Street Smart sound hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1991, karatblz,   0,        karatblz,   karatblz,  aerofgt_state, 0, ROT0,   "Video System Co.",                 "Karate Blazers (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblza,  karatblz, karatblz,   karatblz,  aerofgt_state, 0, ROT0,   "Video System Co.",                 "Karate Blazers (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblzt,  karatblz, karatblz,   karatblz,  aerofgt_state, 0, ROT0,   "Video System Co. (Tecmo license)", "Karate Blazers (World, Tecmo license)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblzu,  karatblz, karatblz,   karatblzu, aerofgt_state, 0, ROT0,   "Video System Co.",                 "Karate Blazers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblzj,  karatblz, karatblz,   karatblz,  aerofgt_state, 0, ROT0,   "Video System Co. (Tecmo license)", "Toushin Blazers (Japan, Tecmo license)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblzbl, karatblz, karatblzbl, karatblz,  aerofgt_state, 0, ROT0,   "bootleg",                          "Karate Blazers (bootleg with Street Smart sound hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 
 // according to Gamest magazine in new revision they changed the points value of the rocks in level 6 (5.000 versus 500)
 // -> our three sets all gives 5k points, huh?

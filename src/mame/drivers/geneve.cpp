@@ -736,7 +736,7 @@ MACHINE_CONFIG_START(geneve_state::geneve_60hz)
 	MCFG_PERIBOX_READY_HANDLER( WRITELINE(*this, geneve_state, ext_ready) )
 
 	// Sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("sound_out")
+	SPEAKER(config, "sound_out").front_center();
 	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN76496, 3579545) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
 	MCFG_SN76496_READY_HANDLER( WRITELINE(*this, geneve_state, ext_ready) )

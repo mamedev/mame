@@ -116,7 +116,8 @@ MACHINE_CONFIG_START(cupidon_state::cupidon)
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound, probably DAC driven using 68340 DMA */
 MACHINE_CONFIG_END
 

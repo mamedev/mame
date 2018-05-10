@@ -463,7 +463,7 @@ MACHINE_CONFIG_START(galpani3_state::galpani3)
 	MCFG_DEVICE_ROM("rlebg")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(33'333'000) / 2)  // Confirmed from PCB
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)

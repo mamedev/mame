@@ -570,32 +570,19 @@ READ8_MEMBER( segas16a_state::mcu_io_r )
 //**************************************************************************
 
 //-------------------------------------------------
-//  mcu_irq_assert - signal an interrupt to the
-//  I8751 MCU, and boost interleave to ensure
-//  good synchronization with the main CPU
-//-------------------------------------------------
-
-INTERRUPT_GEN_MEMBER( segas16a_state::mcu_irq_assert )
-{
-	// toggle the INT0 line on the MCU
-	m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
-	m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
-
-	// boost interleave to ensure that the MCU can break the M68000 out of a STOP
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
-}
-
-
-//-------------------------------------------------
-//  i8751_main_cpu_vblank - if we have a fake
+//  i8751_main_cpu_vblank_w - if we have a fake
 //  handler, we hook this to execute it
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER( segas16a_state::i8751_main_cpu_vblank )
+WRITE_LINE_MEMBER(segas16a_state::i8751_main_cpu_vblank_w)
 {
 	// if we have a fake 8751 handler, call it on VBLANK
-	if (!m_i8751_vblank_hook.isnull())
+	if (state && !m_i8751_vblank_hook.isnull())
 		m_i8751_vblank_hook();
+
+	// if we have a 8751, toggle the INT0 line on the MCU
+	if (m_mcu.found())
+		m_mcu->set_input_line(MCS51_INT0_LINE, state);
 }
 
 
@@ -2015,7 +2002,7 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -2060,12 +2047,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(segas16a_state::system16a_i8751)
 	system16a(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, i8751_main_cpu_vblank)
+	MCFG_DEVICE_VBLANK_INT_REMOVE()
 
 	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
 	MCFG_DEVICE_IO_MAP(mcu_io_map)
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, segas16a_state, mcu_control_w))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, mcu_irq_assert)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, segas16a_state, i8751_main_cpu_vblank_w))
 MACHINE_CONFIG_END
 
 

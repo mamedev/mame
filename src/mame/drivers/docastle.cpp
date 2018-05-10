@@ -650,7 +650,7 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	MCFG_PALETTE_INIT_OWNER(docastle_state, docastle)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

@@ -1144,7 +1144,7 @@ MACHINE_CONFIG_START(meritm_state::meritm_crt250)
 	MCFG_SCREEN_UPDATE_DRIVER(meritm_state, screen_update_meritm)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8930, SYSTEM_CLK/12)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW")) /* Port A read */
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, meritm_state, meritm_ay8930_port_b_w))  /* Port B write */

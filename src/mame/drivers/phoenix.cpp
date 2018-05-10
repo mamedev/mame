@@ -461,7 +461,7 @@ MACHINE_CONFIG_START(phoenix_state::phoenix)
 	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_TMS36XX_ADD("tms", 372)
 	MCFG_TMS36XX_TYPE(MM6221AA)
@@ -472,8 +472,7 @@ MACHINE_CONFIG_START(phoenix_state::phoenix)
 	MCFG_DEVICE_ADD("cust", PHOENIX_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, 120000)
-	MCFG_DISCRETE_INTF(phoenix)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, 120000, phoenix_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 MACHINE_CONFIG_END
 
@@ -536,7 +535,7 @@ MACHINE_CONFIG_START(phoenix_state::survival)
 	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* FIXME: check clock */
 	MCFG_DEVICE_ADD("aysnd", AY8910, 11000000/4)

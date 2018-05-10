@@ -1184,7 +1184,7 @@ MACHINE_CONFIG_START(highvdeo_state::tv_vcf)
 	MCFG_VIDEO_START_OVERRIDE(highvdeo_state,tourvisn)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	//OkiM6376
 	MCFG_DEVICE_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives approx. same sample rate as previous emulation
@@ -1266,7 +1266,7 @@ MACHINE_CONFIG_START(highvdeo_state::brasil)
 	MCFG_VIDEO_START_OVERRIDE(highvdeo_state,tourvisn)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives same sample rate as previous emulation
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1292,7 +1292,7 @@ MACHINE_CONFIG_START(highvdeo_state::grancapi)
 	MCFG_VIDEO_START_OVERRIDE(highvdeo_state,tourvisn)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives same sample rate as previous emulation
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1318,7 +1318,7 @@ MACHINE_CONFIG_START(highvdeo_state::magicbom)
 	MCFG_VIDEO_START_OVERRIDE(highvdeo_state,tourvisn)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6376, XTAL(12'000'000)/2/2/20)//Guess, gives same sample rate as previous emulation
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

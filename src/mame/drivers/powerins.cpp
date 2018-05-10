@@ -328,7 +328,7 @@ MACHINE_CONFIG_START(powerins_state::powerins)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -362,7 +362,7 @@ MACHINE_CONFIG_START(powerins_state::powerinsa)
 
 	MCFG_MACHINE_START_OVERRIDE(powerins_state, powerinsa)
 
-	MCFG_OKIM6295_REPLACE("oki1", 990000, PIN7_LOW) // pin7 not verified
+	MCFG_DEVICE_REPLACE("oki1", OKIM6295, 990000, okim6295_device::PIN7_LOW) // pin7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, powerinsa_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

@@ -349,7 +349,7 @@ MACHINE_CONFIG_START(suprridr_state::suprridr)
 	MCFG_PALETTE_INIT_OWNER(suprridr_state, suprridr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(49'152'000)/32)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

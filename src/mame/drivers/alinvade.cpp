@@ -62,7 +62,7 @@ static const discrete_dac_r1_ladder alinvade_music_dac =
 
 #define ALINVADE_MUSIC_CLK      (75000)
 
-DISCRETE_SOUND_START(alinvade)
+DISCRETE_SOUND_START(alinvade_discrete)
 	DISCRETE_INPUT_DATA (NODE_01)
 
 	DISCRETE_NOTE(NODE_20, 1, ALINVADE_MUSIC_CLK, NODE_01, 255, 5, DISC_CLK_IS_FREQ)
@@ -221,8 +221,8 @@ MACHINE_CONFIG_START(alinvade_state::alinvade)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, alinvade_state, vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DISCRETE_ADD("discrete", 0, alinvade)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, alinvade_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

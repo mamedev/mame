@@ -878,7 +878,7 @@ MACHINE_CONFIG_START(novag6502_state::supercon)
 	MCFG_DEFAULT_LAYOUT(layout_novag_supercon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 1024) // guessed
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -902,7 +902,7 @@ MACHINE_CONFIG_START(novag6502_state::cforte)
 	MCFG_DEFAULT_LAYOUT(layout_novag_cforte)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -949,7 +949,7 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 	MCFG_DEFAULT_LAYOUT(layout_novag_sexpert)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

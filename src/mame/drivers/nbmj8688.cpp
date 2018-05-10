@@ -2480,7 +2480,7 @@ MACHINE_CONFIG_START(nbmj8688_state::NBMJDRV_4096)
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_pure_12bit)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("psg", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nbmj8688_state, dipsw1_r))     // DIPSW-A read
@@ -2673,7 +2673,7 @@ MACHINE_CONFIG_START(nbmj8688_state::mbmj_p16bit_LCD)
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_pure_16bit_LCD)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("psg", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, nbmj8688_state, dipsw1_r))     // DIPSW-A read

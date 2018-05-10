@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(popper_state::popper)
 	MCFG_PALETTE_INIT_OWNER(popper_state, popper)
 
 	// audio hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/3/2/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

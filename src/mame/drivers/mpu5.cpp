@@ -553,7 +553,8 @@ MACHINE_CONFIG_START(mpu5_state::mpu5)
 
 	MCFG_DEFAULT_LAYOUT(layout_mpu5)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound */
 MACHINE_CONFIG_END
 

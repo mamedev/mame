@@ -438,7 +438,7 @@ MACHINE_CONFIG_START(othello_state::othello)
 	MCFG_MC6845_UPDATE_ROW_CB(othello_state, crtc_update_row)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

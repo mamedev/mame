@@ -661,7 +661,7 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fp1100)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) // inside the keyboard
 

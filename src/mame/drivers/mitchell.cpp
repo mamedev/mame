@@ -1191,7 +1191,7 @@ MACHINE_CONFIG_START(mitchell_state::mgakuen)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* probably same clock as the other mitchell hardware games */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -1232,7 +1232,7 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -1350,7 +1350,7 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1387,7 +1387,7 @@ MACHINE_CONFIG_START(mitchell_state::marukin)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -1442,7 +1442,7 @@ MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* It should be a OKIM5205 with a 384khz resonator */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

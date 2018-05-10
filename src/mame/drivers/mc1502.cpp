@@ -296,10 +296,9 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	MCFG_DEVICE_ADD("isa1",   ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "fdc", false)
 	MCFG_DEVICE_ADD("isa2",   ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "rom", false)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette"); // FIXME: really no output routes for the cassette sound?
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))

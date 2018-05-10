@@ -451,7 +451,7 @@ MACHINE_CONFIG_START(kangaroo_state::nomcu)
 	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

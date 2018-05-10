@@ -246,7 +246,7 @@ MACHINE_CONFIG_START(skyfox_state::skyfox)
 	MCFG_PALETTE_INIT_OWNER(skyfox_state, skyfox)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 

@@ -369,7 +369,8 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 28000000/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -422,7 +423,8 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 28000000 / 2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

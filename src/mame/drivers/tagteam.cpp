@@ -234,7 +234,7 @@ MACHINE_CONFIG_START(tagteam_state::tagteam)
 	MCFG_PALETTE_INIT_OWNER(tagteam_state, tagteam)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6502_IRQ_LINE))

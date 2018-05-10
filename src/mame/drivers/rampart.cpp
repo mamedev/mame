@@ -370,7 +370,7 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rampart_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK/4/3, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

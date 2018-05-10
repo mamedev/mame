@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(wpc_dot_state::wpc_dot)
 	MCFG_WPC_SOUND_DATA(READ8(*this, wpc_dot_state,wpc_sound_data_r),WRITE8(*this, wpc_dot_state,wpc_sound_data_w))
 	MCFG_WPC_DMDBANK(WRITE8(*this, wpc_dot_state,wpc_dmdbank_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("wpcsnd", WPCSND)
 	MCFG_WPC_ROM_REGION("sound1")
 	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_dot_state,wpcsnd_reply_w))

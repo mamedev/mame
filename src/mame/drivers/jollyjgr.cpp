@@ -699,7 +699,7 @@ MACHINE_CONFIG_START(jollyjgr_state::jollyjgr)
 	MCFG_PALETTE_ADD_3BIT_RGB("bm_palette") // bitmap
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(3'579'545)/2) /* 1.7897725MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)

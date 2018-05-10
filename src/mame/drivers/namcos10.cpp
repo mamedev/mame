@@ -937,7 +937,8 @@ MACHINE_CONFIG_START(namcos10_state::namcos10_memm)
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL(53'693'175) )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos10_state::namcos10_memn)
@@ -961,7 +962,8 @@ MACHINE_CONFIG_START(namcos10_state::namcos10_memn)
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL(53'693'175) )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos10_state::ns10_mrdrilr2)

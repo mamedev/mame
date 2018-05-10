@@ -471,7 +471,7 @@ MACHINE_CONFIG_START(pingpong_state::pingpong)
 	MCFG_PALETTE_INIT_OWNER(pingpong_state, pingpong)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76496, 18432000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

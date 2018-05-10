@@ -1710,7 +1710,7 @@ MACHINE_CONFIG_START(itech8_state::itech8_core_lo)
 	MCFG_TMS34061_INTERRUPT_CB(WRITELINE(*this, itech8_state, generate_tms34061_interrupt))      /* interrupt gen callback */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, CLOCK_8MHz/4)

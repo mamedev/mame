@@ -256,7 +256,7 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(20'000'000)/8)  /* Divisor estimated */
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)

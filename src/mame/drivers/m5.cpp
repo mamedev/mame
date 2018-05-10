@@ -1417,7 +1417,7 @@ MACHINE_CONFIG_START(m5_state::m5)
 	MCFG_DEVICE_IO_MAP(fd5_io)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

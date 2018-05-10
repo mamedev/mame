@@ -384,7 +384,8 @@ MACHINE_CONFIG_START(_2mindril_state::drill)
 
 	MCFG_VIDEO_START_OVERRIDE(_2mindril_state,f3)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(*this, _2mindril_state, irqhandler))

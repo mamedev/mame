@@ -201,7 +201,8 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -631,7 +632,8 @@ MACHINE_CONFIG_START(gaelco2_state::play2000)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -735,7 +737,8 @@ MACHINE_CONFIG_START(bang_state::bang)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_CG1V, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -972,7 +975,8 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -1286,7 +1290,8 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	/* sound hardware */
 	/* the chip is stereo, but the game sound is mono because the right channel
 	   output is for cabinet 1 and the left channel output is for cabinet 2 */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -1582,7 +1587,8 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_CG1V, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -1624,7 +1630,8 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -1880,7 +1887,8 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	/* sound hardware */
 	/* the chip is stereo, but the game sound is mono because the right channel
 	   output is for cabinet 1 and the left channel output is for cabinet 2 */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
