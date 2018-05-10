@@ -1507,7 +1507,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kof98umh)
 
 // Oriental Legend 2 - should be a V102 and V100 too
 //西游释厄传2/Xīyóu shì è chuán 2 (China; Simplified Chinese)
-//西遊釋厄傳2/Saiyuu Shakuyakuden 2 (Japan; Traditional Chinese)
+//西遊釋厄傳2/Saiyū Shakuyakuden 2 (Japan; Traditional Chinese - Taiwan(undumped) too?)
 GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_SUPPORTS_SAVE ) /* Overseas sets of OL2 do not use the card reader */
 GAME( 2007, orleg2_103,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", MACHINE_SUPPORTS_SAVE )
 GAME( 2007, orleg2_101,   orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", MACHINE_SUPPORTS_SAVE )
@@ -1523,6 +1523,7 @@ GAME( 2007, orleg2_101jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,     
 // Knights of Valour 2 New Legend
 //三國戰紀2撗掃于軍 New Legend/Sānguó zhàn jì 2 Guàng sǎo yú jūn New Legend (Oversea; Mixed Traditional and Simplified Chinese)
 //三國戰紀2盖世英雄/Sānguó zhàn jì 2 Gàishì yīngxióng (China; Mixed Traditional and Simplified Chinese)
+//三國戰紀2乱世英雄/Sangoku-Senki 2 Ranse Eiyū (Japan; Mixed Traditional and Simplified Chinese - Undumped)
 GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Guang Sao Yu Jun (V302, Oversea)", MACHINE_SUPPORTS_SAVE )
 GAME( 2008, kov2nl_301,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Guang Sao Yu Jun (V301, Oversea)", MACHINE_SUPPORTS_SAVE )
 GAME( 2008, kov2nl_300,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Guang Sao Yu Jun (V300, Oversea)", MACHINE_SUPPORTS_SAVE )
@@ -1547,4 +1548,4 @@ GAME( 2009, kof98umh,     0,    pgm2_lores, pgm2, pgm2_state,  kof98umh,   ROT0,
 
 // Jigsaw World Arena
 
-// Puzzle of Ocha / Ochainu No Pazuru
+// お茶犬のパズル/Ochaken no Puzzle (V101JP exists but undumped, Puzzle game of Japanese お茶犬/Ochaken franchises)
