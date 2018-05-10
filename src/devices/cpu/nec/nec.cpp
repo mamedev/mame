@@ -218,7 +218,7 @@ void nec_common_device::do_prefetch(int previous_ICount)
 uint8_t nec_common_device::fetch()
 {
 	prefetch();
-	return m_direct->read_byte((Sreg(PS)<<4)+m_ip++, m_fetch_xor);
+	return m_dr8((Sreg(PS)<<4)+m_ip++);
 }
 
 uint16_t nec_common_device::fetchword()
@@ -238,7 +238,7 @@ static uint8_t parity_table[256];
 uint8_t nec_common_device::fetchop()
 {
 	prefetch();
-	return m_direct->read_byte(( Sreg(PS)<<4)+m_ip++, m_fetch_xor);
+	return m_dr8((Sreg(PS)<<4)+m_ip++);
 }
 
 
@@ -419,7 +419,14 @@ void nec_common_device::device_start()
 	save_item(NAME(m_prefetch_reset));
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	if(m_program->data_width() == 8) {
+		auto cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
+		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+	} else {
+		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
+		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+	}
+
 	m_io = &space(AS_IO);
 
 	state_add( NEC_PC,    "PC", m_debugger_temp).callimport().callexport().formatstr("%05X");

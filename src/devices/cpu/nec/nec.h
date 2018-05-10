@@ -88,7 +88,7 @@ private:
 	uint8_t   m_halted;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	std::function<u8 (offs_t address)> m_dr8;
 	address_space *m_io;
 	int     m_icount;
 

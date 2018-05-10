@@ -1571,7 +1571,7 @@ void upd78c05_device::handle_timers(int cycles)
 void upd7810_device::base_device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 
 	m_to_func.resolve_safe();
 	m_co0_func.resolve_safe();

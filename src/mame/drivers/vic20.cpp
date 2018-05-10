@@ -845,7 +845,7 @@ MACHINE_CONFIG_START(vic20_state::ntsc)
 	// basic machine hardware
 	MCFG_DEVICE_ADD(M6502_TAG, M6502, MOS6560_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(vic20_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, MOS6560_CLOCK)
 	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vic20_state, via1_pa_r))
@@ -893,7 +893,7 @@ MACHINE_CONFIG_START(vic20_state::pal)
 	// basic machine hardware
 	MCFG_DEVICE_ADD(M6502_TAG, M6502, MOS6561_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(vic20_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, MOS6561_CLOCK)
 	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vic20_state, via1_pa_r))

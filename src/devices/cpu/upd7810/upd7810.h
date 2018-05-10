@@ -414,7 +414,7 @@ protected:
 	const struct opcode_s *m_op70;
 	const struct opcode_s *m_op74;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	int m_icount;
 
 	uint8_t RP(offs_t port);

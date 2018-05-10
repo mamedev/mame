@@ -138,7 +138,7 @@ class driver_device;
 
 // declared in emumem.h
 class address_space;
-template<int addr_shift> class direct_read_data;
+template<int Width, int AddrShift, int Endian> class memory_access_cache;
 class memory_bank;
 class memory_block;
 class memory_manager;

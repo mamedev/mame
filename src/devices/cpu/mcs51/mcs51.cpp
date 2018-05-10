@@ -402,8 +402,8 @@ device_memory_interface::space_config_vector mcs51_cpu_device::memory_space_conf
 ***************************************************************************/
 
 /* Read Opcode/Opcode Arguments from Program Code */
-#define ROP(pc)         m_direct->read_byte(pc)
-#define ROP_ARG(pc)     m_direct->read_byte(pc)
+#define ROP(pc)         m_cache->read_byte(pc)
+#define ROP_ARG(pc)     m_cache->read_byte(pc)
 
 /* Read a byte from External Code Memory (Usually Program Rom(s) Space) */
 #define CODEMEM_R(a)    (uint8_t)m_program->read_byte(a)
@@ -1988,7 +1988,7 @@ void mcs51_cpu_device::execute_run()
 		/* Read next opcode */
 		PPC = PC;
 		debugger_instruction_hook(PC);
-		op = m_direct->read_byte(PC++);
+		op = m_cache->read_byte(PC++);
 
 		/* process opcode and count cycles */
 		m_inst_cycles = mcs51_cycles[op];
@@ -2103,7 +2103,7 @@ uint8_t mcs51_cpu_device::sfr_read(size_t offset)
 void mcs51_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 

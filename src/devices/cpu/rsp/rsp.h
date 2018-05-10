@@ -236,7 +236,7 @@ private:
 
 	address_space *m_program;
 protected:
-	direct_read_data<0> *m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_pcache;
 
 private:
 	std::unique_ptr<cop2>    m_cop2;
