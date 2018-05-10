@@ -28,7 +28,7 @@
 
 class rf5c68_device : public device_t,
 						public device_sound_interface,
-						public device_rom_interface
+						public device_memory_interface
 {
 public:
 	typedef device_delegate<void (int channel)> sample_end_cb_delegate;
@@ -50,9 +50,10 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	// device_rom_interface overrides
-	virtual void rom_bank_updated() override;
+	// device_memory_interface configuration
+	virtual space_config_vector memory_space_config() const override;
 
+	address_space_config m_data_config;
 private:
 	static constexpr unsigned NUM_CHANNELS = 8;
 
@@ -69,6 +70,8 @@ private:
 		uint16_t      loopst = 0;
 	};
 
+	address_space		*m_data;
+	direct_read_data<0> *m_direct;
 	sound_stream*        m_stream;
 	pcm_channel          m_chan[NUM_CHANNELS];
 	uint8_t              m_cbank;

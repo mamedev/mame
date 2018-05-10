@@ -26,7 +26,8 @@ DEFINE_DEVICE_TYPE(RF5C68, rf5c68_device, "rf5c68", "Ricoh RF5C68")
 rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RF5C68, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, 16) // 15 bit Address + 2 Memory select outputs(total 64KB), PSRAM/SRAM/ROM
+	, device_memory_interface(mconfig, *this)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16) // 15 bit Address + 2 Memory select outputs(total 64KB), PSRAM/SRAM/ROM
 	, m_stream(nullptr)
 	, m_cbank(0)
 	, m_wbank(0)
@@ -41,6 +42,9 @@ rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, dev
 
 void rf5c68_device::device_start()
 {
+	m_data = &space(0);
+	// Find our direct access
+	m_direct = space().direct<0>();
 	m_sample_end_cb.bind_relative_to(*owner());
 
 	/* allocate the stream */
@@ -62,12 +66,13 @@ void rf5c68_device::device_start()
 }
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
 //-------------------------------------------------
 
-void rf5c68_device::rom_bank_updated()
+device_memory_interface::space_config_vector rf5c68_device::memory_space_config() const
 {
-	m_stream->update();
+	return space_config_vector{ std::make_pair(0, &m_data_config) };
 }
 
 //-------------------------------------------------
@@ -109,11 +114,11 @@ void rf5c68_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				}
 
 				/* fetch the sample and handle looping */
-				sample = read_byte((chan.addr >> 11) & 0xffff);
+				sample = m_direct->read_byte((chan.addr >> 11) & 0xffff);
 				if (sample == 0xff)
 				{
 					chan.addr = chan.loopst << 11;
-					sample = read_byte((chan.addr >> 11) & 0xffff);
+					sample = m_direct->read_byte((chan.addr >> 11) & 0xffff);
 
 					/* if we loop to a loop point, we're effectively dead */
 					if (sample == 0xff)
@@ -238,7 +243,7 @@ WRITE8_MEMBER( rf5c68_device::rf5c68_w )
 
 READ8_MEMBER( rf5c68_device::rf5c68_mem_r )
 {
-	return read_byte(m_wbank | offset);
+	return m_direct->read_byte(m_wbank | offset);
 }
 
 
@@ -248,5 +253,5 @@ READ8_MEMBER( rf5c68_device::rf5c68_mem_r )
 
 WRITE8_MEMBER( rf5c68_device::rf5c68_mem_w )
 {
-	space(0).write_byte(m_wbank | offset, data);
+	m_data->write_byte(m_wbank | offset, data);
 }
