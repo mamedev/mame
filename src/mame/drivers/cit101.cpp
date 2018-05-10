@@ -88,6 +88,7 @@ private:
 	DECLARE_READ8_MEMBER(e0_latch_r);
 	DECLARE_WRITE8_MEMBER(e0_latch_w);
 
+	DECLARE_WRITE_LINE_MEMBER(blink_w);
 	DECLARE_WRITE8_MEMBER(screen_control_w);
 	DECLARE_WRITE8_MEMBER(brightness_w);
 
@@ -100,6 +101,8 @@ private:
 	void io_map(address_map &map);
 
 	u8 m_e0_latch;
+
+	bool m_blink;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -116,6 +119,7 @@ void cit101_state::machine_start()
 	subdevice<i8251_device>("kbduart")->write_cts(0);
 
 	save_item(NAME(m_e0_latch));
+	save_item(NAME(m_blink));
 }
 
 u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -130,17 +134,27 @@ u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 		const u16 rowattr = m_mainram[row * 2 + ptrbase] | m_extraram[row * 2 + ptrbase] << 8;
 		const int line = ((y % 10) / (BIT(rowattr, 8) ? 2 : 1) + (rowattr & 0x000f)) & 0xf;
 
+		// Character attribute bit 0: underline (also used to render cursor)
+		// Character attribute bit 1: reverse video (also used to render cursor)
+		// Character attribute bit 2: boldface
+		// Character attribute bit 3: blinking (half intensity)
+
 		int c = 0;
 		u8 attr = m_extraram[rowaddr];
 		u8 char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
 		if (line == 9 && BIT(attr, 0))
 			char_data ^= 0xff;
-		if (BIT(attr, 1))
-			char_data ^= 0xff;
+		rgb_t on_color = BIT(attr, 1) ? rgb_t::black() : rgb_t::white();
+		rgb_t off_color = BIT(attr, 1) ? rgb_t::white() : rgb_t::black();
+		if (BIT(attr, 3) && m_blink)
+			on_color = rgb_t(0xc0, 0xc0, 0xc0);
+		bool last_bit = false;
 		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
 		{
+			const bool cur_bit = BIT(char_data, 7);
 			if (x >= cliprect.left() && x <= cliprect.right())
-				bitmap.pix32(y, x) = BIT(char_data, 7) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix32(y, x) = (cur_bit || (BIT(attr, 2) && last_bit)) ? on_color : off_color;
+			last_bit = cur_bit;
 
 			c++;
 			if (!BIT(rowattr, 9) || !BIT(c, 0))
@@ -155,8 +169,11 @@ u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 					char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
 					if (line == 9 && BIT(attr, 0))
 						char_data ^= 0xff;
-					if (BIT(attr, 1))
-						char_data ^= 0xff;
+					on_color = BIT(attr, 1) ? rgb_t::black() : rgb_t::white();
+					off_color = BIT(attr, 1) ? rgb_t::white() : rgb_t::black();
+					if (BIT(attr, 3) && m_blink)
+						on_color = rgb_t(0xc0, 0xc0, 0xc0);
+					last_bit = false;
 				}
 			}
 		}
@@ -187,6 +204,11 @@ READ8_MEMBER(cit101_state::e0_latch_r)
 WRITE8_MEMBER(cit101_state::e0_latch_w)
 {
 	m_e0_latch = data;
+}
+
+WRITE_LINE_MEMBER(cit101_state::blink_w)
+{
+	m_blink = state;
 }
 
 WRITE8_MEMBER(cit101_state::screen_control_w)
@@ -277,6 +299,8 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_I8085A_SID(GND) // used to time NVR reads
+	MCFG_I8085A_SOD(WRITELINE(*this, cit101_state, blink_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	//MCFG_SCREEN_RAW_PARAMS(14.976_MHz_XTAL, 960, 0, 800, 260, 0, 240)

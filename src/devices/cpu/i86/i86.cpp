@@ -201,13 +201,21 @@ void i8086_cpu_device::execute_run()
 				{
 					interrupt(I8086_NMI_INT_VECTOR);
 					m_pending_irq &= ~NMI_IRQ;
+					m_halt = false;
 				}
 				else if ( m_IF )
 				{
 					/* the actual vector is retrieved after pushing flags */
 					/* and clearing the IF */
 					interrupt(-1);
+					m_halt = false;
 				}
+			}
+
+			if(m_halt)
+			{
+				m_icount = 0;
+				return;
 			}
 
 			/* Trap should allow one instruction to be executed.
