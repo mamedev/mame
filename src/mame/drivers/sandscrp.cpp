@@ -569,7 +569,7 @@ ROM_START( sandscrpa ) /* Z03VA-003 PCB, earlier program version */
 	ROM_LOAD( "7.ic55", 0x000000, 0x040000, CRC(9870ab12) SHA1(5ea3412cbc57bfaa32a1e2552b2eb46f4ceb5fa8) )
 ROM_END
 
-
+//快打獅子皇帝/Kuài dǎ shīzi huángdì
 ROM_START( sandscrpb ) /* Different rev PCB */
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "11.ic4", 0x000000, 0x040000, CRC(80020cab) SHA1(4f1f4d8ea07ad745f2d6d3f800686f07fe4bf20f) ) /* Chinese title screen */
@@ -592,4 +592,4 @@ ROM_END
 
 GAME( 1992, sandscrp,  0,        sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Sand Scorpion", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sandscrpa, sandscrp, sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Sand Scorpion (Earlier)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sandscrpb, sandscrp, sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Sand Scorpion (Chinese Title Screen, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sandscrpb, sandscrp, sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Kuai Da Shizi Huangdi (China?, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
