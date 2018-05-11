@@ -581,8 +581,8 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
 	, m_sprite_region(*this, "sprites")
 	, m_maincpu_region(*this, "maincpu")
 	, m_soundrom_bank(*this, "soundbank")
-	, m_multipcm_bank_lo(*this, "multipcmbanklo")
 	, m_multipcm_bank_hi(*this, "multipcmbankhi")
+	, m_multipcm_bank_lo(*this, "multipcmbanklo")
 {
 }
 
