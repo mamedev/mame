@@ -70,13 +70,13 @@ private:
 		uint16_t      loopst = 0;
 	};
 
-	address_space		*m_data;
-	direct_read_data<0> *m_direct;
-	sound_stream*        m_stream;
-	pcm_channel          m_chan[NUM_CHANNELS];
-	uint8_t              m_cbank;
-	uint16_t             m_wbank;
-	uint8_t              m_enable;
+	address_space                                *m_data;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	sound_stream*                                 m_stream;
+	pcm_channel                                   m_chan[NUM_CHANNELS];
+	uint8_t                                       m_cbank;
+	uint16_t                                      m_wbank;
+	uint8_t                                       m_enable;
 
 	sample_end_cb_delegate m_sample_end_cb;
 };
