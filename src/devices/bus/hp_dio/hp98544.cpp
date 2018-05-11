@@ -39,6 +39,8 @@ MACHINE_CONFIG_START(dio16_98544_device::device_add_mconfig)
 	MCFG_SCREEN_SIZE(1024,768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 	MCFG_SCREEN_REFRESH_RATE(70)
+
+	MCFG_DEVICE_ADD("topcat", TOPCAT, XTAL(40000000))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -65,7 +67,8 @@ dio16_98544_device::dio16_98544_device(const machine_config &mconfig, const char
 
 dio16_98544_device::dio16_98544_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_dio16_card_interface(mconfig, *this)
+	device_dio16_card_interface(mconfig, *this),
+	m_topcat(*this, "topcat")
 {
 }
 
