@@ -41,6 +41,9 @@ MACHINE_CONFIG_START(dio16_98544_device::device_add_mconfig)
 	MCFG_SCREEN_REFRESH_RATE(70)
 
 	MCFG_DEVICE_ADD("topcat", TOPCAT, XTAL(40000000))
+	MCFG_TOPCAT_FB_WIDTH(1024)
+	MCFG_TOPCAT_FB_HEIGHT(768)
+	MCFG_TOPCAT_PLANES(1)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
