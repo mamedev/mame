@@ -678,7 +678,6 @@ locations: COLON, QUOTE, BACKSLASH, OPENBRACE, CLOSEBRACE, BACKSLASH2, TILDE.
 The corresponding symbols would not work properly in -natural mode).
 
 Additional note about natural keyboard support: currently,
-- "Keypad ," is not mapped
 - "Graph" is mapped to 'F6' (this key could be labeled "L Graph")
 - "Code" is mapped to 'F7' (this key could be labeled "R Graph", "Kana" or "Hangul")
 - "Stop" is mapped to 'F8'
@@ -872,7 +871,7 @@ Additional note about natural keyboard support: currently,
 	PORT_BIT (0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)     PORT_CHAR(UCHAR_MAMEKEY(8_PAD))     \
 	PORT_BIT (0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)     PORT_CHAR(UCHAR_MAMEKEY(9_PAD))     \
 	PORT_BIT (0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) \
-	PORT_BIT (0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad ,") PORT_CODE(KEYCODE_ENTER_PAD)               \
+	PORT_BIT (0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD)) \
 	PORT_BIT (0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)   PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 
 static INPUT_PORTS_START( msx )
