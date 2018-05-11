@@ -953,13 +953,13 @@ MACHINE_CONFIG_START(ql_state::ql)
 	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr) // wired as DTE
 	MCFG_RS232_CTS_HANDLER(WRITELINE(ZX8302_TAG, zx8302_device, write_cts2))
 
-	MCFG_QL_EXPANSION_SLOT_ADD("exp", ql_expansion_cards, nullptr)
+	MCFG_DEVICE_ADD("exp", QL_EXPANSION_SLOT, 0, ql_expansion_cards, nullptr) // FIXME: what's the clock on the slot?
 	//MCFG_QL_EXPANSION_SLOT_IPL0L_CALLBACK()
 	//MCFG_QL_EXPANSION_SLOT_IPL1L_CALLBACK()
 	//MCFG_QL_EXPANSION_SLOT_BERRL_CALLBACK()
 	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, ql_state, exp_extintl_w))
 
-	MCFG_QL_ROM_CARTRIDGE_SLOT_ADD("rom", ql_rom_cartridge_cards, nullptr)
+	MCFG_DEVICE_ADD("rom", QL_ROM_CARTRIDGE_SLOT, ql_rom_cartridge_cards, nullptr)
 
 	MCFG_DEVICE_ADD(QIMI_TAG, QIMI, 0)
 	MCFG_QIMI_EXTINT_CALLBACK(WRITELINE(*this, ql_state, qimi_extintl_w))
