@@ -119,7 +119,7 @@ private:
 	int m_fb_width;
 	int m_fb_height;
 	int m_planes;
-	int m_plane_mask;
+	//int m_plane_mask;
 };
 
 DECLARE_DEVICE_TYPE(TOPCAT, topcat_device)
