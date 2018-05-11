@@ -2219,7 +2219,7 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_V)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 24_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi,  8500)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi, ALPHA68K_PIXEL_CLOCK / ALPHA68K_HTOTAL / 2)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_V)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_V)
