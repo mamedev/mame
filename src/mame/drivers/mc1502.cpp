@@ -10,6 +10,7 @@
     - fix video errors caused by 465caf8038a120b4c1ffad9df67a1dc7474e5bb1
       "cga: treat as fixed sync monitor (nw)"
     - debug video init in BIOS 7.2
+    - pk88 (video, keyboard, etc.)
 
 ***************************************************************************/
 
@@ -25,17 +26,18 @@
 #include "speaker.h"
 
 
-#define VERBOSE_DBG 0
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_KEYBOARD  (1U <<  1)
+#define LOG_PPI       (1U <<  2)
 
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f: %-24s",machine().time().as_double(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+//#define VERBOSE (LOG_GENERAL | LOG_VRAM)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+#define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
+#define LOGPPI(...) LOGMASKED(LOG_PPI, __VA_ARGS__)
+
 
 /*
  * onboard devices:
@@ -54,8 +56,7 @@ TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 		key |= m_kbdio[i]->read();
 	}
 
-//  DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, m_kbd.pulsing,
-//      (key || m_kbd.pulsing) ? " will IRQ" : ""));
+	LOGKBD("k_s_c = %02X (%d) %s\n", key, m_kbd.pulsing, (key || m_kbd.pulsing) ? " will IRQ" : "");
 
 	/*
 	   If a key is pressed and we're not pulsing yet, start pulsing the IRQ1;
@@ -79,7 +80,6 @@ TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 
 WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
 {
-//  DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
 	m_ppi_portb = data;
 	m_pit8253->write_gate2(BIT(data, 0));
 	mc1502_speaker_set_spkrdata(BIT(data, 1));
@@ -93,7 +93,6 @@ WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
 // bit 3: i8251 SYNDET pin triggers NMI (default = 1 = no)
 WRITE8_MEMBER(mc1502_state::mc1502_ppi_portc_w)
 {
-//  DBG_LOG(2,"mc1502_ppi_portc_w",("( %02X )\n", data));
 	m_ppi_portc = data & 15;
 }
 
@@ -110,8 +109,8 @@ READ8_MEMBER(mc1502_state::mc1502_ppi_portc_r)
 	data = (data & ~0x20) | (m_pit_out2 ? 0x20 : 0x00);
 	data = (data & ~0x10) | ((BIT(m_ppi_portb, 1) && m_pit_out2) ? 0x10 : 0x00);
 
-//  DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
-//      data, tap_val, m_pit_out2, machine().describe_context()));
+	LOGPPI("mc1502_ppi_portc_r = %02X (tap_val %f t2out %d) at %s\n",
+		data, tap_val, m_pit_out2, machine().describe_context());
 	return data;
 }
 
@@ -128,7 +127,7 @@ READ8_MEMBER(mc1502_state::mc1502_kppi_porta_r)
 	}
 
 	key ^= 0xff;
-//  DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
+	LOGPPI("mc1502_kppi_porta_r = %02X\n", key);
 	return key;
 }
 
@@ -140,14 +139,14 @@ WRITE8_MEMBER(mc1502_state::mc1502_kppi_portb_w)
 		m_kbd.mask |= 1 << 11;
 	else
 		m_kbd.mask &= ~(1 << 11);
-//  DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, m_kbd.mask));
+	LOGPPI("mc1502_kppi_portb_w ( %02X -> %04X )\n", data, m_kbd.mask);
 }
 
 WRITE8_MEMBER(mc1502_state::mc1502_kppi_portc_w)
 {
 	m_kbd.mask &= ~(7 << 8);
 	m_kbd.mask |= ((data ^ 7) & 7) << 8;
-//  DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, m_kbd.mask));
+	LOGPPI("mc1502_kppi_portc_w ( %02X -> %04X )\n", data, m_kbd.mask);
 }
 
 WRITE_LINE_MEMBER(mc1502_state::mc1502_i8251_syndet)
@@ -179,16 +178,12 @@ DRIVER_INIT_MEMBER(mc1502_state, mc1502)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	DBG_LOG(0, "init", ("driver_init()\n"));
-
 	program.install_readwrite_bank(0, m_ram->size() - 1, "bank10");
 	membank("bank10")->set_base(m_ram->pointer());
 }
 
 MACHINE_START_MEMBER(mc1502_state, mc1502)
 {
-	DBG_LOG(0, "init", ("machine_start()\n"));
-
 	/*
 	       Keyboard polling circuit holds IRQ1 high until a key is
 	       pressed, then it starts a timer that pulses IRQ1 low each
@@ -204,8 +199,6 @@ MACHINE_START_MEMBER(mc1502_state, mc1502)
 
 MACHINE_RESET_MEMBER(mc1502_state, mc1502)
 {
-	DBG_LOG(0, "init", ("machine_reset()\n"));
-
 	m_spkrdata = 0;
 	m_pit_out2 = 1;
 	m_ppi_portb = 0;
@@ -384,6 +377,7 @@ ROM_END
 ROM_START( pk88 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
 
+	// datecode 07.23.87
 	ROM_LOAD( "b0.064", 0x0000, 0x2000, CRC(80d3cf5d) SHA1(64769b7a8b60ffeefa04e4afbec778069a2840c9))
 	ROM_LOAD( "b1.064", 0x2000, 0x2000, CRC(673a4acc) SHA1(082ae803994048e225150f771794ca305f73d731))
 	ROM_LOAD( "b2.064", 0x4000, 0x2000, CRC(1ee66152) SHA1(7ed8c4c6c582487e802beabeca5b86702e5083e8))
@@ -399,5 +393,5 @@ ROM_END
 ***************************************************************************/
 
 //     YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       STATE         INIT      COMPANY               FULLNAME               FLAGS
-COMP ( 1989, mc1502, 0,      0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika MS 1502", 0 )
+COMP ( 1989, mc1502, 0,      0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika MS 1502", MACHINE_IMPERFECT_GRAPHICS )
 COMP ( 1988, pk88,   0,      0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika PK-88",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
