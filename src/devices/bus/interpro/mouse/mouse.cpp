@@ -7,8 +7,8 @@
  * Little information is available on this hardware. The mouse has 3 buttons,
  * all of which are commonly used by the system software, but earlier InterPro
  * systems appear to have supported many more buttons; it's not known if those
- * earlier versions use the same port or protocol. The mouse has a male? DB9
- * connector, using an unknown, probably TTL level signalling protocol.
+ * earlier versions use the same port or protocol. The mouse has a male D-sub
+ * 9-pin connector, using an unknown, probably TTL level signalling protocol.
  *
  * It's probable that this mouse can be connected to the mouse port on InterPro
  * system main boards as well as the mouse port(s) on EDGE graphics boards.
@@ -47,6 +47,14 @@ interpro_mouse_port_device::interpro_mouse_port_device(machine_config const &mco
 void interpro_mouse_port_device::device_config_complete()
 {
 	m_device = dynamic_cast<device_interpro_mouse_port_interface *>(get_card_device());
+}
+
+void interpro_mouse_port_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const card(get_card_device());
+
+	if (card && !dynamic_cast<device_interpro_mouse_port_interface *>(card))
+		osd_printf_error("Device %s (%s) does not implement device_interpro_mouse_port_interface\n", card->tag(), card->name());
 }
 
 void interpro_mouse_port_device::device_start()
