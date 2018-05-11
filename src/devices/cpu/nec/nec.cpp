@@ -123,11 +123,10 @@ DEFINE_DEVICE_TYPE(V33A, v33a_device, "v33a", "NEC V33A")
 
 
 
-nec_common_device::nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
+nec_common_device::nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 16, 0)
-	, m_fetch_xor(fetch_xor)
 	, m_prefetch_size(prefetch_size)
 	, m_prefetch_cycles(prefetch_cycles)
 	, m_chip_type(chip_type)
@@ -136,13 +135,13 @@ nec_common_device::nec_common_device(const machine_config &mconfig, device_type 
 
 
 v20_device::v20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nec_common_device(mconfig, V20, tag, owner, clock, false, 0, 4, 4, V20_TYPE)
+	: nec_common_device(mconfig, V20, tag, owner, clock, false, 4, 4, V20_TYPE)
 {
 }
 
 
 v30_device::v30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nec_common_device(mconfig, V30, tag, owner, clock, true, BYTE_XOR_LE(0), 6, 2, V30_TYPE)
+	: nec_common_device(mconfig, V30, tag, owner, clock, true, 6, 2, V30_TYPE)
 {
 }
 
@@ -159,13 +158,13 @@ device_memory_interface::space_config_vector nec_common_device::memory_space_con
  * complete guess below, nbbatman will not work
  * properly without. */
 v33_device::v33_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nec_common_device(mconfig, V33, tag, owner, clock, true, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+	: nec_common_device(mconfig, V33, tag, owner, clock, true, 6, 1, V33_TYPE)
 {
 }
 
 
 v33a_device::v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nec_common_device(mconfig, V33A, tag, owner, clock, true, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+	: nec_common_device(mconfig, V33A, tag, owner, clock, true, 6, 1, V33_TYPE)
 {
 }
 
