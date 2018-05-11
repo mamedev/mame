@@ -7,7 +7,7 @@
 #pragma once
 
 #include "hp_dio.h"
-
+#include "video/topcat.h"
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -30,7 +30,7 @@ public:
 	DECLARE_WRITE16_MEMBER(ctrl_w);
 
 	TIMER_CALLBACK_MEMBER(cursor_callback);
-
+	required_device<topcat_device> m_topcat;
  protected:
 	dio16_98544_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
