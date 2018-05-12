@@ -573,18 +573,32 @@ void validity_checker::validate_rgb()
 	volatile s32 expected_a, expected_r, expected_g, expected_b;
 	volatile s32 actual_a, actual_r, actual_g, actual_b;
 	volatile s32 imm;
+	bool error;
 	rgbaint_t rgb, other;
 	rgb_t packed;
 	auto check_expected = [&] (const char *desc)
 	{
+		error = false;
 		const volatile s32 a = rgb.get_a32();
 		const volatile s32 r = rgb.get_r32();
 		const volatile s32 g = rgb.get_g32();
 		const volatile s32 b = rgb.get_b32();
-		if (a != expected_a) osd_printf_error("Error testing %s get_a32() = %d (expected %d)\n", desc, a, expected_a);
-		if (r != expected_r) osd_printf_error("Error testing %s get_r32() = %d (expected %d)\n", desc, r, expected_r);
-		if (g != expected_g) osd_printf_error("Error testing %s get_g32() = %d (expected %d)\n", desc, g, expected_g);
-		if (b != expected_b) osd_printf_error("Error testing %s get_b32() = %d (expected %d)\n", desc, b, expected_b);
+		if (a != expected_a) {
+			error = true;
+			osd_printf_error("Error testing %s get_a32() = %d (expected %d)\n", desc, a, expected_a);
+		}
+		if (r != expected_r) {
+			error = true;
+			osd_printf_error("Error testing %s get_r32() = %d (expected %d)\n", desc, r, expected_r);
+		}
+		if (g != expected_g) {
+			error = true;
+			osd_printf_error("Error testing %s get_g32() = %d (expected %d)\n", desc, g, expected_g);
+		}
+		if (b != expected_b) {
+			error = true;
+			osd_printf_error("Error testing %s get_b32() = %d (expected %d)\n", desc, b, expected_b);
+		}
 	};
 
 	// check set/get
@@ -1391,6 +1405,114 @@ void validity_checker::validate_rgb()
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.cmplt_imm_rgba(actual_a + 1, std::numeric_limits<s32>::min(), std::numeric_limits<s32>::max(), actual_b);
 	check_expected("rgbaint_t::cmplt_imm_rgba");
+
+	int errors = 0;
+	// These values represent the maximum negative and positive values allowable by the function,
+	// some values around the maximum negative and positive values of rgb8, and some values around zero.
+	s32 imm_array[] = { -0x800, -256, -255, -254, -1, 0, 1, 254, 255, 256, 0x7ff };
+	// test scale_imm_and_clamp (method)
+	//osd_printf_info("Checking scale_imm_and_clamp\n");
+	for (int col = 0; col < ARRAY_LENGTH(imm_array); col++) {
+		for (int i = 0; i < ARRAY_LENGTH(imm_array); i++) {
+			if (errors > 4)
+				break;
+			imm = imm_array[i];
+			actual_a = actual_r = actual_g = actual_b = imm_array[col];
+			rgb.set(actual_a, actual_r, actual_g, actual_b);
+			rgb.scale_imm_and_clamp(imm);
+			// Do manual method
+			expected_a = (actual_a * imm) >> 8;
+			expected_r = (actual_r * imm) >> 8;
+			expected_g = (actual_g * imm) >> 8;
+			expected_b = (actual_b * imm) >> 8;
+			// Clamp
+			expected_a = (expected_a > 0xff) ? 0xff : (expected_a < 0) ? 0 : expected_a;
+			expected_r = (expected_r > 0xff) ? 0xff : (expected_r < 0) ? 0 : expected_r;
+			expected_g = (expected_g > 0xff) ? 0xff : (expected_g < 0) ? 0 : expected_g;
+			expected_b = (expected_b > 0xff) ? 0xff : (expected_b < 0) ? 0 : expected_b;
+			check_expected("rgbaint_t::scale_imm_and_clamp");
+			if (error) {
+				errors++;
+				osd_printf_info("color: %x imm: %x res: %x exp: %x\n", actual_a, imm, rgb.get_a32(), expected_a);
+			}
+		}
+	}
+
+	// test scale_add_and_clamp (method)
+	//osd_printf_info("Checking scale_add_and_clamp\n");
+	// Note that in the voodoo gpu pipeline the blend factor can be negative
+	errors = 0;
+	for (int col = 0; col < ARRAY_LENGTH(imm_array); col++) {
+		for (int scale = 0; scale < ARRAY_LENGTH(imm_array); scale++) {
+			for (int add = 0; add < ARRAY_LENGTH(imm_array); add++) {
+				if (errors > 4)
+					break;
+				rgbaint_t blend;
+				imm = imm_array[scale];
+				actual_a = actual_r = actual_g = actual_b = imm_array[col];
+				rgb.set(actual_a, actual_r, actual_g, actual_b);
+				blend.set_all(imm_array[scale]);
+				other.set_all(imm_array[add]);
+				rgb.scale_add_and_clamp(blend, other);
+				// Do manual method
+				expected_a = (actual_a * imm) >> 8;
+				expected_r = (actual_r * imm) >> 8;
+				expected_g = (actual_g * imm) >> 8;
+				expected_b = (actual_b * imm) >> 8;
+				expected_a += imm_array[add];
+				expected_r += imm_array[add];
+				expected_g += imm_array[add];
+				expected_b += imm_array[add];
+				// Clamp
+				expected_a = (expected_a > 0xff) ? 0xff : (expected_a < 0) ? 0 : expected_a;
+				expected_r = (expected_r > 0xff) ? 0xff : (expected_r < 0) ? 0 : expected_r;
+				expected_g = (expected_g > 0xff) ? 0xff : (expected_g < 0) ? 0 : expected_g;
+				expected_b = (expected_b > 0xff) ? 0xff : (expected_b < 0) ? 0 : expected_b;
+				check_expected("rgbaint_t::scale_add_and_clamp");
+				if (error) {
+					errors++;
+					osd_printf_info("color: %x scale: %x add: %x res: %x exp: %x\n", actual_a, blend.get_a32(), other.get_a32(), rgb.get_a32(), expected_a);
+				}
+			}
+		}
+	}
+
+	// test scale_add_and_clamp (method)
+	//osd_printf_info("Checking scale2_add_and_clamp\n");
+	// Note that in the voodoo gpu pipeline the blend factor can be negative
+	errors = 0;
+	for (int col = 0; col < ARRAY_LENGTH(imm_array); col++) {
+		for (int scale = 0; scale < ARRAY_LENGTH(imm_array); scale++) {
+			if (errors > 4)
+				break;
+			rgbaint_t blend;
+			imm = imm_array[scale];
+			actual_a = actual_r = actual_g = actual_b = imm_array[col];
+			rgb.set(actual_a, actual_r, actual_g, actual_b);
+			blend.set_all(imm_array[scale]);
+			other = rgb;
+			rgb.scale2_add_and_clamp(blend, other, blend);
+			// Do manual method
+			expected_a = (actual_a * imm) >> 8;
+			expected_r = (actual_r * imm) >> 8;
+			expected_g = (actual_g * imm) >> 8;
+			expected_b = (actual_b * imm) >> 8;
+			expected_a *= 2;
+			expected_r *= 2;
+			expected_g *= 2;
+			expected_b *= 2;
+			// Clamp
+			expected_a = (expected_a > 0xff) ? 0xff : (expected_a < 0) ? 0 : expected_a;
+			expected_r = (expected_r > 0xff) ? 0xff : (expected_r < 0) ? 0 : expected_r;
+			expected_g = (expected_g > 0xff) ? 0xff : (expected_g < 0) ? 0 : expected_g;
+			expected_b = (expected_b > 0xff) ? 0xff : (expected_b < 0) ? 0 : expected_b;
+			check_expected("rgbaint_t::scale2_add_and_clamp");
+			if (error) {
+				errors++;
+				osd_printf_info("color: %x blend: %x res: %x exp: %x\n", actual_a, blend.get_a32(), rgb.get_a32(), expected_a);
+			}
+		}
+	}
 }
 
 
