@@ -49,16 +49,16 @@ void vaportra_state::main_map(address_map &map)
 	map(0x100000, 0x100001).portr("PLAYERS");
 	map(0x100002, 0x100003).portr("COINS");
 	map(0x100004, 0x100005).portr("DSW");
-	map(0x100000, 0x100003).w(this, FUNC(vaportra_state::vaportra_priority_w));
+	map(0x100000, 0x100003).w(this, FUNC(vaportra_state::priority_w));
 	map(0x100007, 0x100007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x200000, 0x201fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x202000, 0x203fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x240000, 0x24000f).w(m_deco_tilegen2, FUNC(deco16ic_device::pf_control_w));
-	map(0x280000, 0x281fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x282000, 0x283fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x2c0000, 0x2c000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
-	map(0x300000, 0x3009ff).ram().w(this, FUNC(vaportra_state::vaportra_palette_24bit_rg_w)).share("paletteram");
-	map(0x304000, 0x3049ff).ram().w(this, FUNC(vaportra_state::vaportra_palette_24bit_b_w)).share("paletteram2");
+	map(0x200000, 0x201fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x202000, 0x203fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x240000, 0x24000f).w(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_w));
+	map(0x280000, 0x281fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x282000, 0x283fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x2c0000, 0x2c000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
+	map(0x300000, 0x3009ff).ram().w(this, FUNC(vaportra_state::palette_w)).share("palette");
+	map(0x304000, 0x3049ff).ram().w(this, FUNC(vaportra_state::palette_ext_w)).share("palette_ext");
 	map(0x308001, 0x308001).rw(this, FUNC(vaportra_state::irq6_ack_r), FUNC(vaportra_state::irq6_ack_w));
 	map(0x30c000, 0x30c001).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x318000, 0x3187ff).mirror(0xce0000).ram().share("spriteram");
@@ -76,9 +76,9 @@ void vaportra_state::sound_map(address_map &map)
 	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8");  /* ??? LOOKUP ??? */
-	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f1fff).ram();
+	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 /******************************************************************************/
@@ -167,8 +167,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(0,2)+8,RGN_FRAC(0,2)+0,RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	8*16
 };
 
@@ -178,8 +178,8 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(0,2)+8,RGN_FRAC(0,2)+0,RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+0 },
-	{ 256,257,258,259,260,261,262,263,0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	32*16
 };
 
@@ -228,7 +228,7 @@ MACHINE_CONFIG_START(vaportra_state::vaportra)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vaportra_state, screen_update_vaportra)
+	MCFG_SCREEN_UPDATE_DRIVER(vaportra_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vaportra)

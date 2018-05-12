@@ -46,7 +46,7 @@ public:
 	void madmotor(machine_config &config);
 
 protected:
-	uint32_t screen_update_madmotor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void madmotor_map(address_map &map);
 	void sound_map(address_map &map);
 
@@ -102,9 +102,9 @@ void madmotor_state::sound_map(address_map &map)
 	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140001).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8");
-	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f1fff).ram();
+	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 /******************************************************************************/
@@ -195,8 +195,8 @@ static const gfx_layout charlayout =
 	4096,
 	4,      /* 4 bits per pixel  */
 	{ 0x18000*8, 0x8000*8, 0x10000*8, 0x00000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
@@ -206,10 +206,8 @@ static const gfx_layout tilelayout =
 	2048,
 	4,
 	{ 0x30000*8, 0x10000*8, 0x20000*8, 0x00000*8 },
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	16*16
 };
 
@@ -219,10 +217,8 @@ static const gfx_layout tilelayout2 =
 	4096,
 	4,
 	{ 0x60000*8, 0x20000*8, 0x40000*8, 0x00000*8 },
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	16*16
 };
 
@@ -232,10 +228,8 @@ static const gfx_layout spritelayout =
 	4096*2,
 	4,
 	{ 0xc0000*8, 0x80000*8, 0x40000*8, 0x00000*8 },
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	16*16
 };
 
@@ -248,7 +242,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-uint32_t madmotor_state::screen_update_madmotor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t madmotor_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool flip = m_tilegen[0]->get_flip_state();
 	m_tilegen[0]->set_flip_screen(flip);
@@ -275,7 +269,6 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	MCFG_DEVICE_ADD("audiocpu", H6280, 8053000/2) /* Custom chip 45, Crystal near CPU is 8.053 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -283,7 +276,7 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */ /* frames per second, vblank duration taken from Burger Time */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(madmotor_state, screen_update_madmotor)
+	MCFG_SCREEN_UPDATE_DRIVER(madmotor_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", madmotor)
@@ -303,8 +296,6 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	MCFG_DECO_MXC06_GFX_REGION(3)
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
-
-
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -130,25 +130,25 @@ void boogwing_state::boogwing_map(address_map &map)
 	map(0x220000, 0x220001).w(this, FUNC(boogwing_state::priority_w));
 	map(0x220002, 0x22000f).noprw();
 
-	map(0x240000, 0x240001).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
-	map(0x242000, 0x2427ff).ram().share("spriteram");
-	map(0x244000, 0x244001).w(m_spriteram2, FUNC(buffered_spriteram16_device::write));
+	map(0x240000, 0x240001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write));
+	map(0x242000, 0x2427ff).ram().share("spriteram1");
+	map(0x244000, 0x244001).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write));
 	map(0x246000, 0x2467ff).ram().share("spriteram2");
 
-//  AM_RANGE(0x24e6c0, 0x24e6c1) AM_READ_PORT("DSW")
-//  AM_RANGE(0x24e138, 0x24e139) AM_READ_PORT("SYSTEM")
-//  AM_RANGE(0x24e344, 0x24e345) AM_READ_PORT("INPUTS")
+//  map(0x24e6c0, 0x24e6c1).portr("DSW");
+//  map(0x24e138, 0x24e139).portr("SYSTEM");
+//  map(0x24e344, 0x24e345).portr("INPUTS");
 	map(0x24e000, 0x24efff).rw(this, FUNC(boogwing_state::boogwing_protection_region_0_104_r), FUNC(boogwing_state::boogwing_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
 
-	map(0x260000, 0x26000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
-	map(0x264000, 0x265fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x266000, 0x267fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x260000, 0x26000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
+	map(0x264000, 0x265fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x266000, 0x267fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x268000, 0x268fff).ram().share("pf1_rowscroll");
 	map(0x26a000, 0x26afff).ram().share("pf2_rowscroll");
 
-	map(0x270000, 0x27000f).w(m_deco_tilegen2, FUNC(deco16ic_device::pf_control_w));
-	map(0x274000, 0x275fff).ram().w(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_w));
-	map(0x276000, 0x277fff).ram().w(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_w));
+	map(0x270000, 0x27000f).w(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_w));
+	map(0x274000, 0x275fff).ram().w(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_w));
+	map(0x276000, 0x277fff).ram().w(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_w));
 	map(0x278000, 0x278fff).ram().share("pf3_rowscroll");
 	map(0x27a000, 0x27afff).ram().share("pf4_rowscroll");
 
@@ -170,12 +170,12 @@ void boogwing_state::audio_map(address_map &map)
 	map(0x000000, 0x00ffff).rom();
 	map(0x100000, 0x100001).noprw();
 	map(0x110000, 0x110001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x120000, 0x120001).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x130000, 0x130001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x120000, 0x120001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).r(m_deco104, FUNC(deco104_device::soundlatch_r));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8");
-	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f1fff).ram();
+	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 
@@ -263,8 +263,8 @@ static const gfx_layout tile_8x8_layout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+0,RGN_FRAC(0,2)+8,RGN_FRAC(0,2)+0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	8*16
 };
 
@@ -274,8 +274,8 @@ static const gfx_layout tile_16x16_layout_5bpp =
 	RGN_FRAC(1,3),
 	5,
 	{ RGN_FRAC(2,3), RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0 },
-	{ 256,257,258,259,260,261,262,263,0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	32*16
 };
 
@@ -285,8 +285,8 @@ static const gfx_layout tile_16x16_layout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+0,RGN_FRAC(0,2)+8,RGN_FRAC(0,2)+0 },
-	{ 256,257,258,259,260,261,262,263,0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	32*16
 };
 
@@ -296,9 +296,8 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 24,8,16,0 },
-	{ 512,513,514,515,516,517,518,519, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
+	{ STEP8(16*8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*4) },
 	32*32
 };
 
@@ -320,8 +319,8 @@ void boogwing_state::machine_reset()
 
 WRITE8_MEMBER(boogwing_state::sound_bankswitch_w)
 {
-	m_oki2->set_rom_bank((data & 2) >> 1);
-	m_oki1->set_rom_bank(data & 1);
+	m_oki[1]->set_rom_bank((data & 2) >> 1);
+	m_oki[0]->set_rom_bank(data & 1);
 }
 
 
@@ -357,7 +356,7 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "deco_ace", boogwing)
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	MCFG_DECO_ACE_ADD("deco_ace")

@@ -144,8 +144,8 @@ void cbuster_state::twocrude_map(address_map &map)
 	map(0x0b4000, 0x0b4001).nopw();
 	map(0x0b5000, 0x0b500f).w("tilegen1", FUNC(deco16ic_device::pf_control_w));
 	map(0x0b6000, 0x0b600f).w("tilegen2", FUNC(deco16ic_device::pf_control_w));
-	map(0x0b8000, 0x0b8fff).ram().w(this, FUNC(cbuster_state::cbuster_palette_w)).share("palette");
-	map(0x0b9000, 0x0b9fff).ram().w(this, FUNC(cbuster_state::cbuster_palette_ext_w)).share("palette_ext");
+	map(0x0b8000, 0x0b8fff).ram().w(this, FUNC(cbuster_state::palette_w)).share("palette");
+	map(0x0b9000, 0x0b9fff).ram().w(this, FUNC(cbuster_state::palette_ext_w)).share("palette_ext");
 	map(0x0bc000, 0x0bc00f).rw(this, FUNC(cbuster_state::twocrude_control_r), FUNC(cbuster_state::twocrude_control_w));
 }
 
@@ -161,8 +161,8 @@ void cbuster_state::sound_map(address_map &map)
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 /******************************************************************************/
@@ -248,8 +248,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 24,16,8,0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*4) },
 	8*32
 };
 
@@ -259,10 +259,8 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 24, 16, 8, 0 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP8(16*8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*4) },
 	128*8
 };
 
@@ -272,10 +270,8 @@ static const gfx_layout spritelayout =
 	(4096*2)+2048,  /* Main bank + 4 extra roms */
 	4,
 	{ 0xa0000*8+8, 0xa0000*8, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 

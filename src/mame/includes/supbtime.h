@@ -24,13 +24,12 @@ class supbtime_state : public driver_device
 {
 public:
 	supbtime_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"),
-		m_pf1_rowscroll(*this, "pf1_rowscroll"),
-		m_pf2_rowscroll(*this, "pf2_rowscroll"),
-		m_maincpu(*this, "maincpu"),
-		m_deco_tilegen1(*this, "tilegen1"),
-		m_sprgen(*this, "spritegen")
+		: driver_device(mconfig, type, tag)
+		, m_spriteram(*this, "spriteram")
+		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1U)
+		, m_maincpu(*this, "maincpu")
+		, m_deco_tilegen(*this, "tilegen")
+		, m_sprgen(*this, "spritegen")
 	{ }
 
 	DECLARE_DRIVER_INIT(tumblep);
@@ -49,10 +48,9 @@ public:
 	void tumblep_map(address_map &map);
 private:
 	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_pf1_rowscroll;
-	required_shared_ptr<uint16_t> m_pf2_rowscroll;
+	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
 	required_device<cpu_device> m_maincpu;
-	required_device<deco16ic_device> m_deco_tilegen1;
+	required_device<deco16ic_device> m_deco_tilegen;
 	required_device<decospr_device> m_sprgen;
 };
 

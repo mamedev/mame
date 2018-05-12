@@ -83,9 +83,9 @@ void supbtime_state::supbtime_map(address_map &map)
 	map(0x18000a, 0x18000b).r(this, FUNC(supbtime_state::vblank_ack_r));
 	map(0x18000a, 0x18000d).nopw(); // ?
 	map(0x1a0001, 0x1a0001).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x300000, 0x30000f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
-	map(0x320000, 0x321fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x322000, 0x323fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x300000, 0x30000f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
+	map(0x320000, 0x321fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x322000, 0x323fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x340000, 0x3407ff).ram().share("pf1_rowscroll");
 	map(0x342000, 0x3427ff).ram().share("pf2_rowscroll");
 }
@@ -102,9 +102,9 @@ void supbtime_state::chinatwn_map(address_map &map)
 	map(0x18000a, 0x18000b).r(this, FUNC(supbtime_state::vblank_ack_r));
 	map(0x18000a, 0x18000d).nopw(); // ?
 	map(0x1a0000, 0x1a3fff).ram();
-	map(0x300000, 0x30000f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
-	map(0x320000, 0x321fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x322000, 0x323fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x300000, 0x30000f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
+	map(0x320000, 0x321fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x322000, 0x323fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x340000, 0x3407ff).ram().share("pf1_rowscroll"); // unused
 	map(0x342000, 0x3427ff).ram().share("pf2_rowscroll"); // unused
 }
@@ -124,9 +124,9 @@ void supbtime_state::tumblep_map(address_map &map)
 	map(0x18000a, 0x18000b).r(this, FUNC(supbtime_state::vblank_ack_r));
 	map(0x18000a, 0x18000d).nopw(); // ?
 	map(0x1a0000, 0x1a07ff).ram().share("spriteram");
-	map(0x300000, 0x30000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
-	map(0x320000, 0x320fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x322000, 0x322fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x300000, 0x30000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
+	map(0x320000, 0x320fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x322000, 0x322fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x340000, 0x3407ff).writeonly().share("pf1_rowscroll"); // unused
 	map(0x342000, 0x3427ff).writeonly().share("pf2_rowscroll"); // unused
 }
@@ -141,9 +141,9 @@ void supbtime_state::sound_map(address_map &map)
 	map(0x120000, 0x120001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x130000, 0x130001).noprw(); // This board only has 1 oki chip
 	map(0x140000, 0x140001).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8");
-	map(0x1fec00, 0x1fec01).w("audiocpu", FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w("audiocpu", FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f1fff).ram();
+	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 
@@ -162,7 +162,6 @@ READ16_MEMBER( supbtime_state::vblank_ack_r )
 	m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 	return 0xffff;
 }
-
 
 //**************************************************************************
 //  INPUT DEFINITIONS
@@ -356,7 +355,7 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DEVICE_ADD("tilegen", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
 	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
