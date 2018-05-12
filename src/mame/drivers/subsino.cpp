@@ -244,57 +244,25 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
-		m_reel3_scroll(*this, "reel3_scroll"),
-		m_reel2_scroll(*this, "reel2_scroll"),
-		m_reel1_scroll(*this, "reel1_scroll"),
-		m_reel1_ram(*this, "reel1_ram"),
-		m_reel2_ram(*this, "reel2_ram"),
-		m_reel3_ram(*this, "reel3_ram"),
+		m_reel_scroll(*this, "reel_scroll.%u", 0U),
+		m_reel_ram(*this, "reel_ram.%u", 0U),
 		m_stbsub_out_c(*this, "stbsub_out_c"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") {
+		m_palette(*this, "palette"),
+		m_hopper(*this, "hopper"),
+		m_lamps(*this, "lamp%u", 0U) {
 	}
 
-	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_videoram;
-	optional_shared_ptr<uint8_t> m_reel3_scroll;
-	optional_shared_ptr<uint8_t> m_reel2_scroll;
-	optional_shared_ptr<uint8_t> m_reel1_scroll;
-	optional_shared_ptr<uint8_t> m_reel1_ram;
-	optional_shared_ptr<uint8_t> m_reel2_ram;
-	optional_shared_ptr<uint8_t> m_reel3_ram;
-	optional_shared_ptr<uint8_t> m_stbsub_out_c;
+	void mtrainnv(machine_config &config);
+	void stbsub(machine_config &config);
+	void tisub(machine_config &config);
+	void crsbingo(machine_config &config);
+	void srider(machine_config &config);
+	void victor21(machine_config &config);
+	void sharkpy(machine_config &config);
+	void victor5(machine_config &config);
 
-	tilemap_t *m_tmap;
-	tilemap_t *m_reel1_tilemap;
-	tilemap_t *m_reel2_tilemap;
-	tilemap_t *m_reel3_tilemap;
-	int m_tiles_offset;
-	uint8_t m_out_c;
-	std::unique_ptr<uint8_t[]> m_reel1_attr;
-	std::unique_ptr<uint8_t[]> m_reel2_attr;
-	std::unique_ptr<uint8_t[]> m_reel3_attr;
-	uint8_t m_flash_val;
-	uint8_t m_flash_packet;
-	uint8_t m_flash_packet_start;
-
-	ticket_dispenser_device *m_hopper;
-
-	DECLARE_WRITE8_MEMBER(subsino_tiles_offset_w);
-	DECLARE_WRITE8_MEMBER(subsino_videoram_w);
-	DECLARE_WRITE8_MEMBER(subsino_colorram_w);
-	DECLARE_WRITE8_MEMBER(subsino_reel1_ram_w);
-	DECLARE_WRITE8_MEMBER(subsino_reel2_ram_w);
-	DECLARE_WRITE8_MEMBER(subsino_reel3_ram_w);
-	DECLARE_WRITE8_MEMBER(subsino_out_a_w);
-	DECLARE_WRITE8_MEMBER(subsino_out_b_w);
-	DECLARE_READ8_MEMBER(flash_r);
-	DECLARE_WRITE8_MEMBER(flash_w);
-	DECLARE_READ8_MEMBER(hwcheck_r);
-	DECLARE_WRITE8_MEMBER(subsino_out_c_w);
-	DECLARE_WRITE8_MEMBER(reel_scrollattr_w);
-	DECLARE_READ8_MEMBER(reel_scrollattr_r);
 	DECLARE_DRIVER_INIT(stbsub);
 	DECLARE_DRIVER_INIT(stisub);
 	DECLARE_DRIVER_INIT(tesorone);
@@ -309,34 +277,57 @@ public:
 	DECLARE_DRIVER_INIT(sharkpye);
 	DECLARE_DRIVER_INIT(tisub);
 	DECLARE_DRIVER_INIT(mtrainnv);
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_stbsub_tile_info);
-	TILE_GET_INFO_MEMBER(get_subsino_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_stbsub_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_subsino_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_stbsub_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_subsino_reel3_tile_info);
-	TILE_GET_INFO_MEMBER(get_stbsub_reel3_tile_info);
-	DECLARE_VIDEO_START(subsino);
-	DECLARE_PALETTE_INIT(subsino_2proms);
-	DECLARE_PALETTE_INIT(subsino_3proms);
-	DECLARE_VIDEO_START(subsino_reels);
-	DECLARE_VIDEO_START(stbsub);
-	uint32_t screen_update_subsino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_subsino_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
 	virtual void machine_start() override;
+
+private:
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr_array<uint8_t, 3> m_reel_scroll;
+	optional_shared_ptr_array<uint8_t, 3> m_reel_ram;
+	optional_shared_ptr<uint8_t> m_stbsub_out_c;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void mtrainnv(machine_config &config);
-	void stbsub(machine_config &config);
-	void tisub(machine_config &config);
-	void crsbingo(machine_config &config);
-	void srider(machine_config &config);
-	void victor21(machine_config &config);
-	void sharkpy(machine_config &config);
-	void victor5(machine_config &config);
+	required_device<ticket_dispenser_device> m_hopper;
+	output_finder<16> m_lamps;
+
+	tilemap_t *m_tmap;
+	tilemap_t *m_reel_tilemap[3];
+	int m_tiles_offset;
+	uint8_t m_out_c;
+	std::unique_ptr<uint8_t[]> m_reel_attr[3];
+	uint8_t m_flash_val;
+	uint8_t m_flash_packet;
+	uint8_t m_flash_packet_start;
+
+	DECLARE_WRITE8_MEMBER(tiles_offset_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(colorram_w);
+	template<uint8_t Reel> DECLARE_WRITE8_MEMBER(reel_ram_w);
+	DECLARE_WRITE8_MEMBER(out_a_w);
+	DECLARE_WRITE8_MEMBER(out_b_w);
+	DECLARE_READ8_MEMBER(flash_r);
+	DECLARE_WRITE8_MEMBER(flash_w);
+	DECLARE_READ8_MEMBER(hwcheck_r);
+	DECLARE_WRITE8_MEMBER(out_c_w);
+	DECLARE_WRITE8_MEMBER(reel_scrollattr_w);
+	DECLARE_READ8_MEMBER(reel_scrollattr_r);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_stbsub_tile_info);
+	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
+	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_stbsub_reel_tile_info);
+	DECLARE_VIDEO_START(subsino);
+	DECLARE_PALETTE_INIT(_2proms);
+	DECLARE_PALETTE_INIT(_3proms);
+	DECLARE_VIDEO_START(reels);
+	DECLARE_VIDEO_START(stbsub);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void crsbingo_map(address_map &map);
 	void mtrainnv_map(address_map &map);
 	void ramdac_map(address_map &map);
@@ -351,7 +342,10 @@ public:
 
 void subsino_state::machine_start()
 {
-	m_hopper = machine().device<ticket_dispenser_device>("hopper");
+	m_lamps.resolve();
+
+	save_item(NAME(m_tiles_offset));
+	save_item(NAME(m_out_c));
 }
 
 /***************************************************************************
@@ -359,20 +353,20 @@ void subsino_state::machine_start()
 ***************************************************************************/
 
 
-WRITE8_MEMBER(subsino_state::subsino_tiles_offset_w)
+WRITE8_MEMBER(subsino_state::tiles_offset_w)
 {
 	m_tiles_offset = (data & 1) ? 0x1000: 0;
 	m_tmap->mark_tile_dirty(offset);
 //  popmessage("gfx %02x",data);
 }
 
-WRITE8_MEMBER(subsino_state::subsino_videoram_w)
+WRITE8_MEMBER(subsino_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(subsino_state::subsino_colorram_w)
+WRITE8_MEMBER(subsino_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
@@ -397,22 +391,23 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_tile_info)
 
 VIDEO_START_MEMBER(subsino_state,subsino)
 {
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20);
 	m_tmap->set_transparent_pen(0 );
 	m_tiles_offset = 0;
 }
 
 
-
-WRITE8_MEMBER(subsino_state::subsino_reel1_ram_w)
+template<uint8_t Reel> 
+WRITE8_MEMBER(subsino_state::reel_ram_w)
 {
-	m_reel1_ram[offset] = data;
-	m_reel1_tilemap->mark_tile_dirty(offset);
+	m_reel_ram[Reel][offset] = data;
+	m_reel_tilemap[Reel]->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel1_tile_info)
+template<uint8_t Reel> 
+TILE_GET_INFO_MEMBER(subsino_state::get_reel_tile_info)
 {
-	int code = m_reel1_ram[tile_index];
+	int code = m_reel_ram[Reel][tile_index];
 	int colour = (m_out_c&0x7) + 8;
 
 	SET_TILE_INFO_MEMBER(1,
@@ -421,10 +416,11 @@ TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel1_tile_info)
+template<uint8_t Reel> 
+TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel_tile_info)
 {
-	int code = m_reel1_ram[tile_index];
-	int attr = m_reel1_attr[tile_index];
+	int code = m_reel_ram[Reel][tile_index];
+	int attr = m_reel_attr[Reel][tile_index];
 
 	SET_TILE_INFO_MEMBER(1,
 			code | (attr << 8),
@@ -433,111 +429,54 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel1_tile_info)
 }
 
 
-WRITE8_MEMBER(subsino_state::subsino_reel2_ram_w)
-{
-	m_reel2_ram[offset] = data;
-	m_reel2_tilemap->mark_tile_dirty(offset);
-}
-
-TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel2_tile_info)
-{
-	int code = m_reel2_ram[tile_index];
-	int colour = (m_out_c&0x7) + 8;
-
-	SET_TILE_INFO_MEMBER(1,
-			code,
-			colour,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel2_tile_info)
-{
-	int code = m_reel2_ram[tile_index];
-	int attr = m_reel2_attr[tile_index];
-
-	SET_TILE_INFO_MEMBER(1,
-			code | (attr << 8),
-			0,
-			0);
-}
-
-WRITE8_MEMBER(subsino_state::subsino_reel3_ram_w)
-{
-	m_reel3_ram[offset] = data;
-	m_reel3_tilemap->mark_tile_dirty(offset);
-}
-
-TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel3_tile_info)
-{
-	int code = m_reel3_ram[tile_index];
-	int colour = (m_out_c&0x7) + 8;
-
-	SET_TILE_INFO_MEMBER(1,
-			code,
-			colour,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel3_tile_info)
-{
-	int code = m_reel3_ram[tile_index];
-	int attr = m_reel3_attr[tile_index];
-
-	SET_TILE_INFO_MEMBER(1,
-			code | (attr << 8),
-			0,
-			0);
-}
-
-
-VIDEO_START_MEMBER(subsino_state,subsino_reels)
+VIDEO_START_MEMBER(subsino_state, reels)
 {
 	VIDEO_START_CALL_MEMBER( subsino );
 
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel3_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_reel_tile_info<0>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_reel_tile_info<1>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_reel_tile_info<2>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
-	m_reel1_tilemap->set_scroll_cols(64);
-	m_reel2_tilemap->set_scroll_cols(64);
-	m_reel3_tilemap->set_scroll_cols(64);
+	m_reel_tilemap[0]->set_scroll_cols(64);
+	m_reel_tilemap[1]->set_scroll_cols(64);
+	m_reel_tilemap[2]->set_scroll_cols(64);
 
 }
 
 VIDEO_START_MEMBER(subsino_state,stbsub)
 {
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stbsub_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stbsub_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20);
 	m_tmap->set_transparent_pen(0 );
 
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stbsub_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stbsub_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stbsub_reel3_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stbsub_reel_tile_info<0>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stbsub_reel_tile_info<1>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stbsub_reel_tile_info<2>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
-	m_reel1_tilemap->set_scroll_cols(64);
-	m_reel2_tilemap->set_scroll_cols(64);
-	m_reel3_tilemap->set_scroll_cols(64);
+	m_reel_tilemap[0]->set_scroll_cols(64);
+	m_reel_tilemap[1]->set_scroll_cols(64);
+	m_reel_tilemap[2]->set_scroll_cols(64);
 
 	m_out_c = 0x08;
 }
 
 
-uint32_t subsino_state::screen_update_subsino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t subsino_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-uint32_t subsino_state::screen_update_subsino_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t subsino_state::screen_update_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
 	bitmap.fill(0, cliprect);
 
-	for (i= 0;i < 64;i++)
+	for (uint8_t reel = 0; reel < 3; reel++)
 	{
-		m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
-		m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
-		m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
+		for (int i = 0; i < 64; i++)
+		{
+			m_reel_tilemap[reel]->set_scrolly(i, m_reel_scroll[reel][i]);
+		}
 	}
 
 	if (m_out_c&0x08)
@@ -547,9 +486,9 @@ uint32_t subsino_state::screen_update_subsino_reels(screen_device &screen, bitma
 		const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
 		const rectangle visible3(0*8, (14+48)*8-1, 18*8, (18+7)*8-1);
 
-		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
-		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
-		m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+		m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+		m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+		m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
 	}
 
 	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
@@ -559,21 +498,20 @@ uint32_t subsino_state::screen_update_subsino_reels(screen_device &screen, bitma
 
 uint32_t subsino_state::screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
 	bitmap.fill(0, cliprect);
 
-	if (m_reel1_attr)
+	if (m_reel_attr[0])
 	{
-		m_reel1_tilemap->mark_all_dirty();
-		m_reel2_tilemap->mark_all_dirty();
-		m_reel3_tilemap->mark_all_dirty();
+		for (uint8_t reel = 0; reel < 3; reel++)
+			m_reel_tilemap[reel]->mark_all_dirty();
 	}
 
-	for (i= 0;i < 64;i++)
+	for (uint8_t reel = 0; reel < 3; reel++)
 	{
-		m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
-		m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
-		m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
+		for (int i = 0; i < 64; i++)
+		{
+			m_reel_tilemap[reel]->set_scrolly(i, m_reel_scroll[reel][i]);
+		}
 	}
 
 	if (m_out_c&0x08)
@@ -583,9 +521,9 @@ uint32_t subsino_state::screen_update_stbsub_reels(screen_device &screen, bitmap
 		const rectangle visible2(0, 511,  88, 143);
 		const rectangle visible3(0, 511,  144, 223);
 
-		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
-		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
-		m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+		m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+		m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+		m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
 	}
 
 	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
@@ -594,7 +532,7 @@ uint32_t subsino_state::screen_update_stbsub_reels(screen_device &screen, bitmap
 
 
 
-PALETTE_INIT_MEMBER(subsino_state,subsino_2proms)
+PALETTE_INIT_MEMBER(subsino_state, _2proms)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
@@ -621,7 +559,7 @@ PALETTE_INIT_MEMBER(subsino_state,subsino_2proms)
 	}
 }
 
-PALETTE_INIT_MEMBER(subsino_state,subsino_3proms)
+PALETTE_INIT_MEMBER(subsino_state, _3proms)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
@@ -653,7 +591,7 @@ PALETTE_INIT_MEMBER(subsino_state,subsino_3proms)
 *                          Lamps & other outputs.                          *
 ***************************************************************************/
 
-WRITE8_MEMBER(subsino_state::subsino_out_a_w)
+WRITE8_MEMBER(subsino_state::out_a_w)
 {
 /***** COIN PULSE: *****
 
@@ -684,14 +622,8 @@ WRITE8_MEMBER(subsino_state::subsino_out_a_w)
 
 */
 
-	output().set_lamp_value(8, (data) & 1);       /* Lamp 8 */
-	output().set_lamp_value(9, (data >> 1) & 1);  /* Lamp 9 */
-	output().set_lamp_value(10, (data >> 2) & 1); /* Lamp 10 */
-	output().set_lamp_value(11, (data >> 3) & 1); /* Lamp 11 */
-	output().set_lamp_value(12, (data >> 4) & 1); /* Lamp 12 */
-	output().set_lamp_value(13, (data >> 5) & 1); /* Lamp 13 */
-	output().set_lamp_value(14, (data >> 6) & 1); /* Lamp 14 */
-	output().set_lamp_value(15, (data >> 7) & 1); /* Lamp 15 */
+	for (int i = 0; i < 8; i++) // Lamps 8 - 15
+		m_lamps[i + 8] = BIT(data, i);
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x01 );    /* coin / keyin */
 	machine().bookkeeping().coin_counter_w(1, data & 0x02 );    /* keyin / coin */
@@ -703,7 +635,7 @@ WRITE8_MEMBER(subsino_state::subsino_out_a_w)
 //  popmessage("Out A %02x",data);
 }
 
-WRITE8_MEMBER(subsino_state::subsino_out_b_w)
+WRITE8_MEMBER(subsino_state::out_b_w)
 {
 /***** LAMPS: *****
 
@@ -826,14 +758,9 @@ WRITE8_MEMBER(subsino_state::subsino_out_b_w)
 
 */
 
-	output().set_lamp_value(0, (data) & 1);       /* Lamp 0 */
-	output().set_lamp_value(1, (data >> 1) & 1);  /* Lamp 1 */
-	output().set_lamp_value(2, (data >> 2) & 1);  /* Lamp 2 */
-	output().set_lamp_value(3, (data >> 3) & 1);  /* Lamp 3 */
-	output().set_lamp_value(4, (data >> 4) & 1);  /* Lamp 4 */
-	output().set_lamp_value(5, (data >> 5) & 1);  /* Lamp 5 */
-	output().set_lamp_value(6, (data >> 6) & 1);  /* Lamp 6 */
-	output().set_lamp_value(7, (data >> 7) & 1);  /* Lamp 7 */
+	// Lamps 0 - 7
+	for (int i = 0; i < 8; i++)
+		m_lamps[i] = BIT(data, i);
 
 //  popmessage("Out B %02x",data);
 }
@@ -852,8 +779,8 @@ void subsino_state::srider_map(address_map &map)
 	map(0x0d000, 0x0d002).r("ppi1", FUNC(i8255_device::read));
 	map(0x0d004, 0x0d006).r("ppi2", FUNC(i8255_device::read));
 
-	map(0x0d009, 0x0d009).w(this, FUNC(subsino_state::subsino_out_b_w));
-	map(0x0d00a, 0x0d00a).w(this, FUNC(subsino_state::subsino_out_a_w));
+	map(0x0d009, 0x0d009).w(this, FUNC(subsino_state::out_b_w));
+	map(0x0d00a, 0x0d00a).w(this, FUNC(subsino_state::out_a_w));
 
 	map(0x0d00c, 0x0d00c).portr("INC");
 
@@ -861,10 +788,10 @@ void subsino_state::srider_map(address_map &map)
 
 	map(0x0d018, 0x0d018).w("oki", FUNC(okim6295_device::write));
 
-	map(0x0d01b, 0x0d01b).w(this, FUNC(subsino_state::subsino_tiles_offset_w));
+	map(0x0d01b, 0x0d01b).w(this, FUNC(subsino_state::tiles_offset_w));
 
-	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(subsino_state::subsino_colorram_w)).share("colorram");
-	map(0x0e800, 0x0efff).ram().w(this, FUNC(subsino_state::subsino_videoram_w)).share("videoram");
+	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0e800, 0x0efff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
 }
 
 
@@ -876,8 +803,8 @@ void subsino_state::sharkpy_map(address_map &map)
 	map(0x09000, 0x09002).r("ppi1", FUNC(i8255_device::read));
 	map(0x09004, 0x09006).r("ppi2", FUNC(i8255_device::read));
 
-	map(0x09009, 0x09009).w(this, FUNC(subsino_state::subsino_out_b_w));
-	map(0x0900a, 0x0900a).w(this, FUNC(subsino_state::subsino_out_a_w));
+	map(0x09009, 0x09009).w(this, FUNC(subsino_state::out_b_w));
+	map(0x0900a, 0x0900a).w(this, FUNC(subsino_state::out_a_w));
 
 	map(0x0900c, 0x0900c).portr("INC");
 
@@ -885,11 +812,11 @@ void subsino_state::sharkpy_map(address_map &map)
 
 	map(0x09018, 0x09018).w("oki", FUNC(okim6295_device::write));
 
-	map(0x0901b, 0x0901b).w(this, FUNC(subsino_state::subsino_tiles_offset_w));
+	map(0x0901b, 0x0901b).w(this, FUNC(subsino_state::tiles_offset_w));
 
 	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::subsino_colorram_w)).share("colorram");
-	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::subsino_videoram_w)).share("videoram");
+	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
 }
 
 /*
@@ -917,11 +844,11 @@ void subsino_state::victor21_map(address_map &map)
 
 	map(0x0900e, 0x0900f).w("ymsnd", FUNC(ym2413_device::write));
 
-	map(0x0900d, 0x0900d).w(this, FUNC(subsino_state::subsino_tiles_offset_w));
+	map(0x0900d, 0x0900d).w(this, FUNC(subsino_state::tiles_offset_w));
 
 	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::subsino_videoram_w)).share("videoram");
-	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::subsino_colorram_w)).share("colorram");
+	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
 
 	map(0x10000, 0x13fff).rom();
 }
@@ -1003,11 +930,11 @@ void subsino_state::crsbingo_map(address_map &map)
 	map(0x09002, 0x09002).portr("INA");
 	map(0x09003, 0x09003).portr("INB");
 	map(0x09004, 0x09004).portr("INC");
-	map(0x09005, 0x09005).w(this, FUNC(subsino_state::subsino_out_a_w));
+	map(0x09005, 0x09005).w(this, FUNC(subsino_state::out_a_w));
 
 	map(0x09008, 0x09008).portr("SW4");
-	map(0x09009, 0x09009).portr("SW3");  // AM_WRITE(subsino_out_a_w )
-	map(0x0900a, 0x0900a).rw(this, FUNC(subsino_state::hwcheck_r), FUNC(subsino_state::subsino_out_b_w));
+	map(0x09009, 0x09009).portr("SW3");  // AM_WRITE(out_a_w )
+	map(0x0900a, 0x0900a).rw(this, FUNC(subsino_state::hwcheck_r), FUNC(subsino_state::out_b_w));
 
 	map(0x09010, 0x09010).rw(this, FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
 //  AM_RANGE( 0x09011, 0x09011 ) //"flash" status, bit 0
@@ -1016,17 +943,17 @@ void subsino_state::crsbingo_map(address_map &map)
 
 //  AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE("oki", okim6295_device, write)
 
-//  AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE(subsino_tiles_offset_w )
+//  AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE(tiles_offset_w )
 
 	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::subsino_videoram_w)).share("videoram");
-	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::subsino_colorram_w)).share("colorram");
+	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
 
 	map(0x10000, 0x13fff).rom(); //overlap unmapped regions
 
 }
 
-WRITE8_MEMBER(subsino_state::subsino_out_c_w)
+WRITE8_MEMBER(subsino_state::out_c_w)
 {
 	// not 100% sure on this
 
@@ -1035,10 +962,9 @@ WRITE8_MEMBER(subsino_state::subsino_out_c_w)
 	// c = reel colour bank?
 	m_out_c = data;
 
-	m_reel1_tilemap->mark_all_dirty();
-	m_reel2_tilemap->mark_all_dirty();
-	m_reel3_tilemap->mark_all_dirty();
-//  popmessage("data %02x\n",data);
+	for (uint8_t reel = 0; reel < 3; reel++)
+		m_reel_tilemap[reel]->mark_all_dirty();
+//	popmessage("data %02x\n",data);
 }
 
 void subsino_state::tisub_map(address_map &map)
@@ -1050,9 +976,9 @@ void subsino_state::tisub_map(address_map &map)
 	map(0x09004, 0x09006).r("ppi2", FUNC(i8255_device::read));
 
 	/* 0x09008: is marked as OUTPUT C in the test mode. */
-	map(0x09008, 0x09008).w(this, FUNC(subsino_state::subsino_out_c_w));
-	map(0x09009, 0x09009).w(this, FUNC(subsino_state::subsino_out_b_w));
-	map(0x0900a, 0x0900a).w(this, FUNC(subsino_state::subsino_out_a_w));
+	map(0x09008, 0x09008).w(this, FUNC(subsino_state::out_c_w));
+	map(0x09009, 0x09009).w(this, FUNC(subsino_state::out_b_w));
+	map(0x0900a, 0x0900a).w(this, FUNC(subsino_state::out_a_w));
 
 	map(0x0900c, 0x0900c).portr("INC");
 
@@ -1060,22 +986,22 @@ void subsino_state::tisub_map(address_map &map)
 
 //  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE("oki", okim6295_device, write)
 
-	map(0x0901b, 0x0901b).w(this, FUNC(subsino_state::subsino_tiles_offset_w));
+	map(0x0901b, 0x0901b).w(this, FUNC(subsino_state::tiles_offset_w));
 
 	map(0x07800, 0x07fff).ram();
-	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::subsino_videoram_w)).share("videoram");
-	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::subsino_colorram_w)).share("colorram");
+	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
 
 	map(0x10000, 0x13fff).rom();
 	map(0x14000, 0x14fff).rom(); // reads the card face data here (see rom copy in rom loading)
 
-	map(0x150c0, 0x150ff).ram().share("reel3_scroll");
-	map(0x15140, 0x1517f).ram().share("reel2_scroll");
-	map(0x15180, 0x151bf).ram().share("reel1_scroll");
+	map(0x150c0, 0x150ff).ram().share("reel_scroll.2");
+	map(0x15140, 0x1517f).ram().share("reel_scroll.1");
+	map(0x15180, 0x151bf).ram().share("reel_scroll.0");
 
-	map(0x15800, 0x159ff).ram().w(this, FUNC(subsino_state::subsino_reel1_ram_w)).share("reel1_ram");
-	map(0x15a00, 0x15bff).ram().w(this, FUNC(subsino_state::subsino_reel2_ram_w)).share("reel2_ram");
-	map(0x15c00, 0x15dff).ram().w(this, FUNC(subsino_state::subsino_reel3_ram_w)).share("reel3_ram");
+	map(0x15800, 0x159ff).ram().w(this, FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
+	map(0x15a00, 0x15bff).ram().w(this, FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
+	map(0x15c00, 0x15dff).ram().w(this, FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
 }
 
 void subsino_state::ramdac_map(address_map &map)
@@ -1091,15 +1017,15 @@ WRITE8_MEMBER(subsino_state::reel_scrollattr_w)
 	{
 		if (offset<0x200)
 		{
-			m_reel1_attr[offset&0x1ff] = data;
+			m_reel_attr[0][offset&0x1ff] = data;
 		}
 		else if (offset<0x400)
 		{
-			m_reel2_attr[offset&0x1ff] = data;
+			m_reel_attr[1][offset&0x1ff] = data;
 		}
 		else if (offset<0x600)
 		{
-			m_reel3_attr[offset&0x1ff] = data;
+			m_reel_attr[2][offset&0x1ff] = data;
 		}
 		else
 		{
@@ -1116,22 +1042,22 @@ WRITE8_MEMBER(subsino_state::reel_scrollattr_w)
 		}
 		else if (offset<0x80)
 		{
-			m_reel2_scroll[offset&0x3f] = data;
+			m_reel_scroll[1][offset&0x3f] = data;
 		}
 		else if (offset<0xc0)
 		{
-			m_reel1_scroll[offset&0x3f] = data;
+			m_reel_scroll[0][offset&0x3f] = data;
 		}
 		else
 		{
-			m_reel3_scroll[offset&0x3f] = data;
+			m_reel_scroll[2][offset&0x3f] = data;
 		}
 	}
 }
 
 READ8_MEMBER(subsino_state::reel_scrollattr_r)
 {
-	return m_reel1_attr[offset];
+	return m_reel_attr[0][offset];
 }
 
 void subsino_state::stbsub_map(address_map &map)
@@ -1145,8 +1071,8 @@ void subsino_state::stbsub_map(address_map &map)
 
 	map(0x0d008, 0x0d008).ram().share("stbsub_out_c");
 
-	map(0x0d009, 0x0d009).w(this, FUNC(subsino_state::subsino_out_b_w));
-	map(0x0d00a, 0x0d00a).w(this, FUNC(subsino_state::subsino_out_a_w));
+	map(0x0d009, 0x0d009).w(this, FUNC(subsino_state::out_b_w));
+	map(0x0d00a, 0x0d00a).w(this, FUNC(subsino_state::out_a_w));
 
 	map(0x0d00c, 0x0d00c).portr("INC");
 
@@ -1156,16 +1082,16 @@ void subsino_state::stbsub_map(address_map &map)
 
 	map(0x0d016, 0x0d017).w("ymsnd", FUNC(ym3812_device::write));
 
-//  AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE(subsino_tiles_offset_w )
+//  AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE(tiles_offset_w )
 
-	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(subsino_state::subsino_colorram_w)).share("colorram");
-	map(0x0e800, 0x0efff).ram().w(this, FUNC(subsino_state::subsino_videoram_w)).share("videoram");
+	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0e800, 0x0efff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
 
 	map(0xf000, 0xf7ff).rw(this, FUNC(subsino_state::reel_scrollattr_r), FUNC(subsino_state::reel_scrollattr_w));
 
-	map(0xf800, 0xf9ff).ram().w(this, FUNC(subsino_state::subsino_reel1_ram_w)).share("reel1_ram");
-	map(0xfa00, 0xfbff).ram().w(this, FUNC(subsino_state::subsino_reel2_ram_w)).share("reel2_ram");
-	map(0xfc00, 0xfdff).ram().w(this, FUNC(subsino_state::subsino_reel3_ram_w)).share("reel3_ram");
+	map(0xf800, 0xf9ff).ram().w(this, FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
+	map(0xfa00, 0xfbff).ram().w(this, FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
+	map(0xfc00, 0xfdff).ram().w(this, FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
 }
 
 
@@ -1198,14 +1124,14 @@ void subsino_state::mtrainnv_map(address_map &map)
 
 //  AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(subsino_state::subsino_colorram_w)).share("colorram");
-	map(0x0e800, 0x0efff).ram().w(this, FUNC(subsino_state::subsino_videoram_w)).share("videoram");
+	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0e800, 0x0efff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
 
 	map(0xf000, 0xf7ff).rw(this, FUNC(subsino_state::reel_scrollattr_r), FUNC(subsino_state::reel_scrollattr_w));
 
-	map(0xf800, 0xf9ff).ram().w(this, FUNC(subsino_state::subsino_reel1_ram_w)).share("reel1_ram");
-	map(0xfa00, 0xfbff).ram().w(this, FUNC(subsino_state::subsino_reel2_ram_w)).share("reel2_ram");
-	map(0xfc00, 0xfdff).ram().w(this, FUNC(subsino_state::subsino_reel3_ram_w)).share("reel3_ram");
+	map(0xf800, 0xf9ff).ram().w(this, FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
+	map(0xfa00, 0xfbff).ram().w(this, FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
+	map(0xfc00, 0xfdff).ram().w(this, FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
 }
 
 
@@ -2783,9 +2709,9 @@ MACHINE_CONFIG_START(subsino_state::victor21)
 	MCFG_DEVICE_IO_MAP(subsino_iomap)
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, subsino_state, subsino_out_a_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, subsino_state, out_a_w))
 	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, subsino_state, subsino_out_b_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, subsino_state, out_b_w))
 	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("INC"))
 
@@ -2797,13 +2723,13 @@ MACHINE_CONFIG_START(subsino_state::victor21)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino)
+	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subsino_depth3)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(subsino_state,subsino_2proms)
+	MCFG_PALETTE_INIT_OWNER(subsino_state, _2proms)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
@@ -2841,13 +2767,13 @@ MACHINE_CONFIG_START(subsino_state::crsbingo)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino)
+	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subsino_depth4)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(subsino_state,subsino_2proms)
+	MCFG_PALETTE_INIT_OWNER(subsino_state, _2proms)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
@@ -2883,13 +2809,13 @@ MACHINE_CONFIG_START(subsino_state::srider)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino)
+	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subsino_depth4)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(subsino_state,subsino_3proms)
+	MCFG_PALETTE_INIT_OWNER(subsino_state, _3proms)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
@@ -2936,15 +2862,15 @@ MACHINE_CONFIG_START(subsino_state::tisub)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino_reels)
+	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_reels)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subsino_depth4_reels)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(subsino_state,subsino_3proms)
+	MCFG_PALETTE_INIT_OWNER(subsino_state, _3proms)
 
-	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino_reels)
+	MCFG_VIDEO_START_OVERRIDE(subsino_state, reels)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2983,7 +2909,7 @@ MACHINE_CONFIG_START(subsino_state::stbsub)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subsino_stbsub)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-	//MCFG_PALETTE_INIT_OWNER(subsino_state,subsino_3proms)
+	//MCFG_PALETTE_INIT_OWNER(subsino_state, _3proms)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
 
@@ -3770,8 +3696,8 @@ ROM_END
   to big casino corporations), and should be placed in the empty socket
   to fix a dead board due to NVRAM corruption.
 
-  A version of Magic Train running on subsino.c (unlike mtrain, which is
-  subsino2.c) is needed to match this program ROM.
+  A version of Magic Train running on subsino.cpp (unlike mtrain, which is
+  subsino2.cpp) is needed to match this program ROM.
 
 ***************************************************************************/
 
@@ -3796,6 +3722,10 @@ ROM_END
 DRIVER_INIT_MEMBER(subsino_state,victor5)
 {
 	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0xc000);
+
+	save_item(NAME(m_flash_packet));
+	save_item(NAME(m_flash_packet_start));
+	save_item(NAME(m_flash_val));
 }
 
 DRIVER_INIT_MEMBER(subsino_state,victor21)
@@ -3806,6 +3736,10 @@ DRIVER_INIT_MEMBER(subsino_state,victor21)
 DRIVER_INIT_MEMBER(subsino_state,crsbingo)
 {
 	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0xc000);
+
+	save_item(NAME(m_flash_packet));
+	save_item(NAME(m_flash_packet_start));
+	save_item(NAME(m_flash_val));
 }
 
 DRIVER_INIT_MEMBER(subsino_state,sharkpy)
@@ -3863,13 +3797,14 @@ DRIVER_INIT_MEMBER(subsino_state,stbsub)
 	rom[0x957] = 0x18; //patch "losing protection" check
 #endif
 
-	m_reel1_scroll.allocate(0x40);
-	m_reel2_scroll.allocate(0x40);
-	m_reel3_scroll.allocate(0x40);
+	for (uint8_t reel = 0; reel < 3; reel++)
+	{
+		m_reel_scroll[reel].allocate(0x40);
 
-	m_reel1_attr = std::make_unique<uint8_t[]>(0x200);
-	m_reel2_attr = std::make_unique<uint8_t[]>(0x200);
-	m_reel3_attr = std::make_unique<uint8_t[]>(0x200);
+		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
+
+		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
+	}
 }
 
 DRIVER_INIT_MEMBER(subsino_state, stisub)
@@ -3878,13 +3813,14 @@ DRIVER_INIT_MEMBER(subsino_state, stisub)
 	rom[0x0FA0] = 0x28;
 	rom[0x0FA1] = 0x1d; //patch protection check
 
-	m_reel1_scroll.allocate(0x40);
-	m_reel2_scroll.allocate(0x40);
-	m_reel3_scroll.allocate(0x40);
+	for (uint8_t reel = 0; reel < 3; reel++)
+	{
+		m_reel_scroll[reel].allocate(0x40);
 
-	m_reel1_attr = std::make_unique<uint8_t[]>(0x200);
-	m_reel2_attr = std::make_unique<uint8_t[]>(0x200);
-	m_reel3_attr = std::make_unique<uint8_t[]>(0x200);
+		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
+
+		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
+	}
 }
 
 DRIVER_INIT_MEMBER(subsino_state,tesorone)
@@ -3897,13 +3833,14 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone)
 	rom[0xa84] = 0x18; //patch "losing protection" check
 #endif
 
-	m_reel1_scroll.allocate(0x40);
-	m_reel2_scroll.allocate(0x40);
-	m_reel3_scroll.allocate(0x40);
+	for (uint8_t reel = 0; reel < 3; reel++)
+	{
+		m_reel_scroll[reel].allocate(0x40);
 
-	m_reel1_attr = std::make_unique<uint8_t[]>(0x200);
-	m_reel2_attr = std::make_unique<uint8_t[]>(0x200);
-	m_reel3_attr = std::make_unique<uint8_t[]>(0x200);
+		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
+
+		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
+	}
 }
 
 DRIVER_INIT_MEMBER(subsino_state,tesorone230)
@@ -3916,25 +3853,27 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone230)
 	rom[0xa88] = 0x18; //patch "losing protection" check
 #endif
 
-	m_reel1_scroll.allocate(0x40);
-	m_reel2_scroll.allocate(0x40);
-	m_reel3_scroll.allocate(0x40);
+	for (uint8_t reel = 0; reel < 3; reel++)
+	{
+		m_reel_scroll[reel].allocate(0x40);
 
-	m_reel1_attr = std::make_unique<uint8_t[]>(0x200);
-	m_reel2_attr = std::make_unique<uint8_t[]>(0x200);
-	m_reel3_attr = std::make_unique<uint8_t[]>(0x200);
+		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
+
+		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
+	}
 }
 
 
 DRIVER_INIT_MEMBER(subsino_state,mtrainnv)
 {
-	m_reel1_scroll.allocate(0x40);
-	m_reel2_scroll.allocate(0x40);
-	m_reel3_scroll.allocate(0x40);
+	for (uint8_t reel = 0; reel < 3; reel++)
+	{
+		m_reel_scroll[reel].allocate(0x40);
 
-	m_reel1_attr = std::make_unique<uint8_t[]>(0x200);
-	m_reel2_attr = std::make_unique<uint8_t[]>(0x200);
-	m_reel3_attr = std::make_unique<uint8_t[]>(0x200);
+		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
+
+		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
+	}
 }
 
 /***************************************************************************
