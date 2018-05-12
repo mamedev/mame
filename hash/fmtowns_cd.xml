@@ -414,7 +414,6 @@ Maruanki Eitango: Chuugaku 1-nensei                           CSK Research Insti
 Maruanki Eitango: Chuugaku 2-nensei                           CSK Research Institute (CRI)      1989/12    SET(CD+FD)
 Maruanki Eitango: Chuugaku 3-nensei                           CSK Research Institute (CRI)      1990/2     SET(CD+FD)
 Masuo per Masuo: Ikeda Masuo Hanga-shuu Kazadama Vol. 2       Fujitsu                           1994/7     CD
-Megalomania                                                   Imagineer                         1993/3     CD
 Meisou Toshi                                                  Tiara                             1995/12    CD
 Microsoft Windows 95 (Upgrade Package)                        Fujitsu                           1996/6     CD
 Mietarou V2.0                                                 Uchida Youkou                     1992/12    SET(CD+FD)
@@ -6181,6 +6180,25 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="microcosm" sha1="ae3c07cb50704391e613ce10c64b0bb79c9923c1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="megalo">
+		<!--
+		Origin: Tokugawa Corporate Forums (DamienD)
+		<rom name="Mega lo Mania.ccd" size="767" crc="30f1b6df" sha1="ed25c3e2f5edbf958b964b2f7b0a792b1d865717"/>
+		<rom name="Mega lo Mania.cue" size="77" crc="84490baa" sha1="0cfc4c5c112a4a1f14273d7b54efae4140eb7fbc"/>
+		<rom name="Mega lo Mania.img" size="10231200" crc="80a5c3e3" sha1="23de0ec5214cf25acd53a5a467c5e98c9e0e5dac"/>
+		<rom name="Mega lo Mania.sub" size="417600" crc="85c37af1" sha1="278b6233d247a22ff5702f40c5cb2fccddbb46e6"/>
+		-->
+		<description>Mega Lo Mania</description>
+		<year>1993</year>
+		<publisher>イマジニア (Imagineer)</publisher>
+		<info name="release" value="199303xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="mega lo mania" sha1="f5d7373adb8f6f66a6037cd8c7a7e71f3e964b26" />
 			</diskarea>
 		</part>
 	</software>
