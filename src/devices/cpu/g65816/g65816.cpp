@@ -857,8 +857,8 @@ void g65816_device::device_start()
 
 	address_space &program_space = space(AS_PROGRAM);
 	m_data_space = has_space(AS_DATA) ? &space(AS_DATA) : &program_space;
-	m_program_direct = program_space.direct<0>();
-	m_opcode_direct = (has_space(AS_OPCODES) ? space(AS_OPCODES) : program_space).direct<0>();
+	m_program_cache = program_space.cache<0, 0, ENDIANNESS_LITTLE>();
+	m_opcode_cache = (has_space(AS_OPCODES) ? space(AS_OPCODES) : program_space).cache<0, 0, ENDIANNESS_LITTLE>();
 
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));

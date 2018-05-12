@@ -84,8 +84,8 @@ protected:
 	uint8_t   m_irq_state[3];   /* IRQ line state [IRQ1,TIN,SC1] */
 
 	/* Memory spaces */
-	address_space *m_program, *m_decrypted_opcodes;
-	direct_read_data<0> *m_direct, *m_decrypted_opcodes_direct;
+	address_space *m_program, *m_opcodes;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache, *m_opcodes_cache;
 
 	const op_func *m_insn;
 	const uint8_t *m_cycles;            /* clock cycle of instruction table */

@@ -314,9 +314,8 @@ protected:
 	uint8_t   m_test_state;
 
 	address_space *m_program, *m_opcodes;
-	direct_read_data<0> *m_direct, *m_direct_opcodes;
+	std::function<u8 (offs_t)> m_or8;
 	address_space *m_io;
-	offs_t m_fetch_xor;
 	int m_icount;
 
 	uint32_t m_prefix_seg;   /* the latest prefix segment */

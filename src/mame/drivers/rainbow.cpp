@@ -506,6 +506,7 @@ public:
 		m_z80(*this, "subcpu"),
 
 		m_fdc(*this, FD1793_TAG),
+		m_floppies(*this, FD1793_TAG ":%u", 0U),
 		m_hdc(*this, "hdc"),
 		m_corvus_hdc(*this, "corvus"),
 
@@ -534,6 +535,14 @@ public:
 		m_digits(*this, "digit%u", 0U)
 	{
 	}
+
+	void rainbow(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 
 	DECLARE_READ8_MEMBER(read_video_ram_r);
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt);
@@ -621,17 +630,11 @@ public:
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_WRITE_LINE_MEMBER(GDC_vblank_irq);
 
-	void rainbow(machine_config &config);
 	void rainbow8088_io(address_map &map);
 	void rainbow8088_map(address_map &map);
 	void rainbowz80_io(address_map &map);
 	void rainbowz80_mem(address_map &map);
 	void upd7220_map(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-private:
 	enum
 	{   // LOWEST PRIORITY
 		// Mnemonic - - - - - -  TYPE  ADDRESS - Source
@@ -665,6 +668,7 @@ private:
 	required_device<cpu_device> m_z80;
 
 	required_device<fd1793_device> m_fdc;
+	required_device_array<floppy_connector, 4> m_floppies;
 	optional_device<wd2010_device> m_hdc;
 
 	required_device<corvus_hdc_device> m_corvus_hdc;
@@ -2438,7 +2442,6 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	int disable_start; // set defaults
 
 	int selected_drive = INVALID_DRIVE;
-	static const char *names[] = { FD1793_TAG ":0", FD1793_TAG ":1", FD1793_TAG ":2", FD1793_TAG ":3" };
 
 	int drive = 0;
 	if (m_inp10->read() && ((data & 3) < 2))
@@ -2446,13 +2449,9 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	else
 		drive = data & 3;
 
-	floppy_connector *con = nullptr;
-	if (drive < MAX_FLOPPIES)
-		con = subdevice<floppy_connector>(names[drive]);
-
-	if (con)
+	if (m_floppies[drive])
 	{
-		m_floppy = con->get_device();
+		m_floppy = m_floppies[drive]->get_device();
 		if (m_floppy)
 			selected_drive = drive;
 	}
@@ -2507,9 +2506,10 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 		// Assume the other one is switched off -
 		for (int f_num = 0; f_num < MAX_FLOPPIES; f_num++)
 		{
-		floppy_connector *con = subdevice<floppy_connector>(names[f_num]);
-		floppy_image_device *tmp_floppy = con->get_device();
+		floppy_image_device *tmp_floppy = m_floppies[f_num]->get_device();
 
+		if (!tmp_floppy)
+			continue;
 		tmp_floppy->mon_w(ASSERT_LINE);
 		if ((f_num >= enable_start) && (f_num < disable_start))
 			tmp_floppy->mon_w(CLEAR_LINE); // enable

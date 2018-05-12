@@ -83,8 +83,7 @@ public:
 	DECLARE_READ8_MEMBER( mcu_io_r );
 
 	// I8751-related VBLANK interrupt handlers
-	INTERRUPT_GEN_MEMBER( mcu_irq_assert );
-	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
+	DECLARE_WRITE_LINE_MEMBER(i8751_main_cpu_vblank_w);
 
 	// game-specific driver init
 	DECLARE_DRIVER_INIT(generic);

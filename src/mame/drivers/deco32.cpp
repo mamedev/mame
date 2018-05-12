@@ -415,7 +415,7 @@ void captaven_state::captaven_map(address_map &map)
 void fghthist_state::fghthist_map(address_map &map)
 {
 	map.unmap_value_high();
-//  map(0x000000, 0x001fff) AM_ROM AM_WRITE(pf1_data_w) // wtf??
+//  map(0x000000, 0x001fff).rom().w(this, FUNC(fghthist_state::pf1_data_w)); // wtf??
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x11ffff).ram();
 	map(0x120020, 0x120021).r(this, FUNC(fghthist_state::fghthist_in0_r));
@@ -650,8 +650,8 @@ void deco32_state::h6280_sound_map(address_map &map)
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).w("audiocpu", FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w("audiocpu", FUNC(h6280_device::irq_status_w));
+	map(0x1fec00, 0x1fec01).rw("audiocpu", FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw("audiocpu", FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 void deco32_state::h6280_sound_custom_latch_map(address_map &map)
@@ -1736,8 +1736,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8    /* every char takes 8 consecutive bytes */
 };
 
@@ -1747,10 +1747,8 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 16, 0, 24, 8 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP8(16*8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*4) },
 	128*8
 };
 
@@ -1760,10 +1758,8 @@ static const gfx_layout spritelayout_5bpp =
 	RGN_FRAC(1,2),
 	5,
 	{ RGN_FRAC(1,2), 16, 0, 24, 8 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP8(16*8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*4) },
 	128*8
 };
 
@@ -1773,10 +1769,8 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
@@ -1786,10 +1780,8 @@ static const gfx_layout tilelayout_8bpp =
 	RGN_FRAC(1,4),
 	8,
 	{ RGN_FRAC(3,4)+8, RGN_FRAC(3,4)+0, RGN_FRAC(2,4)+8, RGN_FRAC(2,4)+0, RGN_FRAC(1,4)+8, RGN_FRAC(1,4)+0, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
@@ -1799,11 +1791,8 @@ static const gfx_layout spritelayout_5bpp_alt =
 	RGN_FRAC(1,5),
 	5,
 	{ 0x800000*8, 0x600000*8, 0x400000*8, 0x200000*8, 0 },
-	{
-		16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-		0,1,2,3,4,5,6,7
-	},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	32*8
 };
 
@@ -1815,8 +1804,7 @@ static const gfx_layout spritelayout4 =
 	{0,1,2,3},
 	{3*8,2*8,1*8,0*8,7*8,6*8,5*8,4*8,
 		11*8,10*8,9*8,8*8,15*8,14*8,13*8,12*8},
-	{0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,
-		8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
+	{ STEP16(0,16*8) },
 	16*16*8
 };
 
@@ -1828,8 +1816,7 @@ static const gfx_layout spritelayout5 =
 	{4,5,6,7},
 	{3*8,2*8,1*8,0*8,7*8,6*8,5*8,4*8,
 		11*8,10*8,9*8,8*8,15*8,14*8,13*8,12*8},
-	{0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,
-		8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
+	{ STEP16(0,16*8) },
 	16*16*8
 };
 

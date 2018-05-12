@@ -261,7 +261,7 @@ uint16_t z8_device::mask_external_address(uint16_t addr)
 uint8_t z8_device::fetch()
 {
 	uint16_t real_pc = (m_pc < m_rom_size) ? m_pc : mask_external_address(m_pc);
-	uint8_t data = m_direct->read_byte(real_pc);
+	uint8_t data = m_cache->read_byte(real_pc);
 
 	m_pc++;
 
@@ -274,7 +274,7 @@ uint8_t z8_device::fetch_opcode()
 	m_ppc = (m_pc < m_rom_size) ? m_pc : mask_external_address(m_pc);
 	debugger_instruction_hook(m_ppc);
 
-	uint8_t data = m_direct->read_byte(m_ppc);
+	uint8_t data = m_cache->read_byte(m_ppc);
 
 	m_pc++;
 
@@ -780,7 +780,7 @@ void z8_device::device_start()
 
 	/* find address spaces */
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 	m_data = has_space(AS_DATA) ? &space(AS_DATA) : m_program;
 
 	/* allocate timers */
@@ -839,8 +839,8 @@ void z8_device::take_interrupt(int irq)
 	stack_push_byte(m_r[Z8_REGISTER_FLAGS]);
 
 	// branch to the vector
-	m_pc = m_direct->read_byte(vector) << 8;
-	m_pc |= m_direct->read_byte(vector + 1);
+	m_pc = m_cache->read_byte(vector) << 8;
+	m_pc |= m_cache->read_byte(vector + 1);
 }
 
 void z8_device::process_interrupts()

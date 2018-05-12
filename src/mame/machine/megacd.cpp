@@ -124,6 +124,12 @@ void sega_segacd_device::segacd_map(address_map &map)
 
 }
 
+void sega_segacd_device::segacd_pcm_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).ram();
+}
+
 
 // the tiles in RAM are 8x8 tiles
 // they are referenced in the cell look-up map as either 16x16 or 32x32 tiles (made of 4 / 16 8x8 tiles)
@@ -146,7 +152,7 @@ void sega_segacd_device::segacd_map(address_map &map)
 	16,16, \
 	SEGACD_NUM_TILES16, \
 	4, \
-	{ 0,1,2,3 },
+	{ STEP4(0,1) },
 #define _16x16_END \
 		8*128 \
 };
@@ -155,7 +161,7 @@ void sega_segacd_device::segacd_map(address_map &map)
 	32,32, \
 	SEGACD_NUM_TILES32, \
 	4, \
-	{ 0,1,2,3 },
+	{ STEP4(0,1) },
 
 #define _32x32_END \
 	8*512 \
@@ -308,6 +314,7 @@ MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
 	MCFG_SOUND_ROUTE( 0, ":lspeaker", 0.50 )
 	MCFG_SOUND_ROUTE( 1, ":rspeaker", 0.50 )
+	MCFG_DEVICE_ADDRESS_MAP(0, segacd_pcm_map)
 
 	MCFG_NVRAM_ADD_0FILL("backupram")
 
@@ -1065,8 +1072,8 @@ inline uint8_t sega_segacd_device::get_stampmap_16x16_1x1_tile_info_pixel(int xp
 
 	int wraparound = segacd_stampsize&1;
 
-	int xtile = xpos / (1<<tilesize);
-	int ytile = ypos / (1<<tilesize);
+	int xtile = xpos >> tilesize;
+	int ytile = ypos >> tilesize;
 
 	if (wraparound)
 	{
@@ -1103,8 +1110,8 @@ inline uint8_t sega_segacd_device::get_stampmap_32x32_1x1_tile_info_pixel(int xp
 
 	int wraparound = segacd_stampsize&1;
 
-	int xtile = xpos / (1<<tilesize);
-	int ytile = ypos / (1<<tilesize);
+	int xtile = xpos >> tilesize;
+	int ytile = ypos >> tilesize;
 
 	if (wraparound)
 	{
@@ -1141,8 +1148,8 @@ inline uint8_t sega_segacd_device::get_stampmap_16x16_16x16_tile_info_pixel(int 
 
 	int wraparound = segacd_stampsize&1;
 
-	int xtile = xpos / (1<<tilesize);
-	int ytile = ypos / (1<<tilesize);
+	int xtile = xpos >> tilesize;
+	int ytile = ypos >> tilesize;
 
 	if (wraparound)
 	{
@@ -1179,8 +1186,8 @@ inline uint8_t sega_segacd_device::get_stampmap_32x32_16x16_tile_info_pixel(int 
 
 	int wraparound = segacd_stampsize&1;
 
-	int xtile = xpos / (1<<tilesize);
-	int ytile = ypos / (1<<tilesize);
+	int xtile = xpos >> tilesize;
+	int ytile = ypos >> tilesize;
 
 	if (wraparound)
 	{

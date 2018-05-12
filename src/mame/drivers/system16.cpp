@@ -301,15 +301,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_tilebank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		switch (offset & 1)
-		{
-			case 0:
-				m_tile_bank0 = data & 0x0f;
-				break;
-			case 1:
-				m_tile_bank1 = data & 0x0f;
-				break;
-		}
+		m_tile_bank[offset & 1] = data & 0x0f;
 	}
 }
 
@@ -393,7 +385,7 @@ READ8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_r)
 
 WRITE8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_w)
 {
-	uint8_t *mem = memregion("soundcpu")->base();
+	uint8_t *mem = m_soundcpu_region->base();
 
 	switch(data)
 	{
@@ -493,11 +485,11 @@ void segas1x_bootleg_state::sound_7759_map(address_map &map)
 
 WRITE8_MEMBER(segas1x_bootleg_state::upd7759_bank_w)//*
 {
-	int offs, size = memregion("soundcpu")->bytes() - 0x10000;
+	int offs, size = m_soundcpu_region->bytes() - 0x10000;
 
 	m_upd7759->reset_w(data & 0x40);
 	offs = 0x10000 + (data * 0x4000) % size;
-	membank("bank1")->set_base(memregion("soundcpu")->base() + offs);
+	membank("bank1")->set_base(m_soundcpu_region->base() + offs);
 }
 
 
@@ -515,24 +507,24 @@ void segas1x_bootleg_state::sound_7759_io_map(address_map &map)
 
 void segas1x_bootleg_state::set_tile_bank( int data )
 {
-	m_tile_bank0 = (data >> 4) & 0x0f;
-	m_tile_bank1 = data & 0x0f;
+	m_tile_bank[0] = (data >> 4) & 0x0f;
+	m_tile_bank[1] = data & 0x0f;
 }
 
 void segas1x_bootleg_state::set_fg_page( int data )
 {
-	m_fg_page[0] = data >> 12;
-	m_fg_page[1] = (data >> 8) & 0x0f;
-	m_fg_page[2] = (data >> 4) & 0x0f;
-	m_fg_page[3] = data & 0x0f;
+	m_fg_page[0][0] = data >> 12;
+	m_fg_page[0][1] = (data >> 8) & 0x0f;
+	m_fg_page[0][2] = (data >> 4) & 0x0f;
+	m_fg_page[0][3] = data & 0x0f;
 }
 
 void segas1x_bootleg_state::set_bg_page( int data )
 {
-	m_bg_page[0] = data >> 12;
-	m_bg_page[1] = (data >> 8) & 0x0f;
-	m_bg_page[2] = (data >> 4) & 0x0f;
-	m_bg_page[3] = data & 0x0f;
+	m_bg_page[0][0] = data >> 12;
+	m_bg_page[0][1] = (data >> 8) & 0x0f;
+	m_bg_page[0][2] = (data >> 4) & 0x0f;
+	m_bg_page[0][3] = data & 0x0f;
 }
 
 
@@ -668,27 +660,10 @@ void segas1x_bootleg_state::datsu_set_pages(  )
 	set_bg_page(page);
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::datsu_page0_w)
+template<int Page>
+WRITE16_MEMBER(segas1x_bootleg_state::datsu_page_w)
 {
-	COMBINE_DATA(&m_datsu_page[0]);
-	datsu_set_pages();
-}
-
-WRITE16_MEMBER(segas1x_bootleg_state::datsu_page1_w)
-{
-	COMBINE_DATA(&m_datsu_page[1]);
-	datsu_set_pages();
-}
-
-WRITE16_MEMBER(segas1x_bootleg_state::datsu_page2_w)
-{
-	COMBINE_DATA(&m_datsu_page[2]);
-	datsu_set_pages();
-}
-
-WRITE16_MEMBER(segas1x_bootleg_state::datsu_page3_w)
-{
-	COMBINE_DATA(&m_datsu_page[3]);
+	COMBINE_DATA(&m_datsu_page[Page]);
 	datsu_set_pages();
 }
 
@@ -703,10 +678,10 @@ void segas1x_bootleg_state::bayrouteb2_map(address_map &map)
 	map(0x718008, 0x718009).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrollx_bank_w)); // and tile bank
 	map(0x718010, 0x718011).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
 	map(0x718018, 0x718019).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
-	map(0x718020, 0x718021).w(this, FUNC(segas1x_bootleg_state::datsu_page0_w));
-	map(0x718022, 0x718023).w(this, FUNC(segas1x_bootleg_state::datsu_page1_w));
-	map(0x718024, 0x718025).w(this, FUNC(segas1x_bootleg_state::datsu_page2_w));
-	map(0x718026, 0x718027).w(this, FUNC(segas1x_bootleg_state::datsu_page3_w));
+	map(0x718020, 0x718021).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<0>));
+	map(0x718022, 0x718023).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<1>));
+	map(0x718024, 0x718025).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<2>));
+	map(0x718026, 0x718027).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<3>));
 
 	map(0x800000, 0x800fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
 	map(0x900000, 0x900001).portr("DSW1");
@@ -737,10 +712,10 @@ void segas1x_bootleg_state::dduxbl_map(address_map &map)
 	map(0xC46008, 0xC46009).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrollx_w));
 	map(0xC46010, 0xC46011).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
 	map(0xC46018, 0xC46019).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
-	map(0xC46020, 0xC46021).w(this, FUNC(segas1x_bootleg_state::datsu_page0_w));
-	map(0xC46022, 0xC46023).w(this, FUNC(segas1x_bootleg_state::datsu_page1_w));
-	map(0xC46024, 0xC46025).w(this, FUNC(segas1x_bootleg_state::datsu_page2_w));
-	map(0xC46026, 0xC46027).w(this, FUNC(segas1x_bootleg_state::datsu_page3_w));
+	map(0xC46020, 0xC46021).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<0>));
+	map(0xC46022, 0xC46023).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<1>));
+	map(0xC46024, 0xC46025).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<2>));
+	map(0xC46026, 0xC46027).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<3>));
 
 	map(0xffc000, 0xffffff).ram(); // work ram
 }
@@ -1000,10 +975,10 @@ void segas1x_bootleg_state::tturfbl_map(address_map &map)
 	map(0xC46008, 0xC46009).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrollx_w));
 	map(0xC46010, 0xC46011).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
 	map(0xC46018, 0xC46019).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
-	map(0xC46020, 0xC46021).w(this, FUNC(segas1x_bootleg_state::datsu_page0_w));
-	map(0xc46022, 0xc46023).w(this, FUNC(segas1x_bootleg_state::datsu_page1_w));
-	map(0xC46024, 0xC46025).w(this, FUNC(segas1x_bootleg_state::datsu_page2_w));
-	map(0xC46026, 0xC46027).w(this, FUNC(segas1x_bootleg_state::datsu_page3_w));
+	map(0xC46020, 0xC46021).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<0>));
+	map(0xc46022, 0xc46023).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<1>));
+	map(0xC46024, 0xC46025).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<2>));
+	map(0xC46026, 0xC46027).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<3>));
 }
 
 /***************************************************************************/
@@ -1020,8 +995,8 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys18_tilebank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_tile_bank0 = (data >> 0) & 0x0f;
-		m_tile_bank1 = (data >> 4) & 0x0f;
+		m_tile_bank[0] = (data >> 0) & 0x0f;
+		m_tile_bank[1] = (data >> 4) & 0x0f;
 	}
 }
 
@@ -1046,7 +1021,7 @@ void segas1x_bootleg_state::sound_18_map(address_map &map)
 
 WRITE8_MEMBER(segas1x_bootleg_state::sys18_soundbank_w)
 {
-	uint8_t *mem = memregion("soundcpu")->base();
+	uint8_t *mem = m_soundcpu_region->base();
 	int rom = (data >> 6) & 3;
 	int bank = (data & 0x3f);
 	int mask = m_sound_info[rom * 2 + 0];
@@ -1065,6 +1040,12 @@ void segas1x_bootleg_state::sound_18_io_map(address_map &map)
 	map(0x90, 0x93).rw("3438.1", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
 	map(0xa0, 0xa0).w(this, FUNC(segas1x_bootleg_state::sys18_soundbank_w));
 	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
+
+void segas1x_bootleg_state::pcm_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).ram();
 }
 
 
@@ -1211,7 +1192,7 @@ READ8_MEMBER(segas1x_bootleg_state::shdancbl_soundbank_r)
 
 WRITE8_MEMBER(segas1x_bootleg_state::shdancbl_bankctrl_w)
 {
-	uint8_t *mem = memregion("soundcpu")->base();
+	uint8_t *mem = m_soundcpu_region->base();
 
 	switch (data)
 	{
@@ -1326,7 +1307,7 @@ void segas1x_bootleg_state::mwalkbl_map(address_map &map)
 WRITE8_MEMBER(segas1x_bootleg_state::sys18bl_okibank_w) // TODO: verify correctness
 {
 	//popmessage("okibank: %02x\n", data);
-	membank("okibank")->set_entry(data & 0x07);
+	m_okibank->set_entry(data & 0x07);
 }
 
 /* bootleg doesn't have real vdp or i/o */
@@ -1382,17 +1363,17 @@ void segas1x_bootleg_state::sys18bl_oki_map(address_map &map)
 
 WRITE16_MEMBER(segas1x_bootleg_state::ddcrewbl_spritebank_w)
 {
-//  printf("banking write %08x: %04x (%04x %04x)\n", m_maincpu->pc(), offset*2, data&mem_mask, mem_mask);
+//  printf("banking write %08x: %04x (%04x %04x)\n", m_maincpu->pc(), offset<<1, data&mem_mask, mem_mask);
 
 	data &= mem_mask;
 //  offset &= 0x7;
 	offset += 4;
 
-	int maxbanks = memregion("sprites")->bytes() / 0x40000;
+	int maxbanks = m_sprites_region->bytes() >> 18;
 	if (data >= maxbanks)
 		data = 255;
-	m_sprites->set_bank((offset) * 2 + 0, data * 2 + 0);
-	m_sprites->set_bank((offset) * 2 + 1, data * 2 + 1);
+	m_sprites->set_bank((offset << 1) | 0, (data << 1) | 0);
+	m_sprites->set_bank((offset << 1) | 1, (data << 1) | 1);
 }
 
 
@@ -2481,18 +2462,15 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::system18)
 	MCFG_DEVICE_ADD("3438.0", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.40)
 
 	MCFG_DEVICE_ADD("3438.1", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.40)
 
 	MCFG_DEVICE_ADD("5c68", RF5C68, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, pcm_map)
 MACHINE_CONFIG_END
 
 
@@ -3784,7 +3762,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,common)
 
 	if (m_soundbank.found())
 	{
-		m_soundbank->configure_entries(0, 8, memregion("soundcpu")->base(), 0x4000);
+		m_soundbank->configure_entries(0, 8, m_soundcpu_region->base(), 0x4000);
 		m_soundbank->set_entry(0);
 	}
 }
@@ -3869,7 +3847,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,bayrouteb1)
 
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,bayrouteb2)
 {
-	uint8_t *mem = memregion("soundcpu")->base();
+	uint8_t *mem = m_soundcpu_region->base();
 
 	memcpy(mem, mem + 0x10000, 0x8000);
 
@@ -3885,7 +3863,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,goldnaxeb2)
 
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,tturfbl)
 {
-	uint8_t *mem = memregion("soundcpu")->base();
+	uint8_t *mem = m_soundcpu_region->base();
 
 	memcpy(mem, mem + 0x10000, 0x8000);
 
@@ -3937,26 +3915,26 @@ WRITE16_MEMBER(segas1x_bootleg_state::altbeastbl_gfx_w)
 		}
 
 		case 0x10: {
-			m_bg_page[0] = (data >> 0) & 0x0f;
-			m_fg_page[0] = (data >> 4) & 0x0f;
+			m_bg_page[0][0] = (data >> 0) & 0x0f;
+			m_fg_page[0][0] = (data >> 4) & 0x0f;
 			break;
 		}
 
 		case 0x11: {
-			m_bg_page[1] = (data >> 0) & 0x0f;
-			m_fg_page[1] = (data >> 4) & 0x0f;
+			m_bg_page[0][1] = (data >> 0) & 0x0f;
+			m_fg_page[0][1] = (data >> 4) & 0x0f;
 			break;
 		}
 
 		case 0x12: {
-			m_bg_page[2] = (data >> 0) & 0x0f;
-			m_fg_page[2] = (data >> 4) & 0x0f;
+			m_bg_page[0][2] = (data >> 0) & 0x0f;
+			m_fg_page[0][2] = (data >> 4) & 0x0f;
 			break;
 		}
 
 		case 0x13: {
-			m_bg_page[3] = (data >> 0) & 0x0f;
-			m_fg_page[3] = (data >> 4) & 0x0f;
+			m_bg_page[0][3] = (data >> 0) & 0x0f;
+			m_fg_page[0][3] = (data >> 4) & 0x0f;
 			break;
 		}
 	}
@@ -3990,7 +3968,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,beautyb)
 /* Sys18 */
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,shdancbl)
 {
-	uint8_t *mem = memregion("soundcpu")->base();;
+	uint8_t *mem = m_soundcpu_region->base();;
 
 	/* Copy first 32K of IC45 to Z80 address space */
 	memcpy(mem, mem + 0x10000, 0x8000);
@@ -4004,7 +3982,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,shdancbl)
 
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,astormbl)
 {
-	uint8_t *RAM =  memregion("soundcpu")->base();
+	uint8_t *RAM =  m_soundcpu_region->base();
 	static const int astormbl_sound_info[]  =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K
@@ -4031,7 +4009,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state, sys18bl_oki)
 	m_splittab_fg_x = &m_textram[0x0f80/2];
 	m_splittab_bg_x = &m_textram[0x0fc0/2];
 
-	membank("okibank")->configure_entries(0, 8, memregion("oki")->base() + 0x30000, 0x10000);
+	m_okibank->configure_entries(0, 8, memregion("oki")->base() + 0x30000, 0x10000);
 }
 
 DRIVER_INIT_MEMBER(segas1x_bootleg_state, astormb2)

@@ -1331,7 +1331,7 @@ MACHINE_CONFIG_START(c64_state::ntsc)
 	// basic hardware
 	MCFG_DEVICE_ADD(M6510_TAG, M6510, XTAL(14'318'181)/14)
 	MCFG_DEVICE_PROGRAM_MAP(c64_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_M6510_PORT_CALLBACKS(READ8(*this, c64_state, cpu_r), WRITE8(*this, c64_state, cpu_w))
 	MCFG_M6510_PORT_PULLS(0x17, 0xc8)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
@@ -1489,7 +1489,7 @@ MACHINE_CONFIG_START(c64_state::pal)
 	// basic hardware
 	MCFG_DEVICE_ADD(M6510_TAG, M6510, XTAL(17'734'472)/18)
 	MCFG_DEVICE_PROGRAM_MAP(c64_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_M6510_PORT_CALLBACKS(READ8(*this, c64_state, cpu_r), WRITE8(*this, c64_state, cpu_w))
 	MCFG_M6510_PORT_PULLS(0x17, 0xc8)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
@@ -1625,7 +1625,7 @@ MACHINE_CONFIG_START(c64gs_state::pal_gs)
 	// basic hardware
 	MCFG_DEVICE_ADD(M6510_TAG, M6510, XTAL(17'734'472)/18)
 	MCFG_DEVICE_PROGRAM_MAP(c64_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_M6510_PORT_CALLBACKS(READ8(*this, c64gs_state, cpu_r), WRITE8(*this, c64gs_state, cpu_w))
 	MCFG_M6510_PORT_PULLS(0x07, 0xc0)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)

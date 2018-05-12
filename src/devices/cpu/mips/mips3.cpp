@@ -96,7 +96,7 @@ static const uint8_t fpmode_source[4] =
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)     direct->read_dword(pc)
+#define ROPCODE(pc)     m_lr32(pc)
 
 
 DEFINE_DEVICE_TYPE(VR4300BE,  vr4300be_device,  "vr4300be",  "NEC VR4300 (big)")
@@ -337,7 +337,18 @@ void mips3_device::device_start()
 
 	m_cpu_clock = clock();
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	if(m_program->endianness() == ENDIANNESS_LITTLE)
+	{
+		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	}
+	else
+	{
+		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	}
 
 	/* set up the endianness */
 	m_program->accessors(m_memory);

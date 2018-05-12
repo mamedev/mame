@@ -100,9 +100,7 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
-
 /******************************************************************************/
-
 
 READ16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_r )
 {
@@ -139,9 +137,9 @@ void funkyjet_state::funkyjet_map(address_map &map)
 	map(0x180000, 0x183fff).rw(this, FUNC(funkyjet_state::funkyjet_protection_region_0_146_r), FUNC(funkyjet_state::funkyjet_protection_region_0_146_w)).share("prot16ram"); /* Protection device */ // unlikely to be cs0 region
 	map(0x184000, 0x184001).nopw();
 	map(0x188000, 0x188001).nopw();
-	map(0x300000, 0x30000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
-	map(0x320000, 0x321fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x322000, 0x323fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x300000, 0x30000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
+	map(0x320000, 0x321fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x322000, 0x323fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x340000, 0x340bff).ram().share("pf1_rowscroll");
 	map(0x342000, 0x342bff).ram().share("pf2_rowscroll");
 }
@@ -157,9 +155,9 @@ void funkyjet_state::sound_map(address_map &map)
 	map(0x120000, 0x120001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x130000, 0x130001).noprw(); /* This board only has 1 oki chip */
 	map(0x140000, 0x140000).r(m_deco146, FUNC(deco146_device::soundlatch_r));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8");
-	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f1fff).ram();
+	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 /******************************************************************************/
@@ -281,8 +279,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0, 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8
 };
 
@@ -292,10 +290,8 @@ static const gfx_layout tile_layout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
@@ -307,10 +303,6 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-void funkyjet_state::machine_start()
-{
-}
-
 MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 
 	/* basic machine hardware */
@@ -321,14 +313,13 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(funkyjet_state, screen_update_funkyjet)
+	MCFG_SCREEN_UPDATE_DRIVER(funkyjet_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DECO146_ADD("ioprot")
@@ -338,12 +329,11 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
-
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funkyjet)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DEVICE_ADD("tilegen", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
 	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
@@ -460,7 +450,7 @@ DRIVER_INIT_MEMBER(funkyjet_state,funkyjet)
 
 /******************************************************************************/
 
-GAME( 1992, funkyjet,  0,        funkyjet, funkyjet,  funkyjet_state, funkyjet, ROT0, "Data East (Mitchell license)", "Funky Jet (World, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, funkyjeta, funkyjet, funkyjet, funkyjet,  funkyjet_state, funkyjet, ROT0, "Data East (Mitchell license)", "Funky Jet (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, funkyjetj, funkyjet, funkyjet, funkyjetj, funkyjet_state, funkyjet, ROT0, "Data East Corporation", "Funky Jet (Japan, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, funkyjet,  0,        funkyjet, funkyjet,  funkyjet_state, funkyjet, ROT0, "Mitchell", "Funky Jet (World, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, funkyjeta, funkyjet, funkyjet, funkyjet,  funkyjet_state, funkyjet, ROT0, "Mitchell", "Funky Jet (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, funkyjetj, funkyjet, funkyjet, funkyjetj, funkyjet_state, funkyjet, ROT0, "Mitchell (Data East Corporation license)", "Funky Jet (Japan, rev 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sotsugyo,  0,        funkyjet, sotsugyo,  funkyjet_state, funkyjet, ROT0, "Mitchell (Atlus license)", "Sotsugyo Shousho", MACHINE_SUPPORTS_SAVE )

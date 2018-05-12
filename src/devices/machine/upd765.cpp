@@ -5,8 +5,35 @@
 #include "upd765.h"
 #include "debugger.h"
 
-#define VERBOSE 0
+#define LOG_WARN    (1U << 1)   // Show warnings
+#define LOG_SHIFT   (1U << 2)   // Shows shift register contents
+#define LOG_HEADER  (1U << 3)   // Shows ID fields
+#define LOG_FORMAT  (1U << 4)   // Sectors being formatted
+#define LOG_TCIRQ   (1U << 5)   // Termination code line / interrupt
+#define LOG_REGS    (1U << 6)   // Digital input/output register and data rate select
+#define LOG_FIFO    (1U << 7)   // FIFO operations
+#define LOG_COMMAND (1U << 8)   // Commands
+#define LOG_DONE    (1U << 9)   // Command done
+#define LOG_RW      (1U << 10)  // Read/write sector or track
+#define LOG_LIVERW  (1U << 11)  // Reading/writing in the live states
+#define LOG_MATCH   (1U << 12)  // Sector matching
+
+#define VERBOSE (LOG_GENERAL | LOG_WARN )
+
 #include "logmacro.h"
+
+#define LOGWARN(...)     LOGMASKED(LOG_WARN, __VA_ARGS__)
+#define LOGSHIFT(...)    LOGMASKED(LOG_SHIFT, __VA_ARGS__)
+#define LOGHEADER(...)   LOGMASKED(LOG_HEADER, __VA_ARGS__)
+#define LOGFORMAT(...)   LOGMASKED(LOG_FORMAT, __VA_ARGS__)
+#define LOGTCIRQ(...)    LOGMASKED(LOG_TCIRQ, __VA_ARGS__)
+#define LOGREGS(...)     LOGMASKED(LOG_REGS, __VA_ARGS__)
+#define LOGFIFO(...)     LOGMASKED(LOG_FIFO, __VA_ARGS__)
+#define LOGCOMMAND(...)  LOGMASKED(LOG_COMMAND, __VA_ARGS__)
+#define LOGDONE(...)     LOGMASKED(LOG_DONE, __VA_ARGS__)
+#define LOGRW(...)       LOGMASKED(LOG_RW, __VA_ARGS__)
+#define LOGLIVERW(...)   LOGMASKED(LOG_LIVERW, __VA_ARGS__)
+#define LOGMATCH(...)    LOGMASKED(LOG_MATCH, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(UPD765A,        upd765a_device,        "upd765a",        "NEC uPD765A FDC")
 DEFINE_DEVICE_TYPE(UPD765B,        upd765b_device,        "upd765b",        "NEC uPD765B FDC")
@@ -263,7 +290,7 @@ void upd765_family_device::soft_reset()
 
 void upd765_family_device::tc_w(bool _tc)
 {
-	LOG("tc=%d\n", _tc);
+	LOGTCIRQ("tc=%d\n", _tc);
 	if(tc != _tc && _tc) {
 		live_sync();
 		tc_done = true;
@@ -346,7 +373,7 @@ READ8_MEMBER(upd765_family_device::dor_r)
 
 WRITE8_MEMBER(upd765_family_device::dor_w)
 {
-	LOG("dor = %02x\n", data);
+	LOGREGS("dor = %02x\n", data);
 	uint8_t diff = dor ^ data;
 	dor = data;
 	if(diff & 4)
@@ -414,7 +441,7 @@ uint8_t upd765_family_device::msr_r()
 
 WRITE8_MEMBER(upd765_family_device::dsr_w)
 {
-	LOG("dsr_w %02x (%s)\n", data, machine().describe_context());
+	LOGREGS("dsr_w %02x (%s)\n", data, machine().describe_context());
 	if(data & 0x80)
 		soft_reset();
 	dsr = data & 0x7f;
@@ -438,7 +465,7 @@ uint8_t upd765_family_device::fifo_r()
 	case PHASE_EXEC:
 		if(internal_drq)
 			return fifo_pop(false);
-		LOG("fifo_r in phase %d\n", main_phase);
+		LOGFIFO("fifo_r in phase %d\n", main_phase);
 		break;
 
 	case PHASE_RESULT:
@@ -455,7 +482,7 @@ uint8_t upd765_family_device::fifo_r()
 		}
 		break;
 	default:
-		LOG("fifo_r in phase %d\n", main_phase);
+		LOGFIFO("fifo_r in phase %d\n", main_phase);
 		break;
 	}
 
@@ -478,7 +505,7 @@ void upd765_family_device::fifo_w(uint8_t data)
 		if(cmd == C_INCOMPLETE)
 			break;
 		if(cmd == C_INVALID) {
-			LOG("Invalid on %02x\n", command[0]);
+			LOGFIFO("Invalid on %02x\n", command[0]);
 			main_phase = PHASE_RESULT;
 			result[0] = ST0_UNK;
 			result_pos = 1;
@@ -493,11 +520,11 @@ void upd765_family_device::fifo_w(uint8_t data)
 			fifo_push(data, false);
 			return;
 		}
-		LOG("fifo_w in phase %d\n", main_phase);
+		LOGFIFO("fifo_w in phase %d\n", main_phase);
 		break;
 
 	default:
-		LOG("fifo_w in phase %d\n", main_phase);
+		LOGFIFO("fifo_w in phase %d\n", main_phase);
 		break;
 	}
 }
@@ -564,7 +591,7 @@ void upd765_family_device::fifo_push(uint8_t data, bool internal)
 	if(fifo_pos == 16) {
 		if(internal) {
 			if(!(st1 & ST1_OR))
-				LOG("Fifo overrun\n");
+				LOGFIFO("Fifo overrun\n");
 			st1 |= ST1_OR;
 		}
 		return;
@@ -585,7 +612,7 @@ uint8_t upd765_family_device::fifo_pop(bool internal)
 	if(!fifo_pos) {
 		if(internal) {
 			if(!(st1 & ST1_OR))
-				LOG("Fifo underrun\n");
+				LOGFIFO("Fifo underrun\n");
 			st1 |= ST1_OR;
 		}
 		return 0;
@@ -740,8 +767,8 @@ void upd765_family_device::live_run(attotime limit)
 		case SEARCH_ADDRESS_MARK_HEADER:
 			if(read_one_bit(limit))
 				return;
-#if 0
-			fprintf(stderr, "%s: shift = %04x data=%02x c=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
+
+			LOGSHIFT("%s: shift = %04x data=%02x c=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -751,7 +778,6 @@ void upd765_family_device::live_run(attotime limit)
 					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
 					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
 					cur_live.bit_counter);
-#endif
 
 			if(mfm && cur_live.shift_reg == 0x4489) {
 				cur_live.crc = 0x443b;
@@ -771,8 +797,8 @@ void upd765_family_device::live_run(attotime limit)
 		case READ_HEADER_BLOCK_HEADER: {
 			if(read_one_bit(limit))
 				return;
-#if 0
-			fprintf(stderr, "%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
+
+			LOGSHIFT("%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -782,7 +808,7 @@ void upd765_family_device::live_run(attotime limit)
 					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
 					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
 					cur_live.bit_counter);
-#endif
+
 			if(cur_live.bit_counter & 15)
 				break;
 
@@ -811,8 +837,7 @@ void upd765_family_device::live_run(attotime limit)
 				break;
 			int slot = (cur_live.bit_counter >> 4)-1;
 
-			if(0)
-				fprintf(stderr, "%s: slot=%d data=%02x crc=%04x\n", tts(cur_live.tm).c_str(), slot, cur_live.data_reg, cur_live.crc);
+			LOGHEADER("%s: slot=%d data=%02x crc=%04x\n", tts(cur_live.tm).c_str(), slot, cur_live.data_reg, cur_live.crc);
 			cur_live.idbuf[slot] = cur_live.data_reg;
 			if(slot == 5) {
 				live_delay(IDLE);
@@ -824,8 +849,8 @@ void upd765_family_device::live_run(attotime limit)
 		case SEARCH_ADDRESS_MARK_DATA:
 			if(read_one_bit(limit))
 				return;
-#if 0
-			fprintf(stderr, "%s: shift = %04x data=%02x c=%d.%x\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
+
+			LOGSHIFT("%s: shift = %04x data=%02x c=%d.%x\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -835,7 +860,6 @@ void upd765_family_device::live_run(attotime limit)
 					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
 					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
 					cur_live.bit_counter >> 4, cur_live.bit_counter & 15);
-#endif
 
 			if(mfm) {
 				// Large tolerance due to perpendicular recording at extended density
@@ -870,8 +894,8 @@ void upd765_family_device::live_run(attotime limit)
 		case READ_DATA_BLOCK_HEADER: {
 			if(read_one_bit(limit))
 				return;
-#if 0
-			fprintf(stderr, "%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
+
+			LOGSHIFT("%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).c_str(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -881,7 +905,7 @@ void upd765_family_device::live_run(attotime limit)
 					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
 					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
 					cur_live.bit_counter);
-#endif
+
 			if(cur_live.bit_counter & 15)
 				break;
 
@@ -1094,7 +1118,7 @@ void upd765_family_device::live_run(attotime limit)
 					command[12+cur_live.byte_counter-16] = byte;
 					live_write_mfm(byte);
 					if(cur_live.byte_counter == 19)
-						LOG("formatting sector %02x %02x %02x %02x\n",
+						LOGFORMAT("formatting sector %02x %02x %02x %02x\n",
 									command[12], command[13], command[14], command[15]);
 				} else if(cur_live.byte_counter < 22)
 					live_write_mfm(cur_live.crc >> 8);
@@ -1130,7 +1154,7 @@ void upd765_family_device::live_run(attotime limit)
 					command[12+cur_live.byte_counter-7] = byte;
 					live_write_fm(byte);
 					if(cur_live.byte_counter == 10)
-						LOG("formatting sector %02x %02x %02x %02x\n",
+						LOGFORMAT("formatting sector %02x %02x %02x %02x\n",
 									command[12], command[13], command[14], command[15]);
 				} else if(cur_live.byte_counter < 13)
 					live_write_fm(cur_live.crc >> 8);
@@ -1182,7 +1206,7 @@ void upd765_family_device::live_run(attotime limit)
 			break;
 
 		default:
-			LOG("%s: Unknown live state %d\n", tts(cur_live.tm).c_str(), cur_live.state);
+			LOGWARN("%s: Unknown live state %d\n", tts(cur_live.tm).c_str(), cur_live.state);
 			return;
 		}
 	}
@@ -1295,7 +1319,7 @@ void upd765_family_device::execute_command(int cmd)
 {
 	switch(cmd) {
 	case C_CONFIGURE:
-		LOG("command configure %02x %02x %02x\n",
+		LOGCOMMAND("command configure %02x %02x %02x\n",
 					command[1], command[2], command[3]);
 		// byte 1 is ignored, byte 3 is precompensation-related
 		motorcfg = command[1];
@@ -1305,7 +1329,7 @@ void upd765_family_device::execute_command(int cmd)
 		break;
 
 	case C_DUMP_REG:
-		LOG("command dump regs\n");
+		LOGCOMMAND("command dump regs\n");
 		main_phase = PHASE_RESULT;
 		result[0] = flopi[0].pcn;
 		result[1] = flopi[1].pcn;
@@ -1330,11 +1354,11 @@ void upd765_family_device::execute_command(int cmd)
 		main_phase = PHASE_RESULT;
 		result[0] = locked ? 0x10 : 0x00;
 		result_pos = 1;
-		LOG("command lock (%s)\n", locked ? "on" : "off");
+		LOGCOMMAND("command lock (%s)\n", locked ? "on" : "off");
 		break;
 
 	case C_PERPENDICULAR:
-		LOG("command perpendicular\n");
+		LOGCOMMAND("command perpendicular\n");
 		perpmode = command[1];
 		main_phase = PHASE_CMD;
 		break;
@@ -1378,7 +1402,7 @@ void upd765_family_device::execute_command(int cmd)
 				(fi.dev->wpt_r() ? ST3_WP : 0x00) |
 				(fi.dev->trk00_r() ? 0x00 : ST3_T0) |
 				(fi.dev->twosid_r() ? 0x00 : ST3_TS);
-		LOG("command sense drive status %d (%02x)\n", fi.id, result[0]);
+		LOGCOMMAND("command sense drive status %d (%02x)\n", fi.id, result[0]);
 		result_pos = 1;
 		break;
 	}
@@ -1408,7 +1432,7 @@ void upd765_family_device::execute_command(int cmd)
 		if(fid == 4) {
 			result[0] = ST0_UNK;
 			result_pos = 1;
-			LOG("command sense interrupt status (%02x) (%s)\n", result[0], machine().describe_context());
+			LOGCOMMAND("command sense interrupt status (%02x) (%s)\n", result[0], machine().describe_context());
 			break;
 		}
 
@@ -1418,7 +1442,7 @@ void upd765_family_device::execute_command(int cmd)
 		result[0] = fi.st0;
 		result[1] = fi.pcn;
 
-		LOG("command sense interrupt status (fid=%d %02x %02x) (%s)\n", fid, result[0], result[1], machine().describe_context());
+		LOGCOMMAND("command sense interrupt status (fid=%d %02x %02x) (%s)\n", fid, result[0], result[1], machine().describe_context());
 		result_pos = 2;
 
 		other_irq = false;
@@ -1427,7 +1451,7 @@ void upd765_family_device::execute_command(int cmd)
 	}
 
 	case C_SPECIFY:
-		LOG("command specify %02x %02x\n",
+		LOGCOMMAND("command specify %02x %02x\n",
 					command[1], command[2]);
 		spec = (command[1] << 8) | command[2];
 		main_phase = PHASE_CMD;
@@ -1438,17 +1462,17 @@ void upd765_family_device::execute_command(int cmd)
 		break;
 
 	default:
-		fprintf(stderr, "start command %d\n", cmd);
-		exit(1);
+		LOGWARN("Unknown command %02x\n", cmd);
+		// exit(1);
 	}
 }
 
 void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 {
-	LOG("command done (%s) -", data_completion ? "data" : "seek");
+	LOGDONE("command done (%s) -", data_completion ? "data" : "seek");
 	for(int i=0; i != result_pos; i++)
-		LOG(" %02x", result[i]);
-	LOG("\n");
+		LOGDONE(" %02x", result[i]);
+	LOGDONE("\n");
 	fi.main_state = fi.sub_state = IDLE;
 	if(data_completion)
 		data_irq = true;
@@ -1461,7 +1485,7 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 
 void upd765_family_device::recalibrate_start(floppy_info &fi)
 {
-	LOG("command recalibrate %d\n", command[1] & 3);
+	LOGCOMMAND("command recalibrate %d\n", command[1] & 3);
 	fi.main_state = RECALIBRATE;
 	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
 	fi.dir = 1;
@@ -1473,7 +1497,7 @@ void upd765_family_device::recalibrate_start(floppy_info &fi)
 
 void upd765_family_device::seek_start(floppy_info &fi)
 {
-	LOG("command %sseek %d\n", command[0] & 0x80 ? "relative " : "", command[2]);
+	LOGCOMMAND("command %sseek %d\n", command[0] & 0x80 ? "relative " : "", command[2]);
 	fi.main_state = SEEK;
 	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
 	fi.dir = fi.pcn > command[2] ? 1 : 0;
@@ -1563,7 +1587,7 @@ void upd765_family_device::read_data_start(floppy_info &fi)
 	fi.sub_state = HEAD_LOAD_DONE;
 	mfm = command[0] & 0x40;
 
-	LOG("command read%s data%s%s%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
+	LOGCOMMAND("command read%s data%s%s%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
 				command[0] & 0x08 ? " deleted" : "",
 				command[0] & 0x80 ? " mt" : "",
 				command[0] & 0x40 ? " mfm" : "",
@@ -1607,7 +1631,7 @@ void upd765_family_device::scan_start(floppy_info &fi)
 	fi.sub_state = HEAD_LOAD_DONE;
 	mfm = command[0] & 0x40;
 
-	LOG("command scan%s data%s%s%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x stp=%02x rate=%d\n",
+	LOGCOMMAND("command scan%s data%s%s%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x stp=%02x rate=%d\n",
 				command[0] & 0x08 ? " deleted" : "",
 				command[0] & 0x80 ? " mt" : "",
 				command[0] & 0x40 ? " mfm" : "",
@@ -1710,7 +1734,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
-			LOG("reading sector %02x %02x %02x %02x\n",
+			LOGRW("reading sector %02x %02x %02x %02x\n",
 						cur_live.idbuf[0],
 						cur_live.idbuf[1],
 						cur_live.idbuf[2],
@@ -1785,7 +1809,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			return;
 
 		default:
-			LOG("%s: read sector unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			LOGWARN("%s: read sector unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
 			return;
 		}
 	}
@@ -1796,7 +1820,7 @@ void upd765_family_device::write_data_start(floppy_info &fi)
 	fi.main_state = WRITE_DATA;
 	fi.sub_state = HEAD_LOAD_DONE;
 	mfm = command[0] & 0x40;
-	LOG("command write%s data%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
+	LOGRW("command write%s data%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
 				command[0] & 0x08 ? " deleted" : "",
 				command[0] & 0x80 ? " mt" : "",
 				command[0] & 0x40 ? " mfm" : "",
@@ -1910,7 +1934,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 			return;
 
 		default:
-			LOG("%s: write sector unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			LOGWARN("%s: write sector unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
 			return;
 		}
 	}
@@ -1923,7 +1947,7 @@ void upd765_family_device::read_track_start(floppy_info &fi)
 	mfm = command[0] & 0x40;
 	sectors_read = 0;
 
-	LOG("command read track%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
+	LOGRW("command read track%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
 				command[0] & 0x40 ? " mfm" : "",
 				command[0],
 				command[1],
@@ -2005,7 +2029,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			return;
 
 		case WAIT_INDEX_DONE:
-			LOG("index found, reading track\n");
+			LOGRW("index found, reading track\n");
 			fi.sub_state = SCAN_ID;
 			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 			return;
@@ -2015,7 +2039,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 				st1 |= ST1_DE;
 			}
 			st1 &= ~ST1_MA;
-			LOG("reading sector %02x %02x %02x %02x\n",
+			LOGRW("reading sector %02x %02x %02x %02x\n",
 						cur_live.idbuf[0],
 						cur_live.idbuf[1],
 						cur_live.idbuf[2],
@@ -2078,7 +2102,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			return;
 
 		default:
-			LOG("%s: read track unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			LOGWARN("%s: read track unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
 			return;
 		}
 	}
@@ -2095,7 +2119,7 @@ void upd765_family_device::format_track_start(floppy_info &fi)
 	fi.sub_state = HEAD_LOAD_DONE;
 	mfm = command[0] & 0x40;
 
-	LOG("command format track %s h=%02x n=%02x sc=%02x gpl=%02x d=%02x\n",
+	LOGCOMMAND("command format track %s h=%02x n=%02x sc=%02x gpl=%02x d=%02x\n",
 				command[0] & 0x40 ? "mfm" : "fm",
 				command[1], command[2], command[3], command[4], command[5]);
 
@@ -2130,7 +2154,7 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 			return;
 
 		case WAIT_INDEX_DONE:
-			LOG("index found, writing track\n");
+			LOGRW("index found, writing track\n");
 			fi.sub_state = TRACK_DONE;
 			cur_live.pll.start_writing(machine().time());
 			live_start(fi, WRITE_TRACK_PRE_SECTORS);
@@ -2150,7 +2174,7 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 			return;
 
 		default:
-			LOG("%s: format track unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			LOGWARN("%s: format track unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
 			return;
 		}
 	}
@@ -2162,7 +2186,7 @@ void upd765_family_device::read_id_start(floppy_info &fi)
 	fi.sub_state = HEAD_LOAD_DONE;
 	mfm = command[0] & 0x40;
 
-	LOG("command read id%s %d, rate=%d\n",
+	LOGCOMMAND("command read id%s %d, rate=%d\n",
 				command[0] & 0x40 ? " mfm" : "",
 				command[1] & 3,
 				cur_rate);
@@ -2229,7 +2253,7 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 			return;
 
 		default:
-			LOG("%s: read id unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			LOGWARN("%s: read id unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
 			return;
 		}
 	}
@@ -2241,7 +2265,7 @@ void upd765_family_device::check_irq()
 	cur_irq = data_irq || other_irq || internal_drq;
 	cur_irq = cur_irq && (dor & 4) && (mode != MODE_AT || (dor & 8));
 	if(cur_irq != old_irq) {
-		LOG("irq = %d\n", cur_irq);
+		LOGTCIRQ("irq = %d\n", cur_irq);
 		intrq_cb(cur_irq);
 	}
 }
@@ -2299,7 +2323,7 @@ void upd765_family_device::run_drive_ready_polling()
 	for(int fid=0; fid<4; fid++) {
 		bool ready = get_ready(fid);
 		if(ready != flopi[fid].ready) {
-			LOG("polled %d : %d -> %d\n", fid, flopi[fid].ready, ready);
+			LOGCOMMAND("polled %d : %d -> %d\n", fid, flopi[fid].ready, ready);
 			flopi[fid].ready = ready;
 			if(!flopi[fid].st0_filled) {
 				flopi[fid].st0 = ST0_ABRT | fid;
@@ -2356,7 +2380,7 @@ void upd765_family_device::index_callback(floppy_image_device *floppy, int state
 			break;
 
 		default:
-			LOG("%s: Index pulse on unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
+			LOGWARN("%s: Index pulse on unknown sub-state %d\n", ttsn().c_str(), fi.sub_state);
 			break;
 		}
 
@@ -2404,7 +2428,7 @@ void upd765_family_device::general_continue(floppy_info &fi)
 		break;
 
 	default:
-		LOG("%s: general_continue on unknown main-state %d\n", ttsn().c_str(), fi.main_state);
+		LOGWARN("%s: general_continue on unknown main-state %d\n", ttsn().c_str(), fi.main_state);
 		break;
 	}
 }
@@ -2445,7 +2469,7 @@ bool upd765_family_device::write_one_bit(const attotime &limit)
 
 void upd765_family_device::live_write_raw(uint16_t raw)
 {
-	//  LOG("write %04x %04x\n", raw, cur_live.crc);
+	LOGLIVERW("write %04x %04x\n", raw, cur_live.crc);
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = raw & 1;
 }
@@ -2465,7 +2489,7 @@ void upd765_family_device::live_write_mfm(uint8_t mfm)
 	cur_live.data_reg = mfm;
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = context;
-	//  LOG("write %02x   %04x %04x\n", mfm, cur_live.crc, raw);
+	LOGLIVERW("write %02x   %04x %04x\n", mfm, cur_live.crc, raw);
 }
 
 void upd765_family_device::live_write_fm(uint8_t fm)
@@ -2477,15 +2501,14 @@ void upd765_family_device::live_write_fm(uint8_t fm)
 	cur_live.data_reg = fm;
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = fm & 1;
-	//  LOG("write %02x   %04x %04x\n", fm, cur_live.crc, raw);
+	LOGLIVERW("write %02x   %04x %04x\n", fm, cur_live.crc, raw);
 }
 
 bool upd765_family_device::sector_matches() const
 {
-	if(0)
-		LOG("matching %02x %02x %02x %02x - %02x %02x %02x %02x\n",
-					cur_live.idbuf[0], cur_live.idbuf[1], cur_live.idbuf[2], cur_live.idbuf[3],
-					command[2], command[3], command[4], command[5]);
+	LOGMATCH("matching %02x %02x %02x %02x - %02x %02x %02x %02x\n",
+				cur_live.idbuf[0], cur_live.idbuf[1], cur_live.idbuf[2], cur_live.idbuf[3],
+				command[2], command[3], command[4], command[5]);
 	return
 		cur_live.idbuf[0] == command[2] &&
 		cur_live.idbuf[1] == command[3] &&
@@ -2583,7 +2606,7 @@ void i82072_device::execute_command(int cmd)
 		bool motor_on = command[0] & 0x80;
 		floppy_info &fi = flopi[(command[0] >> 5) & 0x3];
 
-		LOG("command motor %s drive %d\n", motor_on ? "on" : "off", fi.id);
+		LOGCOMMAND("command motor %s drive %d\n", motor_on ? "on" : "off", fi.id);
 
 		// select the drive
 		if(motor_on)
@@ -2644,10 +2667,10 @@ void i82072_device::execute_command(int cmd)
  */
 void i82072_device::command_end(floppy_info &fi, bool data_completion)
 {
-	LOG("command done (%s) -", data_completion ? "data" : "seek");
+	LOGDONE("command done (%s) -", data_completion ? "data" : "seek");
 	for(int i=0; i != result_pos; i++)
-		LOG(" %02x", result[i]);
-	LOG("\n");
+		LOGDONE(" %02x", result[i]);
+	LOGDONE("\n");
 	fi.sub_state = IDLE;
 	if(data_completion) {
 		fi.main_state = IDLE;
@@ -2674,7 +2697,7 @@ void i82072_device::motor_control(int fid, bool start_motor)
 
 		// start the motor on the selected drive
 		if(fi.dev && fi.dev->mon_r() == 1) {
-			LOG("motor_control: switching on motor for drive %d\n", fid);
+			LOGCOMMAND("motor_control: switching on motor for drive %d\n", fid);
 
 			// select the drive and enable the motor
 			set_ds(fid);
@@ -2708,7 +2731,7 @@ void i82072_device::motor_control(int fid, bool start_motor)
 
 		// if the motor off timer has expired, stop the motor
 		if(motor_off_counter == 0 && fi.dev) {
-			LOG("motor_control: switching off motor for drive %d\n", fid);
+			LOGCOMMAND("motor_control: switching off motor for drive %d\n", fid);
 			fi.dev->mon_w(1);
 		}
 	}

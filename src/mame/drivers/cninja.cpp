@@ -53,31 +53,13 @@ Note about version levels using Mutant Fighter as the example:
 #include "sound/okim6295.h"
 #include "speaker.h"
 
-WRITE16_MEMBER(cninja_state::cninja_sound_w)
-{
-	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
-WRITE16_MEMBER(cninja_state::stoneage_sound_w)
-{
-	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 /**********************************************************************************/
 
-WRITE16_MEMBER(cninja_state::cninja_pf12_control_w)
+template<int Chip>
+WRITE16_MEMBER(cninja_state::cninja_pf_control_w)
 {
 	m_screen->update_partial(m_screen->vpos());
-	m_deco_tilegen1->pf_control_w(space, offset, data, mem_mask);
-}
-
-
-WRITE16_MEMBER(cninja_state::cninja_pf34_control_w)
-{
-	m_screen->update_partial(m_screen->vpos());
-	m_deco_tilegen2->pf_control_w(space, offset, data, mem_mask);
+	m_deco_tilegen[Chip]->pf_control_w(space, offset, data, mem_mask);
 }
 
 
@@ -100,7 +82,7 @@ WRITE16_MEMBER( cninja_state::cninja_protection_region_0_104_w )
 
 READ16_MEMBER(cninja_state::cninjabl2_sprite_dma_r)
 {
-	m_spriteram->copy();
+	m_spriteram[0]->copy();
 	return 0;
 }
 
@@ -109,27 +91,25 @@ void cninja_state::cninja_map(address_map &map)
 {
 	map(0x000000, 0x0bffff).rom();
 
-	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf12_control_w));
-	map(0x144000, 0x144fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x146000, 0x146fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf_control_w<0>));
+	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x14c000, 0x14c7ff).writeonly().share("pf1_rowscroll");
 	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
 
-	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf34_control_w));
-	map(0x154000, 0x154fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x156000, 0x156fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf_control_w<1>));
+	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
 	map(0x15e000, 0x15e7ff).ram().share("pf4_rowscroll");
 
-	map(0x184000, 0x187fff).ram().share("ram");
+	map(0x184000, 0x187fff).ram();
 	map(0x190000, 0x190007).m("irq", FUNC(deco_irq_device::map)).umask16(0x00ff);
 	map(0x19c000, 0x19dfff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	map(0x1a4000, 0x1a47ff).ram().share("spriteram");           /* Sprites */
-	map(0x1b4000, 0x1b4001).w(m_spriteram, FUNC(buffered_spriteram16_device::write)); /* DMA flag */
+	map(0x1a4000, 0x1a47ff).ram().share("spriteram1");           /* Sprites */
+	map(0x1b4000, 0x1b4001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); /* DMA flag */
 	map(0x1bc000, 0x1bffff).rw(this, FUNC(cninja_state::cninja_protection_region_0_104_r), FUNC(cninja_state::cninja_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
-
-
 
 	map(0x308000, 0x308fff).nopw(); /* Bootleg only */
 }
@@ -138,17 +118,17 @@ void cninja_state::cninjabl_map(address_map &map)
 {
 	map(0x000000, 0x0bffff).rom();
 
-	map(0x138000, 0x1387ff).ram().share("spriteram"); /* bootleg sprite-ram (sprites rewritten here in new format) */
+	map(0x138000, 0x1387ff).ram().share("spriteram1"); /* bootleg sprite-ram (sprites rewritten here in new format) */
 
-	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf12_control_w));
-	map(0x144000, 0x144fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x146000, 0x146fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf_control_w<0>));
+	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x14c000, 0x14c7ff).writeonly().share("pf1_rowscroll");
 	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
 
-	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf34_control_w));    // not used / incorrect on this
-	map(0x154000, 0x154fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x156000, 0x156fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf_control_w<1>));    // not used / incorrect on this
+	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
 	map(0x15e000, 0x15e7ff).ram().share("pf4_rowscroll");
 
@@ -162,10 +142,10 @@ void cninja_state::cninjabl_map(address_map &map)
 	map(0x190000, 0x190007).m("irq", FUNC(deco_irq_device::map)).umask16(0x00ff);
 	map(0x19c000, 0x19dfff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	map(0x1b4000, 0x1b4001).w(m_spriteram, FUNC(buffered_spriteram16_device::write)); /* DMA flag */
+	map(0x1b4000, 0x1b4001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); /* DMA flag */
 }
 
-READ16_MEMBER( cninja_state::sshangha_protection_region_8_146_r )
+READ16_MEMBER( cninja_state::edrandy_protection_region_8_146_r )
 {
 	int real_address = 0x1a0000 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -174,7 +154,7 @@ READ16_MEMBER( cninja_state::sshangha_protection_region_8_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( cninja_state::sshangha_protection_region_8_146_w )
+WRITE16_MEMBER( cninja_state::edrandy_protection_region_8_146_w )
 {
 	int real_address = 0x1a0000 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -182,7 +162,7 @@ WRITE16_MEMBER( cninja_state::sshangha_protection_region_8_146_w )
 	m_ioprot->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
-READ16_MEMBER( cninja_state::sshangha_protection_region_6_146_r )
+READ16_MEMBER( cninja_state::edrandy_protection_region_6_146_r )
 {
 //  uint16_t realdat = deco16_60_prot_r(space,offset&0x3ff,mem_mask);
 
@@ -198,7 +178,7 @@ READ16_MEMBER( cninja_state::sshangha_protection_region_6_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( cninja_state::sshangha_protection_region_6_146_w )
+WRITE16_MEMBER( cninja_state::edrandy_protection_region_6_146_w )
 {
 //  deco16_60_prot_w(space,offset&0x3ff,data,mem_mask);
 
@@ -213,28 +193,28 @@ void cninja_state::edrandy_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 
-	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf12_control_w));
-	map(0x144000, 0x144fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x146000, 0x146fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf_control_w<0>));
+	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x14c000, 0x14c7ff).ram().share("pf1_rowscroll");
 	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
 
-	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf34_control_w));
-	map(0x154000, 0x154fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x156000, 0x156fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf_control_w<1>));
+	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
 	map(0x15e000, 0x15e7ff).ram().share("pf4_rowscroll");
 
 	map(0x188000, 0x189fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x194000, 0x197fff).ram().share("ram"); /* Main ram */
-	map(0x198000, 0x19bfff).rw(this, FUNC(cninja_state::sshangha_protection_region_6_146_r), FUNC(cninja_state::sshangha_protection_region_6_146_w)).share("prot16ram"); /* Protection device */
-//  AM_RANGE(0x198000, 0x1987ff) AM_READWRITE(sshangha_protection_region_6_146_r,sshangha_protection_region_6_146_w) AM_SHARE("prot16ram") /* Protection device */
+	map(0x194000, 0x197fff).ram(); /* Main ram */
+	map(0x198000, 0x19bfff).rw(this, FUNC(cninja_state::edrandy_protection_region_6_146_r), FUNC(cninja_state::edrandy_protection_region_6_146_w)).share("prot16ram"); /* Protection device */
+//  map(0x198000, 0x1987ff).rw(this, FUNC(cninja_state::edrandy_protection_region_6_146_r), FUNC(cninja_state::edrandy_protection_region_6_146_w)).share("prot16ram"); /* Protection device */
 
-	map(0x1a0000, 0x1a3fff).rw(this, FUNC(cninja_state::sshangha_protection_region_8_146_r), FUNC(cninja_state::sshangha_protection_region_8_146_w));
+	map(0x1a0000, 0x1a3fff).rw(this, FUNC(cninja_state::edrandy_protection_region_8_146_r), FUNC(cninja_state::edrandy_protection_region_8_146_w));
 
 	map(0x1a4000, 0x1a4007).m("irq", FUNC(deco_irq_device::map)).umask16(0x00ff);
-	map(0x1ac000, 0x1ac001).w(m_spriteram, FUNC(buffered_spriteram16_device::write)); /* DMA flag */
-	map(0x1bc000, 0x1bc7ff).ram().share("spriteram"); /* Sprites */
+	map(0x1ac000, 0x1ac001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); /* DMA flag */
+	map(0x1bc000, 0x1bc7ff).ram().share("spriteram1"); /* Sprites */
 	map(0x1bc800, 0x1bcfff).nopw(); /* Another bug in game code?  Sprite list can overrun.  Doesn't seem to mirror */
 }
 
@@ -247,34 +227,31 @@ void cninja_state::robocop2_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 
-	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf12_control_w));
-	map(0x144000, 0x144fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x146000, 0x146fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf_control_w<0>));
+	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x14c000, 0x14c7ff).ram().share("pf1_rowscroll");
 	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
 
-	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf34_control_w));
-	map(0x154000, 0x154fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x156000, 0x156fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf_control_w<1>));
+	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
 	map(0x15e000, 0x15e7ff).ram().share("pf4_rowscroll");
 
-	map(0x180000, 0x1807ff).ram().share("spriteram");
-//  AM_RANGE(0x18c000, 0x18c0ff) AM_WRITE(cninja_loopback_w) /* Protection writes */
-//  AM_RANGE(0x18c000, 0x18c7ff) AM_DEVREAD("ioprot", deco146_device,robocop2_prot_r) /* Protection device */
-//  AM_RANGE(0x18c064, 0x18c065) AM_WRITE(cninja_sound_w)
+	map(0x180000, 0x1807ff).ram().share("spriteram1");
+//  map(0x18c000, 0x18c0ff).w(this, FUNC(cninja_state::cninja_loopback_w)) /* Protection writes */
+//  map(0x18c000, 0x18c7ff).r(m_ioprot, FUNC(deco146_device,robocop2_prot_r)) /* Protection device */
+//  map(0x18c064, 0x18c065).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x18c000, 0x18ffff).rw(this, FUNC(cninja_state::mutantf_protection_region_0_146_r), FUNC(cninja_state::mutantf_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
 
-
-map(0x198000, 0x198001).w(m_spriteram, FUNC(buffered_spriteram16_device::write)); /* DMA flag */
+	map(0x198000, 0x198001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); /* DMA flag */
 	map(0x1a8000, 0x1a9fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x1b0000, 0x1b0007).m("irq", FUNC(deco_irq_device::map)).umask16(0x00ff);
-	map(0x1b8000, 0x1bbfff).ram().share("ram"); /* Main ram */
+	map(0x1b8000, 0x1bbfff).ram(); /* Main ram */
 	map(0x1f0000, 0x1f0001).w(this, FUNC(cninja_state::robocop2_priority_w));
 	map(0x1f8000, 0x1f8001).portr("DSW3"); /* Dipswitch #3 */
 }
-
-
 
 
 READ16_MEMBER( cninja_state::mutantf_protection_region_0_146_r )
@@ -303,24 +280,24 @@ void cninja_state::mutantf_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram();
-	map(0x120000, 0x1207ff).ram().share("spriteram");
+	map(0x120000, 0x1207ff).ram().share("spriteram1");
 	map(0x140000, 0x1407ff).ram().share("spriteram2");
 	map(0x160000, 0x161fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x180001).w(this, FUNC(cninja_state::robocop2_priority_w));
 	map(0x180002, 0x180003).nopw(); /* VBL irq ack */
 	map(0x1a0000, 0x1a3fff).rw(this, FUNC(cninja_state::mutantf_protection_region_0_146_r), FUNC(cninja_state::mutantf_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
-	map(0x1c0000, 0x1c0001).w(m_spriteram, FUNC(buffered_spriteram16_device::write)).r(this, FUNC(cninja_state::mutantf_71_r));
-	map(0x1e0000, 0x1e0001).w(m_spriteram2, FUNC(buffered_spriteram16_device::write));
+	map(0x1c0000, 0x1c0001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)).r(this, FUNC(cninja_state::mutantf_71_r));
+	map(0x1e0000, 0x1e0001).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write));
 
-	map(0x300000, 0x30000f).w(this, FUNC(cninja_state::cninja_pf12_control_w));
-	map(0x304000, 0x305fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x306000, 0x307fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x300000, 0x30000f).w(this, FUNC(cninja_state::cninja_pf_control_w<0>));
+	map(0x304000, 0x305fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x306000, 0x307fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x308000, 0x3087ff).ram().share("pf1_rowscroll");
 	map(0x30a000, 0x30a7ff).ram().share("pf2_rowscroll");
 
-	map(0x310000, 0x31000f).w(this, FUNC(cninja_state::cninja_pf34_control_w));
-	map(0x314000, 0x315fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x316000, 0x317fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x310000, 0x31000f).w(this, FUNC(cninja_state::cninja_pf_control_w<1>));
+	map(0x314000, 0x315fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x316000, 0x317fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x318000, 0x3187ff).ram().share("pf3_rowscroll");
 	map(0x31a000, 0x31a7ff).ram().share("pf4_rowscroll");
 
@@ -337,9 +314,9 @@ void cninja_state::sound_map(address_map &map)
 	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x130000, 0x130001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8");
-	map(0x1fec00, 0x1fec01).w("audiocpu", FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w("audiocpu", FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f1fff).ram();
+	map(0x1fec00, 0x1fec01).rw("audiocpu", FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw("audiocpu", FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 void cninja_state::sound_map_mutantf(address_map &map)
@@ -350,9 +327,9 @@ void cninja_state::sound_map_mutantf(address_map &map)
 	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x130000, 0x130001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140001).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8");
-	map(0x1fec00, 0x1fec01).w("audiocpu", FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w("audiocpu", FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f1fff).ram();
+	map(0x1fec00, 0x1fec01).rw("audiocpu", FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw("audiocpu", FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 void cninja_state::stoneage_s_map(address_map &map)
@@ -676,8 +653,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8    /* every char takes 8 consecutive bytes */
 };
 
@@ -687,8 +664,8 @@ static const gfx_layout charlayout_boot =
 	RGN_FRAC(1,1),
 	4,
 	{ 16, 0, 24, 8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*4) },
 	8*32
 };
 
@@ -698,10 +675,8 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 16, 0, 24, 8 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP8(16*8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*4) },
 	128*8
 };
 
@@ -711,10 +686,8 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
@@ -724,10 +697,8 @@ static const gfx_layout tilelayout_8bpp =
 	4096,
 	8,
 	{ 0x100000*8+8, 0x100000*8, 0x40000*8+8, 0x40000*8, 0xc0000*8+8, 0xc0000*8, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
@@ -848,7 +819,7 @@ MACHINE_CONFIG_START(cninja_state::cninja)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(1)
@@ -880,7 +851,7 @@ MACHINE_CONFIG_START(cninja_state::cninja)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_PRIORITY_CB(cninja_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
@@ -938,7 +909,7 @@ MACHINE_CONFIG_START(cninja_state::stoneage)
 
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,stoneage)
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(1)
@@ -970,7 +941,7 @@ MACHINE_CONFIG_START(cninja_state::stoneage)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_PRIORITY_CB(cninja_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
@@ -1036,7 +1007,7 @@ MACHINE_CONFIG_START(cninja_state::cninjabl)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(1)
@@ -1108,7 +1079,7 @@ MACHINE_CONFIG_START(cninja_state::edrandy)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -1140,7 +1111,7 @@ MACHINE_CONFIG_START(cninja_state::edrandy)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_PRIORITY_CB(cninja_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
@@ -1198,7 +1169,7 @@ MACHINE_CONFIG_START(cninja_state::robocop2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -1231,7 +1202,7 @@ MACHINE_CONFIG_START(cninja_state::robocop2)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_PRIORITY_CB(cninja_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
@@ -1291,7 +1262,7 @@ MACHINE_CONFIG_START(cninja_state::mutantf)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
