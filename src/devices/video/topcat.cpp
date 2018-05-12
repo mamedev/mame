@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "topcat.h"
 
-// define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TOPCAT, topcat_device, "topcat", "HP Topcat ASIC")
@@ -55,9 +55,9 @@ TIMER_CALLBACK_MEMBER(topcat_device::cursor_callback)
 
 	if (m_cursor_ctrl & 0x02) {
 		for(int i = 0; i < m_cursor_width; i++) {
-			m_vram[(m_cursor_y_pos * 512) + (m_cursor_x_pos + i)/2] = m_cursor_state ? 0xffff : 0;
-			m_vram[((m_cursor_y_pos-1) * 512) + (m_cursor_x_pos + i)/2] = m_cursor_state ? 0xffff : 0;
-			m_vram[((m_cursor_y_pos-2) * 512) + (m_cursor_x_pos + i)/2] = m_cursor_state ? 0xffff : 0;
+			m_vram[(m_cursor_y_pos * m_fb_width/2) + (m_cursor_x_pos + i)/2] = m_cursor_state ? 0xffff : 0;
+			m_vram[((m_cursor_y_pos-1) * m_fb_width/2) + (m_cursor_x_pos + i)/2] = m_cursor_state ? 0xffff : 0;
+			m_vram[((m_cursor_y_pos-2) * m_fb_width/2) + (m_cursor_x_pos + i)/2] = m_cursor_state ? 0xffff : 0;
 		}
 	}
 }
@@ -65,9 +65,9 @@ TIMER_CALLBACK_MEMBER(topcat_device::cursor_callback)
 void topcat_device::update_cursor(int x, int y, uint8_t ctrl, uint8_t width)
 {
 	for(int i = 0; i < m_cursor_width; i++) {
-		m_vram[(m_cursor_y_pos * 512) + (m_cursor_x_pos + i)/2] = 0;
-		m_vram[((m_cursor_y_pos-1) * 512) + (m_cursor_x_pos + i)/2] = 0;
-		m_vram[((m_cursor_y_pos-2) * 512) + (m_cursor_x_pos + i)/2] = 0;
+		m_vram[(m_cursor_y_pos * m_fb_width/2) + (m_cursor_x_pos + i)/2] = 0;
+		m_vram[((m_cursor_y_pos-1) * m_fb_width/2) + (m_cursor_x_pos + i)/2] = 0;
+		m_vram[((m_cursor_y_pos-2) * m_fb_width/2) + (m_cursor_x_pos + i)/2] = 0;
 	}
 	m_cursor_x_pos = x;
 	m_cursor_y_pos = y;
@@ -133,8 +133,8 @@ void topcat_device::window_move(void)
 {
 	for(int line = 0; line < m_block_mover_pixel_height; line++) {
 		for(int column = 0; column < m_block_mover_pixel_width; column++) {
-			uint16_t sdata = m_vram[((m_source_y_pixel + line) * 1024 + (m_source_x_pixel + column))/2];
-			uint16_t *ddata = &m_vram[((m_dst_y_pixel + line) * 1024 + (m_dst_x_pixel + column))/2];
+			uint16_t sdata = m_vram[((m_source_y_pixel + line) * m_fb_width + (m_source_x_pixel + column))/2];
+			uint16_t *ddata = &m_vram[((m_dst_y_pixel + line) * m_fb_width + (m_dst_x_pixel + column))/2];
 			execute_rule(sdata, (replacement_rule_t)((m_move_replacement_rule >> 4) & 0x0f), ddata);
 			execute_rule(sdata, (replacement_rule_t)(m_move_replacement_rule & 0x0f), ddata);
 		}
@@ -216,6 +216,7 @@ READ16_MEMBER(topcat_device::ctrl_r)
 
 WRITE16_MEMBER(topcat_device::ctrl_w)
 {
+	LOG("ctrl_w: %02X = %02X\n", offset, data);
 	if (mem_mask == 0xff00)
 		data >>= 8;
 
@@ -309,12 +310,12 @@ uint32_t topcat_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	int x, y;
 	uint32_t pixels;
 
-	for (y = 0; y < 768; y++)
+	for (y = 0; y < m_fb_height; y++)
 	{
 		scanline = &bitmap.pix32(y);
-		for (x = 0; x < 1024/2; x++)
+		for (x = 0; x < m_fb_width/2; x++)
 		{
-			pixels = m_vram[(y * 512) + x];
+			pixels = m_vram[(y * m_fb_width/2) + x];
 
 			*scanline++ = m_palette[(pixels>>8) & 1];
 			*scanline++ = m_palette[(pixels & 1)];
