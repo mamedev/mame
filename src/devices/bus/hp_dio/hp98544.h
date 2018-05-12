@@ -22,12 +22,8 @@ public:
 	// construction/destruction
 	dio16_98544_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_READ16_MEMBER(rom_r);
 	DECLARE_WRITE16_MEMBER(rom_w);
-	DECLARE_READ16_MEMBER(ctrl_r);
-	DECLARE_WRITE16_MEMBER(ctrl_w);
 
 	required_device<topcat_device> m_topcat;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

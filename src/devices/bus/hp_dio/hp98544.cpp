@@ -81,21 +81,20 @@ void dio16_98544_device::device_start()
 {
 	// set_nubus_device makes m_slot valid
 	set_dio_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(HP98544_ROM_REGION).c_str())->base();
 
 	m_dio->install_memory(
 			0x200000, 0x2fffff,
-			read16_delegate(FUNC(dio16_98544_device::vram_r), this),
-			write16_delegate(FUNC(dio16_98544_device::vram_w), this));
+			read16_delegate(FUNC(topcat_device::vram_r), static_cast<topcat_device*>(m_topcat)),
+			write16_delegate(FUNC(topcat_device::vram_w), static_cast<topcat_device*>(m_topcat)));
 	m_dio->install_memory(
 			0x560000, 0x563fff,
 			read16_delegate(FUNC(dio16_98544_device::rom_r), this),
 			write16_delegate(FUNC(dio16_98544_device::rom_w), this));
 	m_dio->install_memory(
 			0x564000, 0x567fff,
-			read16_delegate(FUNC(dio16_98544_device::ctrl_r), this),
-			write16_delegate(FUNC(dio16_98544_device::ctrl_w), this));
+			read16_delegate(FUNC(topcat_device::ctrl_r), static_cast<topcat_device*>(m_topcat)),
+			write16_delegate(FUNC(topcat_device::ctrl_w), static_cast<topcat_device*>(m_topcat)));
 }
 
 //-------------------------------------------------
@@ -106,16 +105,6 @@ void dio16_98544_device::device_reset()
 {
 }
 
-READ16_MEMBER(dio16_98544_device::vram_r)
-{
-	return m_topcat->vram_r(space, offset, mem_mask);
-}
-
-WRITE16_MEMBER(dio16_98544_device::vram_w)
-{
-	m_topcat->vram_w(space, offset, data, mem_mask);
-}
-
 READ16_MEMBER(dio16_98544_device::rom_r)
 {
 	return 0xff00 | m_rom[offset];
@@ -124,16 +113,6 @@ READ16_MEMBER(dio16_98544_device::rom_r)
 // the video chip registers live here, so these writes are valid
 WRITE16_MEMBER(dio16_98544_device::rom_w)
 {
-}
-
-WRITE16_MEMBER(dio16_98544_device::ctrl_w)
-{
-	return m_topcat->ctrl_w(space, offset, data);
-}
-
-READ16_MEMBER(dio16_98544_device::ctrl_r)
-{
-	return m_topcat->ctrl_r(space, offset);
 }
 
 uint32_t dio16_98544_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
