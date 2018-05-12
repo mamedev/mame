@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(cyclwarr_state::get_tile_info_bigfight)
 	int tile=m_cyclwarr_videoram[Bank][(tile_index+0x400)&0x7fff];
 	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
 	SET_TILE_INFO_MEMBER(1,(tile&0x3ff)|(bank<<10),(tile>>12)&0xf,0);
-	tileinfo.mask_data = m_mask[((tile&0x3ff)|(bank<<10))<<3];
+	tileinfo.mask_data = &m_mask[((tile&0x3ff)|(bank<<10))<<3];
 }
 
 /********************************************************************/
