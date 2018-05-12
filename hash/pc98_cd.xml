@@ -174,7 +174,7 @@
 	</software>
 
 	<!-- Supports IBM PC-AT, PC-98, Alpha, MIPS and PowerPC -->
-	<software name="winn351w">
+	<software name="winn351w" supported="no">
 		<!--
 		Origin: WinWorld
 		<rom name="winn351_wks_jpn.iso" size="544534528" crc="3e416147" sha1="86e724f0ae050bfdbe8a795f97f3afb7db4db57d"/>
@@ -190,7 +190,7 @@
 	</software>
 
 	<!-- Supports IBM PC-AT, PC-98, Alpha, MIPS and PowerPC -->
-	<software name="winn351wc">
+	<software name="winn351wc" supported="no">
 		<!--
 		Origin: WinWorld
 		<rom name="winn351_wks_jpn-chk.iso" size="544534528" crc="0b9952f3" sha1="606553951efc84c33549e84f0a782075480b4016"/>
