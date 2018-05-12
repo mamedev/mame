@@ -27,6 +27,8 @@
     changes the size at runtime.
     Big Fight/Cyclewarriors - misc graphics problems.
     Cyclewarriors - test mode text does not appear as it needs a -256 Y scroll offset from somewhere.
+    
+    reference of bigfight : https://youtu.be/aUUoUCr6yhk
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
