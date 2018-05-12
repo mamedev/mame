@@ -28,28 +28,33 @@ public:
 		, m_spriteram(*this, "spriteram")
 		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1U)
 		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
 		, m_deco_tilegen(*this, "tilegen")
 		, m_sprgen(*this, "spritegen")
 	{ }
 
 	DECLARE_DRIVER_INIT(tumblep);
 
+	void chinatwn(machine_config &config);
+	void supbtime(machine_config &config);
+	void tumblep(machine_config &config);
+
+protected:
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 	DECLARE_READ16_MEMBER(vblank_ack_r);
 	uint32_t screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void chinatwn(machine_config &config);
-	void supbtime(machine_config &config);
-	void tumblep(machine_config &config);
 	void chinatwn_map(address_map &map);
 	void sound_map(address_map &map);
 	void supbtime_map(address_map &map);
 	void tumblep_map(address_map &map);
+
 private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
 	required_device<cpu_device> m_maincpu;
+	required_device<h6280_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen;
 	required_device<decospr_device> m_sprgen;
 };
