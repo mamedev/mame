@@ -582,7 +582,13 @@ WRITE_LINE_MEMBER(segas16a_state::i8751_main_cpu_vblank_w)
 
 	// if we have a 8751, toggle the INT0 line on the MCU
 	if (m_mcu.found())
+	{
 		m_mcu->set_input_line(MCS51_INT0_LINE, state);
+
+		// boost interleave to ensure that the MCU can break the M68000 out of a STOP
+		if (state)
+			machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	}
 }
 
 
