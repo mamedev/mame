@@ -113,8 +113,8 @@ const tiny_rom_entry *c64_currah_speech_cartridge_device::device_rom_region() co
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c64_currah_speech_cartridge_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SP0256_TAG, SP0256, 4000000) // ???
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(SP0256_TAG, SP0256, 4000000) // ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

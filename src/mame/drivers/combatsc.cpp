@@ -699,12 +699,12 @@ void combatsc_state::machine_reset()
 MACHINE_CONFIG_START(combatsc_state::combatsc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */
-	MCFG_CPU_PROGRAM_MAP(combatsc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", combatsc_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(combatsc_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", combatsc_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,3579545)   /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(combatsc_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,3579545)   /* 3.579545 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(combatsc_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -736,15 +736,15 @@ MACHINE_CONFIG_START(combatsc_state::combatsc)
 	MCFG_K007121_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(combatsc_state, combatsc_portA_w))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, combatsc_state, combatsc_portA_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -753,12 +753,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(combatsc_state::combatscb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */
-	MCFG_CPU_PROGRAM_MAP(combatscb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", combatsc_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(combatscb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", combatsc_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,3579545)   /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(combatscb_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,3579545)   /* 3.579545 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(combatscb_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -781,15 +781,15 @@ MACHINE_CONFIG_START(combatsc_state::combatscb)
 	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatscb)
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatscb)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_MSM5205_VCK_CALLBACK(ASSERTLINE("audiocpu", 0))

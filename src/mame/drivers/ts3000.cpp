@@ -45,9 +45,9 @@ static INPUT_PORTS_START( ts3000 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(ts3000_state::ts3000)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)  // no idea of clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181)/3)  // no idea of clock
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 MACHINE_CONFIG_END
 
 ROM_START( ts3000 )

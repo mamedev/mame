@@ -160,15 +160,15 @@ QUICKLOAD_LOAD_MEMBER( pipbug_state, pipbug )
 
 MACHINE_CONFIG_START(pipbug_state::pipbug)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(pipbug_mem)
-	MCFG_CPU_DATA_MAP(pipbug_data)
-	MCFG_S2650_FLAG_OUTPUT(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pipbug_mem)
+	MCFG_DEVICE_DATA_MAP(pipbug_data)
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE("rs232", rs232_port_device, write_txd))
 
 	/* video hardware */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(INPUTLINE("maincpu", S2650_SENSE_LINE))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", pipbug_state, pipbug, "pgm", 1)

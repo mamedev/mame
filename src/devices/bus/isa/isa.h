@@ -79,18 +79,10 @@
 // include this in a driver to have ISA allocate it's own address spaces (e.g. non-x86)
 #define MCFG_ISA8_BUS_CUSTOM_SPACES() \
 	downcast<isa8_device &>(*device).set_custom_spaces();
-#define MCFG_ISA8_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, ISA8_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	downcast<isa8_slot_device &>(*device).set_isa8_slot(this, _isatag);
 #define MCFG_ISA16_CPU(_cputag) \
 	downcast<isa8_device &>(*device).set_cputag(_cputag);
 #define MCFG_ISA16_BUS_CUSTOM_SPACES() \
 	downcast<isa8_device &>(*device).set_custom_spaces();
-#define MCFG_ISA16_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, ISA16_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	downcast<isa16_slot_device &>(*device).set_isa16_slot(this, _isatag);
 
 #define MCFG_ISA_BUS_IOCHCK(_iochck) \
 	devcb = &downcast<isa8_device *>(device)->set_iochck_callback(DEVCB_##_iochck);
@@ -157,25 +149,30 @@
 
 class isa8_device;
 
-class isa8_slot_device : public device_t,
-							public device_slot_interface
+class isa8_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
+	template <typename T, typename U>
+	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&isa_tag, U &&opts, const char *dflt, bool fixed)
+		: isa8_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+		m_isa_bus.set_tag(std::forward<T>(isa_tag));
+	}
 	isa8_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// device-level overrides
-	virtual void device_start() override;
-
-	// inline configuration
-	void set_isa8_slot(device_t *owner, const char *isa_tag) { m_owner = owner; m_isa_tag = isa_tag; }
 
 protected:
 	isa8_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	// device-level overrides
+	virtual void device_start() override;
+
 	// configuration
-	device_t *m_owner;
-	const char *m_isa_tag;
+	required_device<device_t> m_isa_bus;
 };
 
 // device type definition
@@ -198,7 +195,7 @@ public:
 	// construction/destruction
 	isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	// inline configuration
-	void set_cputag(const char *tag) { m_maincpu.set_tag(tag); }
+	template <typename T> void set_cputag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 	void set_custom_spaces() { m_allocspaces = true; }
 	template <class Object> devcb_base &set_iochck_callback(Object &&cb) { return m_write_iochck.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_irq2_callback(Object &&cb) { return m_out_irq2_cb.set_callback(std::forward<Object>(cb)); }
@@ -343,12 +340,21 @@ class isa16_slot_device : public isa8_slot_device
 {
 public:
 	// construction/destruction
+	template <typename T, typename U>
+	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&isa_tag, U &&opts, const char *dflt, bool fixed)
+		: isa16_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+		m_isa_bus.set_tag(std::forward<T>(isa_tag));
+	}
 	isa16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-		// device-level overrides
-	virtual void device_start() override;
 
-	// inline configuration
-	void set_isa16_slot(device_t *owner, const char *isa_tag) { m_owner = owner; m_isa_tag = isa_tag; }
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 

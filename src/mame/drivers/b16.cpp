@@ -276,9 +276,9 @@ WRITE8_MEMBER(b16_state::memory_write_byte)
 
 MACHINE_CONFIG_START(b16_state::b16)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8086, XTAL(14'318'181)/2) //unknown xtal
-	MCFG_CPU_PROGRAM_MAP(b16_map)
-	MCFG_CPU_IO_MAP(b16_io)
+	MCFG_DEVICE_ADD("maincpu",I8086, XTAL(14'318'181)/2) //unknown xtal
+	MCFG_DEVICE_PROGRAM_MAP(b16_map)
+	MCFG_DEVICE_IO_MAP(b16_io)
 
 
 	/* video hardware */
@@ -295,8 +295,8 @@ MACHINE_CONFIG_START(b16_state::b16)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_DEVICE_ADD("8237dma", AM9517A, XTAL(14'318'181)/2)
-	MCFG_I8237_IN_MEMR_CB(READ8(b16_state, memory_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(b16_state, memory_write_byte))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, b16_state, memory_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, b16_state, memory_write_byte))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", b16)
 	MCFG_PALETTE_ADD("palette", 8)

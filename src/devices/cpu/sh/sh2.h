@@ -71,6 +71,7 @@ public:
 
 	// construction/destruction
 	sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~sh2_device() override;
 
 	void set_is_slave(int slave) { m_is_slave = slave; }
 	template <typename Object> void set_dma_kludge_callback(Object &&cb) { m_dma_kludge_cb = std::forward<Object>(cb); }
@@ -157,12 +158,12 @@ private:
 
 	uint32_t m_debugger_temp;
 
-	inline uint8_t RB(offs_t A) override;
-	inline uint16_t RW(offs_t A) override;
-	inline uint32_t RL(offs_t A) override;
-	inline void WB(offs_t A, uint8_t V) override;
-	inline void WW(offs_t A, uint16_t V) override;
-	inline void WL(offs_t A, uint32_t V) override;
+	virtual uint8_t RB(offs_t A) override;
+	virtual uint16_t RW(offs_t A) override;
+	virtual uint32_t RL(offs_t A) override;
+	virtual void WB(offs_t A, uint8_t V) override;
+	virtual void WW(offs_t A, uint16_t V) override;
+	virtual void WL(offs_t A, uint32_t V) override;
 
 	virtual void LDCMSR(const uint16_t opcode) override;
 	virtual void LDCSR(const uint16_t opcode) override;

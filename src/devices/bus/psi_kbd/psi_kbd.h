@@ -109,7 +109,7 @@ protected:
 DECLARE_DEVICE_TYPE(PSI_KEYBOARD_INTERFACE, psi_keyboard_bus_device)
 
 // supported devices
-SLOT_INTERFACE_EXTERN( psi_keyboard_devices );
+void psi_keyboard_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_PSI_KBD_PSI_KBD_H

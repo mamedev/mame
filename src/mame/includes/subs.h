@@ -5,6 +5,8 @@
     Atari Subs hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SUBS_H
+#define MAME_INCLUDES_SUBS_H
 
 #include "sound/discrete.h"
 
@@ -49,8 +51,6 @@ public:
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_READ8_MEMBER(coin_r);
 	DECLARE_READ8_MEMBER(options_r);
-	DECLARE_WRITE_LINE_MEMBER(lamp1_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp2_w);
 	DECLARE_WRITE_LINE_MEMBER(invert1_w);
 	DECLARE_WRITE_LINE_MEMBER(invert2_w);
 	DECLARE_WRITE8_MEMBER(noise_reset_w);
@@ -72,4 +72,6 @@ public:
 
 /*----------- defined in audio/subs.c -----------*/
 
-DISCRETE_SOUND_EXTERN( subs );
+DISCRETE_SOUND_EXTERN( subs_discrete );
+
+#endif // MAME_INCLUDES_SUBS_H

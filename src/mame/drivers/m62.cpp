@@ -968,10 +968,10 @@ void m62_state::machine_reset()
 MACHINE_CONFIG_START(m62_state::ldrun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 24000000/6)
-	MCFG_CPU_PROGRAM_MAP(ldrun_map)
-	MCFG_CPU_IO_MAP(kungfum_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m62_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 24000000/6)
+	MCFG_DEVICE_PROGRAM_MAP(ldrun_map)
+	MCFG_DEVICE_IO_MAP(kungfum_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m62_state,  irq0_line_hold)
 
 
 	/* video hardware */
@@ -1002,10 +1002,10 @@ MACHINE_CONFIG_START(m62_state::kungfum)
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(18432000/6)
-	MCFG_CPU_PROGRAM_MAP(kungfum_map)
-	MCFG_CPU_IO_MAP(kungfum_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(18432000/6)
+	MCFG_DEVICE_PROGRAM_MAP(kungfum_map)
+	MCFG_DEVICE_IO_MAP(kungfum_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1020,10 +1020,10 @@ MACHINE_CONFIG_START(m62_state::battroad)
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(18432000/6)
-	MCFG_CPU_PROGRAM_MAP(battroad_map)
-	MCFG_CPU_IO_MAP(battroad_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(18432000/6)
+	MCFG_DEVICE_PROGRAM_MAP(battroad_map)
+	MCFG_DEVICE_IO_MAP(battroad_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(m62_state,battroad)
 
@@ -1045,9 +1045,9 @@ MACHINE_CONFIG_START(m62_state::ldrun2)
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ldrun2_map)
-	MCFG_CPU_IO_MAP(ldrun2_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ldrun2_map)
+	MCFG_DEVICE_IO_MAP(ldrun2_io_map)
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun2)
 	MCFG_SCREEN_MODIFY("screen")
@@ -1059,9 +1059,9 @@ MACHINE_CONFIG_START(m62_state::ldrun3)
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ldrun3_map)
-	MCFG_CPU_IO_MAP(ldrun3_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ldrun3_map)
+	MCFG_DEVICE_IO_MAP(ldrun3_io_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun2)
@@ -1074,9 +1074,9 @@ MACHINE_CONFIG_START(m62_state::ldrun4)
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ldrun4_map)
-	MCFG_CPU_IO_MAP(ldrun4_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ldrun4_map)
+	MCFG_DEVICE_IO_MAP(ldrun4_io_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun4)
@@ -1089,8 +1089,8 @@ MACHINE_CONFIG_START(m62_state::lotlot)
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(lotlot_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(lotlot_map)
 
 	/* video hardware */
 
@@ -1111,9 +1111,9 @@ MACHINE_CONFIG_START(m62_state::kidniki)
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kidniki_map)
-	MCFG_CPU_IO_MAP(kidniki_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kidniki_map)
+	MCFG_DEVICE_IO_MAP(kidniki_io_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("fg_decode", "chr_palette", m62_fg_kidniki)
@@ -1128,8 +1128,8 @@ MACHINE_CONFIG_START(m62_state::spelunkr)
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spelunkr_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spelunkr_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("fg_decode", "chr_palette", m62_fg_spelunkr)
@@ -1144,8 +1144,8 @@ MACHINE_CONFIG_START(m62_state::spelunk2)
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spelunk2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spelunk2_map)
 
 
 	/* video hardware */
@@ -1166,10 +1166,10 @@ MACHINE_CONFIG_START(m62_state::youjyudn)
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(18432000/6)
-	MCFG_CPU_PROGRAM_MAP(youjyudn_map)
-	MCFG_CPU_IO_MAP(youjyudn_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(18432000/6)
+	MCFG_DEVICE_PROGRAM_MAP(youjyudn_map)
+	MCFG_DEVICE_IO_MAP(youjyudn_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1187,8 +1187,8 @@ MACHINE_CONFIG_START(m62_state::horizon)
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(horizon_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(horizon_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

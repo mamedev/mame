@@ -89,8 +89,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(globalvr_state::globalvr)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 100000000)      /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(globalvr_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 100000000)      /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(globalvr_map)
 MACHINE_CONFIG_END
 
 

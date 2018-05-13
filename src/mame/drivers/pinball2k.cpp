@@ -600,10 +600,10 @@ void pinball2k_state::ramdac_map(address_map &map)
 MACHINE_CONFIG_START(pinball2k_state::mediagx)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MEDIAGX, 166000000)
-	MCFG_CPU_PROGRAM_MAP(mediagx_map)
-	MCFG_CPU_IO_MAP(mediagx_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", MEDIAGX, 166000000)
+	MCFG_DEVICE_PROGRAM_MAP(mediagx_map)
+	MCFG_DEVICE_IO_MAP(mediagx_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 
@@ -611,7 +611,7 @@ MACHINE_CONFIG_START(pinball2k_state::mediagx)
 	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, pinball2k_state, cx5510_pci_r, cx5510_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
@@ -626,7 +626,8 @@ MACHINE_CONFIG_START(pinball2k_state::mediagx)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 

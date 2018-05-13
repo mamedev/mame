@@ -1022,16 +1022,16 @@ ADC12138_IPT_CONVERT_CB(hornet_state::adc12138_input_callback)
 MACHINE_CONFIG_START(hornet_state::hornet)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
-	MCFG_CPU_PROGRAM_MAP(hornet_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(hornet_state, irq1_line_assert,  1000)
+	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
+	MCFG_DEVICE_PROGRAM_MAP(hornet_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(hornet_state, irq1_line_assert,  1000)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_memmap)
+	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, XTAL(36'000'000))
+	MCFG_DEVICE_ADD("dsp", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_CPU_DATA_MAP(sharc0_map)
+	MCFG_DEVICE_DATA_MAP(sharc0_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -1045,7 +1045,7 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	MCFG_VOODOO_TMUMEM(4,0)
 	MCFG_VOODOO_SCREEN_TAG("screen")
 	MCFG_VOODOO_CPU_TAG("dsp")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(hornet_state,voodoo_vblank_0))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, hornet_state,voodoo_vblank_0))
 
 	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
 	MCFG_K033906_VOODOO("voodoo0")
@@ -1065,9 +1065,10 @@ MACHINE_CONFIG_START(hornet_state::hornet)
 	MCFG_K056800_ADD("k056800", XTAL(16'934'400))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_RF5C400_ADD("rfsnd", XTAL(16'934'400))  // value from Guru readme, gives 44100 Hz sample rate
+	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(16'934'400))  // value from Guru readme, gives 44100 Hz sample rate
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1084,9 +1085,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hornet_state::hornet_2board)
 	hornet(config);
 
-	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL(36'000'000))
+	MCFG_DEVICE_ADD("dsp2", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_CPU_DATA_MAP(sharc1_map)
+	MCFG_DEVICE_DATA_MAP(sharc1_map)
 
 
 	MCFG_DEVICE_REMOVE("k037122_1")
@@ -1103,14 +1104,14 @@ MACHINE_CONFIG_START(hornet_state::hornet_2board)
 	MCFG_VOODOO_TMUMEM(4,0)
 	MCFG_VOODOO_SCREEN_TAG("lscreen")
 	MCFG_VOODOO_CPU_TAG("dsp")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(hornet_state,voodoo_vblank_0))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, hornet_state,voodoo_vblank_0))
 
 	MCFG_DEVICE_ADD("voodoo1", VOODOO_1, STD_VOODOO_1_CLOCK)
 	MCFG_VOODOO_FBMEM(2)
 	MCFG_VOODOO_TMUMEM(4,0)
 	MCFG_VOODOO_SCREEN_TAG("rscreen")
 	MCFG_VOODOO_CPU_TAG("dsp2")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(hornet_state,voodoo_vblank_1))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, hornet_state,voodoo_vblank_1))
 
 	MCFG_DEVICE_ADD("k033906_2", K033906, 0)
 	MCFG_K033906_VOODOO("voodoo1")
@@ -1142,8 +1143,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hornet_state::terabrst)
 	hornet(config);
 
-	MCFG_CPU_ADD("gn680", M68000, XTAL(32'000'000)/2)   /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(gn680_memmap)
+	MCFG_DEVICE_ADD("gn680", M68000, XTAL(32'000'000)/2)   /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(gn680_memmap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hornet_state::hornet_2board_v2)
@@ -1154,7 +1155,7 @@ MACHINE_CONFIG_START(hornet_state::hornet_2board_v2)
 	MCFG_VOODOO_TMUMEM(4,0)
 	MCFG_VOODOO_SCREEN_TAG("lscreen")
 	MCFG_VOODOO_CPU_TAG("dsp")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(hornet_state,voodoo_vblank_0))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, hornet_state,voodoo_vblank_0))
 
 	MCFG_DEVICE_REMOVE("voodoo1")
 	MCFG_DEVICE_ADD("voodoo1", VOODOO_2, STD_VOODOO_2_CLOCK)
@@ -1162,7 +1163,7 @@ MACHINE_CONFIG_START(hornet_state::hornet_2board_v2)
 	MCFG_VOODOO_TMUMEM(4,0)
 	MCFG_VOODOO_SCREEN_TAG("rscreen")
 	MCFG_VOODOO_CPU_TAG("dsp2")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(hornet_state,voodoo_vblank_1))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, hornet_state,voodoo_vblank_1))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hornet_state::sscope2)

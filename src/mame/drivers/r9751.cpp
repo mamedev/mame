@@ -643,8 +643,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(r9751_state::r9751)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68030, 20000000)
-	MCFG_CPU_PROGRAM_MAP(r9751_mem)
+	MCFG_DEVICE_ADD("maincpu", M68030, 20000000)
+	MCFG_DEVICE_PROGRAM_MAP(r9751_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -656,8 +656,8 @@ MACHINE_CONFIG_START(r9751_state::r9751)
 
 	/* disk hardware */
 	MCFG_DEVICE_ADD("pdc", PDC, 0)
-	MCFG_PDC_R_CB(READ8(r9751_state, pdc_dma_r))
-	MCFG_PDC_W_CB(WRITE8(r9751_state, pdc_dma_w))
+	MCFG_PDC_R_CB(READ8(*this, r9751_state, pdc_dma_r))
+	MCFG_PDC_W_CB(WRITE8(*this, r9751_state, pdc_dma_w))
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
 	MCFG_LEGACY_SCSI_PORT("scsi")

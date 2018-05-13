@@ -1695,18 +1695,18 @@ WRITE_LINE_MEMBER(dkong_state::busreq_w )
 MACHINE_CONFIG_START(dkong_state::dkong_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CLOCK_1H)
-	MCFG_CPU_PROGRAM_MAP(dkong_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, CLOCK_1H)
+	MCFG_DEVICE_PROGRAM_MAP(dkong_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,dkong)
 
 	MCFG_DEVICE_ADD("dma8257", I8257, CLOCK_1H)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(dkong_state, busreq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(dkong_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(dkong_state, memory_write_byte))
-	MCFG_I8257_IN_IOR_1_CB(READ8(dkong_state, p8257_ctl_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(dkong_state, p8257_ctl_w))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, dkong_state, busreq_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, dkong_state, memory_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, dkong_state, memory_write_byte))
+	MCFG_I8257_IN_IOR_1_CB(READ8(*this, dkong_state, p8257_ctl_r))
+	MCFG_I8257_OUT_IOW_0_CB(WRITE8(*this, dkong_state, p8257_ctl_w))
 	MCFG_I8257_REVERSE_RW_MODE(1) // why?
 
 	/* video hardware */
@@ -1714,7 +1714,7 @@ MACHINE_CONFIG_START(dkong_state::dkong_base)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dkong_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dkong_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dkong)
 	MCFG_PALETTE_ADD("palette", DK2B_PALETTE_LENGTH)
@@ -1791,23 +1791,23 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dkong_state::dkong3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2) /* verified in schematics */
-	MCFG_CPU_PROGRAM_MAP(dkong3_map)
-	MCFG_CPU_IO_MAP(dkong3_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2) /* verified in schematics */
+	MCFG_DEVICE_PROGRAM_MAP(dkong3_map)
+	MCFG_DEVICE_IO_MAP(dkong3_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state, dkong3)
 
 	MCFG_DEVICE_ADD("z80dma", Z80DMA, CLOCK_1H)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(dkong_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(dkong_state, memory_write_byte))
+	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, dkong_state, memory_read_byte))
+	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, dkong_state, memory_write_byte))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dkong_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dkong_state, vblank_irq))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("n2a03a", INPUT_LINE_NMI))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("n2a03b", INPUT_LINE_NMI))
 
@@ -1824,8 +1824,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dkong_state::dkongjr)
 	dkong_base(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dkongjr_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dkongjr_map)
 
 	/* sound hardware */
 	dkongjr_audio(config);
@@ -1861,27 +1861,27 @@ MACHINE_CONFIG_START(dkong_state::s2650)
 	dkong2b(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", S2650, CLOCK_1H / 2)    /* ??? */
-	MCFG_CPU_PROGRAM_MAP(s2650_map)
-	MCFG_CPU_IO_MAP(s2650_io_map)
-	MCFG_CPU_DATA_MAP(s2650_data_map)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(dkong_state, s2650_fo_w))
+	MCFG_DEVICE_REPLACE("maincpu", S2650, CLOCK_1H / 2)    /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(s2650_map)
+	MCFG_DEVICE_IO_MAP(s2650_io_map)
+	MCFG_DEVICE_DATA_MAP(s2650_data_map)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, dkong_state, s2650_fo_w))
 
 	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dkong_state, s2650_interrupt))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dkong_state, s2650_interrupt))
 
 	MCFG_DEVICE_MODIFY("dma8257")
-	MCFG_I8257_IN_MEMR_CB(READ8(dkong_state, hb_dma_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(dkong_state, hb_dma_write_byte))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, dkong_state, hb_dma_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, dkong_state, hb_dma_write_byte))
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,s2650)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dkong_state::herbiedk)
 	s2650(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dkong_state::spclforc)
@@ -1905,8 +1905,8 @@ MACHINE_CONFIG_START(dkong_state::strtheat)
 	dkong2b(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(epos_readport)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(epos_readport)
 
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,strtheat)
 MACHINE_CONFIG_END
@@ -1915,8 +1915,8 @@ MACHINE_CONFIG_START(dkong_state::drakton)
 	dkong2b(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(epos_readport)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(epos_readport)
 
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,drakton)
 MACHINE_CONFIG_END
@@ -1925,8 +1925,8 @@ MACHINE_CONFIG_START(dkong_state::drktnjr)
 	dkongjr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(epos_readport)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(epos_readport)
 
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,drakton)
 MACHINE_CONFIG_END

@@ -147,10 +147,10 @@ void rambo_state::machine_reset()
 
 MACHINE_CONFIG_START(rambo_state::rambo)
 
-	MCFG_CPU_ADD("maincpu", ATMEGA2560, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(rambo_prg_map)
-	MCFG_CPU_DATA_MAP(rambo_data_map)
-	MCFG_CPU_IO_MAP(rambo_io_map)
+	MCFG_DEVICE_ADD("maincpu", ATMEGA2560, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(rambo_prg_map)
+	MCFG_DEVICE_DATA_MAP(rambo_data_map)
+	MCFG_DEVICE_IO_MAP(rambo_io_map)
 
 	MCFG_CPU_AVR8_EEPROM("eeprom")
 	MCFG_CPU_AVR8_LFUSE(0xFF)

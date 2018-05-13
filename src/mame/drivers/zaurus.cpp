@@ -1754,8 +1754,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)
 MACHINE_CONFIG_START(zaurus_state::zaurus)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",PXA255,MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(zaurus_map)
+	MCFG_DEVICE_ADD("maincpu",PXA255,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(zaurus_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", zaurus_state, rtc_irq_callback, attotime::from_hz(XTAL(32'768)))
 
@@ -1770,8 +1770,8 @@ MACHINE_CONFIG_START(zaurus_state::zaurus)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+	SPEAKER(config, "mono").front_center();
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

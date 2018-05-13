@@ -229,11 +229,11 @@ WRITE_LINE_MEMBER(pokechmp_state::sound_irq)
 MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(4'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(pokechmp_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(4'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(pokechmp_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, XTAL(4'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(pokechmp_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, XTAL(4'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(pokechmp_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -244,24 +244,24 @@ MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 	MCFG_SCREEN_UPDATE_DRIVER(pokechmp_state, screen_update_pokechmp)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(pokechmp_state, sound_irq))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, pokechmp_state, sound_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pokechmp)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(4'000'000)/4)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(4'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ym2", YM3812, XTAL(24'000'000)/16)
+	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(24'000'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/16, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(24'000'000)/16, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) /* sound fx */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(0, pokechmp_oki_map)

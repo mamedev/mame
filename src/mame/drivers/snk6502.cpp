@@ -836,9 +836,9 @@ MACHINE_RESET_MEMBER(snk6502_state,pballoon)
 MACHINE_CONFIG_START(snk6502_state::sasuke)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) // 700 kHz
-	MCFG_CPU_PROGRAM_MAP(sasuke_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk6502_state, satansat_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) // 700 kHz
+	MCFG_DEVICE_PROGRAM_MAP(sasuke_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk6502_state, satansat_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,sasuke)
 
@@ -865,18 +865,18 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sasuke_timer", snk6502_state, sasuke_update_counter, attotime::from_hz(MASTER_CLOCK / 8))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snk6502", SNK6502, 0)
+	MCFG_DEVICE_ADD("snk6502", SNK6502, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(sasuke_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MCFG_SOUND_ADD("sn76477.1", SN76477, 0)
+	MCFG_DEVICE_ADD("sn76477.1", SN76477)
 	// ic48     GND: 2,22,26,27,28  +5V: 1,15,25
 	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_K(150), CAP_P(4700)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_K(22))                    // decay_res
@@ -893,7 +893,7 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn76477.2", SN76477, 0)
+	MCFG_DEVICE_ADD("sn76477.2", SN76477)
 	// ic51     GND: 2,26,27        +5V: 1,15,22,25,28
 	MCFG_SN76477_NOISE_PARAMS(RES_K(340), RES_K(47), CAP_P(100)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_K(470))                   // decay_res
@@ -910,7 +910,7 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn76477.3", SN76477, 0)
+	MCFG_DEVICE_ADD("sn76477.3", SN76477)
 	// ic52     GND: 2,22,27,28     +5V: 1,15,25,26
 	MCFG_SN76477_NOISE_PARAMS(RES_K(330), RES_K(47), CAP_P(100)) // noise + filter
 	MCFG_SN76477_DECAY_RES(RES_K(1))                     // decay_res
@@ -931,8 +931,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snk6502_state::satansat)
 	sasuke(config);
 	// basic machine hardware
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(satansat_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(satansat_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,satansat)
 
@@ -940,12 +940,12 @@ MACHINE_CONFIG_START(snk6502_state::satansat)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", satansat)
 
 	// sound hardware
-	MCFG_SOUND_MODIFY("samples")
+	MCFG_DEVICE_MODIFY("samples")
 	MCFG_SAMPLES_CHANNELS(3)
 	MCFG_SAMPLES_NAMES(vanguard_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_REPLACE("sn76477.1", SN76477, 0)
+	MCFG_DEVICE_REPLACE("sn76477.1", SN76477)
 	// ???      GND: 2,26,27        +5V: 15,25
 	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
 	MCFG_SN76477_DECAY_RES(0)                            // decay_res
@@ -969,10 +969,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snk6502_state::vanguard)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) // adjusted using common divisor
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) // adjusted using common divisor
 
-	MCFG_CPU_PROGRAM_MAP(vanguard_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk6502_state, snk6502_interrupt)
+	MCFG_DEVICE_PROGRAM_MAP(vanguard_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk6502_state, snk6502_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,vanguard)
 
@@ -997,17 +997,17 @@ MACHINE_CONFIG_START(snk6502_state::vanguard)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snk6502", SNK6502, 0)
+	MCFG_DEVICE_ADD("snk6502", SNK6502, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(3)
 	MCFG_SAMPLES_NAMES(vanguard_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("sn76477.1", SN76477, 0)
+	MCFG_DEVICE_ADD("sn76477.1", SN76477)
 	// SHOT A   GND: 2,9,26,27  +5V: 15,25
 	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
 	MCFG_SN76477_DECAY_RES(0)                            // decay_res
@@ -1024,7 +1024,7 @@ MACHINE_CONFIG_START(snk6502_state::vanguard)
 	MCFG_SN76477_ENABLE(1)                               // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn76477.2", SN76477, 0)
+	MCFG_DEVICE_ADD("sn76477.2", SN76477)
 	// SHOT B   GND: 1,2,26,27  +5V: 15,25,28
 	MCFG_SN76477_NOISE_PARAMS(RES_K(10), RES_K(30), 0)   // noise + filter
 	MCFG_SN76477_DECAY_RES(0)                            // decay_res
@@ -1045,16 +1045,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snk6502_state::fantasy)
 	vanguard(config);
 	// basic machine hardware
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fantasy_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fantasy_map)
 
 	// sound hardware
-	MCFG_SOUND_MODIFY("samples")
+	MCFG_DEVICE_MODIFY("samples")
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(fantasy_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_REPLACE("sn76477.1", SN76477, 0)
+	MCFG_DEVICE_REPLACE("sn76477.1", SN76477)
 	// BOMB     GND:    2,9,26,27       +5V: 15,25
 	MCFG_SN76477_NOISE_PARAMS(RES_K(470), RES_M(1.5), CAP_P(220)) // noise + filter
 	MCFG_SN76477_DECAY_RES(0)                            // decay_res
@@ -1071,10 +1071,9 @@ MACHINE_CONFIG_START(snk6502_state::fantasy)
 	// otherwise it is using the VCO for the envelope, but the VCO is not hooked up
 	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)                   // envelope 1, 2
 	MCFG_SN76477_ENABLE(0)                               // enable
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(fantasy)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, fantasy_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_DEVICE_REMOVE("sn76477.2")
@@ -1090,8 +1089,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snk6502_state::pballoon)
 	nibbler(config);
 	// basic machine hardware
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pballoon_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pballoon_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,pballoon)
 

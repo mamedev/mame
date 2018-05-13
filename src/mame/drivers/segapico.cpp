@@ -371,11 +371,12 @@ static INPUT_PORTS_START( pico )
 INPUT_PORTS_END
 
 
-static SLOT_INTERFACE_START(pico_cart)
-	SLOT_INTERFACE_INTERNAL("rom",  MD_STD_ROM)
-	SLOT_INTERFACE_INTERNAL("rom_sram",  MD_ROM_SRAM)   // not sure these are needed...
-	SLOT_INTERFACE_INTERNAL("rom_sramsafe",  MD_ROM_SRAM)   // not sure these are needed...
-SLOT_INTERFACE_END
+static void pico_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom",  MD_STD_ROM);
+	device.option_add_internal("rom_sram",  MD_ROM_SRAM);   // not sure these are needed...
+	device.option_add_internal("rom_sramsafe",  MD_ROM_SRAM);   // not sure these are needed...
+}
 
 MACHINE_START_MEMBER(pico_state,pico)
 {
@@ -390,8 +391,8 @@ MACHINE_START_MEMBER(pico_state,pico)
 MACHINE_CONFIG_START(pico_state::pico)
 	md_ntsc(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pico_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pico_mem)
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 	MCFG_DEVICE_REMOVE("ymsnd")
@@ -402,8 +403,8 @@ MACHINE_CONFIG_START(pico_state::pico)
 	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
-	MCFG_SOUND_ADD("315_5641", SEGA_315_5641_PCM, UPD7759_STANDARD_CLOCK*2)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(pico_state,sound_cause_irq))
+	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK*2)
+	//MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq)) FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END
@@ -411,8 +412,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pico_state::picopal)
 	md_pal(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pico_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pico_mem)
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 	MCFG_DEVICE_REMOVE("ymsnd")
@@ -423,8 +424,8 @@ MACHINE_CONFIG_START(pico_state::picopal)
 	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
-	MCFG_SOUND_ADD("315_5641", SEGA_315_5641_PCM, UPD7759_STANDARD_CLOCK*2)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(pico_state,sound_cause_irq))
+	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK*2)
+	//MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq)) FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END
@@ -582,11 +583,12 @@ void copera_state::copera_mem(address_map &map)
 
 
 
-static SLOT_INTERFACE_START(copera_cart)
-	SLOT_INTERFACE_INTERNAL("rom",  MD_STD_ROM)
-	SLOT_INTERFACE_INTERNAL("rom_sram",  MD_ROM_SRAM)   // not sure these are needed...
-	SLOT_INTERFACE_INTERNAL("rom_sramsafe",  MD_ROM_SRAM)   // not sure these are needed...
-SLOT_INTERFACE_END
+static void copera_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom",  MD_STD_ROM);
+	device.option_add_internal("rom_sram",  MD_ROM_SRAM);   // not sure these are needed...
+	device.option_add_internal("rom_sramsafe",  MD_ROM_SRAM);   // not sure these are needed...
+}
 
 MACHINE_START_MEMBER(copera_state,copera)
 {
@@ -605,8 +607,8 @@ MACHINE_START_MEMBER(copera_state,copera)
 MACHINE_CONFIG_START(copera_state::copera)
 	md_ntsc(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(copera_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(copera_mem)
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 	MCFG_DEVICE_REMOVE("ymsnd")
@@ -617,8 +619,8 @@ MACHINE_CONFIG_START(copera_state::copera)
 	MCFG_COPERA_CARTRIDGE_ADD("coperaslot", copera_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","copera")
 
-	MCFG_SOUND_ADD("315_5641", SEGA_315_5641_PCM, UPD7759_STANDARD_CLOCK)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(copera_state,sound_cause_irq))
+	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK)
+	//MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, copera_state,sound_cause_irq)) FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END

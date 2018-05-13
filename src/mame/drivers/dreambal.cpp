@@ -310,9 +310,9 @@ void dreambal_state::machine_reset()
 MACHINE_CONFIG_START(dreambal_state::dreambal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
-	MCFG_CPU_PROGRAM_MAP(dreambal_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreambal_state,  irq6_line_hold) // 5 valid too?
+	MCFG_DEVICE_ADD("maincpu", M68000, 28000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(dreambal_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreambal_state,  irq6_line_hold) // 5 valid too?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -351,9 +351,9 @@ MACHINE_CONFIG_START(dreambal_state::dreambal)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 9830400/8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 9830400/8, okim6295_device::PIN7_HIGH)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END

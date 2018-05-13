@@ -2367,9 +2367,9 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 MACHINE_CONFIG_START(subsino2_state::bishjan)
-	MCFG_CPU_ADD("maincpu", H83044, XTAL(44'100'000) / 3)
-	MCFG_CPU_PROGRAM_MAP( bishjan_map )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", H83044, XTAL(44'100'000) / 3)
+	MCFG_DEVICE_PROGRAM_MAP( bishjan_map )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
@@ -2395,8 +2395,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(subsino2_state::new2001)
 	bishjan(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP( new2001_map )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP( new2001_map )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE( 640, 256 )
@@ -2405,9 +2405,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(subsino2_state::humlan)
 	bishjan(config);
-	MCFG_CPU_REPLACE("maincpu", H83044, XTAL(48'000'000) / 3)
-	MCFG_CPU_PROGRAM_MAP( humlan_map )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", H83044, XTAL(48'000'000) / 3)
+	MCFG_DEVICE_PROGRAM_MAP( humlan_map )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
 
 	// sound hardware
 	// SS9804
@@ -2418,9 +2418,9 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 MACHINE_CONFIG_START(subsino2_state::mtrain)
-	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 8)   /* Unknown clock */
-	MCFG_CPU_PROGRAM_MAP( mtrain_map )
-	MCFG_CPU_IO_MAP( mtrain_io )
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 8)   /* Unknown clock */
+	MCFG_DEVICE_PROGRAM_MAP( mtrain_map )
+	MCFG_DEVICE_IO_MAP( mtrain_io )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2441,9 +2441,9 @@ MACHINE_CONFIG_START(subsino2_state::mtrain)
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(8'467'200) / 8, PIN7_HIGH)    // probably
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'467'200) / 8, okim6295_device::PIN7_HIGH)    // probably
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2452,9 +2452,9 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 MACHINE_CONFIG_START(subsino2_state::saklove)
-	MCFG_CPU_ADD("maincpu", I80188, XTAL(20'000'000)*2 )    // !! AMD AM188-EM !!
-	MCFG_CPU_PROGRAM_MAP( saklove_map )
-	MCFG_CPU_IO_MAP( saklove_io )
+	MCFG_DEVICE_ADD("maincpu", I80188, XTAL(20'000'000)*2 )    // !! AMD AM188-EM !!
+	MCFG_DEVICE_PROGRAM_MAP( saklove_map )
+	MCFG_DEVICE_IO_MAP( saklove_io )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2475,12 +2475,12 @@ MACHINE_CONFIG_START(subsino2_state::saklove)
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(8'467'200) / 8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'467'200) / 8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(12'000'000) / 4) // ? chip and clock unknown
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(12'000'000) / 4) // ? chip and clock unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -2489,10 +2489,10 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 MACHINE_CONFIG_START(subsino2_state::xplan)
-	MCFG_CPU_ADD("maincpu", I80188, XTAL(20'000'000)*2 )    // !! AMD AM188-EM !!
-	MCFG_CPU_PROGRAM_MAP( xplan_map )
-	MCFG_CPU_IO_MAP( xplan_io )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, am188em_int0_irq)
+	MCFG_DEVICE_ADD("maincpu", I80188, XTAL(20'000'000)*2 )    // !! AMD AM188-EM !!
+	MCFG_DEVICE_PROGRAM_MAP( xplan_map )
+	MCFG_DEVICE_IO_MAP( xplan_io )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subsino2_state, am188em_int0_irq)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2513,22 +2513,22 @@ MACHINE_CONFIG_START(subsino2_state::xplan)
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(8'467'200) / 8, PIN7_HIGH)    // probably
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'467'200) / 8, okim6295_device::PIN7_HIGH)    // probably
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(subsino2_state::xtrain)
 	xplan(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(xtrain_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(xtrain_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(subsino2_state::expcard)
 	xplan(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(expcard_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(expcard_io)
 MACHINE_CONFIG_END
 
 

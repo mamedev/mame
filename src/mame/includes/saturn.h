@@ -256,8 +256,8 @@ public:
 
 	void refresh_palette_data( void );
 	inline int stv_vdp2_window_process(int x,int y);
-	void stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y);
-	void stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y);
+	void stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y);
+	void stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y);
 	int get_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t win_num);
 	int stv_vdp2_apply_window_on_layer(rectangle &cliprect);
 
@@ -343,6 +343,7 @@ public:
 		uint8_t   linescroll_interval;
 		uint32_t  linescroll_table_address;
 		uint8_t   vertical_linescroll_enable;
+		uint8_t   vertical_cell_scroll_enable;
 		uint8_t   linezoom_enable;
 
 		uint8_t  plane_size;

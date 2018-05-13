@@ -768,10 +768,10 @@ INTERRUPT_GEN_MEMBER(cedar_magnet_state::irq)
 MACHINE_CONFIG_START(cedar_magnet_state::cedar_magnet)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(cedar_magnet_map)
-	MCFG_CPU_IO_MAP(cedar_magnet_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cedar_magnet_state,  irq)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cedar_magnet_map)
+	MCFG_DEVICE_IO_MAP(cedar_magnet_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cedar_magnet_state,  irq)
 
 	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(cedar_bank0)
@@ -796,17 +796,17 @@ MACHINE_CONFIG_START(cedar_magnet_state::cedar_magnet)
 
 	MCFG_DEVICE_ADD("z80pio_ic48", Z80PIO, 4000000/2)
 //  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_state, ic48_pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(cedar_magnet_state, ic48_pio_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_state, ic48_pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(cedar_magnet_state, ic48_pio_pb_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, cedar_magnet_state, ic48_pio_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, cedar_magnet_state, ic48_pio_pa_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, cedar_magnet_state, ic48_pio_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, cedar_magnet_state, ic48_pio_pb_w))
 
 	MCFG_DEVICE_ADD("z80pio_ic49", Z80PIO, 4000000/2)
 //  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-//  MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_state, ic49_pio_pa_r)) // NOT USED
-//  MCFG_Z80PIO_OUT_PA_CB(WRITE8(cedar_magnet_state, ic49_pio_pa_w)) // NOT USED
-	MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_state, ic49_pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(cedar_magnet_state, ic49_pio_pb_w))
+//  MCFG_Z80PIO_IN_PA_CB(READ8(*this, cedar_magnet_state, ic49_pio_pa_r)) // NOT USED
+//  MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, cedar_magnet_state, ic49_pio_pa_w)) // NOT USED
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, cedar_magnet_state, ic49_pio_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, cedar_magnet_state, ic49_pio_pb_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

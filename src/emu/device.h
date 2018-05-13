@@ -75,6 +75,17 @@ namespace emu { namespace detail {
 class device_type_impl_base;
 
 
+template <typename T> struct is_device_implementation
+{
+	static constexpr bool value = std::is_base_of<device_t, T>::value;
+};
+
+template <typename T> struct is_device_interface
+{
+	static constexpr bool value = std::is_base_of<device_interface, T>::value && !is_device_implementation<T>::value;
+};
+
+
 struct device_feature
 {
 	enum type : u32
@@ -203,6 +214,8 @@ private:
 	device_type_impl_base *m_next;
 
 public:
+	using exposed_type = device_t;
+
 	device_type_impl_base(std::nullptr_t)
 		: m_creator(nullptr)
 		, m_type(typeid(std::nullptr_t))
@@ -248,7 +261,7 @@ public:
 	device_feature::type unemulated_features() const { return m_unemulated_features; }
 	device_feature::type imperfect_features() const { return m_imperfect_features; }
 
-	std::unique_ptr<device_t> operator()(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const
+	std::unique_ptr<device_t> create(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const
 	{
 		return m_creator(*this, mconfig, tag, owner, clock);
 	}
@@ -263,8 +276,21 @@ template <class DeviceClass>
 class device_type_impl : public device_type_impl_base
 {
 public:
+	using exposed_type = DeviceClass;
+
 	using device_type_impl_base::device_type_impl_base;
-	template <typename... Params> DeviceClass &operator()(machine_config &config, char const *tag, Params &&... args) const;
+	using device_type_impl_base::create;
+
+	template <typename... Params>
+	std::unique_ptr<DeviceClass> create(machine_config &mconfig, char const *tag, device_t *owner, Params &&... args) const
+	{
+		return make_unique_clear<DeviceClass>(mconfig, tag, owner, std::forward<Params>(args)...);
+	}
+
+	template <typename... Params> DeviceClass &operator()(machine_config &mconfig, char const *tag, Params &&... args) const;
+	template <typename Exposed, bool Required, typename... Params> DeviceClass &operator()(machine_config &mconfig, device_finder<Exposed, Required> &finder, Params &&... args) const;
+	template <typename... Params> DeviceClass &operator()(machine_config_replace replace, char const *tag, Params &&... args) const;
+	template <typename Exposed, bool Required, typename... Params> DeviceClass &operator()(machine_config_replace replace, device_finder<Exposed, Required> &finder, Params &&... args) const;
 };
 
 

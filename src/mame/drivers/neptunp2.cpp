@@ -100,10 +100,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(neptunp2_state::neptunp2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I80188,20000000) // N80C188-20 AMD
-	MCFG_CPU_PROGRAM_MAP(neptunp2_map)
-	MCFG_CPU_IO_MAP(neptunp2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", neptunp2_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",I80188,20000000) // N80C188-20 AMD
+	MCFG_DEVICE_PROGRAM_MAP(neptunp2_map)
+	MCFG_DEVICE_IO_MAP(neptunp2_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", neptunp2_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -118,7 +118,7 @@ MACHINE_CONFIG_START(neptunp2_state::neptunp2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 MACHINE_CONFIG_END
 

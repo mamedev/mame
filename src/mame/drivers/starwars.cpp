@@ -303,15 +303,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(starwars_state::starwars)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(starwars_state, irq0_line_assert, CLOCK_3KHZ / 12)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(starwars_state, irq0_line_assert, CLOCK_3KHZ / 12)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 128))
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK / 16) // designated as "137243-001" on parts list and "157249-120" on schematics
 	MCFG_ADC0808_IN0_CB(IOPORT("STICKY")) // pitch
@@ -319,23 +319,23 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	MCFG_ADC0808_IN2_CB(GND) // thrust (unused)
 
 	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK / 8)
-	MCFG_RIOT6532_IN_PA_CB(READ8(starwars_state, r6532_porta_r))
-	MCFG_RIOT6532_OUT_PA_CB(WRITE8(starwars_state, r6532_porta_w))
-	MCFG_RIOT6532_IN_PB_CB(DEVREAD8("tms", tms5220_device, status_r))
-	MCFG_RIOT6532_OUT_PB_CB(DEVWRITE8("tms", tms5220_device, data_w))
+	MCFG_RIOT6532_IN_PA_CB(READ8(*this, starwars_state, r6532_porta_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, starwars_state, r6532_porta_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8("tms", tms5220_device, status_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8("tms", tms5220_device, data_w))
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
 	MCFG_X2212_ADD_AUTOSAVE("x2212") /* nvram */
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 9L/M
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(starwars_state, coin1_counter_w)) // Coin counter 1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(starwars_state, coin2_counter_w)) // Coin counter 2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(starwars_state, led3_w)) // LED 3
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(starwars_state, led2_w)) // LED 2
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, starwars_state, coin1_counter_w)) // Coin counter 1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, starwars_state, coin2_counter_w)) // Coin counter 2
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT // LED 3
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // LED 2
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1")) // bank switch
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(starwars_state, prng_reset_w)) // reset PRNG
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(starwars_state, led1_w)) // LED 1
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(starwars_state, recall_w)) // NVRAM array recall
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, starwars_state, prng_reset_w)) // reset PRNG
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // LED 1
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, starwars_state, recall_w)) // NVRAM array recall
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
@@ -349,37 +349,37 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("pokey3", POKEY, MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("pokey3", POKEY, MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("pokey4", POKEY, MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("pokey4", POKEY, MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("tms", TMS5220, MASTER_CLOCK/2/9)
+	MCFG_DEVICE_ADD("tms", TMS5220, MASTER_CLOCK/2/9)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("riot", riot6532_device, pa7_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(starwars_state, boost_interleave_hack))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("riot", riot6532_device, pa7_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, starwars_state, boost_interleave_hack))
 
 	MCFG_GENERIC_LATCH_8_ADD("mainlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("riot", riot6532_device, pa6_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(starwars_state, boost_interleave_hack))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("riot", riot6532_device, pa6_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, starwars_state, boost_interleave_hack))
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(starwars_state::esb)
 	starwars(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(esb_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(esb_main_map)
 
 	MCFG_SLAPSTIC_ADD("slapstic", 101)
 

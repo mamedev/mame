@@ -3753,39 +3753,39 @@ void namcos22_state::machine_start()
 MACHINE_CONFIG_START(namcos22_state::namcos22)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68020,SS22_MASTER_CLOCK/2) /* 25 MHz? */
-	MCFG_CPU_PROGRAM_MAP(namcos22_am)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos22_state, namcos22_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68020,SS22_MASTER_CLOCK/2) /* 25 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(namcos22_am)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos22_state, namcos22_interrupt)
 
-	MCFG_CPU_ADD("master", TMS32025,SS22_MASTER_CLOCK) /* ? */
-	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
-	MCFG_CPU_DATA_MAP(master_dsp_data)
-	MCFG_CPU_IO_MAP(master_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(namcos22_state, pdp_status_r))
-	MCFG_TMS32025_HOLD_IN_CB(READ16(namcos22_state, dsp_hold_signal_r))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(namcos22_state, dsp_hold_ack_w))
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(namcos22_state, dsp_xf_output_w))
-	MCFG_TMS32025_DR_IN_CB(READ16(namcos22_state, master_serial_io_r))
+	MCFG_DEVICE_ADD("master", TMS32025,SS22_MASTER_CLOCK) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(master_dsp_program)
+	MCFG_DEVICE_DATA_MAP(master_dsp_data)
+	MCFG_DEVICE_IO_MAP(master_dsp_io)
+	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos22_state, pdp_status_r))
+	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, namcos22_state, dsp_hold_signal_r))
+	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(*this, namcos22_state, dsp_hold_ack_w))
+	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos22_state, dsp_xf_output_w))
+	MCFG_TMS32025_DR_IN_CB(READ16(*this, namcos22_state, master_serial_io_r))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("master_st", namcos22_state, dsp_master_serial_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", TMS32025,SS22_MASTER_CLOCK) /* ? */
-	MCFG_CPU_PROGRAM_MAP(slave_dsp_program)
-	MCFG_CPU_DATA_MAP(slave_dsp_data)
-	MCFG_CPU_IO_MAP(slave_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(namcos22_state, dsp_bioz_r))
-	MCFG_TMS32025_HOLD_IN_CB(READ16(namcos22_state, dsp_hold_signal_r))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(namcos22_state, dsp_hold_ack_w))
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(namcos22_state, dsp_xf_output_w))
-	MCFG_TMS32025_DX_OUT_CB(WRITE16(namcos22_state, slave_serial_io_w))
+	MCFG_DEVICE_ADD("slave", TMS32025,SS22_MASTER_CLOCK) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(slave_dsp_program)
+	MCFG_DEVICE_DATA_MAP(slave_dsp_data)
+	MCFG_DEVICE_IO_MAP(slave_dsp_io)
+	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos22_state, dsp_bioz_r))
+	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, namcos22_state, dsp_hold_signal_r))
+	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(*this, namcos22_state, dsp_hold_ack_w))
+	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos22_state, dsp_xf_output_w))
+	MCFG_TMS32025_DX_OUT_CB(WRITE16(*this, namcos22_state, slave_serial_io_w))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_st", namcos22_state, dsp_slave_serial_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("mcu", NAMCO_C74, SS22_MASTER_CLOCK/3) // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
-	MCFG_CPU_PROGRAM_MAP( mcu_s22_program)
-	MCFG_CPU_IO_MAP( mcu_s22_io)
+	MCFG_DEVICE_ADD("mcu", NAMCO_C74, SS22_MASTER_CLOCK/3) // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
+	MCFG_DEVICE_PROGRAM_MAP( mcu_s22_program)
+	MCFG_DEVICE_IO_MAP( mcu_s22_io)
 
-	MCFG_CPU_ADD("iomcu", NAMCO_C74, XTAL(6'144'000)) // 6.144MHz XTAL on I/O board, not sure if it has a divider
-	MCFG_CPU_PROGRAM_MAP( iomcu_s22_program)
-	MCFG_CPU_IO_MAP( iomcu_s22_io)
+	MCFG_DEVICE_ADD("iomcu", NAMCO_C74, XTAL(6'144'000)) // 6.144MHz XTAL on I/O board, not sure if it has a divider
+	MCFG_DEVICE_PROGRAM_MAP( iomcu_s22_program)
+	MCFG_DEVICE_IO_MAP( iomcu_s22_io)
 
 	MCFG_EEPROM_2864_ADD("eeprom")
 
@@ -3799,7 +3799,8 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos22)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
@@ -3809,9 +3810,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos22_state::cybrcomm)
 	namcos22(config);
 
-	MCFG_SPEAKER_STANDARD_STEREO("rear_left","rear_right")
+	SPEAKER(config, "rear_left", -0.2, 0.0, -0.5);
+	SPEAKER(config, "rear_right", 0.2, 0.0, -0.5);
 
-	MCFG_SOUND_MODIFY("c352")
+	MCFG_DEVICE_MODIFY("c352")
 	MCFG_SOUND_ROUTE(2, "rear_left", 1.00)
 	MCFG_SOUND_ROUTE(3, "rear_right", 1.00)
 MACHINE_CONFIG_END
@@ -3820,35 +3822,35 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos22_state::namcos22s)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020,SS22_MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(namcos22s_am)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos22_state, namcos22s_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68EC020,SS22_MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(namcos22s_am)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcos22_state, namcos22s_interrupt)
 
-	MCFG_CPU_ADD("master", TMS32025,SS22_MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(master_dsp_program)
-	MCFG_CPU_DATA_MAP(master_dsp_data)
-	MCFG_CPU_IO_MAP(master_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(namcos22_state, pdp_status_r))
-	MCFG_TMS32025_HOLD_IN_CB(READ16(namcos22_state, dsp_hold_signal_r))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(namcos22_state, dsp_hold_ack_w))
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(namcos22_state, dsp_xf_output_w))
-	MCFG_TMS32025_DR_IN_CB(READ16(namcos22_state, master_serial_io_r))
+	MCFG_DEVICE_ADD("master", TMS32025,SS22_MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(master_dsp_program)
+	MCFG_DEVICE_DATA_MAP(master_dsp_data)
+	MCFG_DEVICE_IO_MAP(master_dsp_io)
+	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos22_state, pdp_status_r))
+	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, namcos22_state, dsp_hold_signal_r))
+	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(*this, namcos22_state, dsp_hold_ack_w))
+	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos22_state, dsp_xf_output_w))
+	MCFG_TMS32025_DR_IN_CB(READ16(*this, namcos22_state, master_serial_io_r))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("master_st", namcos22_state, dsp_master_serial_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", TMS32025,SS22_MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(slave_dsp_program)
-	MCFG_CPU_DATA_MAP(slave_dsp_data)
-	MCFG_CPU_IO_MAP(slave_dsp_io)
-	MCFG_TMS32025_BIO_IN_CB(READ16(namcos22_state, dsp_bioz_r))
-	MCFG_TMS32025_HOLD_IN_CB(READ16(namcos22_state, dsp_hold_signal_r))
-	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(namcos22_state, dsp_hold_ack_w))
-	MCFG_TMS32025_XF_OUT_CB(WRITE16(namcos22_state, dsp_xf_output_w))
-	MCFG_TMS32025_DX_OUT_CB(WRITE16(namcos22_state, slave_serial_io_w))
+	MCFG_DEVICE_ADD("slave", TMS32025,SS22_MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(slave_dsp_program)
+	MCFG_DEVICE_DATA_MAP(slave_dsp_data)
+	MCFG_DEVICE_IO_MAP(slave_dsp_io)
+	MCFG_TMS32025_BIO_IN_CB(READ16(*this, namcos22_state, dsp_bioz_r))
+	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, namcos22_state, dsp_hold_signal_r))
+	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(*this, namcos22_state, dsp_hold_ack_w))
+	MCFG_TMS32025_XF_OUT_CB(WRITE16(*this, namcos22_state, dsp_xf_output_w))
+	MCFG_TMS32025_DX_OUT_CB(WRITE16(*this, namcos22_state, slave_serial_io_w))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("slave_st", namcos22_state, dsp_slave_serial_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("mcu", M37710S4, SS22_MASTER_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(mcu_program)
-	MCFG_CPU_IO_MAP(mcu_io)
+	MCFG_DEVICE_ADD("mcu", M37710S4, SS22_MASTER_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(mcu_program)
+	MCFG_DEVICE_IO_MAP(mcu_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_st", namcos22_state, mcu_irq, "screen", 0, 1)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -3865,7 +3867,8 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C352_ADD("c352", SS22_MASTER_CLOCK/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
@@ -3875,9 +3878,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos22_state::airco22b)
 	namcos22s(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("bodysonic")
+	SPEAKER(config, "bodysonic").front_center();
 
-	MCFG_SOUND_MODIFY("c352")
+	MCFG_DEVICE_MODIFY("c352")
 	MCFG_SOUND_ROUTE(2, "bodysonic", 0.50)
 MACHINE_CONFIG_END
 
@@ -3885,8 +3888,8 @@ MACHINE_CONFIG_START(namcos22_state::alpine)
 	namcos22s(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("mcu")
-	MCFG_CPU_IO_MAP(alpine_io_map)
+	MCFG_DEVICE_MODIFY("mcu")
+	MCFG_DEVICE_IO_MAP(alpine_io_map)
 
 	MCFG_TIMER_DRIVER_ADD("motor_timer", namcos22_state, alpine_steplock_callback)
 MACHINE_CONFIG_END
@@ -3895,26 +3898,26 @@ MACHINE_CONFIG_START(namcos22_state::alpinesa)
 	alpine(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(alpinesa_am)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(alpinesa_am)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos22_state::cybrcycc)
 	namcos22s(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("tank")
+	SPEAKER(config, "tank").front_center();
 
-	MCFG_SOUND_MODIFY("c352")
+	MCFG_DEVICE_MODIFY("c352")
 	MCFG_SOUND_ROUTE(2, "tank", 1.00)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos22_state::dirtdash)
 	namcos22s(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("road")
-	MCFG_SPEAKER_STANDARD_MONO("under")
+	SPEAKER(config, "road").front_center();
+	SPEAKER(config, "under").front_center();
 
-	MCFG_SOUND_MODIFY("c352")
+	MCFG_DEVICE_MODIFY("c352")
 	MCFG_SOUND_ROUTE(2, "road", 1.00)
 	MCFG_SOUND_ROUTE(3, "under", 0.50) // from sound test
 MACHINE_CONFIG_END
@@ -3923,17 +3926,17 @@ MACHINE_CONFIG_START(namcos22_state::timecris)
 	namcos22s(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(timecris_am)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(timecris_am)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos22_state::tokyowar)
 	namcos22s(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("seat")
-	MCFG_SPEAKER_STANDARD_MONO("vibration")
+	SPEAKER(config, "seat", 0.0, 0.0, 0.0);
+	SPEAKER(config, "vibration", 0.0, 0.0, 0.0);
 
-	MCFG_SOUND_MODIFY("c352")
+	MCFG_DEVICE_MODIFY("c352")
 	MCFG_SOUND_ROUTE(3, "seat", 1.00)
 	MCFG_SOUND_ROUTE(2, "vibration", 0.50)
 MACHINE_CONFIG_END
@@ -3942,8 +3945,8 @@ MACHINE_CONFIG_START(namcos22_state::propcycl)
 	namcos22s(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("mcu")
-	MCFG_CPU_IO_MAP(propcycl_io_map)
+	MCFG_DEVICE_MODIFY("mcu")
+	MCFG_DEVICE_IO_MAP(propcycl_io_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pc_p_upd", namcos22_state, propcycl_pedal_update, attotime::from_msec(20))
 	MCFG_TIMER_DRIVER_ADD("pc_p_int", namcos22_state, propcycl_pedal_interrupt)

@@ -267,21 +267,20 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(acrnsys1_state::acrnsys1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1008000)  /* 1.008 MHz */
-	MCFG_CPU_PROGRAM_MAP(acrnsys1_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1008000)  /* 1.008 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(acrnsys1_map)
 
 	MCFG_DEFAULT_LAYOUT(layout_acrnsys1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	MCFG_DEVICE_ADD("b1", INS8154, 0)
-	MCFG_INS8154_IN_A_CB(READ8(acrnsys1_state, ins8154_b1_port_a_r))
-	MCFG_INS8154_OUT_A_CB(WRITE8(acrnsys1_state, ins8154_b1_port_a_w))
-	MCFG_INS8154_OUT_B_CB(WRITE8(acrnsys1_state, acrnsys1_led_segment_w))
+	MCFG_INS8154_IN_A_CB(READ8(*this, acrnsys1_state, ins8154_b1_port_a_r))
+	MCFG_INS8154_OUT_A_CB(WRITE8(*this, acrnsys1_state, ins8154_b1_port_a_w))
+	MCFG_INS8154_OUT_B_CB(WRITE8(*this, acrnsys1_state, acrnsys1_led_segment_w))
 	MCFG_DEVICE_ADD("ic8_7445", TTL74145, 0)
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("acrnsys1_c", acrnsys1_state, acrnsys1_c, attotime::from_hz(4800))

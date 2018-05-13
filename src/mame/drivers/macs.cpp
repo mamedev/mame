@@ -498,12 +498,12 @@ ST0016_DMA_OFFS_CB(macs_state::dma_offset)
 
 MACHINE_CONFIG_START(macs_state::macs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(macs_mem)
-	MCFG_CPU_IO_MAP(macs_io)
+	MCFG_DEVICE_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(macs_mem)
+	MCFG_DEVICE_IO_MAP(macs_io)
 	MCFG_ST0016_DMA_OFFS_CB(macs_state, dma_offset)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", macs_state, irq0_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", macs_state, irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(macs_state, macs)
 	MCFG_MACHINE_RESET_OVERRIDE(macs_state, macs)

@@ -12,23 +12,27 @@ class segas1x_bootleg_state : public sega_16bit_common_base
 {
 public:
 	segas1x_bootleg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sega_16bit_common_base(mconfig, type, tag) ,
-		m_textram(*this, "textram"),
-		m_bg0_tileram(*this, "bg0_tileram"),
-		m_bg1_tileram(*this, "bg1_tileram"),
-		m_tileram(*this, "tileram"),
-		m_goldnaxeb2_bgpage(*this, "gab2_bgpage"),
-		m_goldnaxeb2_fgpage(*this, "gab2_fgpage"),
-		m_soundbank(*this, "soundbank"),
-		m_sprites(*this, "sprites"),
-		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
-		m_msm(*this, "5205"),
-		m_upd7759(*this, "7759"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_soundlatch(*this, "soundlatch"),
-		m_adpcm_select(*this, "adpcm_select"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		: sega_16bit_common_base(mconfig, type, tag)
+		, m_textram(*this, "textram")
+		, m_bg0_tileram(*this, "bg0_tileram")
+		, m_bg1_tileram(*this, "bg1_tileram")
+		, m_tileram(*this, "tileram")
+		, m_goldnaxeb2_bgpage(*this, "gab2_bgpage")
+		, m_goldnaxeb2_fgpage(*this, "gab2_fgpage")
+		, m_sprites_region(*this, "sprites")
+		, m_soundcpu_region(*this, "soundcpu")
+		, m_soundbank(*this, "soundbank")
+		, m_okibank(*this, "okibank")
+		, m_sprites(*this, "sprites")
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_msm(*this, "5205")
+		, m_upd7759(*this, "7759")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_soundlatch(*this, "soundlatch")
+		, m_adpcm_select(*this, "adpcm_select")
+		, m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
 	required_shared_ptr<uint16_t> m_textram;
 	optional_shared_ptr<uint16_t> m_bg0_tileram;
@@ -37,7 +41,10 @@ public:
 	optional_shared_ptr<uint16_t> m_goldnaxeb2_bgpage;
 	optional_shared_ptr<uint16_t> m_goldnaxeb2_fgpage;
 
+	optional_memory_region m_sprites_region;
+	optional_memory_region m_soundcpu_region;
 	optional_memory_bank m_soundbank;
+	optional_memory_bank m_okibank;
 
 	optional_device<sega_16bit_sprite_device> m_sprites;
 
@@ -56,11 +63,9 @@ public:
 
 
 	/* video-related */
-	tilemap_t *m_background;
-	tilemap_t *m_foreground;
+	tilemap_t *m_background[2];
+	tilemap_t *m_foreground[2];
 	tilemap_t *m_text_layer;
-	tilemap_t *m_background2;
-	tilemap_t *m_foreground2;
 	tilemap_t *m_bg_tilemaps[2];
 	tilemap_t *m_text_tilemap;
 	double m_weights[2][3][6];
@@ -72,22 +77,15 @@ public:
 
 	int m_bg1_trans; // alien syn + sys18
 
-	int m_tile_bank1;
-	int m_tile_bank0;
-	int m_bg_page[4];
-	int m_fg_page[4];
+	int m_tile_bank[2];
+	int m_bg_page[2][4];
+	int m_fg_page[2][4];
 
 	uint16_t m_datsu_page[4];
 
-	int m_bg2_page[4];
-	int m_fg2_page[4];
-
-	int m_old_bg_page[4];
-	int m_old_fg_page[4];
-	int m_old_tile_bank1;
-	int m_old_tile_bank0;
-	int m_old_bg2_page[4];
-	int m_old_fg2_page[4];
+	int m_old_bg_page[2][4];
+	int m_old_fg_page[2][4];
+	int m_old_tile_bank[2];
 
 	int m_bg_scrollx;
 	int m_bg_scrolly;
@@ -152,10 +150,7 @@ public:
 	DECLARE_WRITE16_MEMBER(s16bl_fgscrolly_w);
 	DECLARE_WRITE16_MEMBER(s16bl_bgscrollx_w);
 	DECLARE_WRITE16_MEMBER(s16bl_bgscrolly_w);
-	DECLARE_WRITE16_MEMBER(datsu_page0_w);
-	DECLARE_WRITE16_MEMBER(datsu_page1_w);
-	DECLARE_WRITE16_MEMBER(datsu_page2_w);
-	DECLARE_WRITE16_MEMBER(datsu_page3_w);
+	template<int Page> DECLARE_WRITE16_MEMBER(datsu_page_w);
 	DECLARE_WRITE16_MEMBER(goldnaxeb2_fgscrollx_w);
 	DECLARE_WRITE16_MEMBER(goldnaxeb2_bgscrollx_w);
 	DECLARE_WRITE16_MEMBER(goldnaxeb2_fgscrolly_w);
@@ -273,6 +268,7 @@ public:
 	void mwalkbl_map(address_map &map);
 	void passht4b_map(address_map &map);
 	void passshtb_map(address_map &map);
+	void pcm_map(address_map &map);
 	void shdancbl_map(address_map &map);
 	void shdancbl_sound_io_map(address_map &map);
 	void shdancbl_sound_map(address_map &map);

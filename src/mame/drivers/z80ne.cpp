@@ -410,15 +410,16 @@ FLOPPY_FORMATS_MEMBER( z80ne_state::floppy_formats )
 	FLOPPY_DMK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( z80ne_floppies )
-	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
-SLOT_INTERFACE_END
+static void z80ne_floppies(device_slot_interface &device)
+{
+	device.option_add("sssd", FLOPPY_525_SSSD);
+}
 
 MACHINE_CONFIG_START(z80ne_state::z80ne)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
-	MCFG_CPU_PROGRAM_MAP(z80ne_mem)
-	MCFG_CPU_IO_MAP(z80ne_io)
+	MCFG_DEVICE_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
+	MCFG_DEVICE_PROGRAM_MAP(z80ne_mem)
+	MCFG_DEVICE_IO_MAP(z80ne_io)
 
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80ne)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80ne)
@@ -448,9 +449,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(z80ne_state::z80net)
 	z80ne(config);
 
-	MCFG_CPU_MODIFY("z80ne")
-	MCFG_CPU_PROGRAM_MAP(z80net_mem)
-	MCFG_CPU_IO_MAP(z80net_io)
+	MCFG_DEVICE_MODIFY("z80ne")
+	MCFG_DEVICE_PROGRAM_MAP(z80net_mem)
+	MCFG_DEVICE_IO_MAP(z80net_io)
 
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state, z80net )
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state, z80net )
@@ -464,14 +465,14 @@ MACHINE_CONFIG_START(z80ne_state::z80net)
 	MCFG_KR2376_MATRIX_X5(IOPORT("X5"))
 	MCFG_KR2376_MATRIX_X6(IOPORT("X6"))
 	MCFG_KR2376_MATRIX_X7(IOPORT("X7"))
-	MCFG_KR2376_SHIFT_CB(READLINE(z80ne_state, lx387_shift_r))
-	MCFG_KR2376_CONTROL_CB(READLINE(z80ne_state, lx387_control_r))
+	MCFG_KR2376_SHIFT_CB(READLINE(*this, z80ne_state, lx387_shift_r))
+	MCFG_KR2376_CONTROL_CB(READLINE(*this, z80ne_state, lx387_control_r))
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 
 	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(z80ne_state, lx388_mc6847_videoram_r))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
@@ -487,9 +488,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(z80ne_state::z80netb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
-	MCFG_CPU_PROGRAM_MAP(z80netb_mem)
-	MCFG_CPU_IO_MAP(z80net_io)
+	MCFG_DEVICE_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
+	MCFG_DEVICE_PROGRAM_MAP(z80netb_mem)
+	MCFG_DEVICE_IO_MAP(z80net_io)
 
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80netb)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80netb)
@@ -515,14 +516,14 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	MCFG_KR2376_MATRIX_X5(IOPORT("X5"))
 	MCFG_KR2376_MATRIX_X6(IOPORT("X6"))
 	MCFG_KR2376_MATRIX_X7(IOPORT("X7"))
-	MCFG_KR2376_SHIFT_CB(READLINE(z80ne_state, lx387_shift_r))
-	MCFG_KR2376_CONTROL_CB(READLINE(z80ne_state, lx387_control_r))
+	MCFG_KR2376_SHIFT_CB(READLINE(*this, z80ne_state, lx387_shift_r))
+	MCFG_KR2376_CONTROL_CB(READLINE(*this, z80ne_state, lx387_control_r))
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 
 	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(z80ne_state, lx388_mc6847_videoram_r))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
@@ -538,9 +539,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(z80netf_state::z80netf)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
-	MCFG_CPU_PROGRAM_MAP(z80netf_mem)
-	MCFG_CPU_IO_MAP(z80netf_io)
+	MCFG_DEVICE_ADD("z80ne", Z80, Z80NE_CPU_SPEED_HZ)
+	MCFG_DEVICE_PROGRAM_MAP(z80netf_mem)
+	MCFG_DEVICE_IO_MAP(z80netf_io)
 
 	MCFG_MACHINE_START_OVERRIDE(z80netf_state,z80netf)
 	MCFG_MACHINE_RESET_OVERRIDE(z80netf_state,z80netf)
@@ -563,7 +564,7 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
 
 	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(z80ne_state, lx388_mc6847_videoram_r))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 

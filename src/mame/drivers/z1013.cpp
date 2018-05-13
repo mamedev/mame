@@ -370,9 +370,9 @@ GFXDECODE_END
 /* Machine driver */
 MACHINE_CONFIG_START(z1013_state::z1013)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(1'000'000) )
-	MCFG_CPU_PROGRAM_MAP(z1013_mem)
-	MCFG_CPU_IO_MAP(z1013_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(1'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(z1013_mem)
+	MCFG_DEVICE_IO_MAP(z1013_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -387,14 +387,13 @@ MACHINE_CONFIG_START(z1013_state::z1013)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(1'000'000))
-	MCFG_Z80PIO_IN_PB_CB(READ8(z1013_state, port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(z1013_state, port_b_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, z1013_state, port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, z1013_state, port_b_w))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -406,7 +405,7 @@ MACHINE_CONFIG_START(z1013_state::z1013k76)
 	z1013(config);
 	MCFG_DEVICE_REMOVE("z80pio")
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(1'000'000))
-	MCFG_Z80PIO_IN_PB_CB(READ8(z1013_state, k7659_port_b_r))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, z1013_state, k7659_port_b_r))
 MACHINE_CONFIG_END
 
 /* ROM definition */

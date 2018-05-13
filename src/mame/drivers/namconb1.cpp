@@ -1069,12 +1069,12 @@ MACHINE_RESET_MEMBER(namconb1_state, namconb)
 /***************************************************************/
 
 MACHINE_CONFIG_START(namconb1_state::namconb1)
-	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(namconb1_am)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(namconb1_am)
 
-	MCFG_CPU_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
-	MCFG_CPU_IO_MAP(namcoc75_io)
+	MCFG_DEVICE_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(namcoc75_am)
+	MCFG_DEVICE_IO_MAP(namcoc75_io)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)
@@ -1102,7 +1102,8 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb1)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_C352_ADD("c352", MASTER_CLOCK/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
@@ -1111,12 +1112,12 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namconb1_state::namconb2)
-	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(namconb2_am)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(namconb2_am)
 
-	MCFG_CPU_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
-	MCFG_CPU_IO_MAP(namcoc75_io)
+	MCFG_DEVICE_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(namcoc75_am)
+	MCFG_DEVICE_IO_MAP(namcoc75_io)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)
@@ -1142,7 +1143,8 @@ MACHINE_CONFIG_START(namconb1_state::namconb2)
 
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb2)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_C352_ADD("c352", MASTER_CLOCK/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)

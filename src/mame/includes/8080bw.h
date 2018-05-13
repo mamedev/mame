@@ -247,9 +247,9 @@ public:
 extern const char *const lrescue_sample_names[];
 extern const char *const lupin3_sample_names[];
 
-DISCRETE_SOUND_EXTERN( ballbomb );
-DISCRETE_SOUND_EXTERN( indianbt );
-DISCRETE_SOUND_EXTERN( polaris );
-DISCRETE_SOUND_EXTERN( schaser );
+DISCRETE_SOUND_EXTERN( ballbomb_discrete );
+DISCRETE_SOUND_EXTERN( indianbt_discrete );
+DISCRETE_SOUND_EXTERN( polaris_discrete );
+DISCRETE_SOUND_EXTERN( schaser_discrete );
 
 #endif // MAME_INCLUDES_8080BW_H

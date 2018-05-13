@@ -628,10 +628,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(acefruit_state::acefruit)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2500000) /* 2.5MHz */
-	MCFG_CPU_PROGRAM_MAP(acefruit_map)
-	MCFG_CPU_IO_MAP(acefruit_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2500000) /* 2.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(acefruit_map)
+	MCFG_DEVICE_IO_MAP(acefruit_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

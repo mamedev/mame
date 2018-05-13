@@ -62,14 +62,15 @@ void k2000_state::k2000_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(k2000_state::k2000)
-	MCFG_CPU_ADD("maincpu", M68301, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(k2000_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", M68301, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(k2000_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 	MCFG_TMP68301_CPU("maincpu")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( k2000 )

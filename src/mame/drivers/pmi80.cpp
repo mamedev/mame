@@ -168,9 +168,9 @@ void pmi80_state::machine_start()
 
 MACHINE_CONFIG_START(pmi80_state::pmi80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(pmi80_mem)
-	MCFG_CPU_IO_MAP(pmi80_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pmi80_mem)
+	MCFG_DEVICE_IO_MAP(pmi80_io)
 
 
 	/* video hardware */

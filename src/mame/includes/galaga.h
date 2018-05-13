@@ -102,7 +102,7 @@ public:
 	void gatsbee_main_map(address_map &map);
 };
 
-DISCRETE_SOUND_EXTERN( galaga );
-DISCRETE_SOUND_EXTERN( bosco );
+DISCRETE_SOUND_EXTERN( galaga_discrete );
+DISCRETE_SOUND_EXTERN( bosco_discrete );
 
 #endif // MAME_INCLUDES_GALAGA_H

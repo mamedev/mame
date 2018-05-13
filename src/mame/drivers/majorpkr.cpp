@@ -996,10 +996,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(majorpkr_state::majorpkr)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)  // 6 MHz.
-	MCFG_CPU_PROGRAM_MAP(map)
-	MCFG_CPU_IO_MAP(portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", majorpkr_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)  // 6 MHz.
+	MCFG_DEVICE_PROGRAM_MAP(map)
+	MCFG_DEVICE_IO_MAP(portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", majorpkr_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("palette_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(palettebanks)
@@ -1034,8 +1034,8 @@ MACHINE_CONFIG_START(majorpkr_state::majorpkr)
 	MCFG_MC6845_CHAR_WIDTH(16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH)  // clock frequency & pin 7 verified.
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH)  // clock frequency & pin 7 verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

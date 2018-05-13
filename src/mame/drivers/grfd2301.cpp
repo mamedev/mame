@@ -115,9 +115,9 @@ uint32_t grfd2301_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 MACHINE_CONFIG_START(grfd2301_state::grfd2301)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

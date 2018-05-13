@@ -488,19 +488,19 @@ MACHINE_RESET_MEMBER(splash_state,splash)
 MACHINE_CONFIG_START(splash_state::splash)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* 12MHz (24/2) */
-	MCFG_CPU_PROGRAM_MAP(splash_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", splash_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* 12MHz (24/2) */
+	MCFG_DEVICE_PROGRAM_MAP(splash_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", splash_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(30'000'000)/8)     /* 3.75MHz (30/8) */
-	MCFG_CPU_PROGRAM_MAP(splash_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(splash_state, nmi_line_pulse, 60*64)   /* needed for the msm5205 to play the samples */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(30'000'000)/8)     /* 3.75MHz (30/8) */
+	MCFG_DEVICE_PROGRAM_MAP(splash_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(splash_state, nmi_line_pulse, 60*64)   /* needed for the msm5205 to play the samples */
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // A8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(splash_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(splash_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(splash_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(splash_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, splash_state, coin1_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, splash_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, splash_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, splash_state, coin2_counter_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -519,16 +519,16 @@ MACHINE_CONFIG_START(splash_state::splash)
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(30'000'000)/8)       /* 3.75MHz (30/8) */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(30'000'000)/8)       /* 3.75MHz (30/8) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(splash_state, splash_msm5205_int)) /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, splash_state, splash_msm5205_int)) /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz */     /* Sample rate = 384kHz/48 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -550,20 +550,20 @@ INTERRUPT_GEN_MEMBER(splash_state::roldfrog_interrupt)
 MACHINE_CONFIG_START(splash_state::roldfrog)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* 12 MHz - verified */
-	MCFG_CPU_PROGRAM_MAP(roldfrog_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", splash_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* 12 MHz - verified */
+	MCFG_DEVICE_PROGRAM_MAP(roldfrog_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", splash_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/8)     /* 3 MHz - verified */
-	MCFG_CPU_PROGRAM_MAP(roldfrog_sound_map)
-	MCFG_CPU_IO_MAP(roldfrog_sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", splash_state,  roldfrog_interrupt)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/8)     /* 3 MHz - verified */
+	MCFG_DEVICE_PROGRAM_MAP(roldfrog_sound_map)
+	MCFG_DEVICE_IO_MAP(roldfrog_sound_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", splash_state,  roldfrog_interrupt)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(splash_state, coin1_lockout_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(splash_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(splash_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(splash_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, splash_state, coin1_lockout_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, splash_state, coin2_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, splash_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, splash_state, coin2_counter_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -582,14 +582,14 @@ MACHINE_CONFIG_START(splash_state::roldfrog)
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(24'000'000) / 8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(splash_state, ym_irq))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(24'000'000) / 8)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, splash_state, ym_irq))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -644,13 +644,13 @@ void funystrp_state::machine_start()
 MACHINE_CONFIG_START(funystrp_state::funystrp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* 12 MHz (24/2) */
-	MCFG_CPU_PROGRAM_MAP(funystrp_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funystrp_state, irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* 12 MHz (24/2) */
+	MCFG_DEVICE_PROGRAM_MAP(funystrp_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", funystrp_state, irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/4)     /* 6MHz (24/4) */
-	MCFG_CPU_PROGRAM_MAP(funystrp_sound_map)
-	MCFG_CPU_IO_MAP(funystrp_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/4)     /* 6MHz (24/4) */
+	MCFG_DEVICE_PROGRAM_MAP(funystrp_sound_map)
+	MCFG_DEVICE_IO_MAP(funystrp_sound_io_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -668,18 +668,18 @@ MACHINE_CONFIG_START(funystrp_state::funystrp)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("msm1", MSM5205, XTAL(400'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(funystrp_state, adpcm_int1))         /* interrupt function */
+	MCFG_DEVICE_ADD("msm1", MSM5205, XTAL(400'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, funystrp_state, adpcm_int1))         /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 1 / 48 */       /* Sample rate = 400kHz/64 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, XTAL(400'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(funystrp_state, adpcm_int2))         /* interrupt function */
+	MCFG_DEVICE_ADD("msm2", MSM5205, XTAL(400'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, funystrp_state, adpcm_int2))         /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 */       /* Sample rate = 400kHz/96 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -837,6 +837,17 @@ ROM_START( rebus )
 	ROM_LOAD( "11.u103", 0x20000, 0x20000, CRC(0af65b78) SHA1(9522ad17d26d866e5b11b4fec47781a00a297977) )
 	ROM_LOAD( "12.u104", 0x40000, 0x20000, CRC(3ed6ce19) SHA1(0d574071053157e4ef973a844795e48ec69dc7c4) )
 	ROM_LOAD( "13.u105", 0x60000, 0x20000, CRC(8b54553d) SHA1(5cb776e551527b0e717fe0d76296f5f895523de5) )
+
+	ROM_REGION( 0x1200, "plds", 0 ) // all protected
+	ROM_LOAD( "hy18cv8s",   0x0000, 0x200, NO_DUMP ) // not actual size
+	ROM_LOAD( "gal16v8.0",  0x0200, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8.1",  0x0400, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8.2",  0x0600, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8.3",  0x0800, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8.4",  0x0a00, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8h.0", 0x0c00, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8h.1", 0x0e00, 0x117, NO_DUMP )
+	ROM_LOAD( "pal20v8h",   0x1000, 0x157, NO_DUMP )
 ROM_END
 
 
@@ -859,6 +870,12 @@ ROM_START( splash )
 	ROM_LOAD( "15i", 0x020000, 0x020000, CRC(2a8cb830) SHA1(bc54dfb03fade154085aa2f66784e07664a7a3d8) )
 	ROM_LOAD( "16i", 0x040000, 0x020000, CRC(21aeff2c) SHA1(0c307e94f4a814c674ba0ab471a6bdd57e43c265) )
 	ROM_LOAD( "13i", 0x060000, 0x020000, CRC(febb9893) SHA1(bb607a608c6c1658748a17a62431e8c30323c7ec) )
+
+	ROM_REGION( 0x800, "plds", 0 ) // all protected
+	ROM_LOAD( "a1020a-pl84c.g14",  0x000, 0x200, NO_DUMP ) // not actual size
+	ROM_LOAD( "gal16v8a-25lp.c13", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.d5",  0x400, 0x117, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.f4",  0x600, 0x157, NO_DUMP )
 ROM_END
 
 ROM_START( splash10 )
@@ -880,6 +897,12 @@ ROM_START( splash10 )
 	ROM_LOAD( "15i", 0x020000, 0x020000, CRC(2a8cb830) SHA1(bc54dfb03fade154085aa2f66784e07664a7a3d8) )
 	ROM_LOAD( "16i", 0x040000, 0x020000, CRC(21aeff2c) SHA1(0c307e94f4a814c674ba0ab471a6bdd57e43c265) )
 	ROM_LOAD( "13i", 0x060000, 0x020000, CRC(febb9893) SHA1(bb607a608c6c1658748a17a62431e8c30323c7ec) )
+
+	ROM_REGION( 0x800, "plds", 0 ) // all protected
+	ROM_LOAD( "a1020a-pl84c.g14",  0x000, 0x200, NO_DUMP ) // not actual size
+	ROM_LOAD( "gal16v8a-25lp.c13", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.d5",  0x400, 0x117, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.f4",  0x600, 0x157, NO_DUMP )
 ROM_END
 
 /***************************************************************************
@@ -945,6 +968,12 @@ ROM_START( paintlad )
 	ROM_LOAD( "11.15i", 0x020000, 0x020000, CRC(6e4d598f) SHA1(b5b0d65c50ec469b5ffcd6187ca3aacddd97a477) )
 	ROM_LOAD( "12.16i", 0x040000, 0x020000, CRC(15761eb5) SHA1(61a47dad0e70ff4f1ae7f56ee529d2987eab1997) )
 	ROM_LOAD( "10.13i", 0x060000, 0x020000, CRC(92a0eff8) SHA1(e27a73791d499b0449251ea0678d9a34040e9883) )
+
+	ROM_REGION( 0x800, "plds", 0 ) // all protected
+	ROM_LOAD( "a1020a-pl84c.g14",  0x000, 0x200, NO_DUMP ) // not actual size
+	ROM_LOAD( "gal16v8a-25lp.c13", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.d5",  0x400, 0x117, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.f4",  0x600, 0x157, NO_DUMP )
 ROM_END
 
 /*

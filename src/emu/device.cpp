@@ -215,8 +215,10 @@ std::string device_t::parameter(const char *tag) const
 void device_t::add_machine_configuration(machine_config &config)
 {
 	assert(&config == &m_machine_config);
-	machine_config::token const token(config.begin_configuration(*this));
+	machine_config::token const tok(config.begin_configuration(*this));
 	device_add_mconfig(config);
+	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->next())
+		autodev->end_configuration();
 }
 
 
@@ -493,8 +495,8 @@ bool device_t::findit(bool pre_map, bool isvalidation) const
 			if (isvalidation)
 			{
 				// sanity checking
-				const char *tag = autodev->finder_tag();
-				if (tag == nullptr)
+				char const *const tag = autodev->finder_tag();
+				if (!tag)
 				{
 					osd_printf_error("Finder tag is null!\n");
 					allfound = false;

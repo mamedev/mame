@@ -60,9 +60,9 @@ static INPUT_PORTS_START( wyse )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(wyse_state::wyse)
-	MCFG_CPU_ADD("maincpu", I8031, 11'000'000) // confirmed for WY-50
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I8031, 11'000'000) // confirmed for WY-50
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 MACHINE_CONFIG_END
 
 ROM_START( wy50 )

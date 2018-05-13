@@ -116,10 +116,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(c900_state::c900)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z8001, XTAL(12'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_DATA_MAP(data_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z8001, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_DATA_MAP(data_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(c900_state, kbd_put))
@@ -130,14 +130,14 @@ MACHINE_CONFIG_START(c900_state::c900)
 
 	//MCFG_SCC8030_ADD("scc", 6'000'000, 326400, 0, 326400, 0)
 	/* Port A */
-	//MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	//MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	//MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
-	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE(lwriter_state, scc_int))
+	//MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
+	//MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
+	//MCFG_Z80SCC_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
+	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, lwriter_state, scc_int))
 
 	//MCFG_RS232_PORT_ADD ("rs232a", default_rs232_devices, "terminal")
-	//MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc8030_device, rxa_w))
-	//MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc8030_device, ctsa_w))
+	//MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc8030_device, rxa_w))
+	//MCFG_RS232_CTS_HANDLER (WRITELINE ("scc", scc8030_device, ctsa_w))
 MACHINE_CONFIG_END
 
 ROM_START( c900 )

@@ -99,8 +99,8 @@ MACHINE_RESET_MEMBER( rd100_state, rd100 )
 
 MACHINE_CONFIG_START(rd100_state::rd100)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000)) // MC6809P???
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000)) // MC6809P???
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(rd100_state, rd100)
 

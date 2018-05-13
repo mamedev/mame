@@ -2675,7 +2675,7 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
  // TODO: merge with Dreamcast base machine
 MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK) // SH4!!!
+	MCFG_DEVICE_ADD("maincpu", SH4LE, CPU_CLOCK) // SH4!!!
 	MCFG_SH4_MD0(1)
 	MCFG_SH4_MD1(0)
 	MCFG_SH4_MD2(1)
@@ -2689,8 +2689,8 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
-	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
+	MCFG_DEVICE_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	MCFG_DEVICE_PROGRAM_MAP(dc_audio_map)
 
 	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
 
@@ -2699,13 +2699,14 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	MCFG_SCREEN_RAW_PARAMS(13458568*2, 820, 0, 640, 532, 0, 480) /* TODO: where pclk actually comes? */
 	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_POWERVR2_ADD("powervr2", WRITE8(dc_state, pvr_irq))
+	MCFG_POWERVR2_ADD("powervr2", WRITE8(*this, dc_state, pvr_irq))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("aica", AICA, 0)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("aica", AICA, 0)
 	MCFG_AICA_MASTER
-	MCFG_AICA_IRQ_CB(WRITELINE(dc_state, aica_irq))
-	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(dc_state, sh4_aica_irq))
+	MCFG_AICA_IRQ_CB(WRITELINE(*this, dc_state, aica_irq))
+	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(*this, dc_state, sh4_aica_irq))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
@@ -2716,9 +2717,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(naomi_state::naomi_base)
 	naomi_aw_base(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(naomi_map)
-	MCFG_CPU_IO_MAP(naomi_port)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(naomi_map)
+	MCFG_DEVICE_IO_MAP(naomi_port)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("main_eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
@@ -2745,7 +2746,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi_state::naomi)
 	naomi_base(config);
-	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2754,7 +2755,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi_state::naomigd)
 	naomi_base(config);
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2763,7 +2764,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi_state::naomim1)
 	naomi_base(config);
-	MCFG_NAOMI_M1_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M1_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2772,7 +2773,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi_state::naomim2)
 	naomi_base(config);
-	MCFG_NAOMI_M2_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M2_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2781,7 +2782,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi_state::naomim4)
 	naomi_base(config);
-	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2790,9 +2791,9 @@ MACHINE_CONFIG_END
 /*
 MACHINE_CONFIG_START((naomi2_state::naomi2)
     naomi(config);
-    MCFG_CPU_MODIFY("maincpu")
-    MCFG_CPU_PROGRAM_MAP(naomi2_map)
-    MCFG_CPU_IO_MAP(naomi_port)
+    MCFG_DEVICE_MODIFY("maincpu")
+    MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
+    MCFG_DEVICE_IO_MAP(naomi_port)
 MACHINE_CONFIG_END
 */
 /*
@@ -2800,7 +2801,7 @@ MACHINE_CONFIG_END
  */
 
 MACHINE_CONFIG_START(naomi2_state::naomi2_base)
-	MCFG_POWERVR2_ADD("powervr2_slave", WRITE8(dc_state, pvr_irq))
+	MCFG_POWERVR2_ADD("powervr2_slave", WRITE8(*this, dc_state, pvr_irq))
 
 	// TODO: ELAN device
 MACHINE_CONFIG_END
@@ -2809,8 +2810,8 @@ MACHINE_CONFIG_START(naomi2_state::naomi2gd)
 	naomigd(config);
 	naomi2_base(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(naomi2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
 MACHINE_CONFIG_END
 
 /*
@@ -2821,8 +2822,8 @@ MACHINE_CONFIG_START(naomi2_state::naomi2m1)
 	naomim1(config);
 	naomi2_base(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(naomi2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
 MACHINE_CONFIG_END
 
 /*
@@ -2833,8 +2834,8 @@ MACHINE_CONFIG_START(naomi2_state::naomi2m2)
 	naomim2(config);
 	naomi2_base(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(naomi2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
 MACHINE_CONFIG_END
 
 /*
@@ -2844,11 +2845,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(atomiswave_state::aw_base)
 	naomi_aw_base(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(aw_map)
-	MCFG_CPU_IO_MAP(aw_port)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(aw_map)
+	MCFG_DEVICE_IO_MAP(aw_port)
 	MCFG_MACRONIX_29L001MC_ADD("awflash")
-	MCFG_AW_ROM_BOARD_ADD("rom_board", "rom_key", WRITE8(dc_state, g1_irq))
+	MCFG_AW_ROM_BOARD_ADD("rom_board", "rom_key", WRITE8(*this, dc_state, g1_irq))
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
 	MCFG_NVRAM_ADD_0FILL("sram")

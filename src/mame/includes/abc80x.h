@@ -11,6 +11,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "bus/abckb/abckb.h"
 #include "bus/abckb/abc800kb.h"
 #include "machine/e0516.h"
@@ -20,6 +21,8 @@
 #include "sound/discrete.h"
 #include "video/mc6845.h"
 #include "video/saa5050.h"
+#include "softlist.h"
+#include "speaker.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -54,6 +57,7 @@
 #define Z80SIO_TAG          "z80sio"
 #define Z80DART_TAG         "z80dart"
 #define DISCRETE_TAG        "discrete"
+#define CASSETTE_TAG		"cassette"
 #define RS232_A_TAG         "rs232a"
 #define RS232_B_TAG         "rs232b"
 #define ABC_KEYBOARD_PORT_TAG   "kb"
@@ -74,8 +78,8 @@ public:
 		m_ctc(*this, Z80CTC_TAG),
 		m_dart(*this, Z80DART_TAG),
 		m_sio(*this, Z80SIO_TAG),
-		m_discrete(*this, "discrete"),
-		m_cassette(*this, "cassette"),
+		m_discrete(*this, DISCRETE_TAG),
+		m_cassette(*this, CASSETTE_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, Z80_TAG),
 		m_video_ram(*this, "video_ram"),
@@ -123,10 +127,11 @@ public:
 	DECLARE_WRITE8_MEMBER( hrc_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_txdb_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_dtrb_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_rtsb_w );
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER( bac );
 
 	// memory state
 	bool m_fetch_charram;        // opcode fetched from character RAM region (0x7800-0x7fff)
@@ -153,6 +158,7 @@ public:
 	// timers
 	emu_timer *m_ctc_timer;
 	emu_timer *m_cassette_timer;
+	void common(machine_config &config);
 	void abc800_m1(address_map &map);
 	void abc800c_io(address_map &map);
 	void abc800m_io(address_map &map);
@@ -240,12 +246,10 @@ public:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void bankswitch();
 
 	DECLARE_READ8_MEMBER( m1_r ) override;
-	DECLARE_READ8_MEMBER( pling_r );
 	DECLARE_WRITE_LINE_MEMBER( lrs_w );
 	DECLARE_WRITE_LINE_MEMBER( mux80_40_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );

@@ -43,9 +43,9 @@ static INPUT_PORTS_START( aaa )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(aaa_state::aaa)
-	MCFG_CPU_ADD("maincpu", Z80, 2'000'000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2'000'000)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************

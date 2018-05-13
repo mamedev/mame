@@ -90,8 +90,8 @@ void st17xx_state::machine_start()
 
 MACHINE_CONFIG_START(st17xx_state::st17xx)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, 50000000) /* speed unknown */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 50000000) /* speed unknown */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

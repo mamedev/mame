@@ -188,9 +188,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(mrjong_state::mrjong)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,15468000/6) /* 2.578 MHz?? */
-	MCFG_CPU_PROGRAM_MAP(mrjong_map)
-	MCFG_CPU_IO_MAP(mrjong_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,15468000/6) /* 2.578 MHz?? */
+	MCFG_DEVICE_PROGRAM_MAP(mrjong_map)
+	MCFG_DEVICE_IO_MAP(mrjong_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -208,12 +208,12 @@ MACHINE_CONFIG_START(mrjong_state::mrjong)
 	MCFG_PALETTE_INIT_OWNER(mrjong_state, mrjong)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76489, 15468000/6)
+	MCFG_DEVICE_ADD("sn1", SN76489, 15468000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76489, 15468000/6)
+	MCFG_DEVICE_ADD("sn2", SN76489, 15468000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

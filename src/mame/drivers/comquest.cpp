@@ -215,9 +215,9 @@ void comquest_state::machine_reset()
 
 MACHINE_CONFIG_START(comquest_state::comquest)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6805, 4000000)     /* 4000000? */
-	/*MCFG_CPU_ADD("maincpu", HD63705, 4000000)    instruction set looks like m6805/m6808 */
-	/*MCFG_CPU_ADD("maincpu", M68705, 4000000) instruction set looks like m6805/m6808 */
+	MCFG_DEVICE_ADD("maincpu", M6805, 4000000)     /* 4000000? */
+	/*MCFG_DEVICE_ADD("maincpu", HD63705, 4000000)    instruction set looks like m6805/m6808 */
+	/*MCFG_DEVICE_ADD("maincpu", M68705, 4000000) instruction set looks like m6805/m6808 */
 
 /*
     8 bit bus, integrated io, serial io?,
@@ -243,7 +243,7 @@ MACHINE_CONFIG_START(comquest_state::comquest)
     not epson e0c88
 */
 
-	MCFG_CPU_PROGRAM_MAP(comquest_mem)
+	MCFG_DEVICE_PROGRAM_MAP(comquest_mem)
 
 
 	/* video hardware */

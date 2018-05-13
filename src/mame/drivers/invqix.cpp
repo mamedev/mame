@@ -333,11 +333,11 @@ static INPUT_PORTS_START( invqix )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(invqix_state::invqix)
-	MCFG_CPU_ADD("maincpu", H8S2394, XTAL(20'000'000))
-	MCFG_CPU_PROGRAM_MAP(invqix_prg_map)
-	MCFG_CPU_IO_MAP(invqix_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", invqix_state,  irq1_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(invqix_state, irq0_line_hold,  60)
+	MCFG_DEVICE_ADD("maincpu", H8S2394, XTAL(20'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(invqix_prg_map)
+	MCFG_DEVICE_IO_MAP(invqix_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", invqix_state,  irq1_line_hold)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(invqix_state, irq0_line_hold,  60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -348,9 +348,10 @@ MACHINE_CONFIG_START(invqix_state::invqix)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
+	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 

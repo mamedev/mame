@@ -35,7 +35,7 @@
 	downcast<esrip_device &>(*device).lbrm_prom(_tag);
 
 #define MCFG_ESRIP_SCREEN(screen_tag) \
-	downcast<esrip_device &>(*device).set_screen_tag(("^" screen_tag));
+	downcast<esrip_device &>(*device).set_screen_tag(screen_tag);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -196,7 +196,7 @@ protected:
 	uint8_t   *m_lbrm;
 
 	address_space *m_program;
-	direct_read_data<-3> *m_direct;
+	memory_access_cache<3, -3, ENDIANNESS_BIG> *m_cache;
 
 	int     m_icount;
 

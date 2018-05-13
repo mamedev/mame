@@ -133,9 +133,9 @@ void ipds_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(ipds_state::ipds)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL(19'660'800) / 4)
-	MCFG_CPU_PROGRAM_MAP(ipds_mem)
-	MCFG_CPU_IO_MAP(ipds_io)
+	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(19'660'800) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(ipds_mem)
+	MCFG_DEVICE_IO_MAP(ipds_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

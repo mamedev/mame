@@ -570,9 +570,9 @@ void mwarr_state::machine_reset()
 MACHINE_CONFIG_START(mwarr_state::mwarr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(mwarr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mwarr_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(mwarr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mwarr_state,  irq4_line_hold)
 
 
 	/* video hardware */
@@ -589,12 +589,12 @@ MACHINE_CONFIG_START(mwarr_state::mwarr)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", SOUND_CLOCK/48 , PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, SOUND_CLOCK/48 , okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", SOUND_CLOCK/48 , PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, SOUND_CLOCK/48 , okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 MACHINE_CONFIG_END

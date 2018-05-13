@@ -370,9 +370,9 @@ MACHINE_CONFIG_START(poker72_state::poker72)
 
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(poker72_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", poker72_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,8000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(poker72_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", poker72_state,  irq0_line_hold)
 
 
 	/* video hardware */
@@ -388,9 +388,9 @@ MACHINE_CONFIG_START(poker72_state::poker72)
 	MCFG_PALETTE_ADD("palette", 0xe00)
 	MCFG_PALETTE_INIT_OWNER(poker72_state, poker72)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay", AY8910, 8000000/8) /* ? Mhz */
+	MCFG_DEVICE_ADD("ay", AY8910, 8000000/8) /* ? Mhz */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SW3"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

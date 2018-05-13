@@ -71,7 +71,7 @@ static discrete_mixer_desc bwidow_mixer = {
 		1.0                         /* gain */
 };
 
-static DISCRETE_SOUND_START(bwidow)
+static DISCRETE_SOUND_START(bwidow_discrete)
 
 	/************************************************/
 	/* FINAL MIX                                    */
@@ -130,7 +130,7 @@ static discrete_mixer_desc gravitar_mixer = {
 };
 
 
-static DISCRETE_SOUND_START(gravitar)
+static DISCRETE_SOUND_START(gravitar_discrete)
 
 	/************************************************/
 	/* FINAL MIX                                    */
@@ -150,20 +150,19 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(bwidow_state::bwidow_audio)
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK / 8) /* C/D3 */
+	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK / 8) /* C/D3 */
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW0"))
 	MCFG_POKEY_OUTPUT_OPAMP(BW_R51, BW_C31, 5.0)
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK / 8) /* B3 */
+	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK / 8) /* B3 */
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
 	MCFG_POKEY_OUTPUT_OPAMP(BW_R47, BW_C32, 5.0)
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 1)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 1)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(bwidow)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, bwidow_discrete)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -172,9 +171,9 @@ MACHINE_CONFIG_START(bwidow_state::bwidow_audio)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bwidow_state::gravitar_audio)
-	MCFG_SOUND_MODIFY("pokey1")
+	MCFG_DEVICE_MODIFY("pokey1")
 	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(BW_R51, GRAV_C34, 5.0) /* BW_C31 ignored */
 
-	MCFG_SOUND_MODIFY("discrete")
-	MCFG_DISCRETE_INTF(gravitar)
+	MCFG_DEVICE_MODIFY("discrete")
+	MCFG_DISCRETE_INTF(gravitar_discrete)
 MACHINE_CONFIG_END

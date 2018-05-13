@@ -323,11 +323,11 @@ void galaxygame_state::machine_reset()
 
 MACHINE_CONFIG_START(galaxygame_state::galaxygame)
 
-	MCFG_CPU_ADD("maincpu", T11, 3000000 )
-	MCFG_CPU_PROGRAM_MAP(galaxygame_map)
+	MCFG_DEVICE_ADD("maincpu", T11, 3000000 )
+	MCFG_DEVICE_PROGRAM_MAP(galaxygame_map)
 	MCFG_T11_INITIAL_MODE(5 << 13)
-	MCFG_CPU_PERIODIC_INT_DRIVER(galaxygame_state, galaxygame_irq, 60)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxygame_state,galaxygame_irq_callback)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(galaxygame_state, galaxygame_irq, 60)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(galaxygame_state,galaxygame_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

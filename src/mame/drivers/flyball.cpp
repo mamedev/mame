@@ -458,11 +458,11 @@ void flyball_state::machine_reset()
 MACHINE_CONFIG_START(flyball_state::flyball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(flyball_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/16)
+	MCFG_DEVICE_PROGRAM_MAP(flyball_map)
 
 	MCFG_DEVICE_ADD("outlatch", F9334, 0) // F7
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(flyball_state, lamp_w)) // 1 player lamp
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, flyball_state, lamp_w)) // 1 player lamp
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // crowd very loud
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // footstep off-on
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // crowd off-on

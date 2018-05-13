@@ -557,9 +557,9 @@ void atarifb_state::machine_reset()
 MACHINE_CONFIG_START(atarifb_state::atarifb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 750000)
-	MCFG_CPU_PROGRAM_MAP(atarifb_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(atarifb_state, irq0_line_hold, 4*60)
+	MCFG_DEVICE_ADD("maincpu", M6502, 750000)
+	MCFG_DEVICE_PROGRAM_MAP(atarifb_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(atarifb_state, irq0_line_hold, 4*60)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -577,10 +577,9 @@ MACHINE_CONFIG_START(atarifb_state::atarifb)
 	MCFG_PALETTE_INIT_OWNER(atarifb_state, atarifb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(atarifb)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, atarifb_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.18)
 MACHINE_CONFIG_END
 
@@ -589,8 +588,8 @@ MACHINE_CONFIG_START(atarifb_state::atarifb4)
 	atarifb(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(atarifb4_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(atarifb4_map)
 MACHINE_CONFIG_END
 
 
@@ -598,16 +597,15 @@ MACHINE_CONFIG_START(atarifb_state::abaseb)
 	atarifb(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(abaseb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(abaseb_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_abaseb)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(abaseb)
+	MCFG_DEVICE_REPLACE("discrete", DISCRETE, abaseb_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.24)
 MACHINE_CONFIG_END
 
@@ -616,8 +614,8 @@ MACHINE_CONFIG_START(atarifb_state::soccer)
 	atarifb(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(soccer_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(soccer_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

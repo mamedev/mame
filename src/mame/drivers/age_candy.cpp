@@ -56,12 +56,12 @@ void age_candy_state::age_candy_map(address_map &map)
 MACHINE_CONFIG_START(age_candy_state::age_candy)
 
 	/* basic machine hardware */
-//  MCFG_CPU_ADD("maincpu", HPC46104, 8000000) // unknown clock; HPC emulation needed
-//  MCFG_CPU_PROGRAM_MAP(age_candy_map)
-//  MCFG_CPU_IO_MAP(age_candy_io)
+//  MCFG_DEVICE_ADD("maincpu", HPC46104, 8000000) // unknown clock; HPC emulation needed
+//  MCFG_DEVICE_PROGRAM_MAP(age_candy_map)
+//  MCFG_DEVICE_IO_MAP(age_candy_io)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 

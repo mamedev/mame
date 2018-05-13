@@ -177,9 +177,9 @@ void diablo1300_state::machine_reset()
 
 MACHINE_CONFIG_START( diablo1300_state::diablo1300 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DIABLO1300, XTAL(1'689'600))
-	MCFG_CPU_PROGRAM_MAP(diablo1300_map)
-	MCFG_CPU_DATA_MAP(diablo1300_data_map)
+	MCFG_DEVICE_ADD("maincpu", DIABLO1300, XTAL(1'689'600))
+	MCFG_DEVICE_PROGRAM_MAP(diablo1300_map)
+	MCFG_DEVICE_DATA_MAP(diablo1300_data_map)
 MACHINE_CONFIG_END
 
 ROM_START( diablo )

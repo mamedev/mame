@@ -2383,10 +2383,10 @@ void viper_state::machine_reset()
 MACHINE_CONFIG_START(viper_state::viper)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MPC8240, 166666666) // Unknown
+	MCFG_DEVICE_ADD("maincpu", MPC8240, 166666666) // Unknown
 	MCFG_PPC_BUS_FREQUENCY(100000000)
-	MCFG_CPU_PROGRAM_MAP(viper_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", viper_state, viper_vblank)
+	MCFG_DEVICE_PROGRAM_MAP(viper_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", viper_state, viper_vblank)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, viper_state, mpc8240_pci_r, mpc8240_pci_w)
@@ -2398,8 +2398,8 @@ MACHINE_CONFIG_START(viper_state::viper)
 	MCFG_VOODOO_FBMEM(8)
 	MCFG_VOODOO_SCREEN_TAG("screen")
 	MCFG_VOODOO_CPU_TAG("maincpu")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(viper_state,voodoo_vblank))
-	MCFG_VOODOO_PCIINT_CB(WRITELINE(viper_state, voodoo_pciint))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, viper_state,voodoo_vblank))
+	MCFG_VOODOO_PCIINT_CB(WRITELINE(*this, viper_state, voodoo_pciint))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2413,7 +2413,8 @@ MACHINE_CONFIG_START(viper_state::viper)
 	MCFG_TIMER_ADD_NONE("ds2430_timer2")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_M48T58_ADD( "m48t58" )
 MACHINE_CONFIG_END

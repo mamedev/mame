@@ -697,9 +697,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(magic10_state::magic10)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)  // 10 MHz.
-	MCFG_CPU_PROGRAM_MAP(magic10_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", magic10_state, irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK)  // 10 MHz.
+	MCFG_DEVICE_PROGRAM_MAP(magic10_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", magic10_state, irq1_line_hold)
 
 	// 1FILL is required by vanilla magic10 at least (otherwise gameplay won't work properly)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -718,8 +718,8 @@ MACHINE_CONFIG_START(magic10_state::magic10)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magic10)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH)   /* clock frequency & pin 7 not verified */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH)   /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -728,8 +728,8 @@ MACHINE_CONFIG_START(magic10_state::magic10a)
 	magic10(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(magic10a_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(magic10a_map)
 MACHINE_CONFIG_END
 
 
@@ -737,8 +737,8 @@ MACHINE_CONFIG_START(magic10_state::magic102)
 	magic10(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(magic102_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(magic102_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
@@ -749,8 +749,8 @@ MACHINE_CONFIG_START(magic10_state::hotslot)
 	magic10(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hotslot_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hotslot_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 32*8-1)
@@ -761,9 +761,9 @@ MACHINE_CONFIG_START(magic10_state::sgsafari)
 	magic10(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sgsafari_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", magic10_state, irq2_line_hold)    /* L1 interrupts */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sgsafari_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", magic10_state, irq2_line_hold)    /* L1 interrupts */
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)

@@ -316,9 +316,9 @@ void hitme_state::machine_reset()
 MACHINE_CONFIG_START(hitme_state::hitme)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(hitme_map)
-	MCFG_CPU_IO_MAP(hitme_portmap)
+	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK/16)
+	MCFG_DEVICE_PROGRAM_MAP(hitme_map)
+	MCFG_DEVICE_IO_MAP(hitme_portmap)
 
 
 	/* video hardware */
@@ -335,9 +335,8 @@ MACHINE_CONFIG_START(hitme_state::hitme)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(hitme)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, hitme_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

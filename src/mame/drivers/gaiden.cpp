@@ -760,12 +760,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gaiden_state::shadoww)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 18432000/2) /* 9.216 MHz */
-	MCFG_CPU_PROGRAM_MAP(gaiden_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 18432000/2) /* 9.216 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(gaiden_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 								/* IRQs are triggered by the YM2203 */
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -796,38 +796,38 @@ MACHINE_CONFIG_START(gaiden_state::shadoww)
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,gaiden)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ym2", YM2203, 4000000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaiden_state::wildfang)
 	shadoww(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wildfang_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(wildfang_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaiden_state::raiga)
 	shadoww(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(raiga_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(raiga_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
 
@@ -837,13 +837,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gaiden_state::drgnbowl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 20000000/2) /* 10 MHz */
-	MCFG_CPU_PROGRAM_MAP(drgnbowl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20000000/2) /* 10 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(drgnbowl_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 12000000/2)   /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(drgnbowl_sound_map)
-	MCFG_CPU_IO_MAP(drgnbowl_sound_port_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/2)   /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(drgnbowl_sound_map)
+	MCFG_DEVICE_IO_MAP(drgnbowl_sound_port_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -863,15 +863,15 @@ MACHINE_CONFIG_START(gaiden_state::drgnbowl)
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -992,12 +992,12 @@ void gaiden_state::mastninj_map(address_map &map)
 MACHINE_CONFIG_START(gaiden_state::mastninj)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz? */
-	MCFG_CPU_PROGRAM_MAP(mastninj_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* 10 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(mastninj_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* ?? MHz */
-	MCFG_CPU_PROGRAM_MAP(mastninj_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* ?? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mastninj_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(gaiden_state,mastninj)
 
@@ -1021,37 +1021,37 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	// YM2203 clocks chosen by analogy with Automat; actual rate unknown, but 4 MHz is obviously too fast
-	MCFG_SOUND_ADD("ym1", YM2203, 1250000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 1250000)
+	MCFG_DEVICE_ADD("ym2", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
 	MCFG_DEVICE_ADD("adpcm_select1", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm1", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm1", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("adpcm_select2", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm2", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm2", msm5205_device, data_w))
 
-	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("msm2", msm5205_device, vclk_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(gaiden_state, vck_flipflop_w))
+	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE("msm2", msm5205_device, vclk_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, gaiden_state, vck_flipflop_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
+	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END

@@ -8099,9 +8099,9 @@ WRITE8_MEMBER(goldstar_state::ay8910_outputb_w)
 MACHINE_CONFIG_START(goldstar_state::goldstar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(goldstar_map)
-	MCFG_CPU_IO_MAP(goldstar_readport)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(goldstar_map)
+	MCFG_DEVICE_IO_MAP(goldstar_readport)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8121,13 +8121,13 @@ MACHINE_CONFIG_START(goldstar_state::goldstar)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -8136,9 +8136,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(goldstar_state::goldstbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(goldstar_map)
-	MCFG_CPU_IO_MAP(goldstar_readport)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(goldstar_map)
+	MCFG_DEVICE_IO_MAP(goldstar_readport)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8158,13 +8158,13 @@ MACHINE_CONFIG_START(goldstar_state::goldstbl)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8182,9 +8182,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sanghopm_state::star100)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(star100_map)
-	MCFG_CPU_IO_MAP(star100_readport)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(star100_map)
+	MCFG_DEVICE_IO_MAP(star100_readport)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8206,13 +8206,13 @@ MACHINE_CONFIG_START(sanghopm_state::star100)
 	MCFG_VIDEO_START_OVERRIDE(sanghopm_state, sangho)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW5"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW6"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -8221,11 +8221,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(goldstar_state::super9)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(goldstar_map)
-//  MCFG_CPU_PROGRAM_MAP(nfm_map)
-	MCFG_CPU_IO_MAP(goldstar_readport)
-//  MCFG_CPU_IO_MAP(unkch_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(goldstar_map)
+//  MCFG_DEVICE_PROGRAM_MAP(nfm_map)
+	MCFG_DEVICE_IO_MAP(goldstar_readport)
+//  MCFG_DEVICE_IO_MAP(unkch_portmap)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8245,13 +8245,13 @@ MACHINE_CONFIG_START(goldstar_state::super9)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8319,9 +8319,9 @@ PALETTE_INIT_MEMBER(goldstar_state, lucky8)
 MACHINE_CONFIG_START(cb3_state::ncb3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(ncb3_map)
-	MCFG_CPU_IO_MAP(ncb3_readwriteport)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(ncb3_map)
+	MCFG_DEVICE_IO_MAP(ncb3_readwriteport)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8354,12 +8354,12 @@ MACHINE_CONFIG_START(cb3_state::ncb3)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
+	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -8394,9 +8394,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(goldstar_state::wcherry)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(wcherry_map)
-	MCFG_CPU_IO_MAP(wcherry_readwriteport)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(wcherry_map)
+	MCFG_DEVICE_IO_MAP(wcherry_readwriteport)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8428,12 +8428,12 @@ MACHINE_CONFIG_START(goldstar_state::wcherry)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
+	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -8443,9 +8443,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cmaster_state::cm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cm_map)
-	MCFG_CPU_IO_MAP(cm_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(cm_map)
+	MCFG_DEVICE_IO_MAP(cm_portmap)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8475,8 +8475,8 @@ MACHINE_CONFIG_START(cmaster_state::cm)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -8491,9 +8491,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(goldstar_state::cmast91)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cm_map)
-	MCFG_CPU_IO_MAP(cmast91_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(cm_map)
+	MCFG_DEVICE_IO_MAP(cmast91_portmap)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8523,8 +8523,8 @@ MACHINE_CONFIG_START(goldstar_state::cmast91)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -8541,9 +8541,9 @@ WRITE_LINE_MEMBER(wingco_state::masked_irq)
 MACHINE_CONFIG_START(wingco_state::lucky8)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lucky8_map)
-	//MCFG_CPU_IO_MAP(goldstar_readport)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lucky8_map)
+	//MCFG_DEVICE_IO_MAP(goldstar_readport)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8557,9 +8557,9 @@ MACHINE_CONFIG_START(wingco_state::lucky8)
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(wingco_state, system_outputa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, system_outputb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, system_outputc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, wingco_state, system_outputa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, wingco_state, system_outputb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wingco_state, system_outputc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8569,7 +8569,7 @@ MACHINE_CONFIG_START(wingco_state::lucky8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wingco_state, masked_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wingco_state, masked_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8580,25 +8580,25 @@ MACHINE_CONFIG_START(wingco_state::lucky8)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
+	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", YM2149, AY_CLOCK)
+	MCFG_DEVICE_ADD("aysnd", YM2149, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(goldstar_state, ay8910_outputa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(goldstar_state, ay8910_outputb_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, goldstar_state, ay8910_outputa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, goldstar_state, ay8910_outputb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wingco_state::bingowng)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lucky8_map)
-	//MCFG_CPU_IO_MAP(goldstar_readport)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lucky8_map)
+	//MCFG_DEVICE_IO_MAP(goldstar_readport)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8612,9 +8612,9 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(wingco_state, system_outputa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, system_outputb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, system_outputc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, wingco_state, system_outputa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, wingco_state, system_outputb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wingco_state, system_outputc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8624,7 +8624,7 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_bingowng)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wingco_state, masked_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wingco_state, masked_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8634,16 +8634,16 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	MCFG_VIDEO_START_OVERRIDE(wingco_state, bingowng)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
+	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(goldstar_state, ay8910_outputa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(goldstar_state, ay8910_outputb_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, goldstar_state, ay8910_outputa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, goldstar_state, ay8910_outputb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -8656,11 +8656,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(wingco_state::flam7_w4)
 	lucky8(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(flaming7_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(flaming7_map)
 
 	MCFG_DEVICE_MODIFY("ppi8255_0")
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wingco_state, fl7w4_outc802_w))
 
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
@@ -8668,14 +8668,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(wingco_state::flaming7)
 	lucky8(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(flaming7_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(flaming7_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", flaming7)
 
 	// to do serial protection.
 	MCFG_DEVICE_MODIFY("ppi8255_0")
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wingco_state, fl7w4_outc802_w))
 
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
@@ -8683,14 +8683,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(wingco_state::flam7_tw)
 	lucky8(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(flaming7_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(flaming7_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", flam7_tw)
 
 	// to do serial protection.
 	MCFG_DEVICE_MODIFY("ppi8255_0")
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, fl7w4_outc802_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wingco_state, fl7w4_outc802_w))
 
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
@@ -8698,8 +8698,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(wingco_state::mbstar)
 	lucky8(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mbstar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mbstar_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_mbstar)
@@ -8723,9 +8723,9 @@ PALETTE_INIT_MEMBER(wingco_state, magodds)
 MACHINE_CONFIG_START(wingco_state::magodds)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(magodds_map)
-	//MCFG_CPU_IO_MAP(goldstar_readport)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(magodds_map)
+	//MCFG_DEVICE_IO_MAP(goldstar_readport)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8739,9 +8739,9 @@ MACHINE_CONFIG_START(wingco_state::magodds)
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(wingco_state, system_outputa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, system_outputb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, system_outputc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, wingco_state, system_outputa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, wingco_state, system_outputb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wingco_state, system_outputc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8751,7 +8751,7 @@ MACHINE_CONFIG_START(wingco_state::magodds)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_magical)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wingco_state, masked_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wingco_state, masked_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magodds)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8761,16 +8761,16 @@ MACHINE_CONFIG_START(wingco_state::magodds)
 	MCFG_VIDEO_START_OVERRIDE(wingco_state, magical)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
+	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.00)  // shut up annoying whine
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(goldstar_state, ay8910_outputa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(goldstar_state, ay8910_outputb_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, goldstar_state, ay8910_outputa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, goldstar_state, ay8910_outputb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -8778,9 +8778,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(goldstar_state::kkotnoli)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(kkotnoli_map)
-	//MCFG_CPU_IO_MAP(goldstar_readport)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(kkotnoli_map)
+	//MCFG_DEVICE_IO_MAP(goldstar_readport)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8811,9 +8811,9 @@ MACHINE_CONFIG_START(goldstar_state::kkotnoli)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
+	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 MACHINE_CONFIG_END
@@ -8822,9 +8822,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(goldstar_state::ladylinr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(ladylinr_map)
-	//MCFG_CPU_IO_MAP(goldstar_readport)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(ladylinr_map)
+	//MCFG_DEVICE_IO_MAP(goldstar_readport)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8852,12 +8852,12 @@ MACHINE_CONFIG_START(goldstar_state::ladylinr)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
+	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK) // unused?
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK) // unused?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -8865,9 +8865,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(wingco_state::wcat3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(wcat3_map)
-	//MCFG_CPU_IO_MAP(goldstar_readport)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(wcat3_map)
+	//MCFG_DEVICE_IO_MAP(goldstar_readport)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8881,9 +8881,9 @@ MACHINE_CONFIG_START(wingco_state::wcat3)
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(wingco_state, system_outputa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, system_outputb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, system_outputc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, wingco_state, system_outputa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, wingco_state, system_outputb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wingco_state, system_outputc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8903,16 +8903,16 @@ MACHINE_CONFIG_START(wingco_state::wcat3)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
+	MCFG_DEVICE_ADD("snsnd", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(goldstar_state, ay8910_outputa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(goldstar_state, ay8910_outputb_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, goldstar_state, ay8910_outputa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, goldstar_state, ay8910_outputb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END
@@ -8922,9 +8922,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cmaster_state::amcoe1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cm_map)
-	MCFG_CPU_IO_MAP(amcoe1_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(cm_map)
+	MCFG_DEVICE_IO_MAP(amcoe1_portmap)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8954,13 +8954,13 @@ MACHINE_CONFIG_START(cmaster_state::amcoe1)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8979,9 +8979,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cmaster_state::amcoe2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cm_map)
-	MCFG_CPU_IO_MAP(amcoe2_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(cm_map)
+	MCFG_DEVICE_IO_MAP(amcoe2_portmap)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -9011,8 +9011,8 @@ MACHINE_CONFIG_START(cmaster_state::amcoe2)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00) /* analyzed for clips */
@@ -9022,8 +9022,8 @@ MACHINE_CONFIG_START(cmaster_state::nfm)
 	amcoe2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nfm_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nfm_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", nfm)
 MACHINE_CONFIG_END
@@ -9038,9 +9038,9 @@ WRITE_LINE_MEMBER(unkch_state::vblank_irq)
 MACHINE_CONFIG_START(unkch_state::unkch)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(unkch_map)
-	MCFG_CPU_IO_MAP(unkch_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(unkch_map)
+	MCFG_DEVICE_IO_MAP(unkch_portmap)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -9052,7 +9052,7 @@ MACHINE_CONFIG_START(unkch_state::unkch)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(unkch_state, screen_update_unkch)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(unkch_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, unkch_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unkch)
 	MCFG_PALETTE_ADD("palette", 512)
@@ -9061,8 +9061,8 @@ MACHINE_CONFIG_START(unkch_state::unkch)
 	MCFG_VIDEO_START_OVERRIDE(unkch_state, unkch)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -9077,9 +9077,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(goldstar_state::pkrmast)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cm_map)
-	MCFG_CPU_IO_MAP(pkrmast_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(cm_map)
+	MCFG_DEVICE_IO_MAP(pkrmast_portmap)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9099,8 +9099,8 @@ MACHINE_CONFIG_START(goldstar_state::pkrmast)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -9110,9 +9110,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(unkch_state::megaline)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(megaline_map)
-	MCFG_CPU_IO_MAP(megaline_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(megaline_map)
+	MCFG_DEVICE_IO_MAP(megaline_portmap)
 
 	//MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	//MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
@@ -9136,22 +9136,22 @@ MACHINE_CONFIG_START(unkch_state::megaline)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76489, PSG_CLOCK)
+	MCFG_DEVICE_ADD("sn1", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("sn2", SN76489, PSG_CLOCK)
+	MCFG_DEVICE_ADD("sn2", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("sn3", SN76489, PSG_CLOCK)
+	MCFG_DEVICE_ADD("sn3", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(goldstar_state, ay8910_outputa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(goldstar_state, ay8910_outputb_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, goldstar_state, ay8910_outputa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, goldstar_state, ay8910_outputb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END
@@ -9160,11 +9160,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(unkch_state::bonusch)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(bonusch_map)
-	MCFG_CPU_IO_MAP(bonusch_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, 12_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(bonusch_map)
+	MCFG_DEVICE_IO_MAP(bonusch_portmap)
 
-	MCFG_CPU_ADD("mcu", I80C51, 12_MHz_XTAL)
+	MCFG_DEVICE_ADD("mcu", I80C51, 12_MHz_XTAL)
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
@@ -9183,18 +9183,18 @@ MACHINE_CONFIG_START(unkch_state::bonusch)
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76489, PSG_CLOCK)
+	MCFG_DEVICE_ADD("sn1", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("sn2", SN76489, PSG_CLOCK)
+	MCFG_DEVICE_ADD("sn2", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("sn3", SN76489, PSG_CLOCK)
+	MCFG_DEVICE_ADD("sn3", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("sn4", SN76489, PSG_CLOCK)
+	MCFG_DEVICE_ADD("sn4", SN76489, PSG_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 MACHINE_CONFIG_END

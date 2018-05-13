@@ -34,9 +34,10 @@ FLOPPY_FORMATS_MEMBER( a2bus_corvfdc02_device::corv_floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( corv_floppies )
-	SLOT_INTERFACE( "525dsqd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void corv_floppies(device_slot_interface &device)
+{
+	device.option_add("525dsqd", FLOPPY_525_QD);
+}
 
 ROM_START( fdc02 )
 	ROM_REGION(0x20, FDC02_ROM_REGION, 0)
@@ -53,8 +54,8 @@ ROM_END
 
 MACHINE_CONFIG_START(a2bus_corvfdc02_device::device_add_mconfig)
 	MCFG_UPD765A_ADD(FDC02_FDC_TAG, true, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(a2bus_corvfdc02_device, intrq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(a2bus_corvfdc02_device, drq_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc02_device, intrq_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc02_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":0", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":1", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":2", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)

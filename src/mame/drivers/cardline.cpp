@@ -319,13 +319,13 @@ PALETTE_INIT_MEMBER(cardline_state, cardline)
 MACHINE_CONFIG_START(cardline_state::cardline)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C32, MASTER_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", I80C32, MASTER_CLOCK)
 	MCFG_MCS51_PORT1_CONFIG(0x10)
-	MCFG_CPU_PROGRAM_MAP(mem_prg)
-	MCFG_CPU_IO_MAP(mem_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(cardline_state, hsync_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(cardline_state, video_w))
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", cardline_state,  irq1_line_hold)
+	MCFG_DEVICE_PROGRAM_MAP(mem_prg)
+	MCFG_DEVICE_IO_MAP(mem_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, cardline_state, hsync_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, cardline_state, video_w))
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cardline_state,  irq1_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -346,15 +346,16 @@ MACHINE_CONFIG_START(cardline_state::cardline)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_BEGIN_UPDATE_CB(cardline_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(cardline_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(cardline_state, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(cardline_state, vsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, cardline_state, hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, cardline_state, vsync_changed))
 
 	MCFG_DEFAULT_LAYOUT(layout_cardline)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 

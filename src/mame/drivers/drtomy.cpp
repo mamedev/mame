@@ -305,9 +305,9 @@ void drtomy_state::machine_reset()
 MACHINE_CONFIG_START(drtomy_state::drtomy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,24000000/2)          /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(drtomy_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", drtomy_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,24000000/2)          /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(drtomy_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drtomy_state,  irq6_line_hold)
 
 
 	/* video hardware */
@@ -325,9 +325,9 @@ MACHINE_CONFIG_START(drtomy_state::drtomy)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 26000000/16, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 26000000/16, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_CONFIG_END
 

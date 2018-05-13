@@ -189,8 +189,8 @@ void pgm_028_025_state::igs025_to_igs028_callback( void )
 MACHINE_CONFIG_START(pgm_028_025_state::pgm_028_025_ol)
 	pgmbase(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(olds_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(olds_mem)
 
 	MCFG_DEVICE_ADD("igs025", IGS025, 0)
 	MCFG_IGS025_SET_EXTERNAL_EXECUTE( pgm_028_025_state, igs025_to_igs028_callback )

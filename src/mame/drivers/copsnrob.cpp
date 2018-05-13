@@ -251,8 +251,8 @@ void copsnrob_state::machine_reset()
 MACHINE_CONFIG_START(copsnrob_state::copsnrob)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,14318180/16)      /* 894886.25 kHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502,14318180/16)      /* 894886.25 kHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

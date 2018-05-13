@@ -204,8 +204,8 @@ void bfm_swp_state::machine_start()
 MACHINE_CONFIG_START(bfm_swp_state::bfm_swp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68340, 16000000)
-	MCFG_CPU_PROGRAM_MAP(bfm_swp_map)
+	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(bfm_swp_map)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -215,9 +215,9 @@ MACHINE_CONFIG_START(bfm_swp_state::bfm_swp)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 10000000 )
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 10000000 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

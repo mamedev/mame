@@ -61,7 +61,7 @@ protected:
 	void tranz330_io(address_map &map);
 
 private:
-	required_device<cpu_device>             m_cpu;
+	required_device<z80_device>             m_cpu;
 	required_device<z80ctc_device>          m_ctc;
 	required_device<z80dart_device>         m_dart;
 	required_device<z80pio_device>          m_pio;

@@ -220,20 +220,16 @@ READ8_MEMBER(playch10_state::pc10_in1_r)
 		int trigger = ioport("P1")->read();
 		int x = ioport("GUNX")->read();
 		int y = ioport("GUNY")->read();
-		uint32_t pix, color_base;
 
 		/* no sprite hit (yet) */
 		ret |= 0x08;
 
 		/* get the pixel at the gun position */
-		pix = m_ppu->get_pixel(x, y);
-
-		/* get the color base from the ppu */
-		color_base = m_ppu->get_colorbase();
+		rgb_t pix = m_ppu->get_pixel(x, y);
 
 		/* look at the screen and see if the cursor is over a bright pixel */
-		if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
-			(pix == color_base + 0x33) || (pix == color_base + 0x34))
+		// FIXME: still a gross hack
+		if (pix.r() == 0xff && pix.b() == 0xff && pix.g() > 0x90)
 		{
 			ret &= ~0x08; /* sprite hit */
 		}

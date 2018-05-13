@@ -540,15 +540,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,12000000)
-	MCFG_CPU_PROGRAM_MAP(cupsocbl_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seicupbl_state,  irq4_line_hold) /* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68000,12000000)
+	MCFG_DEVICE_PROGRAM_MAP(cupsocbl_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seicupbl_state,  irq4_line_hold) /* VBL */
 
 	MCFG_DEVICE_SEIBUCOP_BOOTLEG_ADD("seibucop_boot")
 
 	/*Different Sound hardware*/
-	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)
-	MCFG_CPU_PROGRAM_MAP(cupsocbl_sound_mem)
+	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4)
+	MCFG_DEVICE_PROGRAM_MAP(cupsocbl_sound_mem)
 	//MCFG_PERIODIC_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
@@ -561,9 +561,9 @@ MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
 	MCFG_SCREEN_PALETTE("palette")
 
 	//MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	//MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(seicupbl_state, tilemap_enable_w))
-	//MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(seicupbl_state, tile_scroll_w))
-	//MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(seicupbl_state, tile_vreg_1a_w))
+	//MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, seicupbl_state, tilemap_enable_w))
+	//MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, seicupbl_state, tile_scroll_w))
+	//MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, seicupbl_state, tile_vreg_1a_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seicupbl_csb)
 
@@ -573,12 +573,12 @@ MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
 //  MCFG_VIDEO_START_OVERRIDE(seicupbl_state,cupsoc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

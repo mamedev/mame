@@ -3718,13 +3718,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(segas16b_state::system16b)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_10MHz)
-	MCFG_CPU_PROGRAM_MAP(system16b_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_10MHz)
+	MCFG_DEVICE_PROGRAM_MAP(system16b_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_10MHz/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("soundcpu", Z80, MASTER_CLOCK_10MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3747,44 +3747,44 @@ MACHINE_CONFIG_START(segas16b_state::system16b)
 	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ym2151", MASTER_CLOCK_8MHz/2)
+	MCFG_DEVICE_ADD("ym2151", YM2151, MASTER_CLOCK_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(segas16b_state,upd7759_generate_nmi))
+	MCFG_DEVICE_ADD("upd", UPD7759)
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, segas16b_state,upd7759_generate_nmi))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::system16b_mc8123)
 	system16b(config);
-	MCFG_CPU_REPLACE("soundcpu", MC8123, MASTER_CLOCK_10MHz/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("soundcpu", MC8123, MASTER_CLOCK_10MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
+	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::system16b_fd1089a)
 	system16b(config);
-	MCFG_CPU_REPLACE("maincpu", FD1089A, MASTER_CLOCK_10MHz)
-	MCFG_CPU_PROGRAM_MAP(system16b_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", FD1089A, MASTER_CLOCK_10MHz)
+	MCFG_DEVICE_PROGRAM_MAP(system16b_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::system16b_fd1089b)
 	system16b(config);
-	MCFG_CPU_REPLACE("maincpu", FD1089B, MASTER_CLOCK_10MHz)
-	MCFG_CPU_PROGRAM_MAP(system16b_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", FD1089B, MASTER_CLOCK_10MHz)
+	MCFG_DEVICE_PROGRAM_MAP(system16b_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::system16b_fd1094)
 	system16b(config);
-	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK_10MHz)
-	MCFG_CPU_PROGRAM_MAP(system16b_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", FD1094, MASTER_CLOCK_10MHz)
+	MCFG_DEVICE_PROGRAM_MAP(system16b_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::aceattacb_fd1094)
@@ -3800,13 +3800,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::system16b_i8751)
 	system16b(config);
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, i8751_main_cpu_vblank)
 
-	MCFG_CPU_ADD("mcu", I8751, MASTER_CLOCK_8MHz)
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_DEVICE_ADD("mcu", I8751, MASTER_CLOCK_8MHz)
+	MCFG_DEVICE_IO_MAP(mcu_io_map)
 	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("SERVICE"))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(segas16b_state, spin_68k_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, segas16b_state, spin_68k_w))
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ0))
@@ -3837,15 +3837,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::system16b_split)
 	system16b(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(system16b_bootleg_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map_x)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(system16b_bootleg_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map_x)
 
 	MCFG_DEVICE_REMOVE("mapper")
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_sound_map)
-	MCFG_CPU_IO_MAP(bootleg_sound_portmap)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
+	MCFG_DEVICE_IO_MAP(bootleg_sound_portmap)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
@@ -3883,12 +3883,12 @@ MACHINE_CONFIG_START(segas16b_state::fpointbl)
 	MCFG_DEVICE_REMOVE("sprites")
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(fpointbl_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(fpointbl_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(fpointbl_sound_map)
-	MCFG_CPU_IO_MAP(bootleg_sound_portmap)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(fpointbl_sound_map)
+	MCFG_DEVICE_IO_MAP(bootleg_sound_portmap)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
@@ -3904,12 +3904,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::fpointbla)
 	fpointbl(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(map_fpointbla)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map_fpointbla)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(map_fpointbla)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map_fpointbla)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
 
 	MCFG_DEVICE_MODIFY("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(60) // these align the pieces with the playfield
@@ -3918,13 +3918,13 @@ MACHINE_CONFIG_START(segas16b_state::fpointbla)
 MACHINE_CONFIG_START(segas16b_state::lockonph)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) // ?
-	MCFG_CPU_PROGRAM_MAP(lockonph_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) // ?
+	MCFG_DEVICE_PROGRAM_MAP(lockonph_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(16'000'000)/4) // ?
-	MCFG_CPU_PROGRAM_MAP(lockonph_sound_map)
-	MCFG_CPU_IO_MAP(lockonph_sound_iomap)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/4) // ?
+	MCFG_DEVICE_PROGRAM_MAP(lockonph_sound_map)
+	MCFG_DEVICE_IO_MAP(lockonph_sound_iomap)
 
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -3943,17 +3943,17 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4) // ??
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4) // ??
 //  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0)) // does set up the timer, but end up with no sound?
 	MCFG_SOUND_ROUTE(0, "mono", 0.5)
 	MCFG_SOUND_ROUTE(1, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_LOW) // clock / pin not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_LOW) // clock / pin not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
@@ -3977,7 +3977,7 @@ MACHINE_CONFIG_START(segas16b_state::atomicp) // 10MHz CPU Clock verified
 
 	// sound hardware
 	MCFG_DEVICE_REMOVE("ym2151")
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(20'000'000)/4) // 20MHz OSC divided by 4 (verified)
+	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(20'000'000)/4) // 20MHz OSC divided by 4 (verified)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_REMOVE("upd")
@@ -3986,8 +3986,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas16b_state::system16c)
 	system16b(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(system16c_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(system16c_map)
 MACHINE_CONFIG_END
 
 
@@ -9768,13 +9768,13 @@ MACHINE_CONFIG_START(isgsm_state::isgsm)
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_DEVICE_REMOVE("mapper")
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000) // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
-	MCFG_CPU_PROGRAM_MAP(isgsm_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", isgsm_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000) // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
+	MCFG_DEVICE_PROGRAM_MAP(isgsm_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", isgsm_state, irq4_line_hold)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_sound_map)
-	MCFG_CPU_IO_MAP(bootleg_sound_portmap)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
+	MCFG_DEVICE_IO_MAP(bootleg_sound_portmap)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END

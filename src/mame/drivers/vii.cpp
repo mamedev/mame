@@ -1289,8 +1289,8 @@ void spg2xx_cart_state::machine_start()
 
 void spg2xx_game_state::machine_start()
 {
-	memset(m_video_regs, 0, 0x100 * sizeof(uint16_t));
-	memset(m_io_regs, 0, 0x100 * sizeof(uint16_t));
+        memset(m_video_regs, 0, 0x100 * sizeof(m_video_regs[0]));
+	memset(m_io_regs, 0, 0x200 * sizeof(m_io_regs[0]));
 	m_current_bank = 0;
 
 	m_controller_input[0] = 0;
@@ -1412,9 +1412,9 @@ DEVICE_IMAGE_LOAD_MEMBER(spg2xx_cart_state, vsmile_cart)
 }
 
 MACHINE_CONFIG_START(spg2xx_game_state::spg2xx_base)
-	MCFG_CPU_ADD( "maincpu", UNSP, XTAL(27'000'000))
-	MCFG_CPU_PROGRAM_MAP( vii_mem )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spg2xx_game_state,  vii_vblank)
+	MCFG_DEVICE_ADD( "maincpu", UNSP, XTAL(27'000'000))
+	MCFG_DEVICE_PROGRAM_MAP( vii_mem )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spg2xx_game_state,  vii_vblank)
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_REFRESH_RATE(60)

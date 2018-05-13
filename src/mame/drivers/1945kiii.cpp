@@ -384,9 +384,9 @@ void k3_state::machine_start()
 
 MACHINE_CONFIG_START(k3_state::flagrall)
 
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK ) // ?
-	MCFG_CPU_PROGRAM_MAP(flagrall_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", k3_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK ) // ?
+	MCFG_DEVICE_PROGRAM_MAP(flagrall_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", k3_state,  irq4_line_hold)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1945kiii)
 
@@ -401,9 +401,9 @@ MACHINE_CONFIG_START(k3_state::flagrall)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", MASTER_CLOCK/16, PIN7_HIGH)  /* dividers? */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_HIGH)  /* dividers? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -411,10 +411,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(k3_state::k3)
 	flagrall(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(k3_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(k3_map)
 
-	MCFG_OKIM6295_ADD("oki2", MASTER_CLOCK/16, PIN7_HIGH) /* dividers? */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_HIGH)  /* dividers? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SCREEN_MODIFY("screen")

@@ -2567,12 +2567,12 @@ WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
 
 MACHINE_CONFIG_START(taitotz_state::taitotz)
 	/* IBM EMPPC603eBG-100 */
-	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
+	MCFG_DEVICE_ADD("maincpu", PPC603E, 100000000)
 	MCFG_PPC_BUS_FREQUENCY(XTAL(66'666'700))    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	MCFG_CPU_PROGRAM_MAP(ppc603e_mem)
+	MCFG_DEVICE_PROGRAM_MAP(ppc603e_mem)
 
 	/* TMP95C063F I/O CPU */
-	MCFG_CPU_ADD("iocpu", TMP95C063, 25000000)
+	MCFG_DEVICE_ADD("iocpu", TMP95C063, 25000000)
 	MCFG_TMP95C063_PORT9_READ(IOPORT("INPUTS1"))
 	MCFG_TMP95C063_PORTB_READ(IOPORT("INPUTS2"))
 	MCFG_TMP95C063_PORTD_READ(IOPORT("INPUTS3"))
@@ -2586,15 +2586,15 @@ MACHINE_CONFIG_START(taitotz_state::taitotz)
 	MCFG_TMP95C063_AN6_READ(IOPORT("ANALOG7"))
 	MCFG_TMP95C063_AN7_READ(IOPORT("ANALOG8"))
 
-	MCFG_CPU_PROGRAM_MAP(tlcs900h_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitotz_state,  taitotz_vbi)
+	MCFG_DEVICE_PROGRAM_MAP(tlcs900h_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitotz_state,  taitotz_vbi)
 
 	/* MN1020819DA sound CPU */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120))
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(taitotz_state, ide_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, taitotz_state, ide_interrupt))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2609,8 +2609,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taitotz_state::landhigh)
 	taitotz(config);
-	MCFG_CPU_MODIFY("iocpu")
-	MCFG_CPU_PROGRAM_MAP(landhigh_tlcs900h_mem)
+	MCFG_DEVICE_MODIFY("iocpu")
+	MCFG_DEVICE_PROGRAM_MAP(landhigh_tlcs900h_mem)
 MACHINE_CONFIG_END
 
 

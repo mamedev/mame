@@ -360,8 +360,8 @@ static INPUT_PORTS_START( gp2x )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gp2x_state::gp2x)
-	MCFG_CPU_ADD("maincpu", ARM9, 80000000)
-	MCFG_CPU_PROGRAM_MAP(gp2x_map)
+	MCFG_DEVICE_ADD("maincpu", ARM9, 80000000)
+	MCFG_DEVICE_PROGRAM_MAP(gp2x_map)
 
 	MCFG_PALETTE_ADD("palette", 32768)
 
@@ -372,7 +372,8 @@ MACHINE_CONFIG_START(gp2x_state::gp2x)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(gp2x_state, screen_update_gp2x)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 ROM_START(gp2x)

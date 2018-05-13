@@ -1885,13 +1885,13 @@ INTERRUPT_GEN_MEMBER(supracan_state::supracan_sound_irq)
 
 MACHINE_CONFIG_START(supracan_state::supracan)
 
-	MCFG_CPU_ADD( "maincpu", M68000, XTAL(10'738'635) )        /* Correct frequency unknown */
-	MCFG_CPU_PROGRAM_MAP( supracan_mem )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_irq)
+	MCFG_DEVICE_ADD( "maincpu", M68000, XTAL(10'738'635) )        /* Correct frequency unknown */
+	MCFG_DEVICE_PROGRAM_MAP( supracan_mem )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_irq)
 
-	MCFG_CPU_ADD( "soundcpu", M6502, XTAL(3'579'545) )     /* TODO: Verify actual clock */
-	MCFG_CPU_PROGRAM_MAP( supracan_sound_mem )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_sound_irq)
+	MCFG_DEVICE_ADD( "soundcpu", M6502, XTAL(3'579'545) )     /* TODO: Verify actual clock */
+	MCFG_DEVICE_PROGRAM_MAP( supracan_sound_mem )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_sound_irq)
 
 #if !(SOUNDCPU_BOOT_HACK)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")

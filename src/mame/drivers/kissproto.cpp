@@ -51,8 +51,8 @@ void kissp_state::init_kissp()
 
 MACHINE_CONFIG_START(kissp_state::kissp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8035, 6000000/15)
-	MCFG_CPU_PROGRAM_MAP(kissp_map)
+	MCFG_DEVICE_ADD("maincpu", I8035, 6000000/15)
+	MCFG_DEVICE_PROGRAM_MAP(kissp_map)
 MACHINE_CONFIG_END
 
 ROM_START(kissp)

@@ -489,8 +489,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(mpu12wbk_state::mpu12wbk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(mpu12wbk_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(mpu12wbk_map)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -513,9 +513,9 @@ MACHINE_CONFIG_START(mpu12wbk_state::mpu12wbk)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)        /* guess */
+	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)        /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 MACHINE_CONFIG_END

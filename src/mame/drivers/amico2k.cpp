@@ -215,17 +215,17 @@ void amico2k_state::machine_start()
 
 MACHINE_CONFIG_START(amico2k_state::amico2k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1000000) /* 1MHz */
-	MCFG_CPU_PROGRAM_MAP(amico2k_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000) /* 1MHz */
+	MCFG_DEVICE_PROGRAM_MAP(amico2k_mem)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_amico2k )
 
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(amico2k_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(amico2k_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(amico2k_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(amico2k_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, amico2k_state, ppi_pa_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amico2k_state, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, amico2k_state, ppi_pb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, amico2k_state, ppi_pb_w))
 MACHINE_CONFIG_END
 
 

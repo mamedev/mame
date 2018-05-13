@@ -173,8 +173,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(ec65_state::ec65)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502, XTAL(4'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(ec65_mem)
+	MCFG_DEVICE_ADD("maincpu",M6502, XTAL(4'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(ec65_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -211,8 +211,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ec65k_state::ec65k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",G65816, XTAL(4'000'000)) // can use 4,2 or 1 MHz
-	MCFG_CPU_PROGRAM_MAP(ec65k_mem)
+	MCFG_DEVICE_ADD("maincpu",G65816, XTAL(4'000'000)) // can use 4,2 or 1 MHz
+	MCFG_DEVICE_PROGRAM_MAP(ec65k_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

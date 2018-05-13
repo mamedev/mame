@@ -330,8 +330,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tank8_state::tank8)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 11055000 / 10) /* ? */
-	MCFG_CPU_PROGRAM_MAP(tank8_cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 11055000 / 10) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(tank8_cpu_map)
 
 
 	/* video hardware */
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(tank8_state::tank8)
 	MCFG_SCREEN_SIZE(512, 524)
 	MCFG_SCREEN_VISIBLE_AREA(16, 495, 0, 463)
 	MCFG_SCREEN_UPDATE_DRIVER(tank8_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tank8_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tank8_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tank8)
@@ -351,10 +351,9 @@ MACHINE_CONFIG_START(tank8_state::tank8)
 	MCFG_PALETTE_INIT_OWNER(tank8_state, tank8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(tank8)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, tank8_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

@@ -1933,21 +1933,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 MACHINE_CONFIG_START(cischeat_state::bigrun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu1", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_map)
+	MCFG_DEVICE_ADD("cpu1", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, bigrun_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("cpu2", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_map2)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("cpu2", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_map2)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("cpu3", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_map3)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("cpu3", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_map3)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cischeat_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", M68000, 6000000)
-	MCFG_CPU_PROGRAM_MAP(bigrun_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
+	MCFG_DEVICE_ADD("soundcpu", M68000, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigrun_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cischeat_state, irq4_line_hold, 16*30)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -1971,20 +1971,21 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x3600/2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("ymsnd", STD_FM_CLOCK)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, STD_FM_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki1", STD_OKI_CLOCK, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, STD_OKI_CLOCK, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_OKIM6295_ADD("oki2", STD_OKI_CLOCK, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, STD_OKI_CLOCK, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END
@@ -1994,17 +1995,17 @@ MACHINE_CONFIG_START(cischeat_state::cischeat)
 	bigrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(cischeat_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_map)
 
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_PROGRAM_MAP(cischeat_map2)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_map2)
 
-	MCFG_CPU_MODIFY("cpu3")
-	MCFG_CPU_PROGRAM_MAP(cischeat_map3)
+	MCFG_DEVICE_MODIFY("cpu3")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_map3)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(cischeat_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(cischeat_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2032,20 +2033,20 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstar)
 	bigrun(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_CLOCK(12000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_CLOCK(12000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map)
 
-	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_CLOCK(12000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_map2)
+	MCFG_DEVICE_MODIFY("cpu2")
+	MCFG_DEVICE_CLOCK(12000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map2)
 
-	MCFG_CPU_MODIFY("cpu3")
-	MCFG_CPU_CLOCK(12000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_map3)
+	MCFG_DEVICE_MODIFY("cpu3")
+	MCFG_DEVICE_CLOCK(12000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_map3)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(f1gpstar_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_sound_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", f1gpstar)
@@ -2070,14 +2071,14 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstr2)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(f1gpstr2_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(f1gpstr2_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_sound_map)
 
-	MCFG_CPU_ADD("cpu5", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(f1gpstr2_io_map)
+	MCFG_DEVICE_ADD("cpu5", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(f1gpstr2_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 MACHINE_CONFIG_END
@@ -2085,8 +2086,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cischeat_state::wildplt)
 	f1gpstr2(config);
-	MCFG_CPU_MODIFY("cpu1")
-	MCFG_CPU_PROGRAM_MAP(wildplt_map)
+	MCFG_DEVICE_MODIFY("cpu1")
+	MCFG_DEVICE_PROGRAM_MAP(wildplt_map)
 MACHINE_CONFIG_END
 
 
@@ -2115,8 +2116,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 MACHINE_CONFIG_START(cischeat_state::scudhamm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(scudhamm_map)
+	MCFG_DEVICE_ADD("maincpu",M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(scudhamm_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, scudhamm_scanline, "screen", 0, 1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -2140,13 +2141,14 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 0x4e00/2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 MACHINE_CONFIG_END
@@ -2171,8 +2173,8 @@ MACHINE_CONFIG_START(cischeat_state::armchmp2)
 	scudhamm(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(armchmp2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(armchmp2_map)
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(cischeat_state, armchamp2_scanline)
 MACHINE_CONFIG_END
@@ -2203,8 +2205,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
 MACHINE_CONFIG_START(cischeat_state::captflag)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(24'000'000) / 2)  // TMP68000P-12
-	MCFG_CPU_PROGRAM_MAP(captflag_map)
+	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(24'000'000) / 2)  // TMP68000P-12
+	MCFG_DEVICE_PROGRAM_MAP(captflag_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, captflag_scanline, "screen", 0, 1)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
@@ -2237,14 +2239,15 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_DEFAULT_LAYOUT(layout_captflag)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, captflag_oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, captflag_oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)

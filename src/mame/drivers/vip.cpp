@@ -556,7 +556,7 @@ static const discrete_555_desc vip_ca555_a =
 	DEFAULT_555_VALUES
 };
 
-static DISCRETE_SOUND_START( vip )
+static DISCRETE_SOUND_START( vip_discrete )
 	DISCRETE_INPUT_LOGIC(NODE_01)
 	DISCRETE_555_ASTABLE_CV(NODE_02, NODE_01, 470, (int) RES_M(1), (int) CAP_P(470), NODE_01, &vip_ca555_a)
 	DISCRETE_OUTPUT(NODE_02, 5000)
@@ -714,40 +714,39 @@ QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 
 MACHINE_CONFIG_START(vip_state::vip)
 	// basic machine hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(3'521'280)/2)
-	MCFG_CPU_PROGRAM_MAP(vip_mem)
-	MCFG_CPU_IO_MAP(vip_io)
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(3'521'280)/2)
+	MCFG_DEVICE_PROGRAM_MAP(vip_mem)
+	MCFG_DEVICE_IO_MAP(vip_io)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(vip_state, clear_r))
-	MCFG_COSMAC_EF1_CALLBACK(READLINE(vip_state, ef1_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(vip_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(vip_state, ef3_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(vip_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(vip_state, q_w))
-	MCFG_COSMAC_DMAR_CALLBACK(READ8(vip_state, dma_r))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(vip_state, dma_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(vip_state, sc_w))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, vip_state, clear_r))
+	MCFG_COSMAC_EF1_CALLBACK(READLINE(*this, vip_state, ef1_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, vip_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, vip_state, ef3_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, vip_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, vip_state, q_w))
+	MCFG_COSMAC_DMAR_CALLBACK(READ8(*this, vip_state, dma_r))
+	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(*this, vip_state, dma_w))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, vip_state, sc_w))
 
 	// video hardware
 	MCFG_DEVICE_ADD(CDP1861_TAG, CDP1861, XTAL(3'521'280)/2)
-	MCFG_CDP1861_IRQ_CALLBACK(WRITELINE(vip_state, vdc_int_w))
-	MCFG_CDP1861_DMA_OUT_CALLBACK(WRITELINE(vip_state, vdc_dma_out_w))
-	MCFG_CDP1861_EFX_CALLBACK(WRITELINE(vip_state, vdc_ef1_w))
+	MCFG_CDP1861_IRQ_CALLBACK(WRITELINE(*this, vip_state, vdc_int_w))
+	MCFG_CDP1861_DMA_OUT_CALLBACK(WRITELINE(*this, vip_state, vdc_dma_out_w))
+	MCFG_CDP1861_EFX_CALLBACK(WRITELINE(*this, vip_state, vdc_ef1_w))
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL(3'521'280)/2)
 	MCFG_SCREEN_UPDATE_DRIVER(vip_state, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
-	MCFG_DISCRETE_INTF(vip)
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, vip_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_VIP_BYTEIO_PORT_ADD(VIP_BYTEIO_PORT_TAG, vip_byteio_cards, nullptr, WRITELINE(vip_state, byteio_inst_w))
+	MCFG_VIP_BYTEIO_PORT_ADD(VIP_BYTEIO_PORT_TAG, vip_byteio_cards, nullptr, WRITELINE(*this, vip_state, byteio_inst_w))
 	MCFG_VIP_EXPANSION_SLOT_ADD(VIP_EXPANSION_SLOT_TAG, XTAL(3'521'280)/2, vip_expansion_cards, nullptr)
-	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vip_state, exp_int_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vip_state, exp_dma_out_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vip_state, exp_dma_in_w))
+	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(*this, vip_state, exp_int_w))
+	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(*this, vip_state, exp_dma_out_w))
+	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(*this, vip_state, exp_dma_in_w))
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", vip_state, vip, "bin,c8,c8x", 0)

@@ -159,13 +159,13 @@ MACHINE_CONFIG_START(rcorsair_state::rcorsair)
 	/* Main CPU is probably inside Custom Block with
 	   program code, unknown type */
 
-	MCFG_CPU_ADD("maincpu", Z80, 8000000)
-	MCFG_CPU_PROGRAM_MAP(rcorsair_main_map)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", rcorsair_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(rcorsair_main_map)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rcorsair_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", I8035, 8000000)
-	MCFG_CPU_PROGRAM_MAP(rcorsair_sub_map)
-	MCFG_CPU_IO_MAP(rcorsair_sub_io_map)
+	MCFG_DEVICE_ADD("subcpu", I8035, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(rcorsair_sub_map)
+	MCFG_DEVICE_IO_MAP(rcorsair_sub_io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

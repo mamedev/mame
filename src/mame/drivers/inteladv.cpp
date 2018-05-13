@@ -81,8 +81,8 @@ void inteladv_state::machine_reset()
 
 MACHINE_CONFIG_START(inteladv_state::inteladv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, XTAL(1'000'000) )
-	MCFG_CPU_PROGRAM_MAP(inteladv_main)
+	MCFG_DEVICE_ADD("maincpu", R65C02, XTAL(1'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(inteladv_main)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -98,7 +98,8 @@ MACHINE_CONFIG_START(inteladv_state::inteladv)
 	MCFG_PALETTE_FORMAT(XBGR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 ROM_START( inteladv )

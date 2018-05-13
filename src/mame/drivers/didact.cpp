@@ -574,8 +574,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 }
 
 MACHINE_CONFIG_START(md6802_state::md6802)
-	MCFG_CPU_ADD("maincpu", M6802, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(md6802_map)
+	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(md6802_map)
 	MCFG_DEFAULT_LAYOUT(layout_md6802)
 
 	/* Devices */
@@ -596,21 +596,21 @@ MACHINE_CONFIG_START(md6802_state::md6802)
 	/* 0xE068 0xC000 (Port A)    = 0x60 */
 	/* 0xE08A 0xC002 (Port B)    = 0xEE - updating display */
 	/* 0xE090 0xC000 (Port A)    = 0x00 - looping in 0x10,0x20,0x30,0x40,0x50 */
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(md6802_state, pia2_kbA_w))
-	MCFG_PIA_READPA_HANDLER(READ8(md6802_state, pia2_kbA_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(md6802_state, pia2_kbB_w))
-	MCFG_PIA_READPB_HANDLER(READ8(md6802_state, pia2_kbB_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(md6802_state, pia2_ca2_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, md6802_state, pia2_kbA_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, md6802_state, pia2_kbA_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, md6802_state, pia2_kbB_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, md6802_state, pia2_kbB_r))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, md6802_state, pia2_ca2_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", md6802_state, scan_artwork, attotime::from_hz(10))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mp68a_state::mp68a)
 	// Clock source is based on a N9602N Dual Retriggerable Resettable Monostable Multivibrator oscillator at aprox 505KHz.
 	// Trimpot seems broken/stuck at 5K Ohm thu. ROM code 1Ms delay loops suggest 1MHz+
-	MCFG_CPU_ADD("maincpu", M6800, 505000)
-	MCFG_CPU_PROGRAM_MAP(mp68a_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 505000)
+	MCFG_DEVICE_PROGRAM_MAP(mp68a_map)
 	MCFG_DEFAULT_LAYOUT(layout_mp68a)
 
 	/* Devices */
@@ -630,11 +630,11 @@ MACHINE_CONFIG_START(mp68a_state::mp68a)
 	/* --execution-wait for key loop-- */
 	/* 0x086B Update display sequnc, see below                            */
 	/* 0x0826 CB1 read          = 0x603 (Control B)  - is a key pressed? */
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mp68a_state, pia2_kbA_w))
-	MCFG_PIA_READPA_HANDLER(READ8(mp68a_state, pia2_kbA_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mp68a_state, pia2_kbB_w))
-	MCFG_PIA_READPB_HANDLER(READ8(mp68a_state, pia2_kbB_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(mp68a_state, pia2_cb1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mp68a_state, pia2_kbA_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, mp68a_state, pia2_kbA_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mp68a_state, pia2_kbB_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, mp68a_state, pia2_kbB_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, mp68a_state, pia2_cb1_r))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE)) /* Not used by ROM. Combined trace to CPU IRQ with IRQB */
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE)) /* Not used by ROM. Combined trace to CPU IRQ with IRQA */
 
@@ -652,17 +652,17 @@ MACHINE_CONFIG_START(mp68a_state::mp68a)
 	/* 0x086B 0x600 (Port A)    = 0x50 */
 	/* 0x086B 0x600 (Port A)    = 0x70 */
 	MCFG_DEVICE_ADD("digit0", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(mp68a_state, digit_w<0>))
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<0>))
 	MCFG_DEVICE_ADD("digit1", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(mp68a_state, digit_w<1>))
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<1>))
 	MCFG_DEVICE_ADD("digit2", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(mp68a_state, digit_w<2>))
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<2>))
 	MCFG_DEVICE_ADD("digit3", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(mp68a_state, digit_w<3>))
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<3>))
 	MCFG_DEVICE_ADD("digit4", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(mp68a_state, digit_w<4>))
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<4>))
 	MCFG_DEVICE_ADD("digit5", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(mp68a_state, digit_w<5>))
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<5>))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", mp68a_state, scan_artwork, attotime::from_hz(10))
 MACHINE_CONFIG_END

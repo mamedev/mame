@@ -364,10 +364,10 @@ INTERRUPT_GEN_MEMBER(crbaloon_state::vblank_irq)
 MACHINE_CONFIG_START(crbaloon_state::crbaloon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CRBALOON_MASTER_XTAL / 3)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", crbaloon_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, CRBALOON_MASTER_XTAL / 3)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crbaloon_state,  vblank_irq)
 
 
 	/* video hardware */

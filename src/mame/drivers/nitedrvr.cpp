@@ -143,9 +143,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(nitedrvr_state::nitedrvr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'096'000)/12) // 1 MHz
-	MCFG_CPU_PROGRAM_MAP(nitedrvr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nitedrvr_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'096'000)/12) // 1 MHz
+	MCFG_DEVICE_PROGRAM_MAP(nitedrvr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nitedrvr_state, irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 3)
@@ -166,10 +166,9 @@ MACHINE_CONFIG_START(nitedrvr_state::nitedrvr)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(nitedrvr)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, nitedrvr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

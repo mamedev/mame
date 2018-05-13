@@ -534,11 +534,11 @@ void popper_state::machine_reset()
 //**************************************************************************
 
 MACHINE_CONFIG_START(popper_state::popper)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/3/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL(18'432'000)/3/2)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(18'432'000)/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -554,12 +554,12 @@ MACHINE_CONFIG_START(popper_state::popper)
 	MCFG_PALETTE_INIT_OWNER(popper_state, popper)
 
 	// audio hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/3/2/2)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/3/2/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'432'000)/3/2/2)
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'432'000)/3/2/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

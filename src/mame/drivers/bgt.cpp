@@ -50,9 +50,9 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(bgt_state::bgt)
-	MCFG_CPU_ADD("maincpu", V30, 12000000 ) // ? unknown CPU.. definitely x86 based tho
-	MCFG_CPU_PROGRAM_MAP(bgt_map)
-	MCFG_CPU_IO_MAP(bgt_io)
+	MCFG_DEVICE_ADD("maincpu", V30, 12000000 ) // ? unknown CPU.. definitely x86 based tho
+	MCFG_DEVICE_PROGRAM_MAP(bgt_map)
+	MCFG_DEVICE_IO_MAP(bgt_io)
 MACHINE_CONFIG_END
 
 ROM_START( bg_ddb )

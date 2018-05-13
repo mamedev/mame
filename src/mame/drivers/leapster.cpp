@@ -309,9 +309,9 @@ void leapster_state::leapster_aux(address_map &map)
 MACHINE_CONFIG_START(leapster_state::leapster)
 	/* basic machine hardware */
 	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
-	MCFG_CPU_ADD("maincpu", ARCA5, 96000000/10)
-	MCFG_CPU_PROGRAM_MAP(leapster_map)
-	MCFG_CPU_IO_MAP(leapster_aux)
+	MCFG_DEVICE_ADD("maincpu", ARCA5, 96000000/10)
+	MCFG_DEVICE_PROGRAM_MAP(leapster_map)
+	MCFG_DEVICE_IO_MAP(leapster_aux)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

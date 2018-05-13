@@ -458,8 +458,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sprint8_state::sprint8)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 11055000 / 11) /* ? */
-	MCFG_CPU_PROGRAM_MAP(sprint8_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 11055000 / 11) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(sprint8_map)
 
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("input_timer", sprint8_state, input_callback, attotime::from_hz(60))
@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(sprint8_state::sprint8)
 	MCFG_SCREEN_SIZE(512, 261)
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 231)
 	MCFG_SCREEN_UPDATE_DRIVER(sprint8_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sprint8_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint8_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprint8)

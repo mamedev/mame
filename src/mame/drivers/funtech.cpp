@@ -488,10 +488,10 @@ void fun_tech_corp_state::machine_start()
 MACHINE_CONFIG_START(fun_tech_corp_state::funtech)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(funtech_map)
-	MCFG_CPU_IO_MAP(funtech_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fun_tech_corp_state, vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(funtech_map)
+	MCFG_DEVICE_IO_MAP(funtech_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fun_tech_corp_state, vblank_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -511,9 +511,9 @@ MACHINE_CONFIG_START(fun_tech_corp_state::funtech)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000) /* M5255, ? MHz */
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) /* M5255, ? MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

@@ -703,10 +703,10 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(limenko_state::limenko)
-	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4) /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(limenko_map)
-	MCFG_CPU_IO_MAP(limenko_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", E132XN, 20000000*4) /* 4x internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(limenko_map)
+	MCFG_DEVICE_IO_MAP(limenko_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -724,33 +724,34 @@ MACHINE_CONFIG_START(limenko_state::limenko)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("qs1000", qs1000_device, set_irq))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("qs1000", QS1000, XTAL(24'000'000))
+	MCFG_DEVICE_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_QS1000_OUT_P1_CB(WRITE8(limenko_state, qs1000_p1_w))
-	MCFG_QS1000_OUT_P2_CB(WRITE8(limenko_state, qs1000_p2_w))
-	MCFG_QS1000_OUT_P3_CB(WRITE8(limenko_state, qs1000_p3_w))
+	MCFG_QS1000_IN_P1_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_QS1000_OUT_P1_CB(WRITE8(*this, limenko_state, qs1000_p1_w))
+	MCFG_QS1000_OUT_P2_CB(WRITE8(*this, limenko_state, qs1000_p2_w))
+	MCFG_QS1000_OUT_P3_CB(WRITE8(*this, limenko_state, qs1000_p3_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(limenko_state::spotty)
-	MCFG_CPU_ADD("maincpu", GMS30C2232, 20000000)   /* 20 MHz, no internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(spotty_map)
-	MCFG_CPU_IO_MAP(spotty_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", GMS30C2232, 20000000)   /* 20 MHz, no internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(spotty_map)
+	MCFG_DEVICE_IO_MAP(spotty_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", limenko_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", AT89C4051, 4000000)    /* 4 MHz */
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(limenko_state, spotty_sound_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(DEVWRITE8("oki", okim6295_device, write)) //? sound latch and ?
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(limenko_state, spotty_sound_cmd_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(limenko_state, spotty_sound_cmd_w)) //not sure about anything...
+	MCFG_DEVICE_ADD("audiocpu", AT89C4051, 4000000)    /* 4 MHz */
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, limenko_state, spotty_sound_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8("oki", okim6295_device, write)) //? sound latch and ?
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, limenko_state, spotty_sound_cmd_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, limenko_state, spotty_sound_cmd_w)) //not sure about anything...
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -769,11 +770,11 @@ MACHINE_CONFIG_START(limenko_state::spotty)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 4000000 / 4 , PIN7_HIGH) //?
+	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000 / 4 , okim6295_device::PIN7_HIGH) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

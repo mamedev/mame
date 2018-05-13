@@ -114,7 +114,7 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	static void ncr5390(device_t *device);
+	void ncr5390(device_t *device);
 	void next_base(machine_config &config);
 	void next_fdc_base(machine_config &config);
 	void nextst(machine_config &config);

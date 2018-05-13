@@ -368,9 +368,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(nouspikel_ide_interface_device::device_add_mconfig)
 	MCFG_DEVICE_ADD( "ide_rtc", RTC65271, 0 )
-	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(nouspikel_ide_interface_device, clock_interrupt_callback))
+	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(*this, nouspikel_ide_interface_device, clock_interrupt_callback))
 	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(nouspikel_ide_interface_device, ide_interrupt_callback))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, nouspikel_ide_interface_device, ide_interrupt_callback))
 
 	MCFG_RAM_ADD(RAMREGION)
 	MCFG_RAM_DEFAULT_SIZE("512K")

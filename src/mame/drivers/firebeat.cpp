@@ -1163,20 +1163,21 @@ WRITE_LINE_MEMBER( firebeat_state::ata_interrupt )
 void firebeat_state::cdrom_config(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 }
 
-static SLOT_INTERFACE_START(firebeat_ata_devices)
-	SLOT_INTERFACE("cdrom", ATAPI_FIXED_CDROM)
-SLOT_INTERFACE_END
+static void firebeat_ata_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", ATAPI_FIXED_CDROM);
+}
 
 MACHINE_CONFIG_START(firebeat_state::firebeat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GCX, XTAL(64'000'000))
-	MCFG_CPU_PROGRAM_MAP(firebeat_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", firebeat_state,  firebeat_interrupt)
+	MCFG_DEVICE_ADD("maincpu", PPC403GCX, XTAL(64'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(firebeat_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", firebeat_state,  firebeat_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
 	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
@@ -1188,16 +1189,16 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
 
 	MCFG_ATA_INTERFACE_ADD("ata", firebeat_ata_devices, "cdrom", "cdrom", true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(firebeat_state, ata_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, firebeat_state, ata_interrupt))
 
 	MCFG_DEVICE_MODIFY("ata:1")
-	MCFG_DEVICE_CARD_MACHINE_CONFIG( "cdrom", cdrom_config )
+	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cdrom", cdrom_config )
 
 	/* video hardware */
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	MCFG_DEVICE_ADD("gcu0", K057714, 0)
-	MCFG_K057714_IRQ_CALLBACK(WRITELINE(firebeat_state, gcu0_interrupt))
+	MCFG_K057714_IRQ_CALLBACK(WRITELINE(*this, firebeat_state, gcu0_interrupt))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1210,10 +1211,11 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(firebeat_state, sound_irq_callback))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, firebeat_state, sound_irq_callback))
 	MCFG_DEVICE_ADDRESS_MAP(0, ymz280b_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1223,17 +1225,17 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	MCFG_DEVICE_ADD("duart_com:chan1", NS16550, XTAL(19'660'800))
 	MCFG_DEVICE_ADD("duart_midi", PC16552D, 0)  // in all memory maps, pgmd to 31250baud
 	MCFG_DEVICE_ADD("duart_midi:chan0", NS16550, XTAL(24'000'000))
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, firebeat_state, midi_uart_ch0_irq_callback))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, firebeat_state, midi_uart_ch0_irq_callback))
 	MCFG_DEVICE_ADD("duart_midi:chan1", NS16550, XTAL(24'000'000))
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, firebeat_state, midi_uart_ch1_irq_callback))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, firebeat_state, midi_uart_ch1_irq_callback))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(firebeat_state::firebeat2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GCX, XTAL(64'000'000))
-	MCFG_CPU_PROGRAM_MAP(firebeat2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", firebeat_state,  firebeat_interrupt)
+	MCFG_DEVICE_ADD("maincpu", PPC403GCX, XTAL(64'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(firebeat2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", firebeat_state,  firebeat_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
 	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
@@ -1245,19 +1247,19 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
 
 	MCFG_ATA_INTERFACE_ADD("ata", firebeat_ata_devices, "cdrom", "cdrom", true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(firebeat_state, ata_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, firebeat_state, ata_interrupt))
 
 	MCFG_DEVICE_MODIFY("ata:1")
-	MCFG_DEVICE_CARD_MACHINE_CONFIG( "cdrom", cdrom_config )
+	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cdrom", cdrom_config )
 
 	/* video hardware */
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	MCFG_DEVICE_ADD("gcu0", K057714, 0)
-	MCFG_K057714_IRQ_CALLBACK(WRITELINE(firebeat_state, gcu0_interrupt))
+	MCFG_K057714_IRQ_CALLBACK(WRITELINE(*this, firebeat_state, gcu0_interrupt))
 
 	MCFG_DEVICE_ADD("gcu1", K057714, 0)
-	MCFG_K057714_IRQ_CALLBACK(WRITELINE(firebeat_state, gcu1_interrupt))
+	MCFG_K057714_IRQ_CALLBACK(WRITELINE(*this, firebeat_state, gcu1_interrupt))
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1278,10 +1280,11 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(firebeat_state, sound_irq_callback))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, firebeat_state, sound_irq_callback))
 	MCFG_DEVICE_ADDRESS_MAP(0, ymz280b_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1291,28 +1294,28 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	MCFG_DEVICE_ADD("duart_com:chan1", NS16550, XTAL(19'660'800))
 	MCFG_DEVICE_ADD("duart_midi", PC16552D, 0)
 	MCFG_DEVICE_ADD("duart_midi:chan0", NS16550, XTAL(24'000'000))
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, firebeat_state, midi_uart_ch0_irq_callback))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, firebeat_state, midi_uart_ch0_irq_callback))
 	MCFG_DEVICE_ADD("duart_midi:chan1", NS16550, XTAL(24'000'000))
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, firebeat_state, midi_uart_ch1_irq_callback))
-	MCFG_MIDI_KBD_ADD("kbd0", DEVWRITELINE("duart_midi:chan0", ins8250_uart_device, rx_w), 31250)
-	MCFG_MIDI_KBD_ADD("kbd1", DEVWRITELINE("duart_midi:chan1", ins8250_uart_device, rx_w), 31250)
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, firebeat_state, midi_uart_ch1_irq_callback))
+	MCFG_MIDI_KBD_ADD("kbd0", WRITELINE("duart_midi:chan0", ins8250_uart_device, rx_w), 31250)
+	MCFG_MIDI_KBD_ADD("kbd1", WRITELINE("duart_midi:chan1", ins8250_uart_device, rx_w), 31250)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(firebeat_state::firebeat_spu)
 	firebeat(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("audiocpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(spu_map)
+	MCFG_DEVICE_ADD("audiocpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(spu_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sputimer", firebeat_state, spu_timer_callback, attotime::from_hz(1000));
 
-	MCFG_RF5C400_ADD("rf5c400", XTAL(16'934'400))
+	MCFG_DEVICE_ADD("rf5c400", RF5C400, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_ATA_INTERFACE_ADD("spu_ata", firebeat_ata_devices, "cdrom", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(firebeat_state, spu_ata_interrupt))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, firebeat_state, spu_ata_interrupt))
 MACHINE_CONFIG_END
 
 /*****************************************************************************/

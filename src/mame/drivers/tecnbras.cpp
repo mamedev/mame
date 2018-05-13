@@ -114,9 +114,9 @@ void tecnbras_state::machine_reset()
 
 MACHINE_CONFIG_START(tecnbras_state::tecnbras)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, 12_MHz_XTAL) // verified on pcb
-	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
-	MCFG_CPU_IO_MAP(i80c31_io)
+	MCFG_DEVICE_ADD("maincpu", I80C31, 12_MHz_XTAL) // verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
+	MCFG_DEVICE_IO_MAP(i80c31_io)
 	MCFG_MCS51_PORT_P1_OUT_CB(NOOP) // buzzer ?
 
 /* TODO: Add an I2C RTC (Phillips PCF8583P)

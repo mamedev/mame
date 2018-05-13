@@ -64,13 +64,13 @@ uint32_t uknc_state::screen_update_uknc(screen_device &screen, bitmap_ind16 &bit
 
 MACHINE_CONFIG_START(uknc_state::uknc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", K1801VM2, 8000000)
+	MCFG_DEVICE_ADD("maincpu", K1801VM2, 8000000)
 	MCFG_T11_INITIAL_MODE(0x8000)
-	MCFG_CPU_PROGRAM_MAP(uknc_mem)
+	MCFG_DEVICE_PROGRAM_MAP(uknc_mem)
 
-	MCFG_CPU_ADD("subcpu",  K1801VM2, 6000000)
+	MCFG_DEVICE_ADD("subcpu",  K1801VM2, 6000000)
 	MCFG_T11_INITIAL_MODE(0x8000)
-	MCFG_CPU_PROGRAM_MAP(uknc_sub_mem)
+	MCFG_DEVICE_PROGRAM_MAP(uknc_sub_mem)
 
 
 	/* video hardware */

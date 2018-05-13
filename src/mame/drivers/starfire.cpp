@@ -331,9 +331,9 @@ INTERRUPT_GEN_MEMBER(starfire_state::vblank_int)
 MACHINE_CONFIG_START(starfire_state::fireone)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, STARFIRE_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", starfire_state, vblank_int)
+	MCFG_DEVICE_ADD("maincpu", Z80, STARFIRE_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", starfire_state, vblank_int)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -348,9 +348,9 @@ MACHINE_CONFIG_START(starfire_state::starfire)
 	fireone(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(5)
 	MCFG_SAMPLES_NAMES(starfire_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

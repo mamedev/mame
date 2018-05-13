@@ -44,8 +44,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(sansa_fuze_state::sansa_fuze)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, 50000000) // arm based, speed unknown
-	MCFG_CPU_PROGRAM_MAP(sansa_fuze_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 50000000) // arm based, speed unknown
+	MCFG_DEVICE_PROGRAM_MAP(sansa_fuze_map)
 
 MACHINE_CONFIG_END
 

@@ -405,12 +405,12 @@ void silvmil_state::silvmil_sound_map(address_map &map)
 MACHINE_CONFIG_START(silvmil_state::silvmil)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* Verified */
-	MCFG_CPU_PROGRAM_MAP(silvmil_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", silvmil_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* Verified */
+	MCFG_DEVICE_PROGRAM_MAP(silvmil_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", silvmil_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'096'000)) /* Verified */
-	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'096'000)) /* Verified */
+	MCFG_DEVICE_PROGRAM_MAP(silvmil_sound_map)
 
 
 	/* video hardware */
@@ -433,36 +433,36 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 	MCFG_DECO_SPRITE_OFFSETS(5, 7)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* Verified */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(4'096'000)/4, PIN7_HIGH) /* Verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'096'000)/4, okim6295_device::PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(silvmil_state::puzzlove)
 	silvmil(config);
 	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000)) /* Verified */
-	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000)) /* Verified */
+	MCFG_DEVICE_PROGRAM_MAP(silvmil_sound_map)
 
 	MCFG_DEVICE_MODIFY("spritegen")
 	MCFG_DECO_SPRITE_BOOTLEG_TYPE(1)
 
 	MCFG_DEVICE_REMOVE("oki")
-	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH) /* Verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(silvmil_state::puzzlovek)
 	puzzlove(config);
 	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_YM2151_ADD("ymsnd", XTAL(15'000'000)/4) /* Verified */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(15'000'000)/4) /* Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

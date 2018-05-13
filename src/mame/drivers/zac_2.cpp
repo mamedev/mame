@@ -211,12 +211,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_outtimer)
 
 MACHINE_CONFIG_START(zac_2_state::zac_2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 6000000/2)
-	MCFG_CPU_PROGRAM_MAP(zac_2_map)
-	MCFG_CPU_IO_MAP(zac_2_io)
-	MCFG_CPU_DATA_MAP(zac_2_data)
-	MCFG_S2650_SENSE_INPUT(READLINE(zac_2_state, serial_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(zac_2_state, serial_w))
+	MCFG_DEVICE_ADD("maincpu", S2650, 6000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(zac_2_map)
+	MCFG_DEVICE_IO_MAP(zac_2_io)
+	MCFG_DEVICE_DATA_MAP(zac_2_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, zac_2_state, serial_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, zac_2_state, serial_w))
 	MCFG_NVRAM_ADD_0FILL("ram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_2_inttimer", zac_2_state, zac_2_inttimer, attotime::from_hz(200))

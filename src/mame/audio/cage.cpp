@@ -628,8 +628,8 @@ void atari_cage_seattle_device::cage_map_seattle(address_map &map)
 MACHINE_CONFIG_START(atari_cage_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cage", TMS32031, 33868800)
-	MCFG_CPU_PROGRAM_MAP(cage_map)
+	MCFG_DEVICE_ADD("cage", TMS32031, 33868800)
+	MCFG_DEVICE_PROGRAM_MAP(cage_map)
 	MCFG_TMS3203X_MCBL(true)
 
 	MCFG_TIMER_DEVICE_ADD("cage_dma_timer", DEVICE_SELF, atari_cage_device, dma_timer_callback)
@@ -637,27 +637,28 @@ MACHINE_CONFIG_START(atari_cage_device::device_add_mconfig)
 	MCFG_TIMER_DEVICE_ADD("cage_timer1", DEVICE_SELF, atari_cage_device, cage_timer_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
 #if (DAC_BUFFER_CHANNELS == 4)
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dac3", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac3", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MCFG_SOUND_ADD("dac4", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac4", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 #else
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 #endif
 MACHINE_CONFIG_END
@@ -685,6 +686,6 @@ MACHINE_CONFIG_START(atari_cage_seattle_device::device_add_mconfig)
 
 	atari_cage_device::device_add_mconfig(config);
 
-	MCFG_CPU_MODIFY("cage")
-	MCFG_CPU_PROGRAM_MAP(cage_map_seattle)
+	MCFG_DEVICE_MODIFY("cage")
+	MCFG_DEVICE_PROGRAM_MAP(cage_map_seattle)
 MACHINE_CONFIG_END

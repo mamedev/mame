@@ -264,8 +264,8 @@ PALETTE_INIT_MEMBER(itgambl3_state, itgambl3)
 MACHINE_CONFIG_START(itgambl3_state::itgambl3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
-	MCFG_CPU_PROGRAM_MAP(itgambl3_map)
+	MCFG_DEVICE_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
+	MCFG_DEVICE_PROGRAM_MAP(itgambl3_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -281,8 +281,8 @@ MACHINE_CONFIG_START(itgambl3_state::itgambl3)
 	MCFG_PALETTE_INIT_OWNER(itgambl3_state, itgambl3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MAIN_CLOCK/16, PIN7_HIGH) /* 1MHz */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, MAIN_CLOCK/16, okim6295_device::PIN7_HIGH) /* 1MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

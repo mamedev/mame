@@ -809,16 +809,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(artmagic_state::artmagic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("tms", TMS34010, MASTER_CLOCK_40MHz)
-	MCFG_CPU_PROGRAM_MAP(tms_map)
+	MCFG_DEVICE_ADD("tms", TMS34010, MASTER_CLOCK_40MHz)
+	MCFG_DEVICE_PROGRAM_MAP(tms_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(MASTER_CLOCK_40MHz/6) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(artmagic_state, scanline)              /* scanline update (rgb32) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(artmagic_state, m68k_gen_int))
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, artmagic_state, m68k_gen_int))
 	MCFG_TMS340X0_TO_SHIFTREG_CB(artmagic_state, to_shiftreg)           /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(artmagic_state, from_shiftreg)          /* read from shiftreg function */
 
@@ -835,9 +835,9 @@ MACHINE_CONFIG_START(artmagic_state::artmagic)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK_40MHz/3/10, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK_40MHz/3/10, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 MACHINE_CONFIG_END
 
@@ -845,7 +845,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(artmagic_state::cheesech)
 	artmagic(config);
 
-	MCFG_SOUND_MODIFY("oki")
+	MCFG_DEVICE_MODIFY("oki")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -854,13 +854,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(artmagic_state::stonebal)
 	artmagic(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(stonebal_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(stonebal_map)
 
-	MCFG_CPU_MODIFY("tms")
-	MCFG_CPU_PROGRAM_MAP(stonebal_tms_map)
+	MCFG_DEVICE_MODIFY("tms")
+	MCFG_DEVICE_PROGRAM_MAP(stonebal_tms_map)
 
-	MCFG_SOUND_MODIFY("oki")
+	MCFG_DEVICE_MODIFY("oki")
 	MCFG_SOUND_ROUTES_RESET()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
@@ -868,24 +868,24 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(artmagic_state::shtstar)
 	artmagic(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(shtstar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(shtstar_map)
 
 	MCFG_DEVICE_ADD("mainduart", MC68681, 3686400)
 
 	/* sub cpu*/
-	MCFG_CPU_ADD("subcpu", M68000, MASTER_CLOCK_25MHz/2)
-	MCFG_CPU_PROGRAM_MAP(shtstar_subcpu_map)
+	MCFG_DEVICE_ADD("subcpu", M68000, MASTER_CLOCK_25MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(shtstar_subcpu_map)
 
 	MCFG_DEVICE_ADD("subduart", MC68681, 3686400)
 
-	MCFG_SOUND_ADD("aysnd", YM2149, 3686400/2)
+	MCFG_DEVICE_ADD("aysnd", YM2149, 3686400/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/*gun board cpu*/
-	MCFG_CPU_ADD("guncpu", I80C31, 6000000)
-	MCFG_CPU_IO_MAP(shtstar_guncpu_io_map)
-	MCFG_CPU_PROGRAM_MAP(shtstar_guncpu_map)
+	MCFG_DEVICE_ADD("guncpu", I80C31, 6000000)
+	MCFG_DEVICE_IO_MAP(shtstar_guncpu_io_map)
+	MCFG_DEVICE_PROGRAM_MAP(shtstar_guncpu_map)
 	MCFG_MCS51_PORT_P1_IN_CB(NOOP) // ?
 MACHINE_CONFIG_END
 

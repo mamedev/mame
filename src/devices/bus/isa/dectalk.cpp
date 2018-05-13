@@ -158,20 +158,20 @@ const tiny_rom_entry* dectalk_isa_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(dectalk_isa_device::device_add_mconfig)
-	MCFG_CPU_ADD("dectalk_cpu", I80186, XTAL(20'000'000))
-	MCFG_CPU_IO_MAP(dectalk_cpu_io)
-	MCFG_CPU_PROGRAM_MAP(dectalk_cpu_map)
-	MCFG_80186_TMROUT0_HANDLER(WRITELINE(dectalk_isa_device, clock_w));
+	MCFG_DEVICE_ADD("dectalk_cpu", I80186, XTAL(20'000'000))
+	MCFG_DEVICE_IO_MAP(dectalk_cpu_io)
+	MCFG_DEVICE_PROGRAM_MAP(dectalk_cpu_map)
+	MCFG_80186_TMROUT0_HANDLER(WRITELINE(*this, dectalk_isa_device, clock_w));
 
-	MCFG_CPU_ADD("dectalk_dsp", TMS32015, XTAL(20'000'000))
-	MCFG_CPU_IO_MAP(dectalk_dsp_io)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(dectalk_isa_device, bio_line_r))
-	MCFG_CPU_PROGRAM_MAP(dectalk_dsp_map)
+	MCFG_DEVICE_ADD("dectalk_dsp", TMS32015, XTAL(20'000'000))
+	MCFG_DEVICE_IO_MAP(dectalk_dsp_io)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, dectalk_isa_device, bio_line_r))
+	MCFG_DEVICE_PROGRAM_MAP(dectalk_dsp_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "speaker", 1.0) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 WRITE8_MEMBER(dectalk_isa_device::write)

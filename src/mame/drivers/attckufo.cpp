@@ -118,14 +118,14 @@ READ8_MEMBER(attckufo_state::vic_colorram_r)
 //**************************************************************************
 
 MACHINE_CONFIG_START(attckufo_state::attckufo)
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(14'318'181) / 14)
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(14'318'181) / 14)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("DSW"))
 	MCFG_PIA_READPB_HANDLER(IOPORT("INPUT"))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_MOS656X_ATTACK_UFO_ADD("mos6560", "screen", XTAL(14'318'181) / 14, vic_videoram_map, vic_colorram_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

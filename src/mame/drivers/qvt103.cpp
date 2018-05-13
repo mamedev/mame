@@ -66,9 +66,9 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 MACHINE_CONFIG_START(qvt103_state::qvt103)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(29'376'000) / 9) // divider guessed
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(29'376'000) / 9) // divider guessed
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(29'376'000) / 9)
@@ -82,7 +82,7 @@ MACHINE_CONFIG_START(qvt103_state::qvt103)
 	//MCFG_SCREEN_RAW_PARAMS(XTAL(29'376'000), 170 * 9, 0, 132 * 9, 320, 0, 300)
 	MCFG_SCREEN_UPDATE_DRIVER(qvt103_state, screen_update)
 
-	MCFG_CPU_ADD("kbdmcu", I8741, XTAL(6'000'000))
+	MCFG_DEVICE_ADD("kbdmcu", I8741, XTAL(6'000'000))
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************

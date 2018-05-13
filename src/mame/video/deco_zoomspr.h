@@ -36,6 +36,6 @@ private:
 DECLARE_DEVICE_TYPE(DECO_ZOOMSPR, deco_zoomspr_device)
 
 #define MCFG_DECO_ZOOMSPR_GFXDECODE(_gfxtag) \
-	downcast<deco_zoomspr_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<deco_zoomspr_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_DECO_ZOOMSPR_H

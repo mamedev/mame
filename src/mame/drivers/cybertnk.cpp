@@ -839,16 +839,16 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(cybertnk_state::cybertnk)
-	MCFG_CPU_ADD("maincpu", M68000,XTAL(20'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(master_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq1_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(20'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(master_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("slave", M68000,XTAL(20'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(slave_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq3_line_hold)
+	MCFG_DEVICE_ADD("slave", M68000,XTAL(20'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(slave_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq3_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(sound_mem)
+	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))//arbitrary value,needed to get the communication to work
 
@@ -876,15 +876,16 @@ MACHINE_CONFIG_START(cybertnk_state::cybertnk)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", Y8950, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ym1", Y8950, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ym2", Y8950, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ym2", Y8950, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

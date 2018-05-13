@@ -163,6 +163,6 @@ DECLARE_DEVICE_TYPE(IQ151CART_SLOT, iq151cart_slot_device)
 	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_drq_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_SCREEN_TAG(screen_tag) \
-	downcast<iq151cart_slot_device &>(*device).set_screen_tag(("^" screen_tag));
+	downcast<iq151cart_slot_device &>(*device).set_screen_tag(screen_tag);
 
 #endif // MAME_BUS_IQ151_IQ151_H

@@ -334,9 +334,9 @@ void pzletime_state::machine_reset()
 MACHINE_CONFIG_START(pzletime_state::pzletime)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,10000000)
-	MCFG_CPU_PROGRAM_MAP(pzletime_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pzletime_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000,10000000)
+	MCFG_DEVICE_PROGRAM_MAP(pzletime_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pzletime_state, irq4_line_hold)
 
 
 	/* video hardware */
@@ -357,8 +357,8 @@ MACHINE_CONFIG_START(pzletime_state::pzletime)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 937500, PIN7_HIGH) //freq & pin7 taken from stlforce
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, 937500, okim6295_device::PIN7_HIGH) //freq & pin7 taken from stlforce
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

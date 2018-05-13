@@ -543,8 +543,8 @@ static INPUT_PORTS_START( e100 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(e100_state::e100)
-	MCFG_CPU_ADD("maincpu", M6802, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(e100_map)
+	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(e100_map)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("kbd_74145", TTL74145, 0)
@@ -565,21 +565,21 @@ MACHINE_CONFIG_START(e100_state::e100)
 	/* 0xF896 0xC818 (PIA1 Control B) = 0x34 - CB2 is low and lock DDRB */
 	/* 0xF896 0xC818 (PIA2 Control B) = 0x34 - CB2 is low and lock DDRB */
 	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(e100_state, pia1_kbA_w))
-	MCFG_PIA_READPA_HANDLER(READ8(e100_state, pia1_kbA_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(e100_state, pia1_kbB_w))
-	MCFG_PIA_READPB_HANDLER(READ8(e100_state, pia1_kbB_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(e100_state, pia1_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(e100_state, pia1_cb1_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(e100_state, pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(e100_state, pia1_cb2_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, e100_state, pia1_kbA_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, e100_state, pia1_kbA_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, e100_state, pia1_kbB_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, e100_state, pia1_kbB_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, e100_state, pia1_ca1_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, e100_state, pia1_cb1_r))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, e100_state, pia1_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, e100_state, pia1_cb2_w))
 
 	/* The optional second PIA enables the expansion port on CA1 and a software RTC with 50Hz resolution */
 	MCFG_DEVICE_ADD(PIA2_TAG, PIA6821, 0)
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
 	/* Serial port support */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 
 	/* Cassette support - E100 uses 300 baud Kansas City Standard with 1200/2400 Hz modulation */
 	/* NOTE on usage: mame e100 -window -cass <wav file> -ui_active

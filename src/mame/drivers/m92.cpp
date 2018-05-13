@@ -894,13 +894,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(m92_state::m92)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",V33,XTAL(18'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(m92_map)
-	MCFG_CPU_IO_MAP(m92_portmap)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu",V33,XTAL(18'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(m92_map)
+	MCFG_DEVICE_IO_MAP(m92_portmap)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
 
-	MCFG_CPU_ADD("soundcpu" ,V35, XTAL(14'318'181))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu" ,V35, XTAL(14'318'181))
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
@@ -910,7 +910,7 @@ MACHINE_CONFIG_START(m92_state::m92)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m92_state, m92_scanline_interrupt, "screen", 0, 1)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -927,16 +927,16 @@ MACHINE_CONFIG_START(m92_state::m92)
 	MCFG_VIDEO_START_OVERRIDE(m92_state,m92)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP1))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("upd71059c", pic8259_device, ir3_w))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("upd71059c", pic8259_device, ir3_w))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
@@ -948,52 +948,52 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::gunforce)
 	m92(config);
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(gunforce_decryption_table)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::bmaster)
 	m92(config);
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(bomberman_decryption_table)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::lethalth)
 	m92(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(lethalth_map)
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(lethalth_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(lethalth_decryption_table)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::uccops)
 	m92(config);
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(dynablaster_decryption_table)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::mysticri)
 	m92(config);
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(mysticri_decryption_table)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::majtitl2)
 	m92(config);
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(majtitl2_decryption_table)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::hook)
 	m92(config);
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(hook_decryption_table)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::ppan)
 	m92(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(ppan_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(ppan_portmap)
 
 	MCFG_DEVICE_REMOVE("soundcpu")
 	MCFG_DEVICE_REMOVE("soundlatch")
@@ -1006,27 +1006,27 @@ MACHINE_CONFIG_START(m92_state::ppan)
 
 	MCFG_VIDEO_START_OVERRIDE(m92_state,ppan)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::rtypeleo)
 	m92(config);
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(rtypeleo_decryption_table)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(m92_state::inthunt)
 	m92(config);
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(inthunt_decryption_table)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(m92_state::nbbatman)
 	m92(config);
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(leagueman_decryption_table)
 MACHINE_CONFIG_END
 
@@ -1047,7 +1047,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::psoldier)
 	m92(config);
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(psoldier_decryption_table)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", psoldier)
@@ -1055,7 +1055,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::dsoccr94j)
 	m92(config);
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(dsoccr94_decryption_table)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", psoldier)
@@ -1063,7 +1063,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::gunforc2)
 	m92(config);
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(lethalth_decryption_table)
 MACHINE_CONFIG_END
 

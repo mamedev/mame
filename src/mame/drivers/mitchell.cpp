@@ -1164,9 +1164,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(mitchell_state::mitchell_irq)
 MACHINE_CONFIG_START(mitchell_state::mgakuen)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* probably same clock as the other mitchell hardware games */
-	MCFG_CPU_PROGRAM_MAP(mgakuen_map)
-	MCFG_CPU_IO_MAP(mitchell_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* probably same clock as the other mitchell hardware games */
+	MCFG_DEVICE_PROGRAM_MAP(mgakuen_map)
+	MCFG_DEVICE_IO_MAP(mitchell_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
@@ -1191,12 +1191,12 @@ MACHINE_CONFIG_START(mitchell_state::mgakuen)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* probably same clock as the other mitchell hardware games */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* probably same clock as the other mitchell hardware games */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* probably same clock as the other mitchell hardware games */
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* probably same clock as the other mitchell hardware games */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1204,10 +1204,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mitchell_state::pang)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mitchell_map)
-	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
+	MCFG_DEVICE_IO_MAP(mitchell_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
@@ -1232,12 +1232,12 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ymsnd",YM2413, XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd",YM2413, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1280,16 +1280,16 @@ WRITE_LINE_MEMBER(mitchell_state::spangbl_adpcm_int)
 MACHINE_CONFIG_START(mitchell_state::spangbl)
 	pangnv(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spangbl_map)
-	MCFG_CPU_IO_MAP(spangbl_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spangbl_map)
+	MCFG_DEVICE_IO_MAP(spangbl_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
 
 	MCFG_DEVICE_REMOVE("scantimer")
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // Z80A CPU; clock unknown
-	MCFG_CPU_PROGRAM_MAP(spangbl_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // Z80A CPU; clock unknown
+	MCFG_DEVICE_PROGRAM_MAP(spangbl_sound_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", spangbl)
 
@@ -1297,19 +1297,19 @@ MACHINE_CONFIG_START(mitchell_state::spangbl)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_DEVICE_REMOVE("oki")
-	MCFG_SOUND_ADD("msm", MSM5205, 400000) // clock and prescaler unknown
-	MCFG_MSM5205_VCLK_CB(WRITELINE(mitchell_state, spangbl_adpcm_int)) // controls music as well as ADCPM rate
+	MCFG_DEVICE_ADD("msm", MSM5205, 400000) // clock and prescaler unknown
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, mitchell_state, spangbl_adpcm_int)) // controls music as well as ADCPM rate
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mitchell_state::pangba)
 	spangbl(config);
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(pangba_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(pangba_sound_map)
 
 	MCFG_DEVICE_REPLACE("ymsnd", YM3812, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1321,14 +1321,14 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	/* it doesn't glitch with the clock speed set to 4x normal, however this is incorrect..
 	  the interrupt handling (and probably various irq flags / vbl flags handling etc.) is
 	  more likely wrong.. the game appears to run too fast anyway .. */
-	MCFG_CPU_ADD("maincpu", Z80, 6000000*4)
-	MCFG_CPU_PROGRAM_MAP(mitchell_map)
-	MCFG_CPU_IO_MAP(mstworld_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 6000000*4)
+	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
+	MCFG_DEVICE_IO_MAP(mstworld_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,6000000)        /* 6 MHz? */
-	MCFG_CPU_PROGRAM_MAP(mstworld_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,6000000)        /* 6 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(mstworld_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
@@ -1350,11 +1350,11 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 990000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 990000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1362,10 +1362,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mitchell_state::marukin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mitchell_map)
-	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
+	MCFG_DEVICE_IO_MAP(mitchell_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -1387,12 +1387,12 @@ MACHINE_CONFIG_START(mitchell_state::marukin)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1417,10 +1417,10 @@ Vsync is 59.09hz
 MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mitchell_map)
-	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
+	MCFG_DEVICE_IO_MAP(mitchell_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -1442,12 +1442,12 @@ MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* It should be a OKIM5205 with a 384khz resonator */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* It should be a OKIM5205 with a 384khz resonator */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3750000) /* verified on pcb, read the comments */
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 3750000) /* verified on pcb, read the comments */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -2834,10 +2834,10 @@ INTERRUPT_GEN_MEMBER(sigmab98_state::sigmab98_vblank_interrupt)
 }
 
 MACHINE_CONFIG_START(sigmab98_state::sigmab98)
-	MCFG_CPU_ADD("maincpu", Z80, 10000000)  // !! TAXAN KY-80, clock @X1? !!
-	MCFG_CPU_PROGRAM_MAP(gegege_mem_map)
-	MCFG_CPU_IO_MAP(gegege_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sigmab98_state,  sigmab98_vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, 10000000)  // !! TAXAN KY-80, clock @X1? !!
+	MCFG_DEVICE_PROGRAM_MAP(gegege_mem_map)
+	MCFG_DEVICE_IO_MAP(gegege_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sigmab98_state,  sigmab98_vblank_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sigmab98)
 
@@ -2860,35 +2860,36 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)    // clock @X2?
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)    // clock @X2?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sigmab98_state::dodghero)
 	sigmab98(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP( dodghero_mem_map )
-	MCFG_CPU_IO_MAP( dodghero_io_map )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP( dodghero_mem_map )
+	MCFG_DEVICE_IO_MAP( dodghero_io_map )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sigmab98_state::gegege)
 	sigmab98(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP( gegege_mem_map )
-	MCFG_CPU_IO_MAP( gegege_io_map )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP( gegege_mem_map )
+	MCFG_DEVICE_IO_MAP( gegege_io_map )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sigmab98_state::dashhero)
 	sigmab98(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP( gegege_mem_map )
-	MCFG_CPU_IO_MAP( dashhero_io_map )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP( gegege_mem_map )
+	MCFG_DEVICE_IO_MAP( dashhero_io_map )
 
 	MCFG_DEVICE_REMOVE("nvram") // FIXME: does not survive between sessions otherwise
 MACHINE_CONFIG_END
@@ -2917,9 +2918,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_state::lufykzku_irq)
 }
 
 MACHINE_CONFIG_START(lufykzku_state::lufykzku)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(20'000'000) / 2)  // !! TAXAN KY-80, clock @X1? !!
-	MCFG_CPU_PROGRAM_MAP(lufykzku_mem_map)
-	MCFG_CPU_IO_MAP(lufykzku_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(20'000'000) / 2)  // !! TAXAN KY-80, clock @X1? !!
+	MCFG_DEVICE_PROGRAM_MAP(lufykzku_mem_map)
+	MCFG_DEVICE_IO_MAP(lufykzku_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lufykzku_state, lufykzku_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(lufykzku_state, lufykzku)
@@ -2931,13 +2932,13 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
 	// 2 x 8-bit parallel/serial converters
-	MCFG_TTL165_ADD("ttl165_1")
+	MCFG_DEVICE_ADD("ttl165_1", TTL165)
 	MCFG_TTL165_DATA_CB(IOPORT("DSW2"))
-	MCFG_TTL165_QH_CB(DEVWRITELINE("ttl165_2", ttl165_device, serial_w))
+	MCFG_TTL165_QH_CB(WRITELINE("ttl165_2", ttl165_device, serial_w))
 
-	MCFG_TTL165_ADD("ttl165_2")
+	MCFG_DEVICE_ADD("ttl165_2", TTL165)
 	MCFG_TTL165_DATA_CB(IOPORT("DSW1"))
-	MCFG_TTL165_QH_CB(WRITELINE(lufykzku_state, dsw_w))
+	MCFG_TTL165_QH_CB(WRITELINE(*this, lufykzku_state, dsw_w))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2953,11 +2954,12 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-//  MCFG_BUFFERED_SPRITERAM8_ADD("spriteram") // same as sammymdl?
+//  MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8) // same as sammymdl?
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -2987,9 +2989,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(sigmab98_state::sammymdl_irq)
 }
 
 MACHINE_CONFIG_START(sigmab98_state::sammymdl)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(20'000'000) / 2)    // !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
-	MCFG_CPU_PROGRAM_MAP( animalc_map )
-	MCFG_CPU_IO_MAP( animalc_io )
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(20'000'000) / 2)    // !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
+	MCFG_DEVICE_PROGRAM_MAP( animalc_map )
+	MCFG_DEVICE_IO_MAP( animalc_io )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymdl_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl )
@@ -3008,7 +3010,7 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	MCFG_SCREEN_SIZE(0x140, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sigmab98_state, screen_vblank_sammymdl))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sigmab98_state, screen_vblank_sammymdl))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sigmab98)
@@ -3016,28 +3018,29 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-//  MCFG_BUFFERED_SPRITERAM8_ADD("spriteram") // not on sammymdl?
+//  MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8) // not on sammymdl?
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
+	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sigmab98_state::animalc)
 	sammymdl(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP( animalc_map )
-	MCFG_CPU_IO_MAP( animalc_io )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP( animalc_map )
+	MCFG_DEVICE_IO_MAP( animalc_io )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sigmab98_state::gocowboy)
 	sammymdl(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP( gocowboy_map )
-	MCFG_CPU_IO_MAP( gocowboy_io )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP( gocowboy_map )
+	MCFG_DEVICE_IO_MAP( gocowboy_io )
 
 	MCFG_DEVICE_REMOVE("hopper")
 	MCFG_TICKET_DISPENSER_ADD("hopper_small", attotime::from_msec(1000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
@@ -3046,30 +3049,30 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sigmab98_state::haekaka)
 	sammymdl(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP( haekaka_map )
-	MCFG_CPU_IO_MAP( haekaka_io )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP( haekaka_map )
+	MCFG_DEVICE_IO_MAP( haekaka_io )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sigmab98_state::itazuram)
 	sammymdl(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP( itazuram_map )
-	MCFG_CPU_IO_MAP( itazuram_io )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP( itazuram_map )
+	MCFG_DEVICE_IO_MAP( itazuram_io )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sigmab98_state::pyenaget)
 	sammymdl(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP( haekaka_map )
-	MCFG_CPU_IO_MAP( pyenaget_io )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP( haekaka_map )
+	MCFG_DEVICE_IO_MAP( pyenaget_io )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sigmab98_state::tdoboon)
 	sammymdl(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP( tdoboon_map )
-	MCFG_CPU_IO_MAP( tdoboon_io )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP( tdoboon_map )
+	MCFG_DEVICE_IO_MAP( tdoboon_io )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0+4,0xf0+4-1)

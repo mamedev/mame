@@ -442,9 +442,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(_4roses_state::_4roses)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8) /* 2MHz, guess */
-	MCFG_CPU_PROGRAM_MAP(_4roses_map)
-	MCFG_CPU_OPCODES_MAP(_4roses_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", M65C02, MASTER_CLOCK/8) /* 2MHz, guess */
+	MCFG_DEVICE_PROGRAM_MAP(_4roses_map)
+	MCFG_DEVICE_OPCODES_MAP(_4roses_opcodes_map)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -470,17 +470,17 @@ MACHINE_CONFIG_START(_4roses_state::_4roses)
 	//MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* 2MHz, guess */
+	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* 2MHz, guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(_4roses_state::rugby)
 	_4roses(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rugby_map)
-	MCFG_CPU_OPCODES_MAP(rugby_opcodes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rugby_map)
+	MCFG_DEVICE_OPCODES_MAP(rugby_opcodes_map)
 MACHINE_CONFIG_END
 
 

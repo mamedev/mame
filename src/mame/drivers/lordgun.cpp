@@ -639,28 +639,28 @@ void lordgun_state::machine_start()
 }
 
 MACHINE_CONFIG_START(lordgun_state::lordgun)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(lordgun_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(lordgun_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)
-	MCFG_CPU_IO_MAP(lordgun_soundio_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(lordgun_soundmem_map)
+	MCFG_DEVICE_IO_MAP(lordgun_soundio_map)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DIP"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, lordgun_eeprom_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, lordgun_eeprom_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("SERVICE"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, fake2_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, fake2_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("START1"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("START2"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, fake_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("COIN"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, fake_w))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -676,43 +676,43 @@ MACHINE_CONFIG_START(lordgun_state::lordgun)
 	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000) / 20, PIN7_HIGH)   // ? 5MHz can't be right!
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH)   // ? 5MHz can't be right!
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(lordgun_state::aliencha)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(aliencha_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(aliencha_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)
-	MCFG_CPU_IO_MAP(aliencha_soundio_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(lordgun_soundmem_map)
+	MCFG_DEVICE_IO_MAP(aliencha_soundio_map)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(lordgun_state, aliencha_dip_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake2_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, aliencha_eeprom_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, lordgun_state, aliencha_dip_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake2_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, aliencha_eeprom_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("SERVICE"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, aliencha_dip_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, aliencha_dip_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, lordgun_state, fake_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, lordgun_state, fake_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("COIN"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lordgun_state, fake_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, lordgun_state, fake_w))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -728,20 +728,20 @@ MACHINE_CONFIG_START(lordgun_state::aliencha)
 	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymf", YMF278B, 26000000)            // ? 26MHz matches video (decrease for faster music tempo)
+	MCFG_DEVICE_ADD("ymf", YMF278B, 26000000)            // ? 26MHz matches video (decrease for faster music tempo)
 	MCFG_DEVICE_ADDRESS_MAP(0, ymf278_map)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000) / 20, PIN7_HIGH)   // ? 5MHz can't be right
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH)   // ? 5MHz can't be right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(20'000'000) / 20, PIN7_HIGH)  // ? 5MHz can't be right
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH)  // ? 5MHz can't be right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

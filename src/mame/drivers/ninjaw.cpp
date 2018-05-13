@@ -736,16 +736,16 @@ void ninjaw_state::machine_reset()
 MACHINE_CONFIG_START(ninjaw_state::ninjaw)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(ninjaw_master_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(ninjaw_master_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 16/4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 16/4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_CPU_ADD("sub", M68000,16000000/2)  /* 8 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(ninjaw_slave_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000,16000000/2)  /* 8 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(ninjaw_slave_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
 
 	// TODO: if CPUs are unsynched then seldomly stages loads up with no enemies
 	//       Let's use a better timer (was 6000 before) based off actual CPU timing.
@@ -758,7 +758,7 @@ MACHINE_CONFIG_START(ninjaw_state::ninjaw)
 	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(ninjaw_state, coin_control_w))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(*this, ninjaw_state, coin_control_w))
 	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -830,9 +830,10 @@ MACHINE_CONFIG_START(ninjaw_state::ninjaw)
 	MCFG_TC0110PCR_PALETTE("palette3")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -841,16 +842,12 @@ MACHINE_CONFIG_START(ninjaw_state::ninjaw)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 1.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 1.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-//  MCFG_SOUND_ADD("subwoofer", SUBWOOFER, 0)
+//  MCFG_DEVICE_ADD("subwoofer", SUBWOOFER, 0)
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
@@ -861,16 +858,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ninjaw_state::darius2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(darius2_master_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(darius2_master_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_CPU_ADD("sub", M68000,16000000/2)  /* 8 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(darius2_slave_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000,16000000/2)  /* 8 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(darius2_slave_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", ninjaw_state,  irq4_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(16000000/1024))  /* CPU slices */
 	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -880,7 +877,7 @@ MACHINE_CONFIG_START(ninjaw_state::darius2)
 	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(ninjaw_state, coin_control_w))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(*this, ninjaw_state, coin_control_w))
 	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -952,9 +949,10 @@ MACHINE_CONFIG_START(ninjaw_state::darius2)
 	MCFG_TC0110PCR_PALETTE("palette3")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -963,16 +961,12 @@ MACHINE_CONFIG_START(ninjaw_state::darius2)
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 1.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 1.0)
 
-	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-//  MCFG_SOUND_ADD("subwoofer", SUBWOOFER, 0)
+//  MCFG_DEVICE_ADD("subwoofer", SUBWOOFER, 0)
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")

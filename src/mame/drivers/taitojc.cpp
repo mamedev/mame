@@ -1080,18 +1080,18 @@ void taitojc_state::machine_start()
 MACHINE_CONFIG_START(taitojc_state::taitojc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68040, XTAL(10'000'000)*2) // 20MHz, clock source = CY7C991
-	MCFG_CPU_PROGRAM_MAP(taitojc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitojc_state, taitojc_vblank)
+	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(10'000'000)*2) // 20MHz, clock source = CY7C991
+	MCFG_DEVICE_PROGRAM_MAP(taitojc_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitojc_state, taitojc_vblank)
 
-	MCFG_CPU_ADD("sub", MC68HC11, XTAL(16'000'000)/2) // 8MHz, MC68HC11M0
-	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
-	MCFG_CPU_IO_MAP(hc11_io_map)
+	MCFG_DEVICE_ADD("sub", MC68HC11, XTAL(16'000'000)/2) // 8MHz, MC68HC11M0
+	MCFG_DEVICE_PROGRAM_MAP(hc11_pgm_map)
+	MCFG_DEVICE_IO_MAP(hc11_io_map)
 	MCFG_MC68HC11_CONFIG( 1, 1280, 0x00 )
 
-	MCFG_CPU_ADD("dsp", TMS32051, XTAL(10'000'000)*4) // 40MHz, clock source = CY7C991
-	MCFG_CPU_PROGRAM_MAP(tms_program_map)
-	MCFG_CPU_DATA_MAP(tms_data_map)
+	MCFG_DEVICE_ADD("dsp", TMS32051, XTAL(10'000'000)*4) // 40MHz, clock source = CY7C991
+	MCFG_DEVICE_PROGRAM_MAP(tms_program_map)
+	MCFG_DEVICE_DATA_MAP(tms_data_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -1102,7 +1102,7 @@ MACHINE_CONFIG_START(taitojc_state::taitojc)
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
 	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
 	MCFG_TC0640FIO_READ_3_CB(IOPORT("UNUSED"))
-	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(taitojc_state, coin_control_w))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(*this, taitojc_state, coin_control_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("BUTTONS"))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
@@ -1125,16 +1125,16 @@ MACHINE_CONFIG_START(taitojc_state::dendego)
 	taitojc(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dendego_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dendego_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitojc_state, screen_update_dendego)
 
 	/* sound hardware */
-	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	SPEAKER(config, "subwoofer", 0.0, 0.0, 1.0);
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "subwoofer", 0.20)
 MACHINE_CONFIG_END
 

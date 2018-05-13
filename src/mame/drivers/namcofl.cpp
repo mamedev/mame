@@ -581,12 +581,12 @@ MACHINE_RESET_MEMBER(namcofl_state,namcofl)
 
 
 MACHINE_CONFIG_START(namcofl_state::namcofl)
-	MCFG_CPU_ADD("maincpu", I960, 20000000) // i80960KA-20 == 20 MHz part
-	MCFG_CPU_PROGRAM_MAP(namcofl_mem)
+	MCFG_DEVICE_ADD("maincpu", I960, 20000000) // i80960KA-20 == 20 MHz part
+	MCFG_DEVICE_PROGRAM_MAP(namcofl_mem)
 
-	MCFG_CPU_ADD("mcu", NAMCO_C75, 48384000/3)
-	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
-	MCFG_CPU_IO_MAP(namcoc75_io)
+	MCFG_DEVICE_ADD("mcu", NAMCO_C75, 48384000/3)
+	MCFG_DEVICE_PROGRAM_MAP(namcoc75_am)
+	MCFG_DEVICE_IO_MAP(namcoc75_io)
 	/* TODO: irq generation for these */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namcofl_state, mcu_irq0_cb, attotime::from_hz(60))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namcofl_state, mcu_irq2_cb, attotime::from_hz(60))
@@ -612,7 +612,8 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 
 	MCFG_VIDEO_START_OVERRIDE(namcofl_state,namcofl)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_C352_ADD("c352", 48384000/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)

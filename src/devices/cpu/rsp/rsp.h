@@ -108,6 +108,7 @@ class rsp_device : public cpu_device
 public:
 	// construction/destruction
 	rsp_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	virtual ~rsp_device() override;
 
 	void resolve_cb();
 	template <class Object> devcb_base &set_dp_reg_r_callback(Object &&cb) { return m_dp_reg_r_func.set_callback(std::forward<Object>(cb)); }
@@ -235,7 +236,7 @@ private:
 
 	address_space *m_program;
 protected:
-	direct_read_data<0> *m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_pcache;
 
 private:
 	std::unique_ptr<cop2>    m_cop2;

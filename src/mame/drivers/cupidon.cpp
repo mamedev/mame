@@ -103,8 +103,8 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(cupidon_state::cupidon)
-	MCFG_CPU_ADD("maincpu", M68340, 16000000)    // The access to 3FF00 at the start would suggest this is a 68340 so probably 16 or 25 mhz?
-	MCFG_CPU_PROGRAM_MAP(cupidon_map)
+	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)    // The access to 3FF00 at the start would suggest this is a 68340 so probably 16 or 25 mhz?
+	MCFG_DEVICE_PROGRAM_MAP(cupidon_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -116,7 +116,8 @@ MACHINE_CONFIG_START(cupidon_state::cupidon)
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound, probably DAC driven using 68340 DMA */
 MACHINE_CONFIG_END
 

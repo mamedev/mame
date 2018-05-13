@@ -57,8 +57,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(segapm_state::segapm)
 
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) // ??
-	MCFG_CPU_PROGRAM_MAP(segapm_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000) // ??
+	MCFG_DEVICE_PROGRAM_MAP(segapm_map)
 
 	// + 2 sh2s on 32x board
 

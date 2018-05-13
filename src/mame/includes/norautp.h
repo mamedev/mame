@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Roberto Fresca
+#ifndef MAME_INCLUDES_NORAUTP_H
+#define MAME_INCLUDES_NORAUTP_H
+
+#pragma once
+
 #include "machine/i8255.h"
 #include "sound/discrete.h"
 #include "screen.h"
@@ -73,6 +78,8 @@ public:
 };
 
 /*----------- defined in audio/norautp.c -----------*/
-DISCRETE_SOUND_EXTERN( norautp );
-DISCRETE_SOUND_EXTERN( dphl );
-DISCRETE_SOUND_EXTERN( kimble );
+DISCRETE_SOUND_EXTERN( norautp_discrete );
+DISCRETE_SOUND_EXTERN( dphl_discrete );
+DISCRETE_SOUND_EXTERN( kimble_discrete );
+
+#endif // MAME_INCLUDES_NORAUTP_H

@@ -13,7 +13,7 @@
 #include "speaker.h"
 
 
-SLOT_INTERFACE_EXTERN(cpc_exp_cards);
+void cpc_exp_cards(device_slot_interface &device);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -116,34 +116,34 @@ const tiny_rom_entry *cpc_dkspeech_device::device_rom_region() const
 
 // device machine config
 MACHINE_CONFIG_START(cpc_ssa1_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sp0256",SP0256,XTAL(3'120'000))
-	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(cpc_ssa1_device, lrq_cb))
-	MCFG_SP0256_STANDBY_CB(WRITELINE(cpc_ssa1_device, sby_cb))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("sp0256",SP0256,XTAL(3'120'000))
+	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(*this, cpc_ssa1_device, lrq_cb))
+	MCFG_SP0256_STANDBY_CB(WRITELINE(*this, cpc_ssa1_device, sby_cb))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
-	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
+	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(WRITELINE("^", cpc_expansion_slot_device, irq_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(WRITELINE("^", cpc_expansion_slot_device, nmi_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cpc_dkspeech_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sp0256",SP0256,XTAL(4'000'000))  // uses the CPC's clock from pin 50 of the expansion port
-	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(cpc_dkspeech_device, lrq_cb))
-	MCFG_SP0256_STANDBY_CB(WRITELINE(cpc_dkspeech_device, sby_cb))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("sp0256",SP0256,XTAL(4'000'000))  // uses the CPC's clock from pin 50 of the expansion port
+	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(*this, cpc_dkspeech_device, lrq_cb))
+	MCFG_SP0256_STANDBY_CB(WRITELINE(*this, cpc_dkspeech_device, sby_cb))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
-	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
+	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(WRITELINE("^", cpc_expansion_slot_device, irq_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(WRITELINE("^", cpc_expansion_slot_device, nmi_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
 
 MACHINE_CONFIG_END
 

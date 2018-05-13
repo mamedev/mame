@@ -287,8 +287,8 @@ void feversoc_state::machine_start()
 MACHINE_CONFIG_START(feversoc_state::feversoc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",SH2,MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(feversoc_map)
+	MCFG_DEVICE_ADD("maincpu",SH2,MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(feversoc_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(feversoc_state::feversoc)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1) //dynamic resolution?
 	MCFG_SCREEN_UPDATE_DRIVER(feversoc_state, screen_update_feversoc)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(feversoc_state, feversoc_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, feversoc_state, feversoc_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", feversoc)
 	MCFG_PALETTE_ADD("palette", 0x1000)
@@ -306,8 +306,8 @@ MACHINE_CONFIG_START(feversoc_state::feversoc)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")

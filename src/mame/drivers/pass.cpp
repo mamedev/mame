@@ -243,14 +243,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(pass_state::pass)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14318180/2 )
-	MCFG_CPU_PROGRAM_MAP(pass_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pass_state,  irq1_line_hold) /* all the same */
+	MCFG_DEVICE_ADD("maincpu", M68000, 14318180/2 )
+	MCFG_DEVICE_PROGRAM_MAP(pass_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pass_state,  irq1_line_hold) /* all the same */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4 )
-	MCFG_CPU_PROGRAM_MAP(pass_sound_map)
-	MCFG_CPU_IO_MAP(pass_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(pass_state, irq0_line_hold, 60) /* probably not accurate, unknown timing and generation (ym2203 sound chip?). */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4 )
+	MCFG_DEVICE_PROGRAM_MAP(pass_sound_map)
+	MCFG_DEVICE_IO_MAP(pass_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(pass_state, irq0_line_hold, 60) /* probably not accurate, unknown timing and generation (ym2203 sound chip?). */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -267,14 +267,14 @@ MACHINE_CONFIG_START(pass_state::pass)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 14318180/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 14318180/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", 792000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 792000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

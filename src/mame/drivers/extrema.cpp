@@ -50,9 +50,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(extrema_state::extrema)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(extrema_map)
-	MCFG_CPU_IO_MAP(extrema_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(extrema_map)
+	MCFG_DEVICE_IO_MAP(extrema_portmap)
 MACHINE_CONFIG_END
 
 

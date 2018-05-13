@@ -99,9 +99,9 @@ void imds_state::machine_reset()
 
 MACHINE_CONFIG_START(imds_state::imds)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 4_MHz_XTAL) // no idea of clock.
-	MCFG_CPU_PROGRAM_MAP(imds_mem)
-	MCFG_CPU_IO_MAP(imds_io)
+	MCFG_DEVICE_ADD("maincpu", I8080, 4_MHz_XTAL) // no idea of clock.
+	MCFG_DEVICE_PROGRAM_MAP(imds_mem)
+	MCFG_DEVICE_IO_MAP(imds_io)
 
 //  MCFG_INS8250_ADD( "ins8250", imds_com_interface )
 

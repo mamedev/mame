@@ -826,10 +826,10 @@ void gstream_state::machine_reset()
 MACHINE_CONFIG_START(gstream_state::gstream)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(gstream_32bit_map)
-	MCFG_CPU_IO_MAP(gstream_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(gstream_32bit_map)
+	MCFG_DEVICE_IO_MAP(gstream_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -847,22 +847,22 @@ MACHINE_CONFIG_START(gstream_state::gstream)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gstream)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", 1000000, PIN7_HIGH) /* 1 Mhz? */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) /* 1 Mhz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_OKIM6295_ADD("oki2", 1000000, PIN7_HIGH) /* 1 Mhz? */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) /* 1 Mhz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gstream_state::x2222)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(x2222_32bit_map)
-	MCFG_CPU_IO_MAP(x2222_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(x2222_32bit_map)
+	MCFG_DEVICE_IO_MAP(x2222_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
 //  MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -880,9 +880,9 @@ MACHINE_CONFIG_START(gstream_state::x2222)
 
 	// unknown sound hw (no sound roms dumped)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", 1000000, PIN7_HIGH) /* 1 Mhz? */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) /* 1 Mhz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

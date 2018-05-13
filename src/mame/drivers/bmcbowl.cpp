@@ -456,9 +456,9 @@ void bmcbowl_state::ramdac_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(bmcbowl_state::bmcbowl)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(21'477'272) / 2 )
-	MCFG_CPU_PROGRAM_MAP(bmcbowl_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bmcbowl_state, irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(21'477'272) / 2 )
+	MCFG_DEVICE_PROGRAM_MAP(bmcbowl_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bmcbowl_state, irq2_line_hold)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -473,28 +473,29 @@ MACHINE_CONFIG_START(bmcbowl_state::bmcbowl)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545) )  // guessed chip type, clock not verified
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545) )  // guessed chip type, clock not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(3'579'545) / 2)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(bmcbowl_state, dips1_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(bmcbowl_state, input_mux_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(3'579'545) / 2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, bmcbowl_state, dips1_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, bmcbowl_state, input_mux_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1122000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
-	MCFG_VIA6522_READPB_HANDLER(READ8(bmcbowl_state,via_b_in))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(bmcbowl_state, via_a_out))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bmcbowl_state, via_b_out))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(bmcbowl_state, via_ca2_out))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, bmcbowl_state,via_b_in))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, bmcbowl_state, via_a_out))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, bmcbowl_state, via_b_out))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, bmcbowl_state, via_ca2_out))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_4))
 MACHINE_CONFIG_END
 

@@ -323,9 +323,9 @@ void ohmygod_state::machine_reset()
 MACHINE_CONFIG_START(ohmygod_state::ohmygod)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(ohmygod_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ohmygod_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(ohmygod_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ohmygod_state,  irq1_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
@@ -346,9 +346,9 @@ MACHINE_CONFIG_START(ohmygod_state::ohmygod)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 14000000/8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 14000000/8, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

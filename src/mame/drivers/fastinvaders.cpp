@@ -645,22 +645,22 @@ GFXDECODE_END
 MACHINE_CONFIG_START(fastinvaders_state::fastinvaders)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, 6144100/2 ) // 6144100 Xtal /2 internaly
-	MCFG_CPU_PROGRAM_MAP(fastinvaders_map)
-//  MCFG_CPU_IO_MAP(fastinvaders_io_map)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", fastinvaders_state, irq0_line_hold)
-	MCFG_I8085A_SID(READLINE(fastinvaders_state, sid_read))
-MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6144100/2 ) // 6144100 Xtal /2 internaly
+	MCFG_DEVICE_PROGRAM_MAP(fastinvaders_map)
+//  MCFG_DEVICE_IO_MAP(fastinvaders_io_map)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fastinvaders_state, irq0_line_hold)
+	MCFG_I8085A_SID(READLINE(*this, fastinvaders_state, sid_read))
+MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("dma8257", I8257, 6144100)
-	MCFG_I8257_IN_MEMR_CB(READ8(fastinvaders_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(fastinvaders_state, memory_write_byte))
-	MCFG_I8257_OUT_DACK_1_CB(WRITE8(fastinvaders_state, dark_1_clr))
-	MCFG_I8257_OUT_DACK_2_CB(WRITE8(fastinvaders_state, dark_2_clr))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, fastinvaders_state, memory_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, fastinvaders_state, memory_write_byte))
+	MCFG_I8257_OUT_DACK_1_CB(WRITE8(*this, fastinvaders_state, dark_1_clr))
+	MCFG_I8257_OUT_DACK_2_CB(WRITE8(*this, fastinvaders_state, dark_2_clr))
 
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("count_ar", fastinvaders_state, count_ar,  attotime::from_hz(11500000/2))
@@ -683,25 +683,25 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fastinvaders_state::fastinvaders_8275)
 	fastinvaders(config);
-	MCFG_CPU_MODIFY("maincpu" ) // guess
-	MCFG_CPU_IO_MAP(fastinvaders_8275_io)
+	MCFG_DEVICE_MODIFY("maincpu" ) // guess
+	MCFG_DEVICE_IO_MAP(fastinvaders_8275_io)
 
 	MCFG_DEVICE_ADD("8275", I8275, 10000000 ) /* guess */ // does not configure a very useful resolution(!)
 	MCFG_I8275_CHARACTER_WIDTH(16)
 //  MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(apogee_state, display_pixels)
-//  MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
+//  MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma8257",i8257_device, dreq2_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fastinvaders_state::fastinvaders_6845)
 	fastinvaders(config);
-	MCFG_CPU_MODIFY("maincpu" ) // guess
-	MCFG_CPU_IO_MAP(fastinvaders_6845_io)
+	MCFG_DEVICE_MODIFY("maincpu" ) // guess
+	MCFG_DEVICE_IO_MAP(fastinvaders_6845_io)
 
 	MCFG_MC6845_ADD("6845", MC6845, "screen", 11500000/16) /* confirmed */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(fastinvaders_state,vsync))
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(fastinvaders_state,hsync))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, fastinvaders_state,vsync))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, fastinvaders_state,hsync))
 MACHINE_CONFIG_END
 
 

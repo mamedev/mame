@@ -644,10 +644,10 @@ INTERRUPT_GEN_MEMBER(ttchamp_state::irq)/* right? */
 
 MACHINE_CONFIG_START(ttchamp_state::ttchamp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, 8000000)
-	MCFG_CPU_PROGRAM_MAP(ttchamp_map)
-	MCFG_CPU_IO_MAP(ttchamp_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ttchamp_state,  irq)
+	MCFG_DEVICE_ADD("maincpu", V30, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(ttchamp_map)
+	MCFG_DEVICE_IO_MAP(ttchamp_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ttchamp_state,  irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -662,9 +662,9 @@ MACHINE_CONFIG_START(ttchamp_state::ttchamp)
 
 	MCFG_NVRAM_ADD_0FILL("backram")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 8000000/8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

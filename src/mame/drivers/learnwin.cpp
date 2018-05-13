@@ -147,7 +147,7 @@ MACHINE_CONFIG_START(learnwin_state::learnwin)
 //    MCFG_SCREEN_VISIBLE_AREA(0,47,0,31)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 

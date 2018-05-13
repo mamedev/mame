@@ -443,8 +443,8 @@ MACHINE_RESET_MEMBER(phoenix_state,phoenix)
 MACHINE_CONFIG_START(phoenix_state::phoenix)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, CPU_CLOCK)  /* 2.75 MHz */
-	MCFG_CPU_PROGRAM_MAP(phoenix_memory_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, CPU_CLOCK)  /* 2.75 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(phoenix_memory_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
 
@@ -461,7 +461,7 @@ MACHINE_CONFIG_START(phoenix_state::phoenix)
 	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_TMS36XX_ADD("tms", 372)
 	MCFG_TMS36XX_TYPE(MM6221AA)
@@ -469,11 +469,10 @@ MACHINE_CONFIG_START(phoenix_state::phoenix)
 	MCFG_TMS36XX_TUNE_SPEED(0.21)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("cust", PHOENIX, 0)
+	MCFG_DEVICE_ADD("cust", PHOENIX_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 120000)
-	MCFG_DISCRETE_INTF(phoenix)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, 120000, phoenix_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 MACHINE_CONFIG_END
 
@@ -482,8 +481,8 @@ MACHINE_CONFIG_START(phoenix_state::pleiads)
 	phoenix(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pleiads_memory_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pleiads_memory_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pleiads)
@@ -501,7 +500,7 @@ MACHINE_CONFIG_START(phoenix_state::pleiads)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_DEVICE_REMOVE("cust")
-	MCFG_SOUND_ADD("pleiads_custom", PLEIADS, 0)
+	MCFG_DEVICE_ADD("pleiads_custom", PLEIADS_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_REMOVE("discrete")
@@ -513,9 +512,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(phoenix_state::survival)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, CPU_CLOCK)  /* 5.50 MHz */
-	MCFG_I8085A_SID(READLINE(phoenix_state, survival_sid_callback))
-	MCFG_CPU_PROGRAM_MAP(survival_memory_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, CPU_CLOCK)  /* 5.50 MHz */
+	MCFG_I8085A_SID(READLINE(*this, phoenix_state, survival_sid_callback))
+	MCFG_DEVICE_PROGRAM_MAP(survival_memory_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
 
@@ -536,11 +535,11 @@ MACHINE_CONFIG_START(phoenix_state::survival)
 	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* FIXME: check clock */
-	MCFG_SOUND_ADD("aysnd", AY8910, 11000000/4)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(phoenix_state, survival_protection_r))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 11000000/4)
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, phoenix_state, survival_protection_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -551,8 +550,8 @@ MACHINE_CONFIG_START(phoenix_state::condor)
 
 	/* basic machine hardware */
 	/* FIXME: Verify clock. This is most likely 11MHz/2 */
-	MCFG_CPU_REPLACE("maincpu", Z80, 11000000/4)    /* 2.75 MHz??? */
-	MCFG_CPU_PROGRAM_MAP(phoenix_memory_map)
+	MCFG_DEVICE_REPLACE("maincpu", Z80, 11000000/4)    /* 2.75 MHz??? */
+	MCFG_DEVICE_PROGRAM_MAP(phoenix_memory_map)
 MACHINE_CONFIG_END
 
 

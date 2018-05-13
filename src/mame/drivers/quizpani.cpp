@@ -195,10 +195,10 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(quizpani_state::quizpani)
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(quizpani_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", quizpani_state,  irq4_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(quizpani_state, irq1_line_hold, 164) // music tempo
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(quizpani_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quizpani_state,  irq4_line_hold)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(quizpani_state, irq1_line_hold, 164) // music tempo
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizpani)
 	MCFG_PALETTE_ADD("palette", 0x200)
@@ -213,9 +213,9 @@ MACHINE_CONFIG_START(quizpani_state::quizpani)
 	MCFG_SCREEN_PALETTE("palette")
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 16000000/4, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)

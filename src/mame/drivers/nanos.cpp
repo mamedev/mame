@@ -437,9 +437,10 @@ FLOPPY_FORMATS_MEMBER( nanos_state::floppy_formats )
 	FLOPPY_NANOS_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( nanos_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void nanos_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 /* F4 Character Displayer */
 static const gfx_layout nanos_charlayout =
@@ -461,9 +462,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(nanos_state::nanos)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(nanos_mem)
-	MCFG_CPU_IO_MAP(nanos_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(nanos_mem)
+	MCFG_DEVICE_IO_MAP(nanos_io)
 	MCFG_Z80_DAISY_CHAIN(nanos_daisy_chain)
 
 	/* video hardware */
@@ -481,15 +482,15 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	/* devices */
 	MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(nanos_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(nanos_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(nanos_state, ctc_z2_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, nanos_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, nanos_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, nanos_state, ctc_z2_w))
 
 	MCFG_DEVICE_ADD("z80ctc_1", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(nanos_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(nanos_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(nanos_state, ctc_z2_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, nanos_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, nanos_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, nanos_state, ctc_z2_w))
 
 	MCFG_DEVICE_ADD("z80pio_0", Z80PIO, XTAL(4'000'000))
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -498,15 +499,15 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("z80sio_0", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(nanos_state, z80daisy_interrupt))
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, nanos_state, z80daisy_interrupt))
 
 	MCFG_DEVICE_ADD("z80sio_1", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(nanos_state, z80daisy_interrupt))
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, nanos_state, z80daisy_interrupt))
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(nanos_state, nanos_port_a_r))
-	MCFG_Z80PIO_IN_PB_CB(READ8(nanos_state, nanos_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(nanos_state, nanos_port_b_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, nanos_state, nanos_port_a_r))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, nanos_state, nanos_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, nanos_state, nanos_port_b_w))
 
 	/* UPD765 */
 	MCFG_UPD765A_ADD("upd765", false, true)

@@ -610,8 +610,8 @@ void sun2_state::machine_reset()
 
 MACHINE_CONFIG_START(sun2_state::sun2vme)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, XTAL(19'660'800) / 2) // or XTAL(24'000'000) / 2 by jumper setting
-	MCFG_CPU_PROGRAM_MAP(sun2_mem)
+	MCFG_DEVICE_ADD("maincpu", M68010, XTAL(19'660'800) / 2) // or XTAL(24'000'000) / 2 by jumper setting
+	MCFG_DEVICE_PROGRAM_MAP(sun2_mem)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
@@ -653,37 +653,37 @@ MACHINE_CONFIG_START(sun2_state::sun2vme)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
 	MCFG_DEVICE_ADD("timer", AM9513A, XTAL(19'660'800) / 4)
-	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("timer", am9513_device, gate1_w))
+	MCFG_AM9513_FOUT_CALLBACK(WRITELINE("timer", am9513_device, gate1_w))
 	MCFG_AM9513_OUT1_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
-	MCFG_AM9513_OUT2_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<0>))
-	MCFG_AM9513_OUT3_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<1>))
-	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<2>))
-	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<3>))
+	MCFG_AM9513_OUT2_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<0>))
+	MCFG_AM9513_OUT3_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<1>))
+	MCFG_AM9513_OUT4_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<2>))
+	MCFG_AM9513_OUT5_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<3>))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
 
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(19'660'800) / 4, 0, 0, 0, 0)
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(19'660'800) / 4, 0, 0, 0, 0)
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_6))
 
-	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, XTAL(39'321'600) / 4)
-	MCFG_CPU_PROGRAM_MAP(sun2_mem)
+	MCFG_DEVICE_ADD("maincpu", M68010, XTAL(39'321'600) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(sun2_mem)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
@@ -725,48 +725,60 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
 	MCFG_DEVICE_ADD("timer", AM9513, XTAL(39'321'600) / 8)
-	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("timer", am9513_device, gate1_w))
+	MCFG_AM9513_FOUT_CALLBACK(WRITELINE("timer", am9513_device, gate1_w))
 	MCFG_AM9513_OUT1_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
-	MCFG_AM9513_OUT2_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<0>))
-	MCFG_AM9513_OUT3_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<1>))
-	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<2>))
-	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<3>))
+	MCFG_AM9513_OUT2_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<0>))
+	MCFG_AM9513_OUT3_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<1>))
+	MCFG_AM9513_OUT4_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<2>))
+	MCFG_AM9513_OUT5_CALLBACK(WRITELINE("irq5", input_merger_device, in_w<3>))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
 
 	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(39'321'600) / 8, 0, 0, 0, 0)
 	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(39'321'600) / 8, 0, 0, 0, 0)
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_6))
 
-	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
 
 	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
 MACHINE_CONFIG_END
 
 /* ROM definition */
-ROM_START( sun2_120 )
-	ROM_REGION( 0x8000, "bootprom", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "sun2-multi-rev-r.bin", 0x0000, 0x8000, CRC(4df0df77) SHA1(4d6bcf09ddc9cc8f5823847b8ea88f98fe4a642e))
+ROM_START( sun2_120 ) // ROMs are located on the '501-1007' PCB at locations B11 and B10
+	ROM_REGION16_BE( 0x10000, "bootprom", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("revr")
+	ROM_SYSTEM_BIOS( 0, "rev10f", "Bootrom Rev 1.0F")
+	ROMX_LOAD( "1.0f.b11", 0x0000, 0x8000, CRC(8fb0050a) SHA1(399cdb894b2a66d847d76d8a5d266906fb1d3430), ROM_SKIP(1) | ROM_BIOS(1)) // actual rom stickers had fallen off
+	ROMX_LOAD( "1.0f.b10", 0x0001, 0x8000, CRC(70de816d) SHA1(67e980497f463dbc529f64ec5f3e0046b3901b7e), ROM_SKIP(1) | ROM_BIOS(1)) // "
+	ROM_SYSTEM_BIOS( 1, "revr", "Bootrom Rev R")
+	ROMX_LOAD( "sun2-multi-rev-r.bin", 0x0000, 0x8000, CRC(4df0df77) SHA1(4d6bcf09ddc9cc8f5823847b8ea88f98fe4a642e), ROM_BIOS(2)) // todo: this should be 2 separate chips, one at b11 and one at b9
+	ROM_SYSTEM_BIOS( 2, "revn", "Bootrom Rev N")
+	ROMX_LOAD( "revn.b11", 0x0000, 0x4000, CRC(b1e70965) SHA1(726b3ed9323750a1ae238cf6dccaed6ff5981ad1), ROM_SKIP(1) | ROM_BIOS(3)) // actual rom stickers had fallen off
+	ROMX_LOAD( "revn.b10", 0x0001, 0x4000, CRC(95fd9242) SHA1(1eee2d291f4b18f6aafdde1a9521d88e454843b9), ROM_SKIP(1) | ROM_BIOS(3)) // "
+	ROM_SYSTEM_BIOS( 3, "revm", "Bootrom Rev M")
+	ROMX_LOAD( "sun2-revm-8.b11", 0x0000, 0x4000, CRC(98b8ae55) SHA1(55485f4d8fd1ebc218aa8527c8bb62752c34abf7), ROM_SKIP(1) | ROM_BIOS(4)) // handwritten label: "SUN2-RevM-8"
+	ROMX_LOAD( "sun2-revm-0.b10", 0x0001, 0x4000, CRC(5117f431) SHA1(fce85c11ada1614152dde35bb329350f6fb2ecd9), ROM_SKIP(1) | ROM_BIOS(4)) // handwritten label: "SUN2-RevM-0"
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun2120-idprom.bin", 0x000000, 0x000020, CRC(eec8cd1d) SHA1(6a78dc0ea6f9cc7687cffea754d65864fb751ebf) )
 ROM_END
 
 ROM_START( sun2_50 )
-	ROM_REGION( 0x8000, "bootprom", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "250_q_8.rom", 0x0001, 0x4000, CRC(5bfacb5c) SHA1(ec7fb3fb0217b0138ba4748b7c79b8ff0cad896b))
-	ROM_LOAD16_BYTE( "250_q_0.rom", 0x0000, 0x4000, CRC(2ee29abe) SHA1(82f52b9f25e92387329581f7c8ba50a171784968))
+	ROM_REGION16_BE( 0x8000, "bootprom", ROMREGION_ERASEFF )
+	// bootrom rev Q
+	ROM_LOAD16_BYTE( "250_q_8.rom", 0x0000, 0x4000, CRC(5bfacb5c) SHA1(ec7fb3fb0217b0138ba4748b7c79b8ff0cad896b))
+	ROM_LOAD16_BYTE( "250_q_0.rom", 0x0001, 0x4000, CRC(2ee29abe) SHA1(82f52b9f25e92387329581f7c8ba50a171784968))
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun250-idprom.bin", 0x000000, 0x000020, CRC(927744ab) SHA1(d29302b69128165e69dd3a79b8c8d45f2163b88a) )

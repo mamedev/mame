@@ -61,22 +61,23 @@ const tiny_rom_entry *epson_pf10_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( pf10_floppies )
-	SLOT_INTERFACE( "smd165", EPSON_SMD_165 )
-SLOT_INTERFACE_END
+static void pf10_floppies(device_slot_interface &device)
+{
+	device.option_add("smd165", EPSON_SMD_165);
+}
 
 MACHINE_CONFIG_START(epson_pf10_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", HD6303Y, XTAL(4'915'200)) // HD63A03XF
-	MCFG_CPU_PROGRAM_MAP(cpu_mem)
-	MCFG_CPU_IO_MAP(cpu_io)
-	MCFG_M6801_SER_TX(DEVWRITELINE(DEVICE_SELF, epson_pf10_device, hd6303_tx_w))
+	MCFG_DEVICE_ADD("maincpu", HD6303Y, XTAL(4'915'200)) // HD63A03XF
+	MCFG_DEVICE_PROGRAM_MAP(cpu_mem)
+	MCFG_DEVICE_IO_MAP(cpu_io)
+	MCFG_M6801_SER_TX(WRITELINE(DEVICE_SELF, epson_pf10_device, hd6303_tx_w))
 
 	MCFG_UPD765A_ADD("upd765a", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", pf10_floppies, "smd165", floppy_image_device::default_floppy_formats)
 
 	MCFG_EPSON_SIO_ADD("sio", nullptr)
-	MCFG_EPSON_SIO_RX(DEVWRITELINE(DEVICE_SELF, epson_pf10_device, rxc_w))
-	MCFG_EPSON_SIO_PIN(DEVWRITELINE(DEVICE_SELF, epson_pf10_device, pinc_w))
+	MCFG_EPSON_SIO_RX(WRITELINE(DEVICE_SELF, epson_pf10_device, rxc_w))
+	MCFG_EPSON_SIO_PIN(WRITELINE(DEVICE_SELF, epson_pf10_device, pinc_w))
 MACHINE_CONFIG_END
 
 

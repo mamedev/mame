@@ -159,6 +159,10 @@ sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
+sh2_device::~sh2_device()
+{
+}
+
 
 void sh2_device::device_stop()
 {
@@ -444,7 +448,23 @@ void sh2_device::device_start()
 	m_ftcsr_read_cb.bind_relative_to(*owner());
 
 	m_decrypted_program = has_space(AS_OPCODES) ? &space(AS_OPCODES) : &space(AS_PROGRAM);
-	m_direct = m_decrypted_program->direct<0>();
+	auto cache = m_decrypted_program->cache<2, 0, ENDIANNESS_BIG>();
+	m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address); };
+	if (m_decrypted_program->endianness() != ENDIANNESS_NATIVE)
+		m_prptr = [cache](offs_t address) -> const void * {
+			const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~3));
+			if(!(address & 2))
+				ptr++;
+			return ptr;
+		};
+	else
+		m_prptr = [cache](offs_t address) -> const void * {
+			const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~3));
+			if(address & 2)
+				ptr++;
+			return ptr;
+		};
+
 	m_internal = &space(AS_PROGRAM);
 
 	save_item(NAME(m_cpu_off));

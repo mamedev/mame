@@ -565,15 +565,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(srmp5_state::srmp5)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3051, 25000000)
+	MCFG_DEVICE_ADD("maincpu", R3051, 25000000)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_CPU_PROGRAM_MAP(srmp5_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp5_state,  irq4_line_assert)
+	MCFG_DEVICE_PROGRAM_MAP(srmp5_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp5_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("soundcpu",ST0016_CPU,8000000)
-	MCFG_CPU_PROGRAM_MAP(st0016_mem)
-	MCFG_CPU_IO_MAP(st0016_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp5_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("soundcpu",ST0016_CPU,8000000)
+	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)
+	MCFG_DEVICE_IO_MAP(st0016_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp5_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

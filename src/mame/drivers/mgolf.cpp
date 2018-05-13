@@ -371,8 +371,8 @@ void mgolf_state::machine_reset()
 MACHINE_CONFIG_START(mgolf_state::mgolf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16) /* ? */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 16) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
 
 	/* video hardware */

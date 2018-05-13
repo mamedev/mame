@@ -183,9 +183,10 @@ INPUT_PORTS_END
 
 /* disk drive */
 
-static SLOT_INTERFACE_START( ts803_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ts803_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 WRITE8_MEMBER( ts803_state::disk_0_control_w )
 {
@@ -417,9 +418,9 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 MACHINE_CONFIG_START(ts803_state::ts803)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(ts803_mem)
-	MCFG_CPU_IO_MAP(ts803_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(ts803_mem)
+	MCFG_DEVICE_IO_MAP(ts803_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	/* video hardware */
@@ -438,27 +439,27 @@ MACHINE_CONFIG_START(ts803_state::ts803)
 	MCFG_MC6845_ADDR_CHANGED_CB(ts803_state, crtc_update_addr)
 
 	MCFG_DEVICE_ADD("sti_clock", CLOCK, XTAL(16'000'000) / 13)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sti", z80sti_device, tc_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sti", z80sti_device, rc_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sti", z80sti_device, tc_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sti", z80sti_device, rc_w))
 
 	MCFG_DEVICE_ADD("dart_clock", CLOCK, (XTAL(16'000'000) / 13) / 8)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("dart", z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxca_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("dart", z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxca_w))
 
 	MCFG_DEVICE_ADD("sti", Z80STI, XTAL(16'000'000)/4)
-	MCFG_Z80STI_OUT_TBO_CB(DEVWRITELINE("dart", z80dart_device, rxtxcb_w))
+	MCFG_Z80STI_OUT_TBO_CB(WRITELINE("dart", z80dart_device, rxtxcb_w))
 	MCFG_Z80STI_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(16'000'000) / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("dart", z80dart_device, rxa_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("dart", z80dart_device, rxa_w))
 
 	/* floppy disk */
 	MCFG_FD1793_ADD("fdc", XTAL(1'000'000))
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("sti", z80sti_device, i7_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("sti", z80sti_device, i7_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)

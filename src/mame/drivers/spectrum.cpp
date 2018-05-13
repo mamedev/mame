@@ -668,10 +668,10 @@ INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, X1 / 4)        /* This is verified only for the ZX Spectrum. Other clones are reported to have different clocks */
-	MCFG_CPU_PROGRAM_MAP(spectrum_mem)
-	MCFG_CPU_IO_MAP(spectrum_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spectrum_state, spec_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, X1 / 4)        /* This is verified only for the ZX Spectrum. Other clones are reported to have different clocks */
+	MCFG_DEVICE_PROGRAM_MAP(spectrum_mem)
+	MCFG_DEVICE_IO_MAP(spectrum_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spectrum_state, spec_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum )
@@ -682,7 +682,7 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 	MCFG_SCREEN_RAW_PARAMS(X1 / 2, 448, 0, 352,  312, 0, 296)
 
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_spectrum)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(spectrum_state, screen_vblank_spectrum))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, spectrum_state, screen_vblank_spectrum))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
@@ -692,11 +692,9 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* expansion port */
 	MCFG_SPECTRUM_EXPANSION_SLOT_ADD("exp", spectrum_expansion_devices, "kempjoy")

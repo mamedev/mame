@@ -343,9 +343,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(beaminv_state::beaminv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2000000)   /* 2 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2000000)   /* 2 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
 
 
 	/* video hardware */

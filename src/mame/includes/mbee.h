@@ -45,7 +45,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pio(*this, "z80pio")
 		, m_cassette(*this, "cassette")
-		, m_wave(*this, WAVE_TAG)
+		, m_wave(*this, "wave")
 		, m_speaker(*this, "speaker")
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")

@@ -305,13 +305,13 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(roul_state::roul)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(roul_map)
-	MCFG_CPU_IO_MAP(roul_cpu_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(roul_map)
+	MCFG_DEVICE_IO_MAP(roul_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_cpu_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_cpu_io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -329,11 +329,11 @@ MACHINE_CONFIG_START(roul_state::roul)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(roul_state, roul)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

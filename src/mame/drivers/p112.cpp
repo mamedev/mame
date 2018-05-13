@@ -88,9 +88,9 @@ uint32_t p112_state::screen_update_p112(screen_device &screen, bitmap_ind16 &bit
 
 MACHINE_CONFIG_START(p112_state::p112)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z180, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(p112_mem)
-	MCFG_CPU_IO_MAP(p112_io)
+	MCFG_DEVICE_ADD("maincpu",Z180, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(p112_mem)
+	MCFG_DEVICE_IO_MAP(p112_io)
 
 
 	/* video hardware */

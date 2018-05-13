@@ -376,17 +376,17 @@ void drgnmst_state::machine_reset()
 
 MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 
-	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* Confirmed */
-	MCFG_CPU_PROGRAM_MAP(drgnmst_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", drgnmst_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) /* Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(drgnmst_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drgnmst_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", PIC16C55, 32000000/8)  /* Confirmed */
-	MCFG_PIC16C5x_READ_A_CB(READ8(drgnmst_state, pic16c5x_port0_r))
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(drgnmst_state, drgnmst_pcm_banksel_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(drgnmst_state, drgnmst_snd_command_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(drgnmst_state, drgnmst_oki_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(drgnmst_state, drgnmst_snd_flag_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(drgnmst_state, drgnmst_snd_control_w))
+	MCFG_DEVICE_ADD("audiocpu", PIC16C55, 32000000/8)  /* Confirmed */
+	MCFG_PIC16C5x_READ_A_CB(READ8(*this, drgnmst_state, pic16c5x_port0_r))
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, drgnmst_state, drgnmst_pcm_banksel_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, drgnmst_state, drgnmst_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, drgnmst_state, drgnmst_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, drgnmst_state, drgnmst_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, drgnmst_state, drgnmst_snd_control_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drgnmst)
 
@@ -401,15 +401,13 @@ MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", 32000000/32, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32000000/32, okim6295_device::PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_OKIM6295_ADD("oki2", 32000000/32, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 32000000/32, okim6295_device::PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 

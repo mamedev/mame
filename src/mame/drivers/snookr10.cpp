@@ -1043,8 +1043,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(snookr10_state::snookr10)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)    /* 2 MHz (1.999 MHz measured) */
-	MCFG_CPU_PROGRAM_MAP(snookr10_map)
+	MCFG_DEVICE_ADD("maincpu", M65SC02, MASTER_CLOCK/8)    /* 2 MHz (1.999 MHz measured) */
+	MCFG_DEVICE_PROGRAM_MAP(snookr10_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1064,8 +1064,8 @@ MACHINE_CONFIG_START(snookr10_state::snookr10)
 	MCFG_PALETTE_INIT_OWNER(snookr10_state, snookr10)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, PIN7_HIGH)   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_HIGH)   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.8)
 
 MACHINE_CONFIG_END
@@ -1074,7 +1074,7 @@ MACHINE_CONFIG_START(snookr10_state::apple10)
 	snookr10(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1087,8 +1087,8 @@ MACHINE_CONFIG_START(snookr10_state::tenballs)
 	snookr10(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tenballs_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tenballs_map)
 
 MACHINE_CONFIG_END
 
@@ -1096,8 +1096,8 @@ MACHINE_CONFIG_START(snookr10_state::crystalc)
 	snookr10(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(crystalc_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(crystalc_map)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(snookr10_state, crystalc)

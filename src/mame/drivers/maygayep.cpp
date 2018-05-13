@@ -106,12 +106,12 @@ void maygayep_state::init_maygayep()
 }
 
 MACHINE_CONFIG_START(maygayep_state::maygayep)
-	MCFG_CPU_ADD("maincpu", H83002, 16000000 )
-	MCFG_CPU_PROGRAM_MAP( maygayep_map )
+	MCFG_DEVICE_ADD("maincpu", H83002, 16000000 )
+	MCFG_DEVICE_PROGRAM_MAP( maygayep_map )
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 10000000 )
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 10000000 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

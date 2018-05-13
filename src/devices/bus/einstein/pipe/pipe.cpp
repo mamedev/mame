@@ -129,8 +129,9 @@ device_tatung_pipe_interface::~device_tatung_pipe_interface()
 //  SLOT INTERFACE
 //**************************************************************************
 
-SLOT_INTERFACE_START( tatung_pipe_cards )
-	SLOT_INTERFACE("silicon_disc", EINSTEIN_SILICON_DISC)
-	SLOT_INTERFACE("speculator", EINSTEIN_SPECULATOR)
-	SLOT_INTERFACE("tk02", TK02_80COL)
-SLOT_INTERFACE_END
+void tatung_pipe_cards(device_slot_interface &device)
+{
+	device.option_add("silicon_disc", EINSTEIN_SILICON_DISC);
+	device.option_add("speculator", EINSTEIN_SPECULATOR);
+	device.option_add("tk02", TK02_80COL);
+}

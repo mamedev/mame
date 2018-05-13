@@ -794,10 +794,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ssfindo_state::ssfindo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, 54000000) // guess...
-	MCFG_CPU_PROGRAM_MAP(ssfindo_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 54000000) // guess...
+	MCFG_DEVICE_PROGRAM_MAP(ssfindo_map)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssfindo_state,  interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ssfindo_state,  interrupt)
 
 	MCFG_24C01_ADD("i2cmem")
 
@@ -816,8 +816,8 @@ MACHINE_CONFIG_START(ssfindo_state::ppcar)
 	ssfindo(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ppcar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ppcar_map)
 
 	MCFG_DEVICE_REMOVE("i2cmem")
 MACHINE_CONFIG_END
@@ -826,8 +826,8 @@ MACHINE_CONFIG_START(ssfindo_state::tetfight)
 	ppcar(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tetfight_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tetfight_map)
 
 	MCFG_24C02_ADD("i2cmem")
 MACHINE_CONFIG_END

@@ -184,17 +184,17 @@ WRITE8_MEMBER( datum_state::pb_w )
 
 MACHINE_CONFIG_START(datum_state::datum)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6802, XTAL(4'000'000)) // internally divided to 1 MHz
-	MCFG_CPU_PROGRAM_MAP(datum_mem)
+	MCFG_DEVICE_ADD("maincpu",M6802, XTAL(4'000'000)) // internally divided to 1 MHz
+	MCFG_DEVICE_PROGRAM_MAP(datum_mem)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_datum)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0) // keyboard & display
-	MCFG_PIA_READPA_HANDLER(READ8(datum_state, pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(datum_state, pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(datum_state, pb_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, datum_state, pa_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, datum_state, pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, datum_state, pb_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
 

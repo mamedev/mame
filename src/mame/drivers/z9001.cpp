@@ -205,9 +205,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(z9001_state::z9001)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(9'830'400) / 4)
-	MCFG_CPU_PROGRAM_MAP(z9001_mem)
-	MCFG_CPU_IO_MAP(z9001_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(9'830'400) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(z9001_mem)
+	MCFG_DEVICE_IO_MAP(z9001_io)
 	MCFG_Z80_DAISY_CHAIN(z9001_daisy_chain)
 
 	/* video hardware */
@@ -223,11 +223,9 @@ MACHINE_CONFIG_START(z9001_state::z9001)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("beeper", BEEP, 800)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, "beeper", 800).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
@@ -236,15 +234,15 @@ MACHINE_CONFIG_START(z9001_state::z9001)
 
 	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(9'830'400) / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(z9001_state, port88_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, z9001_state, port88_w))
 
 	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(9'830'400) / 4)   // keyboard PIO
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(9'830'400) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(z9001_state, cass_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, z9001_state, cass_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("z80ctc", z80ctc_device, trg3))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END

@@ -193,10 +193,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sspeedr_state::sspeedr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(19'968'000)/8)
-	MCFG_CPU_PROGRAM_MAP(sspeedr_map)
-	MCFG_CPU_IO_MAP(sspeedr_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sspeedr_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(19'968'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(sspeedr_map)
+	MCFG_DEVICE_IO_MAP(sspeedr_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sspeedr_state,  irq0_line_assert)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -207,7 +207,7 @@ MACHINE_CONFIG_START(sspeedr_state::sspeedr)
 	MCFG_SCREEN_SIZE(376, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 375, 0, 247)
 	MCFG_SCREEN_UPDATE_DRIVER(sspeedr_state, screen_update_sspeedr)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sspeedr_state, screen_vblank_sspeedr))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sspeedr_state, screen_vblank_sspeedr))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sspeedr)

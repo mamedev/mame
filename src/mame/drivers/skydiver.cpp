@@ -350,37 +350,37 @@ GFXDECODE_END
 MACHINE_CONFIG_START(skydiver_state::skydiver)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800,MASTER_CLOCK/16)     /* ???? */
-	MCFG_CPU_PROGRAM_MAP(skydiver_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(skydiver_state, interrupt,  5*60)
+	MCFG_DEVICE_ADD("maincpu", M6800,MASTER_CLOCK/16)     /* ???? */
+	MCFG_DEVICE_PROGRAM_MAP(skydiver_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(skydiver_state, interrupt,  5*60)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)    // 128V clocks the same as VBLANK
 
 	MCFG_DEVICE_ADD("latch1", F9334, 0) // F12
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(skydiver_state, lamp_s_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(skydiver_state, lamp_k_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(skydiver_state, start_lamp_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(skydiver_state, start_lamp_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(skydiver_state, lamp_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(skydiver_state, lamp_d_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SKYDIVER_SOUND_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, skydiver_state, lamp_s_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, skydiver_state, lamp_k_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, skydiver_state, start_lamp_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, skydiver_state, start_lamp_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, skydiver_state, lamp_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, skydiver_state, lamp_d_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SKYDIVER_SOUND_EN>))
 	MCFG_DEVICE_ADD("latch2", F9334, 0) // H12
-	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(skydiver_state, jump1_lamps_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(skydiver_state, coin_lockout_w))
-	//MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(skydiver_state, jump2_lamps_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SKYDIVER_WHISTLE1_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SKYDIVER_WHISTLE2_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(skydiver_state, nmion_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(skydiver_state, width_w))
+	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, skydiver_state, jump1_lamps_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, skydiver_state, coin_lockout_w))
+	//MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, skydiver_state, jump2_lamps_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SKYDIVER_WHISTLE1_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SKYDIVER_WHISTLE2_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, skydiver_state, nmion_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, skydiver_state, width_w))
 	MCFG_DEVICE_ADD("latch3", F9334, 0) // A11
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(skydiver_state, lamp_i_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(skydiver_state, lamp_v_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(skydiver_state, lamp_e_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(skydiver_state, lamp_r_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SKYDIVER_OCT1_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SKYDIVER_OCT2_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SKYDIVER_NOISE_RST>))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, skydiver_state, lamp_i_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, skydiver_state, lamp_v_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, skydiver_state, lamp_e_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, skydiver_state, lamp_r_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SKYDIVER_OCT1_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SKYDIVER_OCT2_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SKYDIVER_NOISE_RST>))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -397,10 +397,9 @@ MACHINE_CONFIG_START(skydiver_state::skydiver)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(skydiver)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, skydiver_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

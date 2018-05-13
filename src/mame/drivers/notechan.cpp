@@ -500,17 +500,17 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(notechan_state::notechan)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)  // unknown...
-	MCFG_CPU_PROGRAM_MAP(notechan_map)
-	MCFG_CPU_IO_MAP(notechan_port_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(driver_device, irq0_line_hold, 60)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)  // unknown...
+	MCFG_DEVICE_PROGRAM_MAP(notechan_map)
+	MCFG_DEVICE_IO_MAP(notechan_port_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(driver_device, irq0_line_hold, 60)
 
 	/* NO VIDEO */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_OKIM6295_ADD("oki", SND_CLOCK, PIN7_HIGH)  // match the real sounds
+	MCFG_DEVICE_ADD("oki", OKIM6295, SND_CLOCK, okim6295_device::PIN7_HIGH)  // match the real sounds
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 

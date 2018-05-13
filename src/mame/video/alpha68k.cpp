@@ -15,9 +15,9 @@ void alpha68k_state::alpha68k_flipscreen_w( int flip )
 	m_flipscreen = flip;
 }
 
-void alpha68k_state::alpha68k_V_video_bank_w( int bank )
+WRITE8_MEMBER(alpha68k_state::alpha68k_V_video_bank_w)
 {
-	m_bank_base = bank & 0xf;
+	m_bank_base = data & 0xf;
 }
 
 /******************************************************************************/

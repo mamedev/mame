@@ -2166,191 +2166,192 @@ WRITE_LINE_MEMBER( cmi_state::cmi_iix_vblank )
 	}
 }
 
-static SLOT_INTERFACE_START( cmi2x_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-	SLOT_INTERFACE( "8dssd", FLOPPY_8_DSSD )
-SLOT_INTERFACE_END
+static void cmi2x_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+	device.option_add("8dssd", FLOPPY_8_DSSD);
+}
 
 MACHINE_CONFIG_START(cmi_state::cmi2x)
-	MCFG_CPU_ADD("maincpu1", MC6809E, Q209_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(maincpu1_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu1_interrupt_callback)
+	MCFG_DEVICE_ADD("maincpu1", MC6809E, Q209_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu1_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu1_interrupt_callback)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu1")
 
-	MCFG_CPU_ADD("maincpu2", MC6809E, Q209_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(maincpu2_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu2_interrupt_callback)
+	MCFG_DEVICE_ADD("maincpu2", MC6809E, Q209_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu2_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu2_interrupt_callback)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu2")
 
-	MCFG_CPU_ADD("muskeys", M6802, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(muskeys_map)
+	MCFG_DEVICE_ADD("muskeys", M6802, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(muskeys_map)
 
-	MCFG_CPU_ADD("alphakeys", M6802, XTAL(3'840'000))
-	MCFG_CPU_PROGRAM_MAP(alphakeys_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cmi_state, irq0_line_hold, XTAL(3'840'000) / 400) // TODO: PIA controls this
+	MCFG_DEVICE_ADD("alphakeys", M6802, XTAL(3'840'000))
+	MCFG_DEVICE_PROGRAM_MAP(alphakeys_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cmi_state, irq0_line_hold, XTAL(3'840'000) / 400) // TODO: PIA controls this
 
-	MCFG_CPU_ADD("smptemidi", M68000, XTAL(20'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(midicpu_map)
+	MCFG_DEVICE_ADD("smptemidi", M68000, XTAL(20'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(midicpu_map)
 
-	MCFG_CPU_ADD("cmi07cpu", MC6809E, Q209_CPU_CLOCK) // ?
-	MCFG_CPU_PROGRAM_MAP(cmi07cpu_map)
+	MCFG_DEVICE_ADD("cmi07cpu", MC6809E, Q209_CPU_CLOCK) // ?
+	MCFG_DEVICE_PROGRAM_MAP(cmi07cpu_map)
 
 	/* alpha-numeric display */
-	MCFG_DEVICE_ADD("dp1", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp<0>))
-	MCFG_DEVICE_ADD("dp2", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp<1>))
-	MCFG_DEVICE_ADD("dp3", DL1416T, 0)
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp<2>))
+	MCFG_DEVICE_ADD("dp1", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, cmi_state, cmi_iix_update_dp<0>))
+	MCFG_DEVICE_ADD("dp2", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, cmi_state, cmi_iix_update_dp<1>))
+	MCFG_DEVICE_ADD("dp3", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, cmi_state, cmi_iix_update_dp<2>))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBLANK_END, HBLANK_START, VTOTAL, VBLANK_END, VBLANK_START)
 	MCFG_SCREEN_UPDATE_DRIVER(cmi_state, screen_update_cmi2x)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cmi_state, cmi_iix_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cmi_state, cmi_iix_vblank))
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MSM5832_ADD("msm5832", XTAL(32'768))
 
 	MCFG_DEVICE_ADD("i8214_1", I8214, 1000000) // cmi_8214_intf_1
-	MCFG_I8214_INT_CALLBACK(WRITELINE(cmi_state, i8214_1_int_w))
+	MCFG_I8214_INT_CALLBACK(WRITELINE(*this, cmi_state, i8214_1_int_w))
 	MCFG_DEVICE_ADD("i8214_2", I8214, 1000000) // cmi_8214_intf_2
-	MCFG_I8214_INT_CALLBACK(WRITELINE(cmi_state, i8214_2_int_w))
+	MCFG_I8214_INT_CALLBACK(WRITELINE(*this, cmi_state, i8214_2_int_w))
 	MCFG_DEVICE_ADD("i8214_3", I8214, 1000000) // cmi_8214_intf_3
-	MCFG_I8214_INT_CALLBACK(WRITELINE(cmi_state, i8214_3_int_w))
-	MCFG_I8214_ENLG_CALLBACK(WRITELINE(cmi_state, i8214_3_enlg))
+	MCFG_I8214_INT_CALLBACK(WRITELINE(*this, cmi_state, i8214_3_int_w))
+	MCFG_I8214_ENLG_CALLBACK(WRITELINE(*this, cmi_state, i8214_3_enlg))
 
 	MCFG_DEVICE_ADD("q133_pia_1", PIA6821, 0) // pia_q133_1_config
-	MCFG_PIA_READPA_HANDLER(READ8(cmi_state, q133_1_porta_r));
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(cmi_state, q133_1_porta_w));
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(cmi_state, q133_1_portb_w));
+	MCFG_PIA_READPA_HANDLER(READ8(*this, cmi_state, q133_1_porta_r));
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, cmi_state, q133_1_porta_w));
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, cmi_state, q133_1_portb_w));
 
 	MCFG_DEVICE_ADD("q133_pia_2", PIA6821, 0) // pia_q133_2_config
 	MCFG_DEVICE_ADD("q133_ptm", PTM6840, 2000000) // ptm_q133_config
 	MCFG_PTM6840_EXTERNAL_CLOCKS(1024, 1, 111) // Third is todo
 
 	MCFG_DEVICE_ADD("q219_pia", PIA6821, 0) // pia_q219_config
-	MCFG_PIA_READPB_HANDLER(READ8(cmi_state, pia_q219_b_r));
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(cmi_state, vscroll_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(cmi_state, video_attr_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi_state, pia_q219_irqa))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi_state, pia_q219_irqb))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, cmi_state, pia_q219_b_r));
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, cmi_state, vscroll_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, cmi_state, video_attr_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, cmi_state, pia_q219_irqa))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, cmi_state, pia_q219_irqb))
 
 	MCFG_DEVICE_ADD("q219_ptm", PTM6840, 2000000) // ptm_q219_config
 	MCFG_PTM6840_EXTERNAL_CLOCKS(HBLANK_FREQ.dvalue(), VBLANK_FREQ.dvalue(), 1'000'000) // TODO: does the third thing come from a crystal?
-	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, ptm_q219_irq))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, cmi_state, ptm_q219_irq))
 
 	MCFG_DEVICE_ADD("cmi02_pia_1", PIA6821, 0) // pia_cmi02_1_config
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(cmi_state, master_tune_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, cmi_state, master_tune_w))
 
 	MCFG_DEVICE_ADD("cmi02_pia_2", PIA6821, 0) // pia_cmi02_2_config
 
 	MCFG_DEVICE_ADD("cmi02_ptm", PTM6840, 2000000) // ptm_cmi02_config TODO
-	MCFG_PTM6840_O2_CB(WRITELINE(cmi_state, cmi02_ptm_o2))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, cmi02_ptm_irq))
+	MCFG_PTM6840_O2_CB(WRITELINE(*this, cmi_state, cmi02_ptm_o2))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, cmi_state, cmi02_ptm_irq))
 
 	MCFG_DEVICE_ADD("mkbd_acia_clock", CLOCK, XTAL(1'843'200) / 12)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(cmi_state, mkbd_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, cmi_state, mkbd_acia_clock))
 
 	MCFG_DEVICE_ADD("q133_acia_0", MOS6551, XTAL(1'843'200))
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("q133_acia_irq", input_merger_device, in_w<0>))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("q133_acia_irq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD("q133_acia_1", MOS6551, XTAL(1'843'200))
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("q133_acia_irq", input_merger_device, in_w<1>))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("q133_acia_irq", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("q133_acia_2", MOS6551, XTAL(1'843'200))
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("q133_acia_irq", input_merger_device, in_w<2>))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("q133_acia_irq", input_merger_device, in_w<2>))
 
 	MCFG_DEVICE_ADD("q133_acia_3", MOS6551, XTAL(1'843'200))
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("q133_acia_irq", input_merger_device, in_w<3>))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("q133_acia_irq", input_merger_device, in_w<3>))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("q133_acia_irq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(cmi_state, q133_acia_irq))
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, cmi_state, q133_acia_irq))
 
 	MCFG_DEVICE_ADD("acia_mkbd_kbd", ACIA6850, XTAL(1'843'200) / 12) // acia_mkbd_kbd
 	MCFG_DEVICE_ADD("acia_mkbd_cmi", ACIA6850, XTAL(1'843'200) / 12) // acia_mkbd_cmi
 	MCFG_DEVICE_ADD("ank_pia", PIA6821, 0) // pia_ank_config
 
 	MCFG_DEVICE_MODIFY("q133_acia_0")
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("acia_mkbd_cmi", acia6850_device, write_rxd))
-	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("acia_mkbd_cmi", acia6850_device, write_cts))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("acia_mkbd_cmi", acia6850_device, write_rxd))
+	MCFG_MOS6551_RTS_HANDLER(WRITELINE("acia_mkbd_cmi", acia6850_device, write_cts))
 
 	MCFG_DEVICE_MODIFY("acia_mkbd_cmi")
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("q133_acia_0", mos6551_device, write_rxd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("q133_acia_0", mos6551_device, write_cts))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(cmi_state, mkbd_cmi_acia_int))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("q133_acia_0", mos6551_device, write_rxd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("q133_acia_0", mos6551_device, write_cts))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, cmi_state, mkbd_cmi_acia_int))
 
 	MCFG_DEVICE_MODIFY("acia_mkbd_kbd")
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("ank_pia", pia6821_device, cb2_w))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("ank_pia", pia6821_device, ca2_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(cmi_state, mkbd_kbd_acia_int))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("ank_pia", pia6821_device, cb2_w))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("ank_pia", pia6821_device, ca2_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, cmi_state, mkbd_kbd_acia_int))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("alphakeys", M6802_IRQ_LINE))
 
 	MCFG_DEVICE_MODIFY("ank_pia")
-	MCFG_PIA_READPA_HANDLER(READ8(cmi_state, ank_col_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(cmi_state, ank_rts_r))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("acia_mkbd_kbd", acia6850_device, write_cts))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("acia_mkbd_kbd", acia6850_device, write_rxd))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<0>))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, cmi_state, ank_col_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, cmi_state, ank_rts_r))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("acia_mkbd_kbd", acia6850_device, write_cts))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("acia_mkbd_kbd", acia6850_device, write_rxd))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE("irqs", input_merger_device, in_w<0>))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("irqs", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("ank_pia_clock", CLOCK, 9600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ank_pia", pia6821_device, ca1_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ank_pia", pia6821_device, ca1_w))
 
 	MCFG_DEVICE_ADD("cmi07_ptm", PTM6840, 2000000) // ptm_cmi07_config TODO
-	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, cmi07_irq))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, cmi_state, cmi07_irq))
 
 	MCFG_FD1791_ADD("wd1791", XTAL(16'000'000) / 8) // wd1791_interface
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(cmi_state, wd1791_irq))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(cmi_state, wd1791_drq))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, cmi_state, wd1791_irq))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, cmi_state, wd1791_drq))
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:1", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 
 	/* Musical keyboard */
 	MCFG_DEVICE_ADD("cmi10_pia_u20", PIA6821, 0)
-	MCFG_PIA_READCB1_HANDLER(READLINE(cmi_state, cmi10_u20_cb1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(cmi_state, cmi10_u20_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(cmi_state, cmi10_u20_b_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(cmi_state, cmi10_u20_cb2_w))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, cmi_state, cmi10_u20_cb1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, cmi_state, cmi10_u20_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, cmi_state, cmi10_u20_b_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, cmi_state, cmi10_u20_cb2_w))
 
 	MCFG_DEVICE_ADD("cmi10_pia_u21", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(cmi_state, cmi10_u21_a_r))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(cmi_state, cmi10_u21_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, cmi_state, cmi10_u21_a_r))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, cmi_state, cmi10_u21_cb2_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// Channel cards
 	MCFG_DEVICE_ADD("cmi01a_0", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<0>))
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<0>))
 	MCFG_DEVICE_ADD("cmi01a_1", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<1>))
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<1>))
 	MCFG_DEVICE_ADD("cmi01a_2", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<2>))
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<2>))
 	MCFG_DEVICE_ADD("cmi01a_3", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<3>))
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<3>))
 	MCFG_DEVICE_ADD("cmi01a_4", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<4>))
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<4>))
 	MCFG_DEVICE_ADD("cmi01a_5", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<5>))
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<5>))
 	MCFG_DEVICE_ADD("cmi01a_6", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<6>))
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<6>))
 	MCFG_DEVICE_ADD("cmi01a_7", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<7>))
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(*this, cmi_state, channel_irq<7>))
 MACHINE_CONFIG_END
 
 ROM_START( cmi2x )

@@ -159,8 +159,8 @@ PALETTE_INIT_MEMBER(eolith16_state,eolith16)
 
 
 MACHINE_CONFIG_START(eolith16_state::eolith16)
-	MCFG_CPU_ADD("maincpu", E116T, XTAL(60'000'000))        /* no internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(eolith16_map)
+	MCFG_DEVICE_ADD("maincpu", E116T, XTAL(60'000'000))        /* no internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(eolith16_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith16_state, eolith_speedup, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C66_8BIT_ADD("eeprom")
@@ -178,9 +178,10 @@ MACHINE_CONFIG_START(eolith16_state::eolith16)
 
 	MCFG_PALETTE_INIT_OWNER(eolith16_state,eolith16)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

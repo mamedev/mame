@@ -1567,10 +1567,10 @@ ROM_START( netmerc )
 ROM_END
 
 MACHINE_CONFIG_START(model1_state::model1)
-	MCFG_CPU_ADD("maincpu", V60, 16000000)
-	MCFG_CPU_PROGRAM_MAP(model1_mem)
-	MCFG_CPU_IO_MAP(model1_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(model1_state,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", V60, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(model1_mem)
+	MCFG_DEVICE_IO_MAP(model1_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(model1_state,irq_callback)
 
 	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
 	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
@@ -1578,10 +1578,10 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model1_state, model1_interrupt, "screen", 0, 1)
 
 #if 1
-	MCFG_CPU_ADD("tgp_copro", MB86233, 16000000)
-	MCFG_CPU_PROGRAM_MAP(copro_prog_map)
-	MCFG_CPU_DATA_MAP(copro_data_map)
-	MCFG_CPU_IO_MAP(copro_io_map)
+	MCFG_DEVICE_ADD("tgp_copro", MB86233, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(copro_prog_map)
+	MCFG_DEVICE_DATA_MAP(copro_data_map)
+	MCFG_DEVICE_IO_MAP(copro_io_map)
 	MCFG_DEVICE_ADDRESS_MAP(mb86233_device::AS_RF, copro_rf_map)
 #endif
 
@@ -1589,8 +1589,8 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1)
 
 	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO, 0)
-	MCFG_MODEL1IO_READ_CB(DEVREAD8("dpram", mb8421_device, left_r))
-	MCFG_MODEL1IO_WRITE_CB(DEVWRITE8("dpram", mb8421_device, left_w))
+	MCFG_MODEL1IO_READ_CB(READ8("dpram", mb8421_device, left_r))
+	MCFG_MODEL1IO_WRITE_CB(WRITE8("dpram", mb8421_device, left_w))
 	MCFG_MODEL1IO_IN0_CB(IOPORT("IN.0"))
 	MCFG_MODEL1IO_IN1_CB(IOPORT("IN.1"))
 
@@ -1603,7 +1603,7 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000), 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
 	MCFG_SCREEN_UPDATE_DRIVER(model1_state, screen_update_model1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(model1_state, screen_vblank_model1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, model1_state, screen_vblank_model1))
 
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -1611,14 +1611,14 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 
 	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
-	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_rxd))
+	MCFG_SEGAM1AUDIO_RXD_HANDLER(WRITELINE("m1uart", i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("m1uart", I8251, 8000000) // uPD71051C, clock unknown
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
 
 	MCFG_CLOCK_ADD("m1uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("m1uart", i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("m1uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("m1uart", i8251_device, write_rxc))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model1_state::model1_hle)
@@ -1632,7 +1632,7 @@ MACHINE_CONFIG_START(model1_state::vf)
 
 	MCFG_DEVICE_MODIFY("ioboard")
 	MCFG_MODEL1IO_IN2_CB(IOPORT("IN.2"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model1_state, vf_outputs_w))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, vf_outputs_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model1_state::vr)
@@ -1642,7 +1642,7 @@ MACHINE_CONFIG_START(model1_state::vr)
 	MCFG_MODEL1IO_AN0_CB(IOPORT("WHEEL"))
 	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
 	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model1_state, vr_outputs_w))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, vr_outputs_w))
 
 	MCFG_M1COMM_ADD(M1COMM_TAG)
 	MCFG_DEVICE_BIOS("epr15112");
@@ -1655,7 +1655,7 @@ MACHINE_CONFIG_START(model1_state::vformula)
 	MCFG_MODEL1IO_AN0_CB(IOPORT("WHEEL"))
 	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
 	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model1_state, vr_outputs_w))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, vr_outputs_w))
 
 	MCFG_M1COMM_ADD(M1COMM_TAG)
 	MCFG_DEVICE_BIOS("epr15624");
@@ -1670,30 +1670,31 @@ MACHINE_CONFIG_START(model1_state::swa)
 	MCFG_MODEL1IO_AN2_CB(IOPORT("THROTTLE"))
 	MCFG_MODEL1IO_AN4_CB(IOPORT("STICK2X"))
 	MCFG_MODEL1IO_AN5_CB(IOPORT("STICK2Y"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model1_state, swa_outputs_w))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, swa_outputs_w))
 
-	MCFG_SPEAKER_STANDARD_STEREO("dleft", "dright")
+	SPEAKER(config, "dleft").front_left();
+	SPEAKER(config, "dright").front_right();
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "dleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "dright", 1.0)
 
 	// Apparently m1audio has to filter out commands the DSB shouldn't see
 	MCFG_DEVICE_MODIFY(M1AUDIO_TAG)
-	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_rxd))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
+	MCFG_SEGAM1AUDIO_RXD_HANDLER(WRITELINE("m1uart", i8251_device, write_rxd))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model1_state::wingwar)
 	model1_hle(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(model1_comm_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model1_comm_mem)
 
 	MCFG_DEVICE_MODIFY("ioboard")
 	MCFG_MODEL1IO_AN0_CB(IOPORT("STICKX"))
 	MCFG_MODEL1IO_AN1_CB(IOPORT("STICKY"))
 	MCFG_MODEL1IO_AN2_CB(IOPORT("THROTTLE"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model1_state, wingwar_outputs_w))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, wingwar_outputs_w))
 
 	MCFG_M1COMM_ADD(M1COMM_TAG)
 	MCFG_DEVICE_BIOS("epr15112");
@@ -1703,7 +1704,7 @@ MACHINE_CONFIG_START(model1_state::wingwar360)
 	wingwar(config);
 
 	MCFG_DEVICE_MODIFY("ioboard")
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model1_state, wingwar360_outputs_w))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, wingwar360_outputs_w))
 MACHINE_CONFIG_END
 
 void model1_state::polhemus_map(address_map &map)
@@ -1715,13 +1716,13 @@ void model1_state::polhemus_map(address_map &map)
 
 MACHINE_CONFIG_START(model1_state::netmerc)
 	model1_hle(config);
-	MCFG_CPU_ADD("polhemus", I386SX, 16000000)
-	MCFG_CPU_PROGRAM_MAP(polhemus_map)
+	MCFG_DEVICE_ADD("polhemus", I386SX, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(polhemus_map)
 
 	MCFG_DEVICE_MODIFY("ioboard")
 	MCFG_MODEL1IO_AN0_CB(IOPORT("STICKX"))
 	MCFG_MODEL1IO_AN2_CB(IOPORT("STICKY"))
-	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model1_state, netmerc_outputs_w))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, netmerc_outputs_w))
 MACHINE_CONFIG_END
 
 

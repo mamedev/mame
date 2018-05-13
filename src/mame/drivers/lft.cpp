@@ -90,9 +90,9 @@ void lft_state::machine_reset()
 
 MACHINE_CONFIG_START(lft_state::lft)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80186, 4000000) // no idea
-	MCFG_CPU_PROGRAM_MAP(lft_mem)
-	MCFG_CPU_IO_MAP(lft_io)
+	MCFG_DEVICE_ADD("maincpu", I80186, 4000000) // no idea
+	MCFG_DEVICE_PROGRAM_MAP(lft_mem)
+	MCFG_DEVICE_IO_MAP(lft_io)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)

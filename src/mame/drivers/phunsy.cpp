@@ -339,12 +339,12 @@ void phunsy_state::init_phunsy()
 
 MACHINE_CONFIG_START(phunsy_state::phunsy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(phunsy_mem)
-	MCFG_CPU_IO_MAP(phunsy_io)
-	MCFG_CPU_DATA_MAP(phunsy_data)
-	MCFG_S2650_SENSE_INPUT(READLINE(phunsy_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(phunsy_state, cass_w))
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(phunsy_mem)
+	MCFG_DEVICE_IO_MAP(phunsy_io)
+	MCFG_DEVICE_DATA_MAP(phunsy_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, phunsy_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, phunsy_state, cass_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -363,11 +363,9 @@ MACHINE_CONFIG_START(phunsy_state::phunsy)
 	MCFG_PALETTE_INIT_OWNER(phunsy_state, phunsy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)

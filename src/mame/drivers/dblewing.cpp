@@ -352,14 +352,14 @@ DECOSPR_PRIORITY_CB_MEMBER(dblewing_state::pri_callback)
 MACHINE_CONFIG_START(dblewing_state::dblewing)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000)/2)   /* DE102 */
-	MCFG_CPU_PROGRAM_MAP(dblewing_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dblewing_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/2)   /* DE102 */
+	MCFG_DEVICE_PROGRAM_MAP(dblewing_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dblewing_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'220'000)/9)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'220'000)/9)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
@@ -407,17 +407,17 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE(dblewing_state, soundlatch_irq_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("soundirq", input_merger_device, in_w<0>))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(WRITELINE(*this, dblewing_state, soundlatch_irq_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("soundirq", input_merger_device, in_w<0>))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000)/9)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000)/9)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<1>))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(28'000'000)/28, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'000'000)/28, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

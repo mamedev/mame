@@ -289,12 +289,12 @@ MACHINE_RESET_MEMBER(actfancr_state,triothep)
 MACHINE_CONFIG_START(actfancr_state::actfancr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H6280, 21477200/3) /* Should be accurate */
-	MCFG_CPU_PROGRAM_MAP(actfan_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", actfancr_state,  irq0_line_hold) /* VBL */
+	MCFG_DEVICE_ADD("maincpu", H6280, 21477200/3) /* Should be accurate */
+	MCFG_DEVICE_PROGRAM_MAP(actfan_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", actfancr_state,  irq0_line_hold) /* VBL */
 
-	MCFG_CPU_ADD("audiocpu",M6502, 1500000) /* Should be accurate */
-	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
+	MCFG_DEVICE_ADD("audiocpu",M6502, 1500000) /* Should be accurate */
+	MCFG_DEVICE_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -322,34 +322,34 @@ MACHINE_CONFIG_START(actfancr_state::actfancr)
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3812, 3000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_OKIM6295_ADD("oki", 1024188, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1024188, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(actfancr_state::triothep)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",H6280,XTAL(21'477'272)/3) /* XIN=21.4772Mhz, verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(triothep_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", actfancr_state,  irq0_line_hold) /* VBL */
+	MCFG_DEVICE_ADD("maincpu",H6280,XTAL(21'477'272)/3) /* XIN=21.4772Mhz, verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(triothep_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", actfancr_state,  irq0_line_hold) /* VBL */
 
-	MCFG_CPU_ADD("audiocpu",M6502, XTAL(12'000'000)/8) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
+	MCFG_DEVICE_ADD("audiocpu",M6502, XTAL(12'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(dec0_s_map)
 
 	MCFG_MACHINE_START_OVERRIDE(actfancr_state,triothep)
 	MCFG_MACHINE_RESET_OVERRIDE(actfancr_state,triothep)
@@ -380,22 +380,22 @@ MACHINE_CONFIG_START(actfancr_state::triothep)
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM3812, XTAL(12'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(12'000'000)/4) /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'056'000), PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'056'000), okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
 

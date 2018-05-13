@@ -1060,7 +1060,7 @@ static const discrete_op_amp_filt_info as2888_preamp_info = {
 };
 
 
-static DISCRETE_SOUND_START(as2888)
+static DISCRETE_SOUND_START(as2888_discrete)
 
 	DISCRETE_INPUT_DATA(NODE_08)        // Start Sustain Attenuation from 555 circuit
 	DISCRETE_INPUT_LOGIC(NODE_01)       // Binary Counter B output (divide by 1) T2
@@ -1096,8 +1096,8 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(by35_state::by35)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 530000) // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
-	MCFG_CPU_PROGRAM_MAP(by35_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 530000) // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
+	MCFG_DEVICE_PROGRAM_MAP(by35_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")   // 'F' filled causes Credit Display to be blank on first startup
 
@@ -1109,27 +1109,27 @@ MACHINE_CONFIG_START(by35_state::by35)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(by35_state, u10_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(by35_state, u10_a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(by35_state, u10_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by35_state, u10_b_w))
-	MCFG_PIA_READCA1_HANDLER(READLINE(by35_state, u10_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(by35_state, u10_cb1_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(by35_state, u10_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(by35_state, u10_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, by35_state, u10_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, by35_state, u10_a_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, by35_state, u10_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, by35_state, u10_b_w))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, by35_state, u10_ca1_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, by35_state, u10_cb1_r))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, by35_state, u10_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, by35_state, u10_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z_freq", by35_state, timer_z_freq, attotime::from_hz(100)) // Mains Line Frequency * 2
 	MCFG_TIMER_DRIVER_ADD("timer_z_pulse", by35_state, timer_z_pulse)                                // Active pulse length from Zero Crossing detector
 
 	MCFG_DEVICE_ADD("pia_u11", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(by35_state, u11_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(by35_state, u11_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by35_state, u11_b_w))
-	MCFG_PIA_READCA1_HANDLER(READLINE(by35_state, u11_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(by35_state, u11_cb1_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(by35_state, u11_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(by35_state, u11_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, by35_state, u11_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, by35_state, u11_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, by35_state, u11_b_w))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, by35_state, u11_ca1_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, by35_state, u11_cb1_r))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, by35_state, u11_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, by35_state, u11_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d_freq", by35_state, u11_timer, attotime::from_hz(317)) // 555 timer
@@ -1137,14 +1137,13 @@ MACHINE_CONFIG_START(by35_state::by35)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(as2888_state::as2888_audio)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(as2888)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, as2888_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_MODIFY("pia_u11")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(as2888_state, u11_b_as2888_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(as2888_state, u11_cb2_as2888_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, as2888_state, u11_b_as2888_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, as2888_state, u11_cb2_as2888_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s_freq", as2888_state, timer_s, attotime::from_hz(353000))     // Inverter clock on AS-2888 sound board
 	MCFG_TIMER_DRIVER_ADD("timer_as2888", as2888_state, timer_as2888)
@@ -1160,8 +1159,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(by35_state::nuovo)
 	by35(config);
 
-	MCFG_CPU_REPLACE("maincpu", M6802, 2000000) // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
-	MCFG_CPU_PROGRAM_MAP(nuovo_map)
+	MCFG_DEVICE_REPLACE("maincpu", M6802, 2000000) // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
+	MCFG_DEVICE_PROGRAM_MAP(nuovo_map)
 
 MACHINE_CONFIG_END
 

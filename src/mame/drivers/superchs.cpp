@@ -226,13 +226,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(superchs_state::superchs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20MHz - verified */
-	MCFG_CPU_PROGRAM_MAP(superchs_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superchs_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20MHz - verified */
+	MCFG_DEVICE_PROGRAM_MAP(superchs_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superchs_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(32'000'000)/2) /* 16MHz - verified */
-	MCFG_CPU_PROGRAM_MAP(superchs_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(32'000'000)/2) /* 16MHz - verified */
+	MCFG_DEVICE_PROGRAM_MAP(superchs_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480)) /* Need to interleave CPU 1 & 3 */
 
@@ -242,16 +242,16 @@ MACHINE_CONFIG_START(superchs_state::superchs)
 	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 3))
 	MCFG_ADC0808_IN0_CB(IOPORT("WHEEL"))
 	MCFG_ADC0808_IN1_CB(IOPORT("ACCEL"))
-	MCFG_ADC0808_IN2_CB(READ8(superchs_state, volume_r))
+	MCFG_ADC0808_IN2_CB(READ8(*this, superchs_state, volume_r))
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("COINS"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("SWITCHES"))
-	MCFG_TC0510NIO_READ_3_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_TC0510NIO_WRITE_3_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(superchs_state, coin_word_w))
+	MCFG_TC0510NIO_READ_3_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_TC0510NIO_WRITE_3_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, superchs_state, coin_word_w))
 	// there are 'vibration' control bits somewhere!
 
 	/* video hardware */
@@ -281,9 +281,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(superchs_state::chase3)
 	superchs(config);
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(chase3_cpub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(chase3_cpub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

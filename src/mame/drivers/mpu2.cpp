@@ -76,8 +76,8 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(mpu2_state::mpu2)
-	MCFG_CPU_ADD("maincpu", M6800, 2000000) // ?
-	MCFG_CPU_PROGRAM_MAP(mpu2_basemap)
+	MCFG_DEVICE_ADD("maincpu", M6800, 2000000) // ?
+	MCFG_DEVICE_PROGRAM_MAP(mpu2_basemap)
 MACHINE_CONFIG_END
 
 // technically not a 'bios' because they're all on the same board.

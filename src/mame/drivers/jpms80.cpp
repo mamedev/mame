@@ -134,7 +134,7 @@ void jpms80_state::machine_reset()
 MACHINE_CONFIG_START(jpms80_state::jpms80)
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpms80_map, jpms80_io_map)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("outlatch0", LS259, 0) // I/O IC5
 	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // I/O IC6
@@ -148,14 +148,14 @@ MACHINE_CONFIG_START(jpms80_state::jpms80)
 	MCFG_DEVICE_ADD("outlatch9", LS259, 0) // I/O IC14
 
 	MCFG_DEVICE_ADD("outlatch10", LS259, 0) // I/O IC15
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(jpms80_state, int1_enable_w)) // 50 - INT1 enable (lv3)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jpms80_state, int2_enable_w)) // 51 - INT2 enable (lv4)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(jpms80_state, watchdog_w)) // 52 - Watchdog
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(jpms80_state, io_enable_w)) // 53 - I/O Enable
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, jpms80_state, int1_enable_w)) // 50 - INT1 enable (lv3)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jpms80_state, int2_enable_w)) // 51 - INT2 enable (lv4)
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, jpms80_state, watchdog_w)) // 52 - Watchdog
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, jpms80_state, io_enable_w)) // 53 - I/O Enable
 
 	MCFG_DEVICE_ADD("tms9902duart", TMS9902, DUART_CLOCK)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

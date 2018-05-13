@@ -675,8 +675,8 @@ MACHINE_CONFIG_START(nascom_state::nascom)
 	MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
 	MCFG_AY31015_RX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
-	MCFG_AY31015_READ_SI_CB(READLINE(nascom_state, nascom1_hd6402_si))
-	MCFG_AY31015_WRITE_SO_CB(WRITELINE(nascom_state, nascom1_hd6402_so))
+	MCFG_AY31015_READ_SI_CB(READLINE(*this, nascom_state, nascom1_hd6402_si))
+	MCFG_AY31015_WRITE_SO_CB(WRITELINE(*this, nascom_state, nascom1_hd6402_so))
 
 	// cassette is connected to the uart
 	MCFG_CASSETTE_ADD("cassette")
@@ -695,16 +695,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nascom1_state::nascom1)
 	nascom(config);
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(nascom1_mem)
-	MCFG_CPU_IO_MAP(nascom1_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(nascom1_mem)
+	MCFG_DEVICE_IO_MAP(nascom1_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nascom2_state::nascom2)
 	nascom(config);
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(nascom2_mem)
-	MCFG_CPU_IO_MAP(nascom2_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(nascom2_mem)
+	MCFG_DEVICE_IO_MAP(nascom2_io)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -724,7 +724,7 @@ MACHINE_CONFIG_START(nascom2_state::nascom2)
 
 	// nasbus expansion bus
 	MCFG_NASBUS_ADD(NASBUS_TAG)
-	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(nascom2_state, ram_disable_w))
+	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(*this, nascom2_state, ram_disable_w))
 	MCFG_NASBUS_SLOT_ADD("nasbus1", nasbus_slot_cards, nullptr)
 	MCFG_NASBUS_SLOT_ADD("nasbus2", nasbus_slot_cards, nullptr)
 	MCFG_NASBUS_SLOT_ADD("nasbus3", nasbus_slot_cards, nullptr)
@@ -737,15 +737,15 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nascom2_state::nascom2c)
 	nascom2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nascom2c_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nascom2c_mem)
 
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("60K")
 
 	MCFG_DEVICE_MODIFY(NASBUS_TAG)
-	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(nascom2_state, ram_disable_cpm_w))
+	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(*this, nascom2_state, ram_disable_cpm_w))
 MACHINE_CONFIG_END
 
 

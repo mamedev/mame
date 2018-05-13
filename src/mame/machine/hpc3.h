@@ -19,13 +19,13 @@
 	MCFG_DEVICE_ADD(_tag, SGI_HPC3, 0)
 
 #define MCFG_HPC3_CPU_TAG(cpu_tag) \
-	downcast<hpc3_device &>(*device).set_cpu_tag(("^" cpu_tag));
+	downcast<hpc3_device &>(*device).set_cpu_tag(cpu_tag);
 
 #define MCFG_HPC3_SCSI_TAG(scsi_tag) \
-	downcast<hpc3_device &>(*device).set_scsi_tag(("^" scsi_tag));
+	downcast<hpc3_device &>(*device).set_scsi_tag(scsi_tag);
 
 #define MCFG_HPC3_IOC2_TAG(ioc2_tag) \
-	downcast<hpc3_device &>(*device).set_ioc2_tag(("^" ioc2_tag));
+	downcast<hpc3_device &>(*device).set_ioc2_tag(ioc2_tag);
 
 class hpc3_device : public device_t
 {

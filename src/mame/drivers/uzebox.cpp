@@ -285,10 +285,10 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 MACHINE_CONFIG_START(uzebox_state::uzebox)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ATMEGA644, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(uzebox_prg_map)
-	MCFG_CPU_DATA_MAP(uzebox_data_map)
-	MCFG_CPU_IO_MAP(uzebox_io_map)
+	MCFG_DEVICE_ADD("maincpu", ATMEGA644, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(uzebox_prg_map)
+	MCFG_DEVICE_DATA_MAP(uzebox_data_map)
+	MCFG_DEVICE_IO_MAP(uzebox_io_map)
 	MCFG_CPU_AVR8_EEPROM("eeprom")
 
 	/* video hardware */
@@ -300,8 +300,8 @@ MACHINE_CONFIG_START(uzebox_state::uzebox)
 	MCFG_SCREEN_UPDATE_DRIVER(uzebox_state, screen_update_uzebox)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(0, "mono", 1.00)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "uzebox")

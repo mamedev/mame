@@ -727,19 +727,19 @@ void fitfight_state::machine_reset()
 
 MACHINE_CONFIG_START(fitfight_state::fitfight)
 
-	MCFG_CPU_ADD("maincpu",M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(fitfight_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(fitfight_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
-	MCFG_CPU_PROGRAM_MAP(snd_mem)
-	MCFG_UPD7810_PORTA_READ_CB(READ8(fitfight_state, snd_porta_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(fitfight_state, snd_porta_w))
-	MCFG_UPD7810_PORTB_READ_CB(READ8(fitfight_state, snd_portb_r))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(fitfight_state, snd_portb_w))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(fitfight_state, snd_portc_r))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(fitfight_state, snd_portc_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fitfight_state,  snd_irq)
+	MCFG_DEVICE_ADD("audiocpu", UPD7810, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(snd_mem)
+	MCFG_UPD7810_PORTA_READ_CB(READ8(*this, fitfight_state, snd_porta_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, fitfight_state, snd_porta_w))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(*this, fitfight_state, snd_portb_r))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(*this, fitfight_state, snd_portb_w))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(*this, fitfight_state, snd_portc_r))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, fitfight_state, snd_portc_w))
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fitfight_state,  snd_irq)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fitfight)
 
@@ -755,17 +755,17 @@ MACHINE_CONFIG_START(fitfight_state::fitfight)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1333333, PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1333333, okim6295_device::PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fitfight_state::bbprot)
 
-	MCFG_CPU_ADD("maincpu",M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(bbprot_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(bbprot_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", prot)
@@ -782,9 +782,9 @@ MACHINE_CONFIG_START(fitfight_state::bbprot)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1333333, PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1333333, okim6295_device::PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

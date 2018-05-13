@@ -165,6 +165,6 @@ DECLARE_DEVICE_TYPE(SEGAIC16VID, segaic16_video_device)
 	MCFG_DEVICE_ADD(_tag, SEGAIC16VID, 0)
 
 #define MCFG_SEGAIC16VID_GFXDECODE(_gfxtag) \
-	downcast<segaic16_video_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<segaic16_video_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_SEGAIC16_H

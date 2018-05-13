@@ -417,10 +417,10 @@ static const floppy_interface vtech2_floppy_interface =
 
 MACHINE_CONFIG_START(vtech2_state::laser350)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
-	MCFG_CPU_PROGRAM_MAP(vtech2_mem)
-	MCFG_CPU_IO_MAP(vtech2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vtech2_state,  vtech2_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(vtech2_mem)
+	MCFG_DEVICE_IO_MAP(vtech2_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vtech2_state,  vtech2_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -438,11 +438,9 @@ MACHINE_CONFIG_START(vtech2_state::laser350)
 	MCFG_PALETTE_INIT_OWNER(vtech2_state, vtech2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(vtech2_cassette_formats)

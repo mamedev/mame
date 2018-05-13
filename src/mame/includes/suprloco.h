@@ -34,7 +34,6 @@ public:
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(scrollram_w);
 	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE_LINE_MEMBER(pc0_w);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 

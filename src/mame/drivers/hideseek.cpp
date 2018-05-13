@@ -102,8 +102,8 @@ PALETTE_INIT_MEMBER(hideseek_state, hideseek)
 MACHINE_CONFIG_START(hideseek_state::hideseek)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2, 7372800 * 4 )
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", SH2, 7372800 * 4 )
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 //  MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hideseek_state, hideseek_scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -119,7 +119,8 @@ MACHINE_CONFIG_START(hideseek_state::hideseek)
 	MCFG_PALETTE_INIT_OWNER(hideseek_state, hideseek)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hideseek)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	/* sound : M9810 */
 MACHINE_CONFIG_END

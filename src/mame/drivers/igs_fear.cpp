@@ -79,8 +79,8 @@ WRITE_LINE_MEMBER(igs_fear_state::sound_irq)
 
 
 MACHINE_CONFIG_START(igs_fear_state::igs_fear)
-	MCFG_CPU_ADD("maincpu",ARM7, 50000000/2)
-	MCFG_CPU_PROGRAM_MAP(igs_igs_fear_map)
+	MCFG_DEVICE_ADD("maincpu",ARM7, 50000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(igs_igs_fear_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -97,9 +97,9 @@ MACHINE_CONFIG_START(igs_fear_state::igs_fear)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs_fear)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_ICS2115_ADD("ics", 0)
-	MCFG_ICS2115_IRQ_CB(WRITELINE(igs_fear_state, sound_irq))
+	MCFG_ICS2115_IRQ_CB(WRITELINE(*this, igs_fear_state, sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 
 MACHINE_CONFIG_END

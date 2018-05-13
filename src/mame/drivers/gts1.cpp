@@ -700,40 +700,40 @@ WRITE8_MEMBER(gts1_state::gts1_do_w)
 
 MACHINE_CONFIG_START(gts1_state::gts1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPS4_2, XTAL(3'579'545))  // divided by 18 in the CPU
-	MCFG_CPU_PROGRAM_MAP(gts1_map)
-	MCFG_CPU_DATA_MAP(gts1_data)
-	MCFG_CPU_IO_MAP(gts1_io)
-	MCFG_PPS4_DISCRETE_INPUT_A_CB(READ8(gts1_state, gts1_pa_r))
-	MCFG_PPS4_DISCRETE_OUTPUT_CB(WRITE8(gts1_state, gts1_do_w))
+	MCFG_DEVICE_ADD("maincpu", PPS4_2, XTAL(3'579'545))  // divided by 18 in the CPU
+	MCFG_DEVICE_PROGRAM_MAP(gts1_map)
+	MCFG_DEVICE_DATA_MAP(gts1_data)
+	MCFG_DEVICE_IO_MAP(gts1_io)
+	MCFG_PPS4_DISCRETE_INPUT_A_CB(READ8(*this, gts1_state, gts1_pa_r))
+	MCFG_PPS4_DISCRETE_OUTPUT_CB(WRITE8(*this, gts1_state, gts1_do_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* A1753CE 2048 x 8 ROM (000-7ff), 128 x 4 RAM (00-7f) and 16 I/O lines (20 ... 2f) */
 	MCFG_DEVICE_ADD( "u5", RA17XX, 0 )
-	MCFG_RA17XX_READ ( READ8 (gts1_state,gts1_switches_r) )
-	MCFG_RA17XX_WRITE( WRITE8(gts1_state,gts1_switches_w) )
+	MCFG_RA17XX_READ ( READ8 (*this, gts1_state,gts1_switches_r) )
+	MCFG_RA17XX_WRITE( WRITE8(*this, gts1_state,gts1_switches_w) )
 	MCFG_RA17XX_CPU("maincpu")
 
 	/* A1752CF 2048 x 8 ROM (800-fff), 128 x 4 RAM (80-ff) and 16 I/O lines (40 ... 4f) */
 	MCFG_DEVICE_ADD( "u4", RA17XX, 0 )
-	MCFG_RA17XX_READ ( READ8 (gts1_state,gts1_solenoid_r) )
-	MCFG_RA17XX_WRITE( WRITE8(gts1_state,gts1_solenoid_w) )
+	MCFG_RA17XX_READ ( READ8 (*this, gts1_state,gts1_solenoid_r) )
+	MCFG_RA17XX_WRITE( WRITE8(*this, gts1_state,gts1_solenoid_w) )
 	MCFG_RA17XX_CPU("maincpu")
 
 	/* 10696 General Purpose Input/Output */
 	MCFG_DEVICE_ADD( "u2", R10696, 0 )
-	MCFG_R10696_IO( READ8 (gts1_state,gts1_nvram_r),
-					WRITE8(gts1_state,gts1_nvram_w) )
+	MCFG_R10696_IO( READ8 (*this, gts1_state,gts1_nvram_r),
+					WRITE8(*this, gts1_state,gts1_nvram_w) )
 
 	/* 10696 General Purpose Input/Output */
 	MCFG_DEVICE_ADD( "u3", R10696, 0 )
-	MCFG_R10696_IO( READ8 (gts1_state,gts1_lamp_apm_r),
-					WRITE8(gts1_state,gts1_lamp_apm_w) )
+	MCFG_R10696_IO( READ8 (*this, gts1_state,gts1_lamp_apm_r),
+					WRITE8(*this, gts1_state,gts1_lamp_apm_w) )
 
 	/* 10788 General Purpose Display and Keyboard */
 	MCFG_DEVICE_ADD( "u6", R10788, XTAL(3'579'545) / 18 )  // divided in the circuit
-	MCFG_R10788_UPDATE( WRITE8(gts1_state,gts1_display_w) )
+	MCFG_R10788_UPDATE( WRITE8(*this, gts1_state,gts1_display_w) )
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT( layout_gts1 )

@@ -412,8 +412,8 @@ void anzterm_state::anzterm(address_map &map)
 
 
 MACHINE_CONFIG_START(anzterm_state::anzterm)
-	MCFG_CPU_ADD("maincpu", M6809, 15974400/4)
-	MCFG_CPU_PROGRAM_MAP(anzterm)
+	MCFG_DEVICE_ADD("maincpu", M6809, 15974400/4)
+	MCFG_DEVICE_PROGRAM_MAP(anzterm)
 
 	MCFG_DEVICE_ADD("pic.ic39", I8214, 0)
 	MCFG_DEVICE_ADD("adlc.ic16", MC6854, 0)

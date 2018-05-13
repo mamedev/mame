@@ -510,9 +510,9 @@ TODO: understand if later hardware uses different parameters (XTAL is almost sur
 MACHINE_CONFIG_START(astrocorp_state::showhand)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(showhand_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", astrocorp_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(showhand_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", astrocorp_state,  irq4_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -535,17 +535,17 @@ MACHINE_CONFIG_START(astrocorp_state::showhand)
 	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000)/20, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(20'000'000)/20, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(astrocorp_state::showhanc)
 	showhand(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(showhanc_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(showhanc_map)
 MACHINE_CONFIG_END
 
 
@@ -563,8 +563,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::skilldrp_scanline)
 MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2) // JX-1689F1028N GRX586.V5
-	MCFG_CPU_PROGRAM_MAP(skilldrp_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2) // JX-1689F1028N GRX586.V5
+	MCFG_DEVICE_PROGRAM_MAP(skilldrp_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", astrocorp_state, skilldrp_scanline, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -590,17 +590,17 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/24, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(24'000'000)/24, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(astrocorp_state::speeddrp)
 	skilldrp(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(speeddrp_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(speeddrp_map)
 MACHINE_CONFIG_END
 
 

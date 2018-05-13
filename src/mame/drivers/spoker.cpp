@@ -600,22 +600,22 @@ void spoker_state::machine_reset()
 MACHINE_CONFIG_START(spoker_state::spoker)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 2)   /* HD64180RP8, 8 MHz? */
-	MCFG_CPU_PROGRAM_MAP(spoker_map)
-	MCFG_CPU_IO_MAP(spoker_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spoker_state, nmi_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 2)   /* HD64180RP8, 8 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(spoker_map)
+	MCFG_DEVICE_IO_MAP(spoker_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spoker_state, nmi_line_assert)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)  // Control 0x8b --> A:out; B:input; C:input.
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(spoker_state, nmi_and_coins_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, spoker_state, nmi_and_coins_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)  // Control 0x90 --> A:input; B:out; C:out.
 	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(spoker_state, video_and_leds_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(spoker_state, leds_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spoker_state, video_and_leds_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spoker_state, leds_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -631,11 +631,11 @@ MACHINE_CONFIG_START(spoker_state::spoker)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000) / 12, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000) / 12, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -643,12 +643,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(spoker_state::_3super8)
 	spoker(config);
 
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(24'000'000) / 4)    /* z840006, 24/4 MHz? */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spoker_map)
-	MCFG_CPU_IO_MAP(_3super8_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spoker_state, nmi_line_assert)
-	MCFG_CPU_PERIODIC_INT_DRIVER(spoker_state, irq0_line_hold, 120) // this signal comes from the PIC
+	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(24'000'000) / 4)    /* z840006, 24/4 MHz? */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spoker_map)
+	MCFG_DEVICE_IO_MAP(_3super8_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spoker_state, nmi_line_assert)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(spoker_state, irq0_line_hold, 120) // this signal comes from the PIC
 
 	MCFG_DEVICE_REMOVE("ppi8255_0")
 	MCFG_DEVICE_REMOVE("ppi8255_1")

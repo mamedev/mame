@@ -1301,14 +1301,14 @@ void konamim2_state::machine_reset()
 MACHINE_CONFIG_START(konamim2_state::m2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC602, 66000000)   /* actually PPC602, 66MHz */
+	MCFG_DEVICE_ADD("maincpu", PPC602, 66000000)   /* actually PPC602, 66MHz */
 	MCFG_PPC_BUS_FREQUENCY(33000000)  /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
-	MCFG_CPU_PROGRAM_MAP(m2_main_m)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", konamim2_state,  m2)
+	MCFG_DEVICE_PROGRAM_MAP(m2_main_m)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konamim2_state,  m2)
 
-	MCFG_CPU_ADD("sub", PPC602, 66000000)   /* actually PPC602, 66MHz */
+	MCFG_DEVICE_ADD("sub", PPC602, 66000000)   /* actually PPC602, 66MHz */
 	MCFG_PPC_BUS_FREQUENCY(33000000)  /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
-	MCFG_CPU_PROGRAM_MAP(m2_main_s)
+	MCFG_DEVICE_PROGRAM_MAP(m2_main_s)
 
 	// TODO: declaring as second screen causes palette confusion (wants to use palette from the other screen?)
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
@@ -1333,11 +1333,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konamim2_state::_3do_m2)
 	m2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(_3do_m2_main_m)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(_3do_m2_main_m)
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(_3do_m2_main_s)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(_3do_m2_main_s)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","3do_m2")
 MACHINE_CONFIG_END

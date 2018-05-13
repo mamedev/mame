@@ -580,9 +580,9 @@ INPUT_PORTS_END
 /* machine definition */
 MACHINE_CONFIG_START(ti85_state::ti81)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2000000)        /* 2 MHz */
-	MCFG_CPU_PROGRAM_MAP(ti81_mem)
-	MCFG_CPU_IO_MAP(ti81_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2000000)        /* 2 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ti81_mem)
+	MCFG_DEVICE_IO_MAP(ti81_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -603,9 +603,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti85)
 	ti81(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000)        /* 6 MHz */
-	MCFG_CPU_IO_MAP(ti85_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(6000000)        /* 6 MHz */
+	MCFG_DEVICE_IO_MAP(ti85_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
@@ -613,7 +613,7 @@ MACHINE_CONFIG_START(ti85_state::ti85)
 	MCFG_SCREEN_SIZE(128, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 64-1)
 
-	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
+	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
 MACHINE_CONFIG_END
 
 
@@ -626,9 +626,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti82)
 	ti81(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000)        /* 6 MHz */
-	MCFG_CPU_IO_MAP(ti82_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(6000000)        /* 6 MHz */
+	MCFG_DEVICE_IO_MAP(ti82_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
@@ -642,22 +642,22 @@ MACHINE_CONFIG_START(ti85_state::ti82)
 	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
 	MCFG_T6A04_SIZE(96, 64)
 
-	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
+	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti81v2)
 	ti82(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(ti81v2_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(ti81v2_io)
 
 	MCFG_DEVICE_REMOVE("linkport")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti83)
 	ti81(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000)        /* 6 MHz */
-	MCFG_CPU_IO_MAP(ti83_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(6000000)        /* 6 MHz */
+	MCFG_DEVICE_IO_MAP(ti83_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
@@ -674,9 +674,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti86)
 	ti85(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ti86_mem)
-	MCFG_CPU_IO_MAP(ti86_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ti86_mem)
+	MCFG_DEVICE_IO_MAP(ti86_io)
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti86 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
@@ -686,10 +686,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti83p)
 	ti81(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000)        /* 8 MHz running at 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(ti83p_asic_mem)
-	MCFG_CPU_IO_MAP(ti83p_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(6000000)        /* 8 MHz running at 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ti83p_asic_mem)
+	MCFG_DEVICE_IO_MAP(ti83p_io)
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti83p )
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti83p )
@@ -728,16 +728,16 @@ MACHINE_CONFIG_START(ti85_state::ti83p)
 	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
 	MCFG_T6A04_SIZE(96, 64)
 
-	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
+	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
 
 	MCFG_AMD_29F400T_ADD("flash")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti83pse)
 	ti83p(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( 15000000)
-	MCFG_CPU_IO_MAP(ti83pse_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK( 15000000)
+	MCFG_DEVICE_IO_MAP(ti83pse_io)
 
 	MCFG_DEVICE_MODIFY("membank1")
 	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)

@@ -32,8 +32,8 @@ static INPUT_PORTS_START( qvt70 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(qvt70_state::qvt70)
-	MCFG_CPU_ADD("maincpu", Z80, 2'000'000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2'000'000)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************

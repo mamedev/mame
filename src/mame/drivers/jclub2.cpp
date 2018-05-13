@@ -1131,14 +1131,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(common_state::scanline_irq)
 
 // Older hardware (ST-0020 + ST-0016)
 MACHINE_CONFIG_START(jclub2o_state::jclub2o)
-	MCFG_CPU_ADD("maincpu", M68EC020, 12000000)
-	MCFG_CPU_PROGRAM_MAP(jclub2o_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(jclub2o_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu",ST0016_CPU, 8000000)
-	MCFG_CPU_PROGRAM_MAP(st0016_mem)
-	MCFG_CPU_IO_MAP(st0016_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jclub2o_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("soundcpu",ST0016_CPU, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)
+	MCFG_DEVICE_IO_MAP(st0016_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jclub2o_state, irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_EEPROM_SERIAL_S29290_ADD("eeprom") // S-29290 (16 bits)
@@ -1170,8 +1170,8 @@ MACHINE_CONFIG_END
 
 // Newer hardware (ST-0032)
 MACHINE_CONFIG_START(jclub2_state::jclub2)
-	MCFG_CPU_ADD("maincpu", M68EC020, 12000000)
-	MCFG_CPU_PROGRAM_MAP(jclub2_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(jclub2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1205,8 +1205,8 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(darkhors_state::darkhors)
-	MCFG_CPU_ADD("maincpu", M68EC020, 12000000) // 36MHz/3 ??
-	MCFG_CPU_PROGRAM_MAP(darkhors_map)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 12000000) // 36MHz/3 ??
+	MCFG_DEVICE_PROGRAM_MAP(darkhors_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1235,9 +1235,9 @@ MACHINE_CONFIG_START(darkhors_state::darkhors)
 	MCFG_DEFAULT_LAYOUT(layout_jclub2)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 528000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 528000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

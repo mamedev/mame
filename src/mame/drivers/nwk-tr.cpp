@@ -825,19 +825,19 @@ void nwktr_state::machine_reset()
 MACHINE_CONFIG_START(nwktr_state::nwktr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
-	MCFG_CPU_PROGRAM_MAP(nwktr_map)
+	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
+	MCFG_DEVICE_PROGRAM_MAP(nwktr_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_memmap)
+	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, XTAL(36'000'000))
+	MCFG_DEVICE_ADD("dsp", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_CPU_DATA_MAP(sharc0_map)
+	MCFG_DEVICE_DATA_MAP(sharc0_map)
 
-	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL(36'000'000))
+	MCFG_DEVICE_ADD("dsp2", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_CPU_DATA_MAP(sharc1_map)
+	MCFG_DEVICE_DATA_MAP(sharc1_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(9000))
 
@@ -858,14 +858,14 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	MCFG_VOODOO_TMUMEM(2,2)
 	MCFG_VOODOO_SCREEN_TAG("lscreen")
 	MCFG_VOODOO_CPU_TAG("dsp")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(nwktr_state,voodoo_vblank_0))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, nwktr_state,voodoo_vblank_0))
 
 	MCFG_DEVICE_ADD("voodoo1", VOODOO_1, STD_VOODOO_1_CLOCK)
 	MCFG_VOODOO_FBMEM(2)
 	MCFG_VOODOO_TMUMEM(2, 2)
 	MCFG_VOODOO_SCREEN_TAG("rscreen")
 	MCFG_VOODOO_CPU_TAG("dsp2")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(nwktr_state, voodoo_vblank_1))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, nwktr_state, voodoo_vblank_1))
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -888,12 +888,13 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 	MCFG_K001604_ROZ_OFFSET(0)  // correct?
 	MCFG_K001604_PALETTE("palette")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_K056800_ADD("k056800", XTAL(16'934'400))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
-	MCFG_RF5C400_ADD("rfsnd", XTAL(16'934'400))  // as per Guru readme above
+	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(16'934'400))  // as per Guru readme above
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

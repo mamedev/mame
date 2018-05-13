@@ -204,12 +204,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(stadhero_state::stadhero)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 20_MHz_XTAL/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", stadhero_state,  irq5_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", stadhero_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 24_MHz_XTAL/16)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 24_MHz_XTAL/16)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -234,21 +234,21 @@ MACHINE_CONFIG_START(stadhero_state::stadhero)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 24_MHz_XTAL/16)
+	MCFG_DEVICE_ADD("ym1", YM2203, 24_MHz_XTAL/16)
 	MCFG_SOUND_ROUTE(0, "mono", 0.95)
 	MCFG_SOUND_ROUTE(1, "mono", 0.95)
 	MCFG_SOUND_ROUTE(2, "mono", 0.95)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 24_MHz_XTAL/8)
+	MCFG_DEVICE_ADD("ym2", YM3812, 24_MHz_XTAL/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

@@ -101,9 +101,9 @@ uint32_t terak_state::screen_update_terak(screen_device &screen, bitmap_ind16 &b
 
 MACHINE_CONFIG_START(terak_state::terak)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("maincpu",T11, XTAL(4'000'000))
 	MCFG_T11_INITIAL_MODE(6 << 13)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -602,9 +602,9 @@ It needs at least 64 instances because 0xa05b will be eventually nuked by the vb
 MACHINE_CONFIG_START(dblcrown_state::dblcrown)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(dblcrown_map)
-	MCFG_CPU_IO_MAP(dblcrown_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(dblcrown_map)
+	MCFG_DEVICE_IO_MAP(dblcrown_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dblcrown_state, dblcrown_irq_scanline, "screen", 0, 1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -627,13 +627,13 @@ MACHINE_CONFIG_START(dblcrown_state::dblcrown)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(dblcrown_state, lamps_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(dblcrown_state, bank_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(dblcrown_state, mux_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, dblcrown_state, lamps_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, dblcrown_state, bank_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dblcrown_state, mux_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymz", YMZ284, SND_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ymz", YMZ284, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

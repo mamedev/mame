@@ -196,9 +196,9 @@ void dotrikun_state::machine_reset()
 MACHINE_CONFIG_START(dotrikun_state::dotrikun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(dotrikun_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(dotrikun_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scanline_on", dotrikun_state, scanline_on, "screen", 0, 1)
 	MCFG_TIMER_DRIVER_ADD("scanline_off", dotrikun_state, scanline_off)
 	MCFG_TIMER_DRIVER_ADD("interrupt", dotrikun_state, interrupt)

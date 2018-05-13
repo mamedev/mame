@@ -500,22 +500,22 @@ void skimaxx_state::machine_reset()
  *************************************/
 
 MACHINE_CONFIG_START(skimaxx_state::skimaxx)
-	MCFG_CPU_ADD("maincpu", M68EC030, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(m68030_1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", skimaxx_state,  irq3_line_hold)    // 1,3,7 are identical, rest is RTE
+	MCFG_DEVICE_ADD("maincpu", M68EC030, XTAL(40'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(m68030_1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skimaxx_state,  irq3_line_hold)    // 1,3,7 are identical, rest is RTE
 
-	MCFG_CPU_ADD("subcpu", M68EC030, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(m68030_2_map)
+	MCFG_DEVICE_ADD("subcpu", M68EC030, XTAL(40'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(m68030_2_map)
 
 
 	/* video hardware */
-	MCFG_CPU_ADD("tms", TMS34010, XTAL(50'000'000))
-	MCFG_CPU_PROGRAM_MAP(tms_program_map)
+	MCFG_DEVICE_ADD("tms", TMS34010, XTAL(50'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(tms_program_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(50000000/8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(skimaxx_state, scanline_update)     /* scanline updater (indexed16) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(skimaxx_state, tms_irq))
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, skimaxx_state, tms_irq))
 	MCFG_TMS340X0_TO_SHIFTREG_CB(skimaxx_state, to_shiftreg)  /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(skimaxx_state, from_shiftreg) /* read from shiftreg function */
 
@@ -533,18 +533,19 @@ MACHINE_CONFIG_START(skimaxx_state::skimaxx)
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(4'000'000), PIN7_LOW)     // ?
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(4'000'000), okim6295_device::PIN7_LOW)     // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(4'000'000)/2, PIN7_HIGH)  // ?
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(4'000'000)/2, okim6295_device::PIN7_HIGH)  // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki3", XTAL(4'000'000), PIN7_LOW)     // ?
+	MCFG_DEVICE_ADD("oki3", OKIM6295, XTAL(4'000'000), okim6295_device::PIN7_LOW)     // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki4", XTAL(4'000'000)/2, PIN7_HIGH)  // ?
+	MCFG_DEVICE_ADD("oki4", OKIM6295, XTAL(4'000'000)/2, okim6295_device::PIN7_HIGH)  // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 

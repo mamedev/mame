@@ -1727,14 +1727,14 @@ MACHINE_RESET_MEMBER(snowbros_state,finalttr)
 MACHINE_CONFIG_START(snowbros_state::snowbros)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* 8 Mhz - confirmed */
-	MCFG_CPU_PROGRAM_MAP(snowbros_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* 8 Mhz - confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(snowbros_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(12'000'000)/2) /* 6 MHz - confirmed */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/2) /* 6 MHz - confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1743,7 +1743,7 @@ MACHINE_CONFIG_START(snowbros_state::snowbros)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbros)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(snowbros_state, screen_vblank_snowbros))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, snowbros_state, screen_vblank_snowbros))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", snowbros)
@@ -1754,14 +1754,14 @@ MACHINE_CONFIG_START(snowbros_state::snowbros)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(12'000'000)/4) /* 3 MHz - confirmed */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(12'000'000)/4) /* 3 MHz - confirmed */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1771,9 +1771,9 @@ MACHINE_CONFIG_START(snowbros_state::wintbob)
 	snowbros(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(10000000) /* 10mhz - Confirmed */
-	MCFG_CPU_PROGRAM_MAP(wintbob_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(10000000) /* 10mhz - Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(wintbob_map)
 
 	MCFG_DEVICE_REMOVE("pandora")
 
@@ -1789,13 +1789,13 @@ MACHINE_CONFIG_START(snowbros_state::semicom)
 	snowbros(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL(12'000'000)) /* 12MHz - Confirmed */
-	MCFG_CPU_PROGRAM_MAP(hyperpac_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(12'000'000)) /* 12MHz - Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(hyperpac_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CLOCK(XTAL(16'000'000)/4) /* 4MHz - Confirmed */
-	MCFG_CPU_PROGRAM_MAP(hyperpac_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_CLOCK(XTAL(16'000'000)/4) /* 4MHz - Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(hyperpac_sound_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", hyperpac)
@@ -1806,12 +1806,12 @@ MACHINE_CONFIG_START(snowbros_state::semicom)
 	MCFG_DEVICE_REMOVE("soundlatch2")
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, XTAL(16'000'000)/4) /* 4MHz - Confirmed */
+	MCFG_DEVICE_REPLACE("ymsnd", YM2151, XTAL(16'000'000)/4) /* 4MHz - Confirmed */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* 1MHz & pin 7 High - Confirmed */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* 1MHz & pin 7 High - Confirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1821,10 +1821,10 @@ MACHINE_CONFIG_START(snowbros_state::semicom_mcu)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("protection", I80C52, XTAL(16'000'000))  // AT89C52
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(snowbros_state, prot_p0_w))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(snowbros_state, prot_p1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(snowbros_state, prot_p2_w))
+	MCFG_DEVICE_ADD("protection", I80C52, XTAL(16'000'000))  // AT89C52
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, snowbros_state, prot_p0_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, snowbros_state, prot_p1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, snowbros_state, prot_p2_w))
 MACHINE_CONFIG_END
 
 
@@ -1837,13 +1837,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snowbros_state::honeydol)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* MC68000P12 @ 12MHz */
-	MCFG_CPU_PROGRAM_MAP(honeydol_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* MC68000P12 @ 12MHz */
+	MCFG_DEVICE_PROGRAM_MAP(honeydol_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* 4Mhz (16MHz/4) like SemiCom or 6MHz (12MHz/2) like snowbros??? */
-	MCFG_CPU_PROGRAM_MAP(honeydol_sound_map)
-	MCFG_CPU_IO_MAP(honeydol_sound_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* 4Mhz (16MHz/4) like SemiCom or 6MHz (12MHz/2) like snowbros??? */
+	MCFG_DEVICE_PROGRAM_MAP(honeydol_sound_map)
+	MCFG_DEVICE_IO_MAP(honeydol_sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1859,32 +1859,32 @@ MACHINE_CONFIG_START(snowbros_state::honeydol)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(12'000'000)/4) /* 3Mhz */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(12'000'000)/4) /* 3Mhz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* freq? */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* freq? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(snowbros_state::twinadv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* 12MHz like Honey Dolls ? */
-	MCFG_CPU_PROGRAM_MAP(twinadv_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* 12MHz like Honey Dolls ? */
+	MCFG_DEVICE_PROGRAM_MAP(twinadv_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* 4Mhz (16MHz/4) like SemiCom or 6MHz (12MHz/2) like snowbros??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(twinadv_sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snowbros_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* 4Mhz (16MHz/4) like SemiCom or 6MHz (12MHz/2) like snowbros??? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(twinadv_sound_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snowbros_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1900,7 +1900,7 @@ MACHINE_CONFIG_START(snowbros_state::twinadv)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
@@ -1908,7 +1908,7 @@ MACHINE_CONFIG_START(snowbros_state::twinadv)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	/* sound hardware */
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* freq? */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* freq? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1934,21 +1934,21 @@ Intel P8752 (mcu)
 MACHINE_CONFIG_START(snowbros_state::finalttr)
 	semicom(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(finalttr_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(finalttr_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CLOCK(XTAL(3'579'545))
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_CLOCK(XTAL(3'579'545))
 
 	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, finalttr )
 
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, XTAL(3'579'545)) /* possible but less likely 4MHz (12MHz/3) */
+	MCFG_DEVICE_REPLACE("ymsnd", YM2151, XTAL(3'579'545)) /* possible but less likely 4MHz (12MHz/3) */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.08)
 	MCFG_SOUND_ROUTE(1, "mono", 0.08)
 
-	MCFG_OKIM6295_REPLACE("oki", 999900, PIN7_HIGH)
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, 999900, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -1963,8 +1963,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snowbros_state::snowbro3) /* PCB has 16MHz & 12MHz OSCs */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* MC68000P10 CPU @ 12mhz or 8MHz (16MHz/2) ? */
-	MCFG_CPU_PROGRAM_MAP(snowbros3_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000)) /* MC68000P10 CPU @ 12mhz or 8MHz (16MHz/2) ? */
+	MCFG_DEVICE_PROGRAM_MAP(snowbros3_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros3_irq, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1982,9 +1982,9 @@ MACHINE_CONFIG_START(snowbros_state::snowbro3) /* PCB has 16MHz & 12MHz OSCs */
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1993,8 +1993,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(snowbros_state::yutnori)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(yutnori_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(yutnori_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", snowbros_state, snowbros_irq, "screen", 0, 1)
 
 //  MCFG_WATCHDOG_ADD("watchdog") // maybe
@@ -2006,7 +2006,7 @@ MACHINE_CONFIG_START(snowbros_state::yutnori)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbros)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(snowbros_state, screen_vblank_snowbros))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, snowbros_state, screen_vblank_snowbros))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hyperpac)
@@ -2017,12 +2017,12 @@ MACHINE_CONFIG_START(snowbros_state::yutnori)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/16, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(16'000'000)/16, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

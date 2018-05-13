@@ -1039,9 +1039,9 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(vamphalf_state::common)
-	MCFG_CPU_ADD("maincpu", E116T, 50000000)    /* 50 MHz */
-	MCFG_CPU_PROGRAM_MAP(common_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", E116T, 50000000)    /* 50 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(common_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	// various games require fast timing to save settings, probably because our Hyperstone core timings are incorrect
@@ -1063,13 +1063,14 @@ MACHINE_CONFIG_START(vamphalf_state::common)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_ym_oki)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(28'000'000)/8) /* 3.5MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(28'000'000)/8) /* 3.5MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(28'000'000)/16 , PIN7_HIGH) /* 1.75MHz */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(28'000'000)/16 , okim6295_device::PIN7_HIGH) /* 1.75MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1082,119 +1083,121 @@ MACHINE_CONFIG_START(vamphalf_state::sound_ym_banked_oki)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_suplup)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(14'318'181)/8, PIN7_HIGH) /* 1.7897725 MHz */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(14'318'181)/8, okim6295_device::PIN7_HIGH) /* 1.7897725 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_qs1000)
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("qs1000", qs1000_device, set_irq))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("qs1000", qs1000_device, set_irq))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("qs1000", QS1000, XTAL(24'000'000))
+	MCFG_DEVICE_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_QS1000_OUT_P3_CB(WRITE8(vamphalf_state, qs1000_p3_w))
+	MCFG_QS1000_IN_P1_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_QS1000_OUT_P3_CB(WRITE8(*this, vamphalf_state, qs1000_p3_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::vamphalf)
 	common(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(vamphalf_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(vamphalf_io)
 
 	sound_ym_oki(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::misncrft)
 	common(config);
-	MCFG_CPU_REPLACE("maincpu", GMS30C2116, XTAL(50'000'000))   /* 50 MHz */
-	MCFG_CPU_PROGRAM_MAP(common_map)
-	MCFG_CPU_IO_MAP(misncrft_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", GMS30C2116, XTAL(50'000'000))   /* 50 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(common_map)
+	MCFG_DEVICE_IO_MAP(misncrft_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	sound_qs1000(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::coolmini)
 	common(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(coolmini_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(coolmini_io)
 
 	sound_ym_oki(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::mrkicker)
 	common(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(mrkicker_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(mrkicker_io)
 
 	sound_ym_banked_oki(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::suplup)
 	common(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(suplup_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(suplup_io)
 
 	sound_suplup(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::jmpbreak)
 	common(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(jmpbreak_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(jmpbreak_io)
 
 	sound_ym_oki(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::newxpang)
 	common(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(mrdig_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(mrdig_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	sound_ym_oki(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::mrdig)
 	common(config);
-	MCFG_CPU_REPLACE("maincpu", GMS30C2116, XTAL(50'000'000))   /* 50 MHz */
-	MCFG_CPU_PROGRAM_MAP(common_map)
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(mrdig_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", GMS30C2116, XTAL(50'000'000))   /* 50 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(common_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(mrdig_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	sound_ym_oki(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::wyvernwg)
 	common(config);
-	MCFG_CPU_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
-	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
-	MCFG_CPU_IO_MAP(wyvernwg_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(common_32bit_map)
+	MCFG_DEVICE_IO_MAP(wyvernwg_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	sound_qs1000(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::finalgdr)
 	common(config);
-	MCFG_CPU_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
-	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
-	MCFG_CPU_IO_MAP(finalgdr_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(common_32bit_map)
+	MCFG_DEVICE_IO_MAP(finalgdr_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1203,10 +1206,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::mrkickera)
 	common(config);
-	MCFG_CPU_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
-	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
-	MCFG_CPU_IO_MAP(mrkickera_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(common_32bit_map)
+	MCFG_DEVICE_IO_MAP(mrkickera_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1216,10 +1219,10 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(vamphalf_state::aoh)
-	MCFG_CPU_ADD("maincpu", E132XN, XTAL(20'000'000)*4) /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(aoh_map)
-	MCFG_CPU_IO_MAP(aoh_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", E132XN, XTAL(20'000'000)*4) /* 4x internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(aoh_map)
+	MCFG_DEVICE_IO_MAP(aoh_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -1237,17 +1240,18 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vamphalf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki_1", XTAL(32'000'000)/8, PIN7_HIGH) /* 4MHz */
+	MCFG_DEVICE_ADD("oki_1", OKIM6295, XTAL(32'000'000)/8, okim6295_device::PIN7_HIGH) /* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(32'000'000)/32, PIN7_HIGH) /* 1MHz */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH) /* 1MHz */
 	MCFG_DEVICE_ADDRESS_MAP(0, banked_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -1255,18 +1259,18 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::boonggab)
 	common(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(boonggab_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(boonggab_io)
 
 	sound_ym_banked_oki(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::yorijori)
 	common(config);
-	MCFG_CPU_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
-	MCFG_CPU_PROGRAM_MAP(yorijori_32bit_map)
-	MCFG_CPU_IO_MAP(yorijori_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(yorijori_32bit_map)
+	MCFG_DEVICE_IO_MAP(yorijori_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
 
 	sound_qs1000(config);
 MACHINE_CONFIG_END
@@ -1491,7 +1495,7 @@ ROM_START( luplup10 ) /* version 1.05 / 981214 */
 	ROM_LOAD( "p1_rom2.rom2", 0x80000, 0x80000, CRC(1043ce44) SHA1(13a23f35ff2335d837f682761f774a70e298e77a) )
 
 	ROM_REGION( 0x800000, "gfx", 0 ) /* 16x16x8 Sprites */
-	ROM_LOAD32_WORD( "roml00.roml00", 0x000000, 0x200000, BAD_DUMP CRC(1575b2be) SHA1(e4e67ecc15518a1c8ea7ab5cbd0fe9c6f7f64edd) )
+	ROM_LOAD32_WORD( "roml00.roml00", 0x000000, 0x200000, CRC(e2eeb61e) SHA1(5261cf29cd7e10d86c0dd4bc640ad9c3db99cec3) )
 	ROM_LOAD32_WORD( "romu00.romu00", 0x000002, 0x200000, CRC(9ee855b9) SHA1(a51b268a640b667d88a8ceab562607a811602fff) )
 	ROM_LOAD32_WORD( "roml01.roml01", 0x400000, 0x200000, CRC(7182864c) SHA1(48789b20d9b8f41d7c9f5690f4f44bc6f15b8cfe) )
 	ROM_LOAD32_WORD( "romu01.romu01", 0x400002, 0x200000, CRC(44f76640) SHA1(6a49ed4d5584ecd0496b9ce19aefd5f4e0126da7) )
@@ -3327,32 +3331,32 @@ void vamphalf_state::init_boonggab()
 	m_flip_bit = 1;
 }
 
-GAME( 1999, coolmini,  0,        coolmini,  common,   vamphalf_state, init_coolmini,  ROT0,   "SemiCom",                       "Cool Minigame Collection", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, coolminii, coolmini, coolmini,  common,   vamphalf_state, init_coolminii, ROT0,   "SemiCom",                       "Cool Minigame Collection (Italy)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, jmpbreak,  0,        jmpbreak,  common,   vamphalf_state, init_jmpbreak,  ROT0,   "F2 System",                     "Jumping Break" , MACHINE_SUPPORTS_SAVE )
-GAME( 1999, poosho,    0,        jmpbreak,  common,   vamphalf_state, init_poosho,    ROT0,   "F2 System",                     "Poosho Poosho" , MACHINE_SUPPORTS_SAVE )
-GAME( 1999, newxpang,  0,        newxpang,  common,   vamphalf_state, init_newxpang,  ROT0,   "F2 System",                     "New Cross Pang" , MACHINE_SUPPORTS_SAVE )
-GAME( 1999, suplup,    0,        suplup,    common,   vamphalf_state, init_suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , MACHINE_SUPPORTS_SAVE )
-GAME( 1999, luplup,    suplup,   suplup,    common,   vamphalf_state, init_luplup,    ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, luplup29,  suplup,   suplup,    common,   vamphalf_state, init_luplup29,  ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, luplup10,  suplup,   suplup,    common,   vamphalf_state, init_luplup10,  ROT0,   "Omega System (Adko license)",   "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 1.05 / 981214)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // graphics ROML00 needs redump
-GAME( 1999, puzlbang,  suplup,   suplup,    common,   vamphalf_state, init_puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, puzlbanga, suplup,   suplup,    common,   vamphalf_state, init_puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.8 / 990106)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, vamphalf,  0,        vamphalf,  common,   vamphalf_state, init_vamphalf,  ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, vamphalfr1,vamphalf, vamphalf,  common,   vamphalf_state, init_vamphalfr1,ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.0.0903)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, vamphalfk, vamphalf, vamphalf,  common,   vamphalf_state, init_vamphafk,  ROT0,   "Danbi / F2 System",             "Vamp x1/2 (Korea, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, dquizgo2,  0,        coolmini,  common,   vamphalf_state, init_dquizgo2,  ROT0,   "SemiCom",                       "Date Quiz Go Go Episode 2" , MACHINE_SUPPORTS_SAVE )
-GAME( 2000, misncrft,  0,        misncrft,  common,   vamphalf_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, misncrfta, misncrft, misncrft,  common,   vamphalf_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mrdig,     0,        mrdig,     common,   vamphalf_state, init_mrdig,     ROT0,   "Sun",                           "Mr. Dig", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, dtfamily,  0,        mrkicker,  common,   vamphalf_state, init_dtfamily,  ROT0,   "SemiCom",                       "Diet Family", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, finalgdr,  0,        finalgdr,  finalgdr, vamphalf_state, init_finalgdr,  ROT0,   "SemiCom",                       "Final Godori (Korea, version 2.20.5915)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, mrkicker,  0,        mrkicker,  common,   vamphalf_state, init_mrkicker,  ROT0,   "SemiCom",                       "Mr. Kicker (F-E1-16-010 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, mrkickera, mrkicker, mrkickera, finalgdr, vamphalf_state, init_mrkickera, ROT0,   "SemiCom",                       "Mr. Kicker (SEMICOM-003b PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // if you allow eeprom saving works then this set corrupts the eeprom and then won't boot
-GAME( 2001, toyland,   0,        coolmini,  common,   vamphalf_state, init_toyland,   ROT0,   "SemiCom",                       "Toy Land Adventure", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, wivernwg,  0,        wyvernwg,  common,   vamphalf_state, init_wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, wyvernwg,  wivernwg, wyvernwg,  common,   vamphalf_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, wyvernwga, wivernwg, wyvernwg,  common,   vamphalf_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, aoh,       0,        aoh,       aoh,      vamphalf_state, init_aoh,       ROT0,   "Unico",                         "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, boonggab,  0,        boonggab,  boonggab, vamphalf_state, init_boonggab,  ROT270, "Taff System",                   "Boong-Ga Boong-Ga (Spank'em!)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, yorijori,  0,        yorijori,  common,   vamphalf_state, init_yorijori,  ROT0,   "Golden Bell Entertainment",     "Yori Jori Kuk Kuk", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coolmini,   0,        coolmini,  common,   vamphalf_state, init_coolmini,  ROT0,   "SemiCom",                       "Cool Minigame Collection", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, coolminii,  coolmini, coolmini,  common,   vamphalf_state, init_coolminii, ROT0,   "SemiCom",                       "Cool Minigame Collection (Italy)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jmpbreak,   0,        jmpbreak,  common,   vamphalf_state, init_jmpbreak,  ROT0,   "F2 System",                     "Jumping Break" , MACHINE_SUPPORTS_SAVE )
+GAME( 1999, poosho,     0,        jmpbreak,  common,   vamphalf_state, init_poosho,    ROT0,   "F2 System",                     "Poosho Poosho" , MACHINE_SUPPORTS_SAVE )
+GAME( 1999, newxpang,   0,        newxpang,  common,   vamphalf_state, init_newxpang,  ROT0,   "F2 System",                     "New Cross Pang" , MACHINE_SUPPORTS_SAVE )
+GAME( 1999, suplup,     0,        suplup,    common,   vamphalf_state, init_suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , MACHINE_SUPPORTS_SAVE )
+GAME( 1999, luplup,     suplup,   suplup,    common,   vamphalf_state, init_luplup,    ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, luplup29,   suplup,   suplup,    common,   vamphalf_state, init_luplup29,  ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, luplup10,   suplup,   suplup,    common,   vamphalf_state, init_luplup10,  ROT0,   "Omega System (Adko license)",   "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 1.05 / 981214)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, puzlbang,   suplup,   suplup,    common,   vamphalf_state, init_puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, puzlbanga,  suplup,   suplup,    common,   vamphalf_state, init_puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.8 / 990106)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, vamphalf,   0,        vamphalf,  common,   vamphalf_state, init_vamphalf,  ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, vamphalfr1, vamphalf, vamphalf,  common,   vamphalf_state, init_vamphalfr1,ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.0.0903)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, vamphalfk,  vamphalf, vamphalf,  common,   vamphalf_state, init_vamphafk,  ROT0,   "Danbi / F2 System",             "Vamp x1/2 (Korea, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dquizgo2,   0,        coolmini,  common,   vamphalf_state, init_dquizgo2,  ROT0,   "SemiCom",                       "Date Quiz Go Go Episode 2" , MACHINE_SUPPORTS_SAVE )
+GAME( 2000, misncrft,   0,        misncrft,  common,   vamphalf_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, misncrfta,  misncrft, misncrft,  common,   vamphalf_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mrdig,      0,        mrdig,     common,   vamphalf_state, init_mrdig,     ROT0,   "Sun",                           "Mr. Dig", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, dtfamily,   0,        mrkicker,  common,   vamphalf_state, init_dtfamily,  ROT0,   "SemiCom",                       "Diet Family", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, finalgdr,   0,        finalgdr,  finalgdr, vamphalf_state, init_finalgdr,  ROT0,   "SemiCom",                       "Final Godori (Korea, version 2.20.5915)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, mrkicker,   0,        mrkicker,  common,   vamphalf_state, init_mrkicker,  ROT0,   "SemiCom",                       "Mr. Kicker (F-E1-16-010 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, mrkickera,  mrkicker, mrkickera, finalgdr, vamphalf_state, init_mrkickera, ROT0,   "SemiCom",                       "Mr. Kicker (SEMICOM-003b PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // if you allow eeprom saving works then this set corrupts the eeprom and then won't boot
+GAME( 2001, toyland,    0,        coolmini,  common,   vamphalf_state, init_toyland,   ROT0,   "SemiCom",                       "Toy Land Adventure", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, wivernwg,   0,        wyvernwg,  common,   vamphalf_state, init_wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, wyvernwg,   wivernwg, wyvernwg,  common,   vamphalf_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, wyvernwga,  wivernwg, wyvernwg,  common,   vamphalf_state, init_wyvernwg,  ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, aoh,        0,        aoh,       aoh,      vamphalf_state, init_aoh,       ROT0,   "Unico",                         "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, boonggab,   0,        boonggab,  boonggab, vamphalf_state, init_boonggab,  ROT270, "Taff System",                   "Boong-Ga Boong-Ga (Spank'em!)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, yorijori,   0,        yorijori,  common,   vamphalf_state, init_yorijori,  ROT0,   "Golden Bell Entertainment",     "Yori Jori Kuk Kuk", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

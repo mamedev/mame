@@ -694,13 +694,13 @@ WRITE_LINE_MEMBER(niyanpai_state::vblank_irq)
 MACHINE_CONFIG_START(niyanpai_state::niyanpai)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12288000/2) /* TMP68301, 6.144 MHz */
-	MCFG_CPU_PROGRAM_MAP(niyanpai_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12288000/2) /* TMP68301, 6.144 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(niyanpai_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(niyanpai_state, tmp68301_parallel_port_w))
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, niyanpai_state, tmp68301_parallel_port_w))
 
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -713,7 +713,7 @@ MACHINE_CONFIG_START(niyanpai_state::niyanpai)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(niyanpai_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(niyanpai_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, niyanpai_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 256*3)
 
@@ -725,8 +725,8 @@ MACHINE_CONFIG_START(niyanpai_state::musobana)
 	niyanpai(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(musobana_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(musobana_map)
 
 	MCFG_MACHINE_START_OVERRIDE(niyanpai_state, musobana)
 MACHINE_CONFIG_END
@@ -735,16 +735,16 @@ MACHINE_CONFIG_START(niyanpai_state::mhhonban)
 	musobana(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mhhonban_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mhhonban_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(niyanpai_state::zokumahj)
 	musobana(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(zokumahj_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(zokumahj_map)
 MACHINE_CONFIG_END
 
 

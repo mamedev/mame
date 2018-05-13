@@ -1219,9 +1219,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::scanline)
 MACHINE_CONFIG_START(gunpey_state::gunpey)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, 57242400 / 4)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", V30, 57242400 / 4)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gunpey_state, scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -1232,13 +1232,14 @@ MACHINE_CONFIG_START(gunpey_state::gunpey)
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'934'400) / 8, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'934'400) / 8, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
 MACHINE_CONFIG_END

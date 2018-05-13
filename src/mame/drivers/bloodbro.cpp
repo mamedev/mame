@@ -524,12 +524,12 @@ WRITE16_MEMBER( bloodbro_state::weststry_layer_scroll_w )
 
 MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(bloodbro_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(bloodbro_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(7'159'090)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(7'159'090)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
 
 	// video hardware
 
@@ -542,8 +542,8 @@ MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(bloodbro_state, layer_en_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(bloodbro_state, layer_scroll_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, bloodbro_state, layer_en_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, bloodbro_state, layer_scroll_w))
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bloodbro)
@@ -551,32 +551,32 @@ MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(7'159'090)/2)
-	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(7'159'090)/2)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bloodbro_state::weststry)
 	bloodbro(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(weststry_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq6_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(weststry_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq6_line_hold)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_CLOCK(XTAL(20'000'000)/4) /* 5MHz - verified on PCB */
-	MCFG_CPU_PROGRAM_MAP(weststry_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_CLOCK(XTAL(20'000'000)/4) /* 5MHz - verified on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(weststry_sound_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", weststry)
 	MCFG_PALETTE_MODIFY("palette")
@@ -591,23 +591,23 @@ MACHINE_CONFIG_START(bloodbro_state::weststry)
 
 	// Bootleg sound hardware is close copy of Seibu, but uses different interrupts
 
-	MCFG_OKIM6295_REPLACE("oki", XTAL(20'000'000)/16, PIN7_HIGH) /* 1.25MHz - verified on PCB */
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, XTAL(20'000'000)/16, okim6295_device::PIN7_HIGH) /* 1.25MHz - verified on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL(20'000'000)/4) /* ~4.9MHz - see notes at top */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(bloodbro_state, weststry_opl_irq_w))
+	MCFG_DEVICE_REPLACE("ymsnd", YM3812, XTAL(20'000'000)/4) /* ~4.9MHz - see notes at top */
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(*this, bloodbro_state, weststry_opl_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_MODIFY("seibu_sound")
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8(bloodbro_state, weststry_opl_w))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8(*this, bloodbro_state, weststry_opl_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bloodbro_state::skysmash)
 	bloodbro(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(skysmash_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq2_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(skysmash_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq2_line_hold)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(bloodbro_state, screen_update_skysmash)

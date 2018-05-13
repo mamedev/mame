@@ -452,10 +452,10 @@ void chance32_state::machine_reset()
 MACHINE_CONFIG_START(chance32_state::chance32)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
-	MCFG_CPU_PROGRAM_MAP(chance32_map)
-	MCFG_CPU_IO_MAP(chance32_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", chance32_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(chance32_map)
+	MCFG_DEVICE_IO_MAP(chance32_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chance32_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -476,10 +476,10 @@ MACHINE_CONFIG_START(chance32_state::chance32)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* clock at 1050 kHz match the 8000 Hz samples stored inside the ROM */
-	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

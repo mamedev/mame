@@ -240,9 +240,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(sumt8035_state::summit)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8035,5000000)
-	MCFG_CPU_PROGRAM_MAP(sumt_map)
-	MCFG_CPU_IO_MAP(sumt_portmap)
+	MCFG_DEVICE_ADD("maincpu",I8035,5000000)
+	MCFG_DEVICE_PROGRAM_MAP(sumt_map)
+	MCFG_DEVICE_IO_MAP(sumt_portmap)
 
 MACHINE_CONFIG_END
 

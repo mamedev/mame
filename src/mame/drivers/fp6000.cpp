@@ -296,9 +296,9 @@ void fp6000_state::machine_reset()
 
 MACHINE_CONFIG_START(fp6000_state::fp6000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
-	MCFG_CPU_PROGRAM_MAP(fp6000_map)
-	MCFG_CPU_IO_MAP(fp6000_io)
+	MCFG_DEVICE_ADD("maincpu", I8086, 16000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(fp6000_map)
+	MCFG_DEVICE_IO_MAP(fp6000_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

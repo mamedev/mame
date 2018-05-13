@@ -350,22 +350,22 @@ WRITE_LINE_MEMBER( namcond1_state::raster_irq_w )
 MACHINE_CONFIG_START(namcond1_state::namcond1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(49'152'000)/4)
-	MCFG_CPU_PROGRAM_MAP(namcond1_map)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(49'152'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(namcond1_map)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("mcu", H83002, XTAL(49'152'000)/3 )
-	MCFG_CPU_PROGRAM_MAP( nd1h8rwmap)
-	MCFG_CPU_IO_MAP( nd1h8iomap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  mcu_interrupt)
+	MCFG_DEVICE_ADD("mcu", H83002, XTAL(49'152'000)/3 )
+	MCFG_DEVICE_PROGRAM_MAP( nd1h8rwmap)
+	MCFG_DEVICE_IO_MAP( nd1h8iomap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcond1_state,  mcu_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 
 	MCFG_YGV608_ADD("ygv608")
 	MCFG_YGV608_PALETTE("palette")
-	MCFG_YGV608_VBLANK_HANDLER(WRITELINE(namcond1_state, vblank_irq_w))
-	MCFG_YGV608_RASTER_HANDLER(WRITELINE(namcond1_state, raster_irq_w))
+	MCFG_YGV608_VBLANK_HANDLER(WRITELINE(*this, namcond1_state, vblank_irq_w))
+	MCFG_YGV608_RASTER_HANDLER(WRITELINE(*this, namcond1_state, raster_irq_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -380,7 +380,8 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C352_ADD("c352", XTAL(49'152'000)/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
@@ -395,9 +396,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcond1_state::abcheck)
 	namcond1(config);
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(49'152'000)/4)
-	MCFG_CPU_PROGRAM_MAP(abcheck_map)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(49'152'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(abcheck_map)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("zpr1")
 	MCFG_NVRAM_ADD_0FILL("zpr2")

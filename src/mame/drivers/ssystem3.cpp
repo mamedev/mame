@@ -285,8 +285,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(ssystem3_state::ssystem3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1000000)
-	MCFG_CPU_PROGRAM_MAP(ssystem3_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(ssystem3_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -303,10 +303,10 @@ MACHINE_CONFIG_START(ssystem3_state::ssystem3)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
-	MCFG_VIA6522_READPA_HANDLER(READ8(ssystem3_state,ssystem3_via_read_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(ssystem3_state,ssystem3_via_read_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(ssystem3_state,ssystem3_via_write_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(ssystem3_state,ssystem3_via_write_b))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, ssystem3_state,ssystem3_via_read_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, ssystem3_state,ssystem3_via_read_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, ssystem3_state,ssystem3_via_write_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, ssystem3_state,ssystem3_via_write_b))
 MACHINE_CONFIG_END
 
 

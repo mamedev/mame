@@ -929,18 +929,18 @@ void lwings_state::machine_reset()
 MACHINE_CONFIG_START(lwings_state::lwings)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* verified on PCB */
-	MCFG_CPU_PROGRAM_MAP(lwings_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lwings_state,  lwings_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* verified on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(lwings_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lwings_state,  lwings_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(12'000'000)/4) /* verified on PCB */
-	MCFG_CPU_PROGRAM_MAP(lwings_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222) // approximation from pcb music recording - where is the frequency actually derived from??
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/4) /* verified on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(lwings_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222) // approximation from pcb music recording - where is the frequency actually derived from??
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -948,7 +948,7 @@ MACHINE_CONFIG_START(lwings_state::lwings)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lwings_state, screen_update_lwings)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lwings)
@@ -957,17 +957,17 @@ MACHINE_CONFIG_START(lwings_state::lwings)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("2203a", YM2203, XTAL(12'000'000)/8)   /* verified on PCB */
+	MCFG_DEVICE_ADD("2203a", YM2203, XTAL(12'000'000)/8)   /* verified on PCB */
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("2203b", YM2203, XTAL(12'000'000)/8)   /* verified on PCB */
+	MCFG_DEVICE_ADD("2203b", YM2203, XTAL(12'000'000)/8)   /* verified on PCB */
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -976,27 +976,21 @@ MACHINE_CONFIG_END
 
 
 
-
-
-
-
-
-
 MACHINE_CONFIG_START(lwings_state::fball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(fball_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lwings_state,  avengers_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(fball_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lwings_state,  avengers_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(12'000'000)/4) // ?
-	MCFG_CPU_PROGRAM_MAP(fball_sound_map)
-//  MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/4) // ?
+	MCFG_DEVICE_PROGRAM_MAP(fball_sound_map)
+//  MCFG_DEVICE_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1004,7 +998,7 @@ MACHINE_CONFIG_START(lwings_state::fball)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // the 16-pixel black border on left edge is correct, test mode actually uses that area
 	MCFG_SCREEN_UPDATE_DRIVER(lwings_state, screen_update_lwings)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lwings)
@@ -1013,11 +1007,11 @@ MACHINE_CONFIG_START(lwings_state::fball)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, fball_oki_map)
 
@@ -1028,17 +1022,17 @@ MACHINE_CONFIG_START(lwings_state::trojan)
 	lwings(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL(12'000'000)/4)            /* verified on PCB */
-	MCFG_CPU_PROGRAM_MAP(trojan_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(12'000'000)/4)            /* verified on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(trojan_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CLOCK(XTAL(12'000'000)/4)            /* verified on PCB */
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_CLOCK(XTAL(12'000'000)/4)            /* verified on PCB */
 
-	MCFG_CPU_ADD("adpcm", Z80, XTAL(12'000'000)/4)    /* verified on PCB */
-	MCFG_CPU_PROGRAM_MAP(trojan_adpcm_map)
-	MCFG_CPU_IO_MAP(trojan_adpcm_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold,  4000)
+	MCFG_DEVICE_ADD("adpcm", Z80, XTAL(12'000'000)/4)    /* verified on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(trojan_adpcm_map)
+	MCFG_DEVICE_IO_MAP(trojan_adpcm_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold,  4000)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", trojan)
@@ -1051,7 +1045,7 @@ MACHINE_CONFIG_START(lwings_state::trojan)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("5205", MSM5205, XTAL(384'000))    /* verified on PCB */
+	MCFG_DEVICE_ADD("5205", MSM5205, XTAL(384'000))    /* verified on PCB */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* slave mode */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -1060,12 +1054,12 @@ MACHINE_CONFIG_START(lwings_state::avengers)
 	trojan(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(avengers_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lwings_state,  avengers_interrupt) // RST 38h triggered by software
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(avengers_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lwings_state,  avengers_interrupt) // RST 38h triggered by software
 
-	MCFG_CPU_MODIFY("adpcm")
-	MCFG_CPU_IO_MAP(avengers_adpcm_io_map)
+	MCFG_DEVICE_MODIFY("adpcm")
+	MCFG_DEVICE_IO_MAP(avengers_adpcm_io_map)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengers)

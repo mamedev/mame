@@ -542,11 +542,11 @@ void pasogo_state::machine_reset()
 
 MACHINE_CONFIG_START(pasogo_state::pasogo)
 
-	MCFG_CPU_ADD("maincpu", V30, XTAL(32'220'000)/2)
-	MCFG_CPU_PROGRAM_MAP(pasogo_mem)
-	MCFG_CPU_IO_MAP(pasogo_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pasogo_state,  pasogo_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", V30, XTAL(32'220'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(pasogo_mem)
+	MCFG_DEVICE_IO_MAP(pasogo_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pasogo_state,  pasogo_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("ems", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(emsbank_map)

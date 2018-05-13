@@ -103,8 +103,8 @@ void m6805evs_state::machine_reset()
 
 MACHINE_CONFIG_START(m6805evs_state::m6805evs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6805, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M6805, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 ROM_START(m6805evs)

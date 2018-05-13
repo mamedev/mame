@@ -121,8 +121,8 @@ void magreel_state::machine_reset()
 MACHINE_CONFIG_START(magreel_state::magreel)
 
 	/* basic machine hardware - all information unknown */
-//  MCFG_CPU_ADD("maincpu",m68000,MAIN_CLOCK/12)
-//  MCFG_CPU_PROGRAM_MAP(magreel_map)
+//  MCFG_DEVICE_ADD("maincpu",m68000,MAIN_CLOCK/12)
+//  MCFG_DEVICE_PROGRAM_MAP(magreel_map)
 
 	/* video hardware */
 //  MCFG_SCREEN_ADD("screen", RASTER)
@@ -140,7 +140,7 @@ MACHINE_CONFIG_START(magreel_state::magreel)
 //  MCFG_PALETTE_INIT_OWNER(magreel_state, magreel)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 

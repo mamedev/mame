@@ -323,16 +323,16 @@ MACHINE_CONFIG_START(ti990_10_state::ti990_10)
 
 	// VDT 911 terminal
 	MCFG_DEVICE_ADD("vdt911", VDT911, 0)
-	MCFG_VDT911_KEYINT_HANDLER(WRITELINE(ti990_10_state, key_interrupt))
-	MCFG_VDT911_LINEINT_HANDLER(WRITELINE(ti990_10_state, line_interrupt))
+	MCFG_VDT911_KEYINT_HANDLER(WRITELINE(*this, ti990_10_state, key_interrupt))
+	MCFG_VDT911_LINEINT_HANDLER(WRITELINE(*this, ti990_10_state, line_interrupt))
 
 	// Hard disk
 	MCFG_DEVICE_ADD("hdc", TI990_HDC, 0)
-	MCFG_TI990_HDC_INT_CALLBACK(WRITELINE(ti990_10_state, ti990_set_int13))
+	MCFG_TI990_HDC_INT_CALLBACK(WRITELINE(*this, ti990_10_state, ti990_set_int13))
 
 	// Tape controller
 	MCFG_DEVICE_ADD("tpc", TI990_TAPE_CTRL, 0)
-	MCFG_TI990_TAPE_INT_HANDLER(WRITELINE(ti990_10_state, tape_interrupt))
+	MCFG_TI990_TAPE_INT_HANDLER(WRITELINE(*this, ti990_10_state, tape_interrupt))
 MACHINE_CONFIG_END
 
 

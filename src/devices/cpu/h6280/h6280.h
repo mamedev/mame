@@ -357,7 +357,7 @@ protected:
 	// address spaces
 	address_space *m_program;
 	address_space *m_io;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 
 	typedef void (h6280_device::*ophandler)();
 

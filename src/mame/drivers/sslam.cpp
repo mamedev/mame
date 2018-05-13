@@ -694,11 +694,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sslam_state::sslam)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(sslam_program_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sslam_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sslam_program_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sslam_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", I8051, 12000000)
+	MCFG_DEVICE_ADD("audiocpu", I8051, 12000000)
 	MCFG_DEVICE_DISABLE()       /* Internal code is not dumped - 2 boards were protected */
 
 	/* video hardware */
@@ -717,23 +717,23 @@ MACHINE_CONFIG_START(sslam_state::sslam)
 	MCFG_VIDEO_START_OVERRIDE(sslam_state,sslam)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sslam_state::powerbls)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(powerbls_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sslam_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(powerbls_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sslam_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", I80C51, 12000000)      /* 83C751 */
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(sslam_state, playmark_snd_control_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(sslam_state, playmark_snd_command_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(sslam_state, playmark_oki_w))
+	MCFG_DEVICE_ADD("audiocpu", I80C51, 12000000)      /* 83C751 */
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, sslam_state, playmark_snd_control_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, sslam_state, playmark_snd_command_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, sslam_state, playmark_oki_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -751,11 +751,11 @@ MACHINE_CONFIG_START(sslam_state::powerbls)
 	MCFG_VIDEO_START_OVERRIDE(sslam_state,powerbls)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)   /* verified on original PCB */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)   /* verified on original PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

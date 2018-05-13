@@ -259,10 +259,10 @@ void cswat_state::machine_start()
 MACHINE_CONFIG_START(cswat_state::cswat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(18'432'000)/3/4) // HD68A09EP, 1.5MHz?
-	MCFG_CPU_PROGRAM_MAP(cswat_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cswat_state, irq0_line_assert)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cswat_state, nmi_handler, 300) // ?
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(18'432'000)/3/4) // HD68A09EP, 1.5MHz?
+	MCFG_DEVICE_PROGRAM_MAP(cswat_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cswat_state, irq0_line_assert)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cswat_state, nmi_handler, 300) // ?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -270,9 +270,9 @@ void prophet600_state::machine_start()
 
 // master crystal is 8 MHz, all clocks derived from there
 MACHINE_CONFIG_START(prophet600_state::prophet600)
-	MCFG_CPU_ADD(MAINCPU_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD(MAINCPU_TAG, Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_DEFAULT_LAYOUT( layout_prophet600 )
 
@@ -280,20 +280,20 @@ MACHINE_CONFIG_START(prophet600_state::prophet600)
 	MCFG_PIT8253_CLK0(XTAL(8'000'000)/4)
 	MCFG_PIT8253_CLK1(XTAL(8'000'000)/4)
 	MCFG_PIT8253_CLK2(XTAL(8'000'000)/4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(prophet600_state, pit_ch0_tick_w))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(prophet600_state, pit_ch2_tick_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, prophet600_state, pit_ch0_tick_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, prophet600_state, pit_ch2_tick_w))
 
 	MCFG_DEVICE_ADD(UART_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(prophet600_state, acia_irq_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, prophet600_state, acia_irq_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(UART_TAG, acia6850_device, write_rxd))
+	MCFG_MIDI_RX_HANDLER(WRITELINE(UART_TAG, acia6850_device, write_rxd))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL(8'000'000)/16)  // 500kHz = 16 times the MIDI rate
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(prophet600_state, acia_clock_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, prophet600_state, acia_clock_w))
 
 MACHINE_CONFIG_END
 

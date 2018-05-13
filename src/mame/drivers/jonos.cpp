@@ -174,8 +174,8 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(jonos_state::jonos)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(jonos_mem)
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(jonos_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

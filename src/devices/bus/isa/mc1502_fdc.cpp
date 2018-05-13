@@ -35,9 +35,10 @@ FLOPPY_FORMATS_MEMBER( mc1502_fdc_device::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( mc1502_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void mc1502_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 //-------------------------------------------------
 //  ROM( mc1502_fdc )
@@ -53,8 +54,8 @@ ROM_END
 
 MACHINE_CONFIG_START(mc1502_fdc_device::device_add_mconfig)
 	MCFG_FD1793_ADD("fdc", XTAL(16'000'000) / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(mc1502_fdc_device, mc1502_fdc_irq_drq))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mc1502_fdc_device, mc1502_fdc_irq_drq))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, mc1502_fdc_device, mc1502_fdc_irq_drq))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, mc1502_fdc_device, mc1502_fdc_irq_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
@@ -115,7 +116,7 @@ void mc1502_fdc_device::mc1502_wd17xx_aux_w(uint8_t data)
 }
 
 /*
- * Accesses to this port block (halt the CPU until DRQ, INTRQ or MOTOR ON)
+ * Accessing this port halts the CPU via READY line until DRQ, INTRQ or MOTOR ON
  */
 uint8_t mc1502_fdc_device::mc1502_wd17xx_drq_r()
 {

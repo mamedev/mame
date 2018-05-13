@@ -627,7 +627,7 @@ void grchamp_state::sub_portmap(address_map &map)
 void grchamp_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	// 2000-3fff are empty rom sockets
+	map(0x2000, 0x3005).nopr().nopw();
 	map(0x4000, 0x43ff).ram();
 	map(0x4800, 0x4801).mirror(0x07f8).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x4801, 0x4801).mirror(0x07f8).r("ay1", FUNC(ay8910_device::data_r));
@@ -739,21 +739,21 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 
 	/* basic machine hardware */
 	/* CPU BOARD */
-	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu0_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, PIXEL_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu0_interrupt)
 
 	/* GAME BOARD */
-	MCFG_CPU_ADD("sub", Z80, PIXEL_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_IO_MAP(sub_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu1_interrupt)
+	MCFG_DEVICE_ADD("sub", Z80, PIXEL_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_IO_MAP(sub_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu1_interrupt)
 
 	/* SOUND BOARD */
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(grchamp_state, irq0_line_hold,  (double)SOUND_CLOCK/4/16/16/10/16)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(grchamp_state, irq0_line_hold,  (double)SOUND_CLOCK/4/16/16/10/16)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
@@ -771,26 +771,25 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK/4)    /* 3B */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, portA_0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(grchamp_state, portB_0_w))
+	MCFG_DEVICE_ADD("ay1", AY8910, SOUND_CLOCK/4)    /* 3B */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, grchamp_state, portA_0_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, grchamp_state, portB_0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
-	MCFG_SOUND_ADD("ay2", AY8910, SOUND_CLOCK/4)
+	MCFG_DEVICE_ADD("ay2", AY8910, SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
-	MCFG_SOUND_ADD("ay3", AY8910, SOUND_CLOCK/4)    /* 1B */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, portA_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(grchamp_state, portB_2_w))
+	MCFG_DEVICE_ADD("ay3", AY8910, SOUND_CLOCK/4)    /* 1B */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, grchamp_state, portA_2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, grchamp_state, portB_2_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(grchamp)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, grchamp_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -955,5 +954,5 @@ ROM_END
  *************************************/
 
 GAMEL( 1981, grchamp,        0, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
-GAMEL( 1981, grchampa, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
+GAMEL( 1981, grchampa, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp ) // uses different ports. Bad dump?
 GAMEL( 1981, grchampb, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )

@@ -304,13 +304,13 @@ MACHINE_START_MEMBER(powerins_state, powerinsa)
 MACHINE_CONFIG_START(powerins_state::powerins)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12MHz */
-	MCFG_CPU_PROGRAM_MAP(powerins_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", powerins_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12MHz */
+	MCFG_DEVICE_PROGRAM_MAP(powerins_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", powerins_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 6000000) /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(powerins_sound_map)
-	MCFG_CPU_IO_MAP(powerins_sound_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 6000000) /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(powerins_sound_map)
+	MCFG_DEVICE_IO_MAP(powerins_sound_io_map)
 
 
 	/* video hardware */
@@ -328,17 +328,17 @@ MACHINE_CONFIG_START(powerins_state::powerins)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki1", 4000000, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_OKIM6295_ADD("oki2", 4000000, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 4000000, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ym2203", YM2203, 12000000 / 8)
+	MCFG_DEVICE_ADD("ym2203", YM2203, 12000000 / 8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
@@ -352,8 +352,8 @@ MACHINE_CONFIG_START(powerins_state::powerinsa)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(powerinsa_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(powerinsa_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -362,7 +362,7 @@ MACHINE_CONFIG_START(powerins_state::powerinsa)
 
 	MCFG_MACHINE_START_OVERRIDE(powerins_state, powerinsa)
 
-	MCFG_OKIM6295_REPLACE("oki1", 990000, PIN7_LOW) // pin7 not verified
+	MCFG_DEVICE_REPLACE("oki1", OKIM6295, 990000, okim6295_device::PIN7_LOW) // pin7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, powerinsa_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -379,9 +379,9 @@ MACHINE_CONFIG_START(powerins_state::powerinsb)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
 
-	MCFG_CPU_MODIFY("soundcpu") /* 6 MHz */
-	MCFG_CPU_IO_MAP(powerinsb_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(powerins_state, irq0_line_hold,  120)  // YM2203 rate is at 150??
+	MCFG_DEVICE_MODIFY("soundcpu") /* 6 MHz */
+	MCFG_DEVICE_IO_MAP(powerinsb_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(powerins_state, irq0_line_hold,  120)  // YM2203 rate is at 150??
 
 	MCFG_DEVICE_REMOVE("ym2203")    // Sound code talks to one, but it's not fitted on the board
 MACHINE_CONFIG_END

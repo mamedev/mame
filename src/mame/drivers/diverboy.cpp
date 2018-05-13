@@ -272,12 +272,12 @@ void diverboy_state::machine_start()
 
 MACHINE_CONFIG_START(diverboy_state::diverboy)
 
-	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* guess */
-	MCFG_CPU_PROGRAM_MAP(diverboy_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", diverboy_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(diverboy_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", diverboy_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(snd_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(snd_map)
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", diverboy)
@@ -294,11 +294,11 @@ MACHINE_CONFIG_START(diverboy_state::diverboy)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

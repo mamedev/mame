@@ -94,9 +94,9 @@ void tek4107a_state::machine_start()
 
 MACHINE_CONFIG_START(tek4107a_state::tek4107a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I80188_TAG, I80188, 21000000)
-	MCFG_CPU_PROGRAM_MAP(tek4107a_mem)
-	MCFG_CPU_IO_MAP(tek4107a_io)
+	MCFG_DEVICE_ADD(I80188_TAG, I80188, 21000000)
+	MCFG_DEVICE_PROGRAM_MAP(tek4107a_mem)
+	MCFG_DEVICE_IO_MAP(tek4107a_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

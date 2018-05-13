@@ -221,6 +221,7 @@ Todo:
 #include "includes/polepos.h"
 #include "audio/namco52.h"
 #include "audio/namco54.h"
+#include "audio/polepos.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/z8000/z8000.h"
@@ -295,16 +296,6 @@ WRITE_LINE_MEMBER(polepos_state::iosel_w)
 //          polepos_mcu_enable_w(offset,data);
 }
 
-WRITE_LINE_MEMBER(polepos_state::clson_w)
-{
-	m_namco_sound->polepos_sound_enable(state);
-	if (!state)
-	{
-		machine().device<polepos_sound_device>("polepos")->polepos_engine_sound_lsb_w(machine().dummy_space(), 0, 0);
-		machine().device<polepos_sound_device>("polepos")->polepos_engine_sound_msb_w(machine().dummy_space(), 0, 0);
-	}
-}
-
 WRITE_LINE_MEMBER(polepos_state::gasel_w)
 {
 	m_adc_input = state;
@@ -313,11 +304,6 @@ WRITE_LINE_MEMBER(polepos_state::gasel_w)
 WRITE_LINE_MEMBER(polepos_state::sb0_w)
 {
 	m_auto_start_mask = !state;
-}
-
-WRITE_LINE_MEMBER(polepos_state::chacl_w)
-{
-	polepos_chacl_w(machine().dummy_space(), 0, state);
 }
 
 template<bool sub1> WRITE16_MEMBER(polepos_state::polepos_z8002_nvi_enable_w)
@@ -856,15 +842,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(polepos_state::polepos)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(z80_map)
-	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(z80_map)
+	MCFG_DEVICE_IO_MAP(z80_io)
 
-	MCFG_CPU_ADD("sub", Z8002, MASTER_CLOCK/8)  /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(z8002_map_1)
+	MCFG_DEVICE_ADD("sub", Z8002, MASTER_CLOCK/8)  /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(z8002_map_1)
 
-	MCFG_CPU_ADD("sub2", Z8002, MASTER_CLOCK/8) /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(z8002_map_2)
+	MCFG_DEVICE_ADD("sub2", Z8002, MASTER_CLOCK/8) /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(z8002_map_2)
 
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/8/2)      /* 1.536 MHz */
 	MCFG_NAMCO_51XX_SCREEN("screen")
@@ -872,19 +858,19 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_NAMCO_51XX_INPUT_1_CB(IOPORT("IN0")) MCFG_DEVCB_RSHIFT(4)
 	MCFG_NAMCO_51XX_INPUT_2_CB(IOPORT("DSWB")) MCFG_DEVCB_MASK(0x0f)
 	MCFG_NAMCO_51XX_INPUT_3_CB(IOPORT("DSWB")) MCFG_DEVCB_RSHIFT(4)
-	MCFG_NAMCO_51XX_OUTPUT_0_CB(WRITE8(polepos_state,out_0))
-	MCFG_NAMCO_51XX_OUTPUT_1_CB(WRITE8(polepos_state,out_1))
+	MCFG_NAMCO_51XX_OUTPUT_0_CB(WRITE8(*this, polepos_state,out_0))
+	MCFG_NAMCO_51XX_OUTPUT_1_CB(WRITE8(*this, polepos_state,out_1))
 
 	MCFG_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/8/2)      /* 1.536 MHz */
 	MCFG_NAMCO_52XX_DISCRETE("discrete")
 	MCFG_NAMCO_52XX_BASENODE(NODE_04)
-	MCFG_NAMCO_52XX_ROMREAD_CB(READ8(polepos_state,namco_52xx_rom_r))
-	MCFG_NAMCO_52XX_SI_CB(READ8(polepos_state,namco_52xx_si_r))
+	MCFG_NAMCO_52XX_ROMREAD_CB(READ8(*this, polepos_state,namco_52xx_rom_r))
+	MCFG_NAMCO_52XX_SI_CB(READ8(*this, polepos_state,namco_52xx_si_r))
 
 	MCFG_NAMCO_53XX_ADD("53xx", MASTER_CLOCK/8/2)      /* 1.536 MHz */
-	MCFG_NAMCO_53XX_K_CB(READ8(polepos_state,namco_53xx_k_r))
-	MCFG_NAMCO_53XX_INPUT_0_CB(READ8(polepos_state,steering_changed_r))
-	MCFG_NAMCO_53XX_INPUT_1_CB(READ8(polepos_state,steering_delta_r))
+	MCFG_NAMCO_53XX_K_CB(READ8(*this, polepos_state,namco_53xx_k_r))
+	MCFG_NAMCO_53XX_INPUT_0_CB(READ8(*this, polepos_state,steering_changed_r))
+	MCFG_NAMCO_53XX_INPUT_1_CB(READ8(*this, polepos_state,steering_delta_r))
 	MCFG_NAMCO_53XX_INPUT_2_CB(IOPORT("DSWA")) MCFG_DEVCB_MASK(0x0f)
 	MCFG_NAMCO_53XX_INPUT_3_CB(IOPORT("DSWA")) MCFG_DEVCB_RSHIFT(4)
 
@@ -894,12 +880,12 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")
-	MCFG_NAMCO_06XX_READ_0_CB(DEVREAD8("51xx", namco_51xx_device, read))
-	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("51xx", namco_51xx_device, write))
-	MCFG_NAMCO_06XX_READ_1_CB(DEVREAD8("53xx", namco_53xx_device, read))
-	MCFG_NAMCO_06XX_READ_REQUEST_1_CB(DEVWRITELINE("53xx", namco_53xx_device, read_request))
-	MCFG_NAMCO_06XX_WRITE_2_CB(DEVWRITE8("52xx", namco_52xx_device, write))
-	MCFG_NAMCO_06XX_WRITE_3_CB(DEVWRITE8("54xx", namco_54xx_device, write))
+	MCFG_NAMCO_06XX_READ_0_CB(READ8("51xx", namco_51xx_device, read))
+	MCFG_NAMCO_06XX_WRITE_0_CB(WRITE8("51xx", namco_51xx_device, write))
+	MCFG_NAMCO_06XX_READ_1_CB(READ8("53xx", namco_53xx_device, read))
+	MCFG_NAMCO_06XX_READ_REQUEST_1_CB(WRITELINE("53xx", namco_53xx_device, read_request))
+	MCFG_NAMCO_06XX_WRITE_2_CB(WRITE8("52xx", namco_52xx_device, write))
+	MCFG_NAMCO_06XX_WRITE_3_CB(WRITE8("54xx", namco_54xx_device, write))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)   // 128V clocks the same as VBLANK
@@ -913,13 +899,14 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // at 8E on polepos
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(CLEARLINE("maincpu", 0)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(polepos_state, iosel_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(polepos_state, clson_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(polepos_state, gasel_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, polepos_state, iosel_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("namco", namco_device, sound_enable_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("polepos", polepos_sound_device, clson_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, polepos_state, gasel_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub2", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(polepos_state, sb0_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(polepos_state, chacl_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, polepos_state, sb0_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, polepos_state, chacl_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -936,22 +923,22 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_VIDEO_START_OVERRIDE(polepos_state,polepos)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/512)
+	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/512)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_NAMCO_AUDIO_STEREO(1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
 	/* discrete circuit on the 54XX outputs */
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(polepos)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, polepos_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 
 	/* engine sound */
-	MCFG_SOUND_ADD("polepos", POLEPOS, 0)
+	MCFG_DEVICE_ADD("polepos", POLEPOS_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
 MACHINE_CONFIG_END
@@ -991,15 +978,15 @@ void polepos_state::sound_z80_bootleg_iomap(address_map &map)
 MACHINE_CONFIG_START(polepos_state::topracern)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(z80_map)
-	MCFG_CPU_IO_MAP(topracern_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(z80_map)
+	MCFG_DEVICE_IO_MAP(topracern_io)
 
-	MCFG_CPU_ADD("sub", Z8002, MASTER_CLOCK/8)  /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(z8002_map_1)
+	MCFG_DEVICE_ADD("sub", Z8002, MASTER_CLOCK/8)  /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(z8002_map_1)
 
-	MCFG_CPU_ADD("sub2", Z8002, MASTER_CLOCK/8) /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(z8002_map_2)
+	MCFG_DEVICE_ADD("sub2", Z8002, MASTER_CLOCK/8) /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(z8002_map_2)
 
 	/* todo, remove these devices too, this bootleg doesn't have them, but the emulation doesn't boot without them.. */
 	/* doesn't exist on the bootleg, but required for now or the game only boots in test mode!
@@ -1010,8 +997,8 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")
-	MCFG_NAMCO_06XX_READ_0_CB(DEVREAD8("51xx", namco_51xx_device, read))
-	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("51xx", namco_51xx_device, write))
+	MCFG_NAMCO_06XX_READ_0_CB(READ8("51xx", namco_51xx_device, read))
+	MCFG_NAMCO_06XX_WRITE_0_CB(WRITE8("51xx", namco_51xx_device, write))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)   // 128V clocks the same as VBLANK
@@ -1025,13 +1012,14 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(CLEARLINE("maincpu", 0)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(polepos_state, iosel_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(polepos_state, clson_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(polepos_state, gasel_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, polepos_state, iosel_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("namco", namco_device, sound_enable_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("polepos", polepos_sound_device, clson_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, polepos_state, gasel_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub2", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(polepos_state, sb0_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(polepos_state, chacl_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, polepos_state, sb0_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, polepos_state, chacl_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1048,38 +1036,39 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	MCFG_VIDEO_START_OVERRIDE(polepos_state,polepos)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/512)
+	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/512)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_NAMCO_AUDIO_STEREO(1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
 	/* engine sound */
-	MCFG_SOUND_ADD("polepos", POLEPOS, 0)
+	MCFG_DEVICE_ADD("polepos", POLEPOS_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
 
-	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) // unknown resistor configuration
+	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) // unknown resistor configuration
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.12)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(polepos_state::polepos2bi)
 	topracern(config);
 
-	MCFG_CPU_ADD("soundz80bl", Z80, MASTER_CLOCK/8) /*? MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_z80_bootleg_map)
-	MCFG_CPU_IO_MAP(sound_z80_bootleg_iomap)
+	MCFG_DEVICE_ADD("soundz80bl", Z80, MASTER_CLOCK/8) /*? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_z80_bootleg_map)
+	MCFG_DEVICE_IO_MAP(sound_z80_bootleg_iomap)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundz80bl", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("tms", TMS5220, 600000) /* ? Mhz */
+	MCFG_DEVICE_ADD("tms", TMS5220, 600000) /* ? Mhz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END

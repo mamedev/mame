@@ -82,9 +82,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(speeddrv_state::speeddrv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486, 40000000 ) // ?? at least a pentium
-	MCFG_CPU_PROGRAM_MAP(speeddrv_map)
-	MCFG_CPU_IO_MAP(speeddrv_io)
+	MCFG_DEVICE_ADD("maincpu", I486, 40000000 ) // ?? at least a pentium
+	MCFG_DEVICE_PROGRAM_MAP(speeddrv_map)
+	MCFG_DEVICE_IO_MAP(speeddrv_io)
 MACHINE_CONFIG_END
 
 

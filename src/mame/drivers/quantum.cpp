@@ -248,7 +248,7 @@ static discrete_mixer_desc quantum_mixer = {
 		1.0                         /* gain */
 };
 
-static DISCRETE_SOUND_START(quantum)
+static DISCRETE_SOUND_START(quantum_discrete)
 
 	/************************************************/
 	/* FINAL MIX                                    */
@@ -275,9 +275,9 @@ DISCRETE_SOUND_END
 MACHINE_CONFIG_START(quantum_state::quantum)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(quantum_state, irq1_line_hold, CLOCK_3KHZ / 12)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(quantum_state, irq1_line_hold, CLOCK_3KHZ / 12)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -295,35 +295,33 @@ MACHINE_CONFIG_START(quantum_state::quantum)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, 600000)
-	MCFG_POKEY_POT0_R_CB(READ8(quantum_state, input_1_r))
-	MCFG_POKEY_POT1_R_CB(READ8(quantum_state, input_1_r))
-	MCFG_POKEY_POT2_R_CB(READ8(quantum_state, input_1_r))
-	MCFG_POKEY_POT3_R_CB(READ8(quantum_state, input_1_r))
-	MCFG_POKEY_POT4_R_CB(READ8(quantum_state, input_1_r))
-	MCFG_POKEY_POT5_R_CB(READ8(quantum_state, input_1_r))
-	MCFG_POKEY_POT6_R_CB(READ8(quantum_state, input_1_r))
-	MCFG_POKEY_POT7_R_CB(READ8(quantum_state, input_1_r))
+	MCFG_DEVICE_ADD("pokey1", POKEY, 600000)
+	MCFG_POKEY_POT0_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT1_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT2_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT3_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT4_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT5_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT6_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT7_R_CB(READ8(*this, quantum_state, input_1_r))
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, 600000)
-	MCFG_POKEY_POT0_R_CB(READ8(quantum_state, input_2_r))
-	MCFG_POKEY_POT1_R_CB(READ8(quantum_state, input_2_r))
-	MCFG_POKEY_POT2_R_CB(READ8(quantum_state, input_2_r))
-	MCFG_POKEY_POT3_R_CB(READ8(quantum_state, input_2_r))
-	MCFG_POKEY_POT4_R_CB(READ8(quantum_state, input_2_r))
-	MCFG_POKEY_POT5_R_CB(READ8(quantum_state, input_2_r))
-	MCFG_POKEY_POT6_R_CB(READ8(quantum_state, input_2_r))
-	MCFG_POKEY_POT7_R_CB(READ8(quantum_state, input_2_r))
+	MCFG_DEVICE_ADD("pokey2", POKEY, 600000)
+	MCFG_POKEY_POT0_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT1_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT2_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT3_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT4_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT5_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT6_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT7_R_CB(READ8(*this, quantum_state, input_2_r))
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 1)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 1)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(quantum)
-
+	MCFG_DEVICE_ADD("discrete", DISCRETE, quantum_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

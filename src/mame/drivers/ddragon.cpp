@@ -947,15 +947,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(ddragon_state::ddragon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E, MAIN_CLOCK / 4)     /* HD63C09EP, 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(ddragon_map)
+	MCFG_DEVICE_ADD("maincpu", HD6309E, MAIN_CLOCK / 4)     /* HD63C09EP, 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ddragon_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon_state, ddragon_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", HD63701, MAIN_CLOCK / 2)    /* HD63701YOP, 6 MHz / 4 internally */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("sub", HD63701, MAIN_CLOCK / 2)    /* HD63701YOP, 6 MHz / 4 internally */
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", MC6809, MAIN_CLOCK / 2) /* HD68A09P, 6 MHz / 4 internally */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", MC6809, MAIN_CLOCK / 2) /* HD68A09P, 6 MHz / 4 internally */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
 
@@ -975,23 +975,23 @@ MACHINE_CONFIG_START(ddragon_state::ddragon)
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", M6809_IRQ_LINE))
 
-	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state, irq_handler))
+	MCFG_DEVICE_ADD("fmsnd", YM2151, SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, ddragon_state, irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK / 32)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_1))   /* interrupt function */
+	MCFG_DEVICE_ADD("adpcm1", MSM5205, MAIN_CLOCK / 32)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ddragon_state, dd_adpcm_int_1))   /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK / 32)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_2))   /* interrupt function */
+	MCFG_DEVICE_ADD("adpcm2", MSM5205, MAIN_CLOCK / 32)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ddragon_state, dd_adpcm_int_2))   /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -1001,8 +1001,8 @@ MACHINE_CONFIG_START(ddragon_state::ddragonb)
 	ddragon(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)  /* 1.5MHz */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_REPLACE("sub", M6809, MAIN_CLOCK / 8)  /* 1.5MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 MACHINE_CONFIG_END
 
 
@@ -1010,24 +1010,24 @@ MACHINE_CONFIG_START(ddragon_state::ddragonba)
 	ddragon(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)  /* 6MHz / 4 internally */
-	MCFG_CPU_PROGRAM_MAP(ddragonba_sub_map)
-	MCFG_CPU_IO_MAP(ddragonba_sub_portmap)
+	MCFG_DEVICE_REPLACE("sub", M6803, MAIN_CLOCK / 2)  /* 6MHz / 4 internally */
+	MCFG_DEVICE_PROGRAM_MAP(ddragonba_sub_map)
+	MCFG_DEVICE_IO_MAP(ddragonba_sub_portmap)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)  /* 1.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(ddragon_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)  /* 1.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ddragon_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon_state, ddragon_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", MC6809E, MAIN_CLOCK / 8)  /* 1.5 Mhz */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("sub", MC6809E, MAIN_CLOCK / 8)  /* 1.5 Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", MC6809E, MAIN_CLOCK / 8) /* 1.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", MC6809E, MAIN_CLOCK / 8) /* 1.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
 
@@ -1047,23 +1047,23 @@ MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", M6809_IRQ_LINE))
 
-	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state,irq_handler))
+	MCFG_DEVICE_ADD("fmsnd", YM2151, SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, ddragon_state,irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_1))   /* interrupt function */
+	MCFG_DEVICE_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ddragon_state, dd_adpcm_int_1))   /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_2))   /* interrupt function */
+	MCFG_DEVICE_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ddragon_state, dd_adpcm_int_2))   /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -1072,15 +1072,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddragon_state::ddragon2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E, MAIN_CLOCK / 4)     /* HD63C09EP, 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(dd2_map)
+	MCFG_DEVICE_ADD("maincpu", HD6309E, MAIN_CLOCK / 4)     /* HD63C09EP, 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(dd2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon_state, ddragon_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK / 3)        /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(dd2_sub_map)
+	MCFG_DEVICE_ADD("sub", Z80, MAIN_CLOCK / 3)        /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(dd2_sub_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(dd2_sound_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 3579545)
+	MCFG_DEVICE_PROGRAM_MAP(dd2_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
 
@@ -1100,17 +1100,17 @@ MACHINE_CONFIG_START(ddragon_state::ddragon2)
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state,irq_handler))
+	MCFG_DEVICE_ADD("fmsnd", YM2151, SOUND_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, ddragon_state,irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
@@ -1119,8 +1119,8 @@ MACHINE_CONFIG_START(darktowr_state::darktowr)
 	ddragon(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("mcu", M68705P3, XTAL(4'000'000))
-	MCFG_M68705_PORTA_W_CB(WRITE8(darktowr_state, mcu_port_a_w))
+	MCFG_DEVICE_ADD("mcu", M68705P3, XTAL(4'000'000))
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, darktowr_state, mcu_port_a_w))
 
 	/* video hardware */
 MACHINE_CONFIG_END

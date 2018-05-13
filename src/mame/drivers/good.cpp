@@ -289,9 +289,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(good_state::good)
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000 /2)
-	MCFG_CPU_PROGRAM_MAP(good_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", good_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000 /2)
+	MCFG_DEVICE_PROGRAM_MAP(good_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", good_state,  irq2_line_hold)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", good)
 
@@ -307,9 +307,10 @@ MACHINE_CONFIG_START(good_state::good)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END

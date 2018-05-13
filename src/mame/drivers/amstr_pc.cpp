@@ -487,34 +487,35 @@ void amstrad_pc_state::cfg_com(device_t *device)
 
 MACHINE_CONFIG_START(amstrad_pc_state::pc200)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 8000000)
-	MCFG_CPU_PROGRAM_MAP(ppc640_map)
-	MCFG_CPU_IO_MAP(pc200_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(ppc640_map)
+	MCFG_DEVICE_IO_MAP(pc200_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "aga", pc_isa8_cards, "aga_pc200", true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "fdc", pc_isa8_cards, "fdc_xt", true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "com", pc_isa8_cards, "com", true)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("aga", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "aga_pc200", true)
+	MCFG_DEVICE_ADD("fdc", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", true)
+	MCFG_DEVICE_ADD("com", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("com", cfg_com)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("mb:pic8259", pic8259_device, ir7_w))
+	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE("mb:pic8259", pic8259_device, ir7_w))
 
 	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("mb:pic8259", pic8259_device, ir7_w))
+	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE("mb:pic8259", pic8259_device, ir7_w))
 
 	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("mb:pic8259", pic8259_device, ir5_w))
+	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE("mb:pic8259", pic8259_device, ir5_w))
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
-	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
+	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -524,16 +525,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_pc_state::pc2086)
 	pc200(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pc2086_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pc2086_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_pc_state::ppc640)
 	pc200(config);
-	MCFG_CPU_REPLACE("maincpu", V30, 8000000)
-	MCFG_CPU_PROGRAM_MAP(ppc640_map)
-	MCFG_CPU_IO_MAP(ppc512_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_REPLACE("maincpu", V30, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(ppc640_map)
+	MCFG_DEVICE_IO_MAP(ppc512_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_REMOVE("isa1")
 	MCFG_DEVICE_REMOVE("isa2")

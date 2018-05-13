@@ -76,9 +76,9 @@ template<typename T> void generic_fifo_device_base<T>::device_timer(emu_timer &t
 
 		// Adjust devcb lines as needed
 		if(was_empty && !is_empty())
-			set_empty_cb(false);
+			m_empty_cb(false);
 		if(!was_full && is_full())
-			set_full_cb(true);
+			m_full_cb(true);
 
 		// Are there still values that don't fit?
 		if(!m_extra_values.empty()) {

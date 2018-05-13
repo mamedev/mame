@@ -60,32 +60,33 @@ DEFINE_DEVICE_TYPE(SEGAM1AUDIO, segam1audio_device, "segam1audio", "Sega Model 1
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(segam1audio_device::device_add_mconfig)
-	MCFG_CPU_ADD(M68000_TAG, M68000, 10000000)  // verified on real h/w
-	MCFG_CPU_PROGRAM_MAP(segam1audio_map)
+	MCFG_DEVICE_ADD(M68000_TAG, M68000, 10000000)  // verified on real h/w
+	MCFG_DEVICE_PROGRAM_MAP(segam1audio_map)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD(YM3438_TAG, YM3438, 8000000)
+	MCFG_DEVICE_ADD(YM3438_TAG, YM3438, 8000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MCFG_SOUND_ADD(MULTIPCM_1_TAG, MULTIPCM, 8000000)
+	MCFG_DEVICE_ADD(MULTIPCM_1_TAG, MULTIPCM, 8000000)
 	MCFG_DEVICE_ADDRESS_MAP(0, mpcm1_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD(MULTIPCM_2_TAG, MULTIPCM, 8000000)
+	MCFG_DEVICE_ADD(MULTIPCM_2_TAG, MULTIPCM, 8000000)
 	MCFG_DEVICE_ADDRESS_MAP(0, mpcm2_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD(UART_TAG, I8251, 8000000) // T82C51, clock unknown
 	MCFG_I8251_RXRDY_HANDLER(INPUTLINE(M68000_TAG, M68K_IRQ_2))
-	MCFG_I8251_TXD_HANDLER(WRITELINE(segam1audio_device, output_txd))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, segam1audio_device, output_txd))
 
 	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE(UART_TAG, i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(UART_TAG, i8251_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(UART_TAG, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(UART_TAG, i8251_device, write_rxc))
 MACHINE_CONFIG_END
 
 //**************************************************************************

@@ -54,8 +54,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(bntyhunt_state::bntyhunt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 200000000) /* Probably a Pentium or higher .. ?? Mhz*/
-	MCFG_CPU_PROGRAM_MAP(bntyhunt_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 200000000) /* Probably a Pentium or higher .. ?? Mhz*/
+	MCFG_DEVICE_PROGRAM_MAP(bntyhunt_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

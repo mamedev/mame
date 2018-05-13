@@ -1188,7 +1188,7 @@ static const discrete_mixer_desc btime_sound_mixer_desc =
 static const discrete_op_amp_filt_info btime_opamp_desc =
 	{BTIME_R51, 0, BTIME_R50, 0, BTIME_R49, CAP_U(0.068), CAP_U(0.068), 0, 0, 5.0, -5.0};
 
-static DISCRETE_SOUND_START( btime_sound )
+static DISCRETE_SOUND_START( btime_sound_discrete )
 
 	DISCRETE_INPUTX_STREAM(NODE_01, 0, 5.0/32767.0, 0)
 	DISCRETE_INPUTX_STREAM(NODE_02, 1, 5.0/32767.0, 0)
@@ -1280,11 +1280,11 @@ MACHINE_RESET_MEMBER(btime_state,mmonkey)
 MACHINE_CONFIG_START(btime_state::btime)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO_CPU7, HCLK2)   /* seletable between H2/H4 via jumper */
-	MCFG_CPU_PROGRAM_MAP(btime_map)
+	MCFG_DEVICE_ADD("maincpu", DECO_CPU7, HCLK2)   /* seletable between H2/H4 via jumper */
+	MCFG_DEVICE_PROGRAM_MAP(btime_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, HCLK1/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("8vck", btime_state, audio_nmi_gen, "screen", 0, 8)
 
 	MCFG_INPUT_MERGER_ALL_HIGH("audionmi")
@@ -1306,28 +1306,27 @@ MACHINE_CONFIG_START(btime_state::btime)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ay1", AY8910, HCLK2)
+	MCFG_DEVICE_ADD("ay1", AY8910, HCLK2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(5), RES_K(5), RES_K(5))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(btime_state, ay_audio_nmi_enable_w))
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, btime_state, ay_audio_nmi_enable_w))
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 2)
 
-	MCFG_SOUND_ADD("ay2", AY8910, HCLK2)
+	MCFG_DEVICE_ADD("ay2", AY8910, HCLK2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(1), RES_K(5), RES_K(5))
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 5)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 3)
+	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 4)
+	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 5)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(btime_sound)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, btime_sound_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1336,11 +1335,11 @@ MACHINE_CONFIG_START(btime_state::cookrace)
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK2)
-	MCFG_CPU_PROGRAM_MAP(cookrace_map)
+	MCFG_DEVICE_REPLACE("maincpu", DECO_C10707, HCLK2)
+	MCFG_DEVICE_PROGRAM_MAP(cookrace_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cookrace)
@@ -1354,8 +1353,8 @@ MACHINE_CONFIG_START(btime_state::lnc)
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK2)
-	MCFG_CPU_PROGRAM_MAP(lnc_map)
+	MCFG_DEVICE_REPLACE("maincpu", DECO_C10707, HCLK2)
+	MCFG_DEVICE_PROGRAM_MAP(lnc_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,lnc)
 
@@ -1386,8 +1385,8 @@ MACHINE_CONFIG_START(btime_state::mmonkey)
 	wtennis(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mmonkey_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mmonkey_map)
 
 	MCFG_MACHINE_START_OVERRIDE(btime_state,mmonkey)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,mmonkey)
@@ -1397,9 +1396,9 @@ MACHINE_CONFIG_START(btime_state::bnj)
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK4)
-	MCFG_CPU_CLOCK(HCLK4)
-	MCFG_CPU_PROGRAM_MAP(bnj_map)
+	MCFG_DEVICE_REPLACE("maincpu", DECO_C10707, HCLK4)
+	MCFG_DEVICE_CLOCK(HCLK4)
+	MCFG_DEVICE_PROGRAM_MAP(bnj_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bnj)
@@ -1416,8 +1415,8 @@ MACHINE_CONFIG_START(btime_state::sdtennis)
 	bnj(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("audiocpu", DECO_C10707, HCLK1/3/2)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_REPLACE("audiocpu", DECO_C10707, HCLK1/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 MACHINE_CONFIG_END
 
 
@@ -1425,8 +1424,8 @@ MACHINE_CONFIG_START(btime_state::zoar)
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(zoar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(zoar_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", zoar)
@@ -1439,13 +1438,13 @@ MACHINE_CONFIG_START(btime_state::zoar)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ay1", AY8910, HCLK1)
+	MCFG_DEVICE_REPLACE("ay1", AY8910, HCLK1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(5), RES_K(5), RES_K(5))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(btime_state, ay_audio_nmi_enable_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, btime_state, ay_audio_nmi_enable_w))
 
-	MCFG_SOUND_REPLACE("ay2", AY8910, HCLK1)
+	MCFG_DEVICE_REPLACE("ay2", AY8910, HCLK1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
@@ -1454,12 +1453,12 @@ MACHINE_CONFIG_START(btime_state::disco)
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(HCLK4)
-	MCFG_CPU_PROGRAM_MAP(disco_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(HCLK4)
+	MCFG_DEVICE_PROGRAM_MAP(disco_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(disco_audio_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(disco_audio_map)
 
 	MCFG_DEVICE_MODIFY("soundlatch")
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
@@ -1481,8 +1480,8 @@ MACHINE_CONFIG_START(btime_state::tisland)
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tisland_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tisland_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", zoar)

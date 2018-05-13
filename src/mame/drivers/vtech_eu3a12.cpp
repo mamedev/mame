@@ -27,7 +27,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(vreadere_state::vreadere)
 	/* basic machine hardware */
-	// MCFG_CPU_ADD("maincpu", unknown, unknown) // CPU type is unknown, epoxy blob
+	// MCFG_DEVICE_ADD("maincpu", unknown, unknown) // CPU type is unknown, epoxy blob
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

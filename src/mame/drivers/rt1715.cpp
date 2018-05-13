@@ -284,16 +284,16 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 
 MACHINE_CONFIG_START(rt1715_state::rt1715)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(2'457'600))
-	MCFG_CPU_PROGRAM_MAP(rt1715_mem)
-	MCFG_CPU_IO_MAP(rt1715_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(2'457'600))
+	MCFG_DEVICE_PROGRAM_MAP(rt1715_mem)
+	MCFG_DEVICE_IO_MAP(rt1715_io)
 	MCFG_Z80_DAISY_CHAIN(rt1715_daisy_chain)
 
 
 	/* keyboard */
-	MCFG_CPU_ADD("keyboard", Z80, 683000)
-	MCFG_CPU_PROGRAM_MAP(k7658_mem)
-	MCFG_CPU_IO_MAP(k7658_io)
+	MCFG_DEVICE_ADD("keyboard", Z80, 683000)
+	MCFG_DEVICE_PROGRAM_MAP(k7658_mem)
+	MCFG_DEVICE_IO_MAP(k7658_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

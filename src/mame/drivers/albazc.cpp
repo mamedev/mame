@@ -281,9 +281,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(albazc_state::hanaroku)
 
-	MCFG_CPU_ADD("maincpu", Z80,6000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(hanaroku_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", albazc_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,6000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(hanaroku_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", albazc_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -304,9 +304,9 @@ MACHINE_CONFIG_START(albazc_state::hanaroku)
 	MCFG_PALETTE_INIT_OWNER(albazc_state, albazc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000) /* ? MHz */
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) /* ? MHz */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

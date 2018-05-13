@@ -256,9 +256,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(ecoinf1_state::ecoinf1_older)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)
-	MCFG_CPU_PROGRAM_MAP(older_memmap)
-	MCFG_CPU_IO_MAP(older_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)
+	MCFG_DEVICE_PROGRAM_MAP(older_memmap)
+	MCFG_DEVICE_IO_MAP(older_portmap)
 MACHINE_CONFIG_END
 
 

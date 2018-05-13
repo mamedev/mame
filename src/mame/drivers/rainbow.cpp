@@ -506,6 +506,7 @@ public:
 		m_z80(*this, "subcpu"),
 
 		m_fdc(*this, FD1793_TAG),
+		m_floppies(*this, FD1793_TAG ":%u", 0U),
 		m_hdc(*this, "hdc"),
 		m_corvus_hdc(*this, "corvus"),
 
@@ -534,6 +535,14 @@ public:
 		m_digits(*this, "digit%u", 0U)
 	{
 	}
+
+	void rainbow(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 
 	DECLARE_READ8_MEMBER(read_video_ram_r);
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt);
@@ -621,17 +630,11 @@ public:
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_WRITE_LINE_MEMBER(GDC_vblank_irq);
 
-	void rainbow(machine_config &config);
 	void rainbow8088_io(address_map &map);
 	void rainbow8088_map(address_map &map);
 	void rainbowz80_io(address_map &map);
 	void rainbowz80_mem(address_map &map);
 	void upd7220_map(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-private:
 	enum
 	{   // LOWEST PRIORITY
 		// Mnemonic - - - - - -  TYPE  ADDRESS - Source
@@ -665,6 +668,7 @@ private:
 	required_device<cpu_device> m_z80;
 
 	required_device<fd1793_device> m_fdc;
+	required_device_array<floppy_connector, 4> m_floppies;
 	optional_device<wd2010_device> m_hdc;
 
 	required_device<corvus_hdc_device> m_corvus_hdc;
@@ -862,12 +866,13 @@ FLOPPY_IMD_FORMAT,
 FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START(rainbow_floppies)
-SLOT_INTERFACE("525qd", FLOPPY_525_QD) // QD means 80 tracks with DD data rate (single or double sided).
-SLOT_INTERFACE("525dd", FLOPPY_525_DD) // mimic a 5.25" PC (40 track) drive. Requires IDrive5.SYS.
-SLOT_INTERFACE("35dd", FLOPPY_35_DD) // mimic 3.5" PC drive (720K, double density). Use Impdrv3.SYS.
-SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD) // to read a single sided, (160K) PC-DOS 1 disk with MediaMaster
-SLOT_INTERFACE_END
+static void rainbow_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD); // QD means 80 tracks with DD data rate (single or double sided).
+	device.option_add("525dd", FLOPPY_525_DD); // mimic a 5.25" PC (40 track) drive. Requires IDrive5.SYS.
+	device.option_add("35dd", FLOPPY_35_DD); // mimic 3.5" PC drive (720K, double density). Use Impdrv3.SYS.
+	device.option_add("525ssdd", FLOPPY_525_SSDD); // to read a single sided, (160K) PC-DOS 1 disk with MediaMaster
+}
 
 void rainbow_state::machine_start()
 {
@@ -1678,7 +1683,7 @@ void rainbow_state::hdc_reset()
 
 // Return 'hard_disk_file' object for harddisk 1 (fixed).
 // < nullptr if geometry is insane or other errors occured >
-hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
+hard_disk_file *rainbow_state::rainbow_hdc_file(int drv)
 {
 	m_hdc_drive_ready = false;
 
@@ -2437,7 +2442,6 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	int disable_start; // set defaults
 
 	int selected_drive = INVALID_DRIVE;
-	static const char *names[] = { FD1793_TAG ":0", FD1793_TAG ":1", FD1793_TAG ":2", FD1793_TAG ":3" };
 
 	int drive = 0;
 	if (m_inp10->read() && ((data & 3) < 2))
@@ -2445,13 +2449,9 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	else
 		drive = data & 3;
 
-	floppy_connector *con = nullptr;
-	if (drive < MAX_FLOPPIES)
-		con = subdevice<floppy_connector>(names[drive]);
-
-	if (con)
+	if (m_floppies[drive])
 	{
-		m_floppy = con->get_device();
+		m_floppy = m_floppies[drive]->get_device();
 		if (m_floppy)
 			selected_drive = drive;
 	}
@@ -2506,9 +2506,10 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 		// Assume the other one is switched off -
 		for (int f_num = 0; f_num < MAX_FLOPPIES; f_num++)
 		{
-		floppy_connector *con = subdevice<floppy_connector>(names[f_num]);
-		floppy_image_device *tmp_floppy = con->get_device();
+		floppy_image_device *tmp_floppy = m_floppies[f_num]->get_device();
 
+		if (!tmp_floppy)
+			continue;
 		tmp_floppy->mon_w(ASSERT_LINE);
 		if ((f_num >= enable_start) && (f_num < disable_start))
 			tmp_floppy->mon_w(CLEAR_LINE); // enable
@@ -3213,14 +3214,14 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 MCFG_DEFAULT_LAYOUT(layout_rainbow)
 
 /* basic machine hardware */
-MCFG_CPU_ADD("maincpu", I8088, XTAL(24'073'400) / 5) // approximately 4.815 MHz
-MCFG_CPU_PROGRAM_MAP(rainbow8088_map)
-MCFG_CPU_IO_MAP(rainbow8088_io)
-MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(rainbow_state, irq_callback)
+MCFG_DEVICE_ADD("maincpu", I8088, XTAL(24'073'400) / 5) // approximately 4.815 MHz
+MCFG_DEVICE_PROGRAM_MAP(rainbow8088_map)
+MCFG_DEVICE_IO_MAP(rainbow8088_io)
+MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(rainbow_state, irq_callback)
 
-MCFG_CPU_ADD("subcpu", Z80, XTAL(24'073'400) / 6)
-MCFG_CPU_PROGRAM_MAP(rainbowz80_mem)
-MCFG_CPU_IO_MAP(rainbowz80_io)
+MCFG_DEVICE_ADD("subcpu", Z80, XTAL(24'073'400) / 6)
+MCFG_DEVICE_PROGRAM_MAP(rainbowz80_mem)
+MCFG_DEVICE_IO_MAP(rainbowz80_io)
 
 /* video hardware */
 MCFG_SCREEN_ADD("screen", RASTER)
@@ -3234,13 +3235,13 @@ MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, XTAL(24'073'400))
 
 MCFG_VT_SET_SCREEN("screen")
 MCFG_VT_CHARGEN("chargen")
-MCFG_VT_VIDEO_RAM_CALLBACK(READ8(rainbow_state, read_video_ram_r))
-MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE(rainbow_state, video_interrupt))
+MCFG_VT_VIDEO_RAM_CALLBACK(READ8(*this, rainbow_state, read_video_ram_r))
+MCFG_VT_VIDEO_VERT_FREQ_INTR_CALLBACK(WRITELINE(*this, rainbow_state, video_interrupt))
 
 // *************************** COLOR GRAPHICS (OPTION) **************************************
 // While the OSC frequency is confirmed, the divider is not (refresh rate is ~60 Hz with 32).
 MCFG_DEVICE_ADD("upd7220", UPD7220, 31188000 / 32) // Duell schematics shows a 31.188 Mhz oscillator (confirmed by RFKA).
-MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE(rainbow_state, GDC_vblank_irq)) // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
+MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE(*this, rainbow_state, GDC_vblank_irq)) // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
 
 MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(rainbow_state, hgdc_display_pixels)
@@ -3270,20 +3271,20 @@ MCFG_SOFTWARE_LIST_ADD("flop_list", "rainbow")
 
 /// ********************************* HARD DISK CONTROLLER *****************************************
 MCFG_DEVICE_ADD("hdc", WD2010, 5000000) // 10 Mhz quartz on controller (divided by 2 for WCLK)
-MCFG_WD2010_OUT_INTRQ_CB(WRITELINE(rainbow_state, bundle_irq)) // FIRST IRQ SOURCE (OR'ed with DRQ)
-MCFG_WD2010_OUT_BDRQ_CB(WRITELINE(rainbow_state, hdc_bdrq))  // BUFFER DATA REQUEST
+MCFG_WD2010_OUT_INTRQ_CB(WRITELINE(*this, rainbow_state, bundle_irq)) // FIRST IRQ SOURCE (OR'ed with DRQ)
+MCFG_WD2010_OUT_BDRQ_CB(WRITELINE(*this, rainbow_state, hdc_bdrq))  // BUFFER DATA REQUEST
 
 // SIGNALS -FROM- WD CONTROLLER:
-MCFG_WD2010_OUT_BCS_CB(WRITELINE(rainbow_state, hdc_read_sector)) // Problem: OUT_BCS_CB = WRITE8 ... (!)
-MCFG_WD2010_OUT_BCR_CB(WRITELINE(rainbow_state, hdc_bcr))         // BUFFER COUNTER RESET (pulses)
+MCFG_WD2010_OUT_BCS_CB(WRITELINE(*this, rainbow_state, hdc_read_sector)) // Problem: OUT_BCS_CB = WRITE8 ... (!)
+MCFG_WD2010_OUT_BCR_CB(WRITELINE(*this, rainbow_state, hdc_bcr))         // BUFFER COUNTER RESET (pulses)
 
-MCFG_WD2010_OUT_WG_CB(WRITELINE(rainbow_state, hdc_write_sector))   // WRITE GATE
-MCFG_WD2010_OUT_STEP_CB(WRITELINE(rainbow_state, hdc_step))         // STEP PULSE
-MCFG_WD2010_OUT_DIRIN_CB(WRITELINE(rainbow_state, hdc_direction))
+MCFG_WD2010_OUT_WG_CB(WRITELINE(*this, rainbow_state, hdc_write_sector))   // WRITE GATE
+MCFG_WD2010_OUT_STEP_CB(WRITELINE(*this, rainbow_state, hdc_step))         // STEP PULSE
+MCFG_WD2010_OUT_DIRIN_CB(WRITELINE(*this, rainbow_state, hdc_direction))
 
-MCFG_WD2010_IN_WF_CB(READLINE(rainbow_state, hdc_write_fault))   // WRITE FAULT  (set to GND if not serviced)
+MCFG_WD2010_IN_WF_CB(READLINE(*this, rainbow_state, hdc_write_fault))   // WRITE FAULT  (set to GND if not serviced)
 
-MCFG_WD2010_IN_DRDY_CB(READLINE(rainbow_state, hdc_drive_ready)) // DRIVE_READY  (set to VCC if not serviced)
+MCFG_WD2010_IN_DRDY_CB(READLINE(*this, rainbow_state, hdc_drive_ready)) // DRIVE_READY  (set to VCC if not serviced)
 MCFG_WD2010_IN_SC_CB(VCC)                                        // SEEK COMPLETE (set to VCC if not serviced)
 
 MCFG_WD2010_IN_TK000_CB(VCC) // CURRENTLY NOT EVALUATED WITHIN 'WD2010'
@@ -3305,23 +3306,23 @@ MCFG_HARDDISK_INTERFACE("corvus_hdd")
 MCFG_DS1315_ADD("rtc") // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
 MCFG_DEVICE_ADD("dbrg", COM8116_003, XTAL(24'073'400) / 4) // 6.01835 MHz (nominally 6 MHz)
-MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, dbrg_fr_w))
-MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, dbrg_ft_w))
+MCFG_COM8116_FR_HANDLER(WRITELINE(*this, rainbow_state, dbrg_fr_w))
+MCFG_COM8116_FT_HANDLER(WRITELINE(*this, rainbow_state, dbrg_ft_w))
 
 MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, XTAL(24'073'400) / 5 / 2) // 2.4073 MHz (nominally 2.5 MHz)
-MCFG_Z80SIO_OUT_INT_CB(WRITELINE(rainbow_state, mpsc_irq))
-MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("comm", rs232_port_device, write_txd))
-MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("printer", rs232_port_device, write_txd))
+MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, rainbow_state, mpsc_irq))
+MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("comm", rs232_port_device, write_txd))
+MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("printer", rs232_port_device, write_txd))
 // RTS and DTR outputs are not connected
 
-MCFG_RS232_PORT_ADD("comm", default_rs232_devices, nullptr)
-MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, rxa_w))
-MCFG_RS232_CTS_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, ctsa_w))
-MCFG_RS232_DCD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, dcda_w))
+MCFG_DEVICE_ADD("comm", RS232_PORT, default_rs232_devices, nullptr)
+MCFG_RS232_RXD_HANDLER(WRITELINE("mpsc", upd7201_new_device, rxa_w))
+MCFG_RS232_CTS_HANDLER(WRITELINE("mpsc", upd7201_new_device, ctsa_w))
+MCFG_RS232_DCD_HANDLER(WRITELINE("mpsc", upd7201_new_device, dcda_w))
 
-MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
-MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, rxb_w))
-MCFG_RS232_DCD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, ctsb_w)) // actually DTR
+MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
+MCFG_RS232_RXD_HANDLER(WRITELINE("mpsc", upd7201_new_device, rxb_w))
+MCFG_RS232_DCD_HANDLER(WRITELINE("mpsc", upd7201_new_device, ctsb_w)) // actually DTR
 
 MCFG_DEVICE_MODIFY("comm")
 MCFG_SLOT_OPTION_ADD("microsoft_mouse", MSFT_SERIAL_MOUSE)
@@ -3332,18 +3333,18 @@ MCFG_DEVICE_MODIFY("printer")
 MCFG_SLOT_DEFAULT_OPTION("printer")
 
 MCFG_DEVICE_ADD("kbdser", I8251, XTAL(24'073'400) / 5 / 2)
-MCFG_I8251_TXD_HANDLER(WRITELINE(rainbow_state, kbd_tx))
-MCFG_I8251_DTR_HANDLER(WRITELINE(rainbow_state, irq_hi_w))
-MCFG_I8251_RXRDY_HANDLER(WRITELINE(rainbow_state, kbd_rxready_w))
-MCFG_I8251_TXRDY_HANDLER(WRITELINE(rainbow_state, kbd_txready_w))
+MCFG_I8251_TXD_HANDLER(WRITELINE(*this, rainbow_state, kbd_tx))
+MCFG_I8251_DTR_HANDLER(WRITELINE(*this, rainbow_state, irq_hi_w))
+MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, rainbow_state, kbd_rxready_w))
+MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, rainbow_state, kbd_txready_w))
 
 MCFG_DEVICE_ADD(LK201_TAG, LK201, 0)
-MCFG_LK201_TX_HANDLER(DEVWRITELINE("kbdser", i8251_device, write_rxd))
+MCFG_LK201_TX_HANDLER(WRITELINE("kbdser", i8251_device, write_rxd))
 
 MCFG_DEVICE_ADD("prtbrg", RIPPLE_COUNTER, XTAL(24'073'400) / 6 / 13) // 74LS393 at E17 (both halves)
 // divided clock should ideally be 307.2 kHz, but is actually approximately 308.6333 kHz
 MCFG_RIPPLE_COUNTER_STAGES(8)
-MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(rainbow_state, bitrate_counter_w))
+MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(*this, rainbow_state, bitrate_counter_w))
 
 MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, hd_motor_tick, attotime::from_hz(60))
 

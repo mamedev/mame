@@ -51,8 +51,8 @@ void qs_state::qs7_prog_map(address_map &map)
 
 MACHINE_CONFIG_START(qs_state::qs7)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83048, XTAL(10'000'000)) /* FIX-ME! Actual CPU is H8/510 and XTAL value is a guess */
-	MCFG_CPU_PROGRAM_MAP(qs7_prog_map)
+	MCFG_DEVICE_ADD("maincpu", H83048, XTAL(10'000'000)) /* FIX-ME! Actual CPU is H8/510 and XTAL value is a guess */
+	MCFG_DEVICE_PROGRAM_MAP(qs7_prog_map)
 
 		//MCFG_ALESIS_KEYSCAN_ASIC_ADD("keyscan")
 

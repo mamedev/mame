@@ -179,14 +179,14 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(wms_state::wms)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80188, MAIN_CLOCK )    // AMD N80C188-20, ( 40 MHz. internally divided by 2)
-	MCFG_CPU_PROGRAM_MAP(wms_map)
-	MCFG_CPU_IO_MAP(wms_io)
+	MCFG_DEVICE_ADD("maincpu", I80188, MAIN_CLOCK )    // AMD N80C188-20, ( 40 MHz. internally divided by 2)
+	MCFG_DEVICE_PROGRAM_MAP(wms_map)
+	MCFG_DEVICE_IO_MAP(wms_io)
 
-	MCFG_CPU_ADD("adsp", ADSP2105, MAIN_CLOCK / 2)  // ADSP-2105 could run either at 13.824 or 20 MHz...
+	MCFG_DEVICE_ADD("adsp", ADSP2105, MAIN_CLOCK / 2)  // ADSP-2105 could run either at 13.824 or 20 MHz...
 	MCFG_DEVICE_DISABLE()
-	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
-	MCFG_CPU_DATA_MAP(adsp_data_map)
+	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
+	MCFG_DEVICE_DATA_MAP(adsp_data_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

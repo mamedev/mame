@@ -402,10 +402,10 @@ void policetr_state::machine_start()
 MACHINE_CONFIG_START(policetr_state::policetr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3041, MASTER_CLOCK/2)
+	MCFG_DEVICE_ADD("maincpu", R3041, MASTER_CLOCK/2)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_CPU_PROGRAM_MAP(policetr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", policetr_state,  irq4_gen)
+	MCFG_DEVICE_PROGRAM_MAP(policetr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", policetr_state,  irq4_gen)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
@@ -422,7 +422,8 @@ MACHINE_CONFIG_START(policetr_state::policetr)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_BSMT2000_ADD("bsmt", MASTER_CLOCK/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -434,8 +435,8 @@ MACHINE_CONFIG_START(policetr_state::sshooter)
 	policetr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sshooter_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sshooter_map)
 MACHINE_CONFIG_END
 
 

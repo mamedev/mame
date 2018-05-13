@@ -59,8 +59,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(sanremmg_state::sanremmg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, 50000000) // wrong, this is an M30624FG (M16C/62A family) with 256K internal ROM, no CPU core available
-	MCFG_CPU_PROGRAM_MAP(sanremmg_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 50000000) // wrong, this is an M30624FG (M16C/62A family) with 256K internal ROM, no CPU core available
+	MCFG_DEVICE_PROGRAM_MAP(sanremmg_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

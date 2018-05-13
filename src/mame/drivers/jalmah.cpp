@@ -1425,9 +1425,9 @@ void jalmah_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(jalmah_state::jalmah)
-	MCFG_CPU_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
-	MCFG_CPU_PROGRAM_MAP(jalmah)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jalmah_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
+	MCFG_DEVICE_PROGRAM_MAP(jalmah)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jalmah_state,  irq2_line_hold)
 
 	//M50747 MCU
 
@@ -1446,16 +1446,16 @@ MACHINE_CONFIG_START(jalmah_state::jalmah)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", jalmah_state, jalmah_mcu_sim, attotime::from_hz(10000))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 4000000, PIN7_LOW)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jalmah_state::urashima)
 	jalmah(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(urashima)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(urashima)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", urashima)
 

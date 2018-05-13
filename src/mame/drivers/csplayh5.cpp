@@ -363,30 +363,30 @@ WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
 MACHINE_CONFIG_START(csplayh5_state::csplayh5)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
-	MCFG_CPU_PROGRAM_MAP(csplayh5_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301", tmp68301_device, irq_callback)
+	MCFG_DEVICE_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
+	MCFG_DEVICE_PROGRAM_MAP(csplayh5_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301", tmp68301_device, irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(csplayh5_state, tmp68301_parallel_port_w))
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, csplayh5_state, tmp68301_parallel_port_w))
 
 #if USE_H8
-	MCFG_CPU_ADD("subcpu", H83002, DVD_CLOCK/2)    /* unknown divider */
-	MCFG_CPU_PROGRAM_MAP(csplayh5_sub_map)
-	MCFG_CPU_IO_MAP(csplayh5_sub_io_map)
+	MCFG_DEVICE_ADD("subcpu", H83002, DVD_CLOCK/2)    /* unknown divider */
+	MCFG_DEVICE_PROGRAM_MAP(csplayh5_sub_map)
+	MCFG_DEVICE_IO_MAP(csplayh5_sub_io_map)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true) // dvd
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(csplayh5_state, ide_irq))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, csplayh5_state, ide_irq))
 #endif
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272)) // typical 9958 clock, not verified
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(csplayh5_state, csplayh5_vdp0_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, csplayh5_state, csplayh5_vdp0_interrupt))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
 
 	/* sound hardware */

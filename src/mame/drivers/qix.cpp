@@ -604,8 +604,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(qix_state::qix_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK_OSC/4/4)  /* 1.25 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CLOCK_OSC/4/4)  /* 1.25 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	/* high interleave needed to ensure correct text in service mode */
 	/* Zookeeper settings and high score table seem especially sensitive to this */
@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(qix_state::qix_base)
 
 	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("P2"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, qix_coinctl_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state, qix_coinctl_w))
 
 	/* video hardware */
 	qix_video(config);
@@ -637,9 +637,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(qix_state::kram3)
 	qix(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kram3_main_map)
-	MCFG_MC6809E_LIC_CB(WRITELINE(qix_state, kram3_lic_maincpu_changed))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kram3_main_map)
+	MCFG_MC6809E_LIC_CB(WRITELINE(*this, qix_state, kram3_lic_maincpu_changed))
 
 	kram3_video(config);
 MACHINE_CONFIG_END
@@ -656,20 +656,20 @@ MACHINE_CONFIG_START(qix_state::mcu)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("mcu", M68705P3, COIN_CLOCK_OSC) /* 1.00 MHz */
-	MCFG_M68705_PORTB_R_CB(READ8(qix_state, qix_68705_portB_r))
-	MCFG_M68705_PORTC_R_CB(READ8(qix_state, qix_68705_portC_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(qix_state, qix_68705_portA_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(qix_state, qix_68705_portB_w))
+	MCFG_DEVICE_ADD("mcu", M68705P3, COIN_CLOCK_OSC) /* 1.00 MHz */
+	MCFG_M68705_PORTB_R_CB(READ8(*this, qix_state, qix_68705_portB_r))
+	MCFG_M68705_PORTC_R_CB(READ8(*this, qix_state, qix_68705_portC_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, qix_state, qix_68705_portA_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, qix_state, qix_68705_portB_w))
 
 	MCFG_MACHINE_START_OVERRIDE(qix_state,qixmcu)
 
 	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPB_HANDLER(READ8(qix_state, qixmcu_coin_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, qixmcu_coin_w))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, qix_state, qixmcu_coin_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state, qixmcu_coin_w))
 
 	MCFG_DEVICE_MODIFY("pia2")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, qixmcu_coinctrl_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state, qixmcu_coinctrl_w))
 MACHINE_CONFIG_END
 
 
@@ -678,8 +678,8 @@ MACHINE_CONFIG_START(qix_state::zookeep)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(zoo_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(zoo_main_map)
 
 	/* video hardware */
 	zookeep_video(config);
@@ -699,17 +699,17 @@ MACHINE_CONFIG_START(qix_state::slither)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)   /* 1.34 MHz */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(SLITHER_CLOCK_OSC/4/4)   /* 1.34 MHz */
 
 	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA_READPA_HANDLER(READ8(qix_state, slither_trak_lr_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, slither_76489_0_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, qix_state, slither_trak_lr_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state, slither_76489_0_w))
 	MCFG_PIA_READPB_HANDLER(NOOP)
 
 	MCFG_DEVICE_MODIFY("pia2")
-	MCFG_PIA_READPA_HANDLER(READ8(qix_state, slither_trak_ud_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, slither_76489_1_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, qix_state, slither_trak_ud_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state, slither_76489_1_w))
 	MCFG_PIA_READPB_HANDLER(NOOP)
 
 	/* video hardware */

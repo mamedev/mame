@@ -1149,10 +1149,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(ampoker2_state::ampoker2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/2)        /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(ampoker2_map)
-	MCFG_CPU_IO_MAP(ampoker2_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ampoker2_state, nmi_line_pulse, 1536)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/2)        /* 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ampoker2_map)
+	MCFG_DEVICE_IO_MAP(ampoker2_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(ampoker2_state, nmi_line_pulse, 1536)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(200))   /* 200 ms, measured */
@@ -1175,8 +1175,8 @@ MACHINE_CONFIG_START(ampoker2_state::ampoker2)
 	MCFG_PALETTE_INIT_OWNER(ampoker2_state, ampoker2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/4)  /* 1.5 MHz, measured */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/4)  /* 1.5 MHz, measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

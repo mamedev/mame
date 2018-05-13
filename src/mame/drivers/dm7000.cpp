@@ -303,10 +303,10 @@ void dm7000_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(dm7000_state::dm7000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",PPC405GP, 252000000 / 10) // Should be PPC405D4?
+	MCFG_DEVICE_ADD("maincpu",PPC405GP, 252000000 / 10) // Should be PPC405D4?
 	// Slowed down 10 times in order to get normal response for now
 	MCFG_PPC_BUS_FREQUENCY(252000000)
-	MCFG_CPU_PROGRAM_MAP(dm7000_mem)
+	MCFG_DEVICE_PROGRAM_MAP(dm7000_mem)
 
 
 	/* video hardware */

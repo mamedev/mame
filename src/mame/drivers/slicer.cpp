@@ -83,51 +83,52 @@ void slicer_state::slicer_io(address_map &map)
 	map(0x0185, 0x0185).r("sasi_ctrl_in", FUNC(input_buffer_device::read));
 }
 
-static SLOT_INTERFACE_START( slicer_floppies )
-	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
-	SLOT_INTERFACE("8dsdd", FLOPPY_8_DSDD)
-SLOT_INTERFACE_END
+static void slicer_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 MACHINE_CONFIG_START(slicer_state::slicer)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(slicer_map)
-	MCFG_CPU_IO_MAP(slicer_io)
+	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(slicer_map)
+	MCFG_DEVICE_IO_MAP(slicer_io)
 
 	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
-	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232_1", rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232_2", rs232_port_device, write_txd))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(slicer_state, sio_out_w))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int0_w))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("rs232_1", rs232_port_device, write_txd))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232_2", rs232_port_device, write_txd))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, slicer_state, sio_out_w))
 
-	MCFG_RS232_PORT_ADD("rs232_1", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_a_w))
-	MCFG_RS232_PORT_ADD("rs232_2", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_b_w))
+	MCFG_DEVICE_ADD("rs232_1", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_a_w))
+	MCFG_DEVICE_ADD("rs232_2", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
 
 	MCFG_FD1797_ADD("fdc", XTAL(16'000'000)/2/8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int1_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq0_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int1_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", slicer_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", slicer_floppies, nullptr, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", slicer_floppies, nullptr, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", slicer_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("drivelatch", LS259, 0) // U29
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("sasi", scsi_port_device, write_sel))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("sasi", scsi_port_device, write_rst))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(slicer_state, drive_sel_w<3>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(slicer_state, drive_sel_w<2>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(slicer_state, drive_sel_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(slicer_state, drive_sel_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("fdc", fd1797_device, dden_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("sasi", scsi_port_device, write_sel))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("sasi", scsi_port_device, write_rst))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, slicer_state, drive_sel_w<3>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, slicer_state, drive_sel_w<2>))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, slicer_state, drive_sel_w<1>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, slicer_state, drive_sel_w<0>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("fdc", fd1797_device, dden_w))
 
 	MCFG_DEVICE_ADD("sasi", SCSI_PORT, 0)
 	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
-	MCFG_SCSI_BSY_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit3))
-	MCFG_SCSI_MSG_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit4))
-	MCFG_SCSI_CD_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit5))
-	MCFG_SCSI_REQ_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit6))
-	MCFG_SCSI_IO_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit7))
+	MCFG_SCSI_BSY_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit3))
+	MCFG_SCSI_MSG_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit4))
+	MCFG_SCSI_CD_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit5))
+	MCFG_SCSI_REQ_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit6))
+	MCFG_SCSI_IO_HANDLER(WRITELINE("sasi_ctrl_in", input_buffer_device, write_bit7))
 
 	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", "sasi")
 	MCFG_DEVICE_ADD("sasi_data_in", INPUT_BUFFER, 0)

@@ -1104,10 +1104,10 @@ static GFXDECODE_START( pinkiri8 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(pinkiri8_state::pinkiri8)
-	MCFG_CPU_ADD("maincpu",Z180,XTAL(32'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(pinkiri8_map)
-	MCFG_CPU_IO_MAP(pinkiri8_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pinkiri8_state, nmi_line_assert)
+	MCFG_DEVICE_ADD("maincpu",Z180,XTAL(32'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(pinkiri8_map)
+	MCFG_DEVICE_IO_MAP(pinkiri8_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pinkiri8_state, nmi_line_assert)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1124,9 +1124,9 @@ MACHINE_CONFIG_START(pinkiri8_state::pinkiri8)
 	MCFG_DEVICE_ADD("janshivdp", JANSHIVDP, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 

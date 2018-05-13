@@ -57,7 +57,8 @@ device_interpro_keyboard_port_interface::~device_interpro_keyboard_port_interfac
 #include "hle.h"
 #include "lle.h"
 
-SLOT_INTERFACE_START(interpro_keyboard_devices)
-	SLOT_INTERFACE("hle_en_us", INTERPRO_HLE_EN_US_KEYBOARD)
-	SLOT_INTERFACE("lle_en_us", INTERPRO_LLE_EN_US_KEYBOARD)
-SLOT_INTERFACE_END
+void interpro_keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("hle_en_us", INTERPRO_HLE_EN_US_KEYBOARD);
+	device.option_add("lle_en_us", INTERPRO_LLE_EN_US_KEYBOARD);
+}

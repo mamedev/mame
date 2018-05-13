@@ -770,14 +770,14 @@ INPUT_PORTS_END
  *************************************/
 
 MACHINE_CONFIG_START(atarisy4_state::atarisy4)
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", atarisy4_state,  vblank_int)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarisy4_state,  vblank_int)
 
-	MCFG_CPU_ADD("dsp0", TMS32010, 16000000)
-	MCFG_CPU_PROGRAM_MAP(dsp0_map)
-	MCFG_CPU_IO_MAP(dsp0_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(atarisy4_state, dsp0_bio_r))
+	MCFG_DEVICE_ADD("dsp0", TMS32010, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp0_map)
+	MCFG_DEVICE_IO_MAP(dsp0_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, atarisy4_state, dsp0_bio_r))
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -791,10 +791,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(atarisy4_state::airrace)
 	atarisy4(config);
 
-	MCFG_CPU_ADD("dsp1", TMS32010, 16000000)
-	MCFG_CPU_PROGRAM_MAP(dsp1_map)
-	MCFG_CPU_IO_MAP(dsp1_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(atarisy4_state, dsp1_bio_r))
+	MCFG_DEVICE_ADD("dsp1", TMS32010, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp1_map)
+	MCFG_DEVICE_IO_MAP(dsp1_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, atarisy4_state, dsp1_bio_r))
 
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy4_state,airrace)
 MACHINE_CONFIG_END

@@ -267,10 +267,10 @@ void embargo_state::machine_reset()
 MACHINE_CONFIG_START(embargo_state::embargo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 625000)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_DATA_MAP(main_data_map)
+	MCFG_DEVICE_ADD("maincpu", S2650, 625000)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_DATA_MAP(main_data_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

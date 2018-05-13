@@ -28,8 +28,8 @@ static INPUT_PORTS_START( powerstack )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(powerstack_state::powerstack)
-//  MCFG_CPU_ADD("maincpu", PPC604, 300'000'000) // PPC604E @ 300MHz
-//  MCFG_CPU_PROGRAM_MAP(mem_map)
+//  MCFG_DEVICE_ADD("maincpu", PPC604, 300'000'000) // PPC604E @ 300MHz
+//  MCFG_DEVICE_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 ROM_START( powerstk )

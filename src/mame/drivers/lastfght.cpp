@@ -553,9 +553,9 @@ void lastfght_state::machine_reset()
 MACHINE_CONFIG_START(lastfght_state::lastfght)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83044, 32000000/2)
-	MCFG_CPU_PROGRAM_MAP( lastfght_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastfght_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", H83044, 32000000/2)
+	MCFG_DEVICE_PROGRAM_MAP( lastfght_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lastfght_state, irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

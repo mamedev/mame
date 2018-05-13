@@ -397,8 +397,8 @@ WRITE8_MEMBER( hp9k_state::kbd_put )
 
 MACHINE_CONFIG_START(hp9k_state::hp9k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(hp9k_mem)
+	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hp9k_mem)
 
 	/* video hardware */
 

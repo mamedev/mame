@@ -63,11 +63,8 @@ public:
 	DECLARE_READ16_MEMBER(control_3_r);
 	DECLARE_READ16_MEMBER(control_4_r);
 	DECLARE_READ16_MEMBER(jongbou_inputs_r);
-	DECLARE_WRITE16_MEMBER(kyros_sound_w);
-	DECLARE_WRITE16_MEMBER(alpha68k_II_sound_w);
-	DECLARE_WRITE16_MEMBER(alpha68k_V_sound_w);
-	DECLARE_WRITE16_MEMBER(paddlema_soundlatch_w);
-	DECLARE_WRITE16_MEMBER(tnextspc_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(paddlema_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(tnextspc_soundlatch_w);
 	DECLARE_READ16_MEMBER(kyros_alpha_trigger_r);
 	DECLARE_READ16_MEMBER(alpha_II_trigger_r);
 	DECLARE_READ16_MEMBER(alpha_V_trigger_r);
@@ -113,7 +110,7 @@ public:
 	uint32_t screen_update_alpha68k_V_sb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(alpha68k_sound_nmi);
 	void alpha68k_flipscreen_w( int flip );
-	void alpha68k_V_video_bank_w( int bank );
+	DECLARE_WRITE8_MEMBER(alpha68k_V_video_bank_w);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e );
 	void draw_sprites_V( bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e, int fx_mask, int fy_mask, int sprite_mask );
 	void draw_sprites_I( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d, int yshift );

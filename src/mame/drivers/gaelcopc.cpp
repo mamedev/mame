@@ -71,8 +71,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelcopc_state::gaelcopc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Pentium4? */
-	MCFG_CPU_PROGRAM_MAP(gaelcopc_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 2000000000) /* Pentium4? */
+	MCFG_DEVICE_PROGRAM_MAP(gaelcopc_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

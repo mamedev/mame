@@ -171,8 +171,8 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(tk80bs_state::tk80bs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(1'000'000)) //unknown clock
-	MCFG_CPU_PROGRAM_MAP(tk80bs_mem)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(1'000'000)) //unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(tk80bs_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -188,8 +188,8 @@ MACHINE_CONFIG_START(tk80bs_state::tk80bs)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(tk80bs_state, port_a_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(tk80bs_state, port_b_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, tk80bs_state, port_a_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, tk80bs_state, port_b_r))
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(tk80bs_state, kbd_put))

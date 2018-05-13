@@ -130,7 +130,6 @@ r3000_device::r3000_device(const machine_config &mconfig, device_type type, cons
 		m_program_config_be("program", ENDIANNESS_BIG, 32, 29),
 		m_program_config_le("program", ENDIANNESS_LITTLE, 32, 29),
 		m_program(nullptr),
-		m_direct(nullptr),
 		m_chip_type(chiptype),
 		m_hasfpu(false),
 		m_endianness(ENDIANNESS_BIG),
@@ -214,7 +213,18 @@ void r3000_device::device_start()
 {
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	if(m_program->endianness() == ENDIANNESS_LITTLE)
+	{
+		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	}
+	else
+	{
+		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	}
 
 	// determine the cache sizes
 	switch (m_chip_type)
@@ -470,7 +480,7 @@ std::unique_ptr<util::disasm_interface> r3000_device::create_disassembler()
 
 inline uint32_t r3000_device::readop(offs_t pc)
 {
-	return m_direct->read_dword(pc);
+	return m_pr32(pc);
 }
 
 uint8_t r3000_device::readmem(offs_t offset)

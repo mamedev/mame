@@ -378,8 +378,8 @@ void pgm_022_025_state::killbld_mem(address_map &map)
 MACHINE_CONFIG_START(pgm_022_025_state::pgm_022_025)
 	pgmbase(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(killbld_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(killbld_mem)
 
 	MCFG_DEVICE_ADD("igs025", IGS025, 0)
 	MCFG_IGS025_SET_EXTERNAL_EXECUTE( pgm_022_025_state, igs025_to_igs022_callback )

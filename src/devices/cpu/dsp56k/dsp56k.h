@@ -192,7 +192,7 @@ struct dsp56k_core
 	void            (*output_pins_changed)(uint32_t pins);
 	cpu_device *device;
 	address_space *program;
-	direct_read_data<-1> *direct;
+	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *cache;
 	address_space *data;
 
 	uint16_t peripheral_ram[0x40];

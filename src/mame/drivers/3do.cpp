@@ -158,8 +158,8 @@ void _3do_state::machine_reset()
 MACHINE_CONFIG_START(_3do_state::_3do)
 
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7_BE, XTAL(50'000'000)/4 )
-	MCFG_CPU_PROGRAM_MAP( _3do_mem)
+	MCFG_DEVICE_ADD( "maincpu", ARM7_BE, XTAL(50'000'000)/4 )
+	MCFG_DEVICE_PROGRAM_MAP( _3do_mem)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -178,8 +178,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(_3do_state::_3do_pal)
 
 	/* Basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7_BE, XTAL(50'000'000)/4 )
-	MCFG_CPU_PROGRAM_MAP( _3do_mem)
+	MCFG_DEVICE_ADD("maincpu", ARM7_BE, XTAL(50'000'000)/4 )
+	MCFG_DEVICE_PROGRAM_MAP( _3do_mem)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

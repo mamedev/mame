@@ -219,9 +219,9 @@ PALETTE_INIT_MEMBER(poolshrk_state, poolshrk)
 MACHINE_CONFIG_START(poolshrk_state::poolshrk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 11055000 / 8) /* ? */
-	MCFG_CPU_PROGRAM_MAP(poolshrk_cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", poolshrk_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M6800, 11055000 / 8) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(poolshrk_cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", poolshrk_state,  irq0_line_assert)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -238,10 +238,9 @@ MACHINE_CONFIG_START(poolshrk_state::poolshrk)
 	MCFG_PALETTE_INIT_OWNER(poolshrk_state, poolshrk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(poolshrk)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, poolshrk_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

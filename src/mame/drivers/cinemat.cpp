@@ -975,16 +975,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(cinemat_state::cinemat_nojmi_4k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CCPU, MASTER_CLOCK/4)
+	MCFG_DEVICE_ADD("maincpu", CCPU, MASTER_CLOCK/4)
 	MCFG_CCPU_VECTOR_FUNC(ccpu_cpu_device::vector_delegate(FUNC(cinemat_state::cinemat_vector_callback), this))
-	MCFG_CCPU_EXTERNAL_FUNC(READ8(cinemat_state,joystick_read))
-	MCFG_CPU_PROGRAM_MAP(program_map_4k)
-	MCFG_CPU_DATA_MAP(data_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_CCPU_EXTERNAL_FUNC(READ8(*this, cinemat_state,joystick_read))
+	MCFG_DEVICE_PROGRAM_MAP(program_map_4k)
+	MCFG_DEVICE_DATA_MAP(data_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 7J on CCG-1
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(cinemat_state, coin_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(cinemat_state, vector_control_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, cinemat_state, coin_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, cinemat_state, vector_control_w))
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
@@ -999,37 +999,37 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_4k)
 	cinemat_nojmi_4k(config);
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CCPU_VECTOR_FUNC(ccpu_cpu_device::vector_delegate(FUNC(cinemat_state::cinemat_vector_callback), this))
-	MCFG_CCPU_EXTERNAL_FUNC(DEVREAD8("maincpu",ccpu_cpu_device,read_jmi))
+	MCFG_CCPU_EXTERNAL_FUNC(READ8("maincpu",ccpu_cpu_device,read_jmi))
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(cinemat_state::cinemat_nojmi_8k)
 	cinemat_nojmi_4k(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(program_map_8k)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(program_map_8k)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_8k)
 	cinemat_jmi_4k(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(program_map_8k)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(program_map_8k)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_16k)
 	cinemat_jmi_4k(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(program_map_16k)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(program_map_16k)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_32k)
 	cinemat_jmi_4k(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(program_map_32k)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(program_map_32k)
 MACHINE_CONFIG_END
 
 
@@ -1079,7 +1079,7 @@ MACHINE_CONFIG_START(cinemat_state::tailg)
 	tailg_sound(config);
 
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(cinemat_state, mux_select_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, cinemat_state, mux_select_w))
 MACHINE_CONFIG_END
 
 
@@ -1122,7 +1122,7 @@ MACHINE_CONFIG_START(cinemat_state::boxingb)
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_color)
 
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(cinemat_state, mux_select_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, cinemat_state, mux_select_w))
 MACHINE_CONFIG_END
 
 
@@ -1152,9 +1152,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cinemat_state::qb3)
 	cinemat_jmi_32k(config);
 	qb3_sound(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_DATA_MAP(data_map_qb3)
-	MCFG_CPU_IO_MAP(io_map_qb3)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_DATA_MAP(data_map_qb3)
+	MCFG_DEVICE_IO_MAP(io_map_qb3)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1120, 0, 780)
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_qb3color)

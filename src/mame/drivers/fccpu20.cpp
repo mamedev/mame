@@ -118,33 +118,40 @@ static INPUT_PORTS_START (cpu20)
 INPUT_PORTS_END
 
 /* Slot interfaces */
-static SLOT_INTERFACE_START(cpu20_vme_cards)
-	SLOT_INTERFACE("fccpu20", VME_FCCPU20)
-SLOT_INTERFACE_END
+static void cpu20_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu20", VME_FCCPU20);
+}
 
-static SLOT_INTERFACE_START(cpu21s_vme_cards)
-	SLOT_INTERFACE("fccpu21s", VME_FCCPU21S)
-SLOT_INTERFACE_END
+static void cpu21s_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu21s", VME_FCCPU21S);
+}
 
-static SLOT_INTERFACE_START(cpu21_vme_cards)
-	SLOT_INTERFACE("fccpu21", VME_FCCPU21)
-SLOT_INTERFACE_END
+static void cpu21_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu21", VME_FCCPU21);
+}
 
-static SLOT_INTERFACE_START(cpu21a_vme_cards)
-	SLOT_INTERFACE("fccpu21a", VME_FCCPU21A)
-SLOT_INTERFACE_END
+static void cpu21a_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu21a", VME_FCCPU21A);
+}
 
-static SLOT_INTERFACE_START(cpu21ya_vme_cards)
-	SLOT_INTERFACE("fccpu21ya", VME_FCCPU21YA)
-SLOT_INTERFACE_END
+static void cpu21ya_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu21ya", VME_FCCPU21YA);
+}
 
-static SLOT_INTERFACE_START(cpu21b_vme_cards)
-	SLOT_INTERFACE("fccpu21b", VME_FCCPU21B)
-SLOT_INTERFACE_END
+static void cpu21b_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu21b", VME_FCCPU21B);
+}
 
-static SLOT_INTERFACE_START(cpu21yb_vme_cards)
-	SLOT_INTERFACE("fccpu21yb", VME_FCCPU21YB)
-SLOT_INTERFACE_END
+static void cpu21yb_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu21yb", VME_FCCPU21YB);
+}
 
 /* Machine configurations */
 MACHINE_CONFIG_START(cpu20_state::cpu20)

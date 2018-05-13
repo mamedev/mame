@@ -77,8 +77,8 @@ void lynx_state::sound_cb()
 
 MACHINE_CONFIG_START(lynx_state::lynx)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
-	MCFG_CPU_PROGRAM_MAP(lynx_mem)
+	MCFG_DEVICE_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
+	MCFG_DEVICE_PROGRAM_MAP(lynx_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -95,8 +95,8 @@ MACHINE_CONFIG_START(lynx_state::lynx)
 	MCFG_PALETTE_INIT_OWNER(lynx_state, lynx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", LYNX_SND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("custom", LYNX_SND, 0)
 	MCFG_LYNX_SND_SET_TIMER(lynx_state, sound_cb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -118,9 +118,10 @@ static MACHINE_CONFIG_START( lynx2 )
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("mono")
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_REMOVE("lynx")
-	MCFG_SOUND_ADD("custom", LYNX2_SND, 0)
+	MCFG_DEVICE_ADD("custom", LYNX2_SND, 0)
 	MCFG_LYNX_SND_SET_TIMER(lynx_state, sound_cb)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)

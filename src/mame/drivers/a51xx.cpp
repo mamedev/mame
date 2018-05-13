@@ -124,9 +124,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(a51xx_state::a5120)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(a5120_mem)
-	MCFG_CPU_IO_MAP(a5120_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(a5120_mem)
+	MCFG_DEVICE_IO_MAP(a5120_io)
 
 
 	/* video hardware */
@@ -147,9 +147,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a51xx_state::a5130)
 	a5120(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(a5130_mem)
-	MCFG_CPU_IO_MAP(a5130_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(a5130_mem)
+	MCFG_DEVICE_IO_MAP(a5130_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(a51xx_state,a5130)
 

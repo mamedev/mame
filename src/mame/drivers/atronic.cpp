@@ -65,10 +65,10 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(atronic_state::atronic)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, 6000000)
-	MCFG_CPU_PROGRAM_MAP(atronic_map)
-	MCFG_CPU_IO_MAP(atronic_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", atronic_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z180, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(atronic_map)
+	MCFG_DEVICE_IO_MAP(atronic_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atronic_state,  irq0_line_hold)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

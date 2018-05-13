@@ -236,9 +236,9 @@ void d110_state::d110_io(address_map &map)
 }
 
 MACHINE_CONFIG_START(d110_state::d110)
-	MCFG_CPU_ADD( "maincpu", P8098, XTAL(12'000'000) )
-	MCFG_CPU_PROGRAM_MAP( d110_map )
-	MCFG_CPU_IO_MAP( d110_io )
+	MCFG_DEVICE_ADD( "maincpu", P8098, XTAL(12'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP( d110_map )
+	MCFG_DEVICE_IO_MAP( d110_io )
 
 // Battery-backed main ram
 	MCFG_RAM_ADD( "ram" )

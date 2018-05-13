@@ -394,9 +394,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(redalert_state::redalert)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(redalert_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(redalert_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
 	redalert_video(config);
@@ -408,9 +408,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(redalert_state::ww3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(ww3_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(ww3_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
 	ww3_video(config);
@@ -422,9 +422,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(redalert_state::panther)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(panther_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(panther_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
 	panther_video(config);
@@ -436,9 +436,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(redalert_state::demoneye)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(demoneye_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(demoneye_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", redalert_state,  redalert_vblank_interrupt)
 
 	/* video hardware */
 	demoneye_video(config);

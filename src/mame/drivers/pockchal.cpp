@@ -97,9 +97,9 @@ void pockchalv1_state::machine_reset()
 MACHINE_CONFIG_START(pockchalv1_state::pockchalv1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMP90845,8000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(pockchalv1_map)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", pockchalv1_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", TMP90845,8000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(pockchalv1_map)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pockchalv1_state,  irq0_line_hold)
 
 	// wrong, it's a b&w / greyscale thing
 	MCFG_PALETTE_ADD("palette", 0x100)

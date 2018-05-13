@@ -55,13 +55,13 @@ void strkzn_state::light_io(address_map &map)
 }
 
 MACHINE_CONFIG_START(strkzn_state::strkzn)
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(main_mem)
-	MCFG_CPU_IO_MAP(main_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(main_mem)
+	MCFG_DEVICE_IO_MAP(main_io)
 
-	MCFG_CPU_ADD("lightcpu", I80188, 10000000)
-	MCFG_CPU_PROGRAM_MAP(light_mem)
-	MCFG_CPU_IO_MAP(light_io)
+	MCFG_DEVICE_ADD("lightcpu", I80188, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(light_mem)
+	MCFG_DEVICE_IO_MAP(light_io)
 MACHINE_CONFIG_END
 
 INPUT_PORTS_START( strkzn )

@@ -199,16 +199,17 @@ void mzr8105_state::mzr8105_mem(address_map &map)
 static INPUT_PORTS_START (mzr8105)
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(mzr8105_vme_cards)
-	SLOT_INTERFACE("mzr8300", VME_MZR8300)
-SLOT_INTERFACE_END
+static void mzr8105_vme_cards(device_slot_interface &device)
+{
+	device.option_add("mzr8300", VME_MZR8300);
+}
 
 /*
  * Machine configuration
  */
 MACHINE_CONFIG_START(mzr8105_state::mzr8105)
-	MCFG_CPU_ADD ("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP (mzr8105_mem)
+	MCFG_DEVICE_ADD ("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP (mzr8105_mem)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_BUS_OWNER_SPACES()
 	MCFG_VME_SLOT_ADD ("vme", 1, mzr8105_vme_cards, "mzr8300")

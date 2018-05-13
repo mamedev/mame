@@ -196,8 +196,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(klax_state::klax)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(klax_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(klax_map)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -221,12 +221,12 @@ MACHINE_CONFIG_START(klax_state::klax)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(klax_state, screen_update_klax)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(klax_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, klax_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/4/4, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, ATARI_CLOCK_14MHz/4/4, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -238,19 +238,19 @@ void klax_state::bootleg_sound_map(address_map &map)
 MACHINE_CONFIG_START(klax_state::klax2bl)
 	klax(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(klax2bl_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(klax2bl_map)
 
 	MCFG_DEVICE_REMOVE("oki") // no 6295 here
 
-	MCFG_CPU_ADD("audiocpu", Z80, 6000000) /* ? */
-	MCFG_CPU_PROGRAM_MAP(bootleg_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 6000000) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", klax2bl)
 
 	// guess, probably something like this
-	MCFG_SOUND_ADD("msm", MSM5205, 375000)    /* ? */
-//  MCFG_MSM5205_VCLK_CB(WRITELINE(klax_state, m5205_int1)) /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 375000)    /* ? */
+//  MCFG_MSM5205_VCLK_CB(WRITELINE(*this, klax_state, m5205_int1)) /* interrupt function */
 //  MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

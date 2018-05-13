@@ -119,7 +119,6 @@ public:
 	uint32_t screen_update_system1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_system2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_system2_rowscroll(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mcu_irq_assert);
 	TIMER_DEVICE_CALLBACK_MEMBER(soundirq_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_t0_callback);
 	DECLARE_WRITE8_MEMBER(system1_videoram_bank_w);

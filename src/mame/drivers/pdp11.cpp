@@ -355,9 +355,9 @@ void pdp11_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(pdp11_state::pdp11)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, XTAL(4'000'000)) // Need proper CPU here
+	MCFG_DEVICE_ADD("maincpu",T11, XTAL(4'000'000)) // Need proper CPU here
 	MCFG_T11_INITIAL_MODE(6 << 13)
-	MCFG_CPU_PROGRAM_MAP(pdp11_mem)
+	MCFG_DEVICE_PROGRAM_MAP(pdp11_mem)
 
 
 	/* video hardware */
@@ -376,9 +376,9 @@ MACHINE_CONFIG_START(pdp11_state::pdp11qb)
 	pdp11(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11qb)
 
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_T11_INITIAL_MODE(0 << 13)
-	MCFG_CPU_PROGRAM_MAP(pdp11qb_mem)
+	MCFG_DEVICE_PROGRAM_MAP(pdp11qb_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */

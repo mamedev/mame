@@ -566,7 +566,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(atvtrack_state::atvtrack)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4LE, ATV_CPU_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", SH4LE, ATV_CPU_CLOCK)
 	MCFG_SH4_MD0(1)
 	MCFG_SH4_MD1(1)
 	MCFG_SH4_MD2(0)
@@ -577,11 +577,11 @@ MACHINE_CONFIG_START(atvtrack_state::atvtrack)
 	MCFG_SH4_MD7(1)
 	MCFG_SH4_MD8(0)
 	MCFG_SH4_CLOCK(ATV_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(atvtrack_main_map)
-	MCFG_CPU_IO_MAP(atvtrack_main_port)
+	MCFG_DEVICE_PROGRAM_MAP(atvtrack_main_map)
+	MCFG_DEVICE_IO_MAP(atvtrack_main_port)
 	MCFG_CPU_FORCE_NO_DRC()
 
-	MCFG_CPU_ADD("subcpu", SH4LE, ATV_CPU_CLOCK)
+	MCFG_DEVICE_ADD("subcpu", SH4LE, ATV_CPU_CLOCK)
 	MCFG_SH4_MD0(1)
 	MCFG_SH4_MD1(1)
 	MCFG_SH4_MD2(0)
@@ -592,8 +592,8 @@ MACHINE_CONFIG_START(atvtrack_state::atvtrack)
 	MCFG_SH4_MD7(1)
 	MCFG_SH4_MD8(0)
 	MCFG_SH4_CLOCK(ATV_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(atvtrack_sub_map)
-	MCFG_CPU_IO_MAP(atvtrack_sub_port)
+	MCFG_DEVICE_PROGRAM_MAP(atvtrack_sub_map)
+	MCFG_DEVICE_IO_MAP(atvtrack_sub_port)
 	MCFG_CPU_FORCE_NO_DRC()
 
 	/* video hardware */
@@ -609,9 +609,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(smashdrv_state::smashdrv)
 	atvtrack(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(smashdrv_main_map)
-	MCFG_CPU_IO_MAP(smashdrv_main_port)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(smashdrv_main_map)
+	MCFG_DEVICE_IO_MAP(smashdrv_main_port)
 
 MACHINE_CONFIG_END
 

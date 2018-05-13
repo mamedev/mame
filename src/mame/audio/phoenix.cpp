@@ -48,10 +48,10 @@
 
 
 
-DEFINE_DEVICE_TYPE(PHOENIX, phoenix_sound_device, "phoenix_sound", "Phoenix Custom Sound")
+DEFINE_DEVICE_TYPE(PHOENIX_SOUND, phoenix_sound_device, "phoenix_sound", "Phoenix Custom Sound")
 
 phoenix_sound_device::phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PHOENIX, tag, owner, clock)
+	: device_t(mconfig, PHOENIX_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 {
 }
@@ -341,7 +341,7 @@ static const discrete_mixer_desc phoenix_mixer =
 #define PHOENIX_EFFECT_4_SND        0
 
 
-DISCRETE_SOUND_START(phoenix)
+DISCRETE_SOUND_START(phoenix_discrete)
 	/************************************************/
 	/* Input register mapping for phoenix           */
 	/************************************************/

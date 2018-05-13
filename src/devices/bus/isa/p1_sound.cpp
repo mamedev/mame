@@ -31,22 +31,22 @@ DEFINE_DEVICE_TYPE(P1_SOUND, p1_sound_device, "p1_sound", "Poisk-1 sound card (B
 
 MACHINE_CONFIG_START(p1_sound_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("midi", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE(":isa", isa8_device, irq3_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(":isa", isa8_device, irq3_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("midi", i8251_device, write_rxd))
+	MCFG_MIDI_RX_HANDLER(WRITELINE("midi", i8251_device, write_rxd))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_DEVICE_ADD("d14", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(12'500'000)/10)
 //  sampler at 10 KHz
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(p1_sound_device, sampler_sync))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, p1_sound_device, sampler_sync))
 	MCFG_PIT8253_CLK1(XTAL(12'500'000)/10)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("midi", i8251_device, write_txc))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("midi", i8251_device, write_txc))
 	MCFG_PIT8253_CLK2(XTAL(12'500'000)/10)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("midi", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("midi", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("d16", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(12'500'000)/10)
@@ -64,12 +64,12 @@ MACHINE_CONFIG_START(p1_sound_device::device_add_mconfig)
 	MCFG_PIT8253_CLK2(XTAL(12'500'000)/10)
 //  MCFG_PIT8253_OUT2_HANDLER(XXX)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_FILTER_RC_ADD("filter", 0)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("filter", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

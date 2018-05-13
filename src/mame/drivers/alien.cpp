@@ -92,8 +92,8 @@ void alien_state::machine_reset()
 
 MACHINE_CONFIG_START(alien_state::alien)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4LE, MASTER_CLOCK)    /* 200MHz */
-	MCFG_CPU_PROGRAM_MAP(alien_map)
+	MCFG_DEVICE_ADD("maincpu", SH4LE, MASTER_CLOCK)    /* 200MHz */
+	MCFG_DEVICE_PROGRAM_MAP(alien_map)
 	MCFG_CPU_FORCE_NO_DRC()
 
 	/* video hardware */
@@ -108,7 +108,7 @@ MACHINE_CONFIG_START(alien_state::alien)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 MACHINE_CONFIG_END
 

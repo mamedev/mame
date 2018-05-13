@@ -647,19 +647,20 @@ void cpu30_state::update_irq_to_maincpu()
 	}
 }
 
-static SLOT_INTERFACE_START(fccpu30_vme_cards)
-	SLOT_INTERFACE("fcisio", VME_FCISIO1)
-	SLOT_INTERFACE("fcscsi", VME_FCSCSI1)
-SLOT_INTERFACE_END
+static void fccpu30_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fcisio", VME_FCISIO1);
+	device.option_add("fcscsi", VME_FCSCSI1);
+}
 
 /*
  * Machine configuration
  */
 MACHINE_CONFIG_START(cpu30_state::cpu30)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68030, XTAL(25'000'000))
-	MCFG_CPU_PROGRAM_MAP (cpu30_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("fga002", fga002_device, iack)
+	MCFG_DEVICE_ADD ("maincpu", M68030, XTAL(25'000'000))
+	MCFG_DEVICE_PROGRAM_MAP (cpu30_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("fga002", fga002_device, iack)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_VME_DEVICE_ADD("vme")
@@ -688,70 +689,70 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 
 	MCFG_DUSCC68562_ADD("duscc", DUSCC_CLOCK, 0, 0, 0, 0 )
 	/* Port 1 on Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
+	MCFG_DUSCC_OUT_TXDB_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
 	/* Port 4 on Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P4_TAG, rs232_port_device, write_rts))
+	MCFG_DUSCC_OUT_TXDA_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRA_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSA_CB(WRITELINE(RS232P4_TAG, rs232_port_device, write_rts))
 	/* DUSCC1 interrupt signal REQN is connected to LOCAL IRQ4 of the FGA-002 and level is programmable */
-	MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE("fga002", fga002_device, lirq4_w))
+	MCFG_DUSCC_OUT_INT_CB(WRITELINE("fga002", fga002_device, lirq4_w))
 
 	MCFG_DUSCC68562_ADD("duscc2", DUSCC_CLOCK, 0, 0, 0, 0 )
 	/* Port 2 on Port A */
-	MCFG_DUSCC_OUT_TXDA_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRA_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSA_CB(DEVWRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
+	MCFG_DUSCC_OUT_TXDA_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRA_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSA_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
 	/* Port 3 on Port B */
-	MCFG_DUSCC_OUT_TXDB_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_txd))
-	MCFG_DUSCC_OUT_DTRB_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
-	MCFG_DUSCC_OUT_RTSB_CB(DEVWRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
+	MCFG_DUSCC_OUT_TXDB_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_txd))
+	MCFG_DUSCC_OUT_DTRB_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
+	MCFG_DUSCC_OUT_RTSB_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
 	/* DUSCC2 interrupt signal REQN is connected to LOCAL IRQ5 of the FGA-002 and level is programmable */
-	MCFG_DUSCC_OUT_INT_CB(DEVWRITELINE("fga002", fga002_device, lirq5_w))
+	MCFG_DUSCC_OUT_INT_CB(WRITELINE("fga002", fga002_device, lirq5_w))
 
-	MCFG_RS232_PORT_ADD (RS232P1_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, ctsb_w))
+	MCFG_DEVICE_ADD (RS232P1_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc", duscc68562_device, ctsb_w))
 
-	MCFG_RS232_PORT_ADD (RS232P2_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, ctsa_w))
+	MCFG_DEVICE_ADD (RS232P2_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc2", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc2", duscc68562_device, ctsa_w))
 
-	MCFG_RS232_PORT_ADD (RS232P3_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc2", duscc68562_device, ctsb_w))
+	MCFG_DEVICE_ADD (RS232P3_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc2", duscc68562_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc2", duscc68562_device, ctsb_w))
 
-	MCFG_RS232_PORT_ADD (RS232P4_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, ctsa_w))
+	MCFG_DEVICE_ADD (RS232P4_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("duscc", duscc68562_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("duscc", duscc68562_device, ctsa_w))
 
 	/* PIT Parallel Interface and Timer device, assumed strapped for on board clock */
 	MCFG_DEVICE_ADD ("pit1", PIT68230, XTAL(16'000'000) / 2) // The PIT clock is not verified on schema but reversed from behaviour
-	MCFG_PIT68230_PA_INPUT_CB(READ8(cpu30_state, rotary_rd))
-	MCFG_PIT68230_PB_INPUT_CB(READ8(cpu30_state, flop_dmac_r))
-	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(cpu30_state, flop_dmac_w))
-	MCFG_PIT68230_PC_INPUT_CB(READ8(cpu30_state, pit1c_r))
-	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(cpu30_state, pit1c_w))
-//  MCFG_PIT68230_TIMER_IRQ_CB(DEVWRITELINE("fga002", fga002_device, lirq2_w)) // The timer interrupt seems to silence the terminal interrupt, needs invectigation
+	MCFG_PIT68230_PA_INPUT_CB(READ8(*this, cpu30_state, rotary_rd))
+	MCFG_PIT68230_PB_INPUT_CB(READ8(*this, cpu30_state, flop_dmac_r))
+	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(*this, cpu30_state, flop_dmac_w))
+	MCFG_PIT68230_PC_INPUT_CB(READ8(*this, cpu30_state, pit1c_r))
+	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(*this, cpu30_state, pit1c_w))
+//  MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE("fga002", fga002_device, lirq2_w)) // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
 	MCFG_DEVICE_ADD ("pit2", PIT68230, XTAL(16'000'000) / 2) // Th PIT clock is not verified on schema but reversed from behaviour
-	MCFG_PIT68230_PB_INPUT_CB(READ8(cpu30_state, board_mem_id_rd))
-	MCFG_PIT68230_PA_INPUT_CB(READ8(cpu30_state, pit2a_r))
-	MCFG_PIT68230_PA_OUTPUT_CB(WRITE8(cpu30_state, pit2a_w))
-	MCFG_PIT68230_PC_INPUT_CB(READ8(cpu30_state, pit2c_r))
-	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(cpu30_state, pit2c_w))
-//  MCFG_PIT68230_TIMER_IRQ_CB(DEVWRITELINE("fga002", fga002_device, lirq3_w)) // The timer interrupt seems to silence the terminal interrupt, needs invectigation
+	MCFG_PIT68230_PB_INPUT_CB(READ8(*this, cpu30_state, board_mem_id_rd))
+	MCFG_PIT68230_PA_INPUT_CB(READ8(*this, cpu30_state, pit2a_r))
+	MCFG_PIT68230_PA_OUTPUT_CB(WRITE8(*this, cpu30_state, pit2a_w))
+	MCFG_PIT68230_PC_INPUT_CB(READ8(*this, cpu30_state, pit2c_r))
+	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(*this, cpu30_state, pit2c_w))
+//  MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE("fga002", fga002_device, lirq3_w)) // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
 	/* FGA-002, Force Gate Array */
 	MCFG_FGA002_ADD("fga002", 0)
-	MCFG_FGA002_OUT_INT_CB(WRITELINE(cpu30_state, fga_irq_callback))
-	MCFG_FGA002_OUT_LIACK4_CB(DEVREAD8("duscc",  duscc_device, iack))
-	MCFG_FGA002_OUT_LIACK5_CB(DEVREAD8("duscc2",  duscc_device, iack))
+	MCFG_FGA002_OUT_INT_CB(WRITELINE(*this, cpu30_state, fga_irq_callback))
+	MCFG_FGA002_OUT_LIACK4_CB(READ8("duscc",  duscc_device, iack))
+	MCFG_FGA002_OUT_LIACK5_CB(READ8("duscc2",  duscc_device, iack))
 
 	// RTC
 	MCFG_DEVICE_ADD("rtc", RTC72423, XTAL(32'768)) // Fake crystal value, the 72423 uses it own internal crystal
-	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("fga002", fga002_device, lirq0_w))
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("fga002", fga002_device, lirq0_w))
 
 	// dual ported ram
 	MCFG_RAM_ADD(RAM_TAG)

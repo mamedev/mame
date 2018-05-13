@@ -235,8 +235,8 @@ void taitoo_state::machine_start()
 
 MACHINE_CONFIG_START(taitoo_state::parentj)
 
-	MCFG_CPU_ADD("maincpu", M68000,12000000 )       /*?? MHz */
-	MCFG_CPU_PROGRAM_MAP(parentj_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,12000000 )       /*?? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(parentj_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitoo_state, parentj_interrupt, "screen", 0, 1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -260,9 +260,9 @@ MACHINE_CONFIG_START(taitoo_state::parentj)
 	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 2000000) /*?? MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 2000000) /*?? MHz */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(0, "mono",  0.25)

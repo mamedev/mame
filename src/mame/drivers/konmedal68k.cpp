@@ -294,8 +294,8 @@ void konmedal68k_state::machine_reset()
 
 MACHINE_CONFIG_START(konmedal68k_state::kzaurus)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(33'868'800)/4 )    // 33.8688 MHz crystal verified on PCB
-	MCFG_CPU_PROGRAM_MAP(kzaurus_main)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(33'868'800)/4 )    // 33.8688 MHz crystal verified on PCB
+	MCFG_DEVICE_PROGRAM_MAP(kzaurus_main)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konmedal68k_state, scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -319,7 +319,8 @@ MACHINE_CONFIG_START(konmedal68k_state::kzaurus)
 	MCFG_K055555_ADD("k055555")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(33'868'800)/2) // 33.8688 MHz xtal verified on PCB
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

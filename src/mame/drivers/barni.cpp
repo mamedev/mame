@@ -64,14 +64,14 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(barni_state::barni)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(4'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(4'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
 
-	MCFG_CPU_ADD("subcpu", MC6809E, XTAL(4'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(subcpu_map)
+	MCFG_DEVICE_ADD("subcpu", MC6809E, XTAL(4'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(subcpu_map)
 
-	MCFG_CPU_ADD("audiocpu", M6802, 4000000) // uses own XTAL, but what is the value?
-	MCFG_CPU_PROGRAM_MAP(audiocpu_map)
+	MCFG_DEVICE_ADD("audiocpu", M6802, 4000000) // uses own XTAL, but what is the value?
+	MCFG_DEVICE_PROGRAM_MAP(audiocpu_map)
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT()
