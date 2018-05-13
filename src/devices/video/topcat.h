@@ -11,8 +11,8 @@
 #define MCFG_TOPCAT_FB_HEIGHT(_pixels) \
 	downcast<topcat_device &>(*device).set_fb_height(_pixels);
 
-#define MCFG_TOPCAT_PLANES(_planes) \
-	downcast<topcat_device &>(*device).set_planes(_planes);
+#define MCFG_TOPCAT_PLANE(_plane) \
+	downcast<topcat_device &>(*device).set_plane(_plane);
 
 class topcat_device : public device_t
 {
@@ -21,7 +21,7 @@ public:
 
 	void set_fb_width(int _pixels) { m_fb_width = _pixels; }
 	void set_fb_height(int _pixels) { m_fb_height = _pixels; }
-	void set_planes(int _planes) { m_planes = _planes; }
+	void set_plane(int _plane) { m_plane = _plane; }
 
 	TIMER_CALLBACK_MEMBER(cursor_callback);
 
@@ -63,8 +63,8 @@ private:
 		TOPCAT_REG_VERT_RETRACE_INTRQ=0x24,
 		TOPCAT_REG_WMOVE_INTRQ=0x26,
 		TOPCAT_REG_DISPLAY_PLANE_ENABLE=0x40,
-		TOPCAT_REG_DISPLAY_WRITE_ENABLE_PLANE=0x44,
-		TOPCAT_REG_DISPLAY_READ_ENABLE_PLANE=0x46,
+		TOPCAT_REG_WRITE_ENABLE_PLANE=0x44,
+		TOPCAT_REG_READ_ENABLE_PLANE=0x46,
 		TOPCAT_REG_FB_WRITE_ENABLE=0x48,
 		TOPCAT_REG_START_WMOVE=0x4e,
 		TOPCAT_REG_ENABLE_BLINK_PLANES=0x50,
@@ -84,10 +84,10 @@ private:
 	};
 
 	void window_move(void);
-	void execute_rule(uint16_t src, replacement_rule_t rule, uint16_t *dst);
+	void execute_rule(bool src, replacement_rule_t rule, bool *dst);
 
 	void update_cursor(int x, int y, uint8_t ctrl, uint8_t width);
-	std::vector<uint16_t> m_vram;
+	std::vector<bool> m_vram;
 	uint32_t m_palette[2];
 
 	uint8_t m_vblank;
@@ -118,8 +118,11 @@ private:
 
 	int m_fb_width;
 	int m_fb_height;
-	int m_planes;
-	//int m_plane_mask;
+	int m_plane;
+
+	bool m_read_enable;
+	bool m_write_enable;
+	bool m_fb_enable;
 };
 
 DECLARE_DEVICE_TYPE(TOPCAT, topcat_device)

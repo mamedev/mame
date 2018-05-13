@@ -31,21 +31,30 @@ void topcat_device::device_start()
 
 void topcat_device::device_reset()
 {
-	memset(&m_vram[0], 0, VRAM_SIZE);
-
-	m_palette[1] = rgb_t(255, 255, 255);
-	m_palette[0] = rgb_t(0, 0, 0);
+	m_vram.clear();
 	m_pixel_replacement_rule = TOPCAT_REPLACE_RULE_SRC;
 }
 
 READ16_MEMBER(topcat_device::vram_r)
 {
-	return m_vram[offset];
+	uint16_t ret = 0;
+
+	if (mem_mask & (1 << m_plane))
+		ret |= m_vram[offset*2+1] ? (1 << m_plane) : 0;
+
+	if (mem_mask & (0x100 << m_plane))
+		ret |= m_vram[offset*2] ? (0x100 << m_plane) : 0;
+
+	return ret;
 }
 
 WRITE16_MEMBER(topcat_device::vram_w)
 {
-	COMBINE_DATA(&m_vram[offset]);
+	if (mem_mask & (1 << m_plane))
+		m_vram[offset*2+1] = !!(data & (1 << m_plane));
+
+	if (mem_mask & (0x100 << m_plane))
+		m_vram[offset*2] = !!(data & (0x100 << m_plane));
 }
 
 TIMER_CALLBACK_MEMBER(topcat_device::cursor_callback)
@@ -55,9 +64,9 @@ TIMER_CALLBACK_MEMBER(topcat_device::cursor_callback)
 
 	if (m_cursor_ctrl & 0x02) {
 		for(int i = 0; i < m_cursor_width; i++) {
-			m_vram[(m_cursor_y_pos * m_fb_width/2) + (m_cursor_x_pos + i)/2] = m_cursor_state ? 0xffff : 0;
-			m_vram[((m_cursor_y_pos-1) * m_fb_width/2) + (m_cursor_x_pos + i)/2] = m_cursor_state ? 0xffff : 0;
-			m_vram[((m_cursor_y_pos-2) * m_fb_width/2) + (m_cursor_x_pos + i)/2] = m_cursor_state ? 0xffff : 0;
+			m_vram[m_cursor_y_pos * m_fb_width + m_cursor_x_pos + i] = m_cursor_state;
+			m_vram[((m_cursor_y_pos - 1) * m_fb_width) + (m_cursor_x_pos + i)] = m_cursor_state;
+			m_vram[((m_cursor_y_pos - 2) * m_fb_width) + (m_cursor_x_pos + i)] = m_cursor_state;
 		}
 	}
 }
@@ -65,9 +74,9 @@ TIMER_CALLBACK_MEMBER(topcat_device::cursor_callback)
 void topcat_device::update_cursor(int x, int y, uint8_t ctrl, uint8_t width)
 {
 	for(int i = 0; i < m_cursor_width; i++) {
-		m_vram[(m_cursor_y_pos * m_fb_width/2) + (m_cursor_x_pos + i)/2] = 0;
-		m_vram[((m_cursor_y_pos-1) * m_fb_width/2) + (m_cursor_x_pos + i)/2] = 0;
-		m_vram[((m_cursor_y_pos-2) * m_fb_width/2) + (m_cursor_x_pos + i)/2] = 0;
+		m_vram[(m_cursor_y_pos * m_fb_width) + (m_cursor_x_pos + i)] = 0;
+		m_vram[((m_cursor_y_pos-1) * m_fb_width) + (m_cursor_x_pos + i)] = 0;
+		m_vram[((m_cursor_y_pos-2) * m_fb_width) + (m_cursor_x_pos + i)] = 0;
 	}
 	m_cursor_x_pos = x;
 	m_cursor_y_pos = y;
@@ -75,23 +84,23 @@ void topcat_device::update_cursor(int x, int y, uint8_t ctrl, uint8_t width)
 	m_cursor_width = width;
 }
 
-void topcat_device::execute_rule(uint16_t src, replacement_rule_t rule, uint16_t *dst)
+void topcat_device::execute_rule(bool src, replacement_rule_t rule, bool *dst)
 {
 	switch(rule & 0x0f) {
 	case TOPCAT_REPLACE_RULE_CLEAR:
-		*dst = 0;
+		*dst = false;
 		break;
 	case TOPCAT_REPLACE_RULE_SRC_AND_DST:
 		*dst &= src;
 		break;
 	case TOPCAT_REPLACE_RULE_SRC_AND_NOT_DST:
-		*dst = ~(*dst) & src;
+		*dst = !(*dst) & src;
 		break;
 	case TOPCAT_REPLACE_RULE_SRC:
 		*dst = src;
 		break;
 	case TOPCAT_REPLACE_RULE_NOT_SRC_AND_DST:
-		*dst &= ~src;
+		*dst &= !src;
 		break;
 	case TOPCAT_REPLACE_RULE_NOP:
 		break;
@@ -102,28 +111,28 @@ void topcat_device::execute_rule(uint16_t src, replacement_rule_t rule, uint16_t
 		*dst |= src;
 		break;
 	case TOPCAT_REPLACE_RULE_NOT_SRC_AND_NOT_DST:
-		*dst = ~(*dst) & ~src;
+		*dst = !(*dst) & !src;
 		break;
 	case TOPCAT_REPLACE_RULE_NOT_SRC_XOR_DST:
-		*dst ^= ~src;
+		*dst ^= !src;
 		break;
 	case TOPCAT_REPLACE_RULE_NOT_DST:
-		*dst ^= 0xffff;
+		*dst ^= true;
 		break;
 	case TOPCAT_REPLACE_RULE_SRC_OR_NOT_DST:
-		*dst = src | ~(*dst);
+		*dst = src | !(*dst);
 		break;
 	case TOPCAT_REPLACE_RULE_NOT_SRC:
-		*dst = ~src;
+		*dst = !src;
 		break;
 	case TOPCAT_REPLACE_RULE_NOT_SRC_OR_DST:
-		*dst = ~src | *dst;
+		*dst = !src | *dst;
 		break;
 	case TOPCAT_REPLACE_RULE_NOT_SRC_OR_NOT_DST:
-		*dst = ~src | ~(*dst);
+		*dst = !src | !(*dst);
 		break;
 	case TOPCAT_REPLACE_RULE_SET:
-		*dst = 0xffff;
+		*dst = true;
 		break;
 
 	}
@@ -133,10 +142,11 @@ void topcat_device::window_move(void)
 {
 	for(int line = 0; line < m_block_mover_pixel_height; line++) {
 		for(int column = 0; column < m_block_mover_pixel_width; column++) {
-			uint16_t sdata = m_vram[((m_source_y_pixel + line) * m_fb_width + (m_source_x_pixel + column))/2];
-			uint16_t *ddata = &m_vram[((m_dst_y_pixel + line) * m_fb_width + (m_dst_x_pixel + column))/2];
-			execute_rule(sdata, (replacement_rule_t)((m_move_replacement_rule >> 4) & 0x0f), ddata);
-			execute_rule(sdata, (replacement_rule_t)(m_move_replacement_rule & 0x0f), ddata);
+			bool sdata = m_vram[((m_source_y_pixel + line) * m_fb_width + (m_source_x_pixel + column))];
+			bool ddata = m_vram[((m_dst_y_pixel + line) * m_fb_width + (m_dst_x_pixel + column))];
+			execute_rule(sdata, (replacement_rule_t)((m_move_replacement_rule >> 4) & 0x0f), &ddata);
+			execute_rule(sdata, (replacement_rule_t)(m_move_replacement_rule & 0x0f), &ddata);
+			m_vram[((m_dst_y_pixel + line) * m_fb_width + (m_dst_x_pixel + column))] = ddata;
 		}
 	}
 }
@@ -145,6 +155,9 @@ READ16_MEMBER(topcat_device::ctrl_r)
 {
 
 	uint16_t ret = 0xffff;
+
+	if (!m_read_enable)
+		return 0;
 
 	switch(offset) {
 	case TOPCAT_REG_VBLANK:
@@ -162,10 +175,10 @@ READ16_MEMBER(topcat_device::ctrl_r)
 	case TOPCAT_REG_DISPLAY_PLANE_ENABLE:
 		ret = m_display_enable_planes;
 		break;
-	case TOPCAT_REG_DISPLAY_WRITE_ENABLE_PLANE:
+	case TOPCAT_REG_WRITE_ENABLE_PLANE:
 		ret = m_write_enable_plane;
 		break;
-	case TOPCAT_REG_DISPLAY_READ_ENABLE_PLANE:
+	case TOPCAT_REG_READ_ENABLE_PLANE:
 		ret = m_read_enable_plane;
 		break;
 	case TOPCAT_REG_FB_WRITE_ENABLE:
@@ -216,14 +229,28 @@ READ16_MEMBER(topcat_device::ctrl_r)
 
 WRITE16_MEMBER(topcat_device::ctrl_w)
 {
-	LOG("ctrl_w: %02X = %02X\n", offset, data);
+	LOG("PLANE %d: ctrl_w: %02X = %02X\n", m_plane, offset, data);
+
 	if (mem_mask == 0xff00)
 		data >>= 8;
 
 	if (mem_mask == 0x00ff) {
-		logerror("%s: write ignored\n", __FUNCTION__);
+		logerror("%s: write ignored: %d\n", __FUNCTION__, offset);
 		return;
 	}
+
+	if (offset == TOPCAT_REG_WRITE_ENABLE_PLANE) {
+		m_write_enable = data & m_plane;
+		return;
+	}
+
+	if (offset == TOPCAT_REG_READ_ENABLE_PLANE) {
+		m_write_enable = data & m_plane;
+		return;
+	}
+
+	if (!m_write_enable)
+		return;
 
 	switch(offset) {
 	case TOPCAT_REG_VBLANK:
@@ -239,12 +266,6 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 		break;
 	case TOPCAT_REG_DISPLAY_PLANE_ENABLE:
 		m_display_enable_planes = data;
-		break;
-	case TOPCAT_REG_DISPLAY_WRITE_ENABLE_PLANE:
-		m_write_enable_plane = data;
-		break;
-	case TOPCAT_REG_DISPLAY_READ_ENABLE_PLANE:
-		m_read_enable_plane = data;
 		break;
 	case TOPCAT_REG_FB_WRITE_ENABLE:
 		m_fb_write_enable = data;
@@ -306,20 +327,10 @@ WRITE16_MEMBER(topcat_device::ctrl_w)
 
 uint32_t topcat_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t *scanline;
-	int x, y;
-	uint32_t pixels;
-
-	for (y = 0; y < m_fb_height; y++)
-	{
-		scanline = &bitmap.pix32(y);
-		for (x = 0; x < m_fb_width/2; x++)
-		{
-			pixels = m_vram[(y * m_fb_width/2) + x];
-
-			*scanline++ = m_palette[(pixels>>8) & 1];
-			*scanline++ = m_palette[(pixels & 1)];
-		}
+	for (int y = 0; y < m_fb_height; y++) {
+		uint32_t *scanline = &bitmap.pix32(y);
+		for (int x = 0; x < m_fb_width; x++)
+			*scanline++ = (m_vram[y * m_fb_width + x]) ? rgb_t(255,255,255) : rgb_t(0, 0, 0);
 	}
 	return 0;
 }
