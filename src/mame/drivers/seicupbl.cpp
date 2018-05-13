@@ -68,6 +68,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vram_sc1_w);
 	DECLARE_WRITE16_MEMBER(vram_sc2_w);
 	DECLARE_WRITE16_MEMBER(vram_sc3_w);
+	DECLARE_WRITE16_MEMBER(layer_disable_w);
 	TILE_GET_INFO_MEMBER(get_sc0_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc1_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc2_tileinfo);
@@ -85,6 +86,7 @@ protected:
 
 private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
+	uint16_t m_layer_disable;
 };
 
 TILE_GET_INFO_MEMBER(seicupbl_state::get_sc0_tileinfo)
@@ -287,12 +289,19 @@ uint32_t seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 		m_sc_layer[i]->set_scrolly(0, m_vregs[i*2+1]);
 	}
 
-	/*if (!(m_layer_disable&0x0001)) */m_sc_layer[0]->draw(screen, bitmap, cliprect, 0, 0);
-	/*if (!(m_layer_disable&0x0002)) */m_sc_layer[1]->draw(screen, bitmap, cliprect, 0, 1);
-	/*if (!(m_layer_disable&0x0004)) */m_sc_layer[2]->draw(screen, bitmap, cliprect, 0, 2);
-	/*if (!(m_layer_disable&0x0008)) */m_sc_layer[3]->draw(screen, bitmap, cliprect, 0, 4);
+	if (!(m_layer_disable&0x0001)) 
+		m_sc_layer[0]->draw(screen, bitmap, cliprect, 0, 0);
+	
+	if (!(m_layer_disable&0x0002)) 
+		m_sc_layer[1]->draw(screen, bitmap, cliprect, 0, 1);
+	
+	if (!(m_layer_disable&0x0004)) 
+		m_sc_layer[2]->draw(screen, bitmap, cliprect, 0, 2);
+	
+	if (!(m_layer_disable&0x0008)) 
+		m_sc_layer[3]->draw(screen, bitmap, cliprect, 0, 4);
 
-	//if (!(m_layer_disable&0x0010))
+	if (!(m_layer_disable&0x0010))
 		draw_sprites(screen,bitmap,cliprect);
 	return 0;
 }
@@ -321,11 +330,17 @@ WRITE16_MEMBER(seicupbl_state::vram_sc3_w)
 	m_sc_layer[3]->mark_tile_dirty(offset);
 }
 
+WRITE16_MEMBER(seicupbl_state::layer_disable_w)
+{
+	COMBINE_DATA(&m_layer_disable);
+}
+
 void seicupbl_state::cupsocbl_mem(address_map &map)
 {
 //  AM_IMPORT_FROM( legionna_cop_mem )
 	map(0x000000, 0x0fffff).rom();
 	map(0x100400, 0x1005ff).rw("seibucop_boot", FUNC(seibu_cop_bootleg_device::read), FUNC(seibu_cop_bootleg_device::write));
+	map(0x10065c, 0x10065d).w(this, FUNC(seicupbl_state::layer_disable_w));
 	map(0x100660, 0x10066f).ram().share("vregs");
 	map(0x100700, 0x100701).portr("DSW1");
 	map(0x100704, 0x100705).portr("PLAYERS12");
