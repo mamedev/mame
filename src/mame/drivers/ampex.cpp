@@ -245,4 +245,4 @@ ROM_START( dialog80 )
 	ROM_LOAD( "417129-010.u87",  0x0100, 0x0100, NO_DUMP )
 ROM_END
 
-COMP( 1980, dialog80, 0, 0, ampex, ampex, ampex_state, 0, "Ampex", "Dialogue 80", MACHINE_IS_SKELETON )
+COMP( 1980, dialog80, 0, 0, ampex, ampex, ampex_state, empty_init, "Ampex", "Dialogue 80", MACHINE_IS_SKELETON )

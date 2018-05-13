@@ -593,7 +593,7 @@ void gberet_state::init_mrgoemon()
  *
  *************************************/
 
-GAME( 1985, gberet,   0,      gberet,   gberet,   gberet_state, 0,        ROT0, "Konami",  "Green Beret", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, rushatck, gberet, gberet,   gberet,   gberet_state, 0,        ROT0, "Konami",  "Rush'n Attack (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gberetb,  gberet, gberetb,  gberetb,  gberet_state, 0,        ROT0, "bootleg", "Green Beret (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mrgoemon, 0,      mrgoemon, mrgoemon, gberet_state, mrgoemon, ROT0, "Konami",  "Mr. Goemon (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gberet,   0,      gberet,   gberet,   gberet_state, empty_init,    ROT0, "Konami",  "Green Beret", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rushatck, gberet, gberet,   gberet,   gberet_state, empty_init,    ROT0, "Konami",  "Rush'n Attack (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gberetb,  gberet, gberetb,  gberetb,  gberet_state, empty_init,    ROT0, "bootleg", "Green Beret (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mrgoemon, 0,      mrgoemon, mrgoemon, gberet_state, init_mrgoemon, ROT0, "Konami",  "Mr. Goemon (Japan)", MACHINE_SUPPORTS_SAVE )

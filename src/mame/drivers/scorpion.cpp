@@ -399,9 +399,9 @@ ROM_START( kay1024 )
 	ROMX_LOAD( "kay1024s.rom", 0x010000, 0x10000, CRC(67351caa) SHA1(1d9c0606b380c000ca1dfa33f90a122ecf9df1f1), ROM_BIOS(3))
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT      CLASS           INIT    COMPANY              FULLNAME           FLAGS
-COMP( 1994, scorpio,  spec128,  0,      scorpion,   spec_plus, scorpion_state, 0,      "Zonov and Co.",     "Scorpion ZS-256", 0 )
-COMP( 1991, profi,    spec128,  0,      profi,      spec_plus, scorpion_state, 0,      "Kondor and Kramis", "Profi",           MACHINE_NOT_WORKING )
-COMP( 1998, kay1024,  spec128,  0,      scorpion,   spec_plus, scorpion_state, 0,      "NEMO",              "Kay 1024",        MACHINE_NOT_WORKING )
-COMP( 19??, quorum,   spec128,  0,      quorum,     spec_plus, scorpion_state, 0,      "<unknown>",         "Quorum",          MACHINE_NOT_WORKING )
-COMP( 19??, bestzx,   spec128,  0,      scorpion,   spec_plus, scorpion_state, 0,      "<unknown>",         "BestZX",          MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT      CLASS           INIT        COMPANY              FULLNAME           FLAGS
+COMP( 1994, scorpio, spec128, 0,      scorpion, spec_plus, scorpion_state, empty_init, "Zonov and Co.",     "Scorpion ZS-256", 0 )
+COMP( 1991, profi,   spec128, 0,      profi,    spec_plus, scorpion_state, empty_init, "Kondor and Kramis", "Profi",           MACHINE_NOT_WORKING )
+COMP( 1998, kay1024, spec128, 0,      scorpion, spec_plus, scorpion_state, empty_init, "NEMO",              "Kay 1024",        MACHINE_NOT_WORKING )
+COMP( 19??, quorum,  spec128, 0,      quorum,   spec_plus, scorpion_state, empty_init, "<unknown>",         "Quorum",          MACHINE_NOT_WORKING )
+COMP( 19??, bestzx,  spec128, 0,      scorpion, spec_plus, scorpion_state, empty_init, "<unknown>",         "BestZX",          MACHINE_NOT_WORKING )

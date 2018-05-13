@@ -1010,7 +1010,7 @@ ROM_END
 
 
 /* Driver */
-/*    YEAR  NAME       PARENT     COMPAT   MACHINE    INPUT    CLASS            INIT      COMPANY       FULLNAME     FLAGS */
-COMP( 1983, lynx48k,   0,         0,       lynx48k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 48k",  0 )
-COMP( 1983, lynx96k,   lynx48k,   0,       lynx96k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 96k",  0 )
-COMP( 1983, lynx128k,  lynx48k,   0,       lynx128k,  lynx48k, camplynx_state,  lynx128k, "Camputers",  "Lynx 128k", 0 )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS           INIT           COMPANY      FULLNAME     FLAGS */
+COMP( 1983, lynx48k,  0,       0,      lynx48k,  lynx48k, camplynx_state, init_lynx48k,  "Camputers", "Lynx 48k",  0 )
+COMP( 1983, lynx96k,  lynx48k, 0,      lynx96k,  lynx48k, camplynx_state, init_lynx48k,  "Camputers", "Lynx 96k",  0 )
+COMP( 1983, lynx128k, lynx48k, 0,      lynx128k, lynx48k, camplynx_state, init_lynx128k, "Camputers", "Lynx 128k", 0 )

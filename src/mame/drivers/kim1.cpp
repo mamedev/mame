@@ -285,5 +285,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  CLASS           INIT  COMPANY             FULLNAME  FLAGS
-COMP( 1975, kim1,     0,        0,      kim1,     kim1,  kim1_state,     0,    "MOS Technologies", "KIM-1" , MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME  FLAGS
+COMP( 1975, kim1, 0,      0,      kim1,    kim1,  kim1_state, empty_init, "MOS Technologies", "KIM-1",  MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)

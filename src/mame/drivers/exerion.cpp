@@ -621,7 +621,7 @@ void exerion_state::init_irion()
  *
  *************************************/
 
-GAME( 1983, exerion,  0,       exerion, exerion, exerion_state, exerion,  ROT90, "Jaleco", "Exerion", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exeriont, exerion, exerion, exerion, exerion_state, exerion,  ROT90, "Jaleco (Taito America license)", "Exerion (Taito)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exerionb, exerion, exerion, exerion, exerion_state, exerionb, ROT90, "bootleg", "Exerion (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, irion,    exerion, irion,   exerion, exerion_state, irion,    ROT90, "bootleg", "Irion", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exerion,  0,       exerion, exerion, exerion_state, init_exerion,  ROT90, "Jaleco", "Exerion", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exeriont, exerion, exerion, exerion, exerion_state, init_exerion,  ROT90, "Jaleco (Taito America license)", "Exerion (Taito)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exerionb, exerion, exerion, exerion, exerion_state, init_exerionb, ROT90, "bootleg", "Exerion (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, irion,    exerion, irion,   exerion, exerion_state, init_irion,    ROT90, "bootleg", "Irion", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

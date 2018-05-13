@@ -157,5 +157,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY     FULLNAME     FLAGS
-COMP( 1981, aim65_40, 0,      0,      aim65_40, aim65_40, aim65_40_state, 0,    "Rockwell", "AIM-65/40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME     FLAGS
+COMP( 1981, aim65_40, 0,      0,      aim65_40, aim65_40, aim65_40_state, empty_init, "Rockwell", "AIM-65/40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

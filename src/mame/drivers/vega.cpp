@@ -887,4 +887,4 @@ void vega_state::init_vega()
 	membank("bank1")->configure_entries(0, 2, &ROM[0x1000], 0x800);
 }
 
-GAME( 1982, vega,   0, vega, vega, vega_state, vega, ROT270, "Olympia", "Vega", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1982, vega,   0, vega, vega, vega_state, init_vega, ROT270, "Olympia", "Vega", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

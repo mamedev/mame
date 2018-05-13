@@ -130,5 +130,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY        FULLNAME  FLAGS */
-COMP( 1996, p112,   0,      0,       p112,      p112,  p112_state,  0,    "Dave Brooks", "P112",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY        FULLNAME  FLAGS */
+COMP( 1996, p112, 0,      0,      p112,    p112,  p112_state, empty_init, "Dave Brooks", "P112",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

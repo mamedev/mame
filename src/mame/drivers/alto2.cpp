@@ -336,5 +336,5 @@ void alto2_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 /* Game Drivers */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT   COMPANY  FULLNAME   FLAGS
-COMP( 1977, alto2,  0,      0,      alto2,   alto2, alto2_state, alto2, "Xerox", "Alto-II", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1977, alto2, 0,      0,      alto2,   alto2, alto2_state, init_alto2, "Xerox", "Alto-II", 0 )

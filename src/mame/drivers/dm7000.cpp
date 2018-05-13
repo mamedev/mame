@@ -348,7 +348,7 @@ ROM_START( dm500 )
 ROM_END
 /* Driver */
 
-//    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY             FULLNAME         FLAGS
-SYST( 2003, dm7000,  0,       0,       dm7000,    dm7000, dm7000_state, 0,    "Dream Multimedia", "Dreambox 7000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-SYST( 2004, dm5620,  dm7000,  0,       dm7000,    dm7000, dm7000_state, 0,    "Dream Multimedia", "Dreambox 5620", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-SYST( 2006, dm500,   dm7000,  0,       dm7000,    dm7000, dm7000_state, 0,    "Dream Multimedia", "Dreambox 500",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY             FULLNAME         FLAGS
+SYST( 2003, dm7000, 0,      0,      dm7000,  dm7000, dm7000_state, empty_init, "Dream Multimedia", "Dreambox 7000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST( 2004, dm5620, dm7000, 0,      dm7000,  dm7000, dm7000_state, empty_init, "Dream Multimedia", "Dreambox 5620", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST( 2006, dm500,  dm7000, 0,      dm7000,  dm7000, dm7000_state, empty_init, "Dream Multimedia", "Dreambox 500",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

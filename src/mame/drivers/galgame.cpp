@@ -459,4 +459,4 @@ void galaxygame_state::init_galaxygame()
 	main.write_word(8, 000500 - 10);
 }
 
-GAME(1971, galgame, 0, galaxygame, galaxygame, galaxygame_state, galaxygame, ROT270, "Computer Recreations, Inc", "Galaxy Game", MACHINE_NO_SOUND_HW )
+GAME(1971, galgame, 0, galaxygame, galaxygame, galaxygame_state, init_galaxygame, ROT270, "Computer Recreations, Inc", "Galaxy Game", MACHINE_NO_SOUND_HW )

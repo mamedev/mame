@@ -424,4 +424,4 @@ void poker72_state::init_poker72()
 	rom[0x4aa] = 0x00;
 }
 
-GAME( 1995, poker72,  0,    poker72, poker72, poker72_state,  poker72, ROT0, "Extrema Systems International Ltd.", "Poker Monarch (v2.50)", MACHINE_NOT_WORKING )
+GAME( 1995, poker72,  0,    poker72, poker72, poker72_state, init_poker72, ROT0, "Extrema Systems International Ltd.", "Poker Monarch (v2.50)", MACHINE_NOT_WORKING )

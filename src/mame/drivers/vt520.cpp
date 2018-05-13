@@ -143,7 +143,7 @@ ROM_END
 
 /* Driver */
 
-COMP( 1990, vt420,  0,      0,       vt420,    vt520, vt520_state,   0,    "Digital Equipment Corporation", "VT420 Video Terminal", MACHINE_IS_SKELETON )
-//COMP( 1993, vt510,  0,      0,       vt520,    vt520, vt520_state,   0,    "Digital Equipment Corporation", "VT510 Video Terminal",  MACHINE_IS_SKELETON)
-COMP( 1994, vt520,  0,      0,       vt520,    vt520, vt520_state,   0,    "Digital Equipment Corporation", "VT520 Video Terminal",  MACHINE_IS_SKELETON)
-//COMP( 1994, vt525,  0,      0,       vt520,    vt520, vt520_state,   0,    "Digital Equipment Corporation", "VT525 Video Terminal",  MACHINE_IS_SKELETON)
+COMP( 1990, vt420, 0, 0, vt420, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT420 Video Terminal", MACHINE_IS_SKELETON )
+//COMP( 1993, vt510, 0, 0, vt520, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT510 Video Terminal",  MACHINE_IS_SKELETON)
+COMP( 1994, vt520, 0, 0, vt520, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT520 Video Terminal",  MACHINE_IS_SKELETON)
+//COMP( 1994, vt525, 0, 0, vt520, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT525 Video Terminal",  MACHINE_IS_SKELETON)

@@ -146,4 +146,4 @@ ROM_START( m3 )
 	ROM_LOAD( "keyboard_prom,032.bin",     0x0000, 0x0800, CRC(21548355) SHA1(ee4ce4af9c78474263dd58e0f19e79e5b00926fa) )
 ROM_END
 
-COMP( 19??, m3, 0, 0, m3, m3, m3_state, 0, "LSI", "M3", MACHINE_IS_SKELETON )
+COMP( 19??, m3, 0, 0, m3, m3, m3_state, empty_init, "LSI", "M3", MACHINE_IS_SKELETON )

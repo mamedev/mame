@@ -791,6 +791,6 @@ ROM_START( fi6845 )
 	ROM_LOAD( "93427.bin",     0x0000, 0x0100, CRC(f59c8573) SHA1(5aed4866abe1690fd0f088af1cfd99b3c85afe9a) )
 ROM_END
 
-//   YEAR   NAME    PARENT  MACHINE            INPUT         STATE               INIT    ROT     COMPANY       FULLNAME                        FLAGS
-GAME( 1979, fi6845, 0,      fastinvaders_6845, fastinvaders, fastinvaders_state, fi6845, ROT270, "Fiberglass", "Fast Invaders (6845 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1979, fi8275, fi6845, fastinvaders_8275, fastinvaders, fastinvaders_state, fi6845, ROT270, "Fiberglass", "Fast Invaders (8275 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//   YEAR   NAME    PARENT  MACHINE            INPUT         STATE               INIT         ROT     COMPANY       FULLNAME                        FLAGS
+GAME( 1979, fi6845, 0,      fastinvaders_6845, fastinvaders, fastinvaders_state, init_fi6845, ROT270, "Fiberglass", "Fast Invaders (6845 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979, fi8275, fi6845, fastinvaders_8275, fastinvaders, fastinvaders_state, init_fi6845, ROT270, "Fiberglass", "Fast Invaders (8275 version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

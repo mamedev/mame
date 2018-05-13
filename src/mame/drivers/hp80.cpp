@@ -1419,4 +1419,4 @@ ROM_START(hp85)
 	ROM_LOAD("prt_chrgen.bin" , 0 , 0x400 , CRC(abeaba27) SHA1(fbf6bdd5d96df6aa5963f8cdfdeb180402b1cc85))
 ROM_END
 
-COMP(1980 , hp85 , 0 , 0 , hp85 , hp85 , hp85_state , 0 , "HP" , "HP 85" , 0)
+COMP( 1980, hp85, 0, 0, hp85, hp85, hp85_state, empty_init, "HP", "HP 85", 0)

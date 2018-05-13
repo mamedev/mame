@@ -193,5 +193,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR   NAME    PARENT  COMPAT   MACHINE  INPUT  STATE        INIT    COMPANY     FULLNAME  FLAGS */
-COMP( 1982, c10,    0,      0,       c10,     c10,   c10_state,   c10,    "Cromemco", "C-10",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*   YEAR   NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME  FLAGS */
+COMP( 1982, c10,  0,      0,      c10,     c10,   c10_state, empty_init, "Cromemco", "C-10",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -474,5 +474,5 @@ ROM_START( pv1000 )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE           INIT  COMPANY   FULLNAME    FLAGS */
-CONS( 1983, pv1000,  0,      0,      pv1000,  pv1000, pv1000_state,   0,    "Casio",  "PV-1000",  MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME    FLAGS */
+CONS( 1983, pv1000, 0,      0,      pv1000,  pv1000, pv1000_state, empty_init, "Casio", "PV-1000",  MACHINE_SUPPORTS_SAVE )

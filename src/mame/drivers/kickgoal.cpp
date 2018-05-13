@@ -797,7 +797,7 @@ void kickgoal_state::init_kickgoal()
 }
 
 
-GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Kick Goal (set 1)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, kickgoala, kickgoal, kickgoal, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Kick Goal (set 2)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 1)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kickgoala, kickgoal, kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 2)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, actionhw, 0, actionhw, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, actionhw,  0,        actionhw, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

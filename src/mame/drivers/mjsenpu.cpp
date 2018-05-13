@@ -539,4 +539,4 @@ void mjsenpu_state::init_mjsenpu()
 }
 
 
-GAME( 2002, mjsenpu, 0, mjsenpu, mjsenpu, mjsenpu_state, mjsenpu, ROT0, "Oriental Soft", "Mahjong Senpu", 0 )
+GAME( 2002, mjsenpu, 0, mjsenpu, mjsenpu, mjsenpu_state, init_mjsenpu, ROT0, "Oriental Soft", "Mahjong Senpu", 0 )

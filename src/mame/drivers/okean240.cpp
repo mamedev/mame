@@ -601,7 +601,7 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      INIT            COMPANY    FULLNAME     FLAGS
-COMP( 1986, okean240,  0,        0,      okean240,  okean240,  okean240_state, okean240,  "<unknown>", "Okeah-240",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1986, okean240a, okean240, 0,      okean240a, okean240a, okean240_state, okean240,  "<unknown>", "Ocean-240 with FDD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1986, okean240t, okean240, 0,      okean240t, okean240,  okean240_state, okean240,  "<unknown>", "Ocean-240 Test ROM", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS           INIT           COMPANY      FULLNAME              FLAGS
+COMP( 1986, okean240,  0,        0,      okean240,  okean240,  okean240_state, init_okean240, "<unknown>", "Okeah-240",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, okean240a, okean240, 0,      okean240a, okean240a, okean240_state, init_okean240, "<unknown>", "Ocean-240 with FDD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, okean240t, okean240, 0,      okean240t, okean240,  okean240_state, init_okean240, "<unknown>", "Ocean-240 Test ROM", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

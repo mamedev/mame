@@ -283,5 +283,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT   COMPANY                  FULLNAME           FLAGS
-COMP( 1982, eacc,   0,      0,      eacc,    eacc,  eacc_state, 0,     "Electronics Australia", "EA Car Computer", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                  FULLNAME           FLAGS
+COMP( 1982, eacc, 0,      0,      eacc,    eacc,  eacc_state, empty_init, "Electronics Australia", "EA Car Computer", MACHINE_NO_SOUND_HW)

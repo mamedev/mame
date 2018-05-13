@@ -600,8 +600,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995,  cannball,  0,        yunsung8, cannball, yunsung8_state, 0, ROT0,   "Yun Sung / Soft Vision",    "Cannon Ball (Yun Sung, horizontal)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  cannballv, cannball, yunsung8, cannbalv, yunsung8_state, 0, ROT270, "Yun Sung / J&K Production", "Cannon Ball (Yun Sung, vertical)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  magix,     0,        yunsung8, magix,    yunsung8_state, 0, ROT0,   "Yun Sung",                  "Magix / Rock",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  magixb,    magix,    yunsung8, magix,    yunsung8_state, 0, ROT0,   "Yun Sung",                  "Magix / Rock (no copyright message)", MACHINE_SUPPORTS_SAVE ) // was marked as bootleg, but has been seen on original PCBs
-GAME( 1994?, rocktris,  0,        yunsung8, rocktris, yunsung8_state, 0, ROT0,   "Yun Sung",                  "Rock Tris",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  cannball,  0,        yunsung8, cannball, yunsung8_state, empty_init, ROT0,   "Yun Sung / Soft Vision",    "Cannon Ball (Yun Sung, horizontal)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  cannballv, cannball, yunsung8, cannbalv, yunsung8_state, empty_init, ROT270, "Yun Sung / J&K Production", "Cannon Ball (Yun Sung, vertical)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  magix,     0,        yunsung8, magix,    yunsung8_state, empty_init, ROT0,   "Yun Sung",                  "Magix / Rock",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  magixb,    magix,    yunsung8, magix,    yunsung8_state, empty_init, ROT0,   "Yun Sung",                  "Magix / Rock (no copyright message)", MACHINE_SUPPORTS_SAVE ) // was marked as bootleg, but has been seen on original PCBs
+GAME( 1994?, rocktris,  0,        yunsung8, rocktris, yunsung8_state, empty_init, ROT0,   "Yun Sung",                  "Rock Tris",                           MACHINE_SUPPORTS_SAVE )

@@ -108,4 +108,4 @@ ROM_START( blocktax )
 ROM_END
 
 
-GAME( 2002, blocktax, 0, blocktax, blocktax, blocktax_state, 0, ROT0,  "TAX / Game Revival", "Blockout (TAX)", MACHINE_IS_SKELETON )
+GAME( 2002, blocktax, 0, blocktax, blocktax, blocktax_state, empty_init, ROT0, "TAX / Game Revival", "Blockout (TAX)", MACHINE_IS_SKELETON )

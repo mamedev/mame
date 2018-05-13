@@ -126,5 +126,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY      FULLNAME  FLAGS
-COMP( 1989, rd100,  0,      0,       rd100,     rd100,  rd100_state,   rd100,  "Data R.D.", "RD100",  MACHINE_IS_SKELETON )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1989, rd100, 0,      0,      rd100,   rd100, rd100_state, init_rd100, "Data R.D.", "RD100",  MACHINE_IS_SKELETON )

@@ -1705,23 +1705,23 @@ void ninjakd2_state::init_robokidj()
  *
  *************************************/
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, ninjakd2,  0,        ninjakd2, ninjakd2, ninjakd2_state, ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjakd2a, ninjakd2, ninjakd2b, ninjakd2, ninjakd2_state, bootleg, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjakd2b, ninjakd2, ninjakd2b, rdaction, ninjakd2_state, bootleg, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ninjakd2c, ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 4)", MACHINE_SUPPORTS_SAVE ) // close to set 3
-GAME( 1987, rdaction,  ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL (World Games license)",       "Rad Action / NinjaKun Ashura no Shou", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, jt104,     ninjakd2, ninjakd2, rdaction, ninjakd2_state, bootleg,  ROT0,   "UPL (United Amusements license)", "JT-104 (title screen modification of Rad Action)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,   INPUT,    STATE,          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1987, ninjakd2,  0,        ninjakd2,  ninjakd2, ninjakd2_state, init_ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjakd2a, ninjakd2, ninjakd2b, ninjakd2, ninjakd2_state, init_bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjakd2b, ninjakd2, ninjakd2b, rdaction, ninjakd2_state, init_bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ninjakd2c, ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 4)", MACHINE_SUPPORTS_SAVE ) // close to set 3
+GAME( 1987, rdaction,  ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL (World Games license)",       "Rad Action / NinjaKun Ashura no Shou", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, jt104,     ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_bootleg,  ROT0,   "UPL (United Amusements license)", "JT-104 (title screen modification of Rad Action)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, mnight,    0,        mnight,   mnight,   ninjakd2_state, mnight,   ROT0,   "UPL", "Mutant Night", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mnightj,   mnight,   mnight,   mnight,   ninjakd2_state, mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mnight,    0,        mnight,    mnight,   ninjakd2_state, init_mnight,   ROT0,   "UPL", "Mutant Night", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mnightj,   mnight,   mnight,    mnight,   ninjakd2_state, init_mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, arkarea,   0,        arkarea,  arkarea,  ninjakd2_state, mnight,   ROT0,   "UPL", "Ark Area", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, arkarea,   0,        arkarea,   arkarea,  ninjakd2_state, init_mnight,   ROT0,   "UPL", "Ark Area", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, robokid,   0,        robokid,  robokid,  ninjakd2_state, robokid,  ROT0,   "UPL", "Atomic Robo-kid (World, Type-2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // 3-digit highscore names
-GAME( 1988, robokidj,  robokid,  robokid,  robokidj, ninjakd2_state, robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, robokidj2, robokid,  robokid,  robokidj, ninjakd2_state, robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, robokidj3, robokid,  robokid,  robokidj, ninjakd2_state, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, robokid,   0,        robokid,   robokid,  ninjakd2_state, init_robokid,  ROT0,   "UPL", "Atomic Robo-kid (World, Type-2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // 3-digit highscore names
+GAME( 1988, robokidj,  robokid,  robokid,   robokidj, ninjakd2_state, init_robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, robokidj2, robokid,  robokid,   robokidj, ninjakd2_state, init_robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, robokidj3, robokid,  robokid,   robokidj, ninjakd2_state, empty_init,    ROT0,   "UPL", "Atomic Robo-kid (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1989, omegaf,    0,        omegaf,   omegaf,   ninjakd2_state, 0,        ROT270, "UPL", "Omega Fighter", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, omegafs,   omegaf,   omegaf,   omegaf,   ninjakd2_state, 0,        ROT270, "UPL", "Omega Fighter Special", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, omegaf,    0,        omegaf,    omegaf,   ninjakd2_state, empty_init,    ROT270, "UPL", "Omega Fighter", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, omegafs,   omegaf,   omegaf,    omegaf,   ninjakd2_state, empty_init,    ROT270, "UPL", "Omega Fighter Special", MACHINE_SUPPORTS_SAVE )

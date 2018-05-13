@@ -496,9 +496,9 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT       COMPANY             FULLNAME                   FLAGS */
-COMP( 1984, bcs3,   0,       0,      bcs3,      bcs3,  bcs3_state,  0,         "Eckhard Schiller", "BCS 3 rev 2.4",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3a,  bcs3,    0,      bcs3a,     bcs3,  bcs3_state,  bcs3a,     "Eckhard Schiller", "BCS 3 rev 3.1 29-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3b,  bcs3,    0,      bcs3b,     bcs3,  bcs3_state,  bcs3b,     "Eckhard Schiller", "BCS 3 rev 3.1 40-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3c,  bcs3,    0,      bcs3a,     bcs3,  bcs3_state,  bcs3c,     "Eckhard Schiller", "BCS 3 rev 3.2",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, bcs3d,  bcs3,    0,      bcs3a,     bcs3,  bcs3_state,  bcs3d,     "Eckhard Schiller", "BCS 3 rev 3.3",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME                   FLAGS */
+COMP( 1984, bcs3,  0,      0,      bcs3,    bcs3,  bcs3_state, empty_init, "Eckhard Schiller", "BCS 3 rev 2.4",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, bcs3a, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3a, "Eckhard Schiller", "BCS 3 rev 3.1 29-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, bcs3b, bcs3,   0,      bcs3b,   bcs3,  bcs3_state, init_bcs3b, "Eckhard Schiller", "BCS 3 rev 3.1 40-column", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, bcs3c, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3c, "Eckhard Schiller", "BCS 3 rev 3.2",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, bcs3d, bcs3,   0,      bcs3a,   bcs3,  bcs3_state, init_bcs3d, "Eckhard Schiller", "BCS 3 rev 3.3",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

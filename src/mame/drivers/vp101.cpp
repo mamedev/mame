@@ -459,7 +459,7 @@ ROM_START(zoofari)
 	DISK_IMAGE_READONLY("zoofari", 0, SHA1(8fb9cfb1ab2660f40b643fcd772243903bd69a6c) )
 ROM_END
 
-GAME( 2002,  specfrce,  0,          vp101,  vp101, vp10x_state,  0,  ROT0,  "ICE/Play Mechanix",    "Special Forces Elite Training (v01.02.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002,  specfrceo, specfrce,   vp101,  vp101, vp10x_state,  0,  ROT0,  "ICE/Play Mechanix",    "Special Forces Elite Training (v01.01.01)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2004,  jnero,     0,          vp101,  vp101, vp10x_state,  0,  ROT0,  "ICE/Play Mechanix",    "Johnny Nero Action Hero (v01.01.08)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2006,  zoofari,   0,          vp50,   vp50,  vp10x_state,  0,  ROT0,  "ICE/Play Mechanix",    "Zoofari",                                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2002,  specfrce,  0,          vp101,  vp101, vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Special Forces Elite Training (v01.02.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002,  specfrceo, specfrce,   vp101,  vp101, vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Special Forces Elite Training (v01.01.01)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2004,  jnero,     0,          vp101,  vp101, vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Johnny Nero Action Hero (v01.01.08)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006,  zoofari,   0,          vp50,   vp50,  vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Zoofari",                                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

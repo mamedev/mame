@@ -1593,6 +1593,6 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT      CLASS       INIT  COMPANY  FULLNAME  FLAGS
-COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4_state,  px4,  "Epson", "PX-4",   0 )
-COMP( 1985, px4p, px4,    0,      px4p,    px4_h450a, px4p_state, px4p, "Epson", "PX-4+",  0 )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT      CLASS       INIT       COMPANY  FULLNAME  FLAGS
+COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4_state,  init_px4,  "Epson", "PX-4",   0 )
+COMP( 1985, px4p, px4,    0,      px4p,    px4_h450a, px4p_state, init_px4p, "Epson", "PX-4+",  0 )

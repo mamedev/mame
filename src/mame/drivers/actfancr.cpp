@@ -602,9 +602,9 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1989, actfancr,  0,        actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, actfancr2, actfancr, actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, actfancr1, actfancr, actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, actfancrj, actfancr, actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, triothep,  0,        triothep, triothep, actfancr_state, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, triothepj, triothep, triothep, triothep, actfancr_state, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancr,  0,        actfancr, actfancr, actfancr_state, empty_init, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancr2, actfancr, actfancr, actfancr, actfancr_state, empty_init, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancr1, actfancr, actfancr, actfancr, actfancr_state, empty_init, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancrj, actfancr, actfancr, actfancr, actfancr_state, empty_init, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, triothep,  0,        triothep, triothep, actfancr_state, empty_init, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, triothepj, triothep, triothep, triothep, actfancr_state, empty_init, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -1967,5 +1967,5 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS        INIT  COMPANY                           FULLNAME  FLAGS
-COMP( 1961, pdp1,     0,        0,      pdp1,     pdp1, pdp1_state,  0,    "Digital Equipment Corporation",  "PDP-1",  MACHINE_NO_SOUND_HW )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT CLASS       INIT        COMPANY                           FULLNAME  FLAGS
+COMP( 1961, pdp1, 0,      0,      pdp1,    pdp1, pdp1_state, empty_init, "Digital Equipment Corporation",  "PDP-1",  MACHINE_NO_SOUND_HW )

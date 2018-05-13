@@ -1264,4 +1264,4 @@ void gunpey_state::init_gunpey()
 {
 }
 
-GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, gunpey,    ROT0, "Bandai / Banpresto", "Gunpey (Japan)", 0 )
+GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, init_gunpey, ROT0, "Bandai / Banpresto", "Gunpey (Japan)", 0 )

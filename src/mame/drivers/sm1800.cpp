@@ -203,5 +203,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE           INIT   COMPANY      FULLNAME   FLAGS */
-COMP( ????, sm1800,  0,      0,       sm1800,    sm1800, sm1800_state,   0,     "<unknown>", "SM1800",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT        COMPANY      FULLNAME   FLAGS */
+COMP( ????, sm1800, 0,      0,      sm1800,  sm1800, sm1800_state, empty_init, "<unknown>", "SM1800",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

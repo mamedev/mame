@@ -307,5 +307,5 @@ void mustache_state::init_mustache()
 }
 
 
-GAME( 1987, mustache,  0,        mustache, mustache, mustache_state, mustache, ROT90, "Seibu Kaihatsu (March license)",  "Mustache Boy (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mustachei, mustache, mustache, mustache, mustache_state, mustache, ROT90, "Seibu Kaihatsu (IG SPA license)", "Mustache Boy (Italy)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mustache,  0,        mustache, mustache, mustache_state, init_mustache, ROT90, "Seibu Kaihatsu (March license)",  "Mustache Boy (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mustachei, mustache, mustache, mustache, mustache_state, init_mustache, ROT90, "Seibu Kaihatsu (IG SPA license)", "Mustache Boy (Italy)", MACHINE_SUPPORTS_SAVE )

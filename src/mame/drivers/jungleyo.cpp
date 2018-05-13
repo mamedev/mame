@@ -164,4 +164,4 @@ ROM_START( jungleyo )
 ROM_END
 
 
-GAME( 1999, jungleyo,    0,        jungleyo,    jungleyo, jungleyo_state,    0, ROT0,  "Yonshi", "Jungle (VI3.02)", MACHINE_NOT_WORKING )
+GAME( 1999, jungleyo, 0, jungleyo, jungleyo, jungleyo_state, empty_init, ROT0, "Yonshi", "Jungle (VI3.02)", MACHINE_NOT_WORKING )

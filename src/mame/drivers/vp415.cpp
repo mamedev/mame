@@ -578,5 +578,5 @@ ROM_START(vp415)
 	ROM_LOAD( "d8041ahc 152.7211", 0x000, 0x400, CRC(2972d4b2) SHA1(e08086714fa5be1a67feac8f64210b21bb410dd3) ) // Same contents as 7252; this is intentional!
 ROM_END
 
-CONS( 1983, vp415, 0, 0, vp415, vp415, vp415_state, 0, "Philips", "VP415", MACHINE_IS_SKELETON )
+CONS( 1983, vp415, 0, 0, vp415, vp415, vp415_state, empty_init, "Philips", "VP415", MACHINE_IS_SKELETON )
 

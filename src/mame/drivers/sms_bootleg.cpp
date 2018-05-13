@@ -437,5 +437,5 @@ ROM_END
 
 
 // these haven't been set as clones because they contain different games
-GAME( 199?, smssgame,  0,    sms_supergame, sms_supergame, smsbootleg_state,  sms_supergame,  ROT0, "Sono Corp Japan", "Super Game (Sega Master System Multi-game bootleg)", MACHINE_NOT_WORKING )
-GAME( 1990, smssgamea, 0,    sms_supergame, sms_supergame, smsbootleg_state,  sms_supergame,  ROT0, "Seo Jin (TV-Tuning license)", "Super Game (Sega Master System Multi-game bootleg) (alt games)", MACHINE_NOT_WORKING ) // for German market?
+GAME( 199?, smssgame,  0,    sms_supergame, sms_supergame, smsbootleg_state, init_sms_supergame, ROT0, "Sono Corp Japan", "Super Game (Sega Master System Multi-game bootleg)", MACHINE_NOT_WORKING )
+GAME( 1990, smssgamea, 0,    sms_supergame, sms_supergame, smsbootleg_state, init_sms_supergame, ROT0, "Seo Jin (TV-Tuning license)", "Super Game (Sega Master System Multi-game bootleg) (alt games)", MACHINE_NOT_WORKING ) // for German market?

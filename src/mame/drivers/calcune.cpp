@@ -334,4 +334,4 @@ ROM_END
 
 
 
-GAME( 1996, calcune,  0,        calcune,   calcune,     calcune_state, calcune, ROT0, "Yuvo", "Calcune (Japan, prototype)", 0 )
+GAME( 1996, calcune, 0, calcune, calcune, calcune_state, init_calcune, ROT0, "Yuvo", "Calcune (Japan, prototype)", 0 )

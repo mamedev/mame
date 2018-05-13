@@ -433,5 +433,5 @@ ROM_START( tv995 )
 ROM_END
 
 /* Driver */
-COMP( 1992, tv990, 0, 0, tv990, tv990, tv990_state, 0, "TeleVideo", "TeleVideo 990",    MACHINE_SUPPORTS_SAVE )
-COMP( 1994, tv995, 0, 0, tv990, tv990, tv990_state, 0, "TeleVideo", "TeleVideo 995-65", MACHINE_SUPPORTS_SAVE )
+COMP( 1992, tv990, 0, 0, tv990, tv990, tv990_state, empty_init, "TeleVideo", "TeleVideo 990",    MACHINE_SUPPORTS_SAVE )
+COMP( 1994, tv995, 0, 0, tv990, tv990, tv990_state, empty_init, "TeleVideo", "TeleVideo 995-65", MACHINE_SUPPORTS_SAVE )

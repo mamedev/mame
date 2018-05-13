@@ -237,5 +237,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE    INPUT      STATE        INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1991, diablo68, 0,      0, diablo68k, diablo68k, novag68k_state, 0, "Novag", "Diablo 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT      CLASS           INIT        COMPANY  FULLNAME        FLAGS
+CONS( 1991, diablo68, 0,      0,      diablo68k, diablo68k, novag68k_state, empty_init, "Novag", "Diablo 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

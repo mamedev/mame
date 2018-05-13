@@ -775,5 +775,5 @@ ROM_START(geneve)
 	ROM_LOAD_OPTIONAL("gnmbt100.bin", 0x8000, 0x4000, CRC(19b89479) SHA1(6ef297eda78dc705946f6494e9d7e95e5216ec47)) /* CPU ROMs GenMod */
 ROM_END
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE      INPUT   STATE         INIT    COMPANY  FULLNAME       FLAGS
-COMP( 1987, geneve, 0,      0,      geneve_60hz, geneve, geneve_state, geneve, "Myarc", "Geneve 9640", MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE      INPUT   CLASS         INIT         COMPANY  FULLNAME       FLAGS
+COMP( 1987, geneve, 0,      0,      geneve_60hz, geneve, geneve_state, init_geneve, "Myarc", "Geneve 9640", MACHINE_SUPPORTS_SAVE)

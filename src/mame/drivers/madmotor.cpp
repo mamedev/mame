@@ -385,4 +385,4 @@ void madmotor_state::init_madmotor()
 
 
 	/* The title screen is undated, but it's (c) 1989 Data East at 0xefa0 */
-GAME( 1989, madmotor, 0, madmotor, madmotor, madmotor_state, madmotor, ROT0, "Mitchell", "Mad Motor (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, madmotor, 0, madmotor, madmotor, madmotor_state, init_madmotor, ROT0, "Mitchell", "Mad Motor (prototype)", MACHINE_SUPPORTS_SAVE )

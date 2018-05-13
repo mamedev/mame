@@ -215,8 +215,8 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS       INIT  COMPANY          FULLNAME  FLAGS
-COMP( 1982, c8002, 0,      0,       c8002,     c8002, onyx_state, 0,    "Onyx Systems",  "C8002",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY         FULLNAME  FLAGS
+COMP( 1982, c8002, 0,      0,      c8002,   c8002, onyx_state, empty_init, "Onyx Systems", "C8002",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 
 
 
@@ -285,5 +285,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS       INIT  COMPANY          FULLNAME  FLAGS
-COMP( 1981, c5000, 0,      0,       c5000,     c8002, onyx_state, 0,    "Onyx Systems",  "C5000",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS       INIT        COMPANY          FULLNAME  FLAGS
+COMP( 1981, c5000, 0,      0,       c5000,     c8002, onyx_state, empty_init, "Onyx Systems",  "C5000",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -249,9 +249,10 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   STATE       INIT    COMPANY             FULLNAME        FLAGS */
-CONS( 1991, 3do,        0,      0,      _3do,        3do,    _3do_state, 0,      "The 3DO Company",  "3DO (NTSC)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1991, 3do_pal,    3do,    0,      _3do_pal,    3do,    _3do_state, 0,      "The 3DO Company",  "3DO (PAL)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   STATE       INIT        COMPANY            FULLNAME      FLAGS */
+CONS( 1991, 3do,     0,      0,      _3do,       3do,    _3do_state, empty_init, "The 3DO Company", "3DO (NTSC)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1991, 3do_pal, 3do,    0,      _3do_pal,   3do,    _3do_state, empty_init, "The 3DO Company", "3DO (PAL)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 1991, 3dobios,    0,      _3do,    3do, _3do_state, 0, ROT0,     "The 3DO Company",  "3DO Bios",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
-GAME( 199?, orbatak,    3dobios,_3do,    3do, _3do_state, 0, ROT0,     "<unknown>",        "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME     PARENT   MACHINE  INPUT  STATE       INIT        MONITOR   COMPANY             FULLNAME               FLAGS */
+GAME( 1991, 3dobios, 0,       _3do,    3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",  "3DO Bios",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME( 199?, orbatak, 3dobios, _3do,    3do,   _3do_state, empty_init, ROT0,     "<unknown>",        "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

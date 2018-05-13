@@ -152,5 +152,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT  ROTATION  COMPANY               FULLNAME      FLAGS
-GAME( 1980, attckufo, 0,      attckufo, attckufo, attckufo_state, 0,    ROT270,   "Ryoto Electric Co.", "Attack UFO", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY               FULLNAME      FLAGS
+GAME( 1980, attckufo, 0,      attckufo, attckufo, attckufo_state, empty_init, ROT270,   "Ryoto Electric Co.", "Attack UFO", MACHINE_SUPPORTS_SAVE )

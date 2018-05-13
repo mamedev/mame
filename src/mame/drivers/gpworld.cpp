@@ -566,5 +566,5 @@ void gpworld_state::init_gpworld()
 }
 
 
-/*    YEAR  NAME      PARENT   MACHINE  INPUT    STATE          INIT     MONITOR  COMPANY  FULLNAME     FLAGS) */
-GAME( 1984, gpworld,  0,       gpworld, gpworld, gpworld_state, gpworld, ROT0,    "Sega",  "GP World",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+/*    YEAR  NAME      PARENT   MACHINE  INPUT    STATE          INIT          MONITOR  COMPANY  FULLNAME     FLAGS) */
+GAME( 1984, gpworld,  0,       gpworld, gpworld, gpworld_state, init_gpworld, ROT0,    "Sega",  "GP World",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

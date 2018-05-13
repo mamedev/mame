@@ -285,5 +285,5 @@ ROM_START( microtan )
 ROM_END
 
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY      FULLNAME        FLAGS
-COMP( 1979, microtan, 0,        0,      microtan, microtan, microtan_state, microtan, "Tangerine", "Microtan 65" , 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY      FULLNAME        FLAGS
+COMP( 1979, microtan, 0,      0,      microtan, microtan, microtan_state, init_microtan, "Tangerine", "Microtan 65" , 0 )

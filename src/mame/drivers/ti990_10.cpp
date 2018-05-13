@@ -390,5 +390,5 @@ void ti990_10_state::init_ti990_10()
 #endif
 }
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  STATE           INIT      COMPANY              FULLNAME                               FLAGS
-COMP( 1975, ti990_10,   0,      0,      ti990_10,   0,     ti990_10_state, ti990_10, "Texas Instruments", "TI Model 990/10 Minicomputer System", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT           COMPANY              FULLNAME                               FLAGS
+COMP( 1975, ti990_10, 0,      0,      ti990_10, 0,     ti990_10_state, init_ti990_10, "Texas Instruments", "TI Model 990/10 Minicomputer System", MACHINE_NOT_WORKING )

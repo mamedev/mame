@@ -101,5 +101,5 @@ ROM_START( aftrshoka )
 ROM_END
 
 
-GAME( 19??, aftrshok,  0,           aftrshok, aftrshok, aftrshok_state,  0, ROT0, "Lazer-tron", "After Shock (Lazer-tron, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 19??, aftrshoka, aftrshok,    aftrshok, aftrshok, aftrshok_state,  0, ROT0, "Lazer-tron", "After Shock (Lazer-tron, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, aftrshok,  0,        aftrshok, aftrshok, aftrshok_state, empty_init, ROT0, "Lazer-tron", "After Shock (Lazer-tron, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, aftrshoka, aftrshok, aftrshok, aftrshok, aftrshok_state, empty_init, ROT0, "Lazer-tron", "After Shock (Lazer-tron, set 2)", MACHINE_IS_SKELETON_MECHANICAL )

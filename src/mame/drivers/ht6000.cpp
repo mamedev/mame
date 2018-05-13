@@ -342,5 +342,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS         INIT  COMPANY  FULLNAME   FLAGS
-CONS( 1987, ht6000, 0,      0,       ht6000,  ht6000, ht6000_state, 0,    "Casio", "HT-6000", MACHINE_IS_SKELETON )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
+CONS( 1987, ht6000, 0,      0,      ht6000,  ht6000, ht6000_state, empty_init, "Casio", "HT-6000", MACHINE_IS_SKELETON )

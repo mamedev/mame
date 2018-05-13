@@ -618,6 +618,6 @@ void lgp_state::init_lgp()
 {
 }
 
-/*    YEAR  NAME PARENT   MACHINE INPUT STATE       INIT MONITOR  COMPANY   FULLNAME                         FLAGS) */
-GAME( 1983, lgp, 0,       lgp,    lgp,  lgp_state,  lgp, ROT0,    "Taito",  "Laser Grand Prix",              MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, lgpalt, lgp,  lgp,    lgp,  lgp_state,  lgp, ROT0,    "Taito",  "Laser Grand Prix (alternate)",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+/*    YEAR  NAME PARENT   MACHINE INPUT STATE      INIT      MONITOR  COMPANY   FULLNAME                         FLAGS) */
+GAME( 1983, lgp, 0,       lgp,    lgp,  lgp_state, init_lgp, ROT0,    "Taito",  "Laser Grand Prix",              MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, lgpalt, lgp,  lgp,    lgp,  lgp_state, init_lgp, ROT0,    "Taito",  "Laser Grand Prix (alternate)",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

@@ -491,5 +491,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS         INIT    COMPANY  FULLNAME      FLAGS */
-COMP(1982, altos5, 0,      0,       altos5,  altos5, altos5_state, altos5, "Altos", "Altos 5-15", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY  FULLNAME      FLAGS */
+COMP( 1982, altos5, 0,      0,      altos5,  altos5, altos5_state, init_altos5, "Altos", "Altos 5-15", MACHINE_NOT_WORKING )

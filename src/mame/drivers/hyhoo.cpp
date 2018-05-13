@@ -312,5 +312,5 @@ ROM_START( hyhoo2 )
 ROM_END
 
 
-GAME( 1987, hyhoo,  0, hyhoo,  hyhoo,  hyhoo_state, 0, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hyhoo2, 0, hyhoo2, hyhoo2, hyhoo_state, 0, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hyhoo,  0, hyhoo,  hyhoo,  hyhoo_state, empty_init, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hyhoo2, 0, hyhoo2, hyhoo2, hyhoo_state, empty_init, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo 2 (Japan)", MACHINE_SUPPORTS_SAVE )

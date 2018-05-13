@@ -305,4 +305,4 @@ ROM_START( prpht600 )
 	ROM_LOAD( "p600.bin",     0x000000, 0x002000, CRC(78e3f048) SHA1(61548b6de3d9b5c0ae76f8e751ece0b57de17118) )
 ROM_END
 
-CONS( 1983, prpht600, 0, 0, prophet600, prophet600, prophet600_state, 0, "Sequential Circuits", "Prophet-600", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 1983, prpht600, 0, 0, prophet600, prophet600, prophet600_state, empty_init, "Sequential Circuits", "Prophet-600", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

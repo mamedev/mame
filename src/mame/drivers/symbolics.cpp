@@ -397,5 +397,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       STATE            INIT        COMPANY      FULLNAME  FLAGS
-COMP( 1984, s3670,      0,      0,      symbolics,  symbolics,  symbolics_state, symbolics,  "Symbolics", "3670",   MACHINE_IS_SKELETON )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT            COMPANY      FULLNAME  FLAGS
+COMP( 1984, s3670, 0,      0,      symbolics, symbolics, symbolics_state, init_symbolics, "Symbolics", "3670",   MACHINE_IS_SKELETON )

@@ -208,5 +208,5 @@ void trucocl_state::init_trucocl()
 
 
 /******************************************************************************/
-//    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT     MONITOR
-GAME( 1991, trucocl,  0,      trucocl, trucocl, trucocl_state, trucocl, ROT0, "Miky SRL", "Truco Clemente", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT          MONITOR
+GAME( 1991, trucocl,  0,      trucocl, trucocl, trucocl_state, init_trucocl, ROT0, "Miky SRL", "Truco Clemente", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

@@ -54,5 +54,5 @@ ROM_START( canons80 )
 	ROM_LOAD( "canon_8735kx_nh4-0029_064.ic6", 0x8000, 0x8000, CRC(b6cd2ff7) SHA1(e47a136300c826e480fac1be7fc090523078a2a6) )
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE  INPUT  INIT                      COMPANY  FULLNAME                            FLAGS */
-COMP( 1988, canons80,      0,      0, canons80,     0, canons80_state, canons80, "Canon", "Canon S-80 electronic typewriter", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT           COMPANY  FULLNAME                            FLAGS */
+COMP( 1988, canons80, 0,      0,      canons80, 0,     canons80_state, init_canons80, "Canon", "Canon S-80 electronic typewriter", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

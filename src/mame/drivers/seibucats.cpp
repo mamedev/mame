@@ -419,12 +419,12 @@ void seibucats_state::init_seibucats()
 // Gravure Collection
 // Pakkun Ball TV
 /* 01 */ // Mahjong Shichau zo!
-/* 02 */ GAME( 1999, emjjoshi,  0,   seibucats,  seibucats, seibucats_state,  seibucats,       ROT0, "Seibu Kaihatsu / CATS",      "E-Touch Mahjong Series #2: Joshiryou de NE! (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/* 02 */ GAME( 1999, emjjoshi,  0,   seibucats,  seibucats, seibucats_state, init_seibucats, ROT0, "Seibu Kaihatsu / CATS", "E-Touch Mahjong Series #2: Joshiryou de NE! (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 /* 03 */ // Lingerie DE Ikou
 /* 04 */ // Marumie Network
 /* 05 */ // BINKAN Lips
-/* 06 */ GAME( 2001, emjscanb,  0,   seibucats,  seibucats, seibucats_state,  seibucats,       ROT0, "Seibu Kaihatsu / CATS",      "E-Touch Mahjong Series #6: Scandal Blue - Midara na Daishou (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-/* 07 */ GAME( 2001, emjtrapz,  0,   seibucats,  seibucats, seibucats_state,  seibucats,       ROT0, "Seibu Kaihatsu / CATS",      "E-Touch Mahjong Series #7: Trap Zone - Yokubou no Kaisoku Densha (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/* 06 */ GAME( 2001, emjscanb,  0,   seibucats,  seibucats, seibucats_state, init_seibucats, ROT0, "Seibu Kaihatsu / CATS", "E-Touch Mahjong Series #6: Scandal Blue - Midara na Daishou (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/* 07 */ GAME( 2001, emjtrapz,  0,   seibucats,  seibucats, seibucats_state, init_seibucats, ROT0, "Seibu Kaihatsu / CATS", "E-Touch Mahjong Series #7: Trap Zone - Yokubou no Kaisoku Densha (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 /* 08 */ // Poison
 /* 09 */ // Nurse Call
 /* 10 */ // Secret Love

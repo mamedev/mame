@@ -319,4 +319,4 @@ void littlerb_state::init_littlerb()
 	m_indervid->subdevice<cpu_device>("tms")->set_clock_scale(1.2f);
 }
 
-GAME( 1994, littlerb, 0, littlerb, littlerb, littlerb_state, littlerb, ROT0, "TCH", "Little Robin", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+GAME( 1994, littlerb, 0, littlerb, littlerb, littlerb_state, init_littlerb, ROT0, "TCH", "Little Robin", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )

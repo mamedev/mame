@@ -909,4 +909,4 @@ ROM_START(accomm)
 	/* Versone 3.00 13/gen/88 (C)1988 */
 ROM_END
 
-COMP( 1986,  accomm,  0, 0, accomm,  accomm, accomm_state,  0,  "Acorn", "Acorn Communicator", MACHINE_NOT_WORKING )
+COMP( 1986, accomm, 0, 0, accomm, accomm, accomm_state, empty_init, "Acorn", "Acorn Communicator", MACHINE_NOT_WORKING )

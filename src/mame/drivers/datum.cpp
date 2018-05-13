@@ -212,5 +212,5 @@ ROM_START( datum )
 	ROM_LOAD( "datum.bin", 0x0000, 0x0800, BAD_DUMP CRC(6fb11628) SHA1(8a77a846b62eee0d12848da76e16b4c66ef445d8) )
 ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS        INIT  COMPANY       FULLNAME   FLAGS
-COMP( 1982, datum,   0,      0,       datum,      datum,  datum_state, 0,    "Gammatron",  "Datum",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1982, datum, 0,      0,      datum,   datum, datum_state, empty_init, "Gammatron", "Datum",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

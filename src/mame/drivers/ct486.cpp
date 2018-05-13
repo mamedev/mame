@@ -205,4 +205,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1993, ct486, 0, 0, ct486, 0, ct486_state, 0, "<unknown>", "PC/AT 486 with CS4031 chipset", 0 )
+COMP( 1993, ct486, 0, 0, ct486, 0, ct486_state, empty_init, "<unknown>", "PC/AT 486 with CS4031 chipset", 0 )

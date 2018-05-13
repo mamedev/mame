@@ -358,5 +358,5 @@ void leapster_state::init_leapster()
 {
 }
 
-CONS( 2003,  leapster,    0,         0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster",    MACHINE_IS_SKELETON )
-CONS( 2005,  leapstertv,  leapster,  0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster TV", MACHINE_IS_SKELETON )
+CONS( 2003, leapster,   0,        0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster",    MACHINE_IS_SKELETON )
+CONS( 2005, leapstertv, leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster TV", MACHINE_IS_SKELETON )

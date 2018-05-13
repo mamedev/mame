@@ -293,8 +293,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   STATE         INIT    COMPANY      FULLNAME         FLAGS */
-COMP( 1987, korvet,  0,      0,      pk8020,     pk8020, pk8020_state, 0,      "<unknown>", "PK8020 Korvet", 0)
-COMP( 1987, neiva,   korvet, 0,      pk8020,     pk8020, pk8020_state, 0,      "<unknown>", "PK8020 Neiva",  0)
-COMP( 1987, kontur,  korvet, 0,      pk8020,     pk8020, pk8020_state, 0,      "<unknown>", "PK8020 Kontur", 0)
-COMP( 1987, bk8t,    korvet, 0,      pk8020,     pk8020, pk8020_state, 0,      "<unknown>", "BK-8T",         0)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME         FLAGS */
+COMP( 1987, korvet, 0,      0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "PK8020 Korvet", 0)
+COMP( 1987, neiva,  korvet, 0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "PK8020 Neiva",  0)
+COMP( 1987, kontur, korvet, 0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "PK8020 Kontur", 0)
+COMP( 1987, bk8t,   korvet, 0,      pk8020,  pk8020, pk8020_state, empty_init, "<unknown>", "BK-8T",         0)

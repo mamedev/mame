@@ -582,6 +582,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT    STATE          INIT     COMPANY       FULLNAME                                  FLAGS
-COMP( 1981, pegasus,  0,       0,      pegasus,   pegasus, pegasus_state, pegasus, "Technosys",  "Aamber Pegasus",                         MACHINE_NO_SOUND_HW )
-COMP( 1981, pegasusm, pegasus, 0,      pegasusm,  pegasus, pegasus_state, pegasus, "Technosys",  "Aamber Pegasus with RAM expansion unit", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT          COMPANY      FULLNAME                                  FLAGS
+COMP( 1981, pegasus,  0,       0,      pegasus,  pegasus, pegasus_state, init_pegasus, "Technosys", "Aamber Pegasus",                         MACHINE_NO_SOUND_HW )
+COMP( 1981, pegasusm, pegasus, 0,      pegasusm, pegasus, pegasus_state, init_pegasus, "Technosys", "Aamber Pegasus with RAM expansion unit", MACHINE_NO_SOUND_HW )

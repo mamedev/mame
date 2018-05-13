@@ -273,7 +273,7 @@ ROM_END
 #define rom_isbc8010a rom_isbc8010
 #define rom_isbc8010b rom_isbc8010
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1975, isbc8010,  0,        0,      isbc8010,  isbc8010,  isbc8010_state,  0,     "Intel",  "iSBC 80/10",  MACHINE_NO_SOUND_HW )
-COMP( 1977, isbc8010a, isbc8010, 0,      isbc8010a, isbc8010,  isbc8010_state,  0,     "Intel",  "iSBC 80/10A", MACHINE_NO_SOUND_HW )
-COMP( 1979, isbc8010b, isbc8010, 0,      isbc8010b, isbc8010,  isbc8010_state,  0,     "Intel",  "iSBC 80/10B", MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY  FULLNAME       FLAGS */
+COMP( 1975, isbc8010,  0,        0,      isbc8010,  isbc8010, isbc8010_state, empty_init, "Intel", "iSBC 80/10",  MACHINE_NO_SOUND_HW )
+COMP( 1977, isbc8010a, isbc8010, 0,      isbc8010a, isbc8010, isbc8010_state, empty_init, "Intel", "iSBC 80/10A", MACHINE_NO_SOUND_HW )
+COMP( 1979, isbc8010b, isbc8010, 0,      isbc8010b, isbc8010, isbc8010_state, empty_init, "Intel", "iSBC 80/10B", MACHINE_NO_SOUND_HW )

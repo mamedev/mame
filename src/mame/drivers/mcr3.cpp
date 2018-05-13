@@ -1685,16 +1685,16 @@ void mcr3_state::init_turbotag()
  *************************************/
 
 /* MCR monoboard games */
-GAME( 1984, demoderm, demoderb, mono_tcs,  demoderm, mcr3_state, demoderm, ROT0,  "Bally Midway", "Demolition Derby (MCR-3 Mono Board Version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sarge,    0,        mono_tcs,  sarge,    mcr3_state, sarge,    ROT0,  "Bally Midway", "Sarge", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, maxrpm,   0,        maxrpm,    maxrpm,   mcr3_state, maxrpm,   ROT0,  "Bally Midway", "Max RPM (ver 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rampage,  0,        mono_sg,   rampage,  mcr3_state, rampage,  ROT0,  "Bally Midway", "Rampage (Rev 3, 8/27/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rampage2, rampage,  mono_sg,   rampage,  mcr3_state, rampage,  ROT0,  "Bally Midway", "Rampage (Rev 2, 8/4/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, powerdrv, 0,        mono_sg,   powerdrv, mcr3_state, powerdrv, ROT0,  "Bally Midway", "Power Drive", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, stargrds, 0,        mono_sg,   stargrds, mcr3_state, stargrds, ROT0,  "Bally Midway", "Star Guards", MACHINE_SUPPORTS_SAVE )
+GAME(  1984, demoderm, demoderb, mono_tcs,  demoderm, mcr3_state, init_demoderm, ROT0,  "Bally Midway", "Demolition Derby (MCR-3 Mono Board Version)", MACHINE_SUPPORTS_SAVE )
+GAME(  1985, sarge,    0,        mono_tcs,  sarge,    mcr3_state, init_sarge,    ROT0,  "Bally Midway", "Sarge", MACHINE_SUPPORTS_SAVE )
+GAME(  1986, maxrpm,   0,        maxrpm,    maxrpm,   mcr3_state, init_maxrpm,   ROT0,  "Bally Midway", "Max RPM (ver 2)", MACHINE_SUPPORTS_SAVE )
+GAME(  1986, rampage,  0,        mono_sg,   rampage,  mcr3_state, init_rampage,  ROT0,  "Bally Midway", "Rampage (Rev 3, 8/27/86)", MACHINE_SUPPORTS_SAVE )
+GAME(  1986, rampage2, rampage,  mono_sg,   rampage,  mcr3_state, init_rampage,  ROT0,  "Bally Midway", "Rampage (Rev 2, 8/4/86)", MACHINE_SUPPORTS_SAVE )
+GAME(  1986, powerdrv, 0,        mono_sg,   powerdrv, mcr3_state, init_powerdrv, ROT0,  "Bally Midway", "Power Drive", MACHINE_SUPPORTS_SAVE )
+GAME(  1987, stargrds, 0,        mono_sg,   stargrds, mcr3_state, init_stargrds, ROT0,  "Bally Midway", "Star Guards", MACHINE_SUPPORTS_SAVE )
 
 /* MCR scrolling games */
-GAMEL(1983, spyhunt,  0,        mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway", "Spy Hunter", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
-GAMEL(1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway (Playtronic license)", "Spy Hunter (Playtronic license)", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
-GAME( 1984, crater,   0,        mcrscroll, crater,   mcr3_state, crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", MACHINE_SUPPORTS_SAVE )
-GAMEL(1985, turbotag, 0,        mcrsc_csd, turbotag, mcr3_state, turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", MACHINE_SUPPORTS_SAVE, layout_turbotag )
+GAMEL( 1983, spyhunt,  0,        mcrsc_csd, spyhunt,  mcr3_state, init_spyhunt,  ROT90, "Bally Midway", "Spy Hunter", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
+GAMEL( 1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  mcr3_state, init_spyhunt,  ROT90, "Bally Midway (Playtronic license)", "Spy Hunter (Playtronic license)", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
+GAME(  1984, crater,   0,        mcrscroll, crater,   mcr3_state, init_crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1985, turbotag, 0,        mcrsc_csd, turbotag, mcr3_state, init_turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", MACHINE_SUPPORTS_SAVE, layout_turbotag )

@@ -639,10 +639,10 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT     ROT   COMPANY                  FULLNAME                            FLAGS
-GAME( 1990, supbtime,  0,        supbtime, supbtime, supbtime_state,       0, ROT0, "Data East Corporation", "Super Burger Time (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, supbtimea, supbtime, supbtime, supbtime, supbtime_state,       0, ROT0, "Data East Corporation", "Super Burger Time (World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, supbtimej, supbtime, supbtime, supbtime, supbtime_state,       0, ROT0, "Data East Corporation", "Super Burger Time (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1991, chinatwn,  0,        chinatwn, chinatwn, supbtime_state,       0, ROT0, "Data East Corporation", "China Town (Japan)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tumblep,   0,        tumblep,  tumblep,  supbtime_state, tumblep, ROT0, "Data East Corporation", "Tumble Pop (World)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tumblepj,  tumblep,  tumblep,  tumblep,  supbtime_state, tumblep, ROT0, "Data East Corporation", "Tumble Pop (Japan)",               MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT          ROT   COMPANY                  FULLNAME                            FLAGS
+GAME( 1990, supbtime,  0,        supbtime, supbtime, supbtime_state, empty_init,   ROT0, "Data East Corporation", "Super Burger Time (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, supbtimea, supbtime, supbtime, supbtime, supbtime_state, empty_init,   ROT0, "Data East Corporation", "Super Burger Time (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, supbtimej, supbtime, supbtime, supbtime, supbtime_state, empty_init,   ROT0, "Data East Corporation", "Super Burger Time (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, chinatwn,  0,        chinatwn, chinatwn, supbtime_state, empty_init,   ROT0, "Data East Corporation", "China Town (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tumblep,   0,        tumblep,  tumblep,  supbtime_state, init_tumblep, ROT0, "Data East Corporation", "Tumble Pop (World)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tumblepj,  tumblep,  tumblep,  tumblep,  supbtime_state, init_tumblep, ROT0, "Data East Corporation", "Tumble Pop (Japan)",               MACHINE_SUPPORTS_SAVE )

@@ -689,11 +689,11 @@ ROM_START( rpc86 )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT  STATE        INIT  COMPANY   FULLNAME        FLAGS */
-COMP( 19??, rpc86,     0,      0,      rpc86,     isbc,  isbc_state,  0,    "Intel",  "RPC 86",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1978, isbc86,    0,      0,      isbc86,    isbc,  isbc_state,  0,    "Intel",  "iSBC 86/12A",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1981, isbc8605,  0,      0,      isbc8605,  isbc,  isbc_state,  0,    "Intel",  "iSBC 86/05",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1981, isbc8630,  0,      0,      isbc8630,  isbc,  isbc_state,  0,    "Intel",  "iSBC 86/30",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 19??, isbc286,   0,      0,      isbc286,   isbc,  isbc_state,  0,    "Intel",  "iSBC 286",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1983, isbc2861,  0,      0,      isbc2861,  isbc,  isbc_state,  0,    "Intel",  "iSBC 286/10",  MACHINE_NO_SOUND_HW)
-COMP( 1983, isbc28612, 0,      0,      isbc2861,  isbc,  isbc_state,  0,    "Intel",  "iSBC 286/12",  MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT  CLASS       INIT        COMPANY  FULLNAME       FLAGS */
+COMP( 19??, rpc86,     0,      0,      rpc86,    isbc,  isbc_state, empty_init, "Intel", "RPC 86",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1978, isbc86,    0,      0,      isbc86,   isbc,  isbc_state, empty_init, "Intel", "iSBC 86/12A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1981, isbc8605,  0,      0,      isbc8605, isbc,  isbc_state, empty_init, "Intel", "iSBC 86/05",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1981, isbc8630,  0,      0,      isbc8630, isbc,  isbc_state, empty_init, "Intel", "iSBC 86/30",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 19??, isbc286,   0,      0,      isbc286,  isbc,  isbc_state, empty_init, "Intel", "iSBC 286",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1983, isbc2861,  0,      0,      isbc2861, isbc,  isbc_state, empty_init, "Intel", "iSBC 286/10", MACHINE_NO_SOUND_HW)
+COMP( 1983, isbc28612, 0,      0,      isbc2861, isbc,  isbc_state, empty_init, "Intel", "iSBC 286/12", MACHINE_NO_SOUND_HW)

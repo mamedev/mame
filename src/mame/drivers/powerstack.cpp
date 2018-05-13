@@ -37,4 +37,4 @@ ROM_START( powerstk )
 	ROM_LOAD( "motorola_powerstack2.bin", 0x0000, 0x80000, CRC(948e8fcd) SHA1(9a8c32b621c98bc33ee525f66747c34d39851685) )
 ROM_END
 
-COMP( 1996, powerstk, 0, 0, powerstack, powerstack, powerstack_state, 0, "Motorola", "Powerstack II", MACHINE_IS_SKELETON )
+COMP( 1996, powerstk, 0, 0, powerstack, powerstack, powerstack_state, empty_init, "Motorola", "Powerstack II", MACHINE_IS_SKELETON )

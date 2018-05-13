@@ -307,4 +307,4 @@ void m79amb_state::init_m79amb()
 	}
 }
 
-GAME( 1977, m79amb, 0, m79amb, m79amb, m79amb_state, m79amb, ROT0, "Ramtek", "M-79 Ambush", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, m79amb, 0, m79amb, m79amb, m79amb_state, init_m79amb, ROT0, "Ramtek", "M-79 Ambush", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

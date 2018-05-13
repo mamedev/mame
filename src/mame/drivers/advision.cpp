@@ -116,5 +116,5 @@ ROM_END
 
 /* Game Driver */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     STATE            INIT  COMPANY  FULLNAME            FLAGS */
-CONS( 1982, advision,   0,      0,      advision, advision, advision_state,  0,    "Entex", "Adventure Vision", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME            FLAGS */
+CONS( 1982, advision, 0,      0,      advision, advision, advision_state, empty_init, "Entex", "Adventure Vision", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

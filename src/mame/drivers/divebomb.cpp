@@ -578,4 +578,4 @@ MACHINE_RESET_MEMBER(divebomb_state, divebomb)
  *************************************/
 
 // According to a flyer, the world release was to be called 'Gaia'. The Gaia title graphics are present in the ROMs.
-GAME( 1989, divebomb, 0, divebomb, divebomb, divebomb_state, 0, ROT270, "Konami", "Kyuukoukabakugekitai - Dive Bomber Squad (Japan, prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, divebomb, 0, divebomb, divebomb, divebomb_state, empty_init, ROT270, "Konami", "Kyuukoukabakugekitai - Dive Bomber Squad (Japan, prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )

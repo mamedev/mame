@@ -735,8 +735,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, eprom,  0,     eprom, eprom, eprom_state, 0, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, eprom2, eprom, eprom, eprom, eprom_state, 0, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, klaxp1, klax,  klaxp, klaxp, eprom_state, 0, ROT0, "Atari Games", "Klax (prototype set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, klaxp2, klax,  klaxp, klaxp, eprom_state, 0, ROT0, "Atari Games", "Klax (prototype set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, guts,   0,     guts,  guts,  eprom_state, 0, ROT0, "Atari Games", "Guts n' Glory (prototype)", 0 )
+GAME( 1989, eprom,  0,     eprom, eprom, eprom_state, empty_init, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, eprom2, eprom, eprom, eprom, eprom_state, empty_init, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, klaxp1, klax,  klaxp, klaxp, eprom_state, empty_init, ROT0, "Atari Games", "Klax (prototype set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, klaxp2, klax,  klaxp, klaxp, eprom_state, empty_init, ROT0, "Atari Games", "Klax (prototype set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, guts,   0,     guts,  guts,  eprom_state, empty_init, ROT0, "Atari Games", "Guts n' Glory (prototype)", 0 )

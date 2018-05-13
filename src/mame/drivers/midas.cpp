@@ -897,5 +897,5 @@ ROM_START( hammer )
 	/* uploaded */
 ROM_END
 
-GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state, livequiz, ROT0, "Andamiro", "Live Quiz Show", 0 )
-GAME( 2000, hammer,   0, hammer,   hammer,   midas_state, 0,        ROT0, "Andamiro", "Hammer",         0 )
+GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state, init_livequiz, ROT0, "Andamiro", "Live Quiz Show", 0 )
+GAME( 2000, hammer,   0, hammer,   hammer,   midas_state, empty_init,    ROT0, "Andamiro", "Hammer",         0 )

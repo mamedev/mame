@@ -455,4 +455,4 @@ void dblewing_state::init_dblewing()
 }
 
 
-GAME( 1993, dblewing, 0,     dblewing, dblewing, dblewing_state,  dblewing,  ROT90, "Mitchell", "Double Wings", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, dblewing, 0, dblewing, dblewing, dblewing_state, init_dblewing, ROT90, "Mitchell", "Double Wings", MACHINE_SUPPORTS_SAVE )

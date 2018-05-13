@@ -1005,7 +1005,7 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT   STATE         INIT  COMPANY    FULLNAME   FLAGS
-COMP( 1981, mz80b,    0,        0,       mz80b,    mz80be, mz2000_state, 0,    "Sharp",   "MZ-80B",  MACHINE_NOT_WORKING )
-COMP( 1982, mz2000,   0,        0,       mz2000,   mz80bj, mz2000_state, 0,    "Sharp",   "MZ-2000", MACHINE_NOT_WORKING )
-COMP( 1982, mz2200,   mz2000,   0,       mz2000,   mz80bj, mz2000_state, 0,    "Sharp",   "MZ-2200", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1981, mz80b,  0,      0,      mz80b,   mz80be, mz2000_state, empty_init, "Sharp", "MZ-80B",  MACHINE_NOT_WORKING )
+COMP( 1982, mz2000, 0,      0,      mz2000,  mz80bj, mz2000_state, empty_init, "Sharp", "MZ-2000", MACHINE_NOT_WORKING )
+COMP( 1982, mz2200, mz2000, 0,      mz2000,  mz80bj, mz2000_state, empty_init, "Sharp", "MZ-2200", MACHINE_NOT_WORKING )

@@ -305,5 +305,5 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY          FULLNAME                  FLAGS
-CONS( 1995, comquest, 0,        0,      comquest, comquest, comquest_state, 0,    "Data Concepts", "ComQuest Plus (German)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY          FULLNAME                  FLAGS
+CONS( 1995, comquest, 0,      0,      comquest, comquest, comquest_state, empty_init, "Data Concepts", "ComQuest Plus (German)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -170,4 +170,4 @@ ROM_START( bingowav )
 ROM_END
 
 
-GAME( 1994, bingowav, 0, bingowav, bingowav, bingowav_state, 0, ROT0, "Taito", "Bingo Wave", MACHINE_IS_SKELETON )
+GAME( 1994, bingowav, 0, bingowav, bingowav, bingowav_state, empty_init, ROT0, "Taito", "Bingo Wave", MACHINE_IS_SKELETON )

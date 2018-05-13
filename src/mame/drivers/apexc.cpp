@@ -888,6 +888,6 @@ ROM_START(apexc)
 		/* space filled with our font */
 ROM_END
 
-//     YEAR     NAME        PARENT    COMPAT  MACHINE     INPUT  STATE         INIT   COMPANY                FULLNAME */
-//COMP(  1951,    apexc53,    0,        0,      apexc53,    apexc, apexc_state,  apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1953)" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP(  1955,    apexc,      0,        0,      apexc,      apexc, apexc_state,  apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1957)" , MACHINE_NO_SOUND_HW)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                FULLNAME */
+//COMP( 1951, apexc53, 0,      0,      apexc53, apexc, apexc_state, init_apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1953)" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1955, apexc,   0,      0,      apexc,   apexc, apexc_state, init_apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1957)" , MACHINE_NO_SOUND_HW)

@@ -131,4 +131,4 @@ ROM_START( bowltry )
 ROM_END
 
 
-GAME( 200?, bowltry,    0,          bowltry,  bowltry, bowltry_state,  0, ROT0, "Atlus",        "Bowling Try",MACHINE_IS_SKELETON )
+GAME( 200?, bowltry, 0, bowltry, bowltry, bowltry_state, empty_init, ROT0, "Atlus", "Bowling Try", MACHINE_IS_SKELETON )

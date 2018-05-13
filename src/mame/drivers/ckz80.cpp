@@ -473,5 +473,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE  INPUT   STATE         INIT    COMPANY, FULLNAME, FLAGS */
-CONS( 1984, ckmaster,  0,        0,      master,  master, ckz80_state,  master, "Chess King", "Master (Chess King)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT         COMPANY       FULLNAME               FLAGS */
+CONS( 1984, ckmaster, 0,      0,      master,  master, ckz80_state, init_master, "Chess King", "Master (Chess King)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

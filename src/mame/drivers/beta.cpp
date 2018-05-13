@@ -382,5 +382,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE       INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1984, beta,   0,      0,      beta,   beta, beta_state, 0,    "Pitronics", "Beta",   MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1984, beta, 0,      0,      beta,    beta,  beta_state, empty_init, "Pitronics", "Beta",   MACHINE_SUPPORTS_SAVE )

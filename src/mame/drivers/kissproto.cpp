@@ -75,5 +75,5 @@ ROM_START(kissp2)
 	ROM_RELOAD( 0x4800, 0x0800)
 ROM_END
 
-GAME( 1979,  kissp,  kiss,  kissp,  kissp, kissp_state,  kissp,  ROT0,  "Bally", "Kiss (prototype)",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979,  kissp2, kiss,  kissp,  kissp, kissp_state,  kissp,  ROT0,  "Bally", "Kiss (prototype v.2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, kissp,  kiss, kissp, kissp, kissp_state, init_kissp, ROT0, "Bally", "Kiss (prototype)",     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, kissp2, kiss, kissp, kissp, kissp_state, init_kissp, ROT0, "Bally", "Kiss (prototype v.2)", MACHINE_IS_SKELETON_MECHANICAL )

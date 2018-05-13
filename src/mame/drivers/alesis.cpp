@@ -544,8 +544,8 @@ void alesis_state::init_hr16()
 }
 
 /* Driver */
-/*    YEAR  NAME   PARENT   COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY   FULLNAME          FLAGS */
-SYST( 1987, hr16,  0,       0,       hr16,      hr16,  alesis_state, hr16, "Alesis", "HR-16",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST( 1987, mmt8,  0,       0,       mmt8,      mmt8,  alesis_state, 0,    "Alesis", "MMT-8",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST( 1989, hr16b, hr16,    0,       hr16,      hr16,  alesis_state, hr16, "Alesis", "HR-16B",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST( 1990, sr16,  0,       0,       sr16,      sr16,  alesis_state, 0,    "Alesis", "SR-16 (Alesis)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY   FULLNAME          FLAGS */
+SYST( 1987, hr16,  0,      0,      hr16,    hr16,  alesis_state, init_hr16,  "Alesis", "HR-16",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST( 1987, mmt8,  0,      0,      mmt8,    mmt8,  alesis_state, empty_init, "Alesis", "MMT-8",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST( 1989, hr16b, hr16,   0,      hr16,    hr16,  alesis_state, init_hr16,  "Alesis", "HR-16B",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST( 1990, sr16,  0,      0,      sr16,    sr16,  alesis_state, empty_init, "Alesis", "SR-16 (Alesis)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

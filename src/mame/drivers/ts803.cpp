@@ -479,5 +479,5 @@ ROM_END
 
 
 
-//   YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT    COMPANY     FULLNAME  FLAGS
-COMP(1983, ts803h,  0,      0,      ts803,     ts803, ts803_state, ts803, "Televideo", "TS803H", MACHINE_NOT_WORKING )
+//   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
+COMP(1983, ts803h, 0,      0,      ts803,   ts803, ts803_state, init_ts803, "Televideo", "TS803H", MACHINE_NOT_WORKING )

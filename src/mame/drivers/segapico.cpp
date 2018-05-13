@@ -472,9 +472,9 @@ void pico_base_state::init_picoj()
 }
 
 
-CONS( 1994, pico,       0,         0,      picopal,         pico, pico_state,   pico,    "Sega",   "Pico (Europe, PAL)", MACHINE_NOT_WORKING)
-CONS( 1994, picou,      pico,      0,      pico,            pico, pico_state,   picou,   "Sega",   "Pico (USA, NTSC)", MACHINE_NOT_WORKING)
-CONS( 1993, picoj,      pico,      0,      pico,            pico, pico_state,   picoj,   "Sega",   "Pico (Japan, NTSC)", MACHINE_NOT_WORKING)
+CONS( 1994, pico,  0,    0, picopal, pico, pico_state, init_pico,  "Sega", "Pico (Europe, PAL)", MACHINE_NOT_WORKING)
+CONS( 1994, picou, pico, 0, pico,    pico, pico_state, init_picou, "Sega", "Pico (USA, NTSC)", MACHINE_NOT_WORKING)
+CONS( 1993, picoj, pico, 0, pico,    pico, pico_state, init_picoj, "Sega", "Pico (Japan, NTSC)", MACHINE_NOT_WORKING)
 
 /*
 
@@ -630,4 +630,4 @@ ROM_START( copera )
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 ROM_END
 
-CONS( 1993, copera,       0,         0,      copera,         pico, copera_state,   picoj,    "Yamaha / Sega",   "Yamaha Mixt Book Player Copera", MACHINE_NOT_WORKING)
+CONS( 1993, copera, 0, 0, copera, pico, copera_state, init_picoj, "Yamaha / Sega", "Yamaha Mixt Book Player Copera", MACHINE_NOT_WORKING)

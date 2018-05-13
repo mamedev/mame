@@ -599,6 +599,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY      FULLNAME   FLAGS
-COMP( 1982, jr200,  0,      0,      jr200,   jr200, jr200_state, 0,    "National",  "JR-200",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1982, jr200u, jr200,  0,      jr200,   jr200, jr200_state, 0,    "Panasonic", "JR-200U", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME   FLAGS
+COMP( 1982, jr200,  0,      0,      jr200,   jr200, jr200_state, empty_init, "National",  "JR-200",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1982, jr200u, jr200,  0,      jr200,   jr200, jr200_state, empty_init, "Panasonic", "JR-200U", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

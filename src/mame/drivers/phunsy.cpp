@@ -401,5 +401,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY            FULLNAME  FLAGS */
-COMP( 1980, phunsy, 0,      0,       phunsy,    phunsy, phunsy_state,  phunsy, "J.F.P. Philipse", "PHUNSY", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY            FULLNAME  FLAGS */
+COMP( 1980, phunsy, 0,      0,      phunsy,  phunsy, phunsy_state, init_phunsy, "J.F.P. Philipse", "PHUNSY", MACHINE_NOT_WORKING )

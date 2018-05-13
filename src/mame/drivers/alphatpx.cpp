@@ -1449,9 +1449,9 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT   COMPAT   MACHINE   INPUT       CLASS           INIT  COMPANY          FULLNAME  FLAGS
-COMP( 198?, alphatp1,  alphatp2, 0,     alphatp2, alphatp2, alphatp_12_state, 0,    "Triumph-Adler", "alphatronic P1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 198?, alphatp2,  0,        0,     alphatp2, alphatp2, alphatp_12_state, 0,    "Triumph-Adler", "alphatronic P2", MACHINE_NOT_WORKING )
-COMP( 198?, alphatp2u, alphatp2, 0,     alphatp2u,alphatp3, alphatp_12_state, 0,    "Triumph-Adler", "alphatronic P2U", MACHINE_NOT_WORKING )
-COMP( 1982, alphatp3,  0,        0,     alphatp3, alphatp3, alphatp_34_state, 0,    "Triumph-Adler", "alphatronic P3", MACHINE_NOT_WORKING )
-COMP( 198?, alphatp30, alphatp3, 0,     alphatp30, alphatp3, alphatp_34_state, 0,    "Triumph-Adler", "alphatronic P30",MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    COMPAT   MACHINE    INPUT     CLASS             INIT        COMPANY          FULLNAME           FLAGS
+COMP( 198?, alphatp1,  alphatp2, 0,       alphatp2,  alphatp2, alphatp_12_state, empty_init, "Triumph-Adler", "alphatronic P1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 198?, alphatp2,  0,        0,       alphatp2,  alphatp2, alphatp_12_state, empty_init, "Triumph-Adler", "alphatronic P2",  MACHINE_NOT_WORKING )
+COMP( 198?, alphatp2u, alphatp2, 0,       alphatp2u, alphatp3, alphatp_12_state, empty_init, "Triumph-Adler", "alphatronic P2U", MACHINE_NOT_WORKING )
+COMP( 1982, alphatp3,  0,        0,       alphatp3,  alphatp3, alphatp_34_state, empty_init, "Triumph-Adler", "alphatronic P3",  MACHINE_NOT_WORKING )
+COMP( 198?, alphatp30, alphatp3, 0,       alphatp30, alphatp3, alphatp_34_state, empty_init, "Triumph-Adler", "alphatronic P30", MACHINE_NOT_WORKING )

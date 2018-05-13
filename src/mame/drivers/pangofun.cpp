@@ -228,4 +228,4 @@ void pangofun_state::init_pangofun()
 {
 }
 
-GAME( 1995, pangofun,  0,   pangofun, pangofun, pangofun_state, pangofun, ROT0, "InfoCube", "Pango Fun (Italy)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1995, pangofun,  0,   pangofun, pangofun, pangofun_state, init_pangofun, ROT0, "InfoCube", "Pango Fun (Italy)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

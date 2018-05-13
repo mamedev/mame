@@ -1026,5 +1026,5 @@ ROM_START( rabbitjt )
 	ROM_LOAD( "rabbit.nv", 0x0000, 0x0080, CRC(73d471ed) SHA1(45e045f5ea9036342b88013e021d402741d98537) )
 ROM_END
 
-GAME( 1997, rabbit,        0, rabbit,  rabbit, rabbit_state,  rabbit,  ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 3/6)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // This is the Asian version sold in Korea but the devs forgot to update the disclaimer. It has English text.
-GAME( 1996, rabbitjt, rabbit, rabbit,  rabbit, rabbit_state,  rabbit,  ROT0, "Aorn / Electronic Arts", "Rabbit (Japan, location test)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Japanese text.
+GAME( 1997, rabbit,        0, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 3/6)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // This is the Asian version sold in Korea but the devs forgot to update the disclaimer. It has English text.
+GAME( 1996, rabbitjt, rabbit, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Japan, location test)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Japanese text.

@@ -413,4 +413,4 @@ void sderby2_state::init_sderby2()
  *
  *************************************/
 
-GAME( 1985, sderby2, 0, sderby2, sderby2, sderby2_state, sderby2,  ROT0, "Sega", "Super Derby II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1985, sderby2, 0, sderby2, sderby2, sderby2_state, init_sderby2, ROT0, "Sega", "Super Derby II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

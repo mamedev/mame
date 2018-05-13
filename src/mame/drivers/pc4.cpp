@@ -252,5 +252,5 @@ ROM_START( pc4 )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 ROM_END
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY             FULLNAME     FLAGS
-COMP( 1990, pc4,   0,      0,      pc4,     pc4,   pc4_state, 0,    "Laser Computer",   "Laser PC4", MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY           FULLNAME     FLAGS
+COMP( 1990, pc4,  0,      0,      pc4,     pc4,   pc4_state, empty_init, "Laser Computer", "Laser PC4", MACHINE_NOT_WORKING )

@@ -602,6 +602,6 @@ void silvmil_state::init_silvmil()
 	tumblepb_gfx1_rearrange();
 }
 
-GAME( 1995, silvmil,    0,        silvmil,   silvmil,   silvmil_state, silvmil, ROT270, "Para", "Silver Millennium", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, puzzlove,   0,        puzzlove,  puzzlove,  silvmil_state, silvmil, ROT0,   "Para", "PuzzLove", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, puzzlovek,  puzzlove, puzzlovek, puzzlovek, silvmil_state, silvmil, ROT0,   "Para", "PuzzLove (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, silvmil,    0,        silvmil,   silvmil,   silvmil_state, init_silvmil, ROT270, "Para", "Silver Millennium", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, puzzlove,   0,        puzzlove,  puzzlove,  silvmil_state, init_silvmil, ROT0,   "Para", "PuzzLove", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, puzzlovek,  puzzlove, puzzlovek, puzzlovek, silvmil_state, init_silvmil, ROT0,   "Para", "PuzzLove (Korea)", MACHINE_SUPPORTS_SAVE )

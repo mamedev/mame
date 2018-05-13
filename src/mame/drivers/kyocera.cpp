@@ -1630,13 +1630,13 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       STATE           INIT    COMPANY              FULLNAME */
-COMP( 1983, kc85,       0,      0,      kc85,       kc85,       kc85_state,     0,      "Kyosei",            "Kyotronic 85 (Japan)",     0 )
-COMP( 1983, m10,        kc85,   0,      kc85,       olivm10,    kc85_state,     0,      "Olivetti",          "M-10",                     0 )
-//COMP( 1983, m10m,     kc85,   0,      kc85,       olivm10,    kc85_state,     0,      "Olivetti",          "M-10 Modem (US)",          0 )
-COMP( 1983, trsm100,    0,      0,      trsm100,    kc85,       trsm100_state,  0,      "Tandy Radio Shack", "TRS-80 Model 100",         0 )
-COMP( 1986, tandy102,   trsm100,0,      tandy102,   kc85,       trsm100_state,  0,      "Tandy Radio Shack", "Tandy 102",                0 )
-COMP( 1983, pc8201,     0,      0,      pc8201,     pc8201,     pc8201_state,   0,      "NEC",               "PC-8201 (Japan)",          MACHINE_NOT_WORKING ) // keyboard layout wrong
-COMP( 1983, pc8201a,    pc8201, 0,      pc8201,     pc8201a,    pc8201_state,   0,      "NEC",               "PC-8201A",                 0 )
-COMP( 1987, npc8300,    pc8201, 0,      pc8300,     pc8201a,    pc8201_state,   0,      "NEC",               "PC-8300",                  MACHINE_NOT_WORKING )
-COMP( 1984, tandy200,   0,      0,      tandy200,   kc85,       tandy200_state, 0,      "Tandy Radio Shack", "Tandy 200",                0 )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS           INIT        COMPANY              FULLNAME */
+COMP( 1983, kc85,     0,       0,      kc85,     kc85,    kc85_state,     empty_init, "Kyosei",            "Kyotronic 85 (Japan)", 0 )
+COMP( 1983, m10,      kc85,    0,      kc85,     olivm10, kc85_state,     empty_init, "Olivetti",          "M-10",                 0 )
+//COMP( 1983, m10m,     kc85,    0,      kc85,     olivm10, kc85_state,     empty_init, "Olivetti",          "M-10 Modem (US)",      0 )
+COMP( 1983, trsm100,  0,       0,      trsm100,  kc85,    trsm100_state,  empty_init, "Tandy Radio Shack", "TRS-80 Model 100",     0 )
+COMP( 1986, tandy102, trsm100, 0,      tandy102, kc85,    trsm100_state,  empty_init, "Tandy Radio Shack", "Tandy 102",            0 )
+COMP( 1983, pc8201,   0,       0,      pc8201,   pc8201,  pc8201_state,   empty_init, "NEC",               "PC-8201 (Japan)",      MACHINE_NOT_WORKING ) // keyboard layout wrong
+COMP( 1983, pc8201a,  pc8201,  0,      pc8201,   pc8201a, pc8201_state,   empty_init, "NEC",               "PC-8201A",             0 )
+COMP( 1987, npc8300,  pc8201,  0,      pc8300,   pc8201a, pc8201_state,   empty_init, "NEC",               "PC-8300",              MACHINE_NOT_WORKING )
+COMP( 1984, tandy200, 0,       0,      tandy200, kc85,    tandy200_state, empty_init, "Tandy Radio Shack", "Tandy 200",            0 )

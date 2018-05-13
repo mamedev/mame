@@ -605,6 +605,6 @@ ROM_START( ti95 )
 ROM_END
 
 
-//    YEAR  NAME  PARENT CMP MACHINE INPUT STATE    INIT  COMPANY, FULLNAME, FLAGS
-COMP( 1985, ti74, 0,      0, ti74,   ti74, ti74_state, 0, "Texas Instruments", "TI-74 BASICALC", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1986, ti95, 0,      0, ti95,   ti95, ti74_state, 0, "Texas Instruments", "TI-95 PROCALC", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY              FULLNAME          FLAGS
+COMP( 1985, ti74, 0,      0, ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 BASICALC", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1986, ti95, 0,      0, ti95,    ti95,  ti74_state, empty_init, "Texas Instruments", "TI-95 PROCALC",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

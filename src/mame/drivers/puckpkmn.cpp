@@ -489,7 +489,7 @@ ROM_START( jzth )
 ROM_END
 
 /* Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile ram */  // is 'Genie 2000' part of the title, and the parent set a bootleg?
-GAME( 2000, puckpkmn, 0,        puckpkmn,  puckpkmn, md_boot_state, puckpkmn, ROT0, "Genie",                  "Puckman Pockimon (set 1)", 0 )
-GAME( 2000, puckpkmna,puckpkmn, puckpkmna, puckpkmn, md_boot_state, puckpkmn, ROT0, "IBS",                    "Puckman Pockimon (set 2)", 0 )
-GAME( 2000, puckpkmnb,puckpkmn, puckpkmna, puckpkmn, md_boot_state, puckpkmn, ROT0, "Sun Mixing",             "Puckman Pockimon (set 3)", 0 )
-GAME( 2000, jzth,     0,        jzth,      jzth,     md_boot_state, puckpkmn, ROT0, "<unknown>",              "Jue Zhan Tian Huang", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, puckpkmn, 0,        puckpkmn,  puckpkmn, md_boot_state, init_puckpkmn, ROT0, "Genie",                  "Puckman Pockimon (set 1)", 0 )
+GAME( 2000, puckpkmna,puckpkmn, puckpkmna, puckpkmn, md_boot_state, init_puckpkmn, ROT0, "IBS",                    "Puckman Pockimon (set 2)", 0 )
+GAME( 2000, puckpkmnb,puckpkmn, puckpkmna, puckpkmn, md_boot_state, init_puckpkmn, ROT0, "Sun Mixing",             "Puckman Pockimon (set 3)", 0 )
+GAME( 2000, jzth,     0,        jzth,      jzth,     md_boot_state, init_puckpkmn, ROT0, "<unknown>",              "Jue Zhan Tian Huang", MACHINE_IMPERFECT_SOUND )

@@ -370,5 +370,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY   FULLNAME   FLAGS
-COMP( 1982, mbc200,  0,       0,       mbc200,    mbc200, mbc200_state,  0,    "Sanyo",  "MBC-200", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1982, mbc200, 0,      0,      mbc200,  mbc200, mbc200_state, empty_init, "Sanyo", "MBC-200", 0 )

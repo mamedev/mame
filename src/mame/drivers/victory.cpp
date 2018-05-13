@@ -326,5 +326,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, victory,  0,       victory, victory, victory_state, 0, ROT0, "Exidy", "Victory", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, victorba, victory, victory, victory, victory_state, 0, ROT0, "Exidy", "Victor Banana", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, victory,  0,       victory, victory, victory_state, empty_init, ROT0, "Exidy", "Victory", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, victorba, victory, victory, victory, victory_state, empty_init, ROT0, "Exidy", "Victor Banana", MACHINE_SUPPORTS_SAVE )

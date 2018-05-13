@@ -150,5 +150,5 @@ ROM_START( sdk80 )
 	ROM_LOAD( "mcs80.a14", 0x0000, 0x0400, BAD_DUMP CRC(3ce7bd37) SHA1(04cc67875b53d4cdfefce07041af12be3acedf4f)) // Compiled from manual listing
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   CLASS         INIT   COMPANY   FULLNAME     FLAGS */
-COMP( 1975, sdk80,  0,      0,      sdk80,     sdk80,  sdk80_state,  0,     "Intel",  "SDK-80",    MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY   FULLNAME     FLAGS */
+COMP( 1975, sdk80, 0,      0,      sdk80,   sdk80,  sdk80_state, empty_init, "Intel",  "SDK-80",    MACHINE_NO_SOUND_HW )

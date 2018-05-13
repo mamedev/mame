@@ -173,5 +173,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  STATE        INIT   COMPANY   FULLNAME  FLAGS */
-COMP( 1982, ipds,  0,      0,       ipds,    ipds,  ipds_state,  0,     "Intel",  "iPDS",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME  FLAGS */
+COMP( 1982, ipds, 0,      0,      ipds,    ipds,  ipds_state, empty_init, "Intel", "iPDS",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

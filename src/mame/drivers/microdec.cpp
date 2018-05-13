@@ -257,6 +257,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT     CLASS           INIT       COMPANY           FULLNAME               FLAGS
-COMP( 1982, md2,    0,      0,       microdec,  microdec, microdec_state, microdec,  "Morrow Designs", "Micro Decision MD-2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1982, md3,    md2,    0,       microdec,  microdec, microdec_state, microdec,  "Morrow Designs", "Micro Decision MD-3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY           FULLNAME               FLAGS
+COMP( 1982, md2,  0,      0,      microdec, microdec, microdec_state, init_microdec, "Morrow Designs", "Micro Decision MD-2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1982, md3,  md2,    0,      microdec, microdec, microdec_state, init_microdec, "Morrow Designs", "Micro Decision MD-3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

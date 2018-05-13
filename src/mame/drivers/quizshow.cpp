@@ -461,4 +461,4 @@ void quizshow_state::init_quizshow()
 }
 
 
-GAMEL( 1976, quizshow, 0, quizshow, quizshow, quizshow_state, quizshow, ROT0, "Atari (Kee Games)", "Quiz Show", MACHINE_NOT_WORKING, layout_quizshow )
+GAMEL( 1976, quizshow, 0, quizshow, quizshow, quizshow_state, init_quizshow, ROT0, "Atari (Kee Games)", "Quiz Show", MACHINE_NOT_WORKING, layout_quizshow )

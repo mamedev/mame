@@ -784,16 +784,16 @@ void epos_state::init_dealer()
  *************************************/
 
 /* EPOS TRISTAR 8000 PCB based */
-GAME( 1982, megadon,  0,        epos,   megadon,  epos_state,    0,       ROT270, "Epos Corporation (Photar Industries license)", "Megadon", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catapult, 0,        epos,   catapult, epos_state,    0,       ROT270, "Epos Corporation", "Catapult",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* bad rom, hold f2 for test mode */
-GAME( 1983, suprglob, 0,        epos,   suprglob, epos_state,    0,       ROT270, "Epos Corporation", "Super Glob",         MACHINE_SUPPORTS_SAVE )
-GAME( 1983, theglob,  suprglob, epos,   suprglob, epos_state,    0,       ROT270, "Epos Corporation", "The Glob",           MACHINE_SUPPORTS_SAVE )
-GAME( 1983, theglob2, suprglob, epos,   suprglob, epos_state,    0,       ROT270, "Epos Corporation", "The Glob (earlier)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, theglob3, suprglob, epos,   suprglob, epos_state,    0,       ROT270, "Epos Corporation", "The Glob (set 3)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1984, igmo,     0,        epos,   igmo,     epos_state,    0,       ROT270, "Epos Corporation", "IGMO",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, megadon,  0,        epos,   megadon,  epos_state, empty_init, ROT270, "Epos Corporation (Photar Industries license)", "Megadon", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catapult, 0,        epos,   catapult, epos_state, empty_init, ROT270, "Epos Corporation", "Catapult",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* bad rom, hold f2 for test mode */
+GAME( 1983, suprglob, 0,        epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "Super Glob",         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglob,  suprglob, epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "The Glob",           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglob2, suprglob, epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "The Glob (earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, theglob3, suprglob, epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "The Glob (set 3)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, igmo,     0,        epos,   igmo,     epos_state, empty_init, ROT270, "Epos Corporation", "IGMO",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 
 /* EPOS TRISTAR 9000 PCB based */
-GAME( 1984, dealer,   0,        dealer, dealer,   epos_state,    dealer,  ROT270, "Epos Corporation", "The Dealer",           MACHINE_SUPPORTS_SAVE )
-GAME( 1984, revngr84, 0,        dealer, beastf,   epos_state,    dealer,  ROT270, "Epos Corporation", "Revenger '84 (newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, revenger, revngr84, dealer, beastf,   epos_state,    dealer,  ROT270, "Epos Corporation", "Revenger '84 (older)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, beastf,   suprglob, dealer, beastf,   epos_state,    dealer,  ROT270, "Epos Corporation", "Beastie Feastie",      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dealer,   0,        dealer, dealer,   epos_state, init_dealer, ROT270, "Epos Corporation", "The Dealer",           MACHINE_SUPPORTS_SAVE )
+GAME( 1984, revngr84, 0,        dealer, beastf,   epos_state, init_dealer, ROT270, "Epos Corporation", "Revenger '84 (newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, revenger, revngr84, dealer, beastf,   epos_state, init_dealer, ROT270, "Epos Corporation", "Revenger '84 (older)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, beastf,   suprglob, dealer, beastf,   epos_state, init_dealer, ROT270, "Epos Corporation", "Beastie Feastie",      MACHINE_SUPPORTS_SAVE )

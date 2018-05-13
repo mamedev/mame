@@ -1468,10 +1468,10 @@ void multigam_state::init_multigmt()
 	multigam_switch_prg_rom(space, 0x0, 0x01);
 }
 
-GAME( 1992, multigam, 0,        multigam, multigam, multigam_state, multigam, ROT0, "<unknown>", "Multi Game (set 1)", 0 )
-GAME( 1992, multigmb, multigam, multigam, multigam, multigam_state, multigam, ROT0, "<unknown>", "Multi Game (set 2)", 0 )
-GAME( 1992, multigm2, 0,        multigm3, multigm2, multigam_state, multigm3, ROT0, "Seo Jin",   "Multi Game 2", 0 )
-GAME( 1992, multigm3, 0,        multigm3, multigm3, multigam_state, multigm3, ROT0, "Seo Jin",   "Multi Game III", 0 )
-GAME( 1992, multigmt, 0,        multigmt, multigmt, multigam_state, multigmt, ROT0, "Tung Sheng Electronics", "Multi Game (Tung Sheng Electronics)", 0 )
-GAME( 1994, sgmt1,    0,        supergm3, sgmt1,    multigam_state, 0,        ROT0, "<unknown>", "Super Game Mega Type 1", 0 )
-GAME( 1996, supergm3, 0,        supergm3, supergm3, multigam_state, 0,        ROT0, "<unknown>", "Super Game III", 0 )
+GAME( 1992, multigam, 0,        multigam, multigam, multigam_state, init_multigam, ROT0, "<unknown>", "Multi Game (set 1)", 0 )
+GAME( 1992, multigmb, multigam, multigam, multigam, multigam_state, init_multigam, ROT0, "<unknown>", "Multi Game (set 2)", 0 )
+GAME( 1992, multigm2, 0,        multigm3, multigm2, multigam_state, init_multigm3, ROT0, "Seo Jin",   "Multi Game 2", 0 )
+GAME( 1992, multigm3, 0,        multigm3, multigm3, multigam_state, init_multigm3, ROT0, "Seo Jin",   "Multi Game III", 0 )
+GAME( 1992, multigmt, 0,        multigmt, multigmt, multigam_state, init_multigmt, ROT0, "Tung Sheng Electronics", "Multi Game (Tung Sheng Electronics)", 0 )
+GAME( 1994, sgmt1,    0,        supergm3, sgmt1,    multigam_state, empty_init,    ROT0, "<unknown>", "Super Game Mega Type 1", 0 )
+GAME( 1996, supergm3, 0,        supergm3, supergm3, multigam_state, empty_init,    ROT0, "<unknown>", "Super Game III", 0 )

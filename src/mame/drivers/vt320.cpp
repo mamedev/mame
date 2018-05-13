@@ -133,8 +133,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                          FULLNAME   FLAGS */
-COMP( 1987, vt320,   0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT320",   MACHINE_IS_SKELETON )
-COMP( 1987, vt330,   0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT330",   MACHINE_IS_SKELETON )
-//COMP( 1989?, vt340,  0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT340",   MACHINE_IS_SKELETON )
-//COMP( 1990?, vt340p, 0,      0,       vt320,     vt320,  vt320_state,  0,    "Digital Equipment Corporation", "VT340+",  MACHINE_IS_SKELETON )
+/*    YEAR   NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY                          FULLNAME   FLAGS */
+COMP( 1987,  vt320,  0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT320",   MACHINE_IS_SKELETON )
+COMP( 1987,  vt330,  0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT330",   MACHINE_IS_SKELETON )
+//COMP( 1989?, vt340,  0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT340",   MACHINE_IS_SKELETON )
+//COMP( 1990?, vt340p, 0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT340+",  MACHINE_IS_SKELETON )

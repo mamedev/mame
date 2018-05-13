@@ -181,5 +181,5 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME     PARENT    COMPAT  MACHINE  INPUT  STATE           INIT   MONITOR COMPANY      FULLNAME */
-CONS( 1989, banctec, 0,        0,      banctec, 0,     banctec_state,  0,     "DALE Electronics",  "BancTec ESeries Panel", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE          INIT        COMPANY              FULLNAME                 FLAGS */
+CONS( 1989, banctec, 0,      0,      banctec, 0,     banctec_state, empty_init, "DALE Electronics",  "BancTec ESeries Panel", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

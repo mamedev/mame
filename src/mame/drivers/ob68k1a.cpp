@@ -266,5 +266,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY     FULLNAME     FLAGS
-COMP( 1982, ob68k1a,  0,       0,   ob68k1a,    ob68k1a, ob68k1a_state, 0,    "Omnibyte", "OB68K1A",   MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME   FLAGS
+COMP( 1982, ob68k1a, 0,      0,      ob68k1a, ob68k1a, ob68k1a_state, empty_init, "Omnibyte", "OB68K1A", MACHINE_NO_SOUND_HW )

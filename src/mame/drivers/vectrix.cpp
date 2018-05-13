@@ -63,4 +63,4 @@ ROM_START( vectrix )
 	ROM_LOAD( "vectrixr.bin", 0x2000, 0x2000, CRC(33f9b06b) SHA1(6a1dffe5c2c0254824a8dddb8543f86d9ad8f173) )
 ROM_END
 
-COMP( 1983, vectrix, 0, 0, vectrix, vectrix, vectrix_state, 0, "Vectrix", "VX384 Graphics Processor Terminal", MACHINE_IS_SKELETON )
+COMP( 1983, vectrix, 0, 0, vectrix, vectrix, vectrix_state, empty_init, "Vectrix", "VX384 Graphics Processor Terminal", MACHINE_IS_SKELETON )

@@ -621,6 +621,6 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT    MACHINE    INPUT     STATE            INIT  ROT   COMPANY                           FULLNAME                           FLAGS
-GAME( 1990, swisspkr, 0,        swisspkr,  goldngam, goldngam_state,  0,    ROT0, "Golden Games / C+M Technics AG", "Swiss Poker ('50 SG-.10', V2.5)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1998, moviecrd, 0,        moviecrd,  goldngam, goldngam_state,  0,    ROT0, "Golden Games / C+M Technics AG", "Movie Card",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    MACHINE    INPUT     STATE           INIT        ROT   COMPANY                           FULLNAME                           FLAGS
+GAME( 1990, swisspkr, 0,        swisspkr,  goldngam, goldngam_state, empty_init, ROT0, "Golden Games / C+M Technics AG", "Swiss Poker ('50 SG-.10', V2.5)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, moviecrd, 0,        moviecrd,  goldngam, goldngam_state, empty_init, ROT0, "Golden Games / C+M Technics AG", "Movie Card",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

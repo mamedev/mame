@@ -472,5 +472,5 @@ ROM_END
 //**************************************************************************
 //  DRIVERS
 //**************************************************************************
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS            INIT  COMPANY                          FULLNAME       FLAGS */
-COMP( 1978, la120, 0,      0,      la120,   la120, decwriter_state, 0,    "Digital Equipment Corporation", "DECwriter III (LA120)", MACHINE_IS_SKELETON )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS            INIT        COMPANY                          FULLNAME                 FLAGS */
+COMP( 1978, la120, 0,      0,      la120,   la120, decwriter_state, empty_init, "Digital Equipment Corporation", "DECwriter III (LA120)", MACHINE_IS_SKELETON )

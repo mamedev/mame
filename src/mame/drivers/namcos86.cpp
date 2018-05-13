@@ -1734,19 +1734,19 @@ void namcos86_state::init_namco86()
 
 
 
-GAME( 1986, skykiddx, 0,        hopmappy, skykiddx,  namcos86_state, namco86, ROT180, "Namco",   "Sky Kid Deluxe (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, skykiddxo,skykiddx, hopmappy, skykiddx,  namcos86_state, namco86, ROT180, "Namco",   "Sky Kid Deluxe (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, skykiddx, 0,        hopmappy, skykiddx,  namcos86_state, init_namco86, ROT180, "Namco",   "Sky Kid Deluxe (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, skykiddxo,skykiddx, hopmappy, skykiddx,  namcos86_state, init_namco86, ROT180, "Namco",   "Sky Kid Deluxe (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, hopmappy, 0,        hopmappy, hopmappy,  namcos86_state, namco86, ROT0,   "Namco",   "Hopping Mappy", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, hopmappy, 0,        hopmappy, hopmappy,  namcos86_state, init_namco86, ROT0,   "Namco",   "Hopping Mappy", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, roishtar, 0,        roishtar, roishtar,  namcos86_state, namco86, ROT0,   "Namco",   "The Return of Ishtar", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, roishtar, 0,        roishtar, roishtar,  namcos86_state, init_namco86, ROT0,   "Namco",   "The Return of Ishtar", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, genpeitd, 0,        genpeitd, genpeitd,  namcos86_state, namco86, ROT0,   "Namco",   "Genpei ToumaDen", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, genpeitd, 0,        genpeitd, genpeitd,  namcos86_state, init_namco86, ROT0,   "Namco",   "Genpei ToumaDen", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, rthunder, 0,        rthunder, rthunder,  namcos86_state, namco86, ROT0,   "Namco",   "Rolling Thunder (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rthundera,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "bootleg", "Rolling Thunder (rev 3, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rthunder2,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco",   "Rolling Thunder (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rthunder1,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco",   "Rolling Thunder (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rthunder0,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco",   "Rolling Thunder (oldest)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthunder, 0,        rthunder, rthunder,  namcos86_state, init_namco86, ROT0,   "Namco",   "Rolling Thunder (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthundera,rthunder, rthunder, rthunder1, namcos86_state, init_namco86, ROT0,   "bootleg", "Rolling Thunder (rev 3, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthunder2,rthunder, rthunder, rthunder1, namcos86_state, init_namco86, ROT0,   "Namco",   "Rolling Thunder (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthunder1,rthunder, rthunder, rthunder1, namcos86_state, init_namco86, ROT0,   "Namco",   "Rolling Thunder (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthunder0,rthunder, rthunder, rthunder1, namcos86_state, init_namco86, ROT0,   "Namco",   "Rolling Thunder (oldest)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, wndrmomo, 0,        wndrmomo, wndrmomo,  namcos86_state, namco86, ROT0,   "Namco",   "Wonder Momo", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wndrmomo, 0,        wndrmomo, wndrmomo,  namcos86_state, init_namco86, ROT0,   "Namco",   "Wonder Momo", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

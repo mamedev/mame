@@ -554,7 +554,7 @@ void thief_state::init_thief()
 }
 
 
-GAME( 1980, sharkatt, 0,       sharkatt, sharkatt, thief_state, 0,     ROT0, "Pacific Novelty", "Shark Attack",                    0 )
-GAME( 1981, thief,    0,       thief,    thief,    thief_state, thief, ROT0, "Pacific Novelty", "Thief",                           0 )
-GAME( 1982, natodef,  0,       natodef,  natodef,  thief_state, thief, ROT0, "Pacific Novelty", "NATO Defense" ,                   0 )
-GAME( 1982, natodefa, natodef, natodef,  natodef,  thief_state, thief, ROT0, "Pacific Novelty", "NATO Defense (alternate mazes)" , 0 )
+GAME( 1980, sharkatt, 0,       sharkatt, sharkatt, thief_state, empty_init, ROT0, "Pacific Novelty", "Shark Attack",                    0 )
+GAME( 1981, thief,    0,       thief,    thief,    thief_state, init_thief, ROT0, "Pacific Novelty", "Thief",                           0 )
+GAME( 1982, natodef,  0,       natodef,  natodef,  thief_state, init_thief, ROT0, "Pacific Novelty", "NATO Defense" ,                   0 )
+GAME( 1982, natodefa, natodef, natodef,  natodef,  thief_state, init_thief, ROT0, "Pacific Novelty", "NATO Defense (alternate mazes)" , 0 )

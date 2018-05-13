@@ -438,5 +438,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY    FULLNAME                    FLAGS                  LAYOUT
-GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, jankenmn_state, 0,    ROT0, "Sunwise", "Janken Man Kattara Ageru", MACHINE_SUPPORTS_SAVE, layout_jankenmn )
+//     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT   COMPANY    FULLNAME                    FLAGS                  LAYOUT
+GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, jankenmn_state, empty_init, ROT0, "Sunwise", "Janken Man Kattara Ageru", MACHINE_SUPPORTS_SAVE, layout_jankenmn )

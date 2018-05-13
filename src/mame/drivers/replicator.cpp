@@ -727,5 +727,5 @@ ROM_START( replica1 )
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
 
-/*   YEAR  NAME        PARENT    COMPAT    MACHINE        INPUT       STATE                INIT           COMPANY     FULLNAME */
-COMP(2012, replica1,   0,        0,        replicator,    replicator, replicator_state,    replicator,    "Makerbot", "Replicator 1 desktop 3d printer", MACHINE_NOT_WORKING)
+/*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT             COMPANY     FULLNAME */
+COMP(2012, replica1, 0,      0,      replicator, replicator, replicator_state, init_replicator, "Makerbot", "Replicator 1 desktop 3d printer", MACHINE_NOT_WORKING)

@@ -288,5 +288,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE       INIT    COMPANY         FULLNAME    FLAGS
-COMP( 1978, elf2,   0,      0,      elf2,   elf2, elf2_state, 0,      "Netronics",    "Elf II",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1978, elf2, 0,      0,      elf2,    elf2,  elf2_state, empty_init, "Netronics", "Elf II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)

@@ -229,5 +229,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                  FULLNAME  FLAGS
-COMP( 1982, cortex, 0,      0,       cortex,    cortex, cortex_state, init, "Powertran Cybernetics", "Cortex", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT       COMPANY                  FULLNAME  FLAGS
+COMP( 1982, cortex, 0,      0,      cortex,  cortex, cortex_state, init_init, "Powertran Cybernetics", "Cortex", MACHINE_NOT_WORKING )

@@ -76,4 +76,4 @@ ROM_START( alto1 )
 	ROM_LOAD( "pram.bin",     0x2600, 0x0100, CRC(8087140e) SHA1(e17d9756150d41d6ff614afa86808a9c77516749) )
 ROM_END
 
-COMP( 1973, alto1, 0, 0, alto1, alto1, alto1_state, 0, "Xerox", "Alto I", MACHINE_IS_SKELETON )
+COMP( 1973, alto1, 0, 0, alto1, alto1, alto1_state, empty_init, "Xerox", "Alto I", MACHINE_IS_SKELETON )

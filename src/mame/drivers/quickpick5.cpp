@@ -463,5 +463,5 @@ ROM_START( quickp5 )
 
 ROM_END
 
-GAME( 1995, quickp5, 0, quickpick5, quickpick5,  quickpick5_state, 0, ROT0, "Konami", "Quick Pick 5", MACHINE_NOT_WORKING)
+GAME( 1995, quickp5, 0, quickpick5, quickpick5,  quickpick5_state, empty_init, ROT0, "Konami", "Quick Pick 5", MACHINE_NOT_WORKING)
 

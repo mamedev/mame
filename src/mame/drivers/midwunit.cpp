@@ -1365,28 +1365,28 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, mk3,       0,        wunit_picsim, mk3,      midwunit_state, mk3,      ROT0, "Midway", "Mortal Kombat 3 (rev 2.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mk3r20,    mk3,      wunit_picsim, mk3,      midwunit_state, mk3r20,   ROT0, "Midway", "Mortal Kombat 3 (rev 2.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mk3r10,    mk3,      wunit_picsim, mk3,      midwunit_state, mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mk3p40,    mk3,      wunit_picsim, mk3,      midwunit_state, mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1 chip label p4.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3,       0,        wunit_picsim, mk3,      midwunit_state, init_mk3,      ROT0, "Midway", "Mortal Kombat 3 (rev 2.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3r20,    mk3,      wunit_picsim, mk3,      midwunit_state, init_mk3r20,   ROT0, "Midway", "Mortal Kombat 3 (rev 2.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3r10,    mk3,      wunit_picsim, mk3,      midwunit_state, init_mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3p40,    mk3,      wunit_picsim, mk3,      midwunit_state, init_mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1 chip label p4.0)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, umk3,      0,        wunit_picemu, mk3,      midwunit_state, umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, umk3r11,   umk3,     wunit_picemu, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, umk3r10,   umk3,     wunit_picemu, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3,      0,        wunit_picemu, mk3,      midwunit_state, init_umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3r11,   umk3,     wunit_picemu, mk3,      midwunit_state, init_umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3r10,   umk3,     wunit_picemu, mk3,      midwunit_state, init_umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // Ultimate Mortal Kombat 3 rev 2.0.35 (TE? Hack?) version known to exist
 
-GAME( 1995, wwfmania,  0,        wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wwfmaniab, wwfmania, wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.20 08/02/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wwfmaniac, wwfmania, wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.1 07/11/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wwfmaniap, wwfmania, wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (proto 2.01 06/07/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmania,  0,        wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmaniab, wwfmania, wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.20 08/02/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmaniac, wwfmania, wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.1 07/11/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmaniap, wwfmania, wunit_picsim, wwfmania, midwunit_state, init_wwfmania, ROT0, "Midway", "WWF: Wrestlemania (proto 2.01 06/07/95)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, openice,   0,        wunit_picsim, openice,  midwunit_state, openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.21)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, openicea,  openice,  wunit_picsim, openice,  midwunit_state, openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.2A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, openice,   0,        wunit_picsim, openice,  midwunit_state, init_openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, openicea,  openice,  wunit_picsim, openice,  midwunit_state, init_openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.2A)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, nbahangt,  0,        wunit_picsim, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Hangtime (rev L1.1 04/16/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbahangt,  0,        wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Hangtime (rev L1.1 04/16/96)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, nbamht,    0,        wunit_picsim, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.03 06/09/97)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbamht1,   nbamht,   wunit_picsim, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.0 11/08/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbamht,    0,        wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.03 06/09/97)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbamht1,   nbamht,   wunit_picsim, nbahangt, midwunit_state, init_nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.0 11/08/96)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, rmpgwt,    0,        wunit_picemu, rmpgwt,   midwunit_state, rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, rmpgwt11,  rmpgwt,   wunit_picemu, rmpgwt,   midwunit_state, rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, rmpgwt,    0,        wunit_picemu, rmpgwt,   midwunit_state, init_rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, rmpgwt11,  rmpgwt,   wunit_picemu, rmpgwt,   midwunit_state, init_rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.1)", MACHINE_SUPPORTS_SAVE )

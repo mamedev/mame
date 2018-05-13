@@ -161,5 +161,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE   INPUT STATE       INIT   COMPANY   FULLNAME  FLAGS
-COMP( 1982, ax20,  0,      0,       ax20,     ax20, ax20_state, 0,     "Axel",   "AX-20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT CLASS       INIT        COMPANY  FULLNAME  FLAGS
+COMP( 1982, ax20, 0,      0,      ax20,    ax20, ax20_state, empty_init, "Axel",  "AX-20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

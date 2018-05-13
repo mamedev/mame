@@ -220,5 +220,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY     FULLNAME  FLAGS
-COMP( 1978, k1003,  0,      0,       k1003,     k1003, k1003_state, 0,    "Robotron", "K1003",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
+COMP( 1978, k1003, 0,      0,      k1003,   k1003, k1003_state, empty_init, "Robotron", "K1003",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

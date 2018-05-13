@@ -364,4 +364,4 @@ ROM_START( molecula )
 	ROM_LOAD( "wait_16r4.jed", 0x000000, 0x00caef, CRC(3aacfeb4) SHA1(1af1a8046e5a8a0337c85b55adceaef6e45702b7) )
 ROM_END
 
-COMP( 1982, molecula,  0,   0,   molecula,  molecula, molecula_state,  0,  "MOLECULAR",      "MOLECULAR Computer", MACHINE_IS_SKELETON )
+COMP( 1982, molecula, 0, 0, molecula, molecula, molecula_state, empty_init, "MOLECULAR", "MOLECULAR Computer", MACHINE_IS_SKELETON )

@@ -119,5 +119,5 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY      FULLNAME      FLAGS
-COMP( 1990, m6805evs, 0,        0,      m6805evs, m6805evs, m6805evs_state, 0,    "Motorola",  "M68HC05EVS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME      FLAGS
+COMP( 1990, m6805evs, 0,      0,      m6805evs, m6805evs, m6805evs_state, empty_init, "Motorola", "M68HC05EVS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

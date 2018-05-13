@@ -164,5 +164,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE         INIT  COMPANY   FULLNAME    FLAGS
-COMP( 1988, besta88,  0,      0,     besta,     besta,   besta_state,  0,    "Sapsan", "Besta-88", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME    FLAGS
+COMP( 1988, besta88, 0,      0,      besta,   besta, besta_state, empty_init, "Sapsan", "Besta-88", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

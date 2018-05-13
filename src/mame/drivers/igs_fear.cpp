@@ -169,4 +169,4 @@ void igs_fear_state::init_igs_fear()
 	pgm_create_dummy_internal_arm_region();
 }
 
-GAME( 2006,  fearless,  0, igs_fear,    fear, igs_fear_state, igs_fear,    ROT0, "IGS", "Fearless Pinocchio (V101US)",   MACHINE_IS_SKELETON )
+GAME( 2006, fearless, 0, igs_fear, fear, igs_fear_state, init_igs_fear, ROT0, "IGS", "Fearless Pinocchio (V101US)",   MACHINE_IS_SKELETON )

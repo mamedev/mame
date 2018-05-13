@@ -858,20 +858,20 @@ ROM_START(magic)
 ROM_END
 
 // chimes
-GAME( 1977,  pinball,    0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Pinball",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1977,  stingray,   0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Stingray",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978,  stars,      0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Stars",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1978,  memlane,    0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Memory Lane",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1977,  pinball,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Pinball",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1977,  stingray,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Stingray",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978,  stars,      0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Stars",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978,  memlane,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Memory Lane",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // sound unit B-521
-GAME( 1978,  lectrono,   0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Lectronamo",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1978,  wildfyre,   0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Wildfyre",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1978,  nugent,     0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Nugent",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1979,  dracula,    0,      st_mp100,   mp100, st_mp100_state, 0,   ROT0,   "Stern", "Dracula (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1978,  lectrono,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Lectronamo",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1978,  wildfyre,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Wildfyre",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1978,  nugent,     0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Nugent",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  dracula,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Dracula (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // different inputs
-GAME( 1979,  trident,    0,       st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Trident",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1979,  tridento,   trident, st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Trident (Older set)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1979,  hothand,    0,       st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Hot Hand",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1979,  princess,   0,       st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Cosmic Princess",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1979,  magic,      0,       st_mp100,   mp200, st_mp100_state, 0,   ROT0,   "Stern", "Magic",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  trident,    0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Trident",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  tridento,   trident, st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Trident (Older set)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  hothand,    0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Hot Hand",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  princess,   0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Cosmic Princess",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1979,  magic,      0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Magic",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -479,5 +479,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE       INIT   COMPANY     FULLNAME       FLAGS */
-COMP( 1986, dvk_ksm,  0,      0,       ksm,       ksm,     ksm_state,  0,     "USSR",     "DVK KSM",     0)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME   FLAGS */
+COMP( 1986, dvk_ksm, 0,      0,      ksm,     ksm,   ksm_state, empty_init, "USSR",  "DVK KSM", 0 )

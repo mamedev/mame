@@ -611,9 +611,9 @@ void segald_state::init_astron()
 
 
 //    YEAR, NAME,     PARENT,  MACHINE,INPUT,  STATE,        INIT,   MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1983, astron,   0,       astron, astron, segald_state, astron, ROT0,   "Sega", "Astron Belt",                             MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, astronp,  astron,  astron, astron, segald_state, astron, ROT0,   "Sega", "Astron Belt (Pioneer LDV1000)",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, cobraseg, astron,  astron, astron, segald_state, astron, ROT0,   "Sega", "Cobra Command (Sega LaserDisc Hardware)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, galaxyr,  0,       astron, astron, segald_state, astron, ROT0,   "Sega", "Galaxy Ranger",                           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, galaxyrp, galaxyr, astron, astron, segald_state, astron, ROT0,   "Sega", "Galaxy Ranger (Pioneer LDV1000)",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, sblazerp, galaxyr, astron, astron, segald_state, astron, ROT0,   "Sega", "Star Blazer (Pioneer LDV1000)",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, astron,   0,       astron, astron, segald_state, init_astron, ROT0,   "Sega", "Astron Belt",                             MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, astronp,  astron,  astron, astron, segald_state, init_astron, ROT0,   "Sega", "Astron Belt (Pioneer LDV1000)",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, cobraseg, astron,  astron, astron, segald_state, init_astron, ROT0,   "Sega", "Cobra Command (Sega LaserDisc Hardware)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, galaxyr,  0,       astron, astron, segald_state, init_astron, ROT0,   "Sega", "Galaxy Ranger",                           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, galaxyrp, galaxyr, astron, astron, segald_state, init_astron, ROT0,   "Sega", "Galaxy Ranger (Pioneer LDV1000)",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, sblazerp, galaxyr, astron, astron, segald_state, init_astron, ROT0,   "Sega", "Star Blazer (Pioneer LDV1000)",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

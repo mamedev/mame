@@ -387,4 +387,4 @@ ROM_START( go2000 )
 ROM_END
 
 
-GAME( 2000, go2000,    0, go2000,    go2000, go2000_state,    0, ROT0,  "SunA?", "Go 2000", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, go2000, 0, go2000, go2000, go2000_state, empty_init, ROT0, "SunA?", "Go 2000", MACHINE_SUPPORTS_SAVE )

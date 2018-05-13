@@ -111,4 +111,4 @@ ROM_START( tv965 )
 	ROM_LOAD( "180003-38h.u9", 0x00000, 0x08000, CRC(30fae408) SHA1(f05bb2a9ce2df60b046733f746d8d8a1eb3ac8bc) )
 ROM_END
 
-COMP( 1989, tv965, 0, 0, tv965, tv965, tv965_state, 0, "TeleVideo Systems", "TeleVideo 965", MACHINE_IS_SKELETON )
+COMP( 1989, tv965, 0, 0, tv965, tv965, tv965_state, empty_init, "TeleVideo Systems", "TeleVideo 965", MACHINE_IS_SKELETON )

@@ -357,6 +357,6 @@ ROM_START(billlist)
 	ROM_LOAD("billiard_list.x", 0x00000, 0x80000, CRC(b54806ed) SHA1(c6e1485c263ebd9102ff1e8c09b4c4ca5f63c3da) )
 ROM_END
 
-GAME( 1995, pokechmp, 0,        pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 1)", 0 )
-GAME( 1995, pokechmpa,pokechmp, pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 2)", 0 )
-GAME( 1995, billlist, pokechmp, pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Billard List", 0)
+GAME( 1995, pokechmp, 0,        pokechmp, pokechmp, pokechmp_state, init_pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 1)", 0 )
+GAME( 1995, pokechmpa,pokechmp, pokechmp, pokechmp, pokechmp_state, init_pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 2)", 0 )
+GAME( 1995, billlist, pokechmp, pokechmp, pokechmp, pokechmp_state, init_pokechmp, ROT0, "D.G.R.M.", "Billard List", 0)

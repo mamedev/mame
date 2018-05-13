@@ -184,9 +184,9 @@ void megadriv_radica_state::init_megadriv_radica_6button_pal()
 }
 
 // NTSC releases
-CONS( 2004, rad_gen1,0, 0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state,  megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
+CONS( 2004, rad_gen1, 0, 0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state, init_megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
 
 // PAL releases
-CONS( 2004, rad_sf,  0, 0, megadriv_radica_6button_pal,  megadriv_radica_6button,         megadriv_radica_state,  megadriv_radica_6button_pal, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (Europe)", 0) // SF2 game is region locked,  US version ROM is definitely different
-CONS( 2004, rad_ssoc,0, 0, megadriv_radica_3button_pal,  megadriv_radica_3button,         megadriv_radica_state,  megadrie,                    "Radica / Sensible Software / Sega", "Sensible Soccer plus [Cannon Fodder, Mega lo Mania] (Radica, Arcade Legends) (Europe)", 0)  // still branded as Arcade Legends even if none of these were ever arcade games
+CONS( 2004, rad_sf,   0, 0, megadriv_radica_6button_pal,  megadriv_radica_6button,         megadriv_radica_state, init_megadriv_radica_6button_pal, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (Europe)", 0) // SF2 game is region locked,  US version ROM is definitely different
+CONS( 2004, rad_ssoc, 0, 0, megadriv_radica_3button_pal,  megadriv_radica_3button,         megadriv_radica_state, init_megadrie,                    "Radica / Sensible Software / Sega", "Sensible Soccer plus [Cannon Fodder, Mega lo Mania] (Radica, Arcade Legends) (Europe)", 0)  // still branded as Arcade Legends even if none of these were ever arcade games
 

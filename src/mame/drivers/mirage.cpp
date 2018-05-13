@@ -374,4 +374,4 @@ void miragemj_state::init_mirage()
 	deco56_decrypt_gfx(machine(), "gfx1");
 }
 
-GAME( 1994, mirage, 0,     mirage, mirage, miragemj_state, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mirage, 0,     mirage, mirage, miragemj_state, init_mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -315,4 +315,4 @@ ROM_START( clpoker )
 ROM_END
 
 
-GAME( 1994, clpoker,  0, clpoker, clpoker, clpoker_state, 0, ROT0, "Chain Leisure", "Poker Genius", MACHINE_SUPPORTS_SAVE ) // Year taken from string in main CPU ROM
+GAME( 1994, clpoker, 0, clpoker, clpoker, clpoker_state, empty_init, ROT0, "Chain Leisure", "Poker Genius", MACHINE_SUPPORTS_SAVE ) // Year taken from string in main CPU ROM

@@ -465,4 +465,4 @@ ROM_START( compclr2 )
 	ROM_LOAD( "82s129.ug5", 0x00, 0x20, NO_DUMP ) // Color PROM
 ROM_END
 
-COMP( 1977, compclr2,    0,      0,      compucolor2,        compucolor2, compucolor2_state, 0,      "Intelligent Systems Corporation",  "Compucolor II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1977, compclr2, 0, 0, compucolor2, compucolor2, compucolor2_state, empty_init, "Intelligent Systems Corporation", "Compucolor II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

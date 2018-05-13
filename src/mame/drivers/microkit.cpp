@@ -139,4 +139,4 @@ ROM_START( microkit )
 	ROM_LOAD( "4.2a", 0x100, 0x100, CRC(27267bad) SHA1(838df9be2dc175584a1a6ee1770039118e49482e) )
 ROM_END
 
-COMP( 1975, microkit,    0,      0,      microkit,        microkit, microkit_state, 0,      "RCA",  "COSMAC Microkit",  MACHINE_IS_SKELETON )
+COMP( 1975, microkit, 0, 0, microkit, microkit, microkit_state, empty_init, "RCA",  "COSMAC Microkit",  MACHINE_IS_SKELETON )

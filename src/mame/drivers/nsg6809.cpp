@@ -105,4 +105,4 @@ ROM_START( pitchhit )
 ROM_END
 
 
-GAME(1993, pitchhit, 0, pitchhit, pitchhit, nsg6809_state, 0, ROT0, "National Sports Games", "Pitch Hitter - Baseball Challenge", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1993, pitchhit, 0, pitchhit, pitchhit, nsg6809_state, empty_init, ROT0, "National Sports Games", "Pitch Hitter - Baseball Challenge", MACHINE_IS_SKELETON_MECHANICAL )

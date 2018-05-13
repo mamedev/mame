@@ -606,12 +606,12 @@ ROM_END
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     STATE          INIT      COMPANY   FULLNAME                                       FLAGS
 // marketed under a ton of firms and names
-CONS(1992,  svision,  0,       0,      svision,  svision,  svision_state, svision,  "Watara", "Super Vision",                                0 )
+CONS(1992,  svision,  0,       0,      svision,  svision,  svision_state, init_svision,  "Watara", "Super Vision",                                0 )
 // svdual 2 connected via communication port
-CONS( 1992, svisions, svision, 0,      svisions, svisions, svision_state, svisions, "Watara", "Super Vision (PeT Communication Simulation)", 0 )
+CONS( 1992, svisions, svision, 0,      svisions, svisions, svision_state, init_svisions, "Watara", "Super Vision (PeT Communication Simulation)", 0 )
 
-CONS( 1993, svisionp, svision, 0,      svisionp, svision,  svision_state, svision,  "Watara", "Super Vision (PAL TV Link Colored)",          0 )
-CONS( 1993, svisionn, svision, 0,      svisionn, svision,  svision_state, svision,  "Watara", "Super Vision (NTSC TV Link Colored)",         0 )
+CONS( 1993, svisionp, svision, 0,      svisionp, svision,  svision_state, init_svision,  "Watara", "Super Vision (PAL TV Link Colored)",          0 )
+CONS( 1993, svisionn, svision, 0,      svisionn, svision,  svision_state, init_svision,  "Watara", "Super Vision (NTSC TV Link Colored)",         0 )
 // svtvlink (2 supervisions)
 // tvlink (pad supervision simulated)
-CONS( 199?, tvlinkp,  svision, 0,      tvlinkp,  svision,  svision_state, svision,  "Watara", "TV Link PAL",                                 0 )
+CONS( 199?, tvlinkp,  svision, 0,      tvlinkp,  svision,  svision_state, init_svision,  "Watara", "TV Link PAL",                                 0 )

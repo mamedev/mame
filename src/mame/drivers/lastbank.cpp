@@ -598,4 +598,4 @@ void lastbank_state::init_lastbank()
 	m_mainbank->configure_entries(0, max, memregion("maincpu")->base(), 0x2000);
 }
 
-GAME( 1994, lastbank,  0,   lastbank, lastbank, lastbank_state, lastbank, ROT0, "Excellent System", "Last Bank (v1.16)", 0 )
+GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, init_lastbank, ROT0, "Excellent System", "Last Bank (v1.16)", 0 )

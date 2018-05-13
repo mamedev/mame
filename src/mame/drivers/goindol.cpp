@@ -409,7 +409,7 @@ void goindol_state::init_goindol()
 
 
 
-GAME( 1987, goindol,  0,       goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, goindolu, goindol, goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (US)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, goindolk, goindol, goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, homo,     goindol, goindol, homo,    goindol_state, 0,       ROT90, "bootleg", "Homo",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, goindol,  0,       goindol, goindol, goindol_state, init_goindol, ROT90, "SunA",    "Goindol (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, goindolu, goindol, goindol, goindol, goindol_state, init_goindol, ROT90, "SunA",    "Goindol (US)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, goindolk, goindol, goindol, goindol, goindol_state, init_goindol, ROT90, "SunA",    "Goindol (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, homo,     goindol, goindol, homo,    goindol_state, empty_init,   ROT90, "bootleg", "Homo",            MACHINE_SUPPORTS_SAVE )

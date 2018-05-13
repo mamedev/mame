@@ -413,6 +413,6 @@ ROM_START(slotunbl)
 	ROM_LOAD( "74s288.a8",  0x0000, 0x0020, NO_DUMP )
 ROM_END
 
-GAME( 1982, murogmbl,  murogem,   murogmbl, murogmbl, murogmbl_state, 0, ROT0, "bootleg?", "Muroge Monaco (bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, murogmbl,  murogem,   murogmbl, murogmbl, murogmbl_state, empty_init, ROT0, "bootleg?", "Muroge Monaco (bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, slotunbl,  0,   slotunbl, slotunbl, slotunbl_state, 0, ROT0, "bootleg?", "Slot (unknown bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, slotunbl,  0,   slotunbl, slotunbl, slotunbl_state, empty_init, ROT0, "bootleg?", "Slot (unknown bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

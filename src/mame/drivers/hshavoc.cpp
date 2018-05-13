@@ -221,4 +221,4 @@ void md_boot_state::init_hshavoc()
 }
 
 
-GAME( 1993, hshavoc, 0, md_bootleg, hshavoc, md_boot_state, hshavoc, ROT0, "Data East", "High Seas Havoc", MACHINE_NOT_WORKING )
+GAME( 1993, hshavoc, 0, md_bootleg, hshavoc, md_boot_state, init_hshavoc, ROT0, "Data East", "High Seas Havoc", MACHINE_NOT_WORKING )

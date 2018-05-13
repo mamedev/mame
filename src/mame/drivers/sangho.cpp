@@ -546,5 +546,5 @@ void sangho_state::init_pzlestar()
 	ROM[0x12ca8] = 0x00;
 }
 
-GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho_state,  pzlestar,   ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
-GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, sangho_state,  0,          ROT270, "Sang Ho Soft", "Sexy Boom", 0 )
+GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho_state, init_pzlestar, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, sangho_state, empty_init,    ROT270, "Sang Ho Soft", "Sexy Boom", 0 )

@@ -464,5 +464,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY   FULLNAME               FLAGS
-GAME( 198?, nsmpoker, 0,      nsmpoker, nsmpoker, nsmpoker_state, 0,    ROT0, "NSM",    "NSM Poker (TMS9995)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY   FULLNAME               FLAGS
+GAME( 198?, nsmpoker, 0,      nsmpoker, nsmpoker, nsmpoker_state, empty_init, ROT0, "NSM",    "NSM Poker (TMS9995)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

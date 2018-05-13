@@ -208,5 +208,5 @@ void esqasr_state::init_asr()
 {
 }
 
-CONS( 1992, asr10, 0, 0, asr, asr, esqasr_state, asr, "Ensoniq", "ASR-10", MACHINE_NOT_WORKING )
-CONS( 1997, asrx,  0, 0, asrx,asr, esqasr_state, asr, "Ensoniq", "ASR-X", MACHINE_NOT_WORKING )
+CONS( 1992, asr10, 0, 0, asr, asr, esqasr_state, init_asr, "Ensoniq", "ASR-10", MACHINE_NOT_WORKING )
+CONS( 1997, asrx,  0, 0, asrx,asr, esqasr_state, init_asr, "Ensoniq", "ASR-X",  MACHINE_NOT_WORKING )

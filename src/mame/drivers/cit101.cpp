@@ -240,4 +240,4 @@ ROM_START( cit101 )
 	ROM_LOAD( "5g_=7f00=.bin", 0x160, 0x020, NO_DUMP ) // position labeled TBP18S030
 ROM_END
 
-COMP( 1980, cit101, 0, 0, cit101, cit101, cit101_state, 0, "C. Itoh Electronics", "CIT-101", MACHINE_IS_SKELETON )
+COMP( 1980, cit101, 0, 0, cit101, cit101, cit101_state, empty_init, "C. Itoh Electronics", "CIT-101", MACHINE_IS_SKELETON )

@@ -506,5 +506,5 @@ void jokrwild_state::init_jokrwild()
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY  FULLNAME                    FLAGS
-GAME( 1988, jokrwild, 0,      jokrwild, jokrwild, jokrwild_state, jokrwild, ROT0, "Sigma", "Joker's Wild (encrypted)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT   COMPANY  FULLNAME                    FLAGS
+GAME( 1988, jokrwild, 0,      jokrwild, jokrwild, jokrwild_state, init_jokrwild, ROT0, "Sigma", "Joker's Wild (encrypted)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

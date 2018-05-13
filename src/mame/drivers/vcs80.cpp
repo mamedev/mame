@@ -253,5 +253,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   STATE         INIT  COMPANY             FULLNAME  FLAGS */
-COMP( 1983, vcs80,  0,      0,      vcs80,  vcs80,  vcs80_state,  0,    "Eckhard Schiller", "VCS-80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY             FULLNAME  FLAGS */
+COMP( 1983, vcs80, 0,      0,      vcs80,   vcs80, vcs80_state, empty_init, "Eckhard Schiller", "VCS-80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)

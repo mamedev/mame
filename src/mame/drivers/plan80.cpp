@@ -262,5 +262,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   STATE         INIT     COMPANY         FULLNAME   FLAGS
-COMP( 1988, plan80, 0,       0,     plan80,    plan80, plan80_state, plan80,  "Tesla Eltos",  "Plan-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY        FULLNAME   FLAGS
+COMP( 1988, plan80, 0,      0,      plan80,  plan80, plan80_state, init_plan80, "Tesla Eltos", "Plan-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

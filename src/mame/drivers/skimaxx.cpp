@@ -604,4 +604,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1996, skimaxx, 0, skimaxx, skimaxx, skimaxx_state, 0, ROT0, "Kyle Hodgetts / ICE", "Skimaxx", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, skimaxx, 0, skimaxx, skimaxx, skimaxx_state, empty_init, ROT0, "Kyle Hodgetts / ICE", "Skimaxx", MACHINE_IMPERFECT_GRAPHICS )

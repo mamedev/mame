@@ -473,7 +473,7 @@ void pirates_state::init_genix()
 
 /* GAME */
 
-GAME( 1994, pirates,  0,       pirates, pirates, pirates_state, pirates,  0, "NIX", "Pirates (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, piratesb, pirates, pirates, pirates, pirates_state, pirates,  0, "NIX", "Pirates (set 2)", MACHINE_SUPPORTS_SAVE ) // shows 'Copyright 1995' instead of (c)1994 Nix, but isn't unprotected, various changes to the names in the credis + a few other minor alterations
+GAME( 1994, pirates,  0,       pirates, pirates, pirates_state, init_pirates, 0, "NIX", "Pirates (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, piratesb, pirates, pirates, pirates, pirates_state, init_pirates, 0, "NIX", "Pirates (set 2)", MACHINE_SUPPORTS_SAVE ) // shows 'Copyright 1995' instead of (c)1994 Nix, but isn't unprotected, various changes to the names in the credis + a few other minor alterations
 
-GAME( 1994, genix,    0,       pirates, pirates, pirates_state, genix,    0, "NIX", "Genix Family",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, genix,    0,       pirates, pirates, pirates_state, init_genix,   0, "NIX", "Genix Family",    MACHINE_SUPPORTS_SAVE )

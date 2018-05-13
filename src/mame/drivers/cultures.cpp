@@ -505,4 +505,4 @@ ROM_START( cultures )
 ROM_END
 
 
-GAME( 1994, cultures, 0, cultures, cultures, cultures_state, 0, ROT0, "Face", "Jibun wo Migaku Culture School Mahjong Hen", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, cultures, 0, cultures, cultures, cultures_state, empty_init, ROT0, "Face", "Jibun wo Migaku Culture School Mahjong Hen", MACHINE_SUPPORTS_SAVE )

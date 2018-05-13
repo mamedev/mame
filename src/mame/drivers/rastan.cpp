@@ -707,14 +707,14 @@ ROM_START( rastsagab )
 ROM_END
 
 /* Newer revised code base */
-GAME( 1987, rastan,    0,      rastan, rastan,   rastan_state, 0, ROT0, "Taito Corporation Japan",   "Rastan (World Rev 1)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastana,   rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation Japan",   "Rastan (World)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastanu,   rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito America Corporation", "Rastan (US Rev 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastanua,  rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito America Corporation", "Rastan (US)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastsaga,  rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastan,    0,      rastan, rastan,   rastan_state, empty_init, ROT0, "Taito Corporation Japan",   "Rastan (World Rev 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastana,   rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation Japan",   "Rastan (World)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastanu,   rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito America Corporation", "Rastan (US Rev 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastanua,  rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito America Corporation", "Rastan (US)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastsaga,  rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1)", MACHINE_SUPPORTS_SAVE )
 
 /* Based on earliest code base */
-GAME( 1987, rastanb,   rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation Japan",   "Rastan (World, Earlier code base)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastanub,  rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito America Corporation", "Rastan (US, Earlier code base)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastsagaa, rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1, Earlier code base)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rastsagab, rastan, rastan, rastsaga, rastan_state, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan, Earlier code base)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastanb,   rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation Japan",   "Rastan (World, Earlier code base)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastanub,  rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito America Corporation", "Rastan (US, Earlier code base)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastsagaa, rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation",         "Rastan Saga (Japan Rev 1, Earlier code base)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rastsagab, rastan, rastan, rastsaga, rastan_state, empty_init, ROT0, "Taito Corporation",         "Rastan Saga (Japan, Earlier code base)",       MACHINE_SUPPORTS_SAVE )

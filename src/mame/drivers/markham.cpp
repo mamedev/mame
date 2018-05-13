@@ -247,4 +247,4 @@ ROM_START( markham )
 ROM_END
 
 
-GAME( 1983, markham, 0, markham, markham, markham_state, 0, ROT0, "Sun Electronics", "Markham", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, markham, 0, markham, markham, markham_state, empty_init, ROT0, "Sun Electronics", "Markham", MACHINE_SUPPORTS_SAVE )

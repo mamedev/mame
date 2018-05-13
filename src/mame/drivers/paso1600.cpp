@@ -349,5 +349,5 @@ ROM_START( paso1600 )
 ROM_END
 
 
-//    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT     STATE           INIT   COMPANY     FULLNAME        FLAGS
-COMP ( 198?,paso1600,   0,      0,       paso1600,  paso1600, paso1600_state, 0,     "Toshiba",  "Pasopia 1600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY    FULLNAME        FLAGS
+COMP( 198?, paso1600, 0,      0,      paso1600, paso1600, paso1600_state, empty_init, "Toshiba", "Pasopia 1600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

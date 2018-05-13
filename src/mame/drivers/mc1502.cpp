@@ -399,6 +399,6 @@ ROM_END
 
 ***************************************************************************/
 
-//     YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       STATE         INIT      COMPANY               FULLNAME               FLAGS
-COMP ( 1989, mc1502, 0,      0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika MS 1502", 0 )
-COMP ( 1988, pk88,   0,      0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika PK-88",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY               FULLNAME               FLAGS
+COMP( 1989, mc1502, 0,      0,      mc1502,  mc1502, mc1502_state, init_mc1502, "NPO Microprocessor", "Elektronika MS 1502", 0 )
+COMP( 1988, pk88,   0,      0,      mc1502,  mc1502, mc1502_state, init_mc1502, "NPO Microprocessor", "Elektronika PK-88",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -213,4 +213,4 @@ ROM_START( modellot )
 ROM_END
 
 /* Driver */
-COMP( 1979, modellot, 0, 0, modellot, modellot, modellot_state, 0, "General Processor", "Modello T", MACHINE_IS_SKELETON )
+COMP( 1979, modellot, 0, 0, modellot, modellot, modellot_state, empty_init, "General Processor", "Modello T", MACHINE_IS_SKELETON )

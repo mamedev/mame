@@ -690,5 +690,5 @@ void nevada_state::init_nevada()
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME     PARENT MACHINE INPUT   STATE         INIT    ROT   COMPANY     FULLNAME             FLAGS
-GAME( 1995, nevada,  0,     nevada, nevada, nevada_state, nevada, ROT0, "VLC Inc.", "VLC Nevada",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT MACHINE INPUT   STATE         INIT         ROT   COMPANY     FULLNAME             FLAGS
+GAME( 1995, nevada,  0,     nevada, nevada, nevada_state, init_nevada, ROT0, "VLC Inc.", "VLC Nevada",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

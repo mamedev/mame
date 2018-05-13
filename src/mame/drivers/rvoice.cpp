@@ -407,5 +407,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     STATE         INIT      COMPANY                           FULLNAME        FLAGS
-COMP( 1988?, rvoicepc, 0,      0,      rvoicepc, rvoicepc, rvoice_state, rvoicepc, "Adaptive Communication Systems", "Realvoice PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     CLASS         INIT           COMPANY                           FULLNAME        FLAGS
+COMP( 1988?, rvoicepc, 0,      0,      rvoicepc, rvoicepc, rvoice_state, init_rvoicepc, "Adaptive Communication Systems", "Realvoice PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

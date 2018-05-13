@@ -1011,5 +1011,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT      COMPANY                          FULLNAME            FLAGS */
-COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, 0,        "Digital Equipment Corporation", "DECtalk DTC-01",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                          FULLNAME          FLAGS */
+COMP( 1984, dectalk, 0,      0,      dectalk, dectalk, dectalk_state, empty_init, "Digital Equipment Corporation", "DECtalk DTC-01", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

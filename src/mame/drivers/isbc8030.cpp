@@ -126,5 +126,5 @@ ROM_START( isbc8030 )
 	ROM_LOAD( "mon830.bin", 0x0000, 0x0800, CRC(cda15115) SHA1(242dad14a919568178b363c3e27f22ec0a5849b3))
 ROM_END
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1978, isbc8030,  0,        0,      isbc8030,  isbc8030,  isbc8030_state,  0,     "Intel",  "iSBC 80/30",  MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME      FLAGS */
+COMP( 1978, isbc8030, 0,      0,      isbc8030, isbc8030, isbc8030_state, empty_init, "Intel", "iSBC 80/30", MACHINE_NO_SOUND_HW )

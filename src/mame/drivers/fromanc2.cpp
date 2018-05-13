@@ -846,7 +846,7 @@ void fromanc2_state::init_fromanc4()
  *
  *************************************/
 
-GAME( 1995, fromanc2,  0,        fromanc2, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan, newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fromanc2o, fromanc2, fromanc2, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fromancr,  0,        fromancr, fromanc2, fromanc2_state, fromanc2, ROT0, "Video System Co.", "Taisen Mahjong Final Romance R (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1998, fromanc4,  0,        fromanc4, fromanc4, fromanc2_state, fromanc4, ROT0, "Video System Co.", "Taisen Mahjong Final Romance 4 (Japan)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fromanc2,  0,        fromanc2, fromanc2, fromanc2_state, init_fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan, newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fromanc2o, fromanc2, fromanc2, fromanc2, fromanc2_state, init_fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fromancr,  0,        fromancr, fromanc2, fromanc2_state, init_fromanc2, ROT0, "Video System Co.", "Taisen Mahjong Final Romance R (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1998, fromanc4,  0,        fromanc4, fromanc4, fromanc2_state, init_fromanc4, ROT0, "Video System Co.", "Taisen Mahjong Final Romance 4 (Japan)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

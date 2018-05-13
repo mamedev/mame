@@ -227,5 +227,5 @@ ROM_START(gamate)
 ROM_END
 
 
-//    YEAR  NAME     PARENT  COMPAT    MACHINE  INPUT   CLASS         INIT    COMPANY     FULLNAME  FLAGS
-CONS( 1990, gamate,  0,      0,        gamate,  gamate, gamate_state, gamate, "Bit Corp", "Gamate", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY     FULLNAME  FLAGS
+CONS( 1990, gamate, 0,      0,      gamate,  gamate, gamate_state, init_gamate, "Bit Corp", "Gamate", 0 )

@@ -104,4 +104,4 @@ ROM_START( iqunlim )
 	ROM_LOAD16_WORD_SWAP( "27-06126-007.bin", 0x000000, 0x200000, CRC(af38c743) SHA1(5b91748536905812e6de7145638699acb375865a) )
 ROM_END
 
-COMP( 19??, iqunlim,    0,      0,      iqunlim,     iqunlim, iqunlim_state, 0,    "Video Technology", "VTech IQ Unlimited (Germany)",              MACHINE_IS_SKELETON)
+COMP( 19??, iqunlim, 0, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "Video Technology", "VTech IQ Unlimited (Germany)", MACHINE_IS_SKELETON)

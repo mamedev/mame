@@ -159,4 +159,4 @@ ROM_START( zephyr )
 	ROM_LOAD( "23-066-02a.bin",  0x0000, 0x0800, CRC(d5650b6c) SHA1(e6333e59018d9904f12abb270db4ba28aeff1995) )
 ROM_END
 
-COMP( 1979, zephyr, 0, 0, zephyr, zephyr, zms8085_state, 0, "Zentec", "Zephyr (00-441-01)", MACHINE_IS_SKELETON )
+COMP( 1979, zephyr, 0, 0, zephyr, zephyr, zms8085_state, empty_init, "Zentec", "Zephyr (00-441-01)", MACHINE_IS_SKELETON )

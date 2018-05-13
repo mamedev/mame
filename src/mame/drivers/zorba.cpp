@@ -562,8 +562,8 @@ ROM_START( zorba )
 	ROM_LOAD( "74ls288.u77", 0x0040, 0x0020, CRC(946e03b0) SHA1(24240bdd7bdf507a5b51628fb36ad1266fc53a28) BAD_DUMP ) // looks like bad dump of address decode PROM
 ROM_END
 
-COMP( 1984?, zorba, 0, 0, zorba, zorba, zorba_state, 0, "Modular Micros", "Zorba (Modular Micros)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1984?, zorba, 0, 0, zorba, zorba, zorba_state, empty_init, "Modular Micros", "Zorba (Modular Micros)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Undumped versions (see startup screen notes at top of file)
-// COMP( 1983, zorbat, zorba, 0, zorba, zorba, zorba_state, 0, "Telcon Industries",  "Zorba (Telcon Industries)",  MACHINE_NOT_WORKING )
-// COMP( 1984, zorbag, zorba, 0, zorba, zorba, zorba_state, 0, "Gemini Electronics", "Zorba (Gemini Electronics)", MACHINE_NOT_WORKING )
+// COMP( 1983, zorbat, zorba, 0, zorba, zorba, zorba_state, empty_init, "Telcon Industries",  "Zorba (Telcon Industries)",  MACHINE_NOT_WORKING )
+// COMP( 1984, zorbag, zorba, 0, zorba, zorba, zorba_state, empty_init, "Gemini Electronics", "Zorba (Gemini Electronics)", MACHINE_NOT_WORKING )

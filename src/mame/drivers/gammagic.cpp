@@ -187,6 +187,6 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT       ROT   COMPANY             FULLNAME              FLAGS
-GAME( 1999, gammagic,  0,        gammagic, gammagic, gammagic_state, 0,         ROT0, "Bally Gaming Co.", "Game Magic",         MACHINE_IS_SKELETON )
-GAME( 1999, 99bottles, gammagic, gammagic, gammagic, gammagic_state, 0,         ROT0, "Bally Gaming Co.", "99 Bottles of Beer", MACHINE_IS_SKELETON )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        ROT   COMPANY             FULLNAME              FLAGS
+GAME( 1999, gammagic,  0,        gammagic, gammagic, gammagic_state, empty_init, ROT0, "Bally Gaming Co.", "Game Magic",         MACHINE_IS_SKELETON )
+GAME( 1999, 99bottles, gammagic, gammagic, gammagic, gammagic_state, empty_init, ROT0, "Bally Gaming Co.", "99 Bottles of Beer", MACHINE_IS_SKELETON )

@@ -597,5 +597,5 @@ ROM_START( monzagpb )
 ROM_END
 
 
-GAMEL( 1981, monzagp,  0,       monzagp, monzagp, monzagp_state, 0, ROT270, "Olympia", "Monza GP",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
-GAMEL( 1981, monzagpb, monzagp, monzagp, monzagp, monzagp_state, 0, ROT270, "bootleg", "Monza GP (bootleg)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
+GAMEL( 1981, monzagp,  0,       monzagp, monzagp, monzagp_state, empty_init, ROT270, "Olympia", "Monza GP",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )
+GAMEL( 1981, monzagpb, monzagp, monzagp, monzagp, monzagp_state, empty_init, ROT270, "bootleg", "Monza GP (bootleg)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND, layout_monzagp )

@@ -652,5 +652,5 @@ ROM_START( ssem )
 ROM_END
 
 
-//   YEAR  NAME     PARENT    COMPAT   MACHINE  INPUT  STATE        INIT  COMPANY                  FULLNAME
-COMP(1948, ssem,    0,        0,       ssem,    ssem,  ssem_state,  0,    "Manchester University", "Small-Scale Experimental Machine (SSEM), 'Baby'", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
+//   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                  FULLNAME
+COMP(1948, ssem, 0,      0,      ssem,    ssem,  ssem_state, empty_init, "Manchester University", "Small-Scale Experimental Machine (SSEM), 'Baby'", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
