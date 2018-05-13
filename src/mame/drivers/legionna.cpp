@@ -87,7 +87,6 @@ Preliminary COP MCU memory map
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/ym2151.h"
-#include "machine/seicop.h"
 
 #include "screen.h"
 #include "speaker.h"
