@@ -57,7 +57,6 @@ private:
 	uint8_t m_writeindex;
 	uint8_t m_readindex;
 	uint8_t m_dacbits;
-	std::unique_ptr<rgb_t[]> m_pens;
 };
 
 
