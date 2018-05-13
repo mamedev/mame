@@ -183,5 +183,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1979, pipbug, 0,      0,      pipbug,   pipbug, pipbug_state, 0,    "Signetics", "PIPBUG", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1979, pipbug, 0,      0,      pipbug,  pipbug, pipbug_state, empty_init, "Signetics", "PIPBUG", MACHINE_NO_SOUND_HW )

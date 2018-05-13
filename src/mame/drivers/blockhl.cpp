@@ -319,11 +319,11 @@ MACHINE_CONFIG_START(blockhl_state::blockhl)
 	MCFG_K051960_CB(blockhl_state, sprite_callback)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 MACHINE_CONFIG_END
@@ -384,6 +384,6 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT   MACHINE  INPUT    CLASS          INIT  ROT   COMPANY   FULLNAME          FLAGS
-GAME( 1989, blockhl, 0,       blockhl, blockhl, blockhl_state, 0,    ROT0, "Konami", "Block Hole",     MACHINE_SUPPORTS_SAVE )
-GAME( 1989, quarth,  blockhl, blockhl, blockhl, blockhl_state, 0,    ROT0, "Konami", "Quarth (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT   MACHINE  INPUT    CLASS          INIT        ROT   COMPANY   FULLNAME          FLAGS
+GAME( 1989, blockhl, 0,       blockhl, blockhl, blockhl_state, empty_init, ROT0, "Konami", "Block Hole",     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, quarth,  blockhl, blockhl, blockhl, blockhl_state, empty_init, ROT0, "Konami", "Quarth (Japan)", MACHINE_SUPPORTS_SAVE )

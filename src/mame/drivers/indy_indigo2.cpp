@@ -85,8 +85,7 @@ public:
 
 	DECLARE_WRITE32_MEMBER(ip22_write_ram);
 
-	DECLARE_DRIVER_INIT(ip225015);
-
+	void init_ip225015();
 	void ip225015(machine_config &config);
 	void ip224613(machine_config &config);
 	void ip244415(machine_config &config);
@@ -185,7 +184,7 @@ void ip22_state::machine_start()
 {
 }
 
-DRIVER_INIT_MEMBER(ip22_state, ip225015)
+void ip22_state::init_ip225015()
 {
 	// IP22 uses 2 pieces of PC-compatible hardware: the 8042 PS/2 keyboard/mouse
 	// interface and the 8254 PIT.  Both are licensed cores embedded in the IOC custom chip.
@@ -226,7 +225,8 @@ MACHINE_CONFIG_START(ip22_state::ip225015)
 
 	MCFG_DEVICE_ADD("sgi_mc", SGI_MC, 0)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -314,7 +314,7 @@ ROM_START( ip244415 )
 	ROM_LOAD( "ip244415.bin", 0x000000, 0x080000, CRC(2f37825a) SHA1(0d48c573b53a307478820b85aacb57b868297ca3) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     STATE       INIT      COMPANY                 FULLNAME                   FLAGS
-COMP( 1993, ip225015, 0,        0,        ip225015, ip225015, ip22_state, ip225015, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_NOT_WORKING )
-COMP( 1993, ip224613, 0,        0,        ip224613, ip225015, ip22_state, ip225015, "Silicon Graphics Inc", "Indy (R4600, 133MHz)",    MACHINE_NOT_WORKING )
-COMP( 1994, ip244415, 0,        0,        ip244415, ip225015, ip22_state, ip225015, "Silicon Graphics Inc", "Indigo2 (R4400, 150MHz)", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS       INIT           COMPANY                 FULLNAME                   FLAGS
+COMP( 1993, ip225015, 0,      0,      ip225015, ip225015, ip22_state, init_ip225015, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_NOT_WORKING )
+COMP( 1993, ip224613, 0,      0,      ip224613, ip225015, ip22_state, init_ip225015, "Silicon Graphics Inc", "Indy (R4600, 133MHz)",    MACHINE_NOT_WORKING )
+COMP( 1994, ip244415, 0,      0,      ip244415, ip225015, ip22_state, init_ip225015, "Silicon Graphics Inc", "Indigo2 (R4400, 150MHz)", MACHINE_NOT_WORKING )

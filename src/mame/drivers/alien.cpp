@@ -108,7 +108,7 @@ MACHINE_CONFIG_START(alien_state::alien)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 MACHINE_CONFIG_END
 
@@ -146,5 +146,5 @@ ROM_START( pingu )
 ROM_END
 
 
-GAME( 2005, alien,  0,      alien, alien, alien_state, 0, ROT0, "Capcom", "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2006, pingu,  0,      alien, alien, alien_state, 0, ROT0, "Pygos Group / Capcom", "Pingu's Ice Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, alien, 0, alien, alien, alien_state, empty_init, ROT0, "Capcom", "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, pingu, 0, alien, alien, alien_state, empty_init, ROT0, "Pygos Group / Capcom", "Pingu's Ice Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

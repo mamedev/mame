@@ -244,7 +244,7 @@ public:
 	DECLARE_READ8_MEMBER(vk100_keyboard_column_r);
 	DECLARE_READ8_MEMBER(SYSTAT_A);
 	DECLARE_READ8_MEMBER(SYSTAT_B);
-	DECLARE_DRIVER_INIT(vk100);
+	void init_vk100();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	TIMER_CALLBACK_MEMBER(execute_vg);
@@ -988,7 +988,7 @@ WRITE_LINE_MEMBER(vk100_state::i8251_rts)
 	m_ACTS = state;
 }
 
-DRIVER_INIT_MEMBER(vk100_state,vk100)
+void vk100_state::init_vk100()
 {
 	// figure out how the heck to initialize the timers here
 	//m_i8251_rx_timer = timer_alloc(TID_I8251_RX);
@@ -1072,7 +1072,7 @@ MACHINE_CONFIG_START(vk100_state::vk100)
 
 	MCFG_DEFAULT_LAYOUT( layout_vk100 )
 
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 116 ) // 116 hz (page 172 of TM), but duty cycle is wrong here!
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.25 )
 MACHINE_CONFIG_END
@@ -1271,5 +1271,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE          INIT    COMPANY                          FULLNAME        FLAGS */
-COMP( 1980, vk100,  0,      0,       vk100,     vk100, vk100_state,   vk100,  "Digital Equipment Corporation", "VK100 'GIGI'", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY                          FULLNAME        FLAGS */
+COMP( 1980, vk100, 0,      0,      vk100,   vk100, vk100_state, init_vk100, "Digital Equipment Corporation", "VK100 'GIGI'", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

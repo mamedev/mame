@@ -395,7 +395,7 @@ MACHINE_CONFIG_START(unior_state::unior)
 	MCFG_PALETTE_INIT_OWNER(unior_state,unior)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -451,5 +451,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT    COMPAT   MACHINE    INPUT  CLASS          INIT  COMPANY      FULLNAME  FLAGS */
-COMP( 19??, unior,  radio86,  0,       unior,     unior, unior_state,   0,    "<unknown>", "Unior",  MACHINE_NOT_WORKING )
+/*    YEAR  NAME   PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS */
+COMP( 19??, unior, radio86, 0,      unior,   unior, unior_state, empty_init, "<unknown>", "Unior",  MACHINE_NOT_WORKING )

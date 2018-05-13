@@ -529,7 +529,7 @@ MACHINE_CONFIG_START(spy_state::spy)
 	MCFG_K051960_CB(spy_state, sprite_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -610,5 +610,5 @@ ROM_START( spyu )
 ROM_END
 
 
-GAME( 1989, spy,  0,   spy, spy, spy_state, 0, ROT0, "Konami", "S.P.Y. - Special Project Y (World ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, spyu, spy, spy, spy, spy_state, 0, ROT0, "Konami", "S.P.Y. - Special Project Y (US ver. M)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spy,  0,   spy, spy, spy_state, empty_init, ROT0, "Konami", "S.P.Y. - Special Project Y (World ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spyu, spy, spy, spy, spy_state, empty_init, ROT0, "Konami", "S.P.Y. - Special Project Y (US ver. M)", MACHINE_SUPPORTS_SAVE )

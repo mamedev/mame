@@ -577,10 +577,9 @@ MACHINE_CONFIG_START(atarifb_state::atarifb)
 	MCFG_PALETTE_INIT_OWNER(atarifb_state, atarifb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(atarifb)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, atarifb_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.18)
 MACHINE_CONFIG_END
 
@@ -606,8 +605,7 @@ MACHINE_CONFIG_START(atarifb_state::abaseb)
 	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_abaseb)
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(abaseb)
+	MCFG_DEVICE_REPLACE("discrete", DISCRETE, abaseb_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.24)
 MACHINE_CONFIG_END
 
@@ -797,10 +795,10 @@ ROM_END
  *************************************/
 
 /*     YEAR  NAME      PARENT   MACHINE   INPUT */
-GAMEL( 1978, atarifb,  0,       atarifb,  atarifb,  atarifb_state, 0, ROT0, "Atari", "Atari Football (revision 2)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
-GAMEL( 1978, atarifb1, atarifb, atarifb,  atarifb,  atarifb_state, 0, ROT0, "Atari", "Atari Football (revision 1)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
-GAMEL( 1978, atarifb2, atarifb, atarifb,  atarifb,  atarifb_state, 0, ROT0, "Atari", "Atari Football II", MACHINE_SUPPORTS_SAVE, layout_atarifb )
-GAMEL( 1979, atarifb4, atarifb, atarifb4, atarifb4, atarifb_state, 0, ROT0, "Atari", "Atari Football (4 players)", MACHINE_SUPPORTS_SAVE, layout_atarifb4 )
-GAMEL( 1979, abaseb,   0,       abaseb,   abaseb,   atarifb_state, 0, ROT0, "Atari", "Atari Baseball (set 1)", MACHINE_SUPPORTS_SAVE, layout_abaseb )
-GAMEL( 1979, abaseb2,  abaseb,  abaseb,   abaseb,   atarifb_state, 0, ROT0, "Atari", "Atari Baseball (set 2)", MACHINE_SUPPORTS_SAVE, layout_abaseb )
-GAME ( 1980, soccer,   0,       soccer,   soccer,   atarifb_state, 0, ROT0, "Atari", "Atari Soccer", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1978, atarifb,  0,       atarifb,  atarifb,  atarifb_state, empty_init, ROT0, "Atari", "Atari Football (revision 2)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1978, atarifb1, atarifb, atarifb,  atarifb,  atarifb_state, empty_init, ROT0, "Atari", "Atari Football (revision 1)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1978, atarifb2, atarifb, atarifb,  atarifb,  atarifb_state, empty_init, ROT0, "Atari", "Atari Football II", MACHINE_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1979, atarifb4, atarifb, atarifb4, atarifb4, atarifb_state, empty_init, ROT0, "Atari", "Atari Football (4 players)", MACHINE_SUPPORTS_SAVE, layout_atarifb4 )
+GAMEL( 1979, abaseb,   0,       abaseb,   abaseb,   atarifb_state, empty_init, ROT0, "Atari", "Atari Baseball (set 1)", MACHINE_SUPPORTS_SAVE, layout_abaseb )
+GAMEL( 1979, abaseb2,  abaseb,  abaseb,   abaseb,   atarifb_state, empty_init, ROT0, "Atari", "Atari Baseball (set 2)", MACHINE_SUPPORTS_SAVE, layout_abaseb )
+GAME(  1980, soccer,   0,       soccer,   soccer,   atarifb_state, empty_init, ROT0, "Atari", "Atari Soccer", MACHINE_SUPPORTS_SAVE )

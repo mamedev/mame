@@ -193,5 +193,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY    FULLNAME        FLAGS
-COMP( 1984, mx2178, 0,      0,       mx2178,    mx2178, mx2178_state, 0,    "Memorex", "Memorex 2178", MACHINE_IS_SKELETON )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME        FLAGS
+COMP( 1984, mx2178, 0,      0,      mx2178,  mx2178, mx2178_state, empty_init, "Memorex", "Memorex 2178", MACHINE_IS_SKELETON )

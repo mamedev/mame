@@ -184,7 +184,7 @@ MACHINE_CONFIG_START(mephisto_pinball_state::mephisto)
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, mephisto_pinball_state, t0_t1_w))
 	MCFG_MCS51_SERIAL_RX_CB(NOOP) // from MUART
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/8)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mephisto_pinball_state, ay8910_columns_w))
@@ -248,6 +248,6 @@ ROM_START(mephistp1)
 ROM_END
 
 
-GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_pinball_state,  0,  ROT0,  "Stargame",    "Mephisto (rev. 1.2)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_pinball_state,  0,  ROT0,  "Stargame",    "Mephisto (rev. 1.1)",     MACHINE_IS_SKELETON_MECHANICAL)
-//GAME(1988,  sport2k,    0,         sport2k,   sport2k, mephisto_pinball_state,   0,  ROT0,  "Unidesa",     "Cirsa Sport 2000",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_pinball_state, empty_init, ROT0,  "Stargame",    "Mephisto (rev. 1.2)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_pinball_state, empty_init, ROT0,  "Stargame",    "Mephisto (rev. 1.1)",     MACHINE_IS_SKELETON_MECHANICAL)
+//GAME(1988,  sport2k,    0,         sport2k,   sport2k,  mephisto_pinball_state, empty_init, ROT0,  "Unidesa",     "Cirsa Sport 2000",        MACHINE_IS_SKELETON_MECHANICAL)

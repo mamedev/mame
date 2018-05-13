@@ -330,7 +330,7 @@ MACHINE_CONFIG_START(mjkjidai_state::mjkjidai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -379,4 +379,4 @@ ROM_START( mjkjidai )
 ROM_END
 
 
-GAME( 1986, mjkjidai, 0, mjkjidai, mjkjidai, mjkjidai_state, 0, ROT0, "Sanritsu",  "Mahjong Kyou Jidai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mjkjidai, 0, mjkjidai, mjkjidai, mjkjidai_state, empty_init, ROT0, "Sanritsu",  "Mahjong Kyou Jidai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

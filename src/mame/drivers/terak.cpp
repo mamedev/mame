@@ -131,5 +131,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY  FULLNAME       FLAGS
-COMP( 1977, terak,  0,      0,       terak,     terak, terak_state, 0,    "Terak", "Terak 8510A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME       FLAGS
+COMP( 1977, terak, 0,      0,      terak,   terak, terak_state, empty_init, "Terak", "Terak 8510A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

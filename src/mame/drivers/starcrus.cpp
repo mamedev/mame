@@ -162,7 +162,7 @@ MACHINE_CONFIG_START(starcrus_state::starcrus)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
@@ -199,4 +199,4 @@ ROM_START( starcrus )
 ROM_END
 
 
-GAME( 1977, starcrus, 0, starcrus, starcrus, starcrus_state, 0, ROT0, "Ramtek", "Star Cruiser", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, starcrus, 0, starcrus, starcrus, starcrus_state, empty_init, ROT0, "Ramtek", "Star Cruiser", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

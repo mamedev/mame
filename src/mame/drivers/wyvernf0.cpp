@@ -676,7 +676,7 @@ MACHINE_CONFIG_START(wyvernf0_state::wyvernf0)
 	MCFG_VIDEO_START_OVERRIDE(wyvernf0_state,wyvernf0)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -745,4 +745,4 @@ ROM_START( wyvernf0 )
 	ROM_LOAD( "a39_12.ic74",  0x6000, 0x2000, CRC(1cc389de) SHA1(4213484d3a82688f312811e7a5c4d128e40584c3) )
 ROM_END
 
-GAME( 1985, wyvernf0, 0, wyvernf0, wyvernf0, wyvernf0_state, 0, ROT270, "Taito", "Wyvern F-0", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)
+GAME( 1985, wyvernf0, 0, wyvernf0, wyvernf0, wyvernf0_state, empty_init, ROT270, "Taito", "Wyvern F-0", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)

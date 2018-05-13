@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(offtwall_state::offtwall)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_III_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 6)
@@ -441,7 +441,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(offtwall_state,offtwall)
+void offtwall_state::init_offtwall()
 {
 	/* install son-of-slapstic workarounds */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
@@ -453,7 +453,7 @@ DRIVER_INIT_MEMBER(offtwall_state,offtwall)
 }
 
 
-DRIVER_INIT_MEMBER(offtwall_state,offtwalc)
+void offtwall_state::init_offtwalc()
 {
 	/* install son-of-slapstic workarounds */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
@@ -472,5 +472,5 @@ DRIVER_INIT_MEMBER(offtwall_state,offtwalc)
  *
  *************************************/
 
-GAME( 1991, offtwall, 0,        offtwall, offtwall, offtwall_state, offtwall, ROT0, "Atari Games", "Off the Wall (2/3-player upright)", 0 )
-GAME( 1991, offtwallc,offtwall, offtwall, offtwall, offtwall_state, offtwalc, ROT0, "Atari Games", "Off the Wall (2-player cocktail)", 0 )
+GAME( 1991, offtwall, 0,        offtwall, offtwall, offtwall_state, init_offtwall, ROT0, "Atari Games", "Off the Wall (2/3-player upright)", 0 )
+GAME( 1991, offtwallc,offtwall, offtwall, offtwall, offtwall_state, init_offtwalc, ROT0, "Atari Games", "Off the Wall (2-player cocktail)", 0 )

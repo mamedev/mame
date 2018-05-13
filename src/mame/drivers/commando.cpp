@@ -278,10 +278,10 @@ MACHINE_CONFIG_START(commando_state::commando)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", commando)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -669,7 +669,7 @@ ROM_END
 
 /* Driver Initialization */
 
-DRIVER_INIT_MEMBER(commando_state,commando)
+void commando_state::init_commando()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -682,7 +682,7 @@ DRIVER_INIT_MEMBER(commando_state,commando)
 	}
 }
 
-DRIVER_INIT_MEMBER(commando_state,spaceinv)
+void commando_state::init_spaceinv()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -696,12 +696,12 @@ DRIVER_INIT_MEMBER(commando_state,spaceinv)
 
 /* Game Drivers */
 
-GAME( 1985, commando,  0,        commando, commando, commando_state, commando, ROT270, "Capcom", "Commando (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandou, commando, commando, commandou,commando_state, commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandou2,commando, commando, commando, commando_state, commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandoj, commando, commando, commando, commando_state, commando, ROT270, "Capcom", "Senjou no Ookami", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandob, commando, commando, commando, commando_state, spaceinv, ROT270, "bootleg", "Commando (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandob2,commando, commando, commando, commando_state, commando, ROT270, "bootleg", "Commando (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sinvasn,   commando, commando, commando, commando_state, commando, ROT270, "Capcom", "Space Invasion (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sinvasnb,  commando, commando, commando, commando_state, spaceinv, ROT270, "bootleg", "Space Invasion (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, mercenario,commando, commando, commando, commando_state, spaceinv, ROT270, "bootleg", "Mercenario (Commando bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commando,   0,        commando, commando, commando_state, init_commando, ROT270, "Capcom", "Commando (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandou,  commando, commando, commandou,commando_state, init_commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandou2, commando, commando, commando, commando_state, init_commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandoj,  commando, commando, commando, commando_state, init_commando, ROT270, "Capcom", "Senjou no Ookami", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandob,  commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg", "Commando (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandob2, commando, commando, commando, commando_state, init_commando, ROT270, "bootleg", "Commando (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sinvasn,    commando, commando, commando, commando_state, init_commando, ROT270, "Capcom", "Space Invasion (Europe)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sinvasnb,   commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg", "Space Invasion (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, mercenario, commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg", "Mercenario (Commando bootleg)", MACHINE_SUPPORTS_SAVE )

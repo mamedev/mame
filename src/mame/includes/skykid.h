@@ -48,7 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(skykid_scroll_x_w);
 	DECLARE_WRITE8_MEMBER(skykid_scroll_y_w);
 	DECLARE_WRITE8_MEMBER(skykid_flipscreen_priority_w);
-	DECLARE_DRIVER_INIT(skykid);
+	void init_skykid();
 	TILEMAP_MAPPER_MEMBER(tx_tilemap_scan);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);

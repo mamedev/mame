@@ -288,9 +288,9 @@ MACHINE_CONFIG_START(cbasebal_state::cbasebal)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
@@ -339,7 +339,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cbasebal_state,cbasebal)
+void cbasebal_state::init_cbasebal()
 {
 	uint8_t *src = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -357,4 +357,4 @@ DRIVER_INIT_MEMBER(cbasebal_state,cbasebal)
  *
  *************************************/
 
-GAME( 1989, cbasebal, 0, cbasebal, cbasebal, cbasebal_state, cbasebal, ROT0, "Capcom", "Capcom Baseball (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cbasebal, 0, cbasebal, cbasebal, cbasebal_state, init_cbasebal, ROT0, "Capcom", "Capcom Baseball (Japan)", MACHINE_SUPPORTS_SAVE )

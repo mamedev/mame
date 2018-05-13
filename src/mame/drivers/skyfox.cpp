@@ -246,7 +246,7 @@ MACHINE_CONFIG_START(skyfox_state::skyfox)
 	MCFG_PALETTE_INIT_OWNER(skyfox_state, skyfox)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -401,7 +401,7 @@ ROM_END
 
 
 /* Untangle the graphics: cut each 32x32x8 tile in 16 8x8x8 tiles */
-DRIVER_INIT_MEMBER(skyfox_state,skyfox)
+void skyfox_state::init_skyfox()
 {
 	uint8_t *rom = memregion("gfx1")->base();
 	uint8_t *end = rom + memregion("gfx1")->bytes();
@@ -418,6 +418,6 @@ DRIVER_INIT_MEMBER(skyfox_state,skyfox)
 }
 
 
-GAME( 1987, skyfox,    0,      skyfox, skyfox, skyfox_state, skyfox, ROT90, "Jaleco (Nichibutsu USA license)", "Sky Fox", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exerizer,  skyfox, skyfox, skyfox, skyfox_state, skyfox, ROT90, "Jaleco", "Exerizer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exerizerb, skyfox, skyfox, skyfox, skyfox_state, skyfox, ROT90, "bootleg", "Exerizer (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, skyfox,    0,      skyfox, skyfox, skyfox_state, init_skyfox, ROT90, "Jaleco (Nichibutsu USA license)", "Sky Fox", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exerizer,  skyfox, skyfox, skyfox, skyfox_state, init_skyfox, ROT90, "Jaleco", "Exerizer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exerizerb, skyfox, skyfox, skyfox, skyfox_state, init_skyfox, ROT90, "bootleg", "Exerizer (bootleg)", MACHINE_SUPPORTS_SAVE )

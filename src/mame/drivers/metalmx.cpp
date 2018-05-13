@@ -730,7 +730,7 @@ MACHINE_CONFIG_START(metalmx_state::metalmx)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(metalmx_state,metalmx)
+void metalmx_state::init_metalmx()
 {
 	uint8_t *adsp_boot = (uint8_t*)memregion("adsp")->base();
 
@@ -861,4 +861,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, metalmx, 0, metalmx, metalmx, metalmx_state, metalmx, ROT0, "Atari Games", "Metal Maniax (prototype)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, metalmx, 0, metalmx, metalmx, metalmx_state, init_metalmx, ROT0, "Atari Games", "Metal Maniax (prototype)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

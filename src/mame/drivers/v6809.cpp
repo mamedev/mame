@@ -295,7 +295,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", v6809)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -363,5 +363,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS          INIT   COMPANY     FULLNAME      FLAGS
-COMP( 1982, v6809,  0,      0,       v6809,     v6809, v6809_state,   0,     "Microkit", "Vegas 6809", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME      FLAGS
+COMP( 1982, v6809, 0,      0,      v6809,   v6809, v6809_state, empty_init, "Microkit", "Vegas 6809", MACHINE_NOT_WORKING )

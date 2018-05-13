@@ -24,7 +24,6 @@
 #define ACIA_1_TAG  "acia1"
 #define KBD_ACIA_TAG "kbacia"
 #define SPEAKER_TAG "spkr"
-#define A2BUS_TAG "a2bus"
 
 class concept_state : public driver_device
 {
@@ -37,7 +36,7 @@ public:
 		m_kbdacia(*this, KBD_ACIA_TAG),
 		m_speaker(*this, SPEAKER_TAG),
 		m_mm58274(*this,"mm58274c"),
-		m_a2bus(*this, A2BUS_TAG),
+		m_a2bus(*this, "a2bus"),
 		m_videoram(*this,"videoram") { }
 
 	required_device<cpu_device> m_maincpu;

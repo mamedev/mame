@@ -675,7 +675,7 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY FULLNAME */
-COMP( 1984, pc8401a,    0,      0,      pc8401a,    pc8401a, pc8401a_state, 0,      "NEC",    "PC-8401A-LS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-//COMP( 1984, pc8401bd,   pc8401a,0,      pc8401a,    pc8401a, pc8401a_state, 0,      "NEC",    "PC-8401BD", MACHINE_NOT_WORKING)
-COMP( 1985, pc8500,     0,      0,      pc8500,     pc8401a, pc8500_state,  0,      "NEC",    "PC-8500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME */
+COMP( 1984, pc8401a,  0,       0,      pc8401a, pc8401a, pc8401a_state, empty_init, "NEC",   "PC-8401A-LS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//COMP( 1984, pc8401bd, pc8401a, 0,      pc8401a, pc8401a, pc8401a_state, empty_init, "NEC",   "PC-8401BD", MACHINE_NOT_WORKING)
+COMP( 1985, pc8500,   0,       0,      pc8500,  pc8401a, pc8500_state,  empty_init, "NEC",   "PC-8500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

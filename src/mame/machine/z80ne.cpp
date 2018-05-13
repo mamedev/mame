@@ -69,7 +69,7 @@ TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_cassette_tc)
 }
 
 
-DRIVER_INIT_MEMBER(z80ne_state,z80ne)
+void z80ne_state::init_z80ne()
 {
 	/* first two entries point to rom on reset */
 	uint8_t *RAM = m_region_z80ne->base();
@@ -78,16 +78,16 @@ DRIVER_INIT_MEMBER(z80ne_state,z80ne)
 	m_bank2->configure_entry(0, &RAM[0x14000]); /* ep382 at 0x8000 */
 }
 
-DRIVER_INIT_MEMBER(z80ne_state,z80net)
+void z80ne_state::init_z80net()
 {
-	DRIVER_INIT_CALL(z80ne);
+	init_z80ne();
 }
 
-DRIVER_INIT_MEMBER(z80ne_state,z80netb)
+void z80ne_state::init_z80netb()
 {
 }
 
-DRIVER_INIT_MEMBER(z80netf_state,z80netf)
+void z80netf_state::init_z80netf()
 {
 	/* first two entries point to rom on reset */
 	uint8_t *RAM = m_region_z80ne->base();

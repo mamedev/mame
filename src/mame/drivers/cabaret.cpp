@@ -60,7 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi2_b_w);
 	DECLARE_WRITE8_MEMBER(ppi2_c_w);
 	void show_out();
-	DECLARE_DRIVER_INIT(cabaret);
+	void init_cabaret();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_reset() override;
@@ -394,19 +394,18 @@ MACHINE_CONFIG_START(cabaret_state::cabaret)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(cabaret_state,cabaret)
+void cabaret_state::init_cabaret()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
 
 	/* decrypt the program ROM */
-	for (i = 0;i < 0xf000;i++)
+	for (int i = 0; i < 0xf000; i++)
 	{
 		if ((i & 0x2206) == 0x2002) rom[i] ^= 0x01;
 	}
@@ -441,4 +440,4 @@ ROM_START( cabaret )
 	ROM_LOAD( "cg-7.u98",  0x0000, 0x8000, CRC(b93ae6f8) SHA1(accb87045c278d5d79fff65bb763aa6e8025a945) )   /* background maps, read by the CPU */
 ROM_END
 
-GAME( 1992, cabaret,  0, cabaret,  cabaret, cabaret_state, cabaret,  ROT0, "AMT Co. Ltd.", "Cabaret", MACHINE_NOT_WORKING )
+GAME( 1992, cabaret, 0, cabaret, cabaret, cabaret_state, init_cabaret, ROT0, "AMT Co. Ltd.", "Cabaret", MACHINE_NOT_WORKING )

@@ -699,7 +699,7 @@ MACHINE_CONFIG_START(vic10_state::vic10)
 	// basic hardware
 	MCFG_DEVICE_ADD(M6510_TAG, M6510, XTAL(8'000'000)/8)
 	MCFG_DEVICE_PROGRAM_MAP(vic10_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_M6510_PORT_CALLBACKS(READ8(*this, vic10_state, cpu_r), WRITE8(*this, vic10_state, cpu_w))
 	MCFG_M6510_PORT_PULLS(0x10, 0x20)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
@@ -718,7 +718,7 @@ MACHINE_CONFIG_START(vic10_state::vic10)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS6566_TAG, mos6566_device, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(8'000'000)/8)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, vic10_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, vic10_state, sid_poty_r))
@@ -737,7 +737,7 @@ MACHINE_CONFIG_START(vic10_state::vic10)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(MOS6566_TAG, mos6566_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
-	MCFG_VIC10_EXPANSION_SLOT_ADD(VIC10_EXPANSION_SLOT_TAG, XTAL(8'000'000)/8, vic10_expansion_cards, nullptr)
+	MCFG_DEVICE_ADD(VIC10_EXPANSION_SLOT_TAG, VIC10_EXPANSION_SLOT, XTAL(8'000'000)/8, vic10_expansion_cards, nullptr)
 	MCFG_VIC10_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(*this, vic10_state, exp_irq_w))
 	MCFG_VIC10_EXPANSION_SLOT_RES_CALLBACK(WRITELINE(*this, vic10_state, exp_reset_w))
 	MCFG_VIC10_EXPANSION_SLOT_CNT_CALLBACK(WRITELINE(MOS6526_TAG, mos6526_device, cnt_w))
@@ -768,4 +768,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1982, vic10,      0,    0,    vic10, vic10, vic10_state,     0, "Commodore Business Machines", "VIC-10 / Max Machine / UltiMax (NTSC)", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, vic10, 0, 0, vic10, vic10, vic10_state, empty_init, "Commodore Business Machines", "VIC-10 / Max Machine / UltiMax (NTSC)", MACHINE_SUPPORTS_SAVE )

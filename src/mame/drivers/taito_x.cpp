@@ -862,7 +862,8 @@ MACHINE_CONFIG_START(taitox_state::superman)
 	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)   /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -909,9 +910,10 @@ MACHINE_CONFIG_START(taitox_state::daisenpu)
 	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
@@ -954,7 +956,8 @@ MACHINE_CONFIG_START(taitox_state::gigandes)
 	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1001,7 +1004,8 @@ MACHINE_CONFIG_START(taitox_state::ballbros)
 	MCFG_VIDEO_START_OVERRIDE(taitox_state, kyustrkr_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1281,19 +1285,19 @@ ROM_START( ballbros )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(taitox_state,kyustrkr)
+void taitox_state::init_kyustrkr()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x900000, 0x90000f, write16_delegate(FUNC(taitox_state::kyustrkr_input_w),this));
 }
 
 
-GAME( 1988, superman,  0,        superman, superman,  taitox_state, 0,        ROT0,   "Taito Corporation",         "Superman (World)", 0 )
-GAME( 1988, supermanu, superman, superman, supermanu, taitox_state, 0,        ROT0,   "Taito Corporation",         "Superman (US)", 0 )
-GAME( 1988, supermanj, superman, superman, supermanj, taitox_state, 0,        ROT0,   "Taito Corporation",         "Superman (Japan)", 0 )
-GAME( 1989, twinhawk,  0,        daisenpu, twinhawk,  taitox_state, 0,        ROT270, "Taito Corporation Japan",   "Twin Hawk (World)", 0 )
-GAME( 1989, twinhawku, twinhawk, daisenpu, twinhawku, taitox_state, 0,        ROT270, "Taito America Corporation", "Twin Hawk (US)", 0 )
-GAME( 1989, daisenpu,  twinhawk, daisenpu, daisenpu,  taitox_state, 0,        ROT270, "Taito Corporation",         "Daisenpu (Japan)", 0 )
-GAME( 1989, gigandes,  0,        gigandes, gigandes,  taitox_state, 0,        ROT0,   "East Technology",           "Gigandes", 0 )
-GAME( 1989, gigandesa, gigandes, gigandes, gigandes,  taitox_state, 0,        ROT0,   "East Technology",           "Gigandes (earlier)", 0 )
-GAME( 1989, kyustrkr,  0,        ballbros, kyustrkr,  taitox_state, kyustrkr, ROT180, "East Technology",           "Last Striker / Kyuukyoku no Striker", 0 )
-GAME( 1992, ballbros,  0,        ballbros, ballbros,  taitox_state, 0,        ROT0,   "East Technology",           "Balloon Brothers", 0 )
+GAME( 1988, superman,  0,        superman, superman,  taitox_state, empty_init,    ROT0,   "Taito Corporation",         "Superman (World)", 0 )
+GAME( 1988, supermanu, superman, superman, supermanu, taitox_state, empty_init,    ROT0,   "Taito Corporation",         "Superman (US)", 0 )
+GAME( 1988, supermanj, superman, superman, supermanj, taitox_state, empty_init,    ROT0,   "Taito Corporation",         "Superman (Japan)", 0 )
+GAME( 1989, twinhawk,  0,        daisenpu, twinhawk,  taitox_state, empty_init,    ROT270, "Taito Corporation Japan",   "Twin Hawk (World)", 0 )
+GAME( 1989, twinhawku, twinhawk, daisenpu, twinhawku, taitox_state, empty_init,    ROT270, "Taito America Corporation", "Twin Hawk (US)", 0 )
+GAME( 1989, daisenpu,  twinhawk, daisenpu, daisenpu,  taitox_state, empty_init,    ROT270, "Taito Corporation",         "Daisenpu (Japan)", 0 )
+GAME( 1989, gigandes,  0,        gigandes, gigandes,  taitox_state, empty_init,    ROT0,   "East Technology",           "Gigandes", 0 )
+GAME( 1989, gigandesa, gigandes, gigandes, gigandes,  taitox_state, empty_init,    ROT0,   "East Technology",           "Gigandes (earlier)", 0 )
+GAME( 1989, kyustrkr,  0,        ballbros, kyustrkr,  taitox_state, init_kyustrkr, ROT180, "East Technology",           "Last Striker / Kyuukyoku no Striker", 0 )
+GAME( 1992, ballbros,  0,        ballbros, ballbros,  taitox_state, empty_init,    ROT0,   "East Technology",           "Balloon Brothers", 0 )

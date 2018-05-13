@@ -228,7 +228,7 @@ MACHINE_CONFIG_START(fastlane_state::fastlane)
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("k007232_1", K007232, XTAL(3'579'545))
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, fastlane_state, volume_callback0))
@@ -267,4 +267,4 @@ ROM_START( fastlane )
 ROM_END
 
 
-GAME( 1987, fastlane, 0, fastlane, fastlane, fastlane_state, 0, ROT90, "Konami", "Fast Lane", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, fastlane, 0, fastlane, fastlane, fastlane_state, empty_init, ROT90, "Konami", "Fast Lane", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

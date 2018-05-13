@@ -321,10 +321,9 @@ MACHINE_CONFIG_START(starshp1_state::starshp1)
 	MCFG_PALETTE_INIT_OWNER(starshp1_state, starshp1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(starshp1)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, starshp1_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("audiolatch", F9334, 0) // D9
@@ -407,5 +406,5 @@ ROM_START( starshpp )
 ROM_END
 
 
-GAME( 1977, starshp1, 0,        starshp1, starshp1, starshp1_state, 0, ORIENTATION_FLIP_X, "Atari", "Starship 1",              MACHINE_IMPERFECT_SOUND )
-GAME( 1977, starshpp, starshp1, starshp1, starshp1, starshp1_state, 0, ORIENTATION_FLIP_X, "Atari", "Starship 1 (prototype?)", MACHINE_IMPERFECT_SOUND )
+GAME( 1977, starshp1, 0,        starshp1, starshp1, starshp1_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Starship 1",              MACHINE_IMPERFECT_SOUND )
+GAME( 1977, starshpp, starshp1, starshp1, starshp1, starshp1_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Starship 1 (prototype?)", MACHINE_IMPERFECT_SOUND )

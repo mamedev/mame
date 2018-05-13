@@ -326,7 +326,7 @@ MACHINE_CONFIG_START(matmania_state::matmania)
 	MCFG_PALETTE_INIT_OWNER(matmania_state, matmania)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -370,7 +370,7 @@ MACHINE_CONFIG_START(matmania_state::maniach)
 	MCFG_PALETTE_INIT_OWNER(matmania_state, matmania)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -618,7 +618,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, matmania, 0,        matmania, matmania, matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mat Mania",               MACHINE_SUPPORTS_SAVE )
-GAME( 1985, excthour, matmania, matmania, maniach,  matmania_state, 0, ROT270, "Technos Japan (Taito license)",         "Exciting Hour",           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, maniach,  0,        maniach,  maniach,  matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, maniach2, maniach,  maniach,  maniach,  matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", MACHINE_SUPPORTS_SAVE ) // earlier version?
+GAME( 1985, matmania, 0,        matmania, matmania, matmania_state, empty_init, ROT270, "Technos Japan (Taito America license)", "Mat Mania",               MACHINE_SUPPORTS_SAVE )
+GAME( 1985, excthour, matmania, matmania, maniach,  matmania_state, empty_init, ROT270, "Technos Japan (Taito license)",         "Exciting Hour",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, maniach,  0,        maniach,  maniach,  matmania_state, empty_init, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, maniach2, maniach,  maniach,  maniach,  matmania_state, empty_init, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", MACHINE_SUPPORTS_SAVE ) // earlier version?

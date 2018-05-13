@@ -266,7 +266,7 @@ MACHINE_CONFIG_START(drmicro_state::drmicro)
 	MCFG_PALETTE_INIT_OWNER(drmicro_state, drmicro)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76496, MCLK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -324,4 +324,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, drmicro, 0, drmicro, drmicro, drmicro_state, 0, ROT270, "Sanritsu", "Dr. Micro", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, drmicro, 0, drmicro, drmicro, drmicro_state, empty_init, ROT270, "Sanritsu", "Dr. Micro", MACHINE_SUPPORTS_SAVE )

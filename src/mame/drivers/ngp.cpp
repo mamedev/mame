@@ -841,7 +841,8 @@ MACHINE_CONFIG_START(ngp_state::ngp_common)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO( "lspeaker","rspeaker" )
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD( "t6w28", T6W28, 6.144_MHz_XTAL/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )
@@ -904,6 +905,6 @@ ROM_START( ngpc )
 ROM_END
 
 
-//    YEAR  NAME  PARENT COMPAT MACHINE INPUT STATE      INIT COMPANY  FULLNAME               FLAGS
-CONS( 1998, ngp,  0,     0,     ngp,    ngp,  ngp_state, 0,   "SNK",   "NeoGeo Pocket",       MACHINE_SUPPORTS_SAVE )
-CONS( 1999, ngpc, ngp,   0,     ngpc,   ngp,  ngp_state, 0,   "SNK",   "NeoGeo Pocket Color", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE      INIT        COMPANY  FULLNAME               FLAGS
+CONS( 1998, ngp,  0,      0,      ngp,     ngp,   ngp_state, empty_init, "SNK",   "NeoGeo Pocket",       MACHINE_SUPPORTS_SAVE )
+CONS( 1999, ngpc, ngp,    0,      ngpc,    ngp,   ngp_state, empty_init, "SNK",   "NeoGeo Pocket Color", MACHINE_SUPPORTS_SAVE )

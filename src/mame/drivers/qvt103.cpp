@@ -106,4 +106,4 @@ ROM_START( qvt103 )
 	ROM_LOAD( "k304a.u24",  0x0000, 0x0400, CRC(e4b1f0da) SHA1(e9f8c48c34105464b3db206b34f67e7603484fea) )
 ROM_END
 
-COMP( 1983, qvt103, 0, 0, qvt103, qvt103, qvt103_state, 0, "Qume", "QVT-103", MACHINE_IS_SKELETON )
+COMP( 1983, qvt103, 0, 0, qvt103, qvt103, qvt103_state, empty_init, "Qume", "QVT-103", MACHINE_IS_SKELETON )

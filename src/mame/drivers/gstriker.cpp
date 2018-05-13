@@ -548,7 +548,8 @@ MACHINE_CONFIG_START(gstriker_state::gstriker)
 	MCFG_VSYSTEM_SPR_SET_TRANSPEN(0)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -1082,26 +1083,26 @@ void gstriker_state::mcu_init()
 	save_item(NAME(m_prot_reg));
 }
 
-DRIVER_INIT_MEMBER(gstriker_state,twcup94)
+void gstriker_state::init_twcup94()
 {
 	m_gametype = TECMO_WCUP94_MCU;
 	mcu_init();
 }
 
-DRIVER_INIT_MEMBER(gstriker_state,twcup94a)
+void gstriker_state::init_twcup94a()
 {
 	m_gametype = TECMO_WCUP94A_MCU;
 	mcu_init();
 }
 
-DRIVER_INIT_MEMBER(gstriker_state,twcup94b)
+void gstriker_state::init_twcup94b()
 {
 	m_gametype = TECMO_WCUP94B_MCU;
 	mcu_init();
 }
 
 
-DRIVER_INIT_MEMBER(gstriker_state,vgoalsoc)
+void gstriker_state::init_vgoalsoc()
 {
 	m_gametype = VGOAL_SOCCER_MCU;
 	mcu_init();
@@ -1112,14 +1113,14 @@ DRIVER_INIT_MEMBER(gstriker_state,vgoalsoc)
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1993, gstriker, 0,         gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker (Europe, Oceania)",            MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker (Americas)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, 0,        ROT0, "Human", "Grand Striker (Japan)",    MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstriker,  0,        gstriker, gstriker, gstriker_state, empty_init,    ROT0, "Human", "Grand Striker (Europe, Oceania)",            MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, empty_init,    ROT0, "Human", "Grand Striker (Americas)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, empty_init,    ROT0, "Human", "Grand Striker (Japan)",    MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 
 /* Similar, but not identical hardware, appear to be protected by an MCU :-( */
-GAME( 1994, vgoalsoc, 0,         vgoal,    vgoalsoc, gstriker_state, vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (Europe)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra
-GAME( 1994, vgoalsca, vgoalsoc,  vgoal,    vgoalsoc, gstriker_state, vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (US/Japan/Korea)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/kor/usa/jpn
-GAME( 1994, twcup94, 0,          twc94,    twcup94,  gstriker_state, twcup94,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, twcup94a,twcup94,    twc94,    twcup94,  gstriker_state, twcup94a, ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, twcup94b,twcup94,    twc94,    twcup94,  gstriker_state, twcup94b, ROT0, "Tecmo", "Tecmo World Cup '94 (set 3)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, vgoalsoc, 0,         vgoal,    vgoalsoc, gstriker_state, init_vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (Europe)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra
+GAME( 1994, vgoalsca, vgoalsoc,  vgoal,    vgoalsoc, gstriker_state, init_vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (US/Japan/Korea)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/kor/usa/jpn
+GAME( 1994, twcup94,  0,         twc94,    twcup94,  gstriker_state, init_twcup94,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twcup94a, twcup94,   twc94,    twcup94,  gstriker_state, init_twcup94a, ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, twcup94b, twcup94,   twc94,    twcup94,  gstriker_state, init_twcup94b, ROT0, "Tecmo", "Tecmo World Cup '94 (set 3)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

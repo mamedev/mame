@@ -51,7 +51,7 @@ const tiny_rom_entry *bbc_beebspch_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bbc_beebspch_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SP0256_TAG, SP0256, 14_MHz_XTAL / 4) // TODO: Crystal unknown
 	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(*this, bbc_beebspch_device, cb1_w))
 	MCFG_SP0256_STANDBY_CB(WRITELINE(*this, bbc_beebspch_device, cb2_w))

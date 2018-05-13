@@ -553,7 +553,7 @@ MACHINE_CONFIG_START(bitgraph_state::bg_motherboard)
 
 	MCFG_DEVICE_ADD(EAROM_TAG, ER2055, 0)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(PSG_TAG, AY8912, XTAL(1'294'400))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, bitgraph_state, earom_write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -649,6 +649,6 @@ ROM_START( bitgrphb )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY  FULLNAME          FLAGS
-COMP( 1981, bitgrpha, 0,      0,      bitgrpha, bitgraph, bitgraph_state, 0,    "BBN",   "BitGraph rev A", ROT90 )
-COMP( 1982, bitgrphb, 0,      0,      bitgrphb, bitgraph, bitgraph_state, 0,    "BBN",   "BitGraph rev B", ROT270 | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME          FLAGS
+COMP( 1981, bitgrpha, 0,      0,      bitgrpha, bitgraph, bitgraph_state, empty_init, "BBN",   "BitGraph rev A", ROT90 )
+COMP( 1982, bitgrphb, 0,      0,      bitgrphb, bitgraph, bitgraph_state, empty_init, "BBN",   "BitGraph rev B", ROT270 | MACHINE_NOT_WORKING )

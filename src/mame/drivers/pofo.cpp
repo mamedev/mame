@@ -1044,7 +1044,7 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(PCD3311T_TAG, PCD3311, XTAL(3'578'640))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -1098,5 +1098,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT      STATE            INIT  COMPANY   FULLNAME      FLAGS
-COMP( 1989, pofo,   0,      0,      portfolio,  portfolio, portfolio_state, 0,    "Atari",  "Portfolio",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY  FULLNAME     FLAGS
+COMP( 1989, pofo, 0,      0,      portfolio, portfolio, portfolio_state, empty_init, "Atari", "Portfolio", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

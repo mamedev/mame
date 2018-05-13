@@ -51,7 +51,7 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	DECLARE_DRIVER_INIT(gen32);
+	void init_gen32();
 	void alm32(machine_config &config);
 	void van32(machine_config &config);
 	void van16(machine_config &config);
@@ -242,7 +242,7 @@ static INPUT_PORTS_START( berlinp )
 INPUT_PORTS_END
 
 
-DRIVER_INIT_MEMBER(mmodular_state, gen32)
+void mmodular_state::init_gen32()
 {
 	// patch LCD delay loop
 	uint8_t *rom = memregion("maincpu")->base();
@@ -391,19 +391,19 @@ ROM_END
     Game driver(s)
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS                   INIT   COMPANY             FULLNAME                                FLAGS */
-CONS( 1988, alm16,    0,           0,      alm16,     alm16,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Almeria 68000",               MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, alm32,    0,           0,      alm32,     alm32,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Almeria 68020",               MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port16,   alm16,       0,      alm16,     alm16,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Portorose 68000",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port32,   alm32,       0,      alm32,     alm32,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Portorose 68020",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon16,   alm16,       0,      alm16,     alm16,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Lyon 68000",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon32,   alm32,       0,      alm32,     alm32,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Lyon 68020",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, van16,    alm16,       0,      van16,     alm16,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Vancouver 68000",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, van32,    alm32,       0,      van32,     alm32,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto Vancouver 68020",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1993, gen32,    0,           0,      gen32,     gen32,    mmodular_state,     gen32, "Hegener & Glaser", "Mephisto Genius 68030",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, lond020,  alm32,       0,      van32,     alm32,    mmodular_state,     0,     "Hegener & Glaser", "Mephisto London 68020",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, lond030,  gen32,       0,      gen32,     gen32,    mmodular_state,     gen32, "Hegener & Glaser", "Mephisto Genius 68030 London Upgrade", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS           INIT        COMPANY             FULLNAME                                FLAGS */
+CONS( 1988, alm16,   0,       0,      alm16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Almeria 68000",               MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, alm32,   0,       0,      alm32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Almeria 68020",               MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port16,  alm16,   0,      alm16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Portorose 68000",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32,  alm32,   0,      alm32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Portorose 68020",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon16,  alm16,   0,      alm16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Lyon 68000",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon32,  alm32,   0,      alm32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Lyon 68020",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, van16,   alm16,   0,      van16,   alm16,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Vancouver 68000",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, van32,   alm32,   0,      van32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto Vancouver 68020",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1993, gen32,   0,       0,      gen32,   gen32,   mmodular_state, init_gen32, "Hegener & Glaser", "Mephisto Genius 68030",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1996, lond020, alm32,   0,      van32,   alm32,   mmodular_state, empty_init, "Hegener & Glaser", "Mephisto London 68020",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1996, lond030, gen32,   0,      gen32,   gen32,   mmodular_state, init_gen32, "Hegener & Glaser", "Mephisto Genius 68030 London Upgrade", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 
 // not modular boards
-CONS( 1994, berlinp,  0,           0,      berlinp,   berlinp,  berlinp_state,      0,     "Hegener & Glaser", "Mephisto Berlin Pro 68020",            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1996, bpl32,    berlinp,     0,      berlinp,   berlinp,  berlinp_state,      0,     "Hegener & Glaser", "Mephisto Berlin Pro London Upgrade",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1994, berlinp, 0,       0,      berlinp, berlinp, berlinp_state,  empty_init, "Hegener & Glaser", "Mephisto Berlin Pro 68020",            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1996, bpl32,   berlinp, 0,      berlinp, berlinp, berlinp_state,  empty_init, "Hegener & Glaser", "Mephisto Berlin Pro London Upgrade",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )

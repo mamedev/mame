@@ -149,7 +149,7 @@ MACHINE_CONFIG_START(nixieclock_state::_4004clk)
 	MCFG_DEFAULT_LAYOUT(layout_4004clk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
@@ -181,5 +181,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE             INIT  COMPANY             FULLNAME            FLAGS
-SYST( 2008, 4004clk,  0,      0,       _4004clk,  4004clk, nixieclock_state, 0,    "John L. Weinrich", "4004 Nixie Clock", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    CLASS             INIT        COMPANY             FULLNAME            FLAGS
+SYST( 2008, 4004clk, 0,      0,      _4004clk, 4004clk, nixieclock_state, empty_init, "John L. Weinrich", "4004 Nixie Clock", MACHINE_SUPPORTS_SAVE )

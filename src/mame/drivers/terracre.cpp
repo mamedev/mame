@@ -464,7 +464,7 @@ MACHINE_CONFIG_START(terracre_state::ym3526)
 	MCFG_DEVICE_IO_MAP(sound_3526_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(terracre_state, irq0_line_hold,  XTAL(16'000'000)/4/512) // ?
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(terracre_state::ym3526)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(terracre_state, terracre)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -890,17 +890,17 @@ ROM_END
 
 
 
-//    YEAR, NAME,     PARENT,   MACHINE, INPUT,    STATE,          INIT,     MONITOR, COMPANY,      FULLNAME, FLAGS
-GAME( 1985, terracre, 0,        ym3526,  terracre, terracre_state, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, terracreo,terracre, ym3526,  terracre, terracre_state, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, terracrea,terracre, ym3526,  terracre, terracre_state, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, terracren,terracre, ym2203,  terracre, terracre_state, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM2203)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,     PARENT,   MACHINE, INPUT,    STATE,                 INIT,        MONITOR, COMPANY,      FULLNAME, FLAGS
+GAME( 1985, terracre, 0,        ym3526,  terracre, terracre_state,        empty_init, ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, terracreo,terracre, ym3526,  terracre, terracre_state,        empty_init, ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, terracrea,terracre, ym3526,  terracre, terracre_state,        empty_init, ROT270,  "Nichibutsu", "Terra Cresta (YM3526 set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, terracren,terracre, ym2203,  terracre, terracre_state,        empty_init, ROT270,  "Nichibutsu", "Terra Cresta (YM2203)", MACHINE_SUPPORTS_SAVE )
 
 // later HW: supports 1412M2 device, see also mightguy.cpp
-GAME( 1986, amazon,   0,        amazon_1412m2,  amazon,   amazon_state, 0,   ROT270,  "Nichibutsu", "Soldier Girl Amazon", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, amatelas, amazon,   amazon_1412m2,  amazon,   amazon_state, 0,   ROT270,  "Nichibutsu", "Sei Senshi Amatelass", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, horekid,  0,        amazon_1412m2,  horekid,  amazon_state, 0,   ROT270,  "Nichibutsu", "Kid no Hore Hore Daisakusen", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, amazon,   0,        amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu", "Soldier Girl Amazon", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, amatelas, amazon,   amazon_1412m2,  amazon,   amazon_state,   empty_init, ROT270,  "Nichibutsu", "Sei Senshi Amatelass", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, horekid,  0,        amazon_1412m2,  horekid,  amazon_state,   empty_init, ROT270,  "Nichibutsu", "Kid no Hore Hore Daisakusen", MACHINE_SUPPORTS_SAVE )
 
 // bootlegs
-GAME( 1987, horekidb, horekid,  amazon_base,    horekid,  terracre_state, 0,  ROT270,  "bootleg",    "Kid no Hore Hore Daisakusen (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, boobhack, horekid,  amazon_base,    horekid,  terracre_state, 0,  ROT270,  "bootleg",    "Booby Kids (Italian manufactured graphic hack / bootleg of Kid no Hore Hore Daisakusen (bootleg))", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, horekidb, horekid,  amazon_base,    horekid,  terracre_state, empty_init, ROT270,  "bootleg",    "Kid no Hore Hore Daisakusen (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, boobhack, horekid,  amazon_base,    horekid,  terracre_state, empty_init, ROT270,  "bootleg",    "Booby Kids (Italian manufactured graphic hack / bootleg of Kid no Hore Hore Daisakusen (bootleg))", MACHINE_SUPPORTS_SAVE )

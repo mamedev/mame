@@ -194,5 +194,5 @@ ROM_START( timetrv2 )
 	DISK_IMAGE_READONLY( "timetrv", 0, NO_DUMP )
 ROM_END
 
-GAME( 1991, timetrv,  0,       timetrv,  timetrv, timetrv_state,  0, ROT0, "Virtual Image Productions (Sega license)", "Time Traveler (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1991, timetrv2, timetrv, timetrv,  timetrv, timetrv_state,  0, ROT0, "Virtual Image Productions (Sega license)", "Time Traveler (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Europe?
+GAME( 1991, timetrv,  0,       timetrv,  timetrv, timetrv_state, empty_init, ROT0, "Virtual Image Productions (Sega license)", "Time Traveler (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, timetrv2, timetrv, timetrv,  timetrv, timetrv_state, empty_init, ROT0, "Virtual Image Productions (Sega license)", "Time Traveler (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Europe?

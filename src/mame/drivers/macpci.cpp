@@ -107,7 +107,8 @@ MACHINE_CONFIG_START(macpci_state::pippin)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD( "cdda", CDDA )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
@@ -177,5 +178,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT  COMPANY            FULLNAME        FLAGS */
-COMP( 1996, pippin,  0,       0,     pippin,    pippin, macpci_state,  0,    "Apple / Bandai",  "Pippin @mark", MACHINE_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY           FULLNAME        FLAGS */
+COMP( 1996, pippin, 0,      0,      pippin,  pippin, macpci_state, empty_init, "Apple / Bandai", "Pippin @mark", MACHINE_NOT_WORKING)

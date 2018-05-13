@@ -1380,7 +1380,7 @@ MACHINE_CONFIG_START(hotsmash_state::pbillian)
 
 	MCFG_VIDEO_START_OVERRIDE(hotsmash_state, pbillian)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) // AY-3-8910A
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("BUTTONS"))
@@ -1426,7 +1426,7 @@ MACHINE_CONFIG_START(superqix_state::sqix)
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) // AY-3-8910A @3P, analog outputs directly tied together
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
@@ -1479,7 +1479,7 @@ MACHINE_CONFIG_START(superqix_state::sqix_nomcu)
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 12000000/8)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT) // ?
@@ -1683,17 +1683,17 @@ ROM_START( perestro )
 	ROM_LOAD( "rom3a.bin",       0x00000, 0x10000, CRC(7a2a563f) SHA1(e3654091b858cc80ec1991281447fc3622a0d4f9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(superqix_state_base, sqix)
+void superqix_state_base::init_sqix()
 {
 	m_invert_coin_lockout = true;
 }
 
-DRIVER_INIT_MEMBER(superqix_state_base, sqixr0)
+void superqix_state_base::init_sqixr0()
 {
 	m_invert_coin_lockout = false;
 }
 
-DRIVER_INIT_MEMBER(superqix_state_base, perestro)
+void superqix_state_base::init_perestro()
 {
 	uint8_t *src;
 	int len;
@@ -1755,24 +1755,24 @@ DRIVER_INIT_MEMBER(superqix_state_base, perestro)
 	}
 }
 
-DRIVER_INIT_MEMBER(superqix_state_base, pbillian)
+void superqix_state_base::init_pbillian()
 {
 	m_invert_p2_spinner = false;
 }
 
-DRIVER_INIT_MEMBER(superqix_state_base, hotsmash)
+void superqix_state_base::init_hotsmash()
 {
 	m_invert_p2_spinner = true;
 }
 
 
-GAME( 1986, pbillian, 0,        pbillian,   pbillian, hotsmash_state, pbillian, ROT0,  "Kaneko / Taito", "Prebillian", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hotsmash, 0,        pbillian,   hotsmash, hotsmash_state, hotsmash, ROT90, "Kaneko / Taito", "Vs. Hot Smash", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqix,     0,        sqix,       superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixr1,   sqix,     sqix,       superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixr0,   sqix,     sqix,       superqix, superqix_state, sqixr0,   ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixu,    sqix,     sqix,       superqix, superqix_state, sqix,     ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixb1,   sqix,     sqix_8031,  superqix, superqix_state, sqixr0,   ROT90, "bootleg", "Super Qix (bootleg of V1.0, 8031 MCU)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sqixb2,   sqix,     sqix_nomcu, superqix, superqix_state, sqix,     ROT90, "bootleg", "Super Qix (bootleg, No MCU)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, perestro, 0,        sqix_nomcu, superqix, superqix_state, perestro, ROT90, "Promat", "Perestroika Girls", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, perestrof,perestro, sqix_nomcu, superqix, superqix_state, perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, pbillian, 0,        pbillian,   pbillian, hotsmash_state, init_pbillian, ROT0,  "Kaneko / Taito", "Prebillian", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hotsmash, 0,        pbillian,   hotsmash, hotsmash_state, init_hotsmash, ROT90, "Kaneko / Taito", "Vs. Hot Smash", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqix,     0,        sqix,       superqix, superqix_state, init_sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixr1,   sqix,     sqix,       superqix, superqix_state, init_sqix,     ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixr0,   sqix,     sqix,       superqix, superqix_state, init_sqixr0,   ROT90, "Kaneko / Taito", "Super Qix (World/Japan, V1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixu,    sqix,     sqix,       superqix, superqix_state, init_sqix,     ROT90, "Kaneko / Taito (Romstar License)", "Super Qix (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixb1,   sqix,     sqix_8031,  superqix, superqix_state, init_sqixr0,   ROT90, "bootleg", "Super Qix (bootleg of V1.0, 8031 MCU)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sqixb2,   sqix,     sqix_nomcu, superqix, superqix_state, init_sqix,     ROT90, "bootleg", "Super Qix (bootleg, No MCU)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, perestro, 0,        sqix_nomcu, superqix, superqix_state, init_perestro, ROT90, "Promat", "Perestroika Girls", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, perestrof,perestro, sqix_nomcu, superqix, superqix_state, init_perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", MACHINE_SUPPORTS_SAVE )

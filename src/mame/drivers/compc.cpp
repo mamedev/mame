@@ -275,6 +275,6 @@ ROM_START(pc10iii)
 	ROMX_LOAD("318086-02.u607", 0x0000, 0x8000, CRC(b406651c) SHA1(856f58353391a74a06ebb8ec9f8333d7d69e5fd6), ROM_BIOS(9))
 ROM_END
 
-//    YEAR    NAME              PARENT      COMPAT      MACHINE         INPUT     STATE     INIT      COMPANY                            FULLNAME                FLAGS
-COMP( 1984,   compc10,          ibm5150,    0,          compc,          compc,    compc_state, 0,        "Commodore Business Machines",     "Commodore PC 10",      MACHINE_NOT_WORKING )
-COMP( 1987,   pc10iii,          ibm5150,    0,          pc10iii,        compciii, compc_state, 0,        "Commodore Business Machines",     "Commodore PC-10 III",  MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT     CLASS        INIT        COMPANY                        FULLNAME               FLAGS
+COMP( 1984, compc10, ibm5150, 0,      compc,   compc,    compc_state, empty_init, "Commodore Business Machines", "Commodore PC 10",     MACHINE_NOT_WORKING )
+COMP( 1987, pc10iii, ibm5150, 0,      pc10iii, compciii, compc_state, empty_init, "Commodore Business Machines", "Commodore PC-10 III", MACHINE_NOT_WORKING )

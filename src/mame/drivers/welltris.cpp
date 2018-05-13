@@ -655,7 +655,7 @@ static GFXDECODE_START( welltris )
 GFXDECODE_END
 
 
-DRIVER_INIT_MEMBER(welltris_state,welltris)
+void welltris_state::init_welltris()
 {
 #if WELLTRIS_4P_HACK
 	/* A Hack which shows 4 player mode in code which is disabled */
@@ -702,7 +702,7 @@ MACHINE_CONFIG_START(welltris_state::welltris)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -811,6 +811,6 @@ ROM_END
 
 
 
-GAME( 1991, welltris,  0,        welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (World?, 2 players)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, welltrisj, welltris, welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (Japan, 2 players)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, quiz18k,   0,        quiz18k,  quiz18k,  welltris_state, 0,        ROT0,   "EIM",              "Miyasu Nonki no Quiz 18-Kin",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, welltris,  0,        welltris, welltris, welltris_state, init_welltris, ROT0,   "Video System Co.", "Welltris (World?, 2 players)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, welltrisj, welltris, welltris, welltris, welltris_state, init_welltris, ROT0,   "Video System Co.", "Welltris (Japan, 2 players)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quiz18k,   0,        quiz18k,  quiz18k,  welltris_state, empty_init,   ROT0,   "EIM",              "Miyasu Nonki no Quiz 18-Kin",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

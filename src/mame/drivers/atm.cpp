@@ -250,8 +250,8 @@ ROM_START( atmtb2 )
 	ROM_LOAD( "sgen.rom", 0x0000, 0x0800, CRC(1f4387d6) SHA1(93b3774dc8a486643a1bdd48c606b0c84fa0e22b))
 ROM_END
 
-/*    YEAR  NAME    PARENT   COMPAT  MACHINE INPUT      CLASS      INIT  COMPANY     FULLNAME */
-COMP( 1991, atm,    spec128, 0,      atm,    spec_plus, atm_state, 0,    "MicroART", "ATM", MACHINE_NOT_WORKING)
-//COMP( 1991, atmtb1, spec128, 0,      atm,    spec_plus, atm_state, 0,    "MicroART", "ATM-turbo1", MACHINE_NOT_WORKING)
-COMP( 1993, atmtb2, spec128, 0,      atmtb2, spec_plus, atm_state, 0,    "MicroART", "ATM-turbo2", MACHINE_NOT_WORKING)
-//COMP( 1994, turbo2, spec128, 0,      atm,    spec_plus, atm_state, 0,    "MicroART", "TURBO 2+", MACHINE_NOT_WORKING)
+/*    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT      CLASS      INIT        COMPANY     FULLNAME      FLAGS */
+COMP( 1991, atm,    spec128, 0,      atm,     spec_plus, atm_state, empty_init, "MicroART", "ATM",        MACHINE_NOT_WORKING)
+//COMP( 1991, atmtb1, spec128, 0,      atm,     spec_plus, atm_state, empty_init, "MicroART", "ATM-turbo1", MACHINE_NOT_WORKING)
+COMP( 1993, atmtb2, spec128, 0,      atmtb2,  spec_plus, atm_state, empty_init, "MicroART", "ATM-turbo2", MACHINE_NOT_WORKING)
+//COMP( 1994, turbo2, spec128, 0,      atm,     spec_plus, atm_state, empty_init, "MicroART", "TURBO 2+",   MACHINE_NOT_WORKING)

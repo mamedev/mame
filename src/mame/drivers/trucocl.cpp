@@ -165,7 +165,7 @@ MACHINE_CONFIG_START(trucocl_state::trucocl)
 	MCFG_PALETTE_INIT_OWNER(trucocl_state, trucocl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -197,7 +197,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(trucocl_state,trucocl)
+void trucocl_state::init_trucocl()
 {
 	m_cur_dac_address = -1;
 	m_cur_dac_address_index = 0;
@@ -208,5 +208,5 @@ DRIVER_INIT_MEMBER(trucocl_state,trucocl)
 
 
 /******************************************************************************/
-//    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT     MONITOR
-GAME( 1991, trucocl,  0,      trucocl, trucocl, trucocl_state, trucocl, ROT0, "Miky SRL", "Truco Clemente", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT          MONITOR
+GAME( 1991, trucocl,  0,      trucocl, trucocl, trucocl_state, init_trucocl, ROT0, "Miky SRL", "Truco Clemente", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

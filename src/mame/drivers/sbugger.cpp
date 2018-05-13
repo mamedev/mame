@@ -240,7 +240,7 @@ MACHINE_CONFIG_START(sbugger_state::sbugger)
 	MCFG_PALETTE_INIT_OWNER(sbugger_state, sbugger)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn76489.1", SN76489, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -281,5 +281,5 @@ ROM_START( sbuggera )
 	ROM_LOAD( "spbugger.gfx", 0x0000, 0x1000, CRC(d3f345b5) SHA1(a5082ffc3043352e9b731af95770bdd62fb928bf) )
 ROM_END
 
-GAME( 1981, sbugger,  0,        sbugger,  sbugger, sbugger_state,  0, ROT270, "Game-A-Tron", "Space Bugger (set 1)", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, sbuggera, sbugger,  sbugger,  sbugger, sbugger_state,  0, ROT270, "Game-A-Tron", "Space Bugger (set 2)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, sbugger,  0,        sbugger,  sbugger, sbugger_state, empty_init, ROT270, "Game-A-Tron", "Space Bugger (set 1)", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, sbuggera, sbugger,  sbugger,  sbugger, sbugger_state, empty_init, ROT270, "Game-A-Tron", "Space Bugger (set 2)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

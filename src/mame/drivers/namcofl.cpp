@@ -587,7 +587,8 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 
 	MCFG_VIDEO_START_OVERRIDE(namcofl_state,namcofl)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_C352_ADD("c352", 48384000/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
@@ -772,19 +773,19 @@ void namcofl_state::common_init()
 	save_item(NAME(m_sprbank));
 }
 
-DRIVER_INIT_MEMBER(namcofl_state,speedrcr)
+void namcofl_state::init_speedrcr()
 {
 	common_init();
 	m_gametype = NAMCOFL_SPEED_RACER;
 }
 
-DRIVER_INIT_MEMBER(namcofl_state,finalapr)
+void namcofl_state::init_finalapr()
 {
 	common_init();
 	m_gametype = NAMCOFL_FINAL_LAP_R;
 }
 
-GAME ( 1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
-GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
-GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAME(  1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, init_speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, init_finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, init_finalapr, ROT0, "Namco", "Final Lap R", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, init_finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )

@@ -323,7 +323,7 @@ MACHINE_CONFIG_START(goal92_state::goal92)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -403,4 +403,4 @@ ROM_END
 
 
 
-GAME( 1992, goal92,   cupsoc, goal92,   goal92, goal92_state, 0, ROT0, "bootleg", "Goal! '92", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, goal92, cupsoc, goal92, goal92, goal92_state, empty_init, ROT0, "bootleg", "Goal! '92", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

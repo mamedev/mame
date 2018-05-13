@@ -166,7 +166,7 @@ WRITE8_MEMBER( s11a_state::bgbank_w )
 	membank("bgbank")->set_entry(data & 0x03);
 }
 
-DRIVER_INIT_MEMBER( s11a_state, s11a )
+void s11a_state::init_s11a()
 {
 	uint8_t *BGROM = memregion("bgcpu")->base();
 	membank("bgbank")->configure_entries(0, 4, &BGROM[0x10000], 0x8000);
@@ -238,13 +238,13 @@ MACHINE_CONFIG_START(s11a_state::s11a)
 	MCFG_DEVICE_ADD("audiocpu", M6802, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(s11a_audio_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SPEAKER_STANDARD_MONO("speech")
+	SPEAKER(config, "speech").front_center();
 	MCFG_DEVICE_ADD("hc55516", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 0.50)
 
@@ -260,8 +260,8 @@ MACHINE_CONFIG_START(s11a_state::s11a)
 	MCFG_DEVICE_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
 	MCFG_DEVICE_PROGRAM_MAP(s11a_bg_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("bg")
-	MCFG_YM2151_ADD("ym2151", XTAL(3'579'545))
+	SPEAKER(config, "bg").front_center();
+	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, s11a_state, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
 
@@ -459,15 +459,15 @@ ROM_START(pb_p4)
 	ROM_LOAD("pbot_u19.l1", 0x18000, 0x8000, CRC(40eb4e9f) SHA1(07b0557b35599a2dd5aa66a306fbbe8f50eed998))
 ROM_END
 
-GAME(1987, f14_l1,   0,       s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F-14 Tomcat (L-1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, f14_p3,   f14_l1,  s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F-14 Tomcat (P-3)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, f14_p4,   f14_l1,  s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F-14 Tomcat (P-4)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, f14_p5,   f14_l1,  s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F-14 Tomcat (P-5)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, fire_l3,  0,       s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Fire! (L-3)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, fire_l2,  fire_l3, s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Fire! (L-2)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, milln_l3, 0,       s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Millionaire (L-3)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l5,    0,       s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Pin-Bot (L-5)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l1,    pb_l5,   s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Pin-Bot (L-1)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l2,    pb_l5,   s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Pin-Bot (L-2)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l3,    pb_l5,   s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Pin-Bot (L-3)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_p4,    pb_l5,   s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Pin-Bot (P-4)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, f14_l1,   0,       s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "F-14 Tomcat (L-1)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, f14_p3,   f14_l1,  s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "F-14 Tomcat (P-3)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, f14_p4,   f14_l1,  s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "F-14 Tomcat (P-4)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, f14_p5,   f14_l1,  s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "F-14 Tomcat (P-5)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, fire_l3,  0,       s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Fire! (L-3)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, fire_l2,  fire_l3, s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Fire! (L-2)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, milln_l3, 0,       s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Millionaire (L-3)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l5,    0,       s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-5)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l1,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-1)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l2,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-2)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l3,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-3)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_p4,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (P-4)",     MACHINE_IS_SKELETON_MECHANICAL)

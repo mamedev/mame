@@ -236,11 +236,11 @@ MACHINE_CONFIG_START(aliens_state::aliens)
 	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))  /* verified on pcb */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, aliens_state,aliens_snd_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
@@ -482,10 +482,10 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1990, aliens,   0,      aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (World set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliens2,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (World set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliens3,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (World set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensu,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (US)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensj,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensj2, aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensa,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (Asia)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliens,   0,      aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (World set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliens2,  aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (World set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliens3,  aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (World set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensu,  aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (US)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensj,  aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensj2, aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensa,  aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (Asia)",        MACHINE_SUPPORTS_SAVE )

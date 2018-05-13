@@ -85,7 +85,7 @@ public:
 	DECLARE_WRITE16_MEMBER(excelsr_scroll_w);
 	DECLARE_WRITE16_MEMBER(hrdtimes_scroll_w);
 	DECLARE_WRITE8_MEMBER(playmark_oki_banking_w);
-	DECLARE_DRIVER_INIT(pic_decode);
+	void init_pic_decode();
 	TILE_GET_INFO_MEMBER(bigtwin_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(bigtwin_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(wbeachvl_get_tx_tile_info);

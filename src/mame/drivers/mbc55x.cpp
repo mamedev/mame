@@ -264,9 +264,8 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	MCFG_RAM_EXTRA_OPTIONS("128K,192K,256K,320K,384K,448K,512K,576K,640K")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO(MONO_TAG)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,MONO_TAG, 0.75)
+	SPEAKER(config, MONO_TAG).front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, MONO_TAG, 0.75);
 
 	/* Devices */
 	MCFG_DEVICE_ADD(I8251A_KB_TAG, I8251, 0)
@@ -319,5 +318,5 @@ ROM_START( mbc55x )
 ROM_END
 
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY   FULLNAME    FLAGS
-COMP( 1983, mbc55x,     0,      0,      mbc55x,  mbc55x, mbc55x_state, 0,    "Sanyo",  "MBC-55x",  0 /*MACHINE_NO_SOUND*/)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1983, mbc55x, 0,      0,      mbc55x,  mbc55x, mbc55x_state, empty_init, "Sanyo", "MBC-55x", 0 /*MACHINE_NO_SOUND*/)

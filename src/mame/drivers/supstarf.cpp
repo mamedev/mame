@@ -195,7 +195,7 @@ MACHINE_CONFIG_START(supstarf_state::supstarf)
 	MCFG_I8212_INT_CALLBACK(INPUTLINE("soundcpu", MCS48_INPUT_IRQ))
 	//MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("maincpu", I8085_READY_LINE))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("psg1", AY8910, XTAL(5'068'800) / 6) // from 8035 pin 1 (T0)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, supstarf_state, lights_a_w))
@@ -256,4 +256,4 @@ ROM_START(supstarf)
 	ROM_LOAD("2532.ic4", 0x0000, 0x1000, CRC(b6ef3c7a) SHA1(aabb6f8569685fc3a917a7bb5ebfcc4b20086b15) BAD_DUMP) // D6 stuck high and probably totally garbage
 ROM_END
 
-GAME( 1986, supstarf,   0,      supstarf,   supstarf,   supstarf_state,  0,      ROT0, "Recreativos Franco", "Super Star (Recreativos Franco)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, supstarf, 0, supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco)", MACHINE_IS_SKELETON_MECHANICAL )

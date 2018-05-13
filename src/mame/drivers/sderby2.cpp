@@ -55,7 +55,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_DRIVER_INIT(sderby2);
+	void init_sderby2();
 	DECLARE_PALETTE_INIT(sderby2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -401,7 +401,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(sderby2_state, sderby2)
+void sderby2_state::init_sderby2()
 {
 
 }
@@ -413,4 +413,4 @@ DRIVER_INIT_MEMBER(sderby2_state, sderby2)
  *
  *************************************/
 
-GAME( 1985, sderby2, 0, sderby2, sderby2, sderby2_state, sderby2,  ROT0, "Sega", "Super Derby II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1985, sderby2, 0, sderby2, sderby2, sderby2_state, init_sderby2, ROT0, "Sega", "Super Derby II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

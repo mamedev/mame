@@ -810,7 +810,8 @@ MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_I5000_SND_ADD("i5000snd", XTAL(40'000'000))
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
@@ -892,5 +893,5 @@ ROM_START( tmpdoki )
 ROM_END
 
 
-GAME( 1997, tmmjprd,       0, tmmjprd, tmmjprd, tmmjprd_state, 0, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Dear My Love",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, tmpdoki, tmmjprd, tmpdoki, tmmjprd, tmmjprd_state, 0, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Doki Doki Hen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // missing gfx due to wrong roms?
+GAME( 1997, tmmjprd,       0, tmmjprd, tmmjprd, tmmjprd_state, empty_init, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Dear My Love",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, tmpdoki, tmmjprd, tmpdoki, tmmjprd, tmmjprd_state, empty_init, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Doki Doki Hen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // missing gfx due to wrong roms?

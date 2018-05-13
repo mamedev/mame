@@ -55,7 +55,7 @@ a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, device_type 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a1bus_card_interface(mconfig, *this)
 	, m_ata(*this, CFFA_ATA_TAG)
-	, m_rom(nullptr)
+	, m_rom(*this, CFFA_ROM_REGION)
 	, m_lastdata(0)
 	, m_writeprotect(false)
 {
@@ -67,12 +67,8 @@ a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, device_type 
 
 void a1bus_cffa_device::device_start()
 {
-	set_a1bus_device();
-
-	m_rom = device().machine().root_device().memregion(this->subtag(CFFA_ROM_REGION).c_str())->base();
-
 	install_device(0xafe0, 0xafff, read8_delegate(FUNC(a1bus_cffa_device::cffa_r), this), write8_delegate(FUNC(a1bus_cffa_device::cffa_w), this));
-	install_bank(0x9000, 0xafdf, (char *)"bank_cffa1", m_rom);
+	install_bank(0x9000, 0xafdf, "bank_cffa1", &m_rom[0]);
 
 	save_item(NAME(m_lastdata));
 	save_item(NAME(m_writeprotect));

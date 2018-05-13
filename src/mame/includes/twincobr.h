@@ -101,7 +101,7 @@ public:
 	DECLARE_WRITE8_MEMBER(wardner_videoram_w);
 	DECLARE_READ8_MEMBER(wardner_sprite_r);
 	DECLARE_WRITE8_MEMBER(wardner_sprite_w);
-	DECLARE_DRIVER_INIT(twincobr);
+	void init_twincobr();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

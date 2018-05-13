@@ -779,9 +779,8 @@ MACHINE_CONFIG_START(px8_state::px8)
 	MCFG_PALETTE_INIT_OWNER(px8_state, px8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(0, "mono", 0.25);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px8_cart")
@@ -835,5 +834,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE      INIT    COMPANY     FULLNAME    FLAGS */
-COMP( 1984, px8,    0,      0,      px8,    px8,   px8_state, 0,      "Epson",    "PX-8",     MACHINE_NOT_WORKING )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS */
+COMP( 1984, px8,  0,      0,      px8,     px8,   px8_state, empty_init, "Epson", "PX-8",   MACHINE_NOT_WORKING )

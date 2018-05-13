@@ -349,7 +349,7 @@ MACHINE_CONFIG_START(suprridr_state::suprridr)
 	MCFG_PALETTE_INIT_OWNER(suprridr_state, suprridr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(49'152'000)/32)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -415,4 +415,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, suprridr, 0, suprridr, suprridr, suprridr_state, 0, ROT90, "Taito Corporation (Venture Line license)", "Super Rider", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, suprridr, 0, suprridr, suprridr, suprridr_state, empty_init, ROT90, "Taito Corporation (Venture Line license)", "Super Rider", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

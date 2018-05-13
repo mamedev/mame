@@ -22,7 +22,7 @@ public:
 
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	DECLARE_DRIVER_INIT(igs_fear);
+	void init_igs_fear();
 	//virtual void video_start();
 	virtual void video_start_igs_fear();
 	uint32_t screen_update_igs_fear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -97,7 +97,7 @@ MACHINE_CONFIG_START(igs_fear_state::igs_fear)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs_fear)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_ICS2115_ADD("ics", 0)
 	MCFG_ICS2115_IRQ_CB(WRITELINE(*this, igs_fear_state, sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
@@ -162,11 +162,11 @@ void igs_fear_state::pgm_create_dummy_internal_arm_region()
 
 
 
-DRIVER_INIT_MEMBER(igs_fear_state,igs_fear)
+void igs_fear_state::init_igs_fear()
 {
 	fearless_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-GAME( 2006,  fearless,  0, igs_fear,    fear, igs_fear_state, igs_fear,    ROT0, "IGS", "Fearless Pinocchio (V101US)",   MACHINE_IS_SKELETON )
+GAME( 2006, fearless, 0, igs_fear, fear, igs_fear_state, init_igs_fear, ROT0, "IGS", "Fearless Pinocchio (V101US)",   MACHINE_IS_SKELETON )

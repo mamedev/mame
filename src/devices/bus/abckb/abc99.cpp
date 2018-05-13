@@ -172,7 +172,7 @@ MACHINE_CONFIG_START(abc99_device::device_add_mconfig)
 	MCFG_DEVICE_DISABLE() // HACK fix for broken serial I/O
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

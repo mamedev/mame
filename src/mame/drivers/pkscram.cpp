@@ -329,7 +329,7 @@ MACHINE_CONFIG_START(pkscram_state::pkscramble)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 12000000/4)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, pkscram_state, irqhandler))
@@ -348,4 +348,4 @@ ROM_START( pkscram )
 ROM_END
 
 
-GAME( 1993, pkscram, 0, pkscramble, pkscramble, pkscram_state, 0, ROT0, "Cosmo Electronics Corporation", "PK Scramble", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, pkscram, 0, pkscramble, pkscramble, pkscram_state, empty_init, ROT0, "Cosmo Electronics Corporation", "PK Scramble", MACHINE_SUPPORTS_SAVE )

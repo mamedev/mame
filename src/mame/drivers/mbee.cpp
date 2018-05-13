@@ -676,11 +676,9 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	MCFG_VIDEO_START_OVERRIDE(mbee_state, mono)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL(12'000'000) / 8)
@@ -735,11 +733,9 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	MCFG_VIDEO_START_OVERRIDE(mbee_state, standard)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8)
@@ -1199,17 +1195,17 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS        INIT        COMPANY                FULLNAME
-COMP( 1982, mbee,     0,        0,      mbee,     mbee,     mbee_state,  mbee,       "Applied Technology",  "Microbee 16 Standard", 0 )
-COMP( 1982, mbeeic,   mbee,     0,      mbeeic,   mbee,     mbee_state,  mbeeic,     "Applied Technology",  "Microbee 32 IC", 0 )
-COMP( 1982, mbeepc,   mbee,     0,      mbeepc,   mbee,     mbee_state,  mbeepc,     "Applied Technology",  "Microbee Personal Communicator", 0 )
-COMP( 1985, mbeepc85, mbee,     0,      mbeepc,   mbee,     mbee_state,  mbeepc85,   "Applied Technology",  "Microbee PC85", 0 )
-COMP( 1985, mbeepc85b,mbee,     0,      mbeepc,   mbee,     mbee_state,  mbeepc85,   "Applied Technology",  "Microbee PC85 (New version)", 0 )
-COMP( 1985, mbeepc85s,mbee,     0,      mbeepc,   mbee,     mbee_state,  mbeepc85,   "Applied Technology",  "Microbee PC85 (Swedish)", 0 )
-COMP( 1986, mbeeppc,  mbee,     0,      mbeeppc,  mbee,     mbee_state,  mbeeppc,    "Applied Technology",  "Microbee Premium PC85", 0 )
-COMP( 1986, mbeett,   mbee,     0,      mbeett,   mbee256,  mbee_state,  mbeett,     "Applied Technology",  "Microbee Teleterm",      MACHINE_NOT_WORKING )
-COMP( 1986, mbee56,   mbee,     0,      mbee56,   mbee,     mbee_state,  mbee56,     "Applied Technology",  "Microbee 56k",           MACHINE_NOT_WORKING )
-COMP( 1986, mbee128,  mbee,     0,      mbee128,  mbee128,  mbee_state,  mbee128,    "Applied Technology",  "Microbee 128k Standard", MACHINE_NOT_WORKING )
-COMP( 1986, mbee128p, mbee,     0,      mbee128p, mbee128,  mbee_state,  mbee128,    "Applied Technology",  "Microbee 128k Premium",  MACHINE_NOT_WORKING )
-COMP( 1987, mbee256,  mbee,     0,      mbee256,  mbee256,  mbee_state,  mbee256,    "Applied Technology",  "Microbee 256TC",         MACHINE_NOT_WORKING )
-COMP( 2012, mbeepp,   mbee,     0,      mbee256,  mbee128,  mbee_state,  mbee128,    "Microbee Systems",    "Microbee Premium Plus",  MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT           COMPANY               FULLNAME
+COMP( 1982, mbee,      0,      0,      mbee,     mbee,    mbee_state, init_mbee,     "Applied Technology", "Microbee 16 Standard", 0 )
+COMP( 1982, mbeeic,    mbee,   0,      mbeeic,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee 32 IC", 0 )
+COMP( 1982, mbeepc,    mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeepc,   "Applied Technology", "Microbee Personal Communicator", 0 )
+COMP( 1985, mbeepc85,  mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeepc85, "Applied Technology", "Microbee PC85", 0 )
+COMP( 1985, mbeepc85b, mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeepc85, "Applied Technology", "Microbee PC85 (New version)", 0 )
+COMP( 1985, mbeepc85s, mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeepc85, "Applied Technology", "Microbee PC85 (Swedish)", 0 )
+COMP( 1986, mbeeppc,   mbee,   0,      mbeeppc,  mbee,    mbee_state, init_mbeeppc,  "Applied Technology", "Microbee Premium PC85", 0 )
+COMP( 1986, mbeett,    mbee,   0,      mbeett,   mbee256, mbee_state, init_mbeett,   "Applied Technology", "Microbee Teleterm",      MACHINE_NOT_WORKING )
+COMP( 1986, mbee56,    mbee,   0,      mbee56,   mbee,    mbee_state, init_mbee56,   "Applied Technology", "Microbee 56k",           MACHINE_NOT_WORKING )
+COMP( 1986, mbee128,   mbee,   0,      mbee128,  mbee128, mbee_state, init_mbee128,  "Applied Technology", "Microbee 128k Standard", MACHINE_NOT_WORKING )
+COMP( 1986, mbee128p,  mbee,   0,      mbee128p, mbee128, mbee_state, init_mbee128,  "Applied Technology", "Microbee 128k Premium",  MACHINE_NOT_WORKING )
+COMP( 1987, mbee256,   mbee,   0,      mbee256,  mbee256, mbee_state, init_mbee256,  "Applied Technology", "Microbee 256TC",         MACHINE_NOT_WORKING )
+COMP( 2012, mbeepp,    mbee,   0,      mbee256,  mbee128, mbee_state, init_mbee128,  "Microbee Systems",   "Microbee Premium Plus",  MACHINE_NOT_WORKING )

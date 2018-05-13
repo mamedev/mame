@@ -56,8 +56,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sprite_gfx_w);
 	DECLARE_WRITE8_MEMBER(sprite_ram_w);
 	DECLARE_WRITE8_MEMBER(sprite_lookup_w);
-	DECLARE_DRIVER_INIT(25pacman);
-	DECLARE_DRIVER_INIT(20pacgal);
+	void init_25pacman();
+	void init_20pacgal();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

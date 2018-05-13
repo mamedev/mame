@@ -55,10 +55,10 @@ public:
 	DECLARE_WRITE32_MEMBER(policetr_palette_offset_w);
 	DECLARE_WRITE32_MEMBER(policetr_palette_data_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(bsmt_status_r);
-	DECLARE_DRIVER_INIT(sshoot12);
-	DECLARE_DRIVER_INIT(policetr);
-	DECLARE_DRIVER_INIT(sshooter);
-	DECLARE_DRIVER_INIT(plctr13b);
+	void init_sshoot12();
+	void init_policetr();
+	void init_sshooter();
+	void init_plctr13b();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_policetr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

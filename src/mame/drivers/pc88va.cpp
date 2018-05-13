@@ -1867,7 +1867,7 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 	MCFG_PIT8253_CLK1(8000000) /* BEEP frequency setting */
 	MCFG_PIT8253_CLK2(8000000) /* RS232C baud rate setting */
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ym", YM2203, 3993600) //unknown clock / divider
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
@@ -1935,6 +1935,6 @@ ROM_END
 
 
 
-COMP( 1987, pc88va,         0,      0,     pc88va,   pc88va, pc88va_state,  0,    "NEC",  "PC-88VA",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1988, pc88va2,        pc88va, 0,     pc88va,   pc88va, pc88va_state,  0,    "NEC",  "PC-88VA2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88va, pc88va_state,  0,    "NEC",  "PC-88VA3", MACHINE_NOT_WORKING )
+COMP( 1987, pc88va,  0,      0, pc88va, pc88va, pc88va_state, empty_init, "NEC", "PC-88VA",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1988, pc88va2, pc88va, 0, pc88va, pc88va, pc88va_state, empty_init, "NEC", "PC-88VA2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//COMP( 1988, pc88va3, pc88va, 0, pc88va, pc88va, pc88va_state, empty_init, "NEC", "PC-88VA3", MACHINE_NOT_WORKING )

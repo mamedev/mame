@@ -88,7 +88,7 @@ public:
 	DECLARE_WRITE32_MEMBER(port400_w);
 	DECLARE_READ32_MEMBER(port800_r);
 	DECLARE_WRITE32_MEMBER(port800_w);
-	DECLARE_DRIVER_INIT(pinball2k);
+	void init_pinball2k();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -626,7 +626,8 @@ MACHINE_CONFIG_START(pinball2k_state::mediagx)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 
@@ -635,7 +636,7 @@ void pinball2k_state::init_mediagx()
 	m_frame_width = m_frame_height = 1;
 }
 
-DRIVER_INIT_MEMBER(pinball2k_state, pinball2k)
+void pinball2k_state::init_pinball2k()
 {
 	init_mediagx();
 }
@@ -702,6 +703,6 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1999, swe1pb,   0       , mediagx, mediagx, pinball2k_state, pinball2k, ROT0,   "Midway",  "Pinball 2000: Star Wars Episode 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
-GAME( 1999, rfmpb,    0       , mediagx, mediagx, pinball2k_state, pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
-GAME( 1999, rfmpbr2,  rfmpb   , mediagx, mediagx, pinball2k_state, pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
+GAME( 1999, swe1pb,   0       , mediagx, mediagx, pinball2k_state, init_pinball2k, ROT0,   "Midway",  "Pinball 2000: Star Wars Episode 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
+GAME( 1999, rfmpb,    0       , mediagx, mediagx, pinball2k_state, init_pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
+GAME( 1999, rfmpbr2,  rfmpb   , mediagx, mediagx, pinball2k_state, init_pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )

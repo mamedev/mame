@@ -55,4 +55,4 @@ ROM_START( lilith )
 	ROM_LOAD( "kbd_eprom.bin", 0x000000, 0x000800, CRC(40fa5230) SHA1(473ca714959fc35aa2a0ab9310aee2aedffa2163) )
 ROM_END
 
-COMP( 1984, lilith, 0, 0, lilith, lilith, lilith_state, 0, "DISER", "Lilith", MACHINE_IS_SKELETON )
+COMP( 1984, lilith, 0, 0, lilith, lilith, lilith_state, empty_init, "DISER", "Lilith", MACHINE_IS_SKELETON )

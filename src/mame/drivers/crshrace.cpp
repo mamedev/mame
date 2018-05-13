@@ -433,15 +433,16 @@ MACHINE_CONFIG_START(crshrace_state::crshrace)
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
 	MCFG_K053936_WRAP(1)
 	MCFG_K053936_OFFSETS(-48, -21)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -537,14 +538,14 @@ void crshrace_state::crshrace_patch_code( uint16_t offset )
 #endif
 
 
-DRIVER_INIT_MEMBER(crshrace_state,crshrace)
+void crshrace_state::init_crshrace()
 {
 	#if CRSHRACE_3P_HACK
 	crshrace_patch_code(0x003778);
 	#endif
 }
 
-DRIVER_INIT_MEMBER(crshrace_state,crshrace2)
+void crshrace_state::init_crshrace2()
 {
 	#if CRSHRACE_3P_HACK
 	crshrace_patch_code(0x003796);
@@ -552,5 +553,5 @@ DRIVER_INIT_MEMBER(crshrace_state,crshrace2)
 }
 
 
-GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace_state, crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, crshrace2, ROT270, "Video System Co.", "Lethal Crash Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace_state, init_crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, init_crshrace2, ROT270, "Video System Co.", "Lethal Crash Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

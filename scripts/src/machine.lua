@@ -2706,7 +2706,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/phi.h,MACHINES["PHI"] = true
+--@src/devices/machine/tms9914.h,MACHINES["TMS9914"] = true
 ---------------------------------------------------
 
 if (MACHINES["TMS9914"]~=null) then

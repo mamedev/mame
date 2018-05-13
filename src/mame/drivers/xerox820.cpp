@@ -674,7 +674,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(bigboard_state::bigboard)
 	xerox820(config);
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 950)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* bigboard only */
 MACHINE_CONFIG_END
@@ -695,7 +695,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -892,10 +892,10 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     STATE             INIT  COMPANY                       FULLNAME        FLAGS
-COMP( 1980, bigboard, 0,        0,      bigboard,   xerox820, bigboard_state,   0,    "Digital Research Computers", "Big Board",    0 )
-COMP( 1981, x820,     bigboard, 0,      xerox820,   xerox820, xerox820_state,   0,    "Xerox",                      "Xerox 820",    MACHINE_NO_SOUND_HW )
-COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   0,    "Scomar",                     "MK-82",        0 )
-COMP( 1983, x820ii,   0,        0,      xerox820ii, xerox820, xerox820ii_state, 0,    "Xerox",                      "Xerox 820-II", MACHINE_NOT_WORKING )
-COMP( 1983, x168,     x820ii,   0,      xerox168,   xerox820, xerox820ii_state, 0,    "Xerox",                      "Xerox 16/8",   MACHINE_NOT_WORKING )
-COMP( 1983, mk83,     x820ii,   0,      mk83,       xerox820, xerox820_state,   0,    "Scomar",                     "MK-83",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     CLASS             INIT        COMPANY                       FULLNAME        FLAGS
+COMP( 1980, bigboard, 0,        0,      bigboard,   xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board",    0 )
+COMP( 1981, x820,     bigboard, 0,      xerox820,   xerox820, xerox820_state,   empty_init, "Xerox",                      "Xerox 820",    MACHINE_NO_SOUND_HW )
+COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   empty_init, "Scomar",                     "MK-82",        0 )
+COMP( 1983, x820ii,   0,        0,      xerox820ii, xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II", MACHINE_NOT_WORKING )
+COMP( 1983, x168,     x820ii,   0,      xerox168,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8",   MACHINE_NOT_WORKING )
+COMP( 1983, mk83,     x820ii,   0,      mk83,       xerox820, xerox820_state,   empty_init, "Scomar",                     "MK-83",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

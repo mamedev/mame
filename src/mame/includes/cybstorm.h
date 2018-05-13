@@ -29,7 +29,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 	{ }
 
-	DECLARE_DRIVER_INIT(cybstorm);
+	void init_cybstorm();
 	void cybstorm(machine_config &config);
 
 protected:

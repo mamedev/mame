@@ -76,7 +76,7 @@ public:
 	DECLARE_READ8_MEMBER(moonwarp_p1_r);
 	DECLARE_READ8_MEMBER(moonwarp_p2_r);
 
-	DECLARE_DRIVER_INIT(moonwarp);
+	void init_moonwarp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void sound_reset() override;
@@ -1120,8 +1120,8 @@ MACHINE_CONFIG_START(berzerk_state::berzerk)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TTL74181_ADD("ls181_10c")
-	MCFG_TTL74181_ADD("ls181_12c")
+	MCFG_DEVICE_ADD("ls181_10c", TTL74181)
+	MCFG_DEVICE_ADD("ls181_12c", TTL74181)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1129,7 +1129,7 @@ MACHINE_CONFIG_START(berzerk_state::berzerk)
 	MCFG_SCREEN_UPDATE_DRIVER(berzerk_state, screen_update)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("speech", S14001A, S14001_CLOCK/16/8) /* placeholder - the clock is software controllable */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1312,7 +1312,7 @@ ROM_START( moonwarp )
 	ROM_LOAD( "prom.6e",        0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom - from the sound rom only set, is it bad? */
 ROM_END
 
-DRIVER_INIT_MEMBER(berzerk_state,moonwarp)
+void berzerk_state::init_moonwarp()
 {
 	address_space &io = m_maincpu->space(AS_IO);
 	io.install_read_handler (0x48, 0x48, read8_delegate(FUNC(berzerk_state::moonwarp_p1_r), this));
@@ -1330,10 +1330,10 @@ DRIVER_INIT_MEMBER(berzerk_state,moonwarp)
  *
  *************************************/
 
-GAME( 1980, berzerk,  0,       berzerk, berzerk,  berzerk_state, 0,        ROT0, "Stern Electronics", "Berzerk (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, berzerk1, berzerk, berzerk, berzerk,  berzerk_state, 0,        ROT0, "Stern Electronics", "Berzerk (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, berzerkf, berzerk, berzerk, berzerkf, berzerk_state, 0,        ROT0, "Stern Electronics", "Berzerk (French Speech)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, berzerkg, berzerk, berzerk, berzerkg, berzerk_state, 0,        ROT0, "Stern Electronics", "Berzerk (German Speech)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, berzerks, berzerk, berzerk, berzerks, berzerk_state, 0,        ROT0, "Stern Electronics (Sonic License)", "Berzerk (Spanish Speech)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, frenzy,   0,       frenzy,  frenzy,   berzerk_state, 0,        ROT0, "Stern Electronics", "Frenzy", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, moonwarp, 0,       frenzy,  moonwarp, berzerk_state, moonwarp, ROT0, "Stern Electronics", "Moon War (prototype on Frenzy hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerk,  0,       berzerk, berzerk,  berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerk1, berzerk, berzerk, berzerk,  berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerkf, berzerk, berzerk, berzerkf, berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (French Speech)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerkg, berzerk, berzerk, berzerkg, berzerk_state, empty_init,    ROT0, "Stern Electronics", "Berzerk (German Speech)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, berzerks, berzerk, berzerk, berzerks, berzerk_state, empty_init,    ROT0, "Stern Electronics (Sonic License)", "Berzerk (Spanish Speech)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, frenzy,   0,       frenzy,  frenzy,   berzerk_state, empty_init,    ROT0, "Stern Electronics", "Frenzy", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, moonwarp, 0,       frenzy,  moonwarp, berzerk_state, init_moonwarp, ROT0, "Stern Electronics", "Moon War (prototype on Frenzy hardware)", MACHINE_SUPPORTS_SAVE )

@@ -142,7 +142,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(analog_bit_r);
 	DECLARE_WRITE_LINE_MEMBER(ser_irq);
 	DECLARE_READ16_MEMBER(eeprom_data_r);
-	DECLARE_DRIVER_INIT(gaelco3d);
+	void init_gaelco3d();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

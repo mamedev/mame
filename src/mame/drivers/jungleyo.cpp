@@ -137,9 +137,10 @@ MACHINE_CONFIG_START(jungleyo_state::jungleyo)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/16, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -164,4 +165,4 @@ ROM_START( jungleyo )
 ROM_END
 
 
-GAME( 1999, jungleyo,    0,        jungleyo,    jungleyo, jungleyo_state,    0, ROT0,  "Yonshi", "Jungle (VI3.02)", MACHINE_NOT_WORKING )
+GAME( 1999, jungleyo, 0, jungleyo, jungleyo, jungleyo_state, empty_init, ROT0, "Yonshi", "Jungle (VI3.02)", MACHINE_NOT_WORKING )

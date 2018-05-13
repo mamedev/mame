@@ -416,33 +416,33 @@ WRITE16_MEMBER(segas32_state::system32_paletteram_w)
 
 READ32_MEMBER(segas32_state::multi32_paletteram_0_r)
 {
-	return common_paletteram_r(space, 0, offset*2+0) |
-			(common_paletteram_r(space, 0, offset*2+1) << 16);
+	return common_paletteram_r(space, 0, (offset<<1)|0) |
+			(common_paletteram_r(space, 0, (offset<<1)|1) << 16);
 }
 
 
 WRITE32_MEMBER(segas32_state::multi32_paletteram_0_w)
 {
 	if (ACCESSING_BITS_0_15)
-		common_paletteram_w(space, 0, offset*2+0, data, mem_mask);
+		common_paletteram_w(space, 0, (offset<<1)|0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		common_paletteram_w(space, 0, offset*2+1, data >> 16, mem_mask >> 16);
+		common_paletteram_w(space, 0, (offset<<1)|1, data >> 16, mem_mask >> 16);
 }
 
 
 READ32_MEMBER(segas32_state::multi32_paletteram_1_r)
 {
-	return common_paletteram_r(space, 1, offset*2+0) |
-			(common_paletteram_r(space, 1, offset*2+1) << 16);
+	return common_paletteram_r(space, 1, (offset<<1)|0) |
+			(common_paletteram_r(space, 1, (offset<<1)|1) << 16);
 }
 
 
 WRITE32_MEMBER(segas32_state::multi32_paletteram_1_w)
 {
 	if (ACCESSING_BITS_0_15)
-		common_paletteram_w(space, 1, offset*2+0, data, mem_mask);
+		common_paletteram_w(space, 1, (offset<<1)|0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		common_paletteram_w(space, 1, offset*2+1, data >> 16, mem_mask >> 16);
+		common_paletteram_w(space, 1, (offset<<1)|1, data >> 16, mem_mask >> 16);
 }
 
 
@@ -467,8 +467,8 @@ WRITE16_MEMBER(segas32_state::system32_videoram_w)
 	if (offset < 0x1ff00/2)
 	{
 		struct cache_entry *entry;
-		int page = offset / 0x200;
-		offset %= 0x200;
+		int page = offset >> 9;
+		offset &= 0x1ff;
 
 		/* scan the cache for a matching pages */
 		for (entry = m_cache_head; entry != nullptr; entry = entry->next)
@@ -565,7 +565,7 @@ READ16_MEMBER(segas32_state::system32_spriteram_r)
 WRITE16_MEMBER(segas32_state::system32_spriteram_w)
 {
 	COMBINE_DATA(&m_system32_spriteram[offset]);
-	m_spriteram_32bit[offset/2] =
+	m_spriteram_32bit[offset>>1] =
 		((m_system32_spriteram[offset |  1] >> 8 ) & 0x000000ff) |
 		((m_system32_spriteram[offset |  1] << 8 ) & 0x0000ff00) |
 		((m_system32_spriteram[offset & ~1] << 8 ) & 0x00ff0000) |
@@ -575,8 +575,8 @@ WRITE16_MEMBER(segas32_state::system32_spriteram_w)
 
 READ32_MEMBER(segas32_state::multi32_spriteram_r)
 {
-	return m_system32_spriteram[offset*2+0] |
-			(m_system32_spriteram[offset*2+1] << 16);
+	return m_system32_spriteram[(offset<<1)|0] |
+			(m_system32_spriteram[(offset<<1)|1] << 16);
 }
 
 
@@ -584,8 +584,8 @@ WRITE32_MEMBER(segas32_state::multi32_spriteram_w)
 {
 	data = SWAP_HALVES(data);
 	mem_mask = SWAP_HALVES(mem_mask);
-	COMBINE_DATA((uint32_t *)&m_system32_spriteram[offset*2]);
-	m_spriteram_32bit[offset/2] =
+	COMBINE_DATA((uint32_t *)&m_system32_spriteram[offset<<1]);
+	m_spriteram_32bit[offset>>1] =
 		((m_system32_spriteram[offset |  1] >> 8 ) & 0x000000ff) |
 		((m_system32_spriteram[offset |  1] << 8 ) & 0x0000ff00) |
 		((m_system32_spriteram[offset & ~1] << 8 ) & 0x00ff0000) |
@@ -615,7 +615,7 @@ WRITE32_MEMBER(segas32_state::multi32_mixer_0_w)
 {
 	data = SWAP_HALVES(data);
 	mem_mask = SWAP_HALVES(mem_mask);
-	COMBINE_DATA((uint32_t *)&m_mixer_control[0][offset*2]);
+	COMBINE_DATA((uint32_t *)&m_mixer_control[0][offset<<1]);
 }
 
 
@@ -623,7 +623,7 @@ WRITE32_MEMBER(segas32_state::multi32_mixer_1_w)
 {
 	data = SWAP_HALVES(data);
 	mem_mask = SWAP_HALVES(mem_mask);
-	COMBINE_DATA((uint32_t *)&m_mixer_control[1][offset*2]);
+	COMBINE_DATA((uint32_t *)&m_mixer_control[1][offset<<1]);
 }
 
 
@@ -686,8 +686,8 @@ tilemap_t *segas32_state::find_cache_entry(int page, int bank)
 TILE_GET_INFO_MEMBER(segas32_state::get_tile_info)
 {
 	struct segas32_state::cache_entry *entry = (struct segas32_state::cache_entry *)tilemap.user_data();
-	uint16_t data = m_system32_videoram[(entry->page & 0x7f) * 0x200 + tile_index];
-	SET_TILE_INFO_MEMBER(0, (entry->bank << 13) + (data & 0x1fff), (data >> 4) & 0x1ff, (data >> 14) & 3);
+	uint16_t data = m_system32_videoram[((entry->page & 0x7f) << 9) | tile_index];
+	SET_TILE_INFO_MEMBER(0, (entry->bank << 13) | (data & 0x1fff), (data >> 4) & 0x1ff, (data >> 14) & 3);
 }
 
 
@@ -1201,44 +1201,44 @@ void segas32_state::update_tilemap_text(screen_device &screen, struct segas32_st
 
 					pix = (pixels >> 4) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[0] = pix;
 
 					pix = (pixels >> 0) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[1] = pix;
 
 					pix = (pixels >> 12) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[2] = pix;
 
 					pix = (pixels >> 8) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[3] = pix;
 
 					pixels = *src++;
 
 					pix = (pixels >> 4) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[4] = pix;
 
 					pix = (pixels >> 0) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[5] = pix;
 
 					pix = (pixels >> 12) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[6] = pix;
 
 					pix = (pixels >> 8) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[7] = pix;
 
 					dst += bitmap.rowpixels();
@@ -1262,44 +1262,44 @@ void segas32_state::update_tilemap_text(screen_device &screen, struct segas32_st
 
 					pix = (pixels >> 4) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[0] = pix;
 
 					pix = (pixels >> 0) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[-1] = pix;
 
 					pix = (pixels >> 12) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[-2] = pix;
 
 					pix = (pixels >> 8) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[-3] = pix;
 
 					pix = *src++;
 
 					pix = (pixels >> 4) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[-4] = pix;
 
 					pix = (pixels >> 0) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[-5] = pix;
 
 					pix = (pixels >> 12) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[-6] = pix;
 
 					pix = (pixels >> 8) & 0x0f;
 					if (pix)
-						pix += color;
+						pix |= color;
 					dst[-7] = pix;
 
 					dst -= bitmap.rowpixels();
@@ -1618,8 +1618,7 @@ int segas32_state::draw_one_sprite(uint16_t *data, int xoffs, int yoffs, const r
 	};
 
 	bitmap_ind16 &bitmap = *m_layer_data[(!m_is_multi32 || !(data[3] & 0x0800)) ? MIXER_LAYER_SPRITES_2 : MIXER_LAYER_MULTISPR_2].bitmap;
-	uint8_t numbanks = memregion("gfx2")->bytes() / 0x400000;
-	const uint32_t *spritebase = (const uint32_t *)memregion("gfx2")->base();
+	uint8_t numbanks = m_sprite_region.length() >> 20;
 
 	int indirect = data[0] & 0x2000;
 	int indlocal = data[0] & 0x1000;
@@ -1678,7 +1677,7 @@ int segas32_state::draw_one_sprite(uint16_t *data, int xoffs, int yoffs, const r
 	{
 		if (numbanks)
 			bank %= numbanks;
-		spritedata = spritebase + 0x100000 * bank;
+		spritedata = &m_sprite_region[bank << 20];
 		addrmask = 0xfffff;
 	}
 

@@ -451,4 +451,4 @@ ROM_START(duet16)
 	ROM_LOAD("duet16_key_8741ak001b_z.bin", 0x000, 0x400, CRC(d23ee68d) SHA1(3b6a86fe2a304823c5385cd673f9580a35199dac))
 ROM_END
 
-COMP(1983, duet16, 0, 0, duet16, 0, duet16_state, 0, "Panafacom (Panasonic/Fujitsu)", "Duet-16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1983, duet16, 0, 0, duet16, 0, duet16_state, empty_init, "Panafacom (Panasonic/Fujitsu)", "Duet-16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

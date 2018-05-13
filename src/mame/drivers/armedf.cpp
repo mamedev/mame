@@ -1256,7 +1256,7 @@ MACHINE_CONFIG_START(armedf_state::terraf_sound)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1299,7 +1299,7 @@ MACHINE_CONFIG_START(armedf_state::terraf)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
 	terraf_sound(config);
@@ -1340,10 +1340,10 @@ MACHINE_CONFIG_START(armedf_state::terrafjb)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1390,7 +1390,7 @@ MACHINE_CONFIG_START(armedf_state::kozure)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
 	terraf_sound(config);
@@ -1427,10 +1427,10 @@ MACHINE_CONFIG_START(armedf_state::armedf)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1477,10 +1477,10 @@ MACHINE_CONFIG_START(armedf_state::cclimbr2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1527,10 +1527,10 @@ MACHINE_CONFIG_START(armedf_state::legion)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1575,10 +1575,10 @@ MACHINE_CONFIG_START(armedf_state::legionjb)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1619,7 +1619,7 @@ MACHINE_CONFIG_START(bigfghtr_state::bigfghtr)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	/* sound hardware */
 	terraf_sound(config);
@@ -2153,7 +2153,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(armedf_state,terraf)
+void armedf_state::init_terraf()
 {
 	m_scroll_type = 0;
 
@@ -2163,27 +2163,27 @@ DRIVER_INIT_MEMBER(armedf_state,terraf)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0c0001, write16_delegate(FUNC(armedf_state::terraf_fg_scroll_msb_arm_w),this));
 }
 
-DRIVER_INIT_MEMBER(armedf_state,terrafu)
+void armedf_state::init_terrafu()
 {
 	m_scroll_type = 0;
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 }
 
-DRIVER_INIT_MEMBER(armedf_state,terrafjb)
+void armedf_state::init_terrafjb()
 {
 	m_scroll_type = 0;
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terrafjb_io_w),this));
 }
 
-DRIVER_INIT_MEMBER(armedf_state,armedf)
+void armedf_state::init_armedf()
 {
 	m_scroll_type = 1;
 }
 
 
-DRIVER_INIT_MEMBER(armedf_state,kozure)
+void armedf_state::init_kozure()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2197,7 +2197,7 @@ DRIVER_INIT_MEMBER(armedf_state,kozure)
 
 }
 
-DRIVER_INIT_MEMBER(armedf_state,legion)
+void armedf_state::init_legion()
 {
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
@@ -2213,7 +2213,7 @@ DRIVER_INIT_MEMBER(armedf_state,legion)
 	m_scroll_type = 2;
 }
 
-DRIVER_INIT_MEMBER(armedf_state,legionjb)
+void armedf_state::init_legionjb()
 {
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
@@ -2230,7 +2230,7 @@ DRIVER_INIT_MEMBER(armedf_state,legionjb)
 	save_item(NAME(m_legion_cmd));
 }
 
-DRIVER_INIT_MEMBER(armedf_state,cclimbr2)
+void armedf_state::init_cclimbr2()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 
@@ -2243,24 +2243,24 @@ DRIVER_INIT_MEMBER(armedf_state,cclimbr2)
  *
  *************************************/
 
-/*     YEAR, NAME,    PARENT,   MACHINE,  INPUT,    INIT,                     MONITOR, COMPANY,                        FULLNAME, FLAGS */
-GAME( 1987, legion,   0,        legion,   legion,   armedf_state,   legion,   ROT270, "Nichibutsu",                    "Legion - Spinner-87 (World ver 2.03)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, legionj,  legion,   legion,   legion,   armedf_state,   legion,   ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan ver 1.05)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, legionjb, legion,   legionjb, legion,   armedf_state,   legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg)", MACHINE_SUPPORTS_SAVE) /* blitter protection removed */
+/*     YEAR, NAME,     PARENT,   MACHINE,  INPUT,    STATE,          INIT,          MONITOR,COMPANY,                         FULLNAME, FLAGS */
+GAME( 1987, legion,    0,        legion,   legion,   armedf_state,   init_legion,   ROT270, "Nichibutsu",                    "Legion - Spinner-87 (World ver 2.03)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, legionj,   legion,   legion,   legion,   armedf_state,   init_legion,   ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan ver 1.05)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, legionjb,  legion,   legionjb, legion,   armedf_state,   init_legionjb, ROT270, "bootleg",                       "Chouji Meikyuu Legion (Japan ver 1.05, bootleg)", MACHINE_SUPPORTS_SAVE) /* blitter protection removed */
 
-GAME( 1987, terraf,   0,        terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu",                    "Terra Force", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, terrafu,  terraf,   terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu USA",                "Terra Force (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, terrafj,  terraf,   terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, terrafjb, terraf,   terrafjb, terraf,   armedf_state,   terrafjb, ROT0,   "bootleg",                       "Terra Force (Japan, bootleg with additional Z80)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   armedf_state,   terraf,   ROT0,   "bootleg",                       "Terra Force (Japan, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terraf,    0,        terraf,   terraf,   armedf_state,   init_terrafu,  ROT0,   "Nichibutsu",                    "Terra Force", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafu,   terraf,   terraf,   terraf,   armedf_state,   init_terrafu,  ROT0,   "Nichibutsu USA",                "Terra Force (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafj,   terraf,   terraf,   terraf,   armedf_state,   init_terrafu,  ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafjb,  terraf,   terrafjb, terraf,   armedf_state,   init_terrafjb, ROT0,   "bootleg",                       "Terra Force (Japan, bootleg with additional Z80)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, terrafb,   terraf,   terrafb,  terraf,   armedf_state,   init_terraf,   ROT0,   "bootleg",                       "Terra Force (Japan, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, kozure,   0,        kozure,   kozure,   armedf_state,   kozure,   ROT0,   "Nichibutsu",                    "Kozure Ookami (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, kozure,    0,        kozure,   kozure,   armedf_state,   init_kozure,   ROT0,   "Nichibutsu",                    "Kozure Ookami (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, armedf_state,   cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, armedf_state,   cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan, Harder)", MACHINE_SUPPORTS_SAVE  )
+GAME( 1988, cclimbr2,  0,        cclimbr2, cclimbr2, armedf_state,   init_cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cclimbr2a, cclimbr2, cclimbr2, cclimbr2, armedf_state,   init_cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan, Harder)", MACHINE_SUPPORTS_SAVE  )
 
-GAME( 1988, armedf,   0,        armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu",                    "Armed Formation", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, armedf,    0,        armedf,   armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu",                    "Armed Formation", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, armedff,   armedf,   armedf,   armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, bigfghtr_state, armedf,   ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, bigfghtr_state, armedf,   ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skyrobo,   0,        bigfghtr, bigfghtr, bigfghtr_state, init_armedf,   ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bigfghtr,  skyrobo,  bigfghtr, bigfghtr, bigfghtr_state, init_armedf,   ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_SUPPORTS_SAVE )

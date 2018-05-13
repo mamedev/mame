@@ -80,7 +80,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	DECLARE_DRIVER_INIT(i7000);
+	void init_i7000();
 	DECLARE_PALETTE_INIT(i7000);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( i7000_card );
 
@@ -222,7 +222,7 @@ static INPUT_PORTS_START( i7000 )
 		PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(i7000_state, i7000)
+void i7000_state::init_i7000()
 {
 }
 
@@ -363,7 +363,7 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 	MCFG_MC6845_ADDR_CHANGED_CB(i7000_state, crtc_addr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -420,5 +420,5 @@ ROM_START( i7000 )
 	ROM_LOAD( "i7000_telex_ci09.rom", 0x0000, 0x1000, CRC(c1c8fcc8) SHA1(cbf5fb600e587b998f190a9e3fb398a51d8a5e87) )
 ROM_END
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE        INIT   COMPANY    FULLNAME    FLAGS
-COMP( 1982, i7000,  0,      0,       i7000,     i7000,   i7000_state, i7000, "Itautec", "I-7000",   MACHINE_NOT_WORKING)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY    FULLNAME  FLAGS
+COMP( 1982, i7000, 0,      0,      i7000,   i7000, i7000_state, init_i7000, "Itautec", "I-7000", MACHINE_NOT_WORKING)

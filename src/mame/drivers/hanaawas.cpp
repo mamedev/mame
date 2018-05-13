@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(hanaawas_state::hanaawas)
 	MCFG_PALETTE_INIT_OWNER(hanaawas_state, hanaawas)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 18432000/12)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
@@ -274,4 +274,4 @@ ROM_START( hanaawas )
 ROM_END
 
 
-GAME( 1982, hanaawas, 0, hanaawas, hanaawas, hanaawas_state, 0, ROT0, "Seta Kikaku, Ltd.", "Hana Awase", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hanaawas, 0, hanaawas, hanaawas, hanaawas_state, empty_init, ROT0, "Seta Kikaku, Ltd.", "Hana Awase", MACHINE_SUPPORTS_SAVE )

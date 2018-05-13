@@ -444,7 +444,7 @@ MACHINE_CONFIG_START(mainevt_state::mainevt)
 	MCFG_K051960_CB(mainevt_state, mainevt_sprite_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -494,11 +494,11 @@ MACHINE_CONFIG_START(mainevt_state::devstors)
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3.579545_MHz_XTAL)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579545_MHz_XTAL)
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 
@@ -724,11 +724,11 @@ ROM_END
 
 
 
-GAME( 1988, mainevt,  0,        mainevt,  mainevt,  mainevt_state, 0, ROT0,  "Konami", "The Main Event (4 Players ver. Y)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mainevto, mainevt,  mainevt,  mainevt,  mainevt_state, 0, ROT0,  "Konami", "The Main Event (4 Players ver. F)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, mainevt_state, 0, ROT0,  "Konami", "The Main Event (2 Players ver. X)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, mainevt_state, 0, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors, 0,        devstors, devstors, mainevt_state, 0, ROT90, "Konami", "Devastators (ver. Z)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors2,devstors, devstors, devstor2, mainevt_state, 0, ROT90, "Konami", "Devastators (ver. X)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors3,devstors, devstors, devstors, mainevt_state, 0, ROT90, "Konami", "Devastators (ver. V)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, garuka,   devstors, devstors, devstor2, mainevt_state, 0, ROT90, "Konami", "Garuka (Japan ver. W)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevt,  0,        mainevt,  mainevt,  mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (4 Players ver. Y)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevto, mainevt,  mainevt,  mainevt,  mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (4 Players ver. F)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (2 Players ver. X)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, mainevt_state, empty_init, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors, 0,        devstors, devstors, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. Z)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors2,devstors, devstors, devstor2, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. X)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors3,devstors, devstors, devstors, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. V)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, garuka,   devstors, devstors, devstor2, mainevt_state, empty_init, ROT90, "Konami", "Garuka (Japan ver. W)",                 MACHINE_SUPPORTS_SAVE )

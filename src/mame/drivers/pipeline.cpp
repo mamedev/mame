@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(pipeline_state::pipeline)
 	MCFG_PALETTE_ADD("palette", 0x100+0x100)
 	MCFG_PALETTE_INIT_OWNER(pipeline_state, pipeline)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 7372800/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
@@ -440,4 +440,4 @@ ROM_START( pipeline )
 	ROM_LOAD( "82s123.u79", 0x00200, 0x00020,CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
-GAME( 1990, pipeline, 0, pipeline, pipeline, pipeline_state, 0, ROT0, "Daehyun Electronics", "Pipeline", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipeline, 0, pipeline, pipeline, pipeline_state, empty_init, ROT0, "Daehyun Electronics", "Pipeline", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

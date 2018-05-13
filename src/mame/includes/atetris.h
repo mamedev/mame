@@ -26,7 +26,7 @@ public:
 	void atetrisb2(machine_config &config);
 	void atetrisb3(machine_config &config);
 
-	DECLARE_DRIVER_INIT(atetris);
+	void init_atetris();
 
 protected:
 	virtual void machine_start() override;

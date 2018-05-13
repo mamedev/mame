@@ -211,7 +211,8 @@ MACHINE_CONFIG_START(vindictr_state::vindictr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
@@ -531,7 +532,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(vindictr_state,vindictr)
+void vindictr_state::init_vindictr()
 {
 }
 
@@ -543,11 +544,11 @@ DRIVER_INIT_MEMBER(vindictr_state,vindictr)
  *
  *************************************/
 
-GAME( 1988, vindictr,  0,        vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (rev 5)", 0 )
-GAME( 1988, vindictre, vindictr, vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 5)", 0 )
-GAME( 1988, vindictrg, vindictr, vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (German, rev 1)", 0 )
-GAME( 1988, vindictre4,vindictr, vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 4)", 0 )
-GAME( 1988, vindictr4, vindictr, vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (rev 4)", 0 )
-GAME( 1988, vindictre3,vindictr, vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 3)", 0 )
-GAME( 1988, vindictr2, vindictr, vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (rev 2)", 0 )
-GAME( 1988, vindictr1, vindictr, vindictr, vindictr, vindictr_state, vindictr, ROT0, "Atari Games", "Vindicators (rev 1)", 0 )
+GAME( 1988, vindictr,  0,        vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (rev 5)", 0 )
+GAME( 1988, vindictre, vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 5)", 0 )
+GAME( 1988, vindictrg, vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (German, rev 1)", 0 )
+GAME( 1988, vindictre4,vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 4)", 0 )
+GAME( 1988, vindictr4, vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (rev 4)", 0 )
+GAME( 1988, vindictre3,vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (Europe, rev 3)", 0 )
+GAME( 1988, vindictr2, vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (rev 2)", 0 )
+GAME( 1988, vindictr1, vindictr, vindictr, vindictr, vindictr_state, init_vindictr, ROT0, "Atari Games", "Vindicators (rev 1)", 0 )

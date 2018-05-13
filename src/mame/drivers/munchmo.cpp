@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 	MCFG_PALETTE_INIT_OWNER(munchmo_state, munchmo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(ASSERTLINE("audiocpu", 0))
@@ -437,5 +437,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, munchmo_state, 0, ROT270, "SNK",                   "Joyful Road (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, munchmo_state, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, munchmo_state, empty_init, ROT270, "SNK",                   "Joyful Road (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, munchmo_state, empty_init, ROT270, "SNK (Centuri license)", "Munch Mobile (US)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

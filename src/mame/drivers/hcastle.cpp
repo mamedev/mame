@@ -199,8 +199,8 @@ MACHINE_CONFIG_START(hcastle_state::hcastle)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59)
@@ -223,7 +223,7 @@ MACHINE_CONFIG_START(hcastle_state::hcastle)
 	MCFG_K007121_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -379,8 +379,8 @@ ROM_END
 
 
 
-GAME( 1988, hcastle,   0,       hcastle, hcastle, hcastle_state, 0, ROT0, "Konami", "Haunted Castle (version M)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hcastlek,  hcastle, hcastle, hcastle, hcastle_state, 0, ROT0, "Konami", "Haunted Castle (version K)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hcastlee,  hcastle, hcastle, hcastle, hcastle_state, 0, ROT0, "Konami", "Haunted Castle (version E)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, akumajou,  hcastle, hcastle, hcastle, hcastle_state, 0, ROT0, "Konami", "Akuma-Jou Dracula (Japan version P)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, akumajoun, hcastle, hcastle, hcastle, hcastle_state, 0, ROT0, "Konami", "Akuma-Jou Dracula (Japan version N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hcastle,   0,       hcastle, hcastle, hcastle_state, empty_init, ROT0, "Konami", "Haunted Castle (version M)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hcastlek,  hcastle, hcastle, hcastle, hcastle_state, empty_init, ROT0, "Konami", "Haunted Castle (version K)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hcastlee,  hcastle, hcastle, hcastle, hcastle_state, empty_init, ROT0, "Konami", "Haunted Castle (version E)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, akumajou,  hcastle, hcastle, hcastle, hcastle_state, empty_init, ROT0, "Konami", "Akuma-Jou Dracula (Japan version P)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, akumajoun, hcastle, hcastle, hcastle, hcastle_state, empty_init, ROT0, "Konami", "Akuma-Jou Dracula (Japan version N)", MACHINE_SUPPORTS_SAVE )

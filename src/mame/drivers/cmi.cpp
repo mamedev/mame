@@ -274,7 +274,7 @@ public:
 	static const device_timer_id TIMER_JAM_TIMEOUT = 2;
 	static const device_timer_id TIMER_CMI10_SCND = 3;
 
-	DECLARE_DRIVER_INIT( cmi2x );
+	void init_cmi2x();
 
 	// CPU card
 	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq );
@@ -2325,7 +2325,7 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_PIA_READPA_HANDLER(READ8(*this, cmi_state, cmi10_u21_a_r))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, cmi_state, cmi10_u21_cb2_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// Channel cards
 	MCFG_DEVICE_ADD("cmi01a_0", CMI01A_CHANNEL_CARD, 0)
@@ -2404,8 +2404,8 @@ ROM_START( cmi2x )
 ROM_END
 
 /* TODO: Machine start? */
-DRIVER_INIT_MEMBER( cmi_state, cmi2x )
+void cmi_state::init_cmi2x()
 {
 }
 
-CONS( 1983, cmi2x, 0, 0, cmi2x, cmi2x, cmi_state, cmi2x, "Fairlight", "CMI IIx", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1983, cmi2x, 0, 0, cmi2x, cmi2x, cmi_state, init_cmi2x, "Fairlight", "CMI IIx", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -1672,7 +1672,8 @@ MACHINE_CONFIG_START(model1_state::swa)
 	MCFG_MODEL1IO_AN5_CB(IOPORT("STICK2Y"))
 	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(*this, model1_state, swa_outputs_w))
 
-	MCFG_SPEAKER_STANDARD_STEREO("dleft", "dright")
+	SPEAKER(config, "dleft").front_left();
+	SPEAKER(config, "dright").front_right();
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "dleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "dright", 1.0)
@@ -1725,7 +1726,7 @@ MACHINE_CONFIG_START(model1_state::netmerc)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER( model1_state, wingwar360 )
+void model1_state::init_wingwar360()
 {
 	// install r360 hack
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00014, 0xc00015, read16_delegate(FUNC(model1_state::r360_r),this));
@@ -1789,12 +1790,12 @@ WRITE16_MEMBER(model1_state::r360_w)
 	}
 }
 
-GAME( 1993, vf,         0,       vf,         vf,         model1_state,  0,          ROT0, "Sega", "Virtua Fighter",     MACHINE_IMPERFECT_GRAPHICS )
-GAMEL(1992, vr,         0,       vr,         vr,         model1_state,  0,          ROT0, "Sega", "Virtua Racing",      0, layout_vr )
-GAME( 1993, vformula,   vr,      vformula,   vr,         model1_state,  0,          ROT0, "Sega", "Virtua Formula",     MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,        0,       swa,        swa,        model1_state,  0,          ROT0, "Sega", "Star Wars Arcade",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state,  0,          ROT0, "Sega", "Wing War (World)",   MACHINE_NOT_WORKING )
-GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state,  0,          ROT0, "Sega", "Wing War (US)",      MACHINE_NOT_WORKING )
-GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state,  0,          ROT0, "Sega", "Wing War (Japan)",   MACHINE_NOT_WORKING )
-GAME( 1994, wingwar360, wingwar, wingwar360, wingwar360, model1_state,  wingwar360, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
-GAME( 1993, netmerc,    0,       netmerc,    netmerc,    model1_state,  0,          ROT0, "Sega", "Sega NetMerc",       MACHINE_NOT_WORKING )
+GAME( 1993, vf,         0,       vf,         vf,         model1_state, empty_init,      ROT0, "Sega", "Virtua Fighter",     MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1992, vr,         0,       vr,         vr,         model1_state, empty_init,      ROT0, "Sega", "Virtua Racing",      0, layout_vr )
+GAME( 1993, vformula,   vr,      vformula,   vr,         model1_state, empty_init,      ROT0, "Sega", "Virtua Formula",     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, swa,        0,       swa,        swa,        model1_state, empty_init,      ROT0, "Sega", "Star Wars Arcade",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state, empty_init,      ROT0, "Sega", "Wing War (World)",   MACHINE_NOT_WORKING )
+GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state, empty_init,      ROT0, "Sega", "Wing War (US)",      MACHINE_NOT_WORKING )
+GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state, empty_init,      ROT0, "Sega", "Wing War (Japan)",   MACHINE_NOT_WORKING )
+GAME( 1994, wingwar360, wingwar, wingwar360, wingwar360, model1_state, init_wingwar360, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
+GAME( 1993, netmerc,    0,       netmerc,    netmerc,    model1_state, empty_init,      ROT0, "Sega", "Sega NetMerc",       MACHINE_NOT_WORKING )

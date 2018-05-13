@@ -283,7 +283,7 @@ MACHINE_CONFIG_START(jailbrek_state::jailbrek)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jailbrek_state, vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("snsnd", SN76489A, MASTER_CLOCK/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -423,6 +423,6 @@ ROM_START( jailbrekb )
 	ROM_LOAD( "k8.bin",  0x0000, 0x0001, NO_DUMP ) /* PAL16L8 */
 ROM_END
 
-GAME( 1986, jailbrek,  0,        jailbrek, jailbrek, jailbrek_state, 0, ROT0, "Konami",  "Jail Break",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, jailbrekb, jailbrek, jailbrek, jailbrek, jailbrek_state, 0, ROT0, "bootleg", "Jail Break (bootleg)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, manhatan,  jailbrek, jailbrek, jailbrek, jailbrek_state, 0, ROT0, "Konami",  "Manhattan 24 Bunsyo (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jailbrek,  0,        jailbrek, jailbrek, jailbrek_state, empty_init, ROT0, "Konami",  "Jail Break",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jailbrekb, jailbrek, jailbrek, jailbrek, jailbrek_state, empty_init, ROT0, "bootleg", "Jail Break (bootleg)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, manhatan,  jailbrek, jailbrek, jailbrek, jailbrek_state, empty_init, ROT0, "Konami",  "Manhattan 24 Bunsyo (Japan)", MACHINE_SUPPORTS_SAVE )

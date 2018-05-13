@@ -313,7 +313,7 @@ MACHINE_CONFIG_START(battlex_state::battlex)
 	MCFG_PALETTE_ADD("palette", 64 + 128)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(10'000'000)/8)   // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
@@ -390,37 +390,32 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(battlex_state,battlex)
+void battlex_state::init_battlex()
 {
 	uint8_t *colormask = memregion("user1")->base();
 	uint8_t *gfxdata = memregion("user2")->base();
 	uint8_t *dest = memregion("gfx1")->base();
 	int tile_size = memregion("gfx1")->bytes() / 32;
 
-	int tile, line, bit;
 	int offset = 0;
-
-	for (tile = 0; tile < tile_size; tile++)
+	for (int tile = 0; tile < tile_size; tile++)
 	{
-		for (line = 0; line < 8; line ++)
+		for (int line = 0; line < 8; line ++)
 		{
-			for (bit = 0; bit < 8 ; bit ++)
+			for (int bit = 0; bit < 8 ; bit ++)
 			{
+				int color = colormask[(tile << 3) | ((line & 0x6) + (bit > 3 ? 1 : 0))];
+				int data = BIT(gfxdata[(tile << 3) | line], bit);
 
-				int color = colormask[(tile << 3 )| ((line&0x6) + (bit>3?1:0))  ];
-				int data = (gfxdata[(tile << 3 )| line] >> bit) & 1;
+				if (!data)
+					color >>= 4;
 
-				if(!data){
-					color>>=4;
-				}
+				color &= 0x0f;
 
-				color&=0x0f;
-
-				if(offset&1){
-					dest[ offset>>1 ] |= color;
-				} else {
-					dest[ offset>>1 ] = color<<4;
-				}
+				if (offset&1)
+					dest[offset >> 1] |= color;
+				else
+					dest[offset >> 1] = color<<4;
 				++offset;
 			}
 		}
@@ -433,5 +428,5 @@ DRIVER_INIT_MEMBER(battlex_state,battlex)
  *
  *************************************/
 
-GAME( 1982, battlex,   0,   battlex,  battlex,  battlex_state,  battlex, ROT180, "Omori Electric Co., Ltd.", "Battle Cross", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1983, dodgeman,  0,   dodgeman, dodgeman, battlex_state,  battlex, ROT180, "Omori Electric Co., Ltd.", "Dodge Man",    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1982, battlex,  0, battlex,  battlex,  battlex_state, init_battlex, ROT180, "Omori Electric Co., Ltd.", "Battle Cross", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1983, dodgeman, 0, dodgeman, dodgeman, battlex_state, init_battlex, ROT180, "Omori Electric Co., Ltd.", "Dodge Man",    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

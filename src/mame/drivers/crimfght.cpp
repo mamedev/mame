@@ -343,11 +343,12 @@ MACHINE_CONFIG_START(crimfght_state::crimfght)
 	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))  /* verified on pcb */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, crimfght_state, ym2151_ct_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -438,6 +439,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1989, crimfght,  0,        crimfght, crimfght,  crimfght_state, 0, ROT0, "Konami", "Crime Fighters (World 2 players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, crimfghtu, crimfght, crimfght, crimfghtu, crimfght_state, 0, ROT0, "Konami", "Crime Fighters (US 4 Players)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, crimfghtj, crimfght, crimfght, crimfght,  crimfght_state, 0, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimfght,  0,        crimfght, crimfght,  crimfght_state, empty_init, ROT0, "Konami", "Crime Fighters (World 2 players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimfghtu, crimfght, crimfght, crimfghtu, crimfght_state, empty_init, ROT0, "Konami", "Crime Fighters (US 4 Players)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, crimfghtj, crimfght, crimfght, crimfght,  crimfght_state, empty_init, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )

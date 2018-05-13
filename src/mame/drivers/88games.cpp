@@ -346,11 +346,11 @@ MACHINE_CONFIG_START(_88games_state::_88games)
 	MCFG_K051316_CB(_88games_state, zoom_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "mono", 0.75)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
 
@@ -538,6 +538,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, 88games,  0,       _88games, 88games, _88games_state, 0, ROT0, "Konami", "'88 Games", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, konami88, 88games, _88games, 88games, _88games_state, 0, ROT0, "Konami", "Konami '88", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hypsptsp, 88games, _88games, 88games, _88games_state, 0, ROT0, "Konami", "Hyper Sports Special (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, 88games,  0,       _88games, 88games, _88games_state, empty_init, ROT0, "Konami", "'88 Games", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, konami88, 88games, _88games, 88games, _88games_state, empty_init, ROT0, "Konami", "Konami '88", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hypsptsp, 88games, _88games, 88games, _88games_state, empty_init, ROT0, "Konami", "Hyper Sports Special (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -514,7 +514,7 @@ MACHINE_CONFIG_START(ron_state::ron)
 	MCFG_PALETTE_INIT_OWNER(ron_state, ron)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, 0) // T0 CLK from I8035 (not verified)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ron_state, ay_pa_w))
@@ -558,4 +558,4 @@ ROM_START( ron2 )
 	ROM_LOAD( "82s129_4.2m",  0x100, 0x100, CRC(f3c05d59) SHA1(bd48963aa9f2bedaa0c1fd031d7c93089161d1d9) )
 ROM_END
 
-GAME( 1981, ron2,  0,   ron,  ron, ron_state,  0,       ROT270, "Sanritsu",      "Ron II Mah-Jongg", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS )
+GAME( 1981, ron2,  0,   ron,  ron, ron_state, empty_init, ROT270, "Sanritsu", "Ron II Mah-Jongg", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS )

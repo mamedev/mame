@@ -753,7 +753,7 @@ MACHINE_CONFIG_START(taitoair_state::airsys)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000) / 2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1000,8 +1000,8 @@ ROM_START( ainfernoj )
 ROM_END
 
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT  MONITOR  COMPANY                      FULLNAME               FLAGS
-GAME( 1988, topland,   0,        airsys,   topland,  taitoair_state, 0,    ROT0,    "Taito Corporation Japan",   "Top Landing (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, toplandj,  topland,  airsys,   topland,  taitoair_state, 0,    ROT0,    "Taito Corporation",         "Top Landing (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1990, ainferno,  0,        airsys,   ainferno, taitoair_state, 0,    ROT0,    "Taito America Corporation", "Air Inferno (US)",    MACHINE_NOT_WORKING )
-GAME( 1990, ainfernoj, ainferno, airsys,   ainferno, taitoair_state, 0,    ROT0,    "Taito Corporation Japan",   "Air Inferno (Japan)", MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY                      FULLNAME               FLAGS
+GAME( 1988, topland,   0,        airsys,   topland,  taitoair_state, empty_init, ROT0,    "Taito Corporation Japan",   "Top Landing (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, toplandj,  topland,  airsys,   topland,  taitoair_state, empty_init, ROT0,    "Taito Corporation",         "Top Landing (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, ainferno,  0,        airsys,   ainferno, taitoair_state, empty_init, ROT0,    "Taito America Corporation", "Air Inferno (US)",    MACHINE_NOT_WORKING )
+GAME( 1990, ainfernoj, ainferno, airsys,   ainferno, taitoair_state, empty_init, ROT0,    "Taito Corporation Japan",   "Air Inferno (Japan)", MACHINE_NOT_WORKING )

@@ -320,5 +320,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT    STATE          INIT  COMPANY      FULLNAME           FLAGS
-COMP( 1983, att4425,  0,      0,      att4425,   att4425, att4425_state, 0,    "AT&T", "AT&T Teletype 4425", MACHINE_IS_SKELETON )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME              FLAGS
+COMP( 1983, att4425, 0,      0,      att4425, att4425, att4425_state, empty_init, "AT&T",  "AT&T Teletype 4425", MACHINE_IS_SKELETON )

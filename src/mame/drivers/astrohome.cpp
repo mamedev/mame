@@ -29,14 +29,20 @@ public:
 		: astrocde_state(mconfig, type, tag)
 		, m_cart(*this, "cartslot")
 		, m_exp(*this, "exp")
+		, m_keypad(*this, "KEYPAD%u", 0U)
 	{ }
+
+	void astrocde(machine_config &config);
+private:
+	DECLARE_READ8_MEMBER(inputs_r);
+	DECLARE_MACHINE_START(astrocde);
+
+	void astrocade_io(address_map &map);
+	void astrocade_mem(address_map &map);
 
 	required_device<astrocade_cart_slot_device> m_cart;
 	required_device<astrocade_exp_device> m_exp;
-	DECLARE_MACHINE_START(astrocde);
-	void astrocde(machine_config &config);
-	void astrocade_io(address_map &map);
-	void astrocade_mem(address_map &map);
+	required_ioport_array<4> m_keypad;
 };
 
 /*********************************************************************************
@@ -64,7 +70,10 @@ void astrocde_mess_state::astrocade_mem(address_map &map)
 
 void astrocde_mess_state::astrocade_io(address_map &map)
 {
-	map(0x00, 0x1f).select(0xff00).rw(this, FUNC(astrocde_mess_state::astrocade_data_chip_register_r), FUNC(astrocde_mess_state::astrocade_data_chip_register_w));
+	map(0x00, 0x0f).mirror(0xff00).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
+	map(0x10, 0x1f).select(0xff00).r("astrocade1", FUNC(astrocade_io_device::read));
+	map(0x10, 0x18).select(0xff00).w("astrocade1", FUNC(astrocade_io_device::write));
+	map(0x19, 0x19).mirror(0xff00).w(this, FUNC(astrocde_state::expand_register_w));
 }
 
 /*************************************
@@ -89,6 +98,14 @@ void astrocde_mess_state::astrocade_io(address_map &map)
  *  shift, GREEN shift, RED shift, BLUE shift, WORDS shift.
  *
  *************************************/
+
+READ8_MEMBER(astrocde_mess_state::inputs_r)
+{
+	if (BIT(offset, 2))
+		return m_keypad[offset & 3]->read();
+	else
+		return m_handle[offset & 3]->read();
+}
 
 static INPUT_PORTS_START( astrocde )
 	PORT_START("P1HANDLE")
@@ -215,8 +232,13 @@ MACHINE_CONFIG_START(astrocde_mess_state::astrocde)
 	MCFG_PALETTE_INIT_OWNER(astrocde_state, astrocde)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("astrocade1", ASTROCADE, ASTROCADE_CLOCK/4)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("astrocade1", ASTROCADE_IO, ASTROCADE_CLOCK/4)
+	MCFG_ASTROCADE_IO_SI_READ_CB(READ8(*this, astrocde_mess_state, inputs_r))
+	MCFG_ASTROCADE_IO_POT0("P1_KNOB")
+	MCFG_ASTROCADE_IO_POT1("P2_KNOB")
+	MCFG_ASTROCADE_IO_POT2("P3_KNOB")
+	MCFG_ASTROCADE_IO_POT3("P4_KNOB")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* expansion port */
@@ -257,7 +279,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(astrocde_state,astrocde)
+void astrocde_state::init_astrocde()
 {
 	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS;
 }
@@ -279,7 +301,7 @@ MACHINE_START_MEMBER(astrocde_mess_state, astrocde)
  *
  *************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     STATE                INIT      COMPANY                FULLNAME                       FLAGS */
-CONS( 1978, astrocde, 0,        0,        astrocde, astrocde, astrocde_mess_state, astrocde, "Bally Manufacturing", "Bally Professional Arcade",   MACHINE_SUPPORTS_SAVE )
-CONS( 1977, astrocdl, astrocde, 0,        astrocde, astrocde, astrocde_mess_state, astrocde, "Bally Manufacturing", "Bally Home Library Computer", MACHINE_SUPPORTS_SAVE )
-CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, astrocde_mess_state, astrocde, "Bally Manufacturing", "Bally Computer System",       MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS                INIT           COMPANY                FULLNAME                       FLAGS */
+CONS( 1978, astrocde, 0,        0,      astrocde, astrocde, astrocde_mess_state, init_astrocde, "Bally Manufacturing", "Bally Professional Arcade",   MACHINE_SUPPORTS_SAVE )
+CONS( 1977, astrocdl, astrocde, 0,      astrocde, astrocde, astrocde_mess_state, init_astrocde, "Bally Manufacturing", "Bally Home Library Computer", MACHINE_SUPPORTS_SAVE )
+CONS( 1977, astrocdw, astrocde, 0,      astrocde, astrocde, astrocde_mess_state, init_astrocde, "Bally Manufacturing", "Bally Computer System",       MACHINE_SUPPORTS_SAVE )

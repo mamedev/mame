@@ -118,7 +118,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_DRIVER_INIT(supertnk);
+	void init_supertnk();
 	void supertnk(machine_config &config);
 
 protected:
@@ -451,7 +451,7 @@ MACHINE_CONFIG_START(supertnk_state::supertnk)
 	MCFG_SCREEN_UPDATE_DRIVER(supertnk_state, screen_update_supertnk)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -491,18 +491,17 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(supertnk_state,supertnk)
+void supertnk_state::init_supertnk()
 {
 	/* decode the TMS9980 ROMs */
-	offs_t offs;
 	uint8_t *rom = memregion("maincpu")->base();
 	size_t len = memregion("maincpu")->bytes();
 
-	for (offs = 0; offs < len; offs++)
+	for (offs_t offs = 0; offs < len; offs++)
 	{
 		rom[offs] = bitswap<8>(rom[offs],0,1,2,3,4,5,6,7);
 	}
 }
 
 
-GAME( 1981, supertnk, 0, supertnk, supertnk, supertnk_state, supertnk, ROT90, "Video Games GmbH", "Super Tank", 0 )
+GAME( 1981, supertnk, 0, supertnk, supertnk, supertnk_state, init_supertnk, ROT90, "Video Games GmbH", "Super Tank", 0 )

@@ -99,7 +99,7 @@ public:
 	DECLARE_READ8_MEMBER(rng_r);
 	DECLARE_WRITE8_MEMBER(testa_w);
 	DECLARE_WRITE8_MEMBER(testb_w);
-	DECLARE_DRIVER_INIT(jokrwild);
+	void init_jokrwild();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jokrwild);
@@ -477,7 +477,7 @@ ROM_END
 *  Driver Initialization  *
 **************************/
 
-DRIVER_INIT_MEMBER(jokrwild_state,jokrwild)
+void jokrwild_state::init_jokrwild()
 /*****************************************************************************
 
   Encryption was made by pages of 256 bytes.
@@ -493,12 +493,10 @@ DRIVER_INIT_MEMBER(jokrwild_state,jokrwild)
 
 *****************************************************************************/
 {
-	int i, offs;
 	uint8_t *srcp = memregion( "maincpu" )->base();
-
-	for (i = 0x8000; i < 0x10000; i++)
+	for (int i = 0x8000; i < 0x10000; i++)
 	{
-		offs = i & 0xff;
+		int offs = i & 0xff;
 		srcp[i] = srcp[i] ^ 0xcc ^ offs;
 	}
 }
@@ -508,5 +506,5 @@ DRIVER_INIT_MEMBER(jokrwild_state,jokrwild)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY  FULLNAME                    FLAGS
-GAME( 1988, jokrwild, 0,      jokrwild, jokrwild, jokrwild_state, jokrwild, ROT0, "Sigma", "Joker's Wild (encrypted)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT   COMPANY  FULLNAME                    FLAGS
+GAME( 1988, jokrwild, 0,      jokrwild, jokrwild, jokrwild_state, init_jokrwild, ROT0, "Sigma", "Joker's Wild (encrypted)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

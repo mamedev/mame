@@ -272,7 +272,8 @@ MACHINE_CONFIG_START(tail2nos_state::tail2nos)
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -387,6 +388,6 @@ ROM_START( sformulaa )
 	ROM_LOAD( "osb",          0x00000, 0x20000, CRC(d49ab2f5) SHA1(92f7f6c8f35ac39910879dd88d2cfb6db7c848c9) )
 ROM_END
 
-GAME( 1989, tail2nos,  0,        tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Tail to Nose - Great Championship", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sformula,  tail2nos, tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 1)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sformulaa, tail2nos, tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 2)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // No Japan warning, but Japanese version
+GAME( 1989, tail2nos,  0,        tail2nos, tail2nos, tail2nos_state, empty_init, ROT90, "V-System Co.", "Tail to Nose - Great Championship", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sformula,  tail2nos, tail2nos, tail2nos, tail2nos_state, empty_init, ROT90, "V-System Co.", "Super Formula (Japan, set 1)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sformulaa, tail2nos, tail2nos, tail2nos, tail2nos_state, empty_init, ROT90, "V-System Co.", "Super Formula (Japan, set 2)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // No Japan warning, but Japanese version

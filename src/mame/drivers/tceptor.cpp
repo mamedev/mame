@@ -370,9 +370,10 @@ MACHINE_CONFIG_START(tceptor_state::tceptor)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -502,6 +503,6 @@ ROM_START( tceptor2 )
 ROM_END
 
 
-//   ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      MONITOR   COMPANY   FULLNAME                 FLAGS )
-GAME ( 1986, tceptor,  0,        tceptor,  tceptor,  tceptor_state, 0,        ROT0,     "Namco",  "Thunder Ceptor",        0)
-GAMEL( 1986, tceptor2, tceptor,  tceptor,  tceptor2, tceptor_state, 0,        ROT0,     "Namco",  "3-D Thunder Ceptor II", 0, layout_tceptor2)
+//     YEAR  NAME      PARENT   MACHINE  INPUT     CLASS          INIT        MONITOR  COMPANY  FULLNAME                 FLAGS )
+GAME(  1986, tceptor,  0,       tceptor, tceptor,  tceptor_state, empty_init, ROT0,    "Namco", "Thunder Ceptor",        0)
+GAMEL( 1986, tceptor2, tceptor, tceptor, tceptor2, tceptor_state, empty_init, ROT0,    "Namco", "3-D Thunder Ceptor II", 0, layout_tceptor2)

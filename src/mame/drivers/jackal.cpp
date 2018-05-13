@@ -388,9 +388,10 @@ MACHINE_CONFIG_START(jackal_state::jackal)
 	MCFG_PALETTE_INIT_OWNER(jackal_state, jackal)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK) // verified on pcb
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK) // verified on pcb
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -573,9 +574,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, jackal,   0,      jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Jackal (World, 8-way Joystick)",               0 )
-GAME( 1986, jackalr,  jackal, jackal, jackalr, jackal_state, 0, ROT90, "Konami",  "Jackal (World, Rotary Joystick)",              0 )
-GAME( 1986, topgunr,  jackal, jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)",              0 )
-GAME( 1986, jackalj,  jackal, jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", 0 )
-GAME( 1986, jackalbl, jackal, jackal, jackalr, jackal_state, 0, ROT90, "bootleg", "Jackal (bootleg, Rotary Joystick)",            0 )
-GAME( 1986, topgunbl, jackal, jackal, jackalr, jackal_state, 0, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)",        0 )
+GAME( 1986, jackal,   0,      jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Jackal (World, 8-way Joystick)",               0 )
+GAME( 1986, jackalr,  jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "Konami",  "Jackal (World, Rotary Joystick)",              0 )
+GAME( 1986, topgunr,  jackal, jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)",              0 )
+GAME( 1986, jackalj,  jackal, jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", 0 )
+GAME( 1986, jackalbl, jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "bootleg", "Jackal (bootleg, Rotary Joystick)",            0 )
+GAME( 1986, topgunbl, jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)",        0 )

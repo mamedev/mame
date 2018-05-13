@@ -387,7 +387,7 @@ TILE_GET_INFO_MEMBER( blockade_state::tile_info )
 #define BLOCKADE_NOTE_DATA      NODE_01
 #define BLOCKADE_NOTE           NODE_02
 
-DISCRETE_SOUND_START( blockade )
+DISCRETE_SOUND_START( blockade_discrete )
 	DISCRETE_INPUT_DATA  (BLOCKADE_NOTE_DATA)
 
 	/************************************************/
@@ -482,15 +482,14 @@ MACHINE_CONFIG_START(blockade_state::blockade)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(blockade_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(blockade)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, blockade_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -570,10 +569,10 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT  ROTATION  COMPANY    FULLNAME                  FLAGS                                            LAYOUT
-GAMEL(1976, blockade,  0,        blockade, blockade,  blockade_state, 0,    ROT0,     "Gremlin", "Blockade",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
-GAMEL(1976, comotion,  0,        blockade, comotion,  blockade_state, 0,    ROT0,     "Gremlin", "CoMOTION",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
-GAME( 1978, blasto,    0,        blockade, blasto,    blockade_state, 0,    ROT0,     "Gremlin", "Blasto",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // b/w, no overlay
-GAMEL(1977, hustle,    0,        blockade, hustle,    blockade_state, 0,    ROT0,     "Gremlin", "Hustle",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
-GAME( 1977, mineswpr,  0,        blockade, mineswpr,  blockade_state, 0,    ROT0,     "Amutech", "Minesweeper",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1977, mineswpr4, mineswpr, blockade, mineswpr4, blockade_state, 0,    ROT0,     "Amutech", "Minesweeper (4-Player)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT        ROTATION  COMPANY    FULLNAME                  FLAGS                                            LAYOUT
+GAMEL(1976, blockade,  0,        blockade, blockade,  blockade_state, empty_init, ROT0,     "Gremlin", "Blockade",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
+GAMEL(1976, comotion,  0,        blockade, comotion,  blockade_state, empty_init, ROT0,     "Gremlin", "CoMOTION",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
+GAME( 1978, blasto,    0,        blockade, blasto,    blockade_state, empty_init, ROT0,     "Gremlin", "Blasto",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // b/w, no overlay
+GAMEL(1977, hustle,    0,        blockade, hustle,    blockade_state, empty_init, ROT0,     "Gremlin", "Hustle",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_blockade )
+GAME( 1977, mineswpr,  0,        blockade, mineswpr,  blockade_state, empty_init, ROT0,     "Amutech", "Minesweeper",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, mineswpr4, mineswpr, blockade, mineswpr4, blockade_state, empty_init, ROT0,     "Amutech", "Minesweeper (4-Player)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

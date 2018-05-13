@@ -414,7 +414,7 @@ MACHINE_CONFIG_START(segajw_state::segajw)
 	MCFG_HD63484_ADD("hd63484", 8000000, segajw_hd63484_map) // unknown clock
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -445,4 +445,4 @@ ROM_START( segajw )
 ROM_END
 
 
-GAMEL( 1991, segajw,  0,   segajw,  segajw, segajw_state,  0, ROT0, "Sega", "Joker's Wild (Rev. B)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_segajw )
+GAMEL( 1991, segajw, 0, segajw,  segajw, segajw_state, empty_init, ROT0, "Sega", "Joker's Wild (Rev. B)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_segajw )

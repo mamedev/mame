@@ -50,7 +50,7 @@ public:
 	DECLARE_READ8_MEMBER(keyb_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_DRIVER_INIT(pasopia);
+	void init_pasopia();
 	TIMER_CALLBACK_MEMBER(pio_timer);
 
 	void pasopia(machine_config &config);
@@ -268,7 +268,7 @@ static const z80_daisy_config pasopia_daisy[] =
 
 
 
-DRIVER_INIT_MEMBER(pasopia_state,pasopia)
+void pasopia_state::init_pasopia()
 {
 /*
 We preset all banks here, so that bankswitching will incur no speed penalty.
@@ -343,5 +343,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT     COMPANY      FULLNAME   FLAGS
-COMP( 1986, pasopia, 0,      0,       pasopia,   pasopia, pasopia_state, pasopia, "Toshiba",   "Pasopia", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME   FLAGS
+COMP( 1986, pasopia, 0,      0,      pasopia, pasopia, pasopia_state, init_pasopia, "Toshiba", "Pasopia", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

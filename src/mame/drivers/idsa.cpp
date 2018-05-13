@@ -344,7 +344,8 @@ MACHINE_CONFIG_START(idsa_state::idsa)
 
 	/* sound hardware */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("speech", SP0256, 3120000) // unknown variant
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.5)
 
@@ -394,5 +395,5 @@ ROM_START(bsktbllp)
 ROM_END
 
 
-GAME( 1985, v1,       0, idsa,     idsa, idsa_state, 0, ROT0, "IDSA", "V.1",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, bsktbllp, 0, bsktbllp, idsa, idsa_state, 0, ROT0, "IDSA", "Basket Ball", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, v1,       0, idsa,     idsa, idsa_state, empty_init, ROT0, "IDSA", "V.1",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, bsktbllp, 0, bsktbllp, idsa, idsa_state, empty_init, ROT0, "IDSA", "Basket Ball", MACHINE_IS_SKELETON_MECHANICAL )

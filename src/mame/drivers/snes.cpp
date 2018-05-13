@@ -1360,7 +1360,8 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	MCFG_SNESCTRL_GUNLATCH_CB(snes_console_state, gun_latch_cb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("spc700", SNES_SOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
@@ -1403,6 +1404,6 @@ ROM_END
  *
  *************************************/
 
-/*    YEAR  NAME       PARENT  COMPAT MACHINE    INPUT STATE                INIT  COMPANY     FULLNAME                                      FLAGS */
-CONS( 1989, snes,      0,      0,     snes,      snes, snes_console_state,  0,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 1991, snespal,   snes,   0,     snespal,   snes, snes_console_state,  0,    "Nintendo", "Super Nintendo Entertainment System (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS               INIT        COMPANY     FULLNAME                                      FLAGS */
+CONS( 1989, snes,    0,      0,      snes,    snes,  snes_console_state, empty_init, "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1991, snespal, snes,   0,      snespal, snes,  snes_console_state, empty_init, "Nintendo", "Super Nintendo Entertainment System (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -164,9 +164,9 @@ ROM_END
 
 ***************************************************************************/
 
-//     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT  STATE        INIT        COMPANY       FULLNAME
-COMP(  1987,    pc,         ibm5150,    0,      pccga,      0,     genpc_state, 0,          "<generic>",  "PC (CGA)",      0 )
-COMP(  1987,    pcega,      ibm5150,    0,      pcega,      0,     genpc_state, 0,          "<generic>",  "PC (EGA)",      0 )
-COMP ( 1987,    pcmda,      ibm5150,    0,      pcmda,      0,     genpc_state, 0,          "<generic>",  "PC (MDA)",      0 )
-COMP ( 1987,    pcherc,     ibm5150,    0,      pcherc,     0,     genpc_state, 0,          "<generic>",  "PC (Hercules)", 0 )
-COMP ( 1987,    pcvga,      ibm5150,    0,      pcvga,      0,     genpc_state, 0,          "<generic>",  "PC (VGA)",      0 )
+//    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME
+COMP( 1987, pc,     ibm5150, 0,      pccga,   0,     genpc_state, empty_init, "<generic>", "PC (CGA)",      0 )
+COMP( 1987, pcega,  ibm5150, 0,      pcega,   0,     genpc_state, empty_init, "<generic>", "PC (EGA)",      0 )
+COMP( 1987, pcmda,  ibm5150, 0,      pcmda,   0,     genpc_state, empty_init, "<generic>", "PC (MDA)",      0 )
+COMP( 1987, pcherc, ibm5150, 0,      pcherc,  0,     genpc_state, empty_init, "<generic>", "PC (Hercules)", 0 )
+COMP( 1987, pcvga,  ibm5150, 0,      pcvga,   0,     genpc_state, empty_init, "<generic>", "PC (VGA)",      0 )

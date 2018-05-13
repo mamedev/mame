@@ -501,7 +501,7 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900)
 	cgc7900_video(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, XTAL(28'480'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -590,5 +590,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT    COMPANY         FULLNAME    FLAGS */
-COMP( 1980, cgc7900,    0,      0,      cgc7900,    cgc7900, cgc7900_state, 0,      "Chromatics",   "CGC 7900", MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY       FULLNAME    FLAGS */
+COMP( 1980, cgc7900, 0,      0,      cgc7900, cgc7900, cgc7900_state, empty_init, "Chromatics", "CGC 7900", MACHINE_NOT_WORKING)

@@ -123,7 +123,7 @@ public:
 	}
 
 
-	DECLARE_DRIVER_INIT(silvmil);
+	void init_silvmil();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
@@ -433,15 +433,15 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 	MCFG_DECO_SPRITE_OFFSETS(5, 7)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* Verified */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(4'096'000)/4, PIN7_HIGH) /* Verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'096'000)/4, okim6295_device::PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -455,14 +455,14 @@ MACHINE_CONFIG_START(silvmil_state::puzzlove)
 	MCFG_DECO_SPRITE_BOOTLEG_TYPE(1)
 
 	MCFG_DEVICE_REMOVE("oki")
-	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH) /* Verified */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(silvmil_state::puzzlovek)
 	puzzlove(config);
 	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_YM2151_ADD("ymsnd", XTAL(15'000'000)/4) /* Verified */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(15'000'000)/4) /* Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -597,11 +597,11 @@ void silvmil_state::tumblepb_gfx1_rearrange()
 	}
 }
 
-DRIVER_INIT_MEMBER(silvmil_state,silvmil)
+void silvmil_state::init_silvmil()
 {
 	tumblepb_gfx1_rearrange();
 }
 
-GAME( 1995, silvmil,    0,        silvmil,   silvmil,   silvmil_state, silvmil, ROT270, "Para", "Silver Millennium", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, puzzlove,   0,        puzzlove,  puzzlove,  silvmil_state, silvmil, ROT0,   "Para", "PuzzLove", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, puzzlovek,  puzzlove, puzzlovek, puzzlovek, silvmil_state, silvmil, ROT0,   "Para", "PuzzLove (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, silvmil,    0,        silvmil,   silvmil,   silvmil_state, init_silvmil, ROT270, "Para", "Silver Millennium", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, puzzlove,   0,        puzzlove,  puzzlove,  silvmil_state, init_silvmil, ROT0,   "Para", "PuzzLove", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, puzzlovek,  puzzlove, puzzlovek, puzzlovek, silvmil_state, init_silvmil, ROT0,   "Para", "PuzzLove (Korea)", MACHINE_SUPPORTS_SAVE )

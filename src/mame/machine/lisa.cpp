@@ -901,7 +901,7 @@ void lisa_state::init_lisa1(void)
 }
 #endif
 
-DRIVER_INIT_MEMBER(lisa_state,lisa2)
+void lisa_state::init_lisa2()
 {
 	m_ram_ptr = memregion("maincpu")->base() + RAM_OFFSET;
 	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
@@ -914,7 +914,7 @@ DRIVER_INIT_MEMBER(lisa_state,lisa2)
 	m_bad_parity_table = std::make_unique<uint8_t[]>(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
-DRIVER_INIT_MEMBER(lisa_state,lisa210)
+void lisa_state::init_lisa210()
 {
 	m_ram_ptr = memregion("maincpu")->base() + RAM_OFFSET;
 	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
@@ -927,7 +927,7 @@ DRIVER_INIT_MEMBER(lisa_state,lisa210)
 	m_bad_parity_table = std::make_unique<uint8_t[]>(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
-DRIVER_INIT_MEMBER(lisa_state,mac_xl)
+void lisa_state::init_mac_xl()
 {
 	m_ram_ptr = memregion("maincpu")->base() + RAM_OFFSET;
 	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;

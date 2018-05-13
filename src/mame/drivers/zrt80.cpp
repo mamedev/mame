@@ -289,7 +289,7 @@ MACHINE_CONFIG_START(zrt80_state::zrt80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -317,5 +317,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT  COMPANY                       FULLNAME   FLAGS */
-COMP( 1982, zrt80,  0,       0,      zrt80,     zrt80, zrt80_state, 0,    "Digital Research Computers", "ZRT-80",  0)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                       FULLNAME   FLAGS */
+COMP( 1982, zrt80, 0,      0,      zrt80,   zrt80, zrt80_state, empty_init, "Digital Research Computers", "ZRT-80",  0)

@@ -72,7 +72,7 @@ public:
 		, m_crtc(*this, "crtc")
 	{ }
 
-	DECLARE_DRIVER_INIT(micral);
+	void init_micral();
 	DECLARE_MACHINE_RESET(micral);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
@@ -345,7 +345,7 @@ uint32_t micral_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-DRIVER_INIT_MEMBER( micral_state, micral )
+void micral_state::init_micral()
 {
 	//uint8_t *main = memregion("maincpu")->base();
 
@@ -429,5 +429,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT    CLASS          INIT     COMPANY     FULLNAME         FLAGS
-COMP( 1981, micral, 0,      0,      micral,    micral,  micral_state,  micral,  "Bull R2E", "Micral 80-22G", MACHINE_IS_SKELETON )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY     FULLNAME         FLAGS
+COMP( 1981, micral, 0,      0,      micral,  micral, micral_state, init_micral, "Bull R2E", "Micral 80-22G", MACHINE_IS_SKELETON )

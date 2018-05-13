@@ -51,8 +51,9 @@ MACHINE_CONFIG_START(msx_cart_sfg_device::device_add_mconfig)
 	// YM3012 (DAC)
 	// YM2148 (MKS)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_YM2151_ADD("ym2151", XTAL(3'579'545))  // The SFG01 uses a YM2151, the SFG05 uses a YM2164, input clock comes from the main cpu frequency
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))  // The SFG01 uses a YM2151, the SFG05 uses a YM2164, input clock comes from the main cpu frequency
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, msx_cart_sfg_device, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)

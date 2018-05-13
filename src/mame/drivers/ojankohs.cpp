@@ -740,7 +740,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankohs)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", YM2149, 12000000/6)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ojankohs_state, ojankohs_dipsw1_r))
@@ -780,7 +780,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
@@ -821,7 +821,7 @@ MACHINE_CONFIG_START(ojankohs_state::ccasino)
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ccasino)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
@@ -859,7 +859,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoc)
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
@@ -982,9 +982,9 @@ ROM_START( ojankoca )
 ROM_END
 
 
-GAME( 1986, ojankoc,  0,       ojankoc,  ojankoc,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ojankoca, ojankoc, ojankoc,  ojankoc,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ojankoy,  0,       ojankoy,  ojankoy,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Yakata (Japan)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ojanko2,  0,       ojankoy,  ojankoy,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Yakata 2bankan (Japan)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ccasino,  0,       ccasino,  ccasino,  ojankohs_state, 0, ROT0, "V-System Co.", "Chinese Casino [BET] (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ojankohs, 0,       ojankohs, ojankohs, ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko High School (Japan)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoc,  0,       ojankoc,  ojankoc,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoca, ojankoc, ojankoc,  ojankoc,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoy,  0,       ojankoy,  ojankoy,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Yakata (Japan)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ojanko2,  0,       ojankoy,  ojankoy,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Yakata 2bankan (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ccasino,  0,       ccasino,  ccasino,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Chinese Casino [BET] (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ojankohs, 0,       ojankohs, ojankohs, ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko High School (Japan)",            MACHINE_SUPPORTS_SAVE )

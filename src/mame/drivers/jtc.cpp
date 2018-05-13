@@ -734,12 +734,10 @@ MACHINE_CONFIG_START(jtc_state::basic)
 	MCFG_Z8_PORT_P3_WRITE_CB(WRITE8(*this, jtc_state, p3_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(1, "mono", 0.25);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD("cassette")
@@ -857,8 +855,8 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT    STATE          INIT  COMPANY             FULLNAME                    FLAGS */
-COMP( 1987, jtc,        0,       0,     jtc,    jtc,     jtc_state,     0,    "Jugend+Technik",   "CompJU+TEr",               MACHINE_NOT_WORKING )
-COMP( 1988, jtces88,    jtc,     0,     jtces88,jtc,     jtces88_state, 0,    "Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)", MACHINE_NOT_WORKING )
-COMP( 1989, jtces23,    jtc,     0,     jtces23,jtces23, jtces23_state, 0,    "Jugend+Technik",   "CompJU+TEr (ES 2.3)",      MACHINE_NOT_WORKING )
-COMP( 1990, jtces40,    jtc,     0,     jtces40,jtces40, jtces40_state, 0,    "Jugend+Technik",   "CompJU+TEr (ES 4.0)",      MACHINE_NOT_WORKING )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY           FULLNAME                    FLAGS */
+COMP( 1987, jtc,     0,      0,      jtc,     jtc,     jtc_state,     empty_init, "Jugend+Technik", "CompJU+TEr",               MACHINE_NOT_WORKING )
+COMP( 1988, jtces88, jtc,    0,      jtces88, jtc,     jtces88_state, empty_init, "Jugend+Technik", "CompJU+TEr (EMR-ES 1988)", MACHINE_NOT_WORKING )
+COMP( 1989, jtces23, jtc,    0,      jtces23, jtces23, jtces23_state, empty_init, "Jugend+Technik", "CompJU+TEr (ES 2.3)",      MACHINE_NOT_WORKING )
+COMP( 1990, jtces40, jtc,    0,      jtces40, jtces40, jtces40_state, empty_init, "Jugend+Technik", "CompJU+TEr (ES 4.0)",      MACHINE_NOT_WORKING )

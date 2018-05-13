@@ -698,23 +698,23 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(st0016_state,renju)
+void st0016_state::init_renju()
 {
 	m_maincpu->set_st0016_game_flag(0);
 }
 
-DRIVER_INIT_MEMBER(st0016_state,nratechu)
+void st0016_state::init_nratechu()
 {
 	m_maincpu->set_st0016_game_flag(1);
 }
 
-DRIVER_INIT_MEMBER(st0016_state,mayjinsn)
+void st0016_state::init_mayjinsn()
 {
 	m_maincpu->set_st0016_game_flag(4 /*| 0x80*/);
 	membank("bank2")->set_base(memregion("user1")->base());
 }
 
-DRIVER_INIT_MEMBER(st0016_state,mayjisn2)
+void st0016_state::init_mayjisn2()
 {
 	m_maincpu->set_st0016_game_flag(4);
 	membank("bank2")->set_base(memregion("user1")->base());
@@ -727,13 +727,13 @@ DRIVER_INIT_MEMBER(st0016_state,mayjisn2)
  *
  *************************************/
 
-GAME( 1994, renju,      0,      renju,    renju,    st0016_state, renju,    ROT0, "Visco",            "Renju Kizoku",             MACHINE_NO_COCKTAIL)
-GAME( 1996, nratechu,   0,      st0016,   nratechu, st0016_state, nratechu, ROT0, "Seta",             "Neratte Chu",              MACHINE_NO_COCKTAIL)
-GAME( 1994, mayjisn2,   0,      mayjinsn, mayjisn2, st0016_state, mayjisn2, ROT0, "Seta",             "Mayjinsen 2",              MACHINE_NO_COCKTAIL)
-GAME( 1995, koikois,    0,      st0016,   koikois,  st0016_state, renju,    ROT0, "Visco",            "Koi Koi Shimasho",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL)
-GAME( 2001, gostop,     0,      st0016,   gostop,   st0016_state, renju,    ROT0, "Visco",            "Kankoku Hanafuda Go-Stop", MACHINE_NO_COCKTAIL)
+GAME( 1994, renju,      0,      renju,    renju,    st0016_state, init_renju,    ROT0, "Visco",            "Renju Kizoku",             MACHINE_NO_COCKTAIL)
+GAME( 1996, nratechu,   0,      st0016,   nratechu, st0016_state, init_nratechu, ROT0, "Seta",             "Neratte Chu",              MACHINE_NO_COCKTAIL)
+GAME( 1994, mayjisn2,   0,      mayjinsn, mayjisn2, st0016_state, init_mayjisn2, ROT0, "Seta",             "Mayjinsen 2",              MACHINE_NO_COCKTAIL)
+GAME( 1995, koikois,    0,      st0016,   koikois,  st0016_state, init_renju,    ROT0, "Visco",            "Koi Koi Shimasho",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL)
+GAME( 2001, gostop,     0,      st0016,   gostop,   st0016_state, init_renju,    ROT0, "Visco",            "Kankoku Hanafuda Go-Stop", MACHINE_NO_COCKTAIL)
 
 /* Not working */
-GAME( 1994, mayjinsn,   0,      mayjinsn, st0016,   st0016_state, mayjinsn, ROT0, "Seta",             "Mayjinsen",           MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING|MACHINE_NO_COCKTAIL)
-GAME( 1994, dcrown,     0,      st0016,   renju,    st0016_state, renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 1)", MACHINE_NOT_WORKING|MACHINE_NO_COCKTAIL) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
-GAME( 1994, dcrowna,    dcrown, st0016,   renju,    st0016_state, renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 2)", MACHINE_NOT_WORKING|MACHINE_NO_COCKTAIL) // the Insert Coin text has been translated to English and no (c) is uploaded
+GAME( 1994, mayjinsn,   0,      mayjinsn, st0016,   st0016_state, init_mayjinsn, ROT0, "Seta",             "Mayjinsen",           MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING|MACHINE_NO_COCKTAIL)
+GAME( 1994, dcrown,     0,      st0016,   renju,    st0016_state, init_renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 1)", MACHINE_NOT_WORKING|MACHINE_NO_COCKTAIL) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
+GAME( 1994, dcrowna,    dcrown, st0016,   renju,    st0016_state, init_renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 2)", MACHINE_NOT_WORKING|MACHINE_NO_COCKTAIL) // the Insert Coin text has been translated to English and no (c) is uploaded

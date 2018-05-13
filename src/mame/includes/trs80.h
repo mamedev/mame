@@ -105,11 +105,11 @@ public:
 	DECLARE_WRITE8_MEMBER( trs80_gfxram_w );
 	DECLARE_READ8_MEMBER (trs80_wd179x_r);
 	DECLARE_READ8_MEMBER (cp500_a11_flipflop_toggle);
-	DECLARE_DRIVER_INIT(trs80m4);
-	DECLARE_DRIVER_INIT(trs80l2);
-	DECLARE_DRIVER_INIT(trs80m4p);
-	DECLARE_DRIVER_INIT(lnw80);
-	DECLARE_DRIVER_INIT(trs80);
+	void init_trs80m4();
+	void init_trs80l2();
+	void init_trs80m4p();
+	void init_lnw80();
+	void init_trs80();
 	INTERRUPT_GEN_MEMBER(trs80_rtc_interrupt);
 	INTERRUPT_GEN_MEMBER(trs80_fdc_interrupt);
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);

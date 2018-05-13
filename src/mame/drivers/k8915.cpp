@@ -29,7 +29,7 @@ public:
 	{ }
 
 	DECLARE_WRITE8_MEMBER(k8915_a8_w);
-	DECLARE_DRIVER_INIT(k8915);
+	void init_k8915();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void k8915(machine_config &config);
@@ -78,7 +78,7 @@ void k8915_state::machine_reset()
 	membank("boot")->set_entry(1);
 }
 
-DRIVER_INIT_MEMBER(k8915_state,k8915)
+void k8915_state::init_k8915()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
@@ -178,5 +178,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY     FULLNAME  FLAGS
-COMP( 1982, k8915,  0,      0,      k8915,   k8915, k8915_state, k8915, "Robotron", "K8915",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
+COMP( 1982, k8915,  0,      0,      k8915,   k8915, k8915_state, init_k8915, "Robotron", "K8915",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -722,6 +722,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   STATE         INIT  COMPANY                         FULLNAME            FLAGS
-COMP( 1983, comx35p,    0,      0,      pal,        comx35, comx35_state, 0,    "Comx World Operations Ltd",    "COMX 35 (PAL)",    MACHINE_IMPERFECT_SOUND )
-COMP( 1983, comx35n,    comx35p,0,      ntsc,       comx35, comx35_state, 0,    "Comx World Operations Ltd",    "COMX 35 (NTSC)",   MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                      FULLNAME          FLAGS
+COMP( 1983, comx35p, 0,       0,      pal,     comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (PAL)",  MACHINE_IMPERFECT_SOUND )
+COMP( 1983, comx35n, comx35p, 0,      ntsc,    comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (NTSC)", MACHINE_IMPERFECT_SOUND )

@@ -153,9 +153,9 @@ public:
 	DECLARE_WRITE16_MEMBER(pico_68k_io_write);
 	DECLARE_WRITE_LINE_MEMBER(sound_cause_irq);
 
-	DECLARE_DRIVER_INIT(pico);
-	DECLARE_DRIVER_INIT(picou);
-	DECLARE_DRIVER_INIT(picoj);
+	void init_pico();
+	void init_picou();
+	void init_picoj();
 	void pico_mem(address_map &map);
 };
 
@@ -404,7 +404,7 @@ MACHINE_CONFIG_START(pico_state::pico)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
 	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK*2)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq))
+	//MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq)) FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END
@@ -425,7 +425,7 @@ MACHINE_CONFIG_START(pico_state::picopal)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
 	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK*2)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq))
+	//MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq)) FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END
@@ -448,34 +448,34 @@ ROM_START( picoj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(pico_base_state, pico)
+void pico_base_state::init_pico()
 {
-	DRIVER_INIT_CALL(megadrie);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadrie();
+	init_mess_md_common();
 
 	m_version_hi_nibble = 0x60; // Export PAL
 }
 
-DRIVER_INIT_MEMBER(pico_base_state, picou)
+void pico_base_state::init_picou()
 {
-	DRIVER_INIT_CALL(megadriv);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadriv();
+	init_mess_md_common();
 
 	m_version_hi_nibble = 0x40; // Export NTSC
 }
 
-DRIVER_INIT_MEMBER(pico_base_state, picoj)
+void pico_base_state::init_picoj()
 {
-	DRIVER_INIT_CALL(megadrij);
-	DRIVER_INIT_CALL(mess_md_common);
+	init_megadrij();
+	init_mess_md_common();
 
 	m_version_hi_nibble = 0x00; // JPN NTSC
 }
 
 
-CONS( 1994, pico,       0,         0,      picopal,         pico, pico_state,   pico,    "Sega",   "Pico (Europe, PAL)", MACHINE_NOT_WORKING)
-CONS( 1994, picou,      pico,      0,      pico,            pico, pico_state,   picou,   "Sega",   "Pico (USA, NTSC)", MACHINE_NOT_WORKING)
-CONS( 1993, picoj,      pico,      0,      pico,            pico, pico_state,   picoj,   "Sega",   "Pico (Japan, NTSC)", MACHINE_NOT_WORKING)
+CONS( 1994, pico,  0,    0, picopal, pico, pico_state, init_pico,  "Sega", "Pico (Europe, PAL)", MACHINE_NOT_WORKING)
+CONS( 1994, picou, pico, 0, pico,    pico, pico_state, init_picou, "Sega", "Pico (USA, NTSC)", MACHINE_NOT_WORKING)
+CONS( 1993, picoj, pico, 0, pico,    pico, pico_state, init_picoj, "Sega", "Pico (Japan, NTSC)", MACHINE_NOT_WORKING)
 
 /*
 
@@ -620,7 +620,7 @@ MACHINE_CONFIG_START(copera_state::copera)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","copera")
 
 	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, copera_state,sound_cause_irq))
+	//MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, copera_state,sound_cause_irq)) FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END
@@ -632,4 +632,4 @@ ROM_START( copera )
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 ROM_END
 
-CONS( 1993, copera,       0,         0,      copera,         pico, copera_state,   picoj,    "Yamaha / Sega",   "Yamaha Mixt Book Player Copera", MACHINE_NOT_WORKING)
+CONS( 1993, copera, 0, 0, copera, pico, copera_state, init_picoj, "Yamaha / Sega", "Yamaha Mixt Book Player Copera", MACHINE_NOT_WORKING)

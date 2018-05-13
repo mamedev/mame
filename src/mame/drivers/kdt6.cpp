@@ -635,7 +635,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE("ctc2", z80ctc_device, trg2))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 1000) // frequency unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
@@ -750,5 +750,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  CLASS       INIT  COMPANY    FULLNAME  FLAGS
-COMP( 1984, psi98,  0,      0,       psi98,   psi98, kdt6_state, 0,    "Kontron", "PSI98",  0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY    FULLNAME  FLAGS
+COMP( 1984, psi98, 0,      0,      psi98,   psi98, kdt6_state, empty_init, "Kontron", "PSI98",  0 )

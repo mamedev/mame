@@ -146,7 +146,7 @@ MACHINE_CONFIG_START(gokidetor_state::gokidetor)
 	MCFG_PC060HA_MASTER_CPU("maincpu")
 	MCFG_PC060HA_SLAVE_CPU("soundcpu")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
@@ -156,7 +156,7 @@ MACHINE_CONFIG_START(gokidetor_state::gokidetor)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -289,5 +289,5 @@ ROM_START( gokidetor2 )
 	ROM_LOAD( "d33-06.pal20l8b.ic44.jed", 0x5000, 0xd01, CRC(a1400501) SHA1(0b86d09d3e12668eaaf2c4b5a2d2b676d2e599f7) )
 ROM_END
 
-GAME( 1992, gokidetor,          0, gokidetor, gokidetor, gokidetor_state, 0, ROT0, "Taito", "Gokidetor (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1992, gokidetor2, gokidetor, gokidetor, gokidetor, gokidetor_state, 0, ROT0, "Taito", "Gokidetor (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, gokidetor,          0, gokidetor, gokidetor, gokidetor_state, empty_init, ROT0, "Taito", "Gokidetor (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, gokidetor2, gokidetor, gokidetor, gokidetor, gokidetor_state, empty_init, ROT0, "Taito", "Gokidetor (set 2)", MACHINE_IS_SKELETON_MECHANICAL )

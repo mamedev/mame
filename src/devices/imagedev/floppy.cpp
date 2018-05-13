@@ -400,6 +400,31 @@ floppy_image_format_t *floppy_image_device::identify(std::string filename)
 	return best_format;
 }
 
+void floppy_image_device::init_floppy_load(bool write_supported)
+{
+	revolution_start_time = mon ? attotime::never : machine().time();
+	revolution_count = 0;
+
+	index_resync();
+
+	wpt = 1; // disk sleeve is covering the sensor
+	if (!cur_wpt_cb.isnull())
+		cur_wpt_cb(this, wpt);
+
+	wpt = is_readonly() || (!write_supported);
+	if (!cur_wpt_cb.isnull())
+		cur_wpt_cb(this, wpt);
+
+	if (motor_always_on) {
+		// When disk is inserted, start motor
+		mon_w(0);
+	} else if(!mon)
+		ready_counter = 2;
+
+	if (dskchg_writable)
+		dskchg = 1;
+}
+
 image_init_result floppy_image_device::call_load()
 {
 	io_generic io;
@@ -434,31 +459,12 @@ image_init_result floppy_image_device::call_load()
 	}
 	output_format = is_readonly() ? nullptr : best_format;
 
-	revolution_start_time = mon ? attotime::never : machine().time();
-	revolution_count = 0;
-
-	index_resync();
 	image_dirty = false;
 
-	wpt = 1; // disk sleeve is covering the sensor
-	if (!cur_wpt_cb.isnull())
-		cur_wpt_cb(this, wpt);
-
-	wpt = is_readonly() || (output_format == nullptr);
-	if (!cur_wpt_cb.isnull())
-		cur_wpt_cb(this, wpt);
+	init_floppy_load(output_format != nullptr);
 
 	if (!cur_load_cb.isnull())
 		return cur_load_cb(this);
-
-	if (motor_always_on) {
-		// When disk is inserted, start motor
-		mon_w(0);
-	} else if(!mon)
-		ready_counter = 2;
-
-	if (dskchg_writable)
-		dskchg = 1;
 
 	return image_init_result::PASS;
 }
@@ -519,9 +525,7 @@ image_init_result floppy_image_device::call_create(int format_type, util::option
 		return image_init_result::FAIL;
 	}
 
-	if (motor_always_on)
-		// When disk is inserted, start motor
-		mon_w(0);
+	init_floppy_load(output_format != nullptr);
 
 	return image_init_result::PASS;
 }
@@ -1361,11 +1365,11 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 #define FLOPSPK "flopsndout"
 
-MACHINE_CONFIG_START(floppy_image_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO(FLOPSPK)
-	MCFG_DEVICE_ADD(FLOPSND_TAG, FLOPPYSOUND, 44100)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, FLOPSPK, 0.5)
-MACHINE_CONFIG_END
+void floppy_image_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, FLOPSPK).front_center();
+	FLOPPYSOUND(config, FLOPSND_TAG, 44100).add_route(ALL_OUTPUTS, FLOPSPK, 0.5);
+}
 
 
 DEFINE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device, "flopsnd", "Floppy sound")
@@ -2355,4 +2359,3 @@ void ibm_6360::handled_variants(uint32_t *variants, int &var_count) const
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
 }
-

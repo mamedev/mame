@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(carpolo_state::carpolo)
 	MCFG_DEVICE_ADD("74148_3s", TTL74148, 0)
 	MCFG_74148_OUTPUT_CB(carpolo_state, ttl74148_3s_cb)
 
-	MCFG_TTL153_ADD("74153_1k")
+	MCFG_DEVICE_ADD("74153_1k", TTL153)
 	MCFG_TTL153_ZA_CB(WRITELINE(*this, carpolo_state, ls153_za_w)) // pia1 pb5
 	MCFG_TTL153_ZB_CB(WRITELINE(*this, carpolo_state, ls153_zb_w)) // pia1 pb4
 
@@ -346,17 +346,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(carpolo_state,carpolo)
+void carpolo_state::init_carpolo()
 {
-	size_t i, len;
-	uint8_t *ROM;
-
-
 	/* invert gfx PROM since the bits are active LO */
-	ROM = memregion("gfx2")->base();
-	len = memregion("gfx2")->bytes();
-	for (i = 0;i < len; i++)
+	uint8_t *ROM = memregion("gfx2")->base();
+	size_t len = memregion("gfx2")->bytes();
+	for (size_t i = 0; i < len; i++)
 		ROM[i] ^= 0x0f;
 }
 
-GAME( 1977, carpolo, 0, carpolo, carpolo, carpolo_state, carpolo, ROT0, "Exidy", "Car Polo", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+GAME( 1977, carpolo, 0, carpolo, carpolo, carpolo_state, init_carpolo, ROT0, "Exidy", "Car Polo", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )

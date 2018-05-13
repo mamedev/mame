@@ -793,7 +793,8 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, maygay1b_state, srsel_w)) // Srsel
 
 	MCFG_S16LF01_ADD("vfd",0)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("aysnd", YM2149, M1_MASTER_CLOCK)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, maygay1b_state, m1_meter_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, maygay1b_state, m1_lockout_w))
@@ -865,7 +866,7 @@ WRITE8_MEMBER(maygay1b_state::m1ab_no_oki_w)
 	popmessage("write to OKI, but no OKI rom");
 }
 
-DRIVER_INIT_MEMBER(maygay1b_state,m1common)
+void maygay1b_state::init_m1common()
 {
 	//Initialise paging for non-extended ROM space
 	uint8_t *rom = memregion("maincpu")->base();
@@ -900,14 +901,14 @@ DRIVER_INIT_MEMBER(maygay1b_state,m1common)
 }
 
 
-DRIVER_INIT_MEMBER(maygay1b_state,m1nec)
+void maygay1b_state::init_m1nec()
 {
-	DRIVER_INIT_CALL(m1common);
+	init_m1common();
 }
 
-DRIVER_INIT_MEMBER(maygay1b_state,m1)
+void maygay1b_state::init_m1()
 {
-	DRIVER_INIT_CALL(m1common);
+	init_m1common();
 
 	//AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
 	// if there is no OKI region disable writes here, the rom might be missing, so alert user

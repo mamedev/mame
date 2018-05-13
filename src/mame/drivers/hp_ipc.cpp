@@ -858,6 +858,6 @@ ROM_END
 
 #define rom_hp9808a rom_hp_ipc
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE        INPUT           STATE          INIT  COMPANY             FULLNAME  FLAGS
-COMP( 1985, hp_ipc,     0,       0,      hp_ipc,        hp_ipc,         hp_ipc_state,   0  , "Hewlett-Packard",  "Integral Personal Computer 9807A", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1985, hp9808a,    0,       0,      hp9808a,       hp_ipc,         hp_ipc_state,   0  , "Hewlett-Packard",  "Integral Personal Computer 9808A", MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME                            FLAGS
+COMP( 1985, hp_ipc,  0,      0,      hp_ipc,  hp_ipc, hp_ipc_state, empty_init, "Hewlett-Packard", "Integral Personal Computer 9807A", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1985, hp9808a, 0,      0,      hp9808a, hp_ipc, hp_ipc_state, empty_init, "Hewlett-Packard", "Integral Personal Computer 9808A", MACHINE_NOT_WORKING)

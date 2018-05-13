@@ -143,4 +143,4 @@ ROM_START( tv955 )
 	ROM_LOAD( "8049.kbd",            0x0000, 0x0800, CRC(bc86e349) SHA1(0b62003ab7931822f1bcac8370517c685849f62c) )
 ROM_END
 
-COMP( 1985, tv955, 0, 0, tv955, tv955, tv955_state, 0, "TeleVideo Systems", "TeleVideo 955", MACHINE_IS_SKELETON )
+COMP( 1985, tv955, 0, 0, tv955, tv955, tv955_state, empty_init, "TeleVideo Systems", "TeleVideo 955", MACHINE_IS_SKELETON )

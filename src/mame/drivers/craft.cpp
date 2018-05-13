@@ -62,7 +62,7 @@ public:
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_DRIVER_INIT(craft);
+	void init_craft();
 	virtual void machine_reset() override;
 	uint32_t screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
@@ -234,7 +234,7 @@ uint32_t craft_state::screen_update_craft(screen_device &screen, bitmap_rgb32 &b
 * Machine definition                                 *
 \****************************************************/
 
-DRIVER_INIT_MEMBER(craft_state,craft)
+void craft_state::init_craft()
 {
 }
 
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(craft_state::craft)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("avr8")
+	SPEAKER(config, "avr8").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "avr8", 0.25) // pd1/pd2/pd4/pd5/pd6/pd7 + 2k(x7) + 1k(x5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -276,5 +276,5 @@ ROM_START( craft )
 	ROM_LOAD( "eeprom.raw", 0x0000, 0x0200, CRC(e18a2af9) SHA1(81fc6f2d391edfd3244870214fac37929af0ac0c) )
 ROM_END
 
-/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT  STATE           INIT      COMPANY          FULLNAME */
-CONS(2008, craft,    0,        0,        craft,    craft, craft_state,    craft,    "Linus Akesson", "Craft", MACHINE_NOT_WORKING)
+/*   YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME */
+CONS(2008, craft, 0,      0,      craft,   craft, craft_state, init_craft, "Linus Akesson", "Craft", MACHINE_NOT_WORKING)

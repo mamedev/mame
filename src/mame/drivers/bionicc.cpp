@@ -421,13 +421,13 @@ MACHINE_CONFIG_START(bionicc_state::bionicc)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT_CLASS(2, bionicc_state, RRRRGGGGBBBBIIII)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181) / 4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181) / 4)
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 MACHINE_CONFIG_END
@@ -707,11 +707,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, bionicc,   0,       bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Bionic Commando (Euro)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bionicc1,  bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Bionic Commando (US set 1)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bionicc2,  bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Bionic Commando (US set 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, topsecrt,  bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "Capcom",  "Top Secret (Japan, old revision)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bioniccbl, bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "bootleg", "Bionic Commandos (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bioniccbl2,bionicc, bionicc, bionicc, bionicc_state, 0, ROT0, "bootleg", "Bionic Commandos (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bionicc,    0,       bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Bionic Commando (Euro)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bionicc1,   bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Bionic Commando (US set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bionicc2,   bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Bionic Commando (US set 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, topsecrt,   bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Top Secret (Japan, old revision)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bioniccbl,  bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "bootleg", "Bionic Commandos (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bioniccbl2, bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "bootleg", "Bionic Commandos (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 
 // there's also an undumped JP new revision on which there are no extra lives after 1 million points, plus other bug-fixes / changes

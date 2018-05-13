@@ -206,7 +206,7 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 
 	mpu4_common(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(820, 0, 0)
@@ -383,4 +383,4 @@ and reel assembly with this kit and a supplied monitor. This explains why the ca
 The original Deal 'Em ran on Summit Coin hardware, and was made by someone else.
 Two further different releases were made, running on the Barcrest MPU4 Video, rather than this one. These are Deal 'Em Again and Deal 'Em 2000*/
 
-GAME(  1987,v4dealem,   0,          dealem,     dealem, mpu4dealem_state,      0,          ROT0, "Zenitone","Deal 'Em (MPU4 Conversion Kit, v7.0)",MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, v4dealem, 0, dealem, dealem, mpu4dealem_state, empty_init, ROT0, "Zenitone","Deal 'Em (MPU4 Conversion Kit, v7.0)",MACHINE_IMPERFECT_GRAPHICS )

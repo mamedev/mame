@@ -2336,79 +2336,79 @@ ROM_START( horizon )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(m62_state,battroad)
+void m62_state::init_battroad()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
-DRIVER_INIT_MEMBER(m62_state,ldrun2)
+void m62_state::init_ldrun2()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
-DRIVER_INIT_MEMBER(m62_state,ldrun4)
+void m62_state::init_ldrun4()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-DRIVER_INIT_MEMBER(m62_state,kidniki)
+void m62_state::init_kidniki()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
-DRIVER_INIT_MEMBER(m62_state,spelunkr)
+void m62_state::init_spelunkr()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
-DRIVER_INIT_MEMBER(m62_state,spelunk2)
+void m62_state::init_spelunk2()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(0,  4, memregion("maincpu")->base() + 0x20000, 0x1000);
 	membank("bank2")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
 }
 
-DRIVER_INIT_MEMBER(m62_state,youjyudn)
+void m62_state::init_youjyudn()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-GAME( 1984, kungfum,  0,        kungfum,  kungfum,  m62_state, 0,        ROT0,   "Irem", "Kung-Fu Master (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1984, kungfumd, kungfum,  kungfum,  kungfum,  m62_state, 0,        ROT0,   "Irem (Data East USA license)", "Kung-Fu Master (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1984, spartanx, kungfum,  kungfum,  kungfum,  m62_state, 0,        ROT0,   "Irem", "Spartan X (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1984, kungfub,  kungfum,  kungfum,  kungfum,  m62_state, 0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1984, kungfub2, kungfum,  kungfum,  kungfum,  m62_state, 0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, kungfum,  0,        kungfum,  kungfum,  m62_state, empty_init,    ROT0,   "Irem", "Kung-Fu Master (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, kungfumd, kungfum,  kungfum,  kungfum,  m62_state, empty_init,    ROT0,   "Irem (Data East USA license)", "Kung-Fu Master (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, spartanx, kungfum,  kungfum,  kungfum,  m62_state, empty_init,    ROT0,   "Irem", "Spartan X (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, kungfub,  kungfum,  kungfum,  kungfum,  m62_state, empty_init,    ROT0,   "bootleg", "Kung-Fu Master (bootleg set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, kungfub2, kungfum,  kungfum,  kungfum,  m62_state, empty_init,    ROT0,   "bootleg", "Kung-Fu Master (bootleg set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1984, battroad, 0,        battroad, battroad, m62_state, battroad, ROT90,  "Irem", "The Battle-Road", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, battroad, 0,        battroad, battroad, m62_state, init_battroad, ROT90,  "Irem", "The Battle-Road", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1984, ldrun,    0,        ldrun,    ldrun,    m62_state, 0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1984, ldruna,   ldrun,    ldrun,    ldrun,    m62_state, 0,        ROT0,   "Irem (licensed from Broderbund, Digital Controls Inc. license)", "Lode Runner (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, ldrun,    0,        ldrun,    ldrun,    m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, ldruna,   ldrun,    ldrun,    ldrun,    m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund, Digital Controls Inc. license)", "Lode Runner (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1984, ldrun2,   0,        ldrun2,   ldrun2,   m62_state, ldrun2,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner II - The Bungeling Strikes Back", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Japanese version is called Bangeringu Teikoku No Gyakushuu */
+GAME( 1984, ldrun2,   0,        ldrun2,   ldrun2,   m62_state, init_ldrun2,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner II - The Bungeling Strikes Back", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Japanese version is called Bangeringu Teikoku No Gyakushuu */
 
-GAME( 1985, ldrun3,   0,        ldrun3,   ldrun3,   m62_state, 0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - The Golden Labyrinth", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1985, ldrun3j,  ldrun3,   ldrun3,   ldrun3,   m62_state, 0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - Majin No Fukkatsu (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, ldrun3,   0,        ldrun3,   ldrun3,   m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - The Golden Labyrinth", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, ldrun3j,  ldrun3,   ldrun3,   ldrun3,   m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - Majin No Fukkatsu (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1986, ldrun4,   0,        ldrun4,   ldrun4,   m62_state, ldrun4,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner IV - Teikoku Karano Dasshutsu (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, ldrun4,   0,        ldrun4,   ldrun4,   m62_state, init_ldrun4,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner IV - Teikoku Karano Dasshutsu (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1985, lotlot,   0,        lotlot,   lotlot,   m62_state, 0,        ROT0,   "Irem (licensed from Tokuma Shoten)", "Lot Lot", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, lotlot,   0,        lotlot,   lotlot,   m62_state, empty_init,    ROT0,   "Irem (licensed from Tokuma Shoten)", "Lot Lot", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1986, kidniki,  0,        kidniki,  kidniki,  m62_state, kidniki,  ROT0,   "Irem", "Kid Niki - Radical Ninja (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1986, kidnikiu, kidniki,  kidniki,  kidniki,  m62_state, kidniki,  ROT0,   "Irem (Data East USA license)", "Kid Niki - Radical Ninja (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1986, yanchamr, kidniki,  kidniki,  kidniki,  m62_state, kidniki,  ROT0,   "Irem", "Kaiketsu Yanchamaru (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, lithero,  kidniki,  kidniki,  kidniki,  m62_state, kidniki,  ROT0,   "bootleg", "Little Hero", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, kidniki,  0,        kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "Irem", "Kid Niki - Radical Ninja (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, kidnikiu, kidniki,  kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "Irem (Data East USA license)", "Kid Niki - Radical Ninja (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, yanchamr, kidniki,  kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "Irem", "Kaiketsu Yanchamaru (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, lithero,  kidniki,  kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "bootleg", "Little Hero", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1985, spelunkr, 0,        spelunkr, spelunkr, m62_state, spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1985, spelunkrj,spelunkr, spelunkr, spelunkr, m62_state, spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, spelunkr, 0,        spelunkr, spelunkr, m62_state, init_spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, spelunkrj,spelunkr, spelunkr, spelunkr, m62_state, init_spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1986, spelunk2, 0,        spelunk2, spelunk2, m62_state, spelunk2, ROT0,   "Irem (licensed from Broderbund)", "Spelunker II - 23 no Kagi (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, spelunk2, 0,        spelunk2, spelunk2, m62_state, init_spelunk2, ROT0,   "Irem (licensed from Broderbund)", "Spelunker II - 23 no Kagi (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1986, youjyudn, 0,        youjyudn, youjyudn, m62_state, youjyudn, ROT270, "Irem", "Youjyuden (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, youjyudn, 0,        youjyudn, youjyudn, m62_state, init_youjyudn, ROT270, "Irem", "Youjyuden (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1985, horizon,  0,        horizon,  horizon,  m62_state, 0,        ROT0,   "Irem", "Horizon (Irem)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, horizon,  0,        horizon,  horizon,  m62_state, empty_init,    ROT0,   "Irem", "Horizon (Irem)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

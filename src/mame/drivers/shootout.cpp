@@ -299,7 +299,7 @@ MACHINE_CONFIG_START(shootout_state::shootout)
 	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -329,7 +329,7 @@ MACHINE_CONFIG_START(shootout_state::shootouj)
 	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -433,12 +433,12 @@ ROM_START( shootoutb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(shootout_state,shootout)
+void shootout_state::init_shootout()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x8000, 0x4000);
 }
 
 
-GAME( 1985, shootout,  0,        shootout, shootout, shootout_state, shootout, ROT0, "Data East USA",         "Shoot Out (US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shootoutj, shootout, shootouj, shootouj, shootout_state, shootout, ROT0, "Data East Corporation", "Shoot Out (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shootoutb, shootout, shootouk, shootout, shootout_state, shootout, ROT0, "bootleg",               "Shoot Out (Korean Bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shootout,  0,        shootout, shootout, shootout_state, init_shootout, ROT0, "Data East USA",         "Shoot Out (US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shootoutj, shootout, shootouj, shootouj, shootout_state, init_shootout, ROT0, "Data East Corporation", "Shoot Out (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shootoutb, shootout, shootouk, shootout, shootout_state, init_shootout, ROT0, "bootleg",               "Shoot Out (Korean Bootleg)", MACHINE_SUPPORTS_SAVE )

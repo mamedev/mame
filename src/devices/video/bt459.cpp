@@ -22,7 +22,7 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(BT459, bt459_device, "bt459", "Brooktree 150MHz Monolithic CMOS 256x24 Color Palette RAMDAC")
+DEFINE_DEVICE_TYPE(BT459, bt459_device, "bt459", "Brooktree Bt459 256 Color RAMDAC")
 
 void bt459_device::map(address_map &map)
 {
@@ -33,8 +33,8 @@ void bt459_device::map(address_map &map)
 }
 
 bt459_device::bt459_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BT459, tag, owner, clock),
-	device_palette_interface(mconfig, *this)
+	: device_t(mconfig, BT459, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
 {
 }
 
@@ -255,7 +255,9 @@ READ8_MEMBER(bt459_device::register_r)
 	}
 
 	// increment address register and return result
-	m_address = (m_address + 1) & ADDRESS_MASK;
+	if (!machine().side_effects_disabled())
+		m_address = (m_address + 1) & ADDRESS_MASK;
+
 	return result;
 }
 

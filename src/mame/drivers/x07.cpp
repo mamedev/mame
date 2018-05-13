@@ -1501,11 +1501,9 @@ MACHINE_CONFIG_START(x07_state::x07)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x07)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.50 )
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 0).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
@@ -1555,7 +1553,7 @@ ROM_START( x07 )
 	ROM_REGION( 0x0800, "default", ROMREGION_ERASE00 )
 ROM_END
 
-DRIVER_INIT_MEMBER(x07_state, x07)
+void x07_state::init_x07()
 {
 	uint8_t *RAM = memregion("default")->base();
 	uint8_t *GFX = memregion("gfx1")->base();
@@ -1571,5 +1569,5 @@ DRIVER_INIT_MEMBER(x07_state, x07)
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                COMPANY   FULLNAME    FLAGS */
-COMP( 1983, x07,    0,      0,       x07,       x07,     x07_state,   x07,   "Canon",  "X-07",     MACHINE_SUPPORTS_SAVE)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT      COMPANY  FULLNAME  FLAGS */
+COMP( 1983, x07,  0,      0,      x07,     x07,   x07_state, init_x07, "Canon", "X-07",   MACHINE_SUPPORTS_SAVE)

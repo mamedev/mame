@@ -18,7 +18,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "machine/seicop.h"
+#include "machine/seicopbl.h"
 #include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
@@ -325,7 +325,7 @@ void seicupbl_state::cupsocbl_mem(address_map &map)
 {
 //  AM_IMPORT_FROM( legionna_cop_mem )
 	map(0x000000, 0x0fffff).rom();
-	map(0x100400, 0x1005ff).rw("seibucop_boot", FUNC(seibu_cop_bootleg_device::copdxbl_0_r), FUNC(seibu_cop_bootleg_device::copdxbl_0_w)).share("cop_mcu_ram");
+	map(0x100400, 0x1005ff).rw("seibucop_boot", FUNC(seibu_cop_bootleg_device::read), FUNC(seibu_cop_bootleg_device::write));
 	map(0x100660, 0x10066f).ram().share("vregs");
 	map(0x100700, 0x100701).portr("DSW1");
 	map(0x100704, 0x100705).portr("PLAYERS12");
@@ -573,12 +573,12 @@ MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
 //  MCFG_VIDEO_START_OVERRIDE(seicupbl_state,cupsoc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -807,6 +807,6 @@ ROM_START( cupsocsb3 )
 ROM_END
 
 
-GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc, seicupbl_state,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocsb2,cupsoc,   cupsocbl, cupsoc, seicupbl_state,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocsb3,cupsoc,   cupsocbl, cupsoc, seicupbl_state,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb2,cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb3,cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

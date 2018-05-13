@@ -181,7 +181,7 @@ MACHINE_CONFIG_START(tourtabl_state::tourtabl)
 	MCFG_SCREEN_PALETTE("tia_video:palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK/114)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -210,5 +210,5 @@ ROM_START( tourtab2 )
 ROM_END
 
 
-GAME( 1978, tourtabl, 0,        tourtabl, tourtabl, tourtabl_state, 0, ROT0, "Atari", "Tournament Table (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1978, tourtab2, tourtabl, tourtabl, tourtabl, tourtabl_state, 0, ROT0, "Atari", "Tournament Table (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, tourtabl, 0,        tourtabl, tourtabl, tourtabl_state, empty_init, ROT0, "Atari", "Tournament Table (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, tourtab2, tourtabl, tourtabl, tourtabl, tourtabl_state, empty_init, ROT0, "Atari", "Tournament Table (set 2)", MACHINE_SUPPORTS_SAVE )

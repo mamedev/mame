@@ -449,12 +449,12 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	MCFG_MCS48_PORT_T0_IN_CB(READ8(*this, hp9k3xx_state, iocpu_test0_r))
 
 	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL(15'920'000)/2)
-	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
+	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_46021a")
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76494_TAG, SN76494, SN76494_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
@@ -504,12 +504,12 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	MCFG_MCS48_PORT_T0_IN_CB(READ8(*this, hp9k3xx_state, iocpu_test0_r))
 
 	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL(15'920'000)/2)
-	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
+	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_46021a")
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76494_TAG, SN76494, SN76494_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
@@ -566,12 +566,12 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k332)
 	MCFG_MCS48_PORT_T0_IN_CB(READ8(*this, hp9k3xx_state, iocpu_test0_r))
 
 	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL(15'920'000)/2)
-	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
+	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_46021a")
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76494_TAG, SN76494, SN76494_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
@@ -717,12 +717,12 @@ ROM_START( hp9k382 )
 	ROM_LOAD( "1818-5282_8ce61e951207_28c64.bin", 0x000000, 0x002000, CRC(740442f3) SHA1(ab65bd4eec1024afb97fc2dd3bd3f017e90f49ae) )
 ROM_END
 
-/*    YEAR  NAME    PARENT   COMPAT  MACHINE   INPUT    STATE       INIT  COMPANY            FULLNAME      FLAGS */
-COMP( 1985, hp9k310, 0,      0,      hp9k310,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/310", MACHINE_NOT_WORKING)
-COMP( 1985, hp9k320, 0,      0,      hp9k320,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/320", MACHINE_NOT_WORKING)
-COMP( 1987, hp9k330, 0,      0,      hp9k330,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/330", MACHINE_NOT_WORKING)
-COMP( 1987, hp9k332, 0,      0,      hp9k332,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/332", MACHINE_NOT_WORKING)
-COMP( 1989, hp9k340, hp9k330,0,      hp9k340,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/340", MACHINE_NOT_WORKING)
-COMP( 1988, hp9k370, hp9k330,0,      hp9k370,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/370", MACHINE_NOT_WORKING)
-COMP( 1991, hp9k380, 0,      0,      hp9k380,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/380", MACHINE_NOT_WORKING)
-COMP( 1991, hp9k382, 0,      0,      hp9k382,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/382", MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY            FULLNAME      FLAGS */
+COMP( 1985, hp9k310, 0,       0,      hp9k310, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/310", MACHINE_NOT_WORKING)
+COMP( 1985, hp9k320, 0,       0,      hp9k320, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/320", MACHINE_NOT_WORKING)
+COMP( 1987, hp9k330, 0,       0,      hp9k330, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/330", MACHINE_NOT_WORKING)
+COMP( 1987, hp9k332, 0,       0,      hp9k332, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/332", MACHINE_NOT_WORKING)
+COMP( 1989, hp9k340, hp9k330, 0,      hp9k340, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/340", MACHINE_NOT_WORKING)
+COMP( 1988, hp9k370, hp9k330, 0,      hp9k370, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/370", MACHINE_NOT_WORKING)
+COMP( 1991, hp9k380, 0,       0,      hp9k380, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/380", MACHINE_NOT_WORKING)
+COMP( 1991, hp9k382, 0,       0,      hp9k382, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/382", MACHINE_NOT_WORKING)

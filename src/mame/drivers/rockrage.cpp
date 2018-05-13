@@ -287,11 +287,12 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 	MCFG_PALETTE_INIT_OWNER(rockrage_state, rockrage)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
@@ -394,6 +395,6 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1986, rockrage,  0,        rockrage, rockrage, rockrage_state, 0,   ROT0,   "Konami", "Rock'n Rage (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rockragea, rockrage, rockrage, rockrage, rockrage_state, 0,   ROT0,   "Konami", "Rock'n Rage (prototype?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rockragej, rockrage, rockrage, rockrage, rockrage_state, 0,   ROT0,   "Konami", "Koi no Hotrock (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockrage,  0,        rockrage, rockrage, rockrage_state, empty_init, ROT0, "Konami", "Rock'n Rage (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockragea, rockrage, rockrage, rockrage, rockrage_state, empty_init, ROT0, "Konami", "Rock'n Rage (prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockragej, rockrage, rockrage, rockrage, rockrage_state, empty_init, ROT0, "Konami", "Koi no Hotrock (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -248,7 +248,7 @@ static discrete_mixer_desc quantum_mixer = {
 		1.0                         /* gain */
 };
 
-static DISCRETE_SOUND_START(quantum)
+static DISCRETE_SOUND_START(quantum_discrete)
 
 	/************************************************/
 	/* FINAL MIX                                    */
@@ -295,7 +295,7 @@ MACHINE_CONFIG_START(quantum_state::quantum)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, 600000)
 	MCFG_POKEY_POT0_R_CB(READ8(*this, quantum_state, input_1_r))
@@ -321,9 +321,7 @@ MACHINE_CONFIG_START(quantum_state::quantum)
 	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
 	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 1)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(quantum)
-
+	MCFG_DEVICE_ADD("discrete", DISCRETE, quantum_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -405,6 +403,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, quantum,  0,       quantum, quantum, quantum_state, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, quantum1, quantum, quantum, quantum, quantum_state, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, quantump, quantum, quantum, quantum, quantum_state, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, quantum,  0,       quantum, quantum, quantum_state, empty_init, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, quantum1, quantum, quantum, quantum, quantum_state, empty_init, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, quantump, quantum, quantum, quantum, quantum_state, empty_init, ROT270, "General Computer Corporation (Atari license)", "Quantum (prototype)", MACHINE_SUPPORTS_SAVE )

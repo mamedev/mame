@@ -214,11 +214,12 @@ MACHINE_CONFIG_START(ajax_state::ajax)
 	MCFG_K051316_CB(ajax_state, zoom_callback)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -380,6 +381,6 @@ ROM_START( ajaxj )
 ROM_END
 
 
-GAME( 1987, ajax,    0,    ajax, ajax, ajax_state, 0, ROT90, "Konami", "Ajax", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, typhoon, ajax, ajax, ajax, ajax_state, 0, ROT90, "Konami", "Typhoon", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ajaxj,   ajax, ajax, ajax, ajax_state, 0, ROT90, "Konami", "Ajax (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ajax,    0,    ajax, ajax, ajax_state, empty_init, ROT90, "Konami", "Ajax", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, typhoon, ajax, ajax, ajax, ajax_state, empty_init, ROT90, "Konami", "Typhoon", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ajaxj,   ajax, ajax, ajax, ajax_state, empty_init, ROT90, "Konami", "Ajax (Japan)", MACHINE_SUPPORTS_SAVE )

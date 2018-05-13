@@ -186,7 +186,7 @@ MACHINE_CONFIG_START(higemaru_state::higemaru)
 	MCFG_PALETTE_INIT_OWNER(higemaru_state, higemaru)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -224,4 +224,4 @@ ROM_START( higemaru )
 ROM_END
 
 
-GAME( 1984, higemaru, 0, higemaru, higemaru, higemaru_state, 0, ROT0, "Capcom", "Pirate Ship Higemaru", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, higemaru, 0, higemaru, higemaru, higemaru_state, empty_init, ROT0, "Capcom", "Pirate Ship Higemaru", MACHINE_SUPPORTS_SAVE )

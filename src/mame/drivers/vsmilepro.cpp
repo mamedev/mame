@@ -69,5 +69,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT COMPANY   FULLNAME       FLAGS
-COMP( 2007, vsmilpro, 0,      0,      vsmilpro, vsmilpro, vsmilpro_state, 0,    "VTech", "V.Smile Pro", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME       FLAGS
+COMP( 2007, vsmilpro, 0,      0,      vsmilpro, vsmilpro, vsmilpro_state, empty_init, "VTech", "V.Smile Pro", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

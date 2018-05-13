@@ -789,9 +789,8 @@ MACHINE_CONFIG_START(oric_state::oric)
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	MCFG_DEVICE_ADD("ay8912", AY8912, XTAL(12'000'000)/12)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(4700, 4700, 4700)
@@ -961,9 +960,9 @@ ROM_START(prav8dd)
 ROM_END
 
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE     INPUT     STATE            INIT  COMPANY      FULLNAME                 FLAGS
-COMP( 1983, oric1,     0,      0,      oric,       oric,     oric_state,      0,    "Tangerine", "Oric 1" ,               0 )
-COMP( 1984, orica,     oric1,  0,      oric,       orica,    oric_state,      0,    "Tangerine", "Oric Atmos" ,           0 )
-COMP( 1985, prav8d,    oric1,  0,      prav8d,     prav8d,   oric_state,      0,    "Pravetz",   "Pravetz 8D",            0 )
-COMP( 1989, prav8dd,   oric1,  0,      prav8d,     prav8d,   oric_state,      0,    "Pravetz",   "Pravetz 8D (Disk ROM)", MACHINE_UNOFFICIAL )
-COMP( 1986, telstrat,  oric1,  0,      telstrat,   telstrat, telestrat_state, 0,    "Tangerine", "Oric Telestrat",        0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY      FULLNAME                 FLAGS
+COMP( 1983, oric1,    0,      0,      oric,     oric,     oric_state,      empty_init, "Tangerine", "Oric 1" ,               0 )
+COMP( 1984, orica,    oric1,  0,      oric,     orica,    oric_state,      empty_init, "Tangerine", "Oric Atmos" ,           0 )
+COMP( 1985, prav8d,   oric1,  0,      prav8d,   prav8d,   oric_state,      empty_init, "Pravetz",   "Pravetz 8D",            0 )
+COMP( 1989, prav8dd,  oric1,  0,      prav8d,   prav8d,   oric_state,      empty_init, "Pravetz",   "Pravetz 8D (Disk ROM)", MACHINE_UNOFFICIAL )
+COMP( 1986, telstrat, oric1,  0,      telstrat, telstrat, telestrat_state, empty_init, "Tangerine", "Oric Telestrat",        0 )

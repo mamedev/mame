@@ -450,7 +450,7 @@ protected:
 	address_space *     m_program;
 	address_space *     m_data;
 	address_space *     m_io;
-	direct_read_data<-2> *m_direct;
+	memory_access_cache<2, -2, ENDIANNESS_LITTLE> *m_cache;
 
 	// tables
 	uint8_t               m_condition_table[0x1000];

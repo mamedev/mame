@@ -380,5 +380,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT           INIT  COMPANY                     FULLNAME                                        FLAGS */
-COMP( 1983, amu880, 0,      0,      amu880, amu880, amu880_state,  0,    "Militaerverlag der DDR",   "Ausbaufaehiger Mikrocomputer mit dem U 880",   MACHINE_NO_SOUND )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT        COMPANY                   FULLNAME                                      FLAGS */
+COMP( 1983, amu880, 0,      0,      amu880, amu880, amu880_state, empty_init, "Militaerverlag der DDR", "Ausbaufaehiger Mikrocomputer mit dem U 880", MACHINE_NO_SOUND )

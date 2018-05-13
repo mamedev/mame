@@ -660,4 +660,4 @@ ROM_START( gimix )
 		ROM_LOAD( "gimixhd.h11",  0x000000, 0x001000, CRC(35c12201) SHA1(51ac9052f9757d79c7f5bd3aa5d8421e98cfcc37) )
 ROM_END
 
-COMP( 1980, gimix,    0,      0,      gimix,        gimix, gimix_state, 0,      "Gimix",  "Gimix 6809 System",  MACHINE_IS_SKELETON )
+COMP( 1980, gimix, 0, 0, gimix, gimix, gimix_state, empty_init, "Gimix", "Gimix 6809 System", MACHINE_IS_SKELETON )

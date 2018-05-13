@@ -2258,7 +2258,8 @@ void pc9801_state::cdrom_headphones(device_t *device)
 }
 
 MACHINE_CONFIG_START(pc9801_state::pc9801_ide)
-	MCFG_SPEAKER_STANDARD_STEREO("lheadphone", "rheadphone")
+	SPEAKER(config, "lheadphone").front_left();
+	SPEAKER(config, "rheadphone").front_right();
 	MCFG_ATA_INTERFACE_ADD("ide1", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("ideirq", input_merger_device, in_w<0>))
 	MCFG_ATA_INTERFACE_ADD("ide2", pc9801_atapi_devices, "pc9801_cd", nullptr, false)
@@ -2347,7 +2348,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
@@ -2692,7 +2693,7 @@ ROM_START( pc9801vm )
 
 	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF )
 	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
-	
+
 //	LOAD_KANJI_ROMS
 //  LOAD_IDE_ROM
 ROM_END
@@ -2914,15 +2915,14 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
+void pc9801_state::init_pc9801_kanji()
 {
 	#define copy_kanji_strip(_dst,_src,_fill_type) \
-	for(i=_dst,k=_src;i<_dst+0x20;i++,k++) \
+	for (uint32_t i = _dst, k = _src; i < _dst + 0x20; i++, k++) \
 	{ \
-		for(j=0;j<0x20;j++) \
+		for (uint32_t j = 0; j < 0x20; j++) \
 			kanji[j+(i << 5)] = _fill_type ? new_chargen[j+(k << 5)] : 0; \
 	}
-	uint32_t i,j,k;
 	uint32_t pcg_tile;
 	uint8_t *kanji = memregion("kanji")->base();
 	uint8_t *raw_kanji = memregion("raw_kanji")->base();
@@ -2931,9 +2931,9 @@ DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
 
 	/* Convert the ROM bitswap here from the original structure */
 	/* TODO: kanji bitswap should be completely wrong, will check it out once that a dump is remade. */
-	for(i=0;i<0x80000/0x20;i++)
+	for (uint32_t i = 0; i < 0x80000 / 0x20; i++)
 	{
-		for(j=0;j<0x20;j++)
+		for (uint32_t j = 0; j < 0x20; j++)
 		{
 			pcg_tile = bitswap<16>(i,15,14,13,12,11,7,6,5,10,9,8,4,3,2,1,0) << 5;
 			kanji[j+(i << 5)] = raw_kanji[j+pcg_tile];
@@ -2941,12 +2941,12 @@ DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
 	}
 
 	/* convert charset into even/odd structure */
-	for(i=0;i<0x80000/0x20;i++)
+	for (uint32_t i = 0; i < 0x80000 / 0x20; i++)
 	{
-		for(j=0;j<0x10;j++)
+		for (uint32_t j = 0; j < 0x10; j++)
 		{
-			new_chargen[j*2+(i << 5)] = chargen[j+(i<<5)];
-			new_chargen[j*2+(i << 5)+1] = chargen[j+(i<<5)+0x10];
+			new_chargen[j*2 + (i << 5)] = chargen[j + (i << 5)];
+			new_chargen[j*2 + (i << 5) + 1] = chargen[j + (i << 5) + 0x10];
 		}
 	}
 
@@ -2974,21 +2974,21 @@ DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
 }
 
 /* Genuine dumps */
-COMP( 1983, pc9801f,   0,        0,     pc9801,    pc9801,   pc9801_state, pc9801_kanji, "NEC",   "PC-9801F",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1985, pc9801vm,  pc9801ux, 0,     pc9801vm,  pc9801rs, pc9801_state, pc9801_kanji, "NEC",   "PC-9801VM",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1983, pc9801f,    0,        0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji, "NEC",   "PC-9801F",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1985, pc9801vm,   pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 /* TODO: ANYTHING below there needs REDUMPING! */
-COMP( 1989, pc9801rs,  0,        0,     pc9801rs,  pc9801rs, pc9801_state, pc9801_kanji, "NEC",   "PC-9801RS",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) //TODO: not sure about the exact model
-COMP( 1985, pc9801vm11,  pc9801ux, 0,   pc9801vm,  pc9801rs, pc9801_state, pc9801_kanji, "NEC",   "PC-9801VM11",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1987, pc9801ux,  0,        0,     pc9801ux,  pc9801rs, pc9801_state, pc9801_kanji, "NEC",   "PC-9801UX",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1988, pc9801rx,  pc9801rs, 0,     pc9801rs,  pc9801rs, pc9801_state, pc9801_kanji, "NEC",   "PC-9801RX",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1993, pc9801bx2, pc9801rs, 0,     pc9801bx2, pc9801rs, pc9801_state, pc9801_kanji, "NEC",   "PC-9801BX2/U2",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1994, pc9821,    0,        0,     pc9821,    pc9821,   pc9801_state, pc9801_kanji, "NEC",   "PC-9821 (98MATE)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) //TODO: not sure about the exact model
-COMP( 1993, pc9821as,  pc9821,   0,     pc9821,    pc9821,   pc9801_state, pc9801_kanji, "NEC",   "PC-9821 (98MATE A)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1993, pc9821ap2, pc9821,   0,     pc9821ap2, pc9821,   pc9801_state, pc9801_kanji, "NEC",   "PC-9821AP2/U8W (98MATE A)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1994, pc9821xs,  pc9821,   0,     pc9821,    pc9821,   pc9801_state, pc9801_kanji, "NEC",   "PC-9821 (98MATE Xs)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1994, pc9821ce2, pc9821,   0,     pc9821,    pc9821,   pc9801_state, pc9801_kanji, "NEC",   "PC-9821 (98MULTi Ce2)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1994, pc9821ne,  pc9821,   0,     pc9821,    pc9821,   pc9801_state, pc9801_kanji, "NEC",   "PC-9821 (98NOTE)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1994, pc486mu,   pc9821,   0,     pc9821,    pc9821,   pc9801_state, pc9801_kanji, "Epson", "PC-486MU",                       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1998, pc9821v13, pc9821,   0,     pc9821,    pc9821,   pc9801_state, pc9801_kanji, "NEC",   "PC-9821 (98MATE VALUESTAR 13)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1998, pc9821v20, pc9821,   0,     pc9821v20, pc9821,   pc9801_state, pc9801_kanji, "NEC",   "PC-9821 (98MATE VALUESTAR 20)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji, "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) //TODO: not sure about the exact model
+COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801_kanji, "NEC",   "PC-9801VM11",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801_state, init_pc9801_kanji, "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1988, pc9801rx,   pc9801rs, 0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji, "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1993, pc9801bx2,  pc9801rs, 0, pc9801bx2, pc9801rs, pc9801_state, init_pc9801_kanji, "NEC",   "PC-9801BX2/U2",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1994, pc9821,     0,        0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji, "NEC",   "PC-9821 (98MATE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) //TODO: not sure about the exact model
+COMP( 1993, pc9821as,   pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji, "NEC",   "PC-9821 (98MATE A)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1993, pc9821ap2,  pc9821,   0, pc9821ap2, pc9821,   pc9801_state, init_pc9801_kanji, "NEC",   "PC-9821AP2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1994, pc9821xs,   pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji, "NEC",   "PC-9821 (98MATE Xs)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1994, pc9821ce2,  pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji, "NEC",   "PC-9821 (98MULTi Ce2)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1994, pc9821ne,   pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji, "NEC",   "PC-9821 (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1994, pc486mu,    pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji, "Epson", "PC-486MU",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1998, pc9821v13,  pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji, "NEC",   "PC-9821 (98MATE VALUESTAR 13)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1998, pc9821v20,  pc9821,   0, pc9821v20, pc9821,   pc9801_state, init_pc9801_kanji, "NEC",   "PC-9821 (98MATE VALUESTAR 20)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

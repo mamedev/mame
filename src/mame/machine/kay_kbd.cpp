@@ -358,7 +358,7 @@ MACHINE_CONFIG_START(kaypro_10_keyboard_device::device_add_mconfig)
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, kaypro_10_keyboard_device, bus_r))
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, kaypro_10_keyboard_device, bus_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("keyboard")
+	SPEAKER(config, "keyboard").front_center();
 	MCFG_DEVICE_ADD("bell", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "keyboard", 0.25)
 MACHINE_CONFIG_END

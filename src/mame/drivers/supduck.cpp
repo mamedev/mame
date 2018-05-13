@@ -460,7 +460,7 @@ MACHINE_CONFIG_START(supduck_state::supduck)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supduck)
 
@@ -470,11 +470,11 @@ MACHINE_CONFIG_START(supduck_state::supduck)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000)/8, PIN7_HIGH) // 1MHz - Verified on PCB, pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000)/8, okim6295_device::PIN7_HIGH) // 1MHz - Verified on PCB, pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
@@ -524,4 +524,4 @@ ROM_START( supduck )
 	ROM_LOAD( "1.su13",   0x00000, 0x80000, CRC(7fb1ed42) SHA1(77ec86a6454398e329066aa060e9b6a39085ce71) ) // banked sample data
 ROM_END
 
-GAME( 1992, supduck, 0, supduck, supduck, supduck_state, 0, ROT0, "Comad", "Super Duck", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, supduck, 0, supduck, supduck, supduck_state, empty_init, ROT0, "Comad", "Super Duck", MACHINE_SUPPORTS_SAVE )
