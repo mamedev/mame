@@ -53,7 +53,7 @@ public:
 	#endif
 	DECLARE_READ32_MEMBER(juicebox_nand_r);
 	DECLARE_WRITE32_MEMBER(juicebox_nand_w);
-	DECLARE_DRIVER_INIT(juicebox);
+	void init_juicebox();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
@@ -299,7 +299,7 @@ void juicebox_state::juicebox_map(address_map &map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(juicebox_state,juicebox)
+void juicebox_state::init_juicebox()
 {
 	// do nothing
 }
@@ -358,4 +358,4 @@ ROM_START( juicebox )
 	ROMX_LOAD( "image.rom", 0, 0x19E400, CRC(6c0308bf) SHA1(5fe21a38a4cd0d86bb60920eb100138b0e924d90), ROM_BIOS(3) )
 ROM_END
 
-COMP(2004, juicebox, 0, 0, juicebox, juicebox, juicebox_state, juicebox, "Mattel", "Juice Box", 0)
+COMP(2004, juicebox, 0, 0, juicebox, juicebox, juicebox_state, init_juicebox, "Mattel", "Juice Box", 0)

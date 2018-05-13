@@ -143,5 +143,5 @@ ROM_START( tecnbras )
 	ROM_LOAD( "tecnbras.u2",  0x0000, 0x8000, CRC(1a1e18fc) SHA1(8907e72f0356a2e2e1097dabac6d6b0b3d717f85) )
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT  COMPANY     FULLNAME                            FLAGS
-COMP( 200?, tecnbras, 0,      0,      tecnbras, 0,     tecnbras_state, 0,    "Tecnbras", "Dot Matrix Display (70x7 pixels)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT        COMPANY     FULLNAME                            FLAGS
+COMP( 200?, tecnbras, 0,      0,      tecnbras, 0,     tecnbras_state, empty_init, "Tecnbras", "Dot Matrix Display (70x7 pixels)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

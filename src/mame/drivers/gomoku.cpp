@@ -186,5 +186,5 @@ ROM_START( gomoku )
 ROM_END
 
 
-//    YEAR,   NAME,   PARENT,  MACHINE,  INPUT,  STATE         INIT,   MONITOR, COMPANY,      FULLNAME,              FLAGS
-GAME( 1981,   gomoku, 0,       gomoku,   gomoku, gomoku_state, 0,      ROT90,   "Nichibutsu", "Gomoku Narabe Renju", 0 )
+//    YEAR,   NAME,   PARENT,  MACHINE,  INPUT,  STATE         INIT,       MONITOR, COMPANY,      FULLNAME,              FLAGS
+GAME( 1981,   gomoku, 0,       gomoku,   gomoku, gomoku_state, empty_init, ROT90,   "Nichibutsu", "Gomoku Narabe Renju", 0 )

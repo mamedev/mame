@@ -3,7 +3,7 @@
 /***************************************************************************
 
 	Super Burger Time
-	
+
 ***************************************************************************/
 
 #ifndef MAME_INCLUDES_SUPBTIME_H
@@ -33,7 +33,7 @@ public:
 		, m_sprgen(*this, "spritegen")
 	{ }
 
-	DECLARE_DRIVER_INIT(tumblep);
+	void init_tumblep();
 
 	void chinatwn(machine_config &config);
 	void supbtime(machine_config &config);

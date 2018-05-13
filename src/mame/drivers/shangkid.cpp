@@ -162,12 +162,12 @@ READ8_MEMBER(shangkid_state::soundlatch_r)
 
 /***************************************************************************************/
 
-DRIVER_INIT_MEMBER(shangkid_state,dynamski)
+void shangkid_state::init_dynamski()
 {
 	save_item(NAME(m_int_enable[0]));
 }
 
-DRIVER_INIT_MEMBER(shangkid_state,chinhero)
+void shangkid_state::init_chinhero()
 {
 	m_gfx_type = 0;
 
@@ -176,7 +176,7 @@ DRIVER_INIT_MEMBER(shangkid_state,chinhero)
 	save_item(NAME(m_nmi_enable));
 }
 
-DRIVER_INIT_MEMBER(shangkid_state,shangkid)
+void shangkid_state::init_shangkid()
 {
 	m_gfx_type = 1;
 
@@ -1057,10 +1057,10 @@ ROM_START( dynamski )
 ROM_END
 
 
-GAME( 1984, dynamski,  0,        dynamski, dynamski, shangkid_state, dynamski, ROT90, "Taiyo",                     "Dynamic Ski",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, chinhero,  0,        chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo",                     "Chinese Hero",                MACHINE_SUPPORTS_SAVE ) // by Nihon Game?
-GAME( 1984, chinhero2, chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo",                     "Chinese Hero (older, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, chinhero3, chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo",                     "Chinese Hero (older, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, chinherot, chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo (Taito license)",     "Chinese Heroe (Taito)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shangkid,  0,        shangkid, shangkid, shangkid_state, shangkid, ROT0,  "Taiyo (Data East license)", "Shanghai Kid",                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, hiryuken,  shangkid, shangkid, shangkid, shangkid_state, shangkid, ROT0,  "Taiyo (Taito license)",     "Hokuha Syourin Hiryu no Ken", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dynamski,  0,        dynamski, dynamski, shangkid_state, init_dynamski, ROT90, "Taiyo",                     "Dynamic Ski",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, chinhero,  0,        chinhero, chinhero, shangkid_state, init_chinhero, ROT90, "Taiyo",                     "Chinese Hero",                MACHINE_SUPPORTS_SAVE ) // by Nihon Game?
+GAME( 1984, chinhero2, chinhero, chinhero, chinhero, shangkid_state, init_chinhero, ROT90, "Taiyo",                     "Chinese Hero (older, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, chinhero3, chinhero, chinhero, chinhero, shangkid_state, init_chinhero, ROT90, "Taiyo",                     "Chinese Hero (older, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, chinherot, chinhero, chinhero, chinhero, shangkid_state, init_chinhero, ROT90, "Taiyo (Taito license)",     "Chinese Heroe (Taito)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shangkid,  0,        shangkid, shangkid, shangkid_state, init_shangkid, ROT0,  "Taiyo (Data East license)", "Shanghai Kid",                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, hiryuken,  shangkid, shangkid, shangkid, shangkid_state, init_shangkid, ROT0,  "Taiyo (Taito license)",     "Hokuha Syourin Hiryu no Ken", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

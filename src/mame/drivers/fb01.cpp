@@ -237,5 +237,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT   MACHINE  INPUT  STATE        INIT  COMPANY   FULLNAME  FLAGS
-CONS( 1986, fb01, 0,      0,       fb01,    fb01,  fb01_state,  0,    "Yamaha", "FB-01",  MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT        COMPANY   FULLNAME  FLAGS
+CONS( 1986, fb01, 0,      0,      fb01,    fb01,  fb01_state, empty_init, "Yamaha", "FB-01",  MACHINE_SUPPORTS_SAVE )

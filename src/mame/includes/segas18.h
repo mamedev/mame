@@ -52,13 +52,13 @@ public:
 	}
 
 	// driver init
-	DECLARE_DRIVER_INIT(ddcrew);
-	DECLARE_DRIVER_INIT(lghost);
-	DECLARE_DRIVER_INIT(generic_shad);
-	DECLARE_DRIVER_INIT(generic_5874);
-	DECLARE_DRIVER_INIT(wwally);
-	DECLARE_DRIVER_INIT(generic_5987);
-	DECLARE_DRIVER_INIT(hamaway);
+	void init_ddcrew();
+	void init_lghost();
+	void init_generic_shad();
+	void init_generic_5874();
+	void init_wwally();
+	void init_generic_5987();
+	void init_hamaway();
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);

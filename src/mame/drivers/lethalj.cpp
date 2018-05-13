@@ -1017,19 +1017,19 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(lethalj_state,ripribit)
+void lethalj_state::init_ripribit()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::ripribit_control_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(lethalj_state,cfarm)
+void lethalj_state::init_cfarm()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cfarm_control_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(lethalj_state,cclownz)
+void lethalj_state::init_cclownz()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cclownz_control_w),this));
 }
@@ -1042,15 +1042,15 @@ DRIVER_INIT_MEMBER(lethalj_state,cclownz)
  *
  *************************************/
 
-GAME( 1996, lethalj,   0,        lethalj,  lethalj,   lethalj_state, 0,        ROT0,  "The Game Room", "Lethal Justice (Version 2.3)", 0 )
-GAME( 1996, franticf,  0,        gameroom, franticf,  lethalj_state, 0,        ROT0,  "The Game Room", "Frantic Fred", MACHINE_NOT_WORKING )
-GAME( 1997, eggventr,  0,        gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
-GAME( 1997, eggventr8, eggventr, gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 8)", 0 )
-GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
-GAME( 1997, eggventr2, eggventr, gameroom, eggventr2, lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture (Release 2)", 0 )
-GAME( 1997, eggventra, eggventr, gameroom, eggventr,  lethalj_state, 0,        ROT0,  "The Game Room (A.L. Australia license)", "Egg Venture (A.L. Release)", 0 )
-GAME( 1997, eggventrd, eggventr, gameroom, eggvntdx,  lethalj_state, 0,        ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
-GAME( 1997, ripribit,  0,        gameroom, ripribit,  lethalj_state, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 3.5)", 0 )
-GAME( 1997, ripribita, ripribit, gameroom, ripribit,  lethalj_state, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", 0 )
-GAME( 1999, cfarm,     0,        gameroom, cfarm,     lethalj_state, cfarm,    ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", 0 )
-GAME( 1999, cclownz,   0,        gameroom, cclownz,   lethalj_state, cclownz,  ROT0,  "LAI Games",     "Crazzy Clownz (Version 1.0)", 0 )
+GAME( 1996, lethalj,   0,        lethalj,  lethalj,   lethalj_state, empty_init,    ROT0,  "The Game Room", "Lethal Justice (Version 2.3)", 0 )
+GAME( 1996, franticf,  0,        gameroom, franticf,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Frantic Fred", MACHINE_NOT_WORKING )
+GAME( 1997, eggventr,  0,        gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
+GAME( 1997, eggventr8, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture (Release 8)", 0 )
+GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
+GAME( 1997, eggventr2, eggventr, gameroom, eggventr2, lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture (Release 2)", 0 )
+GAME( 1997, eggventra, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room (A.L. Australia license)", "Egg Venture (A.L. Release)", 0 )
+GAME( 1997, eggventrd, eggventr, gameroom, eggvntdx,  lethalj_state, empty_init,    ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
+GAME( 1997, ripribit,  0,        gameroom, ripribit,  lethalj_state, init_ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 3.5)", 0 )
+GAME( 1997, ripribita, ripribit, gameroom, ripribit,  lethalj_state, init_ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", 0 )
+GAME( 1999, cfarm,     0,        gameroom, cfarm,     lethalj_state, init_cfarm,    ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", 0 )
+GAME( 1999, cclownz,   0,        gameroom, cclownz,   lethalj_state, init_cclownz,  ROT0,  "LAI Games",     "Crazzy Clownz (Version 1.0)", 0 )

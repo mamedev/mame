@@ -94,7 +94,7 @@ public:
 	DECLARE_READ8_MEMBER(mycom_05_r);
 	DECLARE_READ8_MEMBER(mycom_06_r);
 	DECLARE_READ8_MEMBER(mycom_08_r);
-	DECLARE_DRIVER_INIT(mycom);
+	void init_mycom();
 	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
 	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -497,7 +497,7 @@ void mycom_state::machine_reset()
 	m_0a = 0;
 }
 
-DRIVER_INIT_MEMBER(mycom_state,mycom)
+void mycom_state::init_mycom()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
@@ -582,5 +582,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY                      FULLNAME      FLAGS
-COMP( 1981, mycom,  0,      0,       mycom,     mycom, mycom_state, mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                      FULLNAME      FLAGS
+COMP( 1981, mycom, 0,      0,      mycom,   mycom, mycom_state, init_mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

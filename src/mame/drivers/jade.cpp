@@ -97,5 +97,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT  CLASS       INIT      COMPANY               FULLNAME   FLAGS
-COMP( 1983, jgz80,   0,      0,       jade,    jade,  jade_state, 0,    "Jade Computer Products",  "JGZ80",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                   FULLNAME  FLAGS
+COMP( 1983, jgz80, 0,      0,      jade,    jade,  jade_state, empty_init, "Jade Computer Products", "JGZ80",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

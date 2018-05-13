@@ -440,20 +440,18 @@ ROM_END
 
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(darkseal_state,darkseal)
+void darkseal_state::init_darkseal()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
-	int i;
-
-	for (i=0x00000; i<0x80000; i++)
+	for (int i = 0x00000; i < 0x80000; i++)
 		RAM[i]=(RAM[i] & 0xbd) | ((RAM[i] & 0x02) << 5) | ((RAM[i] & 0x40) >> 5);
 
 }
 
 /******************************************************************************/
 
-GAME( 1990, darkseal,  0,        darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Dark Seal (World revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, darkseal1, darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Dark Seal (World revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, darksealj, darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Dark Seal (Japan revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gatedoom,  darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gatedoom1, darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, darkseal,  0,        darkseal, darkseal, darkseal_state, init_darkseal, ROT0, "Data East Corporation", "Dark Seal (World revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, darkseal1, darkseal, darkseal, darkseal, darkseal_state, init_darkseal, ROT0, "Data East Corporation", "Dark Seal (World revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, darksealj, darkseal, darkseal, darkseal, darkseal_state, init_darkseal, ROT0, "Data East Corporation", "Dark Seal (Japan revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gatedoom,  darkseal, darkseal, darkseal, darkseal_state, init_darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gatedoom1, darkseal, darkseal, darkseal, darkseal_state, init_darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 1)", MACHINE_SUPPORTS_SAVE )

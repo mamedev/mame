@@ -26,6 +26,7 @@ DEFINE_DEVICE_TYPE(NB1413M3, nb1413m3_device, "nb1413m3", "NB1413 Mahjong Custom
 
 nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NB1413M3, tag, owner, clock),
+	m_maincpu(*this, "^maincpu"),
 	m_sndromrgntag("voice"),
 	m_sndrombank1(0),
 	m_sndrombank2(0),
@@ -124,7 +125,7 @@ TIMER_CALLBACK_MEMBER( nb1413m3_device::timer_callback )
 	{
 		if (m_nmi_enable)
 		{
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			m_nmi_count++;
 		}
 

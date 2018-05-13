@@ -111,7 +111,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(junofrst);
+	void init_junofrst();
 
 	void junofrst(machine_config &config);
 
@@ -519,11 +519,11 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(junofrst_state,junofrst)
+void junofrst_state::init_junofrst()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
 }
 
 
-GAME( 1983, junofrst, 0,        junofrst, junofrst, junofrst_state, junofrst, ROT90, "Konami", "Juno First", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, junofrstg,junofrst, junofrst, junofrst, junofrst_state, junofrst, ROT90, "Konami (Gottlieb license)", "Juno First (Gottlieb)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, junofrst,  0,        junofrst, junofrst, junofrst_state, init_junofrst, ROT90, "Konami", "Juno First", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, junofrstg, junofrst, junofrst, junofrst, junofrst_state, init_junofrst, ROT90, "Konami (Gottlieb license)", "Juno First (Gottlieb)", MACHINE_SUPPORTS_SAVE )

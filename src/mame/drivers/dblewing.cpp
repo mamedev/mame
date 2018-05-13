@@ -114,7 +114,7 @@ public:
 
 	DECLARE_READ8_MEMBER(irq_latch_r);
 	DECLARE_WRITE_LINE_MEMBER(soundlatch_irq_w);
-	DECLARE_DRIVER_INIT(dblewing);
+	void init_dblewing();
 	uint32_t screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
@@ -446,7 +446,7 @@ ROM_START( dblewing )
 	ROM_RELOAD(                0x60000, 0x20000 )
 ROM_END
 
-DRIVER_INIT_MEMBER(dblewing_state,dblewing)
+void dblewing_state::init_dblewing()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x399d, 0x25, 0x3d);
@@ -455,4 +455,4 @@ DRIVER_INIT_MEMBER(dblewing_state,dblewing)
 }
 
 
-GAME( 1993, dblewing, 0,     dblewing, dblewing, dblewing_state,  dblewing,  ROT90, "Mitchell", "Double Wings", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, dblewing, 0, dblewing, dblewing, dblewing_state, init_dblewing, ROT90, "Mitchell", "Double Wings", MACHINE_SUPPORTS_SAVE )

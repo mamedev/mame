@@ -94,5 +94,5 @@ ROM_START( elsypokr )
 	// there is space for what looks like a 3rd rom
 ROM_END
 
-GAME( 2003, sanremmg, 0,        sanremmg,  sanremmg, sanremmg_state,  0,  ROT0, "San Remo Games", "unknown San Remo / Elsy Multigame", MACHINE_IS_SKELETON )
-GAME( 200?, elsypokr, 0,        sanremmg,  sanremmg, sanremmg_state,  0,  ROT0, "Electro System (Elsy)", "unknown Elsy poker", MACHINE_IS_SKELETON )
+GAME( 2003, sanremmg, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "San Remo Games", "unknown San Remo / Elsy Multigame", MACHINE_IS_SKELETON )
+GAME( 200?, elsypokr, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "Electro System (Elsy)", "unknown Elsy poker", MACHINE_IS_SKELETON )

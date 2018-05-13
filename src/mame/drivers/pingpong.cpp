@@ -564,29 +564,25 @@ ROM_START( cashquiz )
 	ROM_LOAD( "pingpong.11j", 0x0120, 0x0100, CRC(09d96b08) SHA1(81405e33eacc47f91ea4c7221d122f7e6f5b1e5d) ) /* sprites */
 ROM_END
 
-DRIVER_INIT_MEMBER(pingpong_state,merlinmm)
+void pingpong_state::init_merlinmm()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	int i;
 
 	/* decrypt program code */
-	for( i = 0; i < 0x4000; i++ )
+	for (int i = 0; i < 0x4000; i++)
 		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 }
 
-DRIVER_INIT_MEMBER(pingpong_state,cashquiz)
+void pingpong_state::init_cashquiz()
 {
-	uint8_t *ROM;
-	int i;
-
 	/* decrypt program code */
-	ROM = memregion("maincpu")->base();
-	for( i = 0; i < 0x4000; i++ )
+	uint8_t *ROM = memregion("maincpu")->base();
+	for (int i = 0; i < 0x4000; i++)
 		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* decrypt questions */
 	ROM = memregion("user1")->base();
-	for( i = 0; i < 0x40000; i++ )
+	for (int i = 0; i < 0x40000; i++)
 		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* questions banking handlers */
@@ -615,6 +611,6 @@ DRIVER_INIT_MEMBER(pingpong_state,cashquiz)
 }
 
 
-GAME( 1985, pingpong, 0, pingpong, pingpong, pingpong_state, 0,        ROT0,  "Konami",         "Konami's Ping-Pong",            0 )
-GAME( 1986, merlinmm, 0, merlinmm, merlinmm, pingpong_state, merlinmm, ROT90, "Zilec-Zenitone", "Merlins Money Maze",            0 )
-GAME( 1986, cashquiz, 0, merlinmm, cashquiz, pingpong_state, cashquiz, ROT0,  "Zilec-Zenitone", "Cash Quiz (Type B, Version 5)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, pingpong, 0, pingpong, pingpong, pingpong_state, empty_init,    ROT0,  "Konami",         "Konami's Ping-Pong",            0 )
+GAME( 1986, merlinmm, 0, merlinmm, merlinmm, pingpong_state, init_merlinmm, ROT90, "Zilec-Zenitone", "Merlins Money Maze",            0 )
+GAME( 1986, cashquiz, 0, merlinmm, cashquiz, pingpong_state, init_cashquiz, ROT0,  "Zilec-Zenitone", "Cash Quiz (Type B, Version 5)", MACHINE_IMPERFECT_GRAPHICS )

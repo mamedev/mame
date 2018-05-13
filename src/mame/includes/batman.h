@@ -26,7 +26,7 @@ public:
 		m_vad(*this, "vad")
 	{ }
 
-	DECLARE_DRIVER_INIT(batman);
+	void init_batman();
 	void batman(machine_config &config);
 
 protected:

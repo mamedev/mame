@@ -1905,7 +1905,7 @@ static INPUT_PORTS_START( fm8 )
 	PORT_DIPSETTING(0x02,"BASIC")
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(fm7_state,fm7)
+void fm7_state::init_fm7()
 {
 //  m_shared_ram = std::make_unique<uint8_t[]>(0x80);
 	m_video_ram = std::make_unique<uint8_t[]>(0x18000);  // 2 pages on some systems
@@ -2514,13 +2514,13 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT  COMPANY      FULLNAME         FLAGS */
-COMP( 1981, fm8,      0,      0,      fm8,     fm8,   fm7_state,  fm7,  "Fujitsu",   "FM-8",          0)
-COMP( 1982, fm7,      0,      0,      fm7,     fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-7",          0)
-COMP( 1984, fmnew7,   fm7,    0,      fm7,     fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-NEW7",       0)
-COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-77AV",       MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-77AV40SX",   MACHINE_NOT_WORKING)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS      INIT      COMPANY    FULLNAME         FLAGS */
+COMP( 1981, fm8,      0,      0,      fm8,      fm8,   fm7_state, init_fm7, "Fujitsu", "FM-8",          0)
+COMP( 1982, fm7,      0,      0,      fm7,      fm7,   fm7_state, init_fm7, "Fujitsu", "FM-7",          0)
+COMP( 1984, fmnew7,   fm7,    0,      fm7,      fm7,   fm7_state, init_fm7, "Fujitsu", "FM-NEW7",       0)
+COMP( 1985, fm77av,   fm7,    0,      fm77av,   fm7,   fm7_state, init_fm7, "Fujitsu", "FM-77AV",       MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1985, fm7740sx, fm7,    0,      fm77av,   fm7,   fm7_state, init_fm7, "Fujitsu", "FM-77AV40SX",   MACHINE_NOT_WORKING)
 
 // These may be separated into a separate driver, depending on how different they are to the FM-8/FM-7
-COMP( 1982, fm11,     0,      0,      fm11,     fm7,   fm7_state,  fm7, "Fujitsu",   "FM-11 EX",      MACHINE_NOT_WORKING)
-COMP( 1982, fm16beta, 0,      0,      fm16beta, fm7,   fm7_state,  fm7, "Fujitsu",   "FM-16\xCE\xB2", MACHINE_NOT_WORKING)
+COMP( 1982, fm11,     0,      0,      fm11,     fm7,   fm7_state, init_fm7, "Fujitsu", "FM-11 EX",      MACHINE_NOT_WORKING)
+COMP( 1982, fm16beta, 0,      0,      fm16beta, fm7,   fm7_state, init_fm7, "Fujitsu", "FM-16\xCE\xB2", MACHINE_NOT_WORKING)

@@ -162,5 +162,5 @@ ROM_START(whtforce)
 ROM_END
 
 
-GAME( 1986, spcship,  0, stargame, stargame, stargame_state, 0, ROT0, "Stargame", "Space Ship (Pinball)",  MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, whtforce, 0, stargame, stargame, stargame_state, 0, ROT0, "Stargame", "White Force",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, spcship,  0, stargame, stargame, stargame_state, empty_init, ROT0, "Stargame", "Space Ship (Pinball)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, whtforce, 0, stargame, stargame, stargame_state, empty_init, ROT0, "Stargame", "White Force",           MACHINE_IS_SKELETON_MECHANICAL )

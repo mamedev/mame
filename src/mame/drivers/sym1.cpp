@@ -64,7 +64,7 @@ public:
 	uint8_t m_riot_port_a;
 	uint8_t m_riot_port_b;
 	emu_timer *m_led_update;
-	DECLARE_DRIVER_INIT(sym1);
+	void init_sym1();
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_CALLBACK_MEMBER(led_refresh);
@@ -277,7 +277,7 @@ WRITE8_MEMBER( sym1_state::via3_a_w )
 	}
 }
 
-DRIVER_INIT_MEMBER( sym1_state, sym1 )
+void sym1_state::init_sym1()
 {
 	// wipe expansion memory banks that are not installed
 	if (m_ram->size() < 4*1024)
@@ -397,5 +397,5 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT  COMPANY                   FULLNAME          FLAGS
-COMP( 1978, sym1, 0,      0,      sym1,    sym1,  sym1_state, sym1, "Synertek Systems Corp.", "SYM-1/SY-VIM-1", 0 )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY                   FULLNAME          FLAGS
+COMP( 1978, sym1, 0,      0,      sym1,    sym1,  sym1_state, init_sym1, "Synertek Systems Corp.", "SYM-1/SY-VIM-1", 0 )

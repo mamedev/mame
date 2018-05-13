@@ -540,11 +540,11 @@ public:
 
 	template<int Width, int AddrShift, int Endian> memory_access_cache<Width, AddrShift, Endian> *cache() const {
 		if(AddrShift != m_config.addr_shift())
-			fatalerror("Requesing cache() with address shift %d while the config says %d\n", AddrShift, m_config.addr_shift());
+			fatalerror("Requesting cache() with address shift %d while the config says %d\n", AddrShift, m_config.addr_shift());
 		if(8 << Width != m_config.data_width())
-			fatalerror("Requesing cache() with data width %d while the config says %d\n", 8 << Width, m_config.data_width());
+			fatalerror("Requesting cache() with data width %d while the config says %d\n", 8 << Width, m_config.data_width());
 		if(Endian != m_config.endianness())
-			fatalerror("Requesing cache() with endianness %s while the config says %s\n",
+			fatalerror("Requesting cache() with endianness %s while the config says %s\n",
 					   endianness_names[Endian], endianness_names[m_config.endianness()]);
 
 		return static_cast<memory_access_cache<Width, AddrShift, Endian> *>(m_cache);

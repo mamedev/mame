@@ -230,10 +230,10 @@ private:
 	uint16_t m_analog_values[8];
 
 public:
-	DECLARE_DRIVER_INIT(eps);
-	DECLARE_DRIVER_INIT(common);
-	DECLARE_DRIVER_INIT(sq1);
-	DECLARE_DRIVER_INIT(denib);
+	void init_eps();
+	void init_common();
+	void init_sq1();
+	void init_denib();
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
 	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
@@ -984,7 +984,7 @@ ROM_START( eps16p )
 	ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)
 ROM_END
 
-DRIVER_INIT_MEMBER(esq5505_state,common)
+void esq5505_state::init_common()
 {
 	m_system_type = GENERIC;
 	m_duart_io = 0;
@@ -998,28 +998,28 @@ DRIVER_INIT_MEMBER(esq5505_state,common)
 	}
 }
 
-DRIVER_INIT_MEMBER(esq5505_state,eps)
+void esq5505_state::init_eps()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 	m_system_type = EPS;
 }
 
-DRIVER_INIT_MEMBER(esq5505_state,sq1)
+void esq5505_state::init_sq1()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 	m_system_type = SQ1;
 #if KEYBOARD_HACK
 	shift = 60;
 #endif
 }
 
-DRIVER_INIT_MEMBER(esq5505_state,denib)
+void esq5505_state::init_denib()
 {
 	uint8_t *pNibbles = (uint8_t *)memregion("nibbles")->base();
 	uint8_t *pBS0L = (uint8_t *)memregion("waverom")->base();
 	uint8_t *pBS0H = pBS0L + 0x100000;
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 
 	// create the 12 bit samples by patching in the nibbles from the nibble ROM
 	// low nibbles go with the lower ROM, high nibbles with the upper ROM
@@ -1033,12 +1033,12 @@ DRIVER_INIT_MEMBER(esq5505_state,denib)
 	}
 }
 
-CONS( 1988, eps,   0,   0, eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1989, vfx,   0,   0, vfx,   vfx, esq5505_state, denib,  "Ensoniq", "VFX",             MACHINE_NOT_WORKING )  // 2x40 VFD
-CONS( 1989, vfxsd, 0,   0, vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "VFX-SD",          MACHINE_NOT_WORKING )  // 2x40 VFD
-CONS( 1990, eps16p,eps, 0, eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1990, sd1,   0,   0, vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
-CONS( 1990, sq1,   0,   0, sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )  // 2x16 LCD
-CONS( 1990, sqrack,sq1, 0, sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )  // 2x16 LCD
-CONS( 1991, sq2,   0,   0, sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-2",            MACHINE_NOT_WORKING )  // 2x16 LCD
-CONS( 1991, sd132, sd1, 0, vfx32, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1988, eps,    0,   0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1989, vfx,    0,   0, vfx,   vfx, esq5505_state, init_denib,  "Ensoniq", "VFX",             MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1989, vfxsd,  0,   0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "VFX-SD",          MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1990, eps16p, eps, 0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1990, sd1,    0,   0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1990, sq1,    0,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )  // 2x16 LCD
+CONS( 1990, sqrack, sq1, 0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )  // 2x16 LCD
+CONS( 1991, sq2,    0,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-2",            MACHINE_NOT_WORKING )  // 2x16 LCD
+CONS( 1991, sd132,  sd1, 0, vfx32, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD

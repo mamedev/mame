@@ -2341,45 +2341,45 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segas24_state,qgh)
+void segas24_state::init_qgh()
 {
 	mlatch_table = segas24_state::qgh_mlt;
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,dcclub)
+void segas24_state::init_dcclub()
 {
 	mlatch_table = segas24_state::dcclub_mlt;
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,qrouka)
+void segas24_state::init_qrouka()
 {
 	mlatch_table = segas24_state::qrouka_mlt;
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,quizmeku)
+void segas24_state::init_quizmeku()
 {
 	mlatch_table = segas24_state::quizmeku_mlt;
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,mahmajn)
+void segas24_state::init_mahmajn()
 {
 	mlatch_table = segas24_state::mahmajn_mlt;
 	track_size = 0;
 	cur_input_line = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,mahmajn2)
+void segas24_state::init_mahmajn2()
 {
 	mlatch_table = segas24_state::mahmajn2_mlt;
 	track_size = 0;
 	cur_input_line = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,hotrod)
+void segas24_state::init_hotrod()
 {
 	mlatch_table = nullptr;
 
@@ -2394,7 +2394,7 @@ DRIVER_INIT_MEMBER(segas24_state,hotrod)
 	track_size = 0x2f00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,bnzabros)
+void segas24_state::init_bnzabros()
 {
 	mlatch_table = segas24_state::bnzabros_mlt;
 
@@ -2410,38 +2410,38 @@ DRIVER_INIT_MEMBER(segas24_state,bnzabros)
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,sspirits)
+void segas24_state::init_sspirits()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,sspiritj)
+void segas24_state::init_sspiritj()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2f00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,dcclubfd)
+void segas24_state::init_dcclubfd()
 {
 	mlatch_table = segas24_state::dcclub_mlt;
 	track_size = 0x2d00;
 }
 
 
-DRIVER_INIT_MEMBER(segas24_state,sgmast)
+void segas24_state::init_sgmast()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,qsww)
+void segas24_state::init_qsww()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,gground)
+void segas24_state::init_gground()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
@@ -2449,13 +2449,13 @@ DRIVER_INIT_MEMBER(segas24_state,gground)
 	m_gground_hack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas24_state::gground_hack_timer_callback), this));
 }
 
-DRIVER_INIT_MEMBER(segas24_state,crkdown)
+void segas24_state::init_crkdown()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,roughrac)
+void segas24_state::init_roughrac()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
@@ -2468,35 +2468,35 @@ DRIVER_INIT_MEMBER(segas24_state,roughrac)
  *
  *************************************/
 
-//            YEAR, NAME,      PARENT,   MACHINE,                INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
+//            YEAR  NAME       PARENT    MACHINE                 INPUT     CLASS          INIT           MONITOR COMPANY FULLNAME FLAGS
 /* Disk Based Games */
-/* 01 */GAME( 1988, hotrod,    0,        system24_floppy_hotrod, hotrod,   segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 1, Floppy Based)", 0 )
-/* 01 */GAME( 1988, hotroda,   hotrod,   system24_floppy_hotrod, hotrod,   segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 2, Floppy Based)", 0 )
-/* 01 */GAME( 1988, hotrodj,   hotrod,   system24_floppy_hotrod, hotrodj,  segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev C)", 0 )
-/* 01 */GAME( 1988, hotrodja,  hotrod,   system24_floppy_hotrod, hotrodj,  segas24_state, hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev B)", 0 )
-/* 02 */GAME( 1988, sspirits,  0,        system24_floppy,        sspirits, segas24_state, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based)", 0 )
-/* 02 */GAME( 1988, sspiritj,  sspirits, system24_floppy,        sspirits, segas24_state, sspiritj, ROT270, "Sega", "Scramble Spirits (Japan, Floppy DS3-5000-02-REV-A Based)", 0 )
-/* 02 */GAME( 1988, sspirtfc,  sspirits, system24_floppy_fd1094, sspirits, segas24_state, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based, FD1094 317-0058-02c)", MACHINE_NOT_WORKING ) /* MISSING disk image */
-/* 03 */GAME( 1988, gground,   0,        system24_floppy_fd1094, gground,  segas24_state, gground,  ROT270, "Sega", "Gain Ground (World, 3 Players, Floppy Based, FD1094 317-0058-03d Rev A)", 0 )
-/* 03 */GAME( 1988, ggroundj,  gground,  system24_floppy_fd1094, gground,  segas24_state, gground,  ROT270, "Sega", "Gain Ground (Japan, 2 Players, Floppy Based, FD1094 317-0058-03b)", 0 )
-/* 04 */GAME( 1989, crkdown,   0,        system24_floppy_fd1094, crkdown,  segas24_state, crkdown,  ROT0,   "Sega", "Crack Down (World, Floppy Based, FD1094 317-0058-04c)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
-/* 04 */GAME( 1989, crkdownu,  crkdown,  system24_floppy_fd1094, crkdown,  segas24_state, crkdown,  ROT0,   "Sega", "Crack Down (US, Floppy Based, FD1094 317-0058-04d)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
-/* 04 */GAME( 1989, crkdownj,  crkdown,  system24_floppy_fd1094, crkdown,  segas24_state, crkdown,  ROT0,   "Sega", "Crack Down (Japan, Floppy Based, FD1094 317-0058-04b Rev A)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
-/* 05 */GAME( 1989, sgmast,    0,        system24_floppy_fd1094, sgmast,   segas24_state, sgmast,   ROT0,   "Sega", "Super Masters Golf (World?, Floppy Based, FD1094 317-0058-05d?)", 0 )
-/* 05 */GAME( 1989, sgmastc,   sgmast,   system24_floppy_fd1094, sgmast,   segas24_state, sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (World, Floppy Based, FD1094 317-0058-05c)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
-/* 05 */GAME( 1989, sgmastj,   sgmast,   system24_floppy_fd_upd, sgmastj,  segas24_state, sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (Japan, Floppy Based, FD1094 317-0058-05b)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
-/* 06 */GAME( 1990, roughrac,  0,        system24_floppy_fd_upd, roughrac, segas24_state, roughrac, ROT0,   "Sega", "Rough Racer (Japan, Floppy Based, FD1094 317-0058-06b)", 0 )
-/* 07 */GAME( 1990, bnzabros,  0,        system24_floppy,        bnzabros, segas24_state, bnzabros, ROT0,   "Sega", "Bonanza Bros (US, Floppy DS3-5000-07d? Based)", 0 )
-/* 07 */GAME( 1990, bnzabrosj, bnzabros, system24_floppy,        bnzabros, segas24_state, bnzabros, ROT0,   "Sega", "Bonanza Bros (Japan, Floppy DS3-5000-07b Based)", 0 )
-/* 08 */GAME( 1991, qsww,      0,        system24_floppy_fd1094, qsww,     segas24_state, qsww,     ROT0,   "Sega", "Quiz Syukudai wo Wasuremashita (Japan, Floppy Based, FD1094 317-0058-08b)", MACHINE_IMPERFECT_GRAPHICS ) // wrong bg colour on title
-/* 09 */GAME( 1991, dcclubfd,  dcclub,   system24_floppy_dcclub, dcclub,   segas24_state, dcclubfd, ROT0,   "Sega", "Dynamic Country Club (US, Floppy Based, FD1094 317-0058-09d)", 0 )
+/* 01 */GAME( 1988, hotrod,    0,        system24_floppy_hotrod, hotrod,   segas24_state, init_hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 1, Floppy Based)", 0 )
+/* 01 */GAME( 1988, hotroda,   hotrod,   system24_floppy_hotrod, hotrod,   segas24_state, init_hotrod,   ROT0,   "Sega", "Hot Rod (World, 3 Players, Turbo set 2, Floppy Based)", 0 )
+/* 01 */GAME( 1988, hotrodj,   hotrod,   system24_floppy_hotrod, hotrodj,  segas24_state, init_hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev C)", 0 )
+/* 01 */GAME( 1988, hotrodja,  hotrod,   system24_floppy_hotrod, hotrodj,  segas24_state, init_hotrod,   ROT0,   "Sega", "Hot Rod (Japan, 4 Players, Floppy Based, Rev B)", 0 )
+/* 02 */GAME( 1988, sspirits,  0,        system24_floppy,        sspirits, segas24_state, init_sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based)", 0 )
+/* 02 */GAME( 1988, sspiritj,  sspirits, system24_floppy,        sspirits, segas24_state, init_sspiritj, ROT270, "Sega", "Scramble Spirits (Japan, Floppy DS3-5000-02-REV-A Based)", 0 )
+/* 02 */GAME( 1988, sspirtfc,  sspirits, system24_floppy_fd1094, sspirits, segas24_state, init_sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based, FD1094 317-0058-02c)", MACHINE_NOT_WORKING ) /* MISSING disk image */
+/* 03 */GAME( 1988, gground,   0,        system24_floppy_fd1094, gground,  segas24_state, init_gground,  ROT270, "Sega", "Gain Ground (World, 3 Players, Floppy Based, FD1094 317-0058-03d Rev A)", 0 )
+/* 03 */GAME( 1988, ggroundj,  gground,  system24_floppy_fd1094, gground,  segas24_state, init_gground,  ROT270, "Sega", "Gain Ground (Japan, 2 Players, Floppy Based, FD1094 317-0058-03b)", 0 )
+/* 04 */GAME( 1989, crkdown,   0,        system24_floppy_fd1094, crkdown,  segas24_state, init_crkdown,  ROT0,   "Sega", "Crack Down (World, Floppy Based, FD1094 317-0058-04c)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
+/* 04 */GAME( 1989, crkdownu,  crkdown,  system24_floppy_fd1094, crkdown,  segas24_state, init_crkdown,  ROT0,   "Sega", "Crack Down (US, Floppy Based, FD1094 317-0058-04d)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
+/* 04 */GAME( 1989, crkdownj,  crkdown,  system24_floppy_fd1094, crkdown,  segas24_state, init_crkdown,  ROT0,   "Sega", "Crack Down (Japan, Floppy Based, FD1094 317-0058-04b Rev A)", MACHINE_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
+/* 05 */GAME( 1989, sgmast,    0,        system24_floppy_fd1094, sgmast,   segas24_state, init_sgmast,   ROT0,   "Sega", "Super Masters Golf (World?, Floppy Based, FD1094 317-0058-05d?)", 0 )
+/* 05 */GAME( 1989, sgmastc,   sgmast,   system24_floppy_fd1094, sgmast,   segas24_state, init_sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (World, Floppy Based, FD1094 317-0058-05c)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
+/* 05 */GAME( 1989, sgmastj,   sgmast,   system24_floppy_fd_upd, sgmastj,  segas24_state, init_sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (Japan, Floppy Based, FD1094 317-0058-05b)", MACHINE_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
+/* 06 */GAME( 1990, roughrac,  0,        system24_floppy_fd_upd, roughrac, segas24_state, init_roughrac, ROT0,   "Sega", "Rough Racer (Japan, Floppy Based, FD1094 317-0058-06b)", 0 )
+/* 07 */GAME( 1990, bnzabros,  0,        system24_floppy,        bnzabros, segas24_state, init_bnzabros, ROT0,   "Sega", "Bonanza Bros (US, Floppy DS3-5000-07d? Based)", 0 )
+/* 07 */GAME( 1990, bnzabrosj, bnzabros, system24_floppy,        bnzabros, segas24_state, init_bnzabros, ROT0,   "Sega", "Bonanza Bros (Japan, Floppy DS3-5000-07b Based)", 0 )
+/* 08 */GAME( 1991, qsww,      0,        system24_floppy_fd1094, qsww,     segas24_state, init_qsww,     ROT0,   "Sega", "Quiz Syukudai wo Wasuremashita (Japan, Floppy Based, FD1094 317-0058-08b)", MACHINE_IMPERFECT_GRAPHICS ) // wrong bg colour on title
+/* 09 */GAME( 1991, dcclubfd,  dcclub,   system24_floppy_dcclub, dcclub,   segas24_state, init_dcclubfd, ROT0,   "Sega", "Dynamic Country Club (US, Floppy Based, FD1094 317-0058-09d)", 0 )
 
-//    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
+//    YEAR  NAME      PARENT    MACHINE   INPUT     CLASS          INIT           MONITOR COMPANY FULLNAME FLAGS
 /* ROM Based */
-GAME( 1991, dcclub,   0,        dcclub,   dcclub,   segas24_state, dcclub,   ROT0,   "Sega", "Dynamic Country Club (World, ROM Based)", 0 )
-GAME( 1991, dcclubj,  dcclub,   dcclub,   dcclub,   segas24_state, dcclub,   ROT0,   "Sega", "Dynamic Country Club (Japan, ROM Based)", 0 )
-GAME( 1991, qrouka,   0,        system24, qrouka,   segas24_state, qrouka,   ROT0,   "Sega", "Quiz Rouka Ni Tattenasai (Japan, ROM Based)", 0 )
-GAME( 1992, quizmeku, 0,        system24, quizmeku, segas24_state, quizmeku, ROT0,   "Sega", "Quiz Mekurumeku Story (Japan, ROM Based)", 0 ) /* Released in 05.1993 */
-GAME( 1992, mahmajn,  0,        mahmajn,  mahmajn,  segas24_state, mahmajn,  ROT0,   "Sega", "Tokoro San no MahMahjan (Japan, ROM Based)", 0 )
-GAME( 1994, qgh,      0,        system24, qgh,      segas24_state, qgh,      ROT0,   "Sega", "Quiz Ghost Hunter (Japan, ROM Based)", 0 )
-GAME( 1994, mahmajn2, 0,        mahmajn,  mahmajn,  segas24_state, mahmajn2, ROT0,   "Sega", "Tokoro San no MahMahjan 2 (Japan, ROM Based)", 0 )
+GAME( 1991, dcclub,   0,        dcclub,   dcclub,   segas24_state, init_dcclub,   ROT0,   "Sega", "Dynamic Country Club (World, ROM Based)", 0 )
+GAME( 1991, dcclubj,  dcclub,   dcclub,   dcclub,   segas24_state, init_dcclub,   ROT0,   "Sega", "Dynamic Country Club (Japan, ROM Based)", 0 )
+GAME( 1991, qrouka,   0,        system24, qrouka,   segas24_state, init_qrouka,   ROT0,   "Sega", "Quiz Rouka Ni Tattenasai (Japan, ROM Based)", 0 )
+GAME( 1992, quizmeku, 0,        system24, quizmeku, segas24_state, init_quizmeku, ROT0,   "Sega", "Quiz Mekurumeku Story (Japan, ROM Based)", 0 ) /* Released in 05.1993 */
+GAME( 1992, mahmajn,  0,        mahmajn,  mahmajn,  segas24_state, init_mahmajn,  ROT0,   "Sega", "Tokoro San no MahMahjan (Japan, ROM Based)", 0 )
+GAME( 1994, qgh,      0,        system24, qgh,      segas24_state, init_qgh,      ROT0,   "Sega", "Quiz Ghost Hunter (Japan, ROM Based)", 0 )
+GAME( 1994, mahmajn2, 0,        mahmajn,  mahmajn,  segas24_state, init_mahmajn2, ROT0,   "Sega", "Tokoro San no MahMahjan 2 (Japan, ROM Based)", 0 )

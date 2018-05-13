@@ -509,6 +509,6 @@ ROM_START( pt68k4 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY                  FULLNAME  FLAGS
-COMP( 1988, pt68k2, 0,      0,      pt68k2,  pt68k4, pt68k4_state, 0,    "Peripheral Technology", "PT68K2", MACHINE_SUPPORTS_SAVE )
-COMP( 1990, pt68k4, 0,      0,      pt68k4,  pt68k4, pt68k4_state, 0,    "Peripheral Technology", "PT68K4", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                  FULLNAME  FLAGS
+COMP( 1988, pt68k2, 0,      0,      pt68k2,  pt68k4, pt68k4_state, empty_init, "Peripheral Technology", "PT68K2", MACHINE_SUPPORTS_SAVE )
+COMP( 1990, pt68k4, 0,      0,      pt68k4,  pt68k4, pt68k4_state, empty_init, "Peripheral Technology", "PT68K4", MACHINE_SUPPORTS_SAVE )

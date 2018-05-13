@@ -97,7 +97,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s6);
-	DECLARE_DRIVER_INIT(s6);
+	void init_s6();
 	void s6(machine_config &config);
 	void s6_audio_map(address_map &map);
 	void s6_main_map(address_map &map);
@@ -398,7 +398,7 @@ MACHINE_RESET_MEMBER( s6_state, s6 )
 {
 }
 
-DRIVER_INIT_MEMBER( s6_state, s6 )
+void s6_state::init_s6()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
@@ -647,15 +647,15 @@ ROM_START(frpwr_l2)
 ROM_END
 
 
-GAME( 1979, lzbal_l2, 0,        s6, s6, s6_state, s6, ROT0, "Williams", "Laser Ball (L-2)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, lzbal_t2, lzbal_l2, s6, s6, s6_state, s6, ROT0, "Williams", "Laser Ball (T-2)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, scrpn_l1, 0,        s6, s6, s6_state, s6, ROT0, "Williams", "Scorpion (L-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, scrpn_t1, scrpn_l1, s6, s6, s6_state, s6, ROT0, "Williams", "Scorpion (T-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, blkou_l1, 0,        s6, s6, s6_state, s6, ROT0, "Williams", "Blackout (L-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, blkou_t1, blkou_l1, s6, s6, s6_state, s6, ROT0, "Williams", "Blackout (T-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, blkou_f1, blkou_l1, s6, s6, s6_state, s6, ROT0, "Williams", "Blackout (L-1, French Speech)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, grgar_l1, 0,        s6, s6, s6_state, s6, ROT0, "Williams", "Gorgar (L-1)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1979, grgar_t1, grgar_l1, s6, s6, s6_state, s6, ROT0, "Williams", "Gorgar (T-1)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, frpwr_l6, 0,        s6, s6, s6_state, s6, ROT0, "Williams", "Firepower (L-6)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1980, frpwr_t6, frpwr_l6, s6, s6, s6_state, s6, ROT0, "Williams", "Firepower (T-6)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1980, frpwr_l2, frpwr_l6, s6, s6, s6_state, s6, ROT0, "Williams", "Firepower (L-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1979, lzbal_l2, 0,        s6, s6, s6_state, init_s6, ROT0, "Williams", "Laser Ball (L-2)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, lzbal_t2, lzbal_l2, s6, s6, s6_state, init_s6, ROT0, "Williams", "Laser Ball (T-2)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, scrpn_l1, 0,        s6, s6, s6_state, init_s6, ROT0, "Williams", "Scorpion (L-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, scrpn_t1, scrpn_l1, s6, s6, s6_state, init_s6, ROT0, "Williams", "Scorpion (T-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, blkou_l1, 0,        s6, s6, s6_state, init_s6, ROT0, "Williams", "Blackout (L-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, blkou_t1, blkou_l1, s6, s6, s6_state, init_s6, ROT0, "Williams", "Blackout (T-1)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, blkou_f1, blkou_l1, s6, s6, s6_state, init_s6, ROT0, "Williams", "Blackout (L-1, French Speech)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, grgar_l1, 0,        s6, s6, s6_state, init_s6, ROT0, "Williams", "Gorgar (L-1)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1979, grgar_t1, grgar_l1, s6, s6, s6_state, init_s6, ROT0, "Williams", "Gorgar (T-1)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, frpwr_l6, 0,        s6, s6, s6_state, init_s6, ROT0, "Williams", "Firepower (L-6)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1980, frpwr_t6, frpwr_l6, s6, s6, s6_state, init_s6, ROT0, "Williams", "Firepower (T-6)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1980, frpwr_l2, frpwr_l6, s6, s6, s6_state, init_s6, ROT0, "Williams", "Firepower (L-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -424,4 +424,4 @@ ROM_START( magmax )
 ROM_END
 
 
-GAME( 1985, magmax, 0, magmax, magmax, magmax_state, 0, ROT0, "Nichibutsu", "Mag Max", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, magmax, 0, magmax, magmax, magmax_state, empty_init, ROT0, "Nichibutsu", "Mag Max", MACHINE_SUPPORTS_SAVE )

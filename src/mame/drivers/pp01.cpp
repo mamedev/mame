@@ -275,5 +275,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS        INIT  COMPANY  FULLNAME  FLAGS
-COMP( 198?, pp01,   0,      0,      pp01,       pp01,   pp01_state,  0,    "ZVT",   "PP-01",  MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME  FLAGS
+COMP( 198?, pp01, 0,      0,      pp01,    pp01,  pp01_state, empty_init, "ZVT",   "PP-01",  MACHINE_NOT_WORKING )

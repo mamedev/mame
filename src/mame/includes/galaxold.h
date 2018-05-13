@@ -157,11 +157,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
 
-	DECLARE_DRIVER_INIT(bullsdrtg);
-	DECLARE_DRIVER_INIT(ladybugg);
-	DECLARE_DRIVER_INIT(4in1);
-	DECLARE_DRIVER_INIT(guttangt);
-	DECLARE_DRIVER_INIT(ckonggx);
+	void init_bullsdrtg();
+	void init_ladybugg();
+	void init_4in1();
+	void init_guttangt();
+	void init_ckonggx();
 
 	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
 	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);

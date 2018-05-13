@@ -70,8 +70,8 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_status_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_command_r);
-	DECLARE_DRIVER_INIT(fixed);
-	DECLARE_DRIVER_INIT(variable);
+	void init_fixed();
+	void init_variable();
 
 	void dlair_base(machine_config &config);
 	void dlair_pr7820(machine_config &config);
@@ -1025,13 +1025,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(dlair_state,fixed)
+void dlair_state::init_fixed()
 {
 //  m_laserdisc_type = LASERDISC_TYPE_FIXED;
 }
 
 
-DRIVER_INIT_MEMBER(dlair_state,variable)
+void dlair_state::init_variable()
 {
 //  m_laserdisc_type = LASERDISC_TYPE_VARIABLE;
 }
@@ -1044,21 +1044,21 @@ DRIVER_INIT_MEMBER(dlair_state,variable)
  *
  *************************************/
 
-GAMEL( 1983, dlair,    0,        dlair_ldv1000, dlaire, dlair_state, variable, ROT0, "Cinematronics", "Dragon's Lair (US Rev. F2)", MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlairf,   dlair,    dlair_ldv1000, dlaire, dlair_state, variable, ROT0, "Cinematronics", "Dragon's Lair (US Rev. F)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlaire,   dlair,    dlair_ldv1000, dlaire, dlair_state, variable, ROT0, "Cinematronics", "Dragon's Lair (US Rev. E)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlaird,   dlair,    dlair_ldv1000, dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. D, Pioneer LD-V1000)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlairc,   dlair,    dlair_pr7820,  dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. C, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlairb,   dlair,    dlair_pr7820,  dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. B, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlaira,   dlair,    dlair_pr7820,  dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. A, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlair_2,  dlair,    dlair_pr7820,  dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Beta 2?, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlair_1,  dlair,    dlair_pr7820,  dlair, dlair_state,  fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Beta 1, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlair,        0,        dlair_ldv1000, dlaire,   dlair_state, init_variable, ROT0, "Cinematronics", "Dragon's Lair (US Rev. F2)", MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlairf,       dlair,    dlair_ldv1000, dlaire,   dlair_state, init_variable, ROT0, "Cinematronics", "Dragon's Lair (US Rev. F)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlaire,       dlair,    dlair_ldv1000, dlaire,   dlair_state, init_variable, ROT0, "Cinematronics", "Dragon's Lair (US Rev. E)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlaird,       dlair,    dlair_ldv1000, dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. D, Pioneer LD-V1000)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlairc,       dlair,    dlair_pr7820,  dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. C, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlairb,       dlair,    dlair_pr7820,  dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. B, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlaira,       dlair,    dlair_pr7820,  dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Rev. A, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlair_2,      dlair,    dlair_pr7820,  dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Beta 2?, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlair_1,      dlair,    dlair_pr7820,  dlair,    dlair_state, init_fixed,    ROT0, "Cinematronics", "Dragon's Lair (US Beta 1, Pioneer PR-7820)",  MACHINE_NOT_WORKING, layout_dlair )
 
-GAMEL( 1983, dleuro,   dlair,    dleuro,        dleuro, dlair_state, fixed,    ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dleuroalt,dlair,    dleuro,        dleuro, dlair_state, fixed,    ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European, alternate)",  MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, dlital,   dlair,    dleuro,        dleuro, dlair_state, fixed,    ROT0, "Cinematronics (Sidam license?)","Dragon's Lair (Italian)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dleuro,       dlair,    dleuro,        dleuro,   dlair_state, init_fixed,    ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dleuroalt,    dlair,    dleuro,        dleuro,   dlair_state, init_fixed,    ROT0, "Cinematronics (Atari license)", "Dragon's Lair (European, alternate)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, dlital,       dlair,    dleuro,        dleuro,   dlair_state, init_fixed,    ROT0, "Cinematronics (Sidam license?)","Dragon's Lair (Italian)",  MACHINE_NOT_WORKING, layout_dlair )
 
-GAMEL( 1983, spaceace,     0,        dlair_ldv1000, spaceace, dlair_state, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A3)", MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, spaceacea2,   spaceace, dlair_ldv1000, spaceace, dlair_state, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A2)", MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, spaceacea,    spaceace, dlair_ldv1000, spaceace, dlair_state, variable, ROT0, "Cinematronics", "Space Ace (US Rev. A)", MACHINE_NOT_WORKING, layout_dlair )
-GAMEL( 1983, spaceaceeuro, spaceace, dleuro,        spaceace, dlair_state, fixed,    ROT0, "Cinematronics (Atari license)", "Space Ace (European)",  MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceace,     0,        dlair_ldv1000, spaceace, dlair_state, init_variable, ROT0, "Cinematronics", "Space Ace (US Rev. A3)", MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceacea2,   spaceace, dlair_ldv1000, spaceace, dlair_state, init_variable, ROT0, "Cinematronics", "Space Ace (US Rev. A2)", MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceacea,    spaceace, dlair_ldv1000, spaceace, dlair_state, init_variable, ROT0, "Cinematronics", "Space Ace (US Rev. A)", MACHINE_NOT_WORKING, layout_dlair )
+GAMEL( 1983, spaceaceeuro, spaceace, dleuro,        spaceace, dlair_state, init_fixed,    ROT0, "Cinematronics (Atari license)", "Space Ace (European)",  MACHINE_NOT_WORKING, layout_dlair )

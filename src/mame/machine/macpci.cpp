@@ -143,7 +143,7 @@ void macpci_state::mac_driver_init(model_t model)
 }
 
 #define MAC_DRIVER_INIT(label, model)   \
-DRIVER_INIT_MEMBER(macpci_state,label)  \
+void macpci_state::init_##label()  \
 {   \
 	mac_driver_init(model ); \
 }

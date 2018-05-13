@@ -2523,19 +2523,19 @@ ROM_END
  *
  **************************************************************/
 
-/*     YEAR  NAME      PARENT    COMPAT MACHINE     INPUT   STATE          INIT  COMPANY    FULLNAME */
-COMP ( 1979, a400,     0,        0,     a400,       a800,   a400_state,    0,    "Atari",   "Atari 400 (NTSC)",     0)
-COMP ( 1979, a400pal,  a400,     0,     a400pal,    a800,   a400_state,    0,    "Atari",   "Atari 400 (PAL)",      0)
-COMP ( 1979, a800,     0,        0,     a800,       a800,   a400_state,    0,    "Atari",   "Atari 800 (NTSC)",     0)
-COMP ( 1979, a800pal,  a800,     0,     a800pal,    a800,   a400_state,    0,    "Atari",   "Atari 800 (PAL)",      0)
-COMP ( 1982, a1200xl,  a800,     0,     a1200xl,    a800xl, a400_state,    0,    "Atari",   "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
-COMP ( 1983, a600xl,   a800xl,   0,     a600xl,     a800xl, a400_state,    0,    "Atari",   "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
-COMP ( 1983, a800xl,   0,        0,     a800xl,     a800xl, a400_state,    0,    "Atari",   "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP ( 1983, a800xlp,  a800xl,   0,     a800xlpal,  a800xl, a400_state,    0,    "Atari",   "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP ( 1986, a65xe,    a800xl,   0,     a800xl,     a800xl, a400_state,    0,    "Atari",   "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP ( 1986, a65xea,   a800xl,   0,     a800xl,     a800xl, a400_state,    0,    "Atari",   "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING )
-COMP ( 1986, a130xe,   a800xl,   0,     a130xe,     a800xl, a400_state,    0,    "Atari",   "Atari 130XE",          MACHINE_NOT_WORKING )      // 128k RAM
-COMP ( 1986, a800xe,   a800xl,   0,     a800xl,     a800xl, a400_state,    0,    "Atari",   "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP ( 1987, xegs,     0,        0,     xegs,       a800xl, a400_state,    0,    "Atari",   "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM
+/*     YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   CLASS       INIT        COMPANY  FULLNAME */
+COMP( 1979, a400,    0,      0,      a400,      a800,   a400_state, empty_init, "Atari", "Atari 400 (NTSC)",     0)
+COMP( 1979, a400pal, a400,   0,      a400pal,   a800,   a400_state, empty_init, "Atari", "Atari 400 (PAL)",      0)
+COMP( 1979, a800,    0,      0,      a800,      a800,   a400_state, empty_init, "Atari", "Atari 800 (NTSC)",     0)
+COMP( 1979, a800pal, a800,   0,      a800pal,   a800,   a400_state, empty_init, "Atari", "Atari 800 (PAL)",      0)
+COMP( 1982, a1200xl, a800,   0,      a1200xl,   a800xl, a400_state, empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
+COMP( 1983, a600xl,  a800xl, 0,      a600xl,    a800xl, a400_state, empty_init, "Atari", "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
+COMP( 1983, a800xl,  0,      0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1983, a800xlp, a800xl, 0,      a800xlpal, a800xl, a400_state, empty_init, "Atari", "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1986, a65xe,   a800xl, 0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1986, a65xea,  a800xl, 0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING )
+COMP( 1986, a130xe,  a800xl, 0,      a130xe,    a800xl, a400_state, empty_init, "Atari", "Atari 130XE",          MACHINE_NOT_WORKING )      // 128k RAM
+COMP( 1986, a800xe,  a800xl, 0,      a800xl,    a800xl, a400_state, empty_init, "Atari", "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP( 1987, xegs,    0,      0,      xegs,      a800xl, a400_state, empty_init, "Atari", "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM
 
-CONS ( 1982, a5200,    0,        0,     a5200,      a5200,  a400_state,    0,    "Atari",   "Atari 5200",           0)
+CONS( 1982, a5200,   0,      0,      a5200,     a5200,  a400_state, empty_init, "Atari", "Atari 5200",           0)

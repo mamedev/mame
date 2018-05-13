@@ -1075,28 +1075,28 @@ ROM_END
 
 /* DRIVER INITs */
 
-DRIVER_INIT_MEMBER(splash_state,splash)
+void splash_state::init_splash()
 {
 	m_bitmap_type = 0;
 	m_sprite_attr2_shift = 8;
 }
 
-DRIVER_INIT_MEMBER(splash_state,splash10)
+void splash_state::init_splash10()
 {
 	m_bitmap_type = 0;
 	m_sprite_attr2_shift = 0;
 }
 
-DRIVER_INIT_MEMBER(splash_state,roldfrog)
+void splash_state::init_roldfrog()
 {
-	uint8_t * ROM = (uint8_t *)memregion("audiocpu")->base();
+	uint8_t *ROM = (uint8_t*)memregion("audiocpu")->base();
 	membank("sound_bank")->configure_entries(0, 16, &ROM[0x10000], 0x8000);
 
 	m_bitmap_type = 1;
 	m_sprite_attr2_shift = 8;
 }
 
-DRIVER_INIT_MEMBER(splash_state,rebus)
+void splash_state::init_rebus()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -1437,7 +1437,7 @@ WRITE16_MEMBER(funystrp_state::protection_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(funystrp_state,funystrp)
+void funystrp_state::init_funystrp()
 {
 	m_bitmap_type = 0;
 	m_sprite_attr2_shift = 0;
@@ -1450,13 +1450,13 @@ DRIVER_INIT_MEMBER(funystrp_state,funystrp)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x1fffff, read16_delegate(FUNC(funystrp_state::protection_r),this));
 }
 
-GAME( 1992, splash,   0,        splash,   splash,   splash_state, splash,   ROT0, "Gaelco / OMK Software",  "Splash! (Ver. 1.2 World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, splash10, splash,   splash,   splash,   splash_state, splash10, ROT0, "Gaelco / OMK Software",  "Splash! (Ver. 1.0 World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, paintlad, splash,   splash,   splash,   splash_state, splash,   ROT0, "Gaelco / OMK Software",  "Painted Lady (Splash) (Ver. 1.3 US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, splash,   0,        splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software",  "Splash! (Ver. 1.2 World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, splash10, splash,   splash,   splash,   splash_state,   init_splash10, ROT0, "Gaelco / OMK Software",  "Splash! (Ver. 1.0 World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, paintlad, splash,   splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software",  "Painted Lady (Splash) (Ver. 1.3 US)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, roldfrog, 0,        roldfrog, splash,   splash_state, roldfrog, ROT0, "Microhard",              "The Return of Lady Frog (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, roldfroga,roldfrog, roldfrog, splash,   splash_state, roldfrog, ROT0, "Microhard",              "The Return of Lady Frog (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, rebus,    0,        roldfrog, splash,   splash_state, rebus,    ROT0, "Microhard",              "Rebus", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, funystrp, 0,        funystrp, funystrp, funystrp_state, funystrp, ROT0, "Microhard / MagicGames", "Funny Strip", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, puckpepl, funystrp, funystrp, funystrp, funystrp_state, funystrp, ROT0, "Microhard",              "Puck People", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, ringball, funystrp, funystrp, funystrp, funystrp_state, funystrp, ROT0, "Microhard",              "Ring & Ball (unknown title)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Wouldn't surprise me if in-game is actually called King & Bell ...
+GAME( 1993, roldfrog, 0,        roldfrog, splash,   splash_state,   init_roldfrog, ROT0, "Microhard",              "The Return of Lady Frog (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, roldfroga,roldfrog, roldfrog, splash,   splash_state,   init_roldfrog, ROT0, "Microhard",              "The Return of Lady Frog (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, rebus,    0,        roldfrog, splash,   splash_state,   init_rebus,    ROT0, "Microhard",              "Rebus", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, funystrp, 0,        funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard / MagicGames", "Funny Strip", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, puckpepl, funystrp, funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard",              "Puck People", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, ringball, funystrp, funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard",              "Ring & Ball (unknown title)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Wouldn't surprise me if in-game is actually called King & Bell ...

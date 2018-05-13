@@ -116,6 +116,8 @@ private:
 	devcb_read8     m_databus_contents_cb;
 	devcb_write16   m_vsync_cb;
 
+	required_device<cpu_device> m_maincpu;
+
 	struct player_gfx p0gfx;
 	struct player_gfx p1gfx;
 

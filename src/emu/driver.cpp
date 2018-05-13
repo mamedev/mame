@@ -22,10 +22,10 @@
 //-------------------------------------------------
 
 driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
-	: device_t(mconfig, type, tag, nullptr, 0),
-		m_system(nullptr),
-		m_flip_screen_x(0),
-		m_flip_screen_y(0)
+	: device_t(mconfig, type, tag, nullptr, 0)
+	, m_system(nullptr)
+	, m_flip_screen_x(0)
+	, m_flip_screen_y(0)
 {
 }
 
@@ -71,6 +71,27 @@ void driver_device::set_game_driver(const game_driver &game)
 void driver_device::static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback)
 {
 	downcast<driver_device &>(device).m_callbacks[type] = callback;
+}
+
+
+//-------------------------------------------------
+//  empty_init - default implementation which
+//  calls driver init
+//-------------------------------------------------
+
+void driver_device::empty_init()
+{
+	driver_init();
+}
+
+
+//-------------------------------------------------
+//  driver_init - default implementation which
+//  does nothing
+//-------------------------------------------------
+
+void driver_device::driver_init()
+{
 }
 
 

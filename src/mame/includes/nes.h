@@ -93,7 +93,7 @@ public:
 	uint32_t screen_update_nes(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	NESCTRL_BRIGHTPIXEL_CB(bright_pixel);
 
-	DECLARE_DRIVER_INIT(famicom);
+	void init_famicom();
 
 	// these are needed until we modernize the FDS controller
 	DECLARE_MACHINE_START(fds);

@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE8_MEMBER(port60_w);
 
-	DECLARE_DRIVER_INIT(quizo);
+	void init_quizo();
 	DECLARE_PALETTE_INIT(quizo);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -273,7 +273,7 @@ ROM_START( quizoa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(quizo_state,quizo)
+void quizo_state::init_quizo()
 {
 	m_videoram=std::make_unique<uint8_t[]>(0x4000*2);
 	membank("bank1")->configure_entries(0, 6, memregion("user1")->base(), 0x4000);
@@ -283,5 +283,5 @@ DRIVER_INIT_MEMBER(quizo_state,quizo)
 	save_item(NAME(m_port70));
 }
 
-GAME( 1985, quizo,  0,       quizo,  quizo, quizo_state,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, quizoa, quizo,   quizo,  quizo, quizo_state,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, quizo,  0,       quizo,  quizo, quizo_state, init_quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, quizoa, quizo,   quizo,  quizo, quizo_state, init_quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 2)", MACHINE_SUPPORTS_SAVE )

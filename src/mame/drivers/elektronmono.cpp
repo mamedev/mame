@@ -176,5 +176,5 @@ ROM_START( machdrum )
 	ROM_LOAD( "elektron_sps1-1uw_os1.63.bin", 0x000000, 0x800000, CRC(3d552c99) SHA1(a872a2f3527063673d6ea6d3080c4c62ef0cadc1) )
 ROM_END
 
-CONS( 2004, monomach, 0, 0, elektron, elektron, elekmono_state, 0, "Elektron", "Monomachine SFX6 MK2", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-CONS( 2007, machdrum, 0, 0, elektron, elektron, elekmono_state, 0, "Elektron", "Machinedrum SPS-1 MK2", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 2004, monomach, 0, 0, elektron, elektron, elekmono_state, empty_init, "Elektron", "Monomachine SFX6 MK2",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 2007, machdrum, 0, 0, elektron, elektron, elekmono_state, empty_init, "Elektron", "Machinedrum SPS-1 MK2", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

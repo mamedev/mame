@@ -233,4 +233,4 @@ ROM_START( tim100 )
 ROM_END
 
 /* Driver */
-COMP( 1985, tim100, 0, 0, tim100, tim100, tim100_state, 0, "Mihajlo Pupin Institute", "TIM-100", MACHINE_IS_SKELETON)
+COMP( 1985, tim100, 0, 0, tim100, tim100, tim100_state, empty_init, "Mihajlo Pupin Institute", "TIM-100", MACHINE_IS_SKELETON)

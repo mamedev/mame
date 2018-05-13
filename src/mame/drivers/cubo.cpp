@@ -341,15 +341,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
 	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
 
-	DECLARE_DRIVER_INIT(cubo);
-	DECLARE_DRIVER_INIT(mgprem11);
-	DECLARE_DRIVER_INIT(odeontw2);
-	DECLARE_DRIVER_INIT(cndypuzl);
-	DECLARE_DRIVER_INIT(haremchl);
-	DECLARE_DRIVER_INIT(mgnumber);
-	DECLARE_DRIVER_INIT(lsrquiz2);
-	DECLARE_DRIVER_INIT(lasstixx);
-	DECLARE_DRIVER_INIT(lsrquiz);
+	void init_cubo();
+	void init_mgprem11();
+	void init_odeontw2();
+	void init_cndypuzl();
+	void init_haremchl();
+	void init_mgnumber();
+	void init_lsrquiz2();
+	void init_lasstixx();
+	void init_lsrquiz();
 
 	optional_ioport_array<2> m_player_ports;
 
@@ -1117,7 +1117,7 @@ ROM_END
 
 /***************************************************************************************************/
 
-DRIVER_INIT_MEMBER( cubo_state, cubo )
+void cubo_state::init_cubo()
 {
 	m_agnus_id = ALICE_PAL_NEW;
 	m_denise_id = LISA;
@@ -1211,9 +1211,9 @@ void cubo_state::cndypuzl_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, cndypuzl )
+void cubo_state::init_cndypuzl()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::cndypuzl_input_hack;
 }
 
@@ -1227,9 +1227,9 @@ void cubo_state::haremchl_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, haremchl )
+void cubo_state::init_haremchl()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::haremchl_input_hack;
 }
 
@@ -1243,9 +1243,9 @@ void cubo_state::lsrquiz_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, lsrquiz )
+void cubo_state::init_lsrquiz()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::lsrquiz_input_hack;
 }
 
@@ -1260,9 +1260,9 @@ void cubo_state::lsrquiz2_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, lsrquiz2 )
+void cubo_state::init_lsrquiz2()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::lsrquiz2_input_hack;
 }
 
@@ -1276,9 +1276,9 @@ void cubo_state::lasstixx_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER(cubo_state, lasstixx)
+void cubo_state::init_lasstixx()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::lasstixx_input_hack;
 }
 
@@ -1291,9 +1291,9 @@ void cubo_state::mgnumber_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, mgnumber )
+void cubo_state::init_mgnumber()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::mgnumber_input_hack;
 }
 
@@ -1306,9 +1306,9 @@ void cubo_state::mgprem11_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, mgprem11 )
+void cubo_state::init_mgprem11()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::mgprem11_input_hack;
 }
 
@@ -1377,12 +1377,12 @@ INPUT_PORTS_END
 
 
 
-GAME( 1993, cubo,     0,    cubo, cubo,     cubo_state, cubo,     ROT0, "Commodore",  "Cubo BIOS",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT )
-GAME( 1995, cndypuzl, cubo, cubo, cndypuzl, cubo_state, cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, haremchl, cubo, cubo, haremchl, cubo_state, haremchl, ROT0, "CD Express", "Harem Challenge",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, lsrquiz,  cubo, cubo, lsrquiz,  cubo_state, lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )  /* no player 2 inputs (ingame), wrong pitch for most gfxs */
-GAME( 1995, lsrquiz2, cubo, cubo, lsrquiz2, cubo_state, lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* wrong pitch for some gfxs, crashes during gameplay */
-GAME( 1995, lasstixx, cubo, cubo, lasstixx, cubo_state, lasstixx, ROT0, "CD Express", "Laser Strixx 2",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, mgnumber, cubo, cubo, mgnumber, cubo_state, mgnumber, ROT0, "CD Express", "Magic Number",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, mgprem11, cubo, cubo, mgprem11, cubo_state, mgprem11, ROT0, "CD Express", "Magic Premium (v1.1)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, odeontw2, cubo, cubo, odeontw2, cubo_state, cubo,     ROT0, "CD Express", "Odeon Twister 2 (v202.19)", MACHINE_NOT_WORKING )
+GAME( 1993, cubo,     0,    cubo, cubo,     cubo_state, init_cubo,     ROT0, "Commodore",  "Cubo BIOS",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME( 1995, cndypuzl, cubo, cubo, cndypuzl, cubo_state, init_cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, haremchl, cubo, cubo, haremchl, cubo_state, init_haremchl, ROT0, "CD Express", "Harem Challenge",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, lsrquiz,  cubo, cubo, lsrquiz,  cubo_state, init_lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )  /* no player 2 inputs (ingame), wrong pitch for most gfxs */
+GAME( 1995, lsrquiz2, cubo, cubo, lsrquiz2, cubo_state, init_lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* wrong pitch for some gfxs, crashes during gameplay */
+GAME( 1995, lasstixx, cubo, cubo, lasstixx, cubo_state, init_lasstixx, ROT0, "CD Express", "Laser Strixx 2",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, mgnumber, cubo, cubo, mgnumber, cubo_state, init_mgnumber, ROT0, "CD Express", "Magic Number",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, mgprem11, cubo, cubo, mgprem11, cubo_state, init_mgprem11, ROT0, "CD Express", "Magic Premium (v1.1)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, odeontw2, cubo, cubo, odeontw2, cubo_state, init_cubo,     ROT0, "CD Express", "Odeon Twister 2 (v202.19)", MACHINE_NOT_WORKING )

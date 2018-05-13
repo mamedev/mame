@@ -649,6 +649,6 @@ ROM_START( bitgrphb )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY  FULLNAME          FLAGS
-COMP( 1981, bitgrpha, 0,      0,      bitgrpha, bitgraph, bitgraph_state, 0,    "BBN",   "BitGraph rev A", ROT90 )
-COMP( 1982, bitgrphb, 0,      0,      bitgrphb, bitgraph, bitgraph_state, 0,    "BBN",   "BitGraph rev B", ROT270 | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME          FLAGS
+COMP( 1981, bitgrpha, 0,      0,      bitgrpha, bitgraph, bitgraph_state, empty_init, "BBN",   "BitGraph rev A", ROT90 )
+COMP( 1982, bitgrphb, 0,      0,      bitgrphb, bitgraph, bitgraph_state, empty_init, "BBN",   "BitGraph rev B", ROT270 | MACHINE_NOT_WORKING )

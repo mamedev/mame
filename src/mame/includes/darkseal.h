@@ -44,7 +44,7 @@ public:
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_WRITE16_MEMBER(palette_ext_w);
 
-	DECLARE_DRIVER_INIT(darkseal);
+	void init_darkseal();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_palette(int offset);

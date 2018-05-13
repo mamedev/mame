@@ -93,8 +93,8 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write);
 	DECLARE_READ8_MEMBER(io_read);
 	DECLARE_WRITE8_MEMBER(io_write);
-	DECLARE_DRIVER_INIT(ccs2810);
-	DECLARE_DRIVER_INIT(ccs2422);
+	void init_ccs2810();
+	void init_ccs2422();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_READ8_MEMBER(port04_r);
@@ -882,11 +882,11 @@ void ccs_state::machine_reset()
 	m_power_on_status = m_jump_en->read() | 8;
 }
 
-DRIVER_INIT_MEMBER( ccs_state, ccs2810 )
+void ccs_state::init_ccs2810()
 {
 }
 
-DRIVER_INIT_MEMBER( ccs_state, ccs2422 )
+void ccs_state::init_ccs2422()
 {
 }
 
@@ -976,6 +976,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT    CLASS       INIT       COMPANY                        FULLNAME                    FLAGS */
-COMP( 1980, ccs2810,  0,       0,       ccs2810,   ccs2810, ccs_state,  ccs2810,   "California Computer Systems", "CCS Model 2810 CPU card",  MACHINE_NO_SOUND_HW)
-COMP( 1980, ccs2422,  ccs2810, 0,       ccs2422,   ccs2810, ccs_state,  ccs2422,   "California Computer Systems", "CCS Model 2422B FDC card", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT    CLASS      INIT          COMPANY                        FULLNAME                    FLAGS */
+COMP( 1980, ccs2810, 0,       0,      ccs2810,  ccs2810, ccs_state, init_ccs2810, "California Computer Systems", "CCS Model 2810 CPU card",  MACHINE_NO_SOUND_HW)
+COMP( 1980, ccs2422, ccs2810, 0,      ccs2422,  ccs2810, ccs_state, init_ccs2422, "California Computer Systems", "CCS Model 2422B FDC card", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

@@ -381,6 +381,6 @@ ROM_START( ajaxj )
 ROM_END
 
 
-GAME( 1987, ajax,    0,    ajax, ajax, ajax_state, 0, ROT90, "Konami", "Ajax", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, typhoon, ajax, ajax, ajax, ajax_state, 0, ROT90, "Konami", "Typhoon", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ajaxj,   ajax, ajax, ajax, ajax_state, 0, ROT90, "Konami", "Ajax (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ajax,    0,    ajax, ajax, ajax_state, empty_init, ROT90, "Konami", "Ajax", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, typhoon, ajax, ajax, ajax, ajax_state, empty_init, ROT90, "Konami", "Typhoon", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ajaxj,   ajax, ajax, ajax, ajax_state, empty_init, ROT90, "Konami", "Ajax (Japan)", MACHINE_SUPPORTS_SAVE )

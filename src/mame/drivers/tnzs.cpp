@@ -2893,44 +2893,44 @@ ROM_START( insectxj )
 ROM_END
 
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, plumppop,  0,        plumppop, plumppop, extrmatn_state, 0, ROT0,   "Taito Corporation", "Plump Pop (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, jpopnics,  0,        jpopnics, jpopnics, jpopnics_state, 0, ROT0,   "Nics",              "Jumping Pop (Nics, Korean hack of Plump Pop)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    CLASS,          INIT,       MONITOR,COMPANY,             FULLNAME,            FLAGS
+GAME( 1987, plumppop,  0,        plumppop, plumppop, extrmatn_state, empty_init, ROT0,   "Taito Corporation", "Plump Pop (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, jpopnics,  0,        jpopnics, jpopnics, jpopnics_state, empty_init, ROT0,   "Nics",              "Jumping Pop (Nics, Korean hack of Plump Pop)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, extrmatn,  0,        extrmatn, extrmatn, extrmatn_state, 0, ROT270, "Taito Corporation Japan",                         "Extermination (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, extrmatnu, extrmatn, extrmatn, extrmatn, extrmatn_state, 0, ROT270, "Taito (World Games license)",                     "Extermination (US, World Games)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, extrmatnur,extrmatn, extrmatn, extrmatn, extrmatn_state, 0, ROT270, "Taito America Corporation (Romstar license)",     "Extermination (US, Romstar)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, extrmatnj, extrmatn, extrmatn, extrmatn, extrmatn_state, 0, ROT270, "Taito Corporation",                               "Extermination (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatn,  0,        extrmatn, extrmatn, extrmatn_state, empty_init, ROT270, "Taito Corporation Japan",                         "Extermination (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatnu, extrmatn, extrmatn, extrmatn, extrmatn_state, empty_init, ROT270, "Taito (World Games license)",                     "Extermination (US, World Games)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatnur,extrmatn, extrmatn, extrmatn, extrmatn_state, empty_init, ROT270, "Taito America Corporation (Romstar license)",     "Extermination (US, Romstar)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatnj, extrmatn, extrmatn, extrmatn, extrmatn_state, empty_init, ROT270, "Taito Corporation",                               "Extermination (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, arknoid2,  0,        arknoid2, arknoid2, arknoid2_state, 0, ROT270, "Taito Corporation Japan",                     "Arkanoid - Revenge of DOH (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, arknoid2u, arknoid2, arknoid2, arknid2u, arknoid2_state, 0, ROT270, "Taito America Corporation (Romstar license)", "Arkanoid - Revenge of DOH (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1987, arknoid2j, arknoid2, arknoid2, arknid2u, arknoid2_state, 0, ROT270, "Taito Corporation",                           "Arkanoid - Revenge of DOH (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, arknoid2b, arknoid2, arknoid2, arknid2u, arknoid2_state, 0, ROT270, "bootleg",                                     "Arkanoid - Revenge of DOH (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, arknoid2,  0,        arknoid2, arknoid2, arknoid2_state, empty_init, ROT270, "Taito Corporation Japan",                     "Arkanoid - Revenge of DOH (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, arknoid2u, arknoid2, arknoid2, arknid2u, arknoid2_state, empty_init, ROT270, "Taito America Corporation (Romstar license)", "Arkanoid - Revenge of DOH (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, arknoid2j, arknoid2, arknoid2, arknid2u, arknoid2_state, empty_init, ROT270, "Taito Corporation",                           "Arkanoid - Revenge of DOH (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, arknoid2b, arknoid2, arknoid2, arknid2u, arknoid2_state, empty_init, ROT270, "bootleg",                                     "Arkanoid - Revenge of DOH (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, drtoppel,  0,        extrmatn, drtoppel, extrmatn_state, 0, ROT90,  "Kaneko / Taito Corporation Japan",   "Dr. Toppel's Adventure (World)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1987, drtoppelu, drtoppel, extrmatn, drtopplu, extrmatn_state, 0, ROT90,  "Kaneko / Taito America Corporation", "Dr. Toppel's Adventure (US)",    MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1987, drtoppelj, drtoppel, extrmatn, drtopplu, extrmatn_state, 0, ROT90,  "Kaneko / Taito Corporation",         "Dr. Toppel's Tankentai (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, drtoppel,  0,        extrmatn, drtoppel, extrmatn_state, empty_init, ROT90,  "Kaneko / Taito Corporation Japan",   "Dr. Toppel's Adventure (World)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
+GAME( 1987, drtoppelu, drtoppel, extrmatn, drtopplu, extrmatn_state, empty_init, ROT90,  "Kaneko / Taito America Corporation", "Dr. Toppel's Adventure (US)",    MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
+GAME( 1987, drtoppelj, drtoppel, extrmatn, drtopplu, extrmatn_state, empty_init, ROT90,  "Kaneko / Taito Corporation",         "Dr. Toppel's Tankentai (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, kageki,    0,        kageki,   kageki,   kageki_state,   0, ROT90,  "Kaneko / Taito Corporation",                           "Kageki (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kagekiu,   kageki,   kageki,   kagekiu,  kageki_state,   0, ROT90,  "Kaneko / Taito America Corporation (Romstar license)", "Kageki (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kagekij,   kageki,   kageki,   kagekij,  kageki_state,   0, ROT90,  "Kaneko / Taito Corporation",                           "Kageki (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, kagekih,   kageki,   kageki,   kageki,   kageki_state,   0, ROT90,  "hack",                                                 "Kageki (hack)",  MACHINE_SUPPORTS_SAVE ) // date is hacked at least, might also be a Japan set hacked to show english
+GAME( 1988, kageki,    0,        kageki,   kageki,   kageki_state,   empty_init, ROT90,  "Kaneko / Taito Corporation",                           "Kageki (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kagekiu,   kageki,   kageki,   kagekiu,  kageki_state,   empty_init, ROT90,  "Kaneko / Taito America Corporation (Romstar license)", "Kageki (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kagekij,   kageki,   kageki,   kagekij,  kageki_state,   empty_init, ROT90,  "Kaneko / Taito Corporation",                           "Kageki (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, kagekih,   kageki,   kageki,   kageki,   kageki_state,   empty_init, ROT90,  "hack",                                                 "Kageki (hack)",  MACHINE_SUPPORTS_SAVE ) // date is hacked at least, might also be a Japan set hacked to show english
 
-GAME( 1988, chukatai,  0,        tnzs,     chukatai, tnzs_state,     0, ROT0,   "Taito Corporation Japan",   "Chuka Taisen (World) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1988, chukataiu, chukatai, tnzs,     chukatau, tnzs_state,     0, ROT0,   "Taito America Corporation", "Chuka Taisen (US) (P0-028-A PCB)",    MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1988, chukataij, chukatai, tnzs,     chukatau, tnzs_state,     0, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chukataija,chukatai, extrmatn, chukatau, extrmatn_state, 0, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan) (P0-025-A PCB)", MACHINE_SUPPORTS_SAVE ) /* Higher rom ID# but older PCB stock */
+GAME( 1988, chukatai,  0,        tnzs,     chukatai, tnzs_state,     empty_init, ROT0,   "Taito Corporation Japan",   "Chuka Taisen (World) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
+GAME( 1988, chukataiu, chukatai, tnzs,     chukatau, tnzs_state,     empty_init, ROT0,   "Taito America Corporation", "Chuka Taisen (US) (P0-028-A PCB)",    MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
+GAME( 1988, chukataij, chukatai, tnzs,     chukatau, tnzs_state,     empty_init, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chukataija,chukatai, extrmatn, chukatau, extrmatn_state, empty_init, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan) (P0-025-A PCB)", MACHINE_SUPPORTS_SAVE ) /* Higher rom ID# but older PCB stock */
 
-GAME( 1988, tnzs,      0,        tnzsb,    tnzs,     tnzsb_state,    0, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, new version) (P0-043A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsj,     tnzs,     tnzsb,    tnzsj,    tnzsb_state,    0, ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, new version) (P0-043A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzso,     tnzs,     tnzs,     tnzsop,   tnzs_state,     0, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, old version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsjo,    tnzs,     tnzs,     tnzsjo,   tnzs_state,     0, ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, old version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsuo,    tnzs,     tnzs,     tnzsjo,   tnzs_state,     0, ROT0,   "Taito America Corporation", "The NewZealand Story (US, old version) (P0-041A PCB)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsoa,    tnzs,     tnzs,     tnzsop,   tnzs_state,     0, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, unknown version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsop,    tnzs,     tnzs,     tnzsop,   tnzs_state,     0, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, prototype) (P0-041-1 PCB)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzs,      0,        tnzsb,    tnzs,     tnzsb_state,    empty_init, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, new version) (P0-043A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsj,     tnzs,     tnzsb,    tnzsj,    tnzsb_state,    empty_init, ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, new version) (P0-043A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzso,     tnzs,     tnzs,     tnzsop,   tnzs_state,     empty_init, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, old version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsjo,    tnzs,     tnzs,     tnzsjo,   tnzs_state,     empty_init, ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, old version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsuo,    tnzs,     tnzs,     tnzsjo,   tnzs_state,     empty_init, ROT0,   "Taito America Corporation", "The NewZealand Story (US, old version) (P0-041A PCB)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsoa,    tnzs,     tnzs,     tnzsop,   tnzs_state,     empty_init, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, unknown version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsop,    tnzs,     tnzs,     tnzsop,   tnzs_state,     empty_init, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, prototype) (P0-041-1 PCB)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, kabukiz,   0,        kabukiz,  kabukiz,  kabukiz_state,  0, ROT0,   "Kaneko / Taito Corporation Japan", "Kabuki-Z (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kabukizj,  kabukiz,  kabukiz,  kabukizj, kabukiz_state,  0, ROT0,   "Kaneko / Taito Corporation",       "Kabuki-Z (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kabukiz,   0,        kabukiz,  kabukiz,  kabukiz_state,  empty_init, ROT0,   "Kaneko / Taito Corporation Japan", "Kabuki-Z (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kabukizj,  kabukiz,  kabukiz,  kabukizj, kabukiz_state,  empty_init, ROT0,   "Kaneko / Taito Corporation",       "Kabuki-Z (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, insectx,   0,        insectx,  insectx,  insectx_state,  0, ROT0,   "Taito Corporation Japan", "Insector X (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, insectxj,  insectx,  insectx,  insectxj, insectx_state,  0, ROT0,   "Taito Corporation",       "Insector X (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, insectx,   0,        insectx,  insectx,  insectx_state,  empty_init, ROT0,   "Taito Corporation Japan", "Insector X (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, insectxj,  insectx,  insectx,  insectxj, insectx_state,  empty_init, ROT0,   "Taito Corporation",       "Insector X (Japan)", MACHINE_SUPPORTS_SAVE )

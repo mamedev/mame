@@ -86,9 +86,9 @@ public:
 	DECLARE_READ16_MEMBER(eeprom_r);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 
-	DECLARE_DRIVER_INIT(tkdensha);
-	DECLARE_DRIVER_INIT(deroon);
-	DECLARE_DRIVER_INIT(tkdensho);
+	void init_tkdensha();
+	void init_deroon();
+	void init_tkdensho();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 

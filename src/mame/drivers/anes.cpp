@@ -189,4 +189,4 @@ ROM_START( tonpuu )
 ROM_END
 
 
-GAME( 200?, tonpuu,  0, anes, anes, anes_state, 0, ROT0, "ANES", "Ton Puu Mahjong [BET] (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 200?, tonpuu, 0, anes, anes, anes_state, empty_init, ROT0, "ANES", "Ton Puu Mahjong [BET] (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

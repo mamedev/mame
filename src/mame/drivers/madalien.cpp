@@ -451,6 +451,6 @@ ROM_START( madalienb )
 ROM_END
 
 /*          set       parent    machine   inp       init */
-GAME( 1980, madalien, 0,        madalien, madalien, madalien_state, 0, ROT270, "Data East Corporation", "Mad Alien (set 1)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1980, madaliena,madalien, madalien, madalien, madalien_state, 0, ROT270, "Data East Corporation", "Mad Alien (set 2)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1980, madalienb,madalien, madalien, madalien, madalien_state, 0, ROT270, "Data East Corporation", "Mad Alien (set 2, alt gfx)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, madalien, 0,        madalien, madalien, madalien_state, empty_init, ROT270, "Data East Corporation", "Mad Alien (set 1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1980, madaliena,madalien, madalien, madalien, madalien_state, empty_init, ROT270, "Data East Corporation", "Mad Alien (set 2)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1980, madalienb,madalien, madalien, madalien, madalien_state, empty_init, ROT270, "Data East Corporation", "Mad Alien (set 2, alt gfx)", MACHINE_SUPPORTS_SAVE )

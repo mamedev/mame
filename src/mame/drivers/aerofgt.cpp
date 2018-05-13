@@ -819,7 +819,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( karatblzu )
 	PORT_INCLUDE( karatblz )
-	
+
 	PORT_MODIFY("DSW")
 	/* Suggested default in US manual is DEF_STR( Hard ) for these two */
 	PORT_DIPNAME( 0x0600, 0x0200, "Number of Enemies" )         PORT_DIPLOCATION("SW2:2,3")
@@ -3161,55 +3161,55 @@ ROM_START( kickball )
 	ROM_LOAD( "kickball.3", 0x000000, 0x040000, CRC(2f3ed4c1) SHA1(4688df5d420343a935d066f3b46580b77ee77b0e) )
 ROM_END
 
-DRIVER_INIT_MEMBER(aerofgt_state, banked_oki)
+void aerofgt_state::init_banked_oki()
 {
 	m_okibank->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
 }
 
 
-DRIVER_INIT_MEMBER(aerofgt_state, kickball)
+void aerofgt_state::init_kickball()
 {
 	// 2 lines on 1 gfx rom are swapped, why?
-	uint8_t *src = memregion( "gfx2" )->base();
-	for (int i = 0;i < 0x80000;i++)
+	uint8_t *src = memregion("gfx2")->base();
+	for (int i = 0; i < 0x80000; i++)
 	{
 		src[i] = bitswap<8>(src[i], 7, 5, 6, 4, 3, 2, 1, 0);
 	}
 }
 
-GAME( 1990, spinlbrk,  0,        spinlbrk, spinlbrk,  aerofgt_state, 0, ROT0,   "V-System Co.",     "Spinal Breakers (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1990, spinlbrku, spinlbrk, spinlbrk, spinlbrku, aerofgt_state, 0, ROT0,   "V-System Co.",     "Spinal Breakers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1990, spinlbrkj, spinlbrk, spinlbrk, spinlbrk,  aerofgt_state, 0, ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrk,  0,         spinlbrk,   spinlbrk,  aerofgt_state, empty_init,      ROT0,   "V-System Co.",     "Spinal Breakers (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrku, spinlbrk,  spinlbrk,   spinlbrku, aerofgt_state, empty_init,      ROT0,   "V-System Co.",     "Spinal Breakers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrkj, spinlbrk,  spinlbrk,   spinlbrk,  aerofgt_state, empty_init,      ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
-GAME( 1991, pspikes,   0,        pspikes,  pspikes,  aerofgt_state, 0, ROT0,   "Video System Co.",    "Power Spikes (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, pspikesk,  pspikes,  pspikes,  pspikes,  aerofgt_state, 0, ROT0,   "Video System Co.",    "Power Spikes (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, pspikesu,  pspikes,  pspikes,  pspikes,  aerofgt_state, 0, ROT0,   "Video System Co.",    "Power Spikes (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, svolly91,  pspikes,  pspikes,  pspikes,  aerofgt_state, 0, ROT0,   "Video System Co.",    "Super Volley '91 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, pspikesb,  pspikes,  pspikesb, pspikesb, aerofgt_state, 0, ROT0,   "bootleg",             "Power Spikes (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, pspikesba, pspikes,  pspikesb, pspikesb, aerofgt_state, 0, ROT0,   "bootleg (Playmark?)", "Power Spikes (Italian bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, spikes91,  pspikes,  spikes91, pspikes,  aerofgt_state, 0, ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL )
-GAME( 1991, spikes91b, pspikes,  spikes91, pspikes,  aerofgt_state, 0, ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL )
-GAME( 1991, pspikesc,  pspikes,  pspikesc, pspikesc, aerofgt_state, 0, ROT0,   "bootleg",             "Power Spikes (China)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, wbbc97,    0,        wbbc97,   wbbc97,   aerofgt_state, 0, ROT0,   "Comad",               "Beach Festival World Championship 1997", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // based on power spikes codebase
-GAME( 1998, kickball,  0,        kickball, pspikes,  aerofgt_state, kickball, ROT0, "Seoung Youn",    "Kick Ball", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // based on power spikes codebase, wrong priorities
+GAME( 1991, pspikes,   0,         pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Power Spikes (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, pspikesk,  pspikes,   pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Power Spikes (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, pspikesu,  pspikes,   pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Power Spikes (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, svolly91,  pspikes,   pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Super Volley '91 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, pspikesb,  pspikes,   pspikesb,   pspikesb,  aerofgt_state, empty_init,      ROT0,   "bootleg",             "Power Spikes (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, pspikesba, pspikes,   pspikesb,   pspikesb,  aerofgt_state, empty_init,      ROT0,   "bootleg (Playmark?)", "Power Spikes (Italian bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, spikes91,  pspikes,   spikes91,   pspikes,   aerofgt_state, empty_init,      ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL )
+GAME( 1991, spikes91b, pspikes,   spikes91,   pspikes,   aerofgt_state, empty_init,      ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL )
+GAME( 1991, pspikesc,  pspikes,   pspikesc,   pspikesc,  aerofgt_state, empty_init,      ROT0,   "bootleg",             "Power Spikes (China)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, wbbc97,    0,         wbbc97,     wbbc97,    aerofgt_state, empty_init,      ROT0,   "Comad",               "Beach Festival World Championship 1997", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // based on power spikes codebase
+GAME( 1998, kickball,  0,         kickball,   pspikes,   aerofgt_state, init_kickball,   ROT0,   "Seoung Youn",    "Kick Ball", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // based on power spikes codebase, wrong priorities
 
-GAME( 1991, karatblz,   0,        karatblz,   karatblz,  aerofgt_state, 0, ROT0,   "Video System Co.",                 "Karate Blazers (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblza,  karatblz, karatblz,   karatblz,  aerofgt_state, 0, ROT0,   "Video System Co.",                 "Karate Blazers (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzt,  karatblz, karatblz,   karatblz,  aerofgt_state, 0, ROT0,   "Video System Co. (Tecmo license)", "Karate Blazers (World, Tecmo license)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzu,  karatblz, karatblz,   karatblzu, aerofgt_state, 0, ROT0,   "Video System Co.",                 "Karate Blazers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzj,  karatblz, karatblz,   karatblz,  aerofgt_state, 0, ROT0,   "Video System Co. (Tecmo license)", "Toushin Blazers (Japan, Tecmo license)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzbl, karatblz, karatblzbl, karatblz,  aerofgt_state, 0, ROT0,   "bootleg",                          "Karate Blazers (bootleg with Street Smart sound hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1991, karatblz,   0,        karatblz,   karatblz,  aerofgt_state, empty_init,      ROT0,   "Video System Co.",                 "Karate Blazers (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblza,  karatblz, karatblz,   karatblz,  aerofgt_state, empty_init,      ROT0,   "Video System Co.",                 "Karate Blazers (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblzt,  karatblz, karatblz,   karatblz,  aerofgt_state, empty_init,      ROT0,   "Video System Co. (Tecmo license)", "Karate Blazers (World, Tecmo license)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblzu,  karatblz, karatblz,   karatblzu, aerofgt_state, empty_init,      ROT0,   "Video System Co.",                 "Karate Blazers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblzj,  karatblz, karatblz,   karatblz,  aerofgt_state, empty_init,      ROT0,   "Video System Co. (Tecmo license)", "Toushin Blazers (Japan, Tecmo license)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblzbl, karatblz, karatblzbl, karatblz,  aerofgt_state, empty_init,      ROT0,   "bootleg",                          "Karate Blazers (bootleg with Street Smart sound hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 
 // according to Gamest magazine in new revision they changed the points value of the rocks in level 6 (5.000 versus 500)
 // -> our three sets all gives 5k points, huh?
-GAME( 1991, turbofrc,  0,        turbofrc, turbofrc, aerofgt_state, 0, ROT270, "Video System Co.", "Turbo Force (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, turbofrco, turbofrc, turbofrc, turbofrc, aerofgt_state, 0, ROT270, "Video System Co.", "Turbo Force (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, turbofrcu, turbofrc, turbofrc, turbofrc, aerofgt_state, 0, ROT270, "Video System Co.", "Turbo Force (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, turbofrc,   0,        turbofrc,   turbofrc,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, turbofrco,  turbofrc, turbofrc,   turbofrc,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, turbofrcu,  turbofrc, turbofrc,   turbofrc,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 // the tiles on these also contain an alt title 'The Final War' for both the title screen and attract logo was it ever used?
-GAME( 1992, aerofgt,  0,        aerofgt,  aerofgt,  aerofgt_state, 0,          ROT270, "Video System Co.", "Aero Fighters (World / USA + Canada / Korea / Hong Kong / Taiwan) (newer hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // this has the newer sprite chip etc. unlike all other games in this driver..
-GAME( 1992, aerofgtb, aerofgt,  aerofgtb, aerofgtb, aerofgt_state, 0,          ROT270, "Video System Co.", "Aero Fighters (Taiwan / Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // probably intended for Taiwan because the Japanese name is Sonic Wings (below)
-GAME( 1992, aerofgtc, aerofgt,  aerofgtb, aerofgtb, aerofgt_state, 0,          ROT270, "Video System Co.", "Aero Fighters (Taiwan / Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sonicwi,  aerofgt,  aerofgtb, aerofgtb, aerofgt_state, 0,          ROT270, "Video System Co.", "Sonic Wings (Japan)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1992, aerfboot, aerofgt,  aerfboot, aerofgtb, aerofgt_state, banked_oki, ROT270, "bootleg",          "Aero Fighters (bootleg, set 1)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
-GAME( 1992, aerfboo2, aerofgt,  aerfboo2, aerofgtb, aerofgt_state, 0,          ROT270, "bootleg",          "Aero Fighters (bootleg, set 2)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, aerofgt,    0,        aerofgt,    aerofgt,   aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Aero Fighters (World / USA + Canada / Korea / Hong Kong / Taiwan) (newer hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // this has the newer sprite chip etc. unlike all other games in this driver..
+GAME( 1992, aerofgtb,   aerofgt,  aerofgtb,   aerofgtb,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Aero Fighters (Taiwan / Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // probably intended for Taiwan because the Japanese name is Sonic Wings (below)
+GAME( 1992, aerofgtc,   aerofgt,  aerofgtb,   aerofgtb,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Aero Fighters (Taiwan / Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sonicwi,    aerofgt,  aerofgtb,   aerofgtb,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Sonic Wings (Japan)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1992, aerfboot,   aerofgt,  aerfboot,   aerofgtb,  aerofgt_state, init_banked_oki, ROT270, "bootleg",             "Aero Fighters (bootleg, set 1)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, aerfboo2,   aerofgt,  aerfboo2,   aerofgtb,  aerofgt_state, empty_init,      ROT270, "bootleg",             "Aero Fighters (bootleg, set 2)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )

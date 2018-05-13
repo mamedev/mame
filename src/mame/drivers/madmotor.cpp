@@ -42,7 +42,7 @@ public:
 		m_spritegen(*this, "spritegen")
 	{ }
 
-	DECLARE_DRIVER_INIT(madmotor);
+	void init_madmotor();
 	void madmotor(machine_config &config);
 
 protected:
@@ -364,12 +364,10 @@ ROM_END
 
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(madmotor_state,madmotor)
+void madmotor_state::init_madmotor()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
-
-	for (i = 0x00000;i < 0x80000;i++)
+	for (int i = 0x00000; i < 0x80000; i++)
 	{
 		rom[i] = (rom[i] & 0xdb) | ((rom[i] & 0x04) << 3) | ((rom[i] & 0x20) >> 3);
 		rom[i] = (rom[i] & 0x7e) | ((rom[i] & 0x01) << 7) | ((rom[i] & 0x80) >> 7);
@@ -378,4 +376,4 @@ DRIVER_INIT_MEMBER(madmotor_state,madmotor)
 
 
 	/* The title screen is undated, but it's (c) 1989 Data East at 0xefa0 */
-GAME( 1989, madmotor, 0, madmotor, madmotor, madmotor_state, madmotor, ROT0, "Mitchell", "Mad Motor (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, madmotor, 0, madmotor, madmotor, madmotor_state, init_madmotor, ROT0, "Mitchell", "Mad Motor (prototype)", MACHINE_SUPPORTS_SAVE )

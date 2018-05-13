@@ -113,7 +113,7 @@ public:
 	DECLARE_READ8_MEMBER(captaven_soundcpu_status_r);
 
 	DECLARE_VIDEO_START(captaven);
-	DECLARE_DRIVER_INIT(captaven);
+	void init_captaven();
 
 	uint32_t screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -137,7 +137,7 @@ public:
 	DECLARE_READ16_MEMBER(fghthist_in1_r);
 	DECLARE_READ32_MEMBER(unk_status_r);
 
-	DECLARE_DRIVER_INIT(fghthist);
+	void init_fghthist();
 	DECLARE_VIDEO_START(fghthist);
 
 	uint32_t screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -166,8 +166,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tattass_sound_irq_w);
 	DECLARE_READ16_MEMBER(nslasher_debug_r);
 
-	DECLARE_DRIVER_INIT(tattass);
-	DECLARE_DRIVER_INIT(nslasher);
+	void init_tattass();
+	void init_nslasher();
 	DECLARE_VIDEO_START(nslasher);
 
 	uint32_t screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -238,9 +238,9 @@ public:
 	DECLARE_WRITE8_MEMBER(lockload_okibank_lo_w);
 	DECLARE_WRITE8_MEMBER(lockload_okibank_hi_w); // lockload
 
-	DECLARE_DRIVER_INIT(dragngun);
-	DECLARE_DRIVER_INIT(dragngunj);
-	DECLARE_DRIVER_INIT(lockload);
+	void init_dragngun();
+	void init_dragngunj();
+	void init_lockload();
 	DECLARE_VIDEO_START(dragngun);
 	void dragngun_init_common();
 	DECLARE_INPUT_CHANGED_MEMBER(lockload_gun_trigger);

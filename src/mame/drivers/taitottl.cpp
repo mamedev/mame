@@ -365,9 +365,9 @@ ROM_START( zzblock )
 ROM_END
 
 
-GAME( 1977, fisco400,  0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Cisco/Fisco 400 [TTL]",     MACHINE_IS_SKELETON )
-GAME( 1977, gunman,    0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Gunman [TTL]",              MACHINE_IS_SKELETON )
-GAME( 1977, missilex,  0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Missile-X [TTL]",           MACHINE_IS_SKELETON )
-GAME( 1977, ttblock,   0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "T.T Block [TTL]",           MACHINE_IS_SKELETON )
-GAME( 1978, ttsracec,  0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "T.T. Speed Race CL [TTL]",  MACHINE_IS_SKELETON )
-GAME( 1979, zzblock,   0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Zun Zun Block [TTL]",       MACHINE_IS_SKELETON )
+GAME( 1977, fisco400,  0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Cisco/Fisco 400 [TTL]",     MACHINE_IS_SKELETON )
+GAME( 1977, gunman,    0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Gunman [TTL]",              MACHINE_IS_SKELETON )
+GAME( 1977, missilex,  0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Missile-X [TTL]",           MACHINE_IS_SKELETON )
+GAME( 1977, ttblock,   0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T Block [TTL]",           MACHINE_IS_SKELETON )
+GAME( 1978, ttsracec,  0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T. Speed Race CL [TTL]",  MACHINE_IS_SKELETON )
+GAME( 1979, zzblock,   0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Zun Zun Block [TTL]",       MACHINE_IS_SKELETON )

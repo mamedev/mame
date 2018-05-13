@@ -316,5 +316,5 @@ ROM_START( concept )
 	ROM_LOAD16_BYTE( "mb20l.bin",    0x000001, 0x001000, CRC(b4b59de9) SHA1(3e8b8b5950b5359203c054f94af1fc5b8f0495b9) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY           FULLNAME */
-COMP( 1982, concept,  0,        0,      concept,  concept, concept_state, 0,    "Corvus Systems", "Concept" , 0 )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY           FULLNAME */
+COMP( 1982, concept, 0,      0,      concept, concept, concept_state, empty_init, "Corvus Systems", "Concept" , 0 )

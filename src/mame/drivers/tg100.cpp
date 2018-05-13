@@ -97,5 +97,5 @@ ROM_START( tg100 )
 
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY   FULLNAME       FLAGS
-CONS( 1991, tg100,    0,      0,      tg100,    tg100,    tg100_state,    0,    "Yamaha", "TG100",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME      FLAGS
+CONS( 1991, tg100, 0,      0,      tg100,   tg100, tg100_state, empty_init, "Yamaha", "TG100",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

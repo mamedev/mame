@@ -502,7 +502,7 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 
 	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(8'000'000)/2) // divided by 2 maybe
 	MCFG_NB1412M2_DAC_CB(WRITE8("dac", dac_byte_interface, write))
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -524,7 +524,7 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, AUDIOCPU_CLOCK/2) /* unknown divider */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	
+
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) // unknown DAC
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -653,7 +653,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cop01_state,mightguy)
+void cop01_state::init_mightguy()
 {
 #if MIGHTGUY_HACK
 	/* This is a hack to fix the game code to get a fully working
@@ -675,6 +675,6 @@ DRIVER_INIT_MEMBER(cop01_state,mightguy)
  *
  *************************************/
 
-GAME( 1985, cop01,    0,     cop01,    cop01,    cop01_state,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cop01a,   cop01, cop01,    cop01,    cop01_state,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mightguy, 0,     mightguy, mightguy, mightguy_state, mightguy, ROT270, "Nichibutsu", "Mighty Guy",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01,    0,     cop01,    cop01,    cop01_state,    empty_init,    ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01a,   cop01, cop01,    cop01,    cop01_state,    empty_init,    ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mightguy, 0,     mightguy, mightguy, mightguy_state, init_mightguy, ROT270, "Nichibutsu", "Mighty Guy",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

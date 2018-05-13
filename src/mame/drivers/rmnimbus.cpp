@@ -232,5 +232,5 @@ ROM_START( nimbus )
 	ROM_LOAD("er59256", 0x00, 0x20, CRC(1a39de76) SHA1(0b6607f008dd92d6ab9af62b0b042fc3f5f4461c))
 ROM_END
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE  INPUT   STATE           INIT  COMPANY              FULLNAME  FLAGS
-COMP( 1986, nimbus,     0,      0,      nimbus,  nimbus, rmnimbus_state, 0,    "Research Machines", "Nimbus", 0)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS           INIT        COMPANY              FULLNAME  FLAGS
+COMP( 1986, nimbus, 0,      0,      nimbus,  nimbus, rmnimbus_state, empty_init, "Research Machines", "Nimbus", 0)

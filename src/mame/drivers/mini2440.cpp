@@ -41,7 +41,7 @@ public:
 	required_ioport m_peny;
 
 	uint32_t m_port[9];
-	DECLARE_DRIVER_INIT(mini2440);
+	void init_mini2440();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(mini2440_input_changed);
@@ -217,7 +217,7 @@ void mini2440_state::mini2440_map(address_map &map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(mini2440_state,mini2440)
+void mini2440_state::init_mini2440()
 {
 	// do nothing
 }
@@ -286,4 +286,4 @@ ROM_START( mini2440 )
 	ROMX_LOAD( "android.bin", 0, 0x8400000, CRC(4721837d) SHA1(88fcf553b106d9fc624c9615d9c1da9c705ccb46), ROM_BIOS(3) )
 ROM_END
 
-COMP(2009, mini2440, 0, 0, mini2440, mini2440, mini2440_state, mini2440, "FriendlyARM", "Mini2440", 0)
+COMP(2009, mini2440, 0, 0, mini2440, mini2440, mini2440_state, init_mini2440, "FriendlyARM", "Mini2440", 0)

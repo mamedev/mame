@@ -148,7 +148,7 @@ public:
 	DECLARE_WRITE32_MEMBER(ms32_roz1_ram_w);
 	DECLARE_WRITE32_MEMBER(bnstars1_mahjong_select_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
-	DECLARE_DRIVER_INIT(bnstars);
+	void init_bnstars();
 	TILE_GET_INFO_MEMBER(get_ms32_tx0_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_tx1_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_bg0_tile_info);
@@ -925,7 +925,7 @@ ROM_END
 
 
 /* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi1 */
-DRIVER_INIT_MEMBER(bnstars_state,bnstars)
+void bnstars_state::init_bnstars()
 {
 	ms32_rearrange_sprites(machine(), "gfx1");
 
@@ -937,4 +937,4 @@ DRIVER_INIT_MEMBER(bnstars_state,bnstars)
 	configure_banks();
 }
 
-GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars_state, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, bnstars1, 0, bnstars, bnstars, bnstars_state, init_bnstars, ROT0, "Jaleco", "Vs. Janshi Brandnew Stars", MACHINE_IMPERFECT_GRAPHICS )

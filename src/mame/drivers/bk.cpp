@@ -235,8 +235,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE      INIT    COMPANY        FULLNAME        FLAGS */
-COMP( 1985, bk0010,     0,       0, bk0010,     bk0010, bk_state,  0,      "Elektronika", "BK 0010",      0)
-COMP( 1986, bk001001,   bk0010,  0, bk0010,     bk0010, bk_state,  0,      "Elektronika", "BK 0010-01",   0)
-COMP( 1986, bk0010fd,   bk0010,  0, bk0010fd,   bk0010, bk_state,  0,      "Elektronika", "BK 0010 FDD",  MACHINE_NOT_WORKING)
-COMP( 1986, bk0011m,    bk0010,  0, bk0010fd,   bk0010, bk_state,  0,      "Elektronika", "BK 0011M",     MACHINE_NOT_WORKING)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS     INIT        COMPANY        FULLNAME       FLAGS */
+COMP( 1985, bk0010,   0,      0,      bk0010,   bk0010, bk_state, empty_init, "Elektronika", "BK 0010",     0)
+COMP( 1986, bk001001, bk0010, 0,      bk0010,   bk0010, bk_state, empty_init, "Elektronika", "BK 0010-01",  0)
+COMP( 1986, bk0010fd, bk0010, 0,      bk0010fd, bk0010, bk_state, empty_init, "Elektronika", "BK 0010 FDD", MACHINE_NOT_WORKING)
+COMP( 1986, bk0011m,  bk0010, 0,      bk0010fd, bk0010, bk_state, empty_init, "Elektronika", "BK 0011M",    MACHINE_NOT_WORKING)

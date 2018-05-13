@@ -166,16 +166,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq1);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq3);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq5);
-	DECLARE_DRIVER_INIT(bankrob);
-	DECLARE_DRIVER_INIT(cjffruit);
-	DECLARE_DRIVER_INIT(deucesw2);
-	DECLARE_DRIVER_INIT(megadble);
-	DECLARE_DRIVER_INIT(bankroba);
-	DECLARE_DRIVER_INIT(maxidbl);
-	DECLARE_DRIVER_INIT(cj3play);
-	DECLARE_DRIVER_INIT(megadblj);
-	DECLARE_DRIVER_INIT(hermit);
-	DECLARE_DRIVER_INIT(dualgame);
+	void init_bankrob();
+	void init_cjffruit();
+	void init_deucesw2();
+	void init_megadble();
+	void init_bankroba();
+	void init_maxidbl();
+	void init_cj3play();
+	void init_megadblj();
+	void init_hermit();
+	void init_dualgame();
 	DECLARE_VIDEO_START(blitz68k);
 	DECLARE_VIDEO_START(blitz68k_addr_factor1);
 	uint32_t screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -2769,7 +2769,7 @@ ROM_END
     ROM patches
 *************************************************************************************************************/
 
-DRIVER_INIT_MEMBER(blitz68k_state,bankrob)
+void blitz68k_state::init_bankrob()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2784,7 +2784,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,bankrob)
 	ROM[0x1d4d4/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,bankroba)
+void blitz68k_state::init_bankroba()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2799,7 +2799,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,bankroba)
 	ROM[0x178ec/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,cj3play)
+void blitz68k_state::init_cj3play()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2815,7 +2815,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,cj3play)
 	ROM[0x20ab0/2] = 0x6050;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,cjffruit)
+void blitz68k_state::init_cjffruit()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2826,7 +2826,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,cjffruit)
 	ROM[0x1e7b8/2] = 0x6050;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,deucesw2)
+void blitz68k_state::init_deucesw2()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2837,7 +2837,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,deucesw2)
 	ROM[0x12f70/2] = 0x6054;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,dualgame)
+void blitz68k_state::init_dualgame()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2848,7 +2848,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,dualgame)
 	ROM[0x1739c/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,hermit)
+void blitz68k_state::init_hermit()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2865,7 +2865,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,hermit)
 	ROM[0x3238/2] = 0x4e75;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,maxidbl)
+void blitz68k_state::init_maxidbl()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2876,7 +2876,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,maxidbl)
 	ROM[0x17ca/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,megadblj)
+void blitz68k_state::init_megadblj()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2887,7 +2887,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,megadblj)
 	ROM[0x19d4/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,megadble)
+void blitz68k_state::init_megadble()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2900,16 +2900,16 @@ DRIVER_INIT_MEMBER(blitz68k_state,megadble)
 
 
 
-GAME( 1992,  maxidbl,  0,       maxidbl,  maxidbl,  blitz68k_state, maxidbl,  ROT0,  "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS )
-GAME( 1990,  megadblj, 0,       maxidbl,  maxidbl,  blitz68k_state, megadblj, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // JUNE 28TH, 1993
-GAME( 1990,  megadble, 0,       maxidbl,  maxidbl,  blitz68k_state, megadble, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker (Ver. 1.63 Espagnol)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS ) // NOVEMBER 1994
-GAME( 1993,  steaser,  0,       steaser,  steaser,  blitz68k_state, 0,        ROT0,  "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
-GAME( 1993,  bankrob,  0,       bankrob,  bankrob,  blitz68k_state, bankrob,  ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC APRIL 1995
-GAME( 1993,  bankroba, bankrob, bankroba, bankrob,  blitz68k_state, bankroba, ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC MAY 10TH, 1993
-GAME( 1993?, poker52,  0,       maxidbl,  maxidbl,  blitz68k_state, 0,        ROT0,  "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                  // MARCH 10TH, 1994
-GAME( 1995,  dualgame, 0,       dualgame, dualgame, blitz68k_state, dualgame, ROT0,  "Labtronix Technologies",         "Dual Games (prototype)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // SEPTEMBER 5TH, 1995
-GAME( 1995,  hermit,   0,       hermit,   hermit,   blitz68k_state, hermit,   ROT0,  "Dugamex",                        "The Hermit (Ver. 1.14)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 1995
-GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, deucesw2, ROT0,  "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 10TH, 1997
-GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, blitz68k_state, cj3play,  ROT0,  "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999
-GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, blitz68k_state, cjffruit, ROT0,  "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 21ST, 1999
-GAME( 199?,  ilpag,    0,       ilpag,    ilpag,    blitz68k_state, 0,        ROT0,  "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )
+GAME( 1992,  maxidbl,  0,       maxidbl,  maxidbl,  blitz68k_state, init_maxidbl,  ROT0, "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS )
+GAME( 1990,  megadblj, 0,       maxidbl,  maxidbl,  blitz68k_state, init_megadblj, ROT0, "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // JUNE 28TH, 1993
+GAME( 1990,  megadble, 0,       maxidbl,  maxidbl,  blitz68k_state, init_megadble, ROT0, "Blitz Systems Inc.",             "Mega Double Poker (Ver. 1.63 Espagnol)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS ) // NOVEMBER 1994
+GAME( 1993,  steaser,  0,       steaser,  steaser,  blitz68k_state, empty_init,    ROT0, "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
+GAME( 1993,  bankrob,  0,       bankrob,  bankrob,  blitz68k_state, init_bankrob,  ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC APRIL 1995
+GAME( 1993,  bankroba, bankrob, bankroba, bankrob,  blitz68k_state, init_bankroba, ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC MAY 10TH, 1993
+GAME( 1993?, poker52,  0,       maxidbl,  maxidbl,  blitz68k_state, empty_init,    ROT0, "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                  // MARCH 10TH, 1994
+GAME( 1995,  dualgame, 0,       dualgame, dualgame, blitz68k_state, init_dualgame, ROT0, "Labtronix Technologies",         "Dual Games (prototype)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // SEPTEMBER 5TH, 1995
+GAME( 1995,  hermit,   0,       hermit,   hermit,   blitz68k_state, init_hermit,   ROT0, "Dugamex",                        "The Hermit (Ver. 1.14)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 1995
+GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, init_deucesw2, ROT0, "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 10TH, 1997
+GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, blitz68k_state, init_cj3play,  ROT0, "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999
+GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, blitz68k_state, init_cjffruit, ROT0, "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 21ST, 1999
+GAME( 199?,  ilpag,    0,       ilpag,    ilpag,    blitz68k_state, empty_init,    ROT0, "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )

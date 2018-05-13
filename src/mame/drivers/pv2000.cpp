@@ -430,5 +430,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE           INIT COMPANY   FULLNAME    FLAGS
-CONS( 1983, pv2000,  0,      0,      pv2000,  pv2000, pv2000_state,   0,   "Casio",  "PV-2000",  MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY   FULLNAME    FLAGS
+CONS( 1983, pv2000, 0,      0,      pv2000,  pv2000, pv2000_state, empty_init, "Casio",  "PV-2000",  MACHINE_NOT_WORKING )

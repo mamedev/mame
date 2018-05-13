@@ -440,7 +440,7 @@ ROM_START( meteors )
 ROM_END
 
 
-GAME( 1980, spcforce, 0,        spcforce, spcforce, spcforce_state, 0, ROT270, "Venture Line",     "Space Force (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, spcforc2, spcforce, spcforce, spcforc2, spcforce_state, 0, ROT270, "bootleg? (Elcon)", "Space Force (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, meteor,   spcforce, spcforce, spcforc2, spcforce_state, 0, ROT270, "Venture Line",     "Meteoroids",          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, meteors,  spcforce, meteors,  spcforc2, spcforce_state, 0, ROT0,   "Amusement World",  "Meteors",             MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spcforce, 0,        spcforce, spcforce, spcforce_state, empty_init, ROT270, "Venture Line",     "Space Force (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, spcforc2, spcforce, spcforce, spcforc2, spcforce_state, empty_init, ROT270, "bootleg? (Elcon)", "Space Force (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, meteor,   spcforce, spcforce, spcforc2, spcforce_state, empty_init, ROT270, "Venture Line",     "Meteoroids",          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, meteors,  spcforce, meteors,  spcforc2, spcforce_state, empty_init, ROT0,   "Amusement World",  "Meteors",             MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

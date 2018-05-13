@@ -73,4 +73,4 @@ ROM_START( trocana)
 ROM_END
 
 
-GAME( 1996, trocana, 0, trocana, trocana, nmkmedal_state, 0, ROT0, "NTC / NMK", "Trocana", MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, NTC LTD, V96313 strings
+GAME( 1996, trocana, 0, trocana, trocana, nmkmedal_state, empty_init, ROT0, "NTC / NMK", "Trocana", MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, NTC LTD, V96313 strings

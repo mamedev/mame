@@ -1251,7 +1251,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(champbas_state,champbas)
+void champbas_state::init_champbas()
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
 	uint8_t *rom1 = memregion("gfx1")->base();
@@ -1267,7 +1267,7 @@ DRIVER_INIT_MEMBER(champbas_state,champbas)
 }
 
 
-DRIVER_INIT_MEMBER(champbas_state,exctsccr)
+void champbas_state::init_exctsccr()
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
 	uint8_t *rom1 = memregion("gfx1")->base();
@@ -1303,20 +1303,20 @@ DRIVER_INIT_MEMBER(champbas_state,exctsccr)
  *************************************/
 
 /*    YEAR  NAME        PARENT    MACHINE     INPUT     INIT                      MONITOR COMPANY, FULLNAME, FLAGS */
-GAME( 1982, talbot,     0,        talbot,     talbot,   champbas_state, 0,        ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, talbot,     0,        talbot,     talbot,   champbas_state, empty_init,    ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, champbas,   0,        champbas,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball", MACHINE_SUPPORTS_SAVE ) // no protection
-GAME( 1983, champbasj,  champbas, champbasj,  champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, champbasja, champbas, champbasja, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", MACHINE_SUPPORTS_SAVE ) // simplified protection, no mcu
-GAME( 1983, champbasjb, champbas, champbasjb, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 3)", MACHINE_SUPPORTS_SAVE ) // no protection
-GAME( 1983, champbb2,   0,        champbb2,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball Part-2 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, champbb2j,  champbb2, champbb2,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball Part-2 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tbasebal,   champbb2, tbasebal,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Taikyoku Base Ball", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 68705 protection instead
+GAME( 1983, champbas,   0,        champbas,   champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball", MACHINE_SUPPORTS_SAVE ) // no protection
+GAME( 1983, champbasj,  champbas, champbasj,  champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, champbasja, champbas, champbasja, champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", MACHINE_SUPPORTS_SAVE ) // simplified protection, no mcu
+GAME( 1983, champbasjb, champbas, champbasjb, champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 3)", MACHINE_SUPPORTS_SAVE ) // no protection
+GAME( 1983, champbb2,   0,        champbb2,   champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball Part-2 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, champbb2j,  champbb2, champbb2,   champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball Part-2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tbasebal,   champbb2, tbasebal,   champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Taikyoku Base Ball", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 68705 protection instead
 
-GAME( 1983, exctsccr,   0,        exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccru,  exctsccr, exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccra,  exctsccr, exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccrj,  exctsccr, exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccrjo, exctsccr, exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccrb,  exctsccr, exctsccrb,  exctsccr, champbas_state, exctsccr, ROT270, "bootleg (Kazutomi)", "Exciting Soccer (bootleg)", MACHINE_SUPPORTS_SAVE ) // on champbasj hardware
-GAME( 1984, exctscc2,   0,        exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccr,   0,        exctsccr,   exctsccr, champbas_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccru,  exctsccr, exctsccr,   exctsccr, champbas_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccra,  exctsccr, exctsccr,   exctsccr, champbas_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccrj,  exctsccr, exctsccr,   exctsccr, champbas_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccrjo, exctsccr, exctsccr,   exctsccr, champbas_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccrb,  exctsccr, exctsccrb,  exctsccr, champbas_state, init_exctsccr, ROT270, "bootleg (Kazutomi)", "Exciting Soccer (bootleg)", MACHINE_SUPPORTS_SAVE ) // on champbasj hardware
+GAME( 1984, exctscc2,   0,        exctsccr,   exctsccr, champbas_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", MACHINE_SUPPORTS_SAVE )

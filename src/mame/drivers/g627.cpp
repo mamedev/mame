@@ -61,8 +61,8 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(v115);
-	DECLARE_DRIVER_INIT(v117);
+	void init_v115();
+	void init_v117();
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(portc_w);
@@ -181,12 +181,12 @@ static INPUT_PORTS_START( g627 )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Test 8") PORT_CODE(KEYCODE_STOP)
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER( g627_state, v115 )
+void g627_state::init_v115()
 {
 	m_type = 0;
 }
 
-DRIVER_INIT_MEMBER( g627_state, v117 )
+void g627_state::init_v117()
 {
 	m_type = 1;
 }
@@ -342,6 +342,6 @@ ROM_START(rota_101)
 	ROM_LOAD("v101-c.bin", 0x1000, 0x0800, CRC(c7e85638) SHA1(b59805d8b558ab8f5ea5b4b9261e862afca4b9d3))
 ROM_END
 
-GAME(1978,  rotation,  0,         g627,  g627, g627_state, v117,  ROT0,  "Midway", "Rotation VIII (v. 1.17)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  rota_115,  rotation,  g627,  g627, g627_state, v115,  ROT0,  "Midway", "Rotation VIII (v. 1.15)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  rota_101,  rotation,  g627,  g627, g627_state, v115,  ROT0,  "Midway", "Rotation VIII (v. 1.01)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, rotation, 0,        g627, g627, g627_state, init_v117, ROT0, "Midway", "Rotation VIII (v. 1.17)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, rota_115, rotation, g627, g627, g627_state, init_v115, ROT0, "Midway", "Rotation VIII (v. 1.15)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1978, rota_101, rotation, g627, g627, g627_state, init_v115, ROT0, "Midway", "Rotation VIII (v. 1.01)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

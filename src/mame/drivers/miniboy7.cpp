@@ -627,6 +627,6 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT   ROT   COMPANY                     FULLNAME              FLAGS                LAYOUT
-GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
-GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROT   COMPANY                     FULLNAME              FLAGS                LAYOUT
+GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
+GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL, layout_miniboy7 )

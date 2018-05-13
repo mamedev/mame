@@ -65,12 +65,12 @@ public:
 	DECLARE_WRITE8_MEMBER(spacfury2_sh_w);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_WRITE8_MEMBER(usb_ram_w);
-	DECLARE_DRIVER_INIT(zektor);
-	DECLARE_DRIVER_INIT(startrek);
-	DECLARE_DRIVER_INIT(elim4);
-	DECLARE_DRIVER_INIT(elim2);
-	DECLARE_DRIVER_INIT(tacscan);
-	DECLARE_DRIVER_INIT(spacfury);
+	void init_zektor();
+	void init_startrek();
+	void init_elim4();
+	void init_elim2();
+	void init_tacscan();
+	void init_spacfury();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_segag80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

@@ -287,7 +287,7 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	DECLARE_WRITE8_MEMBER(sg1000a_coin_counter_w);
-	DECLARE_DRIVER_INIT(sg1000a);
+	void init_sg1000a();
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void sderby2s(machine_config &config);
@@ -549,7 +549,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(sg1000a_state,sg1000a)
+void sg1000a_state::init_sg1000a()
 {
 }
 
@@ -561,7 +561,7 @@ DRIVER_INIT_MEMBER(sg1000a_state,sg1000a)
  *
  *************************************/
 
-GAME( 1984, chboxing, 0, sg1000a,  chboxing, sg1000a_state, sg1000a,  ROT0, "Sega", "Champion Boxing",                  0 )
-GAME( 1985, chwrestl, 0, sg1000ax, chwrestl, sg1000a_state, sg1000a,  ROT0, "Sega", "Champion Pro Wrestling",           0 )
-GAME( 1985, dokidoki, 0, sg1000a,  dokidoki, sg1000a_state, sg1000a,  ROT0, "Sega", "Doki Doki Penguin Land",           0 )
-GAME( 1985, sderby2s, 0, sderby2s, sderby2s, sg1000a_state, sg1000a,  ROT0, "Sega", "Super Derby II (Satellite board)", MACHINE_NOT_WORKING ) // inputs aren't hooked up, probably needs to be connected to the main board anyway
+GAME( 1984, chboxing, 0, sg1000a,  chboxing, sg1000a_state, init_sg1000a, ROT0, "Sega", "Champion Boxing",                  0 )
+GAME( 1985, chwrestl, 0, sg1000ax, chwrestl, sg1000a_state, init_sg1000a, ROT0, "Sega", "Champion Pro Wrestling",           0 )
+GAME( 1985, dokidoki, 0, sg1000a,  dokidoki, sg1000a_state, init_sg1000a, ROT0, "Sega", "Doki Doki Penguin Land",           0 )
+GAME( 1985, sderby2s, 0, sderby2s, sderby2s, sg1000a_state, init_sg1000a, ROT0, "Sega", "Super Derby II (Satellite board)", MACHINE_NOT_WORKING ) // inputs aren't hooked up, probably needs to be connected to the main board anyway

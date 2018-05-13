@@ -805,7 +805,7 @@ ROM_START(pyuutajr)
 	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(2ca37e62) SHA1(eebdc5c37d3b532edd5e5ca65eb785269ebd1ac0))      /* system ROM */
 ROM_END
 
-//   YEAR    NAME      PARENT      COMPAT  MACHINE     INPUT     STATE          INIT    COMPANY   FULLNAME           FLAGS
-COMP(1983?,  tutor,    0,          0,      tutor,      tutor,    tutor_state,   0,      "Tomy",   "Tomy Tutor" ,     0)
-COMP(1982,   pyuuta,   tutor,      0,      tutor,      tutor,    tutor_state,   0,      "Tomy",   "Tomy Pyuuta" ,    0)
-COMP(1983,   pyuutajr, tutor,      0,      pyuutajr,   pyuutajr, tutor_state,   0,      "Tomy",   "Tomy Pyuuta Jr.", 0)
+//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS        INIT        COMPANY   FULLNAME           FLAGS
+COMP( 1983?, tutor,    0,      0,      tutor,    tutor,    tutor_state, empty_init, "Tomy",   "Tomy Tutor" ,     0)
+COMP( 1982,  pyuuta,   tutor,  0,      tutor,    tutor,    tutor_state, empty_init, "Tomy",   "Tomy Pyuuta" ,    0)
+COMP( 1983,  pyuutajr, tutor,  0,      pyuutajr, pyuutajr, tutor_state, empty_init, "Tomy",   "Tomy Pyuuta Jr.", 0)

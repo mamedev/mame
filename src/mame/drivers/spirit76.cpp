@@ -159,4 +159,4 @@ ROM_START(spirit76)
 ROM_END
 
 
-GAME( 1975, spirit76, 0, spirit76, spirit76, spirit76_state, 0, ROT0, "Mirco", "Spirit of 76", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1975, spirit76, 0, spirit76, spirit76, spirit76_state, empty_init, ROT0, "Mirco", "Spirit of 76", MACHINE_IS_SKELETON_MECHANICAL )

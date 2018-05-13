@@ -226,7 +226,7 @@ public:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	DECLARE_DRIVER_INIT(gunpey);
+	void init_gunpey();
 private:
 
 	DECLARE_WRITE8_MEMBER(status_w);
@@ -1012,7 +1012,7 @@ WRITE8_MEMBER(gunpey_state::blitter_w)
 		if(compression)
 		{
 			if(compression == 8)
-			{				
+			{
 				if (decompress_sprite(m_vram.get(), m_srcx, m_srcy, m_xsize, m_ysize, m_dstx, m_dsty))
 				{
 					logerror("[-] Failed to decompress sprite at %04x %04x\n", m_srcx, m_srcy);
@@ -1261,8 +1261,8 @@ ROM_START( gunpey )
 	ROM_LOAD( "gp_rom5.622",  0x000000, 0x400000,  CRC(f79903e0) SHA1(4fd50b4138e64a48ec1504eb8cd172a229e0e965)) // 1xxxxxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
-DRIVER_INIT_MEMBER(gunpey_state,gunpey)
+void gunpey_state::init_gunpey()
 {
 }
 
-GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, gunpey,    ROT0, "Bandai / Banpresto", "Gunpey (Japan)", 0 )
+GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, init_gunpey, ROT0, "Bandai / Banpresto", "Gunpey (Japan)", 0 )

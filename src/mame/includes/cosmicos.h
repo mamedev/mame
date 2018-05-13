@@ -92,7 +92,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( memory_disable );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cosmicos );
-	DECLARE_DRIVER_INIT(cosmicos);
+	void init_cosmicos();
 	TIMER_DEVICE_CALLBACK_MEMBER(digit_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(int_tick);
 	void cosmicos(machine_config &config);

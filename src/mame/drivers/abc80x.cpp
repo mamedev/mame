@@ -1151,7 +1151,7 @@ MACHINE_CONFIG_START(abc800_state::common)
 	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(*this, abc800_state, sio_txdb_w))
 	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(*this, abc800_state, sio_txdb_w))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	
+
 	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, ABC800_X01/2/2)
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
@@ -1199,7 +1199,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(abc800c_state::abc800c)
 	common(config);
-	
+
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY(Z80_TAG)
 	MCFG_DEVICE_PROGRAM_MAP(abc800c_mem)
@@ -1229,7 +1229,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(abc800m_state::abc800m)
 	common(config);
-	
+
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY(Z80_TAG)
 	MCFG_DEVICE_PROGRAM_MAP(abc800m_mem)
@@ -1259,7 +1259,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(abc802_state::abc802)
 	common(config);
-	
+
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY(Z80_TAG)
 	MCFG_DEVICE_PROGRAM_MAP(abc802_mem)
@@ -1291,7 +1291,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(abc806_state::abc806)
 	common(config);
-	
+
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY(Z80_TAG)
 	MCFG_DEVICE_PROGRAM_MAP(abc806_mem)
@@ -1594,8 +1594,8 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   STATE           INIT  COMPANY             FULLNAME        FLAGS
-COMP( 1981, abc800c,    0,          0,      abc800c,    abc800, abc800c_state,  0,    "Luxor Datorer AB", "ABC 800 C/HR", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, abc800m,    abc800c,    0,      abc800m,    abc800, abc800m_state,  0,    "Luxor Datorer AB", "ABC 800 M/HR", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802_state,   0,    "Luxor Datorer AB", "ABC 802",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806_state,   0,    "Luxor Datorer AB", "ABC 806",      MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS          INIT        COMPANY             FULLNAME        FLAGS
+COMP( 1981, abc800c, 0,       0,      abc800c, abc800, abc800c_state, empty_init, "Luxor Datorer AB", "ABC 800 C/HR", MACHINE_SUPPORTS_SAVE )
+COMP( 1981, abc800m, abc800c, 0,      abc800m, abc800, abc800m_state, empty_init, "Luxor Datorer AB", "ABC 800 M/HR", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, abc802,  0,       0,      abc802,  abc802, abc802_state,  empty_init, "Luxor Datorer AB", "ABC 802",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, abc806,  0,       0,      abc806,  abc806, abc806_state,  empty_init, "Luxor Datorer AB", "ABC 806",      MACHINE_SUPPORTS_SAVE )

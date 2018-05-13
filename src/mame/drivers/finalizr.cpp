@@ -366,5 +366,5 @@ ROM_END
 
 
 
-GAME( 1985, finalizr,  0,        finalizr, finalizr,  finalizr_state, 0, ROT90, "Konami",  "Finalizer - Super Transformation",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, finalizrb, finalizr, finalizr, finalizrb, finalizr_state, 0, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, finalizr,  0,        finalizr, finalizr,  finalizr_state, empty_init, ROT90, "Konami",  "Finalizer - Super Transformation",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, finalizrb, finalizr, finalizr, finalizrb, finalizr_state, empty_init, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

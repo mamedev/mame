@@ -305,7 +305,7 @@ public:
 	std::unique_ptr<rollext_renderer> m_renderer;
 
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-	DECLARE_DRIVER_INIT(rollext);
+	void init_rollext();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -566,7 +566,7 @@ INTERRUPT_GEN_MEMBER(rollext_state::vblank_interrupt)
 	m_maincpu->set_input_line(tms32082_mp_device::INPUT_X1, ASSERT_LINE);
 }
 
-DRIVER_INIT_MEMBER(rollext_state, rollext)
+void rollext_state::init_rollext()
 {
 	m_maincpu->set_command_callback(write32_delegate(FUNC(rollext_state::cmd_callback),this));
 }
@@ -588,4 +588,4 @@ ROM_START(rollext)
 ROM_END
 
 
-GAME( 1999, rollext, 0, rollext, rollext, rollext_state, rollext, ROT0, "Gaelco", "ROLLing eX.tre.me", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, rollext, 0, rollext, rollext, rollext_state, init_rollext, ROT0, "Gaelco", "ROLLing eX.tre.me", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

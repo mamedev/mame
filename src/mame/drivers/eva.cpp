@@ -233,6 +233,6 @@ ROM_END
 
 
 
-//    YEAR  NAME   PARENT CMP MACHINE INPUT  STATE   INIT  COMPANY, FULLNAME, FLAGS
-SYST( 1984, eva24, 0,      0, eva24,  eva24, eva_state, 0, "Chrysler", "Electronic Voice Alert (24-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-SYST( 1983, eva11, eva24,  0, eva11,  eva11, eva_state, 0, "Chrysler", "Electronic Voice Alert (11-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT CMP MACHINE INPUT  CLASS      INIT        COMPANY     FULLNAME                                FLAGS
+SYST( 1984, eva24, 0,      0, eva24,  eva24, eva_state, empty_init, "Chrysler", "Electronic Voice Alert (24-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+SYST( 1983, eva11, eva24,  0, eva11,  eva11, eva_state, empty_init, "Chrysler", "Electronic Voice Alert (11-function)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

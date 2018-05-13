@@ -1013,7 +1013,7 @@ void md_base_state::megadriv_init_common()
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
 }
 
-DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
+void md_base_state::init_megadriv_c2()
 {
 	megadriv_init_common();
 
@@ -1027,7 +1027,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 
 
 
-DRIVER_INIT_MEMBER(md_base_state, megadriv)
+void md_base_state::init_megadriv()
 {
 	megadriv_init_common();
 
@@ -1040,7 +1040,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadriv)
 	m_version_hi_nibble = 0xa0; // Export NTSC no-SCD
 }
 
-DRIVER_INIT_MEMBER(md_base_state, megadrij)
+void md_base_state::init_megadrij()
 {
 	megadriv_init_common();
 
@@ -1053,7 +1053,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadrij)
 	m_version_hi_nibble = 0x20; // JPN NTSC no-SCD
 }
 
-DRIVER_INIT_MEMBER(md_base_state, megadrie)
+void md_base_state::init_megadrie()
 {
 	megadriv_init_common();
 

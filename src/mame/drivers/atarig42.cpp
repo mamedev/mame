@@ -820,7 +820,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarig42_0x200_state,roadriot)
+void atarig42_0x200_state::init_roadriot()
 {
 	m_playfield_base = 0x400;
 
@@ -851,7 +851,7 @@ DRIVER_INIT_MEMBER(atarig42_0x200_state,roadriot)
 }
 
 
-DRIVER_INIT_MEMBER(atarig42_0x400_state,guardian)
+void atarig42_0x400_state::init_guardian()
 {
 	m_playfield_base = 0x000;
 
@@ -893,7 +893,7 @@ DRIVER_INIT_MEMBER(atarig42_0x400_state,guardian)
  *
  *************************************/
 
-GAME( 1991, roadriot,  0,        atarig42_0x200, roadriot, atarig42_0x200_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 1, 04 Dec 1991)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1991, roadriota, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 2, 13 Nov 1991)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1991, roadriotb, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 3, 04 Jun 1991)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1992, guardian,  0,        atarig42_0x400, guardian, atarig42_0x400_state, guardian, ROT0, "Atari Games", "Guardians of the 'Hood", 0 )
+GAME( 1991, roadriot,  0,        atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 1, 04 Dec 1991)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1991, roadriota, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 2, 13 Nov 1991)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1991, roadriotb, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 3, 04 Jun 1991)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1992, guardian,  0,        atarig42_0x400, guardian, atarig42_0x400_state, init_guardian, ROT0, "Atari Games", "Guardians of the 'Hood", 0 )

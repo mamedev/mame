@@ -46,10 +46,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_tx);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_WRITE_LINE_MEMBER(update_aciabaud_scale);
-	DECLARE_DRIVER_INIT(sys903);
-	DECLARE_DRIVER_INIT(comg080);
-	DECLARE_DRIVER_INIT(s903mod);
-	DECLARE_DRIVER_INIT(sys905);
+	void init_sys903();
+	void init_comg080();
+	void init_s903mod();
+	void init_sys905();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_calomega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(calomega);

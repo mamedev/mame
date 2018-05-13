@@ -331,5 +331,5 @@ ROM_END
 
 
 
-GAME( 1989, badlandsb, badlands, badlandsb, badlandsb, badlandsbl_state, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", MACHINE_NOT_WORKING )
-GAME( 1989, badlandsb2,badlands, badlandsb, badlandsb, badlandsbl_state, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", MACHINE_NOT_WORKING )
+GAME( 1989, badlandsb,  badlands, badlandsb, badlandsb, badlandsbl_state, empty_init, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", MACHINE_NOT_WORKING )
+GAME( 1989, badlandsb2, badlands, badlandsb, badlandsb, badlandsbl_state, empty_init, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", MACHINE_NOT_WORKING )

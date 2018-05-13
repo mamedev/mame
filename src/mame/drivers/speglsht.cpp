@@ -143,7 +143,7 @@ public:
 	DECLARE_WRITE32_MEMBER(cop_w);
 	DECLARE_READ32_MEMBER(cop_r);
 	DECLARE_READ32_MEMBER(irq_ack_clear);
-	DECLARE_DRIVER_INIT(speglsht);
+	void init_speglsht();
 	DECLARE_MACHINE_RESET(speglsht);
 	virtual void machine_start() override;
 	DECLARE_VIDEO_START(speglsht);
@@ -455,10 +455,10 @@ ROM_START( speglsht )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(speglsht_state,speglsht)
+void speglsht_state::init_speglsht()
 {
 	m_maincpu->set_st0016_game_flag(3);
 }
 
 
-GAME( 1994, speglsht, 0, speglsht, speglsht, speglsht_state, speglsht, ROT0, "Seta",  "Super Eagle Shot", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, speglsht, 0, speglsht, speglsht, speglsht_state, init_speglsht, ROT0, "Seta",  "Super Eagle Shot", MACHINE_IMPERFECT_GRAPHICS )

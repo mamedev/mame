@@ -114,5 +114,5 @@ ROM_END
 
 /* Driver */
 
-//   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   STATE         INIT  COMPANY   FULLNAME      FLAGS
-COMP(19??, systec, 0,      0,       systec,  systec, systec_state, 0,    "Systec", "Systec Z80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY   FULLNAME      FLAGS
+COMP(19??, systec, 0,      0,      systec,  systec, systec_state, empty_init, "Systec", "Systec Z80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

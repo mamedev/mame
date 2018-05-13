@@ -56,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(prot_data_w);
 	DECLARE_READ8_MEMBER(prot_data_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mightguy_area_r);
-	DECLARE_DRIVER_INIT(mightguy);
+	void init_mightguy();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
@@ -85,6 +85,6 @@ public:
 private:
 	void mightguy_io_map(address_map &map);
 	void mightguy_audio_io_map(address_map &map);
-	
+
 	required_device<nb1412m2_device> m_prot;
 };

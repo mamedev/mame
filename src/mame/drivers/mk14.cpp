@@ -235,5 +235,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT  COMPANY                 FULLNAME  FLAGS
-COMP( 1977, mk14,  0,      0,      mk14,      mk14,  mk14_state, 0,    "Science of Cambridge", "MK-14",  0 )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                 FULLNAME  FLAGS
+COMP( 1977, mk14, 0,      0,      mk14,    mk14,  mk14_state, empty_init, "Science of Cambridge", "MK-14",  0 )

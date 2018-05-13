@@ -268,7 +268,7 @@ public:
 	DECLARE_READ8_MEMBER(id6_r);
 	DECLARE_READ8_MEMBER(id7_r);
 
-	DECLARE_DRIVER_INIT(m2);
+	void init_m2();
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1470,20 +1470,19 @@ ROM_START(3do_m2)
 	ROMX_LOAD( "fz35_jpn.bin", 0x000000, 0x100000, CRC(e1c5bfd3) SHA1(0a3e27d672be79eeee1d2dc2da60d82f6eba7934), ROM_BIOS(1) )
 ROM_END
 
-DRIVER_INIT_MEMBER(konamim2_state,m2)
+void konamim2_state::init_m2()
 {
-
 }
 
-GAME( 1997, polystar, 0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Tobe! Polystars (ver JAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, totlvice, 0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Total Vice (ver EBA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, totlvicu, totlvice, m2, m2, konamim2_state, m2, ROT0, "Konami", "Total Vice (ver UAC)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, totlvicj, totlvice, m2, m2, konamim2_state, m2, ROT0, "Konami", "Total Vice (ver JAD)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, totlvica, totlvice, m2, m2, konamim2_state, m2, ROT0, "Konami", "Total Vice (ver AAB)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, btltryst, 0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Battle Tryst (ver JAC)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, heatof11, 0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, evilngt,  0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Evil Night (ver UBA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, evilngte, evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Evil Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, hellngt,  evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Hell Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, polystar, 0,        m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Tobe! Polystars (ver JAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, totlvice, 0,        m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Total Vice (ver EBA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, totlvicu, totlvice, m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Total Vice (ver UAC)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, totlvicj, totlvice, m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Total Vice (ver JAD)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, totlvica, totlvice, m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Total Vice (ver AAB)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, btltryst, 0,        m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Battle Tryst (ver JAC)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, heatof11, 0,        m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, evilngt,  0,        m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Evil Night (ver UBA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, evilngte, evilngt,  m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Evil Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, hellngt,  evilngt,  m2, m2, konamim2_state, init_m2, ROT0, "Konami", "Hell Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-CONS( 199?, 3do_m2,     0,      0,    _3do_m2,    m2,    konamim2_state, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 199?, 3do_m2, 0, 0,  _3do_m2, m2, konamim2_state, empty_init,    "3DO",    "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

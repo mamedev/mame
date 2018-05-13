@@ -414,10 +414,10 @@ ROM_END
 
 
 
-GAME( 1982, mrdo,     0,    mrdo, mrdo, mrdo_state, 0, ROT270, "Universal",                 "Mr. Do!",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrdoy,    mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "Universal",                 "Mr. Do! (prototype)", MACHINE_SUPPORTS_SAVE ) /* aka "Yukidaruma" */
-GAME( 1982, mrdot,    mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "Universal (Taito license)", "Mr. Do! (Taito)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrdofix,  mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "Universal (Taito license)", "Mr. Do! (bugfixed)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrlo,     mrdo, mrlo, mrdo, mrdo_state, 0, ROT270, "bootleg",                   "Mr. Lo!",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrdu,     mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "bootleg",                   "Mr. Du!",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, yankeedo, mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "hack",                      "Yankee DO!",          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdo,     0,    mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal",                 "Mr. Do!",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdoy,    mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal",                 "Mr. Do! (prototype)", MACHINE_SUPPORTS_SAVE ) /* aka "Yukidaruma" */
+GAME( 1982, mrdot,    mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal (Taito license)", "Mr. Do! (Taito)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdofix,  mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal (Taito license)", "Mr. Do! (bugfixed)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrlo,     mrdo, mrlo, mrdo, mrdo_state, empty_init, ROT270, "bootleg",                   "Mr. Lo!",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdu,     mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "bootleg",                   "Mr. Du!",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, yankeedo, mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "hack",                      "Yankee DO!",          MACHINE_SUPPORTS_SAVE )

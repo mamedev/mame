@@ -380,16 +380,15 @@ ROM sockets U63 & U64 empty
 
 ****************************************************************************/
 
-DRIVER_INIT_MEMBER(md_boot_state,puckpkmn)
+void md_boot_state::init_puckpkmn()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	size_t len = memregion("maincpu")->bytes();
-	int i;
+	const size_t len = memregion("maincpu")->bytes();
 
-	for (i = 0; i < len; i++)
+	for (size_t i = 0; i < len; i++)
 		rom[i] = bitswap<8>(rom[i],1,4,2,0,7,5,3,6);
 
-	DRIVER_INIT_CALL(megadriv);
+	init_megadriv();
 }
 
 ROM_START( puckpkmn ) /* Puckman Pockimon  (c)2000 Genie */
@@ -490,7 +489,7 @@ ROM_START( jzth )
 ROM_END
 
 /* Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile ram */  // is 'Genie 2000' part of the title, and the parent set a bootleg?
-GAME( 2000, puckpkmn, 0,        puckpkmn,  puckpkmn, md_boot_state, puckpkmn, ROT0, "Genie",                  "Puckman Pockimon (set 1)", 0 )
-GAME( 2000, puckpkmna,puckpkmn, puckpkmna, puckpkmn, md_boot_state, puckpkmn, ROT0, "IBS",                    "Puckman Pockimon (set 2)", 0 )
-GAME( 2000, puckpkmnb,puckpkmn, puckpkmna, puckpkmn, md_boot_state, puckpkmn, ROT0, "Sun Mixing",             "Puckman Pockimon (set 3)", 0 )
-GAME( 2000, jzth,     0,        jzth,      jzth,     md_boot_state, puckpkmn, ROT0, "<unknown>",              "Juezhan Tianhuang", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, puckpkmn,  0,        puckpkmn,  puckpkmn, md_boot_state, init_puckpkmn, ROT0, "Genie",                  "Puckman Pockimon (set 1)", 0 )
+GAME( 2000, puckpkmna, puckpkmn, puckpkmna, puckpkmn, md_boot_state, init_puckpkmn, ROT0, "IBS",                    "Puckman Pockimon (set 2)", 0 )
+GAME( 2000, puckpkmnb, puckpkmn, puckpkmna, puckpkmn, md_boot_state, init_puckpkmn, ROT0, "Sun Mixing",             "Puckman Pockimon (set 3)", 0 )
+GAME( 2000, jzth,      0,        jzth,      jzth,     md_boot_state, init_puckpkmn, ROT0, "<unknown>",              "Juezhan Tianhuang", MACHINE_IMPERFECT_SOUND )

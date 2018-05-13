@@ -346,9 +346,8 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cybstorm_state, cybstorm)
+void cybstorm_state::init_cybstorm()
 {
-
 }
 
 
@@ -359,4 +358,4 @@ DRIVER_INIT_MEMBER(cybstorm_state, cybstorm)
  *
  *************************************/
 
-GAME( 1993, cybstorm, 0, cybstorm, cybstorm, cybstorm_state, cybstorm, ROT0, "Atari Games", "Cyberstorm (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cybstorm, 0, cybstorm, cybstorm, cybstorm_state, init_cybstorm, ROT0, "Atari Games", "Cyberstorm (prototype)", MACHINE_SUPPORTS_SAVE )

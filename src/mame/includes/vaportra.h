@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_WRITE16_MEMBER(palette_ext_w);
 
-	DECLARE_DRIVER_INIT(vaportra);
+	void init_vaportra();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

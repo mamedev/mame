@@ -203,7 +203,7 @@ public:
 	DECLARE_WRITE16_MEMBER( vram_w );
 
 	DECLARE_MACHINE_START(nevada);
-	DECLARE_DRIVER_INIT(nevada);
+	void init_nevada();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -663,7 +663,7 @@ ROM_END
 /*************************
 *      Driver Init       *
 *************************/
-DRIVER_INIT_MEMBER(nevada_state,nevada)
+void nevada_state::init_nevada()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -690,5 +690,5 @@ DRIVER_INIT_MEMBER(nevada_state,nevada)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME     PARENT MACHINE INPUT   STATE         INIT    ROT   COMPANY     FULLNAME             FLAGS
-GAME( 1995, nevada,  0,     nevada, nevada, nevada_state, nevada, ROT0, "VLC Inc.", "VLC Nevada",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT MACHINE INPUT   STATE         INIT         ROT   COMPANY     FULLNAME             FLAGS
+GAME( 1995, nevada,  0,     nevada, nevada, nevada_state, init_nevada, ROT0, "VLC Inc.", "VLC Nevada",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
