@@ -43,7 +43,7 @@ public:
 		m_refresh_timer(nullptr)
 	{ }
 
-	DECLARE_DRIVER_INIT(sidewndr);
+	void init_sidewndr();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(sidewndr_payout_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_coinage_r);
@@ -655,11 +655,11 @@ MACHINE_CONFIG_START(acefruit_state::acefruit)
 	/* sound hardware */
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(acefruit_state,sidewndr)
+void acefruit_state::init_sidewndr()
 {
-	uint8_t *ROM = memregion( "maincpu" )->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	/* replace "ret nc" ( 0xd0 ) with "di" */
-	ROM[ 0 ] = 0xf3;
+	ROM[0] = 0xf3;
 	/* this is either a bad dump or the cpu core should set the carry flag on reset */
 }
 
@@ -793,8 +793,8 @@ ROM_START( acefruit  )
 ROM_END
 
 
-GAMEL( 1981?, sidewndr, 0,        acefruit, sidewndr, acefruit_state, sidewndr, ROT270, "ACE", "Sidewinder", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
-GAMEL( 1981?, spellbnd, 0,        acefruit, spellbnd, acefruit_state, 0,        ROT270, "ACE", "Spellbound", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
-GAME ( 1982?, starspnr, 0,        acefruit, starspnr, acefruit_state, 0,        ROT270, "ACE", "Starspinner (Dutch/Nederlands)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME ( 1982?, acefruit, 0,        acefruit, spellbnd, acefruit_state, 0,        ROT270, "ACE", "Silhouette", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs and video in bonus game need fixing on this one
+GAMEL( 1981?, sidewndr, 0, acefruit, sidewndr, acefruit_state, init_sidewndr, ROT270, "ACE", "Sidewinder", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
+GAMEL( 1981?, spellbnd, 0, acefruit, spellbnd, acefruit_state, empty_init,    ROT270, "ACE", "Spellbound", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
+GAME(  1982?, starspnr, 0, acefruit, starspnr, acefruit_state, empty_init,    ROT270, "ACE", "Starspinner (Dutch/Nederlands)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(  1982?, acefruit, 0, acefruit, spellbnd, acefruit_state, empty_init,    ROT270, "ACE", "Silhouette", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs and video in bonus game need fixing on this one
 // not dumped: Magnum?

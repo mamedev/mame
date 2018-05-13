@@ -2142,7 +2142,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(homedata_state,jogakuen)
+void homedata_state::init_jogakuen()
 {
 	/* it seems that Mahjong Jogakuen runs on the same board as the others,
 	   but with just these two addresses swapped. Instead of creating a new
@@ -2151,49 +2151,49 @@ DRIVER_INIT_MEMBER(homedata_state,jogakuen)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8005, 0x8005, write8_delegate(FUNC(homedata_state::pteacher_gfx_bank_w),this));
 }
 
-DRIVER_INIT_MEMBER(homedata_state,mjikaga)
+void homedata_state::init_mjikaga()
 {
 	/* Mahjong Ikagadesuka is different as well. */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7802, 0x7802, read8_delegate(FUNC(homedata_state::pteacher_snd_r),this));
 	m_audiocpu->space(AS_PROGRAM).install_write_handler(0x0123, 0x0123, write8_delegate(FUNC(homedata_state::pteacher_snd_answer_w),this));
 }
 
-DRIVER_INIT_MEMBER(homedata_state,reikaids)
+void homedata_state::init_reikaids()
 {
 	m_priority = 0;
 }
 
-DRIVER_INIT_MEMBER(homedata_state,battlcry)
+void homedata_state::init_battlcry()
 {
 	m_priority = 1; /* priority and initial value for bank write */
 }
 
-DRIVER_INIT_MEMBER(homedata_state,mirderby)
+void homedata_state::init_mirderby()
 {
 }
 
 
-GAME( 1987, hourouki,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Hourouki Part 1 - Seisyun Hen (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mhgaiden,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Hourouki Gaiden (Japan)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mjhokite,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Hourouki Okite (Japan)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mjclinic,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Clinic (Japan, set 1)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mjclinica, mjclinic, mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Clinic (Japan, set 2)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mrokumei,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Rokumeikan (Japan)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hourouki,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Hourouki Part 1 - Seisyun Hen (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mhgaiden,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Hourouki Gaiden (Japan)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mjhokite,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Hourouki Okite (Japan)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mjclinic,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Clinic (Japan, set 1)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mjclinica, mjclinic, mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Clinic (Japan, set 2)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mrokumei,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Rokumeikan (Japan)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, reikaids,  0,        reikaids, reikaids, homedata_state, reikaids,   ROT0, "Home Data",  "Reikai Doushi (Japan)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, battlcry,  0,        reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data",  "Battlecry (Version E)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, battlcryc, battlcry, reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data",  "Battlecry (Version C)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, battlcryp, battlcry, reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data",  "Battlecry (Prototype)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjkojink,  0,        pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Kojinkyouju (Private Teacher) (Japan)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mjjoship,  0,        pteacher, mjjoship, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Joshi Pro-wres -Give up 5 byou mae- (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, vitaminc,  0,        pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Vitamin C (Japan)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjyougo,   0,        pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong-yougo no Kisotairyoku (Japan)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjkinjas,  0,        mjkinjas, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Kinjirareta Asobi (Japan)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1992?,jogakuen,  0,        pteacher, jogakuen, homedata_state, jogakuen,   ROT0, "Windom",     "Mahjong Jogakuen (Japan)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, reikaids,  0,        reikaids, reikaids, homedata_state, init_reikaids, ROT0, "Home Data",  "Reikai Doushi (Japan)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1991, battlcry,  0,        reikaids, battlcry, homedata_state, init_battlcry, ROT0, "Home Data",  "Battlecry (Version E)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, battlcryc, battlcry, reikaids, battlcry, homedata_state, init_battlcry, ROT0, "Home Data",  "Battlecry (Version C)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, battlcryp, battlcry, reikaids, battlcry, homedata_state, init_battlcry, ROT0, "Home Data",  "Battlecry (Prototype)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjkojink,  0,        pteacher, pteacher, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Kojinkyouju (Private Teacher) (Japan)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mjjoship,  0,        pteacher, mjjoship, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Joshi Pro-wres -Give up 5 byou mae- (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vitaminc,  0,        pteacher, pteacher, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Vitamin C (Japan)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjyougo,   0,        pteacher, pteacher, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong-yougo no Kisotairyoku (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjkinjas,  0,        mjkinjas, pteacher, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Kinjirareta Asobi (Japan)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1992?,jogakuen,  0,        pteacher, jogakuen, homedata_state, init_jogakuen, ROT0, "Windom",     "Mahjong Jogakuen (Japan)",                            MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, lemnangl,  0,        lemnangl, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Lemon Angel (Japan)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjprivat,  0,        lemnangl, pteacher, homedata_state, 0,          ROT0, "Matoba",     "Mahjong Private (Japan)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lemnangl,  0,        lemnangl, pteacher, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Lemon Angel (Japan)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjprivat,  0,        lemnangl, pteacher, homedata_state, empty_init,    ROT0, "Matoba",     "Mahjong Private (Japan)",                             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991?,mjikaga,   0,        lemnangl, mjikaga,  homedata_state, mjikaga,    ROT0, "Mitchell",   "Mahjong Ikaga Desu ka (Japan)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991?,mjikaga,   0,        lemnangl, mjikaga,  homedata_state, init_mjikaga,  ROT0, "Mitchell",   "Mahjong Ikaga Desu ka (Japan)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, mirderby,  0,        mirderby, mirderby, homedata_state, mirderby,   ROT0, "Home Data?", "Miracle Derby - Ascot",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1988, mirderby,  0,        mirderby, mirderby, homedata_state, init_mirderby, ROT0, "Home Data?", "Miracle Derby - Ascot",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

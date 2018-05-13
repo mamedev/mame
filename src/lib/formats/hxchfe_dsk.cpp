@@ -403,7 +403,10 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 bool hfe_format::save(io_generic *io, floppy_image *image)
 {
 	std::vector<uint8_t> cylbuf;
-	cylbuf.resize(0x6200);
+
+	// Create a buffer that is big enough to handle HD formats. We don't
+	// know the track length until we generate the HFE bitstream.
+	cylbuf.resize(0x10000);
 
 	uint8_t header[HEADER_LENGTH];
 	uint8_t track_table[TRACK_TABLE_LENGTH];

@@ -79,4 +79,4 @@ ROM_START( d461 )
 	ROM_LOAD( "dgc_100_5776-05.bin", 0x0000, 0x8000, CRC(fdce2132) SHA1(82eac1751c31f99d4490505e16af5e7e7a52b310) )
 ROM_END
 
-COMP( 1986, d461, 0, 0, d461, d461, d400_state, 0, "Data General", "Dasher D461", MACHINE_IS_SKELETON )
+COMP( 1986, d461, 0, 0, d461, d461, d400_state, empty_init, "Data General", "Dasher D461", MACHINE_IS_SKELETON )

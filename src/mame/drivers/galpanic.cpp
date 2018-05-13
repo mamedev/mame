@@ -352,6 +352,6 @@ ROM_START( galpanicb ) /* PAMERA-04 PCB with the CALC1 MCU used */
 	ROM_LOAD( "pm007e.u",     0x80000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
 ROM_END
 
-GAME( 1990, galpanic,  0,        galpanic,  galpanic,  galpanic_state, 0, ROT90, "Kaneko", "Gals Panic (Unprotected)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galpanica, galpanic, galpanica, galpanica, galpanic_state, 0, ROT90, "Kaneko", "Gals Panic (MCU Protected, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galpanicb, galpanic, galpanica, galpanica, galpanic_state, 0, ROT90, "Kaneko", "Gals Panic (MCU Protected, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanic,  0,        galpanic,  galpanic,  galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (Unprotected)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanica, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (MCU Protected, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanicb, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (MCU Protected, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

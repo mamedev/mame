@@ -549,9 +549,9 @@ ROM_START( kot )
 ROM_END
 
 
-GAME( 1988, konek,    0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "Konek-Gorbunok",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, sosterm,  0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "S.O.S.",             MACHINE_SUPPORTS_SAVE )
-GAME( 1988, koroleva, 0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "Snezhnaja Koroleva", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bilyard,  0, tiamc1, tiamc1,  tiamc1_state, 0, ROT0, "Terminal", "Billiard",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gorodki,  0, tiamc1, gorodki, tiamc1_state, 0, ROT0, "Terminal", "Gorodki",            MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kot,      0, kot,    kot,     tiamc1_state, 0, ROT0, "Terminal", "Kot-Rybolov",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1988, konek,    0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "Konek-Gorbunok",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, sosterm,  0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "S.O.S.",             MACHINE_SUPPORTS_SAVE )
+GAME( 1988, koroleva, 0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "Snezhnaja Koroleva", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bilyard,  0, tiamc1, tiamc1,  tiamc1_state, empty_init, ROT0, "Terminal", "Billiard",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gorodki,  0, tiamc1, gorodki, tiamc1_state, empty_init, ROT0, "Terminal", "Gorodki",            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kot,      0, kot,    kot,     tiamc1_state, empty_init, ROT0, "Terminal", "Kot-Rybolov",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

@@ -522,5 +522,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY                FULLNAME             FLAGS  LAYOUT */
-GAMEL( 19??, chance32, 0,      chance32, chance32, chance32_state, 0,    ROT0, "PAL System Co, Ltd.", "Chance Thirty Two", 0,     layout_chance32 )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT   COMPANY                FULLNAME             FLAGS  LAYOUT */
+GAMEL( 19??, chance32, 0,      chance32, chance32, chance32_state, empty_init, ROT0, "PAL System Co, Ltd.", "Chance Thirty Two", 0,     layout_chance32 )

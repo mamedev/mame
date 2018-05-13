@@ -1069,3 +1069,14 @@ if (VIDEOS["BT45X"]~=null) then
 		MAME_DIR .. "src/devices/video/bt45x.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/topcat.h,VIDEOS["TOPCAT"] = true
+--------------------------------------------------
+if (VIDEOS["TOPCAT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/topcat.cpp",
+		MAME_DIR .. "src/devices/video/topcat.h",
+	}
+end

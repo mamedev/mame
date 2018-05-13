@@ -1617,12 +1617,12 @@ ROM_END
 /*************************
 *      Game Drivers      *
 *************************/
-//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT  ROT   COMPANY                                  FULLNAME                              FLAGS                LAYOUT
-GAMEL( 1984, videopkr, 0,        videopkr, videopkr, videopkr_state, 0,    ROT0, "InterFlip",                             "Video Poker",                        0,                   layout_videopkr )
-GAMEL( 1984, fortune1, videopkr, fortune1, videopkr, videopkr_state, 0,    ROT0, "IGT - International Game Technology",   "Fortune I (PK485-S) Draw Poker",     0,                   layout_videopkr )
-GAMEL( 1984, blckjack, videopkr, blckjack, blckjack, videopkr_state, 0,    ROT0, "InterFlip",                             "Black Jack",                         0,                   layout_blckjack )
-GAMEL( 1987, videodad, videopkr, videodad, videodad, videopkr_state, 0,    ROT0, "InterFlip",                             "Video Dado",                         0,                   layout_videodad )
-GAMEL( 1987, videocba, videopkr, videodad, videocba, videopkr_state, 0,    ROT0, "InterFlip",                             "Video Cordoba",                      0,                   layout_videocba )
-GAMEL( 1987, babypkr,  videopkr, babypkr,  babypkr,  videopkr_state, 0,    ROT0, "Recreativos Franco",                    "Baby Poker",                         0,                   layout_babypkr  )
-GAMEL( 1987, babydad,  videopkr, babypkr,  babydad,  videopkr_state, 0,    ROT0, "Recreativos Franco",                    "Baby Dado",                          0,                   layout_babydad  )
-GAMEL( 198?, bpoker,   videopkr, bpoker,   babypkr,  videopkr_state, 0,    ROT0, "Recreativos Franco",                    "Video Poker (v1403)",                MACHINE_NOT_WORKING, layout_babypkr  )
+//     YEAR  NAME      PARENT    MACHINE   INPUT     CLASS           INIT        ROT   COMPANY                                FULLNAME                          FLAGS                LAYOUT
+GAMEL( 1984, videopkr, 0,        videopkr, videopkr, videopkr_state, empty_init, ROT0, "InterFlip",                           "Video Poker",                    0,                   layout_videopkr )
+GAMEL( 1984, fortune1, videopkr, fortune1, videopkr, videopkr_state, empty_init, ROT0, "IGT - International Game Technology", "Fortune I (PK485-S) Draw Poker", 0,                   layout_videopkr )
+GAMEL( 1984, blckjack, videopkr, blckjack, blckjack, videopkr_state, empty_init, ROT0, "InterFlip",                           "Black Jack",                     0,                   layout_blckjack )
+GAMEL( 1987, videodad, videopkr, videodad, videodad, videopkr_state, empty_init, ROT0, "InterFlip",                           "Video Dado",                     0,                   layout_videodad )
+GAMEL( 1987, videocba, videopkr, videodad, videocba, videopkr_state, empty_init, ROT0, "InterFlip",                           "Video Cordoba",                  0,                   layout_videocba )
+GAMEL( 1987, babypkr,  videopkr, babypkr,  babypkr,  videopkr_state, empty_init, ROT0, "Recreativos Franco",                  "Baby Poker",                     0,                   layout_babypkr  )
+GAMEL( 1987, babydad,  videopkr, babypkr,  babydad,  videopkr_state, empty_init, ROT0, "Recreativos Franco",                  "Baby Dado",                      0,                   layout_babydad  )
+GAMEL( 198?, bpoker,   videopkr, bpoker,   babypkr,  videopkr_state, empty_init, ROT0, "Recreativos Franco",                  "Video Poker (v1403)",            MACHINE_NOT_WORKING, layout_babypkr  )

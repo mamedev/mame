@@ -605,5 +605,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE         INIT  COMPANY        FULLNAME   FLAGS
-COMP( 1990, ms0515, 0,      0,       ms0515,    ms0515,  ms0515_state, 0,    "Elektronika", "MS 0515", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME   FLAGS
+COMP( 1990, ms0515, 0,      0,      ms0515,  ms0515, ms0515_state, empty_init, "Elektronika", "MS 0515", 0 )

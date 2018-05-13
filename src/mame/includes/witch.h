@@ -85,7 +85,7 @@ public:
 	DECLARE_READ8_MEMBER(prot_read_700x);
 	DECLARE_WRITE8_MEMBER(xscroll_w);
 	DECLARE_WRITE8_MEMBER(yscroll_w);
-	DECLARE_DRIVER_INIT(witch);
+	void init_witch();
 	TILE_GET_INFO_MEMBER(get_gfx0b_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx0a_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx1_tile_info);
@@ -98,7 +98,7 @@ public:
 	void witch_common_map(address_map &map);
 	void witch_main_map(address_map &map);
 	void witch_sub_map(address_map &map);
-	
+
 protected:
 	void video_common_init();
 	bool has_spr_rom_bank;
@@ -112,7 +112,7 @@ public:
 		: witch_state(mconfig, type, tag),
 		m_paletteram(*this, "paletteram")
 	{ }
-	
+
 	void keirinou_common_map(address_map &map);
 	void keirinou_main_map(address_map &map);
 	void keirinou_sub_map(address_map &map);

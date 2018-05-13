@@ -315,7 +315,7 @@ static INPUT_PORTS_START( svi328 )
 	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)   PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
 	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)  PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
 	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)    PORT_NAME("Keypad ,")
+	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))
 INPUT_PORTS_END
 
 
@@ -637,8 +637,8 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT    COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY         FULLNAME          FLAGS
-COMP( 1983, svi318,  0,        0,      svi318,  svi318, svi3x8_state, 0,    "Spectravideo", "SVI-318 (PAL)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, svi318n, svi318,   0,      svi318n, svi318, svi3x8_state, 0,    "Spectravideo", "SVI-318 (NTSC)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, svi328,  0,        0,      svi328,  svi328, svi3x8_state, 0,    "Spectravideo", "SVI-328 (PAL)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, svi328n, svi328,   0,      svi328n, svi328, svi3x8_state, 0,    "Spectravideo", "SVI-328 (NTSC)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME          FLAGS
+COMP( 1983, svi318,  0,      0,      svi318,  svi318, svi3x8_state, empty_init, "Spectravideo", "SVI-318 (PAL)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, svi318n, svi318, 0,      svi318n, svi318, svi3x8_state, empty_init, "Spectravideo", "SVI-318 (NTSC)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, svi328,  0,      0,      svi328,  svi328, svi3x8_state, empty_init, "Spectravideo", "SVI-328 (PAL)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, svi328n, svi328, 0,      svi328n, svi328, svi3x8_state, empty_init, "Spectravideo", "SVI-328 (NTSC)", MACHINE_SUPPORTS_SAVE )

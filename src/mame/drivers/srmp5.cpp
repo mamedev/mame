@@ -119,7 +119,7 @@ public:
 	DECLARE_READ8_MEMBER(cmd2_r);
 	DECLARE_READ8_MEMBER(cmd_stat8_r);
 	virtual void machine_start() override;
-	DECLARE_DRIVER_INIT(srmp5);
+	void init_srmp5();
 	uint32_t screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 
@@ -619,7 +619,7 @@ ROM_START( srmp5 )
 #endif
 ROM_END
 
-DRIVER_INIT_MEMBER(srmp5_state,srmp5)
+void srmp5_state::init_srmp5()
 {
 	m_soundcpu->set_st0016_game_flag(9);
 
@@ -630,4 +630,4 @@ DRIVER_INIT_MEMBER(srmp5_state,srmp5)
 #endif
 }
 
-GAME( 1994, srmp5,  0,    srmp5,    srmp5, srmp5_state,    srmp5,    ROT0, "Seta",  "Super Real Mahjong P5", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, srmp5, 0, srmp5, srmp5, srmp5_state, init_srmp5, ROT0, "Seta", "Super Real Mahjong P5", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

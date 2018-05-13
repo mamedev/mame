@@ -702,9 +702,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, kikikai,  0,        kikikai,  kikikai,  mexico86_state, 0, ROT90, "Taito Corporation",  "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1986, knightb,  kikikai,  knightb,  kikikai,  mexico86_state, 0, ROT90, "bootleg",            "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kicknrun, 0,        mexico86, mexico86, mexico86_state, 0, ROT0,  "Taito Corporation",  "Kick and Run (World)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kicknrunu,kicknrun, mexico86, mexico86, mexico86_state, 0, ROT0,  "Taito America Corp", "Kick and Run (US)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86, kicknrun, mexico86, mexico86, mexico86_state, 0, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86a,kicknrun, mexico86, mexico86, mexico86_state, 0, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kikikai,  0,        kikikai,  kikikai,  mexico86_state, empty_init, ROT90, "Taito Corporation",  "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1986, knightb,  kikikai,  knightb,  kikikai,  mexico86_state, empty_init, ROT90, "bootleg",            "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrun, 0,        mexico86, mexico86, mexico86_state, empty_init, ROT0,  "Taito Corporation",  "Kick and Run (World)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrunu,kicknrun, mexico86, mexico86, mexico86_state, empty_init, ROT0,  "Taito America Corp", "Kick and Run (US)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86, kicknrun, mexico86, mexico86, mexico86_state, empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86a,kicknrun, mexico86, mexico86, mexico86_state, empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

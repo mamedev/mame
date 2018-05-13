@@ -193,7 +193,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( kb_break );
 	DECLARE_INPUT_CHANGED_MEMBER( kb_update_udk );
 
-	DECLARE_DRIVER_INIT(x07);
+	void init_x07();
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	void t6834_cmd(uint8_t cmd);

@@ -77,16 +77,16 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_outcoin_flag_r);
 
-	DECLARE_DRIVER_INIT(pairsten);
-	DECLARE_DRIVER_INIT(telmahjn);
-	DECLARE_DRIVER_INIT(gionbana);
-	DECLARE_DRIVER_INIT(omotesnd);
-	DECLARE_DRIVER_INIT(scandal);
-	DECLARE_DRIVER_INIT(mgmen89);
-	DECLARE_DRIVER_INIT(mjfocusm);
-	DECLARE_DRIVER_INIT(mjfocus);
-	DECLARE_DRIVER_INIT(pairsnb);
-	DECLARE_DRIVER_INIT(mjnanpas);
+	void init_pairsten();
+	void init_telmahjn();
+	void init_gionbana();
+	void init_omotesnd();
+	void init_scandal();
+	void init_mgmen89();
+	void init_mjfocusm();
+	void init_mjfocus();
+	void init_pairsnb();
+	void init_mjnanpas();
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(_1layer);
 

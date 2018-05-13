@@ -581,4 +581,4 @@ ROM_START(famibox)
 
 ROM_END
 
-GAME( 1986,  famibox,      0,  famibox,  famibox, famibox_state,  0, ROT0, "Nintendo", "FamicomBox", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+GAME( 1986, famibox, 0, famibox, famibox, famibox_state, empty_init, ROT0, "Nintendo", "FamicomBox", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

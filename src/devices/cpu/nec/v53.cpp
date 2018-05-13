@@ -535,8 +535,8 @@ MACHINE_CONFIG_START(v53_base_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 
-v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
-	: nec_common_device(mconfig, type, tag, owner, clock, true, fetch_xor, prefetch_size, prefetch_cycles, chip_type),
+v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
+	: nec_common_device(mconfig, type, tag, owner, clock, true, prefetch_size, prefetch_cycles, chip_type),
 	m_io_space_config( "io", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor(FUNC(v53_base_device::v53_internal_port_map), this) ),
 	m_v53tcu(*this, "pit"),
 	m_v53dmau(*this, "upd71071dma"),
@@ -576,12 +576,12 @@ v53_base_device::v53_base_device(const machine_config &mconfig, device_type type
 
 
 v53_device::v53_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v53_base_device(mconfig, V53, tag, owner, clock, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+	: v53_base_device(mconfig, V53, tag, owner, clock, 6, 1, V33_TYPE)
 {
 }
 
 
 v53a_device::v53a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v53_base_device(mconfig, V53A, tag, owner, clock, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+	: v53_base_device(mconfig, V53A, tag, owner, clock, 6, 1, V33_TYPE)
 {
 }

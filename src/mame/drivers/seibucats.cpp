@@ -114,7 +114,7 @@ public:
 	DECLARE_WRITE16_MEMBER(input_select_w);
 	DECLARE_WRITE16_MEMBER(output_latch_w);
 	DECLARE_WRITE16_MEMBER(aux_rtc_w);
-	DECLARE_DRIVER_INIT(seibucats);
+	void init_seibucats();
 
 	void seibucats(machine_config &config);
 	void seibucats_map(address_map &map);
@@ -398,18 +398,17 @@ ROM_START( emjtrapz )
 	DISK_IMAGE_READONLY( "trap zone sktp-00009", 0, SHA1(b4a51f42eeaeefc329031651859caa108418a96e) )
 ROM_END
 
-DRIVER_INIT_MEMBER(seibucats_state,seibucats)
+void seibucats_state::init_seibucats()
 {
-	int i, j;
 	uint16_t *src = (uint16_t *)memregion("gfx3")->base();
 	uint16_t tmp[0x40 / 2], offset;
 
 	// sprite_reorder() only
-	for (i = 0; i < memregion("gfx3")->bytes() / 0x40; i++)
+	for (int i = 0; i < memregion("gfx3")->bytes() / 0x40; i++)
 	{
 		memcpy(tmp, src, 0x40);
 
-		for (j = 0; j < 0x40 / 2; j++)
+		for (int j = 0; j < 0x40 / 2; j++)
 		{
 			offset = (j >> 1) | (j << 4 & 0x10);
 			*src++ = tmp[offset];
@@ -421,12 +420,12 @@ DRIVER_INIT_MEMBER(seibucats_state,seibucats)
 // Gravure Collection
 // Pakkun Ball TV
 /* 01 */ // Mahjong Shichau zo!
-/* 02 */ GAME( 1999, emjjoshi,  0,   seibucats,  seibucats, seibucats_state,  seibucats,       ROT0, "Seibu Kaihatsu / CATS",      "E-Touch Mahjong Series #2: Joshiryou de NE! (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/* 02 */ GAME( 1999, emjjoshi,  0,   seibucats,  seibucats, seibucats_state, init_seibucats, ROT0, "Seibu Kaihatsu / CATS", "E-Touch Mahjong Series #2: Joshiryou de NE! (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 /* 03 */ // Lingerie DE Ikou
 /* 04 */ // Marumie Network
 /* 05 */ // BINKAN Lips
-/* 06 */ GAME( 2001, emjscanb,  0,   seibucats,  seibucats, seibucats_state,  seibucats,       ROT0, "Seibu Kaihatsu / CATS",      "E-Touch Mahjong Series #6: Scandal Blue - Midara na Daishou (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-/* 07 */ GAME( 2001, emjtrapz,  0,   seibucats,  seibucats, seibucats_state,  seibucats,       ROT0, "Seibu Kaihatsu / CATS",      "E-Touch Mahjong Series #7: Trap Zone - Yokubou no Kaisoku Densha (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/* 06 */ GAME( 2001, emjscanb,  0,   seibucats,  seibucats, seibucats_state, init_seibucats, ROT0, "Seibu Kaihatsu / CATS", "E-Touch Mahjong Series #6: Scandal Blue - Midara na Daishou (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/* 07 */ GAME( 2001, emjtrapz,  0,   seibucats,  seibucats, seibucats_state, init_seibucats, ROT0, "Seibu Kaihatsu / CATS", "E-Touch Mahjong Series #7: Trap Zone - Yokubou no Kaisoku Densha (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 /* 08 */ // Poison
 /* 09 */ // Nurse Call
 /* 10 */ // Secret Love

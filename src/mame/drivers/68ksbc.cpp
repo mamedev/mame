@@ -87,5 +87,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS           INIT  COMPANY             FULLNAME                     FLAGS */
-COMP( 2002, 68ksbc,   0,       0,    c68ksbc,   c68ksbc, c68ksbc_state,  0,    "Wichit Sirichote", "68k Single Board Computer", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME                     FLAGS */
+COMP( 2002, 68ksbc, 0,      0,      c68ksbc, c68ksbc, c68ksbc_state, empty_init, "Wichit Sirichote", "68k Single Board Computer", MACHINE_NO_SOUND_HW)

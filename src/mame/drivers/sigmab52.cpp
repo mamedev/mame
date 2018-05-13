@@ -150,7 +150,7 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	DECLARE_DRIVER_INIT(jwildb52);
+	void init_jwildb52();
 	void jwildb52(machine_config &config);
 
 protected:
@@ -730,7 +730,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(sigmab52_state, jwildb52)
+void sigmab52_state::init_jwildb52()
 {
 }
 
@@ -739,8 +739,8 @@ DRIVER_INIT_MEMBER(sigmab52_state, jwildb52)
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY  FULLNAME                                                             FLAGS */
-GAMEL( 199?, jwildb52,  0,        jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV)",               MACHINE_NOT_WORKING, layout_sigmab52 )
-GAMEL( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV, Harrah's GFX)", MACHINE_NOT_WORKING, layout_sigmab52 )
-GAMEL( 199?, jwildb52a, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, WP02001-054, Ver.031WM)",                  MACHINE_NOT_WORKING, layout_sigmab52 )
-GAME ( 1989, s8waysfc,  0,        jwildb52, s8waysfc, sigmab52_state, jwildb52, ROT0, "Sigma", "Super 8 Ways FC (DB98103-011, Fruit combination)",                   MACHINE_NOT_WORKING )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT           ROT   COMPANY  FULLNAME                                                              FLAGS */
+GAMEL( 199?, jwildb52,  0,        jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV)",               MACHINE_NOT_WORKING, layout_sigmab52 )
+GAMEL( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, BP55114-V1104, Ver.054NMV, Harrah's GFX)", MACHINE_NOT_WORKING, layout_sigmab52 )
+GAMEL( 199?, jwildb52a, jwildb52, jwildb52, jwildb52, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, WP02001-054, Ver.031WM)",                  MACHINE_NOT_WORKING, layout_sigmab52 )
+GAME ( 1989, s8waysfc,  0,        jwildb52, s8waysfc, sigmab52_state, init_jwildb52, ROT0, "Sigma", "Super 8 Ways FC (DB98103-011, Fruit combination)",                   MACHINE_NOT_WORKING )

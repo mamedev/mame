@@ -580,6 +580,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  STATE       INIT    COMPANY           FULLNAME                FLAGS
-COMP( 1981, mm1m6,      0,      0,      mm1m6,      mm1,   mm1_state,  0,      "Nokia Data",     "MikroMikko 1 M6",      MACHINE_SUPPORTS_SAVE )
-COMP( 1981, mm1m7,      mm1m6,  0,      mm1m7,      mm1,   mm1_state,  0,      "Nokia Data",     "MikroMikko 1 M7",      MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY       FULLNAME           FLAGS
+COMP( 1981, mm1m6, 0,      0,      mm1m6,   mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M6", MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mm1m7, mm1m6,  0,      mm1m7,   mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M7", MACHINE_SUPPORTS_SAVE )

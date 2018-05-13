@@ -724,11 +724,11 @@ ROM_END
 
 
 
-GAME( 1988, mainevt,  0,        mainevt,  mainevt,  mainevt_state, 0, ROT0,  "Konami", "The Main Event (4 Players ver. Y)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mainevto, mainevt,  mainevt,  mainevt,  mainevt_state, 0, ROT0,  "Konami", "The Main Event (4 Players ver. F)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, mainevt_state, 0, ROT0,  "Konami", "The Main Event (2 Players ver. X)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, mainevt_state, 0, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors, 0,        devstors, devstors, mainevt_state, 0, ROT90, "Konami", "Devastators (ver. Z)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors2,devstors, devstors, devstor2, mainevt_state, 0, ROT90, "Konami", "Devastators (ver. X)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors3,devstors, devstors, devstors, mainevt_state, 0, ROT90, "Konami", "Devastators (ver. V)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, garuka,   devstors, devstors, devstor2, mainevt_state, 0, ROT90, "Konami", "Garuka (Japan ver. W)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevt,  0,        mainevt,  mainevt,  mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (4 Players ver. Y)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevto, mainevt,  mainevt,  mainevt,  mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (4 Players ver. F)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (2 Players ver. X)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, mainevt_state, empty_init, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors, 0,        devstors, devstors, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. Z)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors2,devstors, devstors, devstor2, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. X)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors3,devstors, devstors, devstors, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. V)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, garuka,   devstors, devstors, devstor2, mainevt_state, empty_init, ROT90, "Konami", "Garuka (Japan ver. W)",                 MACHINE_SUPPORTS_SAVE )

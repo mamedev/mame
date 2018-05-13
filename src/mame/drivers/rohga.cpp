@@ -314,8 +314,8 @@ void rohga_state::sound_map(address_map &map)
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 
@@ -1875,27 +1875,27 @@ ROM_END
 
 /**********************************************************************************/
 
-DRIVER_INIT_MEMBER(rohga_state,rohga)
+void rohga_state::init_rohga()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco56_decrypt_gfx(machine(), "gfx2");
 }
 
-DRIVER_INIT_MEMBER(rohga_state,wizdfire)
+void rohga_state::init_wizdfire()
 {
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
 	deco74_decrypt_gfx(machine(), "gfx3");
 }
 
-DRIVER_INIT_MEMBER(rohga_state,nitrobal)
+void rohga_state::init_nitrobal()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco56_decrypt_gfx(machine(), "gfx2");
 	deco74_decrypt_gfx(machine(), "gfx3");
 }
 
-DRIVER_INIT_MEMBER(rohga_state,hangzo)
+void rohga_state::init_hangzo()
 {
 	const uint8_t *src = memregion("gfx2")->base();
 	uint8_t *dst = memregion("gfx1")->base();
@@ -1904,28 +1904,28 @@ DRIVER_INIT_MEMBER(rohga_state,hangzo)
 	std::copy(&src[0x80000], &src[0xa0000], &dst[0x20000]);
 }
 
-DRIVER_INIT_MEMBER(rohga_state,schmeisr)
+void rohga_state::init_schmeisr()
 {
-	DRIVER_INIT_CALL(hangzo);
+	init_hangzo();
 
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
 }
 
-GAME( 1991, rohga,     0,        rohga,    rohga,    rohga_state, rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v5.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rohga1,    rohga,    rohga,    rohga,    rohga_state, rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rohga2,    rohga,    rohga,    rohga,    rohga_state, rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rohgah,    rohga,    rohga,    rohga,    rohga_state, rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Hong Kong v3.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rohgau,    rohga,    rohga,    rohga,    rohga_state, rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (US v1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wolffang,  rohga,    rohga,    rohga,    rohga_state, rohga,    ROT0,   "Data East Corporation", "Wolf Fang -Kuhga 2001- (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohga,     0,        rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v5.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohga1,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohga2,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohgah,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Hong Kong v3.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rohgau,    rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (US v1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wolffang,  rohga,    rohga,    rohga,    rohga_state, init_rohga,    ROT0,   "Data East Corporation", "Wolf Fang -Kuhga 2001- (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, wizdfire,  0,        wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (Over Sea v2.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, wizdfireu, wizdfire, wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (US v1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, darkseal2, wizdfire, wizdfire, wizdfire, rohga_state, wizdfire, ROT0,   "Data East Corporation", "Dark Seal 2 (Japan v2.1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, wizdfire,  0,        wizdfire, wizdfire, rohga_state, init_wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (Over Sea v2.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, wizdfireu, wizdfire, wizdfire, wizdfire, rohga_state, init_wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (US v1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, darkseal2, wizdfire, wizdfire, wizdfire, rohga_state, init_wizdfire, ROT0,   "Data East Corporation", "Dark Seal 2 (Japan v2.1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, nitrobal,  0,        nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, nitrobala, nitrobal, nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // was marked 'US' but doesn't seem to have a 'Winners Don't Use Drugs' screen, so unlikely
-GAME( 1992, gunball,   nitrobal, nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Gun Ball (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, nitrobal,  0,        nitrobal, nitrobal, rohga_state, init_nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, nitrobala, nitrobal, nitrobal, nitrobal, rohga_state, init_nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // was marked 'US' but doesn't seem to have a 'Winners Don't Use Drugs' screen, so unlikely
+GAME( 1992, gunball,   nitrobal, nitrobal, nitrobal, rohga_state, init_nitrobal, ROT270, "Data East Corporation", "Gun Ball (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, rohga_state, schmeisr, ROT0,   "Hot-B",                 "Schmeiser Robo (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, hangzo,    0,        hangzo,   hangzo,   rohga_state, hangzo,   ROT0,   "Hot-B",                 "Hangzo (Japan, prototype)", MACHINE_SUPPORTS_SAVE ) // ROM contains a '(c)1992 Data East Corporation' string, but other sources indicate the game is by Hot-B
+GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, rohga_state, init_schmeisr, ROT0,   "Hot-B",                 "Schmeiser Robo (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, hangzo,    0,        hangzo,   hangzo,   rohga_state, init_hangzo,   ROT0,   "Hot-B",                 "Hangzo (Japan, prototype)", MACHINE_SUPPORTS_SAVE ) // ROM contains a '(c)1992 Data East Corporation' string, but other sources indicate the game is by Hot-B

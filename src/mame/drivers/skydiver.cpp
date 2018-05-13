@@ -434,4 +434,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL(1978, skydiver, 0, skydiver, skydiver, skydiver_state, 0, ROT0, "Atari", "Sky Diver", MACHINE_SUPPORTS_SAVE, layout_skydiver )
+GAMEL(1978, skydiver, 0, skydiver, skydiver, skydiver_state, empty_init, ROT0, "Atari", "Sky Diver", MACHINE_SUPPORTS_SAVE, layout_skydiver )

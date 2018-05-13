@@ -539,7 +539,7 @@ ROM_END
 // DRIVERS  //
 //////////////
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE         INIT        COMPANY       FULLNAME                FLAGS */
-COMP( 2000, cybikov1,   0,          0,      cybikov1,   cybiko,   cybiko_state, cybiko,     "Cybiko Inc", "Cybiko Classic (V1)",  MACHINE_IMPERFECT_SOUND )
-COMP( 2000, cybikov2,   cybikov1,   0,      cybikov2,   cybiko,   cybiko_state, cybiko,     "Cybiko Inc", "Cybiko Classic (V2)",  MACHINE_IMPERFECT_SOUND )
-COMP( 2001, cybikoxt,   cybikov1,   0,      cybikoxt,   cybikoxt, cybiko_state, cybikoxt,   "Cybiko Inc", "Cybiko Xtreme",        MACHINE_IMPERFECT_SOUND )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS         INIT           COMPANY       FULLNAME               FLAGS */
+COMP( 2000, cybikov1, 0,        0,      cybikov1, cybiko,   cybiko_state, init_cybiko,   "Cybiko Inc", "Cybiko Classic (V1)", MACHINE_IMPERFECT_SOUND )
+COMP( 2000, cybikov2, cybikov1, 0,      cybikov2, cybiko,   cybiko_state, init_cybiko,   "Cybiko Inc", "Cybiko Classic (V2)", MACHINE_IMPERFECT_SOUND )
+COMP( 2001, cybikoxt, cybikov1, 0,      cybikoxt, cybikoxt, cybiko_state, init_cybikoxt, "Cybiko Inc", "Cybiko Xtreme",       MACHINE_IMPERFECT_SOUND )

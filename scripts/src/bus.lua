@@ -3425,6 +3425,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/interpro/mouse/mouse.h,BUSES["INTERPRO_MOUSE"] = true
+---------------------------------------------------
+
+if (BUSES["INTERPRO_MOUSE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/interpro/mouse/mouse.cpp",
+		MAME_DIR .. "src/devices/bus/interpro/mouse/mouse.h"
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/einstein/pipe/pipe.h,BUSES["TATUNG_PIPE"] = true
 ---------------------------------------------------
 

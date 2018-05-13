@@ -109,8 +109,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	void decrypt_jingbell();
-	DECLARE_DRIVER_INIT(jingbell);
-	DECLARE_DRIVER_INIT(jingbelli);
+	void init_jingbell();
+	void init_jingbelli();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -1091,7 +1091,7 @@ void igs009_state::decrypt_jingbell()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs009_state,jingbelli)
+void igs009_state::init_jingbelli()
 {
 	decrypt_jingbell();
 
@@ -1100,7 +1100,7 @@ DRIVER_INIT_MEMBER(igs009_state,jingbelli)
 	rom[0x01f19] = 0x18;
 }
 
-DRIVER_INIT_MEMBER(igs009_state,jingbell)
+void igs009_state::init_jingbell()
 {
 	decrypt_jingbell();
 
@@ -1169,10 +1169,10 @@ ROM_START( gp98 )
 ROM_END
 
 
-/*    YEAR   NAME       PARENT    MACHINE   INPUT     STATE          INIT       ROT   COMPANY           FULLNAME                      FLAGS  */
-GAME( 1997,  jingbell,  0,        jingbell, jingbell, igs009_state,  jingbell,  ROT0, "IGS",            "Jingle Bell (US, V157US)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V155UE)",   MACHINE_SUPPORTS_SAVE )   // Shows V154UE in test mode!
-GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998,  gp98,      0,        gp98,     jingbell, igs009_state,  0,         ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     MACHINE_SUPPORTS_SAVE )
+/*    YEAR   NAME       PARENT    MACHINE   INPUT     STATE          INIT            ROT   COMPANY           FULLNAME                      FLAGS  */
+GAME( 1997,  jingbell,  0,        jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (US, V157US)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V155UE)",   MACHINE_SUPPORTS_SAVE )   // Shows V154UE in test mode!
+GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  gp98,      0,        gp98,     jingbell, igs009_state,  empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     MACHINE_SUPPORTS_SAVE )

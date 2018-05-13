@@ -385,5 +385,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE        INIT   COMPANY     FULLNAME       FLAGS */
-COMP( 1987, dvk_kcgd, 0,      0,       kcgd,      0,       kcgd_state,  0,     "USSR",     "DVK KCGD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME    FLAGS */
+COMP( 1987, dvk_kcgd, 0,      0,      kcgd,    0,     kcgd_state, empty_init, "USSR",  "DVK KCGD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

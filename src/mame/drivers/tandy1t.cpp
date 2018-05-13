@@ -939,11 +939,11 @@ ROM_START( t1000tl2 )
 ROM_END
 
 
-//    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT         STATE               INIT  COMPANY               FULLNAME          FLAGS
 // tandy 1000
-COMP( 1987, t1000hx,    ibm5150,    0,          t1000hx,    t1000_90key,  tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 HX",   0 )
-COMP( 1987, t1000sx,    ibm5150,    0,          t1000sx,    t1000_90key,  tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 SX",   0 )
-COMP( 1987, t1000tx,    ibm5150,    0,          t1000tx,    t1000_90key,  tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 TX",   0 )
-COMP( 1989, t1000rl,    ibm5150,    0,          t1000rl,    t1000_101key, tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 RL",   0 )
-COMP( 1989, t1000tl2,   ibm5150,    0,          t1000tl,    t1000_101key, tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 TL/2", 0 )
-COMP( 1988, t1000sl2,   ibm5150,    0,          t1000sl2,   t1000_101key, tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 SL/2", 0 )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT         CLASS            INIT        COMPANY              FULLNAME           FLAGS
+COMP( 1987, t1000hx,  ibm5150, 0,      t1000hx,  t1000_90key,  tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 HX",   0 )
+COMP( 1987, t1000sx,  ibm5150, 0,      t1000sx,  t1000_90key,  tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SX",   0 )
+COMP( 1987, t1000tx,  ibm5150, 0,      t1000tx,  t1000_90key,  tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TX",   0 )
+COMP( 1989, t1000rl,  ibm5150, 0,      t1000rl,  t1000_101key, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 RL",   0 )
+COMP( 1989, t1000tl2, ibm5150, 0,      t1000tl,  t1000_101key, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TL/2", 0 )
+COMP( 1988, t1000sl2, ibm5150, 0,      t1000sl2, t1000_101key, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SL/2", 0 )

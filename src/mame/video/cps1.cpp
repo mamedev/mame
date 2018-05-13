@@ -1921,7 +1921,7 @@ void cps_state::cps2_gfx_decode()
 }
 
 
-DRIVER_INIT_MEMBER(cps_state,cps1)
+void cps_state::init_cps1()
 {
 	m_scanline[0] = 0;
 	m_scanline[1] = 0;
@@ -1933,7 +1933,7 @@ DRIVER_INIT_MEMBER(cps_state,cps1)
 
 
 
-DRIVER_INIT_MEMBER(cps_state,cps2_video)
+void cps_state::init_cps2_video()
 {
 	cps2_gfx_decode();
 

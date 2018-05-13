@@ -250,5 +250,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY                       FULLNAME              FLAGS
-COMP( 1981, sc2,  0,      0,      sc2,     sc2,   sc2_state, 0,    "VEB Mikroelektronik Erfurt", "Schachcomputer SC2", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                       FULLNAME              FLAGS
+COMP( 1981, sc2,  0,      0,      sc2,     sc2,   sc2_state, empty_init, "VEB Mikroelektronik Erfurt", "Schachcomputer SC2", MACHINE_SUPPORTS_SAVE )

@@ -33,8 +33,8 @@ public:
 		m_mob(*this, "mob")
 	{ }
 
-	DECLARE_DRIVER_INIT(gauntlet);
-	DECLARE_DRIVER_INIT(vindctr2);
+	void init_gauntlet();
+	void init_vindctr2();
 	void vindctr2(machine_config &config);
 	void gauntlet(machine_config &config);
 	void gaunt2p(machine_config &config);

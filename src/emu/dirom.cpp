@@ -86,7 +86,189 @@ void device_rom_interface::interface_pre_start()
 	if(!has_space(0))
 		return;
 
-	m_rom_direct = space().direct<0>();
+	switch(space().data_width()) {
+	case  8:
+		if(space().endianness() == ENDIANNESS_LITTLE) {
+			auto cache = space().cache<0, 0, ENDIANNESS_LITTLE>();
+			m_r8  = [cache] (offs_t byteaddress) -> u8  { return cache->read_byte(byteaddress); };
+			m_r16 = [cache] (offs_t byteaddress) -> u16 { return cache->read_word(byteaddress); };
+			m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+			m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+		} else {
+			auto cache = space().cache<0, 0, ENDIANNESS_BIG>();
+			m_r8  = [cache] (offs_t byteaddress) -> u8  { return cache->read_byte(byteaddress); };
+			m_r16 = [cache] (offs_t byteaddress) -> u16 { return cache->read_word(byteaddress); };
+			m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+			m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+		}
+		break;
+
+	case 16:
+		switch(space().addr_shift()) {
+		case  3:
+			if(space().endianness() == ENDIANNESS_LITTLE) {
+				auto cache = space().cache<1, 3, ENDIANNESS_LITTLE>();
+				m_r8  = [cache] (offs_t byteaddress) -> u8  { return cache->read_byte(byteaddress); };
+				m_r16 = [cache] (offs_t byteaddress) -> u16 { return cache->read_word(byteaddress); };
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			} else {
+				auto cache = space().cache<1, 3, ENDIANNESS_BIG>();
+				m_r8  = [cache] (offs_t byteaddress) -> u8  { return cache->read_byte(byteaddress); };
+				m_r16 = [cache] (offs_t byteaddress) -> u16 { return cache->read_word(byteaddress); };
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			}
+			break;
+		case  0:
+			if(space().endianness() == ENDIANNESS_LITTLE) {
+				auto cache = space().cache<1, 0, ENDIANNESS_LITTLE>();
+				m_r8  = [cache] (offs_t byteaddress) -> u8  { return cache->read_byte(byteaddress); };
+				m_r16 = [cache] (offs_t byteaddress) -> u16 { return cache->read_word(byteaddress); };
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			} else {
+				auto cache = space().cache<1, 0, ENDIANNESS_BIG>();
+				m_r8  = [cache] (offs_t byteaddress) -> u8  { return cache->read_byte(byteaddress); };
+				m_r16 = [cache] (offs_t byteaddress) -> u16 { return cache->read_word(byteaddress); };
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			}
+			break;
+		case -1:
+			if(space().endianness() == ENDIANNESS_LITTLE) {
+				auto cache = space().cache<1, -1, ENDIANNESS_LITTLE>();
+				m_r8  = nullptr;
+				m_r16 = nullptr;
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			} else {
+				auto cache = space().cache<1, -1, ENDIANNESS_BIG>();
+				m_r8  = nullptr;
+				m_r16 = nullptr;
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			}
+			break;
+		}
+		break;
+
+	case 32:
+		switch(space().addr_shift()) {
+		case  0:
+			if(space().endianness() == ENDIANNESS_LITTLE) {
+				auto cache = space().cache<2, 0, ENDIANNESS_LITTLE>();
+				m_r8  = [cache] (offs_t byteaddress) -> u8  { return cache->read_byte(byteaddress); };
+				m_r16 = [cache] (offs_t byteaddress) -> u16 { return cache->read_word(byteaddress); };
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			} else {
+				auto cache = space().cache<2, 0, ENDIANNESS_BIG>();
+				m_r8  = [cache] (offs_t byteaddress) -> u8  { return cache->read_byte(byteaddress); };
+				m_r16 = [cache] (offs_t byteaddress) -> u16 { return cache->read_word(byteaddress); };
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			}
+			break;
+		case -1:
+			if(space().endianness() == ENDIANNESS_LITTLE) {
+				auto cache = space().cache<2, -1, ENDIANNESS_LITTLE>();
+				m_r8  = nullptr;
+				m_r16 = [cache] (offs_t byteaddress) -> u16 { return cache->read_word(byteaddress); };
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			} else {
+				auto cache = space().cache<2, -1, ENDIANNESS_BIG>();
+				m_r8  = nullptr;
+				m_r16 = [cache] (offs_t byteaddress) -> u16 { return cache->read_word(byteaddress); };
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			}
+			break;
+		case -2:
+			if(space().endianness() == ENDIANNESS_LITTLE) {
+				auto cache = space().cache<2, -2, ENDIANNESS_LITTLE>();
+				m_r8  = nullptr;
+				m_r16 = nullptr;
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			} else {
+				auto cache = space().cache<2, -2, ENDIANNESS_BIG>();
+				m_r8  = nullptr;
+				m_r16 = nullptr;
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			}
+			break;
+		}
+		break;
+
+	case 64:
+		switch(space().addr_shift()) {
+		case  0:
+			if(space().endianness() == ENDIANNESS_LITTLE) {
+				auto cache = space().cache<3, 0, ENDIANNESS_LITTLE>();
+				m_r8  = [cache] (offs_t byteaddress) -> u8  { return cache->read_byte(byteaddress); };
+				m_r16 = [cache] (offs_t byteaddress) -> u16 { return cache->read_word(byteaddress); };
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			} else {
+				auto cache = space().cache<3, 0, ENDIANNESS_BIG>();
+				m_r8  = [cache] (offs_t byteaddress) -> u8  { return cache->read_byte(byteaddress); };
+				m_r16 = [cache] (offs_t byteaddress) -> u16 { return cache->read_word(byteaddress); };
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			}
+			break;
+		case -1:
+			if(space().endianness() == ENDIANNESS_LITTLE) {
+				auto cache = space().cache<3, -1, ENDIANNESS_LITTLE>();
+				m_r8  = nullptr;
+				m_r16 = [cache] (offs_t byteaddress) -> u16 { return cache->read_word(byteaddress); };
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			} else {
+				auto cache = space().cache<3, -1, ENDIANNESS_BIG>();
+				m_r8  = nullptr;
+				m_r16 = [cache] (offs_t byteaddress) -> u16 { return cache->read_word(byteaddress); };
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			}
+			break;
+		case -2:
+			if(space().endianness() == ENDIANNESS_LITTLE) {
+				auto cache = space().cache<3, -2, ENDIANNESS_LITTLE>();
+				m_r8  = nullptr;
+				m_r16 = nullptr;
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			} else {
+				auto cache = space().cache<3, -2, ENDIANNESS_BIG>();
+				m_r8  = nullptr;
+				m_r16 = nullptr;
+				m_r32 = [cache] (offs_t byteaddress) -> u32 { return cache->read_dword(byteaddress); };
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			}
+			break;
+		case -3:
+			if(space().endianness() == ENDIANNESS_LITTLE) {
+				auto cache = space().cache<3, -3, ENDIANNESS_LITTLE>();
+				m_r8  = nullptr;
+				m_r16 = nullptr;
+				m_r32 = nullptr;
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			} else {
+				auto cache = space().cache<3, -3, ENDIANNESS_BIG>();
+				m_r8  = nullptr;
+				m_r16 = nullptr;
+				m_r32 = nullptr;
+				m_r64 = [cache] (offs_t byteaddress) -> u64 { return cache->read_qword(byteaddress); };
+			}
+			break;
+		}
+		break;
+	}
+
 	device().save_item(NAME(m_cur_bank));
 	device().save_item(NAME(m_bank_count));
 

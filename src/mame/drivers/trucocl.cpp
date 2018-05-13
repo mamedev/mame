@@ -197,7 +197,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(trucocl_state,trucocl)
+void trucocl_state::init_trucocl()
 {
 	m_cur_dac_address = -1;
 	m_cur_dac_address_index = 0;
@@ -208,5 +208,5 @@ DRIVER_INIT_MEMBER(trucocl_state,trucocl)
 
 
 /******************************************************************************/
-//    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT     MONITOR
-GAME( 1991, trucocl,  0,      trucocl, trucocl, trucocl_state, trucocl, ROT0, "Miky SRL", "Truco Clemente", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT          MONITOR
+GAME( 1991, trucocl,  0,      trucocl, trucocl, trucocl_state, init_trucocl, ROT0, "Miky SRL", "Truco Clemente", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

@@ -178,5 +178,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT  COMPANY            FULLNAME        FLAGS */
-COMP( 1996, pippin,  0,       0,     pippin,    pippin, macpci_state,  0,    "Apple / Bandai",  "Pippin @mark", MACHINE_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY           FULLNAME        FLAGS */
+COMP( 1996, pippin, 0,      0,      pippin,  pippin, macpci_state, empty_init, "Apple / Bandai", "Pippin @mark", MACHINE_NOT_WORKING)

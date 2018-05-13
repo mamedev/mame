@@ -32,7 +32,7 @@ public:
 	DECLARE_WRITE16_MEMBER(kickgoal_bgram_w);
 	DECLARE_WRITE16_MEMBER(kickgoal_bg2ram_w);
 	DECLARE_WRITE16_MEMBER(actionhw_snd_w);
-	DECLARE_DRIVER_INIT(kickgoal);
+	void init_kickgoal();
 
 	TILE_GET_INFO_MEMBER(get_kickgoal_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_kickgoal_bg_tile_info);

@@ -171,8 +171,8 @@ public:
 	DECLARE_WRITE8_MEMBER(vsb_ls273_audio_control_w);
 	DECLARE_WRITE8_MEMBER(sound_int_clear_w);
 	DECLARE_WRITE8_MEMBER(gg_led_ctrl_w);
-	DECLARE_DRIVER_INIT(mazerbla);
-	DECLARE_DRIVER_INIT(greatgun);
+	void init_mazerbla();
+	void init_greatgun();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -1173,12 +1173,12 @@ ROM_START( greatgun )
 //  ROM20.10g, ROM21.10f, ROM22.10d and ROM23.10c are unpopulated.
 ROM_END
 
-DRIVER_INIT_MEMBER(mazerbla_state,mazerbla)
+void mazerbla_state::init_mazerbla()
 {
 //  m_game_id = MAZERBLA;
 }
 
-DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
+void mazerbla_state::init_greatgun()
 {
 	uint8_t *rom = memregion("sub2")->base();
 
@@ -1193,6 +1193,6 @@ DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
 	rom[0x0380] = 0;
 }
 
-GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerblaa,mazerbla_state, mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // newer?
-GAME( 1983, greatgun,  0,        greatgun,  greatgun, mazerbla_state, greatgun, ROT0, "Stern Electronics", "Great Guns",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mazerbla,  0,        mazerbla,  mazerbla, mazerbla_state, init_mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mazerblaa, mazerbla, mazerbla,  mazerblaa,mazerbla_state, init_mazerbla, ROT0, "Stern Electronics", "Mazer Blazer (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // newer?
+GAME( 1983, greatgun,  0,        greatgun,  greatgun, mazerbla_state, init_greatgun, ROT0, "Stern Electronics", "Great Guns",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

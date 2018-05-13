@@ -94,8 +94,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(dsp1_bio_r);
 	DECLARE_WRITE16_MEMBER(dsp1_bank_w);
 	DECLARE_READ16_MEMBER(analog_r);
-	DECLARE_DRIVER_INIT(airrace);
-	DECLARE_DRIVER_INIT(laststar);
+	void init_airrace();
+	void init_laststar();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
@@ -1011,7 +1011,7 @@ next_line:
 	}
 }
 
-DRIVER_INIT_MEMBER(atarisy4_state,laststar)
+void atarisy4_state::init_laststar()
 {
 	address_space &main = m_maincpu->space(AS_PROGRAM);
 
@@ -1028,7 +1028,7 @@ DRIVER_INIT_MEMBER(atarisy4_state,laststar)
 	load_ldafile(m_dsp0->space(AS_PROGRAM), memregion("dsp")->base());
 }
 
-DRIVER_INIT_MEMBER(atarisy4_state,airrace)
+void atarisy4_state::init_airrace()
 {
 	/* Allocate two sets of 32kB shared RAM */
 	m_shared_ram[0] = make_unique_clear<uint16_t[]>(0x4000);
@@ -1066,5 +1066,5 @@ MACHINE_RESET_MEMBER(atarisy4_state,airrace)
  *
  *************************************/
 
-GAME( 1984, laststar, 0, atarisy4, atarisy4, atarisy4_state, laststar, ROT0, "Atari Games", "The Last Starfighter (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND_HW )
-GAME( 1985, airrace,  0, airrace,  atarisy4, atarisy4_state, airrace,  ROT0, "Atari Games", "Air Race (prototype)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND_HW )
+GAME( 1984, laststar, 0, atarisy4, atarisy4, atarisy4_state, init_laststar, ROT0, "Atari Games", "The Last Starfighter (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND_HW )
+GAME( 1985, airrace,  0, airrace,  atarisy4, atarisy4_state, init_airrace,  ROT0, "Atari Games", "Air Race (prototype)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND_HW )

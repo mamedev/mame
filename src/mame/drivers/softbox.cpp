@@ -451,5 +451,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY                      FULLNAME   FLAGS
-COMP( 1981, softbox, 0,      0,      softbox, softbox, softbox_state, 0,    "Small Systems Engineering", "SoftBox", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                      FULLNAME   FLAGS
+COMP( 1981, softbox, 0,      0,      softbox, softbox, softbox_state, empty_init, "Small Systems Engineering", "SoftBox", MACHINE_NO_SOUND_HW )

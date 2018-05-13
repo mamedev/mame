@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(sorcerer_state, sorcerer)
+void sorcerer_state::init_sorcerer()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
@@ -539,7 +539,7 @@ ROM_START(sorcerer2)
 	ROMX_LOAD("tvc-2.2e",    0xe800, 0x0800, CRC(bc194487) SHA1(dcfd916558e3e3be22091c5558ea633c332cf6c7), ROM_BIOS(2) )
 ROM_END
 
-/*   YEAR  NAME       PARENT    COMPAT    MACHINE    INPUT     STATE           INIT      COMPANY      FULLNAME */
-COMP(1979, sorcerer,  0,        0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer",                     0 )
-COMP(1979, sorcerer2, sorcerer, 0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer 2",                   0 )
-COMP(1979, sorcererd, sorcerer, 0,        sorcererd, sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer (with floppy disks)", 0 )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     STATE           INIT           COMPANY      FULLNAME */
+COMP( 1979, sorcerer,  0,        0,      sorcerer,  sorcerer, sorcerer_state, init_sorcerer, "Exidy Inc", "Sorcerer",                     0 )
+COMP( 1979, sorcerer2, sorcerer, 0,      sorcerer,  sorcerer, sorcerer_state, init_sorcerer, "Exidy Inc", "Sorcerer 2",                   0 )
+COMP( 1979, sorcererd, sorcerer, 0,      sorcererd, sorcerer, sorcerer_state, init_sorcerer, "Exidy Inc", "Sorcerer (with floppy disks)", 0 )

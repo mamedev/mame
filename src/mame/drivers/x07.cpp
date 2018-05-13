@@ -1553,7 +1553,7 @@ ROM_START( x07 )
 	ROM_REGION( 0x0800, "default", ROMREGION_ERASE00 )
 ROM_END
 
-DRIVER_INIT_MEMBER(x07_state, x07)
+void x07_state::init_x07()
 {
 	uint8_t *RAM = memregion("default")->base();
 	uint8_t *GFX = memregion("gfx1")->base();
@@ -1569,5 +1569,5 @@ DRIVER_INIT_MEMBER(x07_state, x07)
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                COMPANY   FULLNAME    FLAGS */
-COMP( 1983, x07,    0,      0,       x07,       x07,     x07_state,   x07,   "Canon",  "X-07",     MACHINE_SUPPORTS_SAVE)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT      COMPANY  FULLNAME  FLAGS */
+COMP( 1983, x07,  0,      0,      x07,     x07,   x07_state, init_x07, "Canon", "X-07",   MACHINE_SUPPORTS_SAVE)

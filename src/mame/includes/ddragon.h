@@ -123,9 +123,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_2);
 
-	DECLARE_DRIVER_INIT(ddragon2);
-	DECLARE_DRIVER_INIT(ddragon);
-	DECLARE_DRIVER_INIT(ddragon6809);
+	void init_ddragon2();
+	void init_ddragon();
+	void init_ddragon6809();
 	void ddragon(machine_config &config);
 	void ddragon6809(machine_config &config);
 	void ddragonb(machine_config &config);
@@ -157,7 +157,7 @@ public:
 	DECLARE_WRITE8_MEMBER(darktowr_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(mcu_port_a_w);
 
-	DECLARE_DRIVER_INIT(darktowr);
+	void init_darktowr();
 
 	void darktowr(machine_config &config);
 protected:
@@ -177,6 +177,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER(toffy_bankswitch_w);
 
-	DECLARE_DRIVER_INIT(toffy);
+	void init_toffy();
 	void toffy(machine_config &config);
 };

@@ -139,7 +139,7 @@ protected:
 	int         m_bankswitch_icount;
 	devcb_write_line m_cpu_interrupt;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_cache;
 
 	uint32_t      m_internal_ram_start;
 	uint32_t      m_internal_ram_end;

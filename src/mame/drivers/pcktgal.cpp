@@ -430,16 +430,16 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(pcktgal_state,pcktgal)
+void pcktgal_state::init_pcktgal()
 {
 	uint8_t *rom = memregion("gfx1")->base();
-	int len = memregion("gfx1")->bytes();
-	int i,j,temp[16];
+	const int len = memregion("gfx1")->bytes();
 
 	/* Tile graphics roms have some swapped lines, original version only */
-	for (i = 0x00000;i < len;i += 32)
+	for (int i = 0x00000; i < len; i += 32)
 	{
-		for (j=0; j<16; j++)
+		int temp[16];
+		for (int j = 0; j < 16; j++)
 		{
 			temp[j] = rom[i+j+16];
 			rom[i+j+16] = rom[i+j];
@@ -452,9 +452,9 @@ DRIVER_INIT_MEMBER(pcktgal_state,pcktgal)
 
 /***************************************************************************/
 
-GAME( 1987, pcktgal,  0,       pcktgal, pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Pocket Gal (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pcktgalb, pcktgal, bootleg, pcktgal, pcktgal_state, 0,        ROT0, "bootleg", "Pocket Gal (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pcktgal2, pcktgal, pcktgal2,pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Pocket Gal 2 (English)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pcktgal2j,pcktgal, pcktgal2,pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Pocket Gal 2 (Japanese)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, spool3,   pcktgal, pcktgal2,pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Super Pool III (English)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spool3i,  pcktgal, pcktgal2,pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation (I-Vics license)", "Super Pool III (I-Vics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pcktgal,  0,       pcktgal, pcktgal, pcktgal_state, init_pcktgal,  ROT0, "Data East Corporation", "Pocket Gal (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pcktgalb, pcktgal, bootleg, pcktgal, pcktgal_state, empty_init,    ROT0, "bootleg", "Pocket Gal (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pcktgal2, pcktgal, pcktgal2,pcktgal, pcktgal_state, init_pcktgal,  ROT0, "Data East Corporation", "Pocket Gal 2 (English)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pcktgal2j,pcktgal, pcktgal2,pcktgal, pcktgal_state, init_pcktgal,  ROT0, "Data East Corporation", "Pocket Gal 2 (Japanese)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spool3,   pcktgal, pcktgal2,pcktgal, pcktgal_state, init_pcktgal,  ROT0, "Data East Corporation", "Super Pool III (English)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spool3i,  pcktgal, pcktgal2,pcktgal, pcktgal_state, init_pcktgal,  ROT0, "Data East Corporation (I-Vics license)", "Super Pool III (I-Vics)", MACHINE_SUPPORTS_SAVE )

@@ -92,16 +92,16 @@ public:
 	DECLARE_READ8_MEMBER(dac0_r);
 
 	virtual void machine_start() override;
-	DECLARE_DRIVER_INIT(sws95);
-	DECLARE_DRIVER_INIT(machbrkr);
-	DECLARE_DRIVER_INIT(sws97);
-	DECLARE_DRIVER_INIT(sws96);
-	DECLARE_DRIVER_INIT(vshoot);
-	DECLARE_DRIVER_INIT(nebulray);
-	DECLARE_DRIVER_INIT(gunbulet);
-	DECLARE_DRIVER_INIT(gslgr94j);
-	DECLARE_DRIVER_INIT(outfxies);
-	DECLARE_DRIVER_INIT(gslgr94u);
+	void init_sws95();
+	void init_machbrkr();
+	void init_sws97();
+	void init_sws96();
+	void init_vshoot();
+	void init_nebulray();
+	void init_gunbulet();
+	void init_gslgr94j();
+	void init_outfxies();
+	void init_gslgr94u();
 	DECLARE_MACHINE_RESET(namconb);
 	DECLARE_VIDEO_START(namconb1);
 	DECLARE_VIDEO_START(namconb2);

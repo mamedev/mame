@@ -872,15 +872,15 @@ void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-DRIVER_INIT_MEMBER(tmc1800_state,tmc1800)
+void tmc1800_state::init_tmc1800()
 {
 	timer_set(attotime::zero, TIMER_SETUP_BEEP);
 }
 
 /* System Drivers */
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    STATE           INIT     COMPANY        FULLNAME       FLAGS
-COMP( 1977, tmc1800,    0,       0,      tmc1800,    tmc1800, tmc1800_state,  tmc1800, "Telercas Oy", "Telmac 1800", MACHINE_NOT_WORKING )
-COMP( 1977, osc1000b,   tmc1800, 0,      osc1000b,   tmc1800, osc1000b_state, 0,       "OSCOM Oy",    "OSCOM 1000B", MACHINE_NOT_WORKING )
-COMP( 1980, tmc2000,    0,       0,      tmc2000,    tmc2000, tmc2000_state,  0,       "Telercas Oy", "Telmac 2000", MACHINE_SUPPORTS_SAVE )
-COMP( 1980, nano,       tmc2000, 0,      nano,       nano,    nano_state,     0,       "OSCOM Oy",    "OSCOM Nano",  MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS           INIT          COMPANY        FULLNAME       FLAGS
+COMP( 1977, tmc1800,  0,       0,      tmc1800,  tmc1800, tmc1800_state,  init_tmc1800, "Telercas Oy", "Telmac 1800", MACHINE_NOT_WORKING )
+COMP( 1977, osc1000b, tmc1800, 0,      osc1000b, tmc1800, osc1000b_state, empty_init,   "OSCOM Oy",    "OSCOM 1000B", MACHINE_NOT_WORKING )
+COMP( 1980, tmc2000,  0,       0,      tmc2000,  tmc2000, tmc2000_state,  empty_init,   "Telercas Oy", "Telmac 2000", MACHINE_SUPPORTS_SAVE )
+COMP( 1980, nano,     tmc2000, 0,      nano,     nano,    nano_state,     empty_init,   "OSCOM Oy",    "OSCOM Nano",  MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

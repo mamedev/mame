@@ -39,7 +39,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_clock_w);
-	DECLARE_DRIVER_INIT(hnfubuki);
+	void init_hnfubuki();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

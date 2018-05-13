@@ -574,9 +574,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, jackal,   0,      jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Jackal (World, 8-way Joystick)",               0 )
-GAME( 1986, jackalr,  jackal, jackal, jackalr, jackal_state, 0, ROT90, "Konami",  "Jackal (World, Rotary Joystick)",              0 )
-GAME( 1986, topgunr,  jackal, jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)",              0 )
-GAME( 1986, jackalj,  jackal, jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", 0 )
-GAME( 1986, jackalbl, jackal, jackal, jackalr, jackal_state, 0, ROT90, "bootleg", "Jackal (bootleg, Rotary Joystick)",            0 )
-GAME( 1986, topgunbl, jackal, jackal, jackalr, jackal_state, 0, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)",        0 )
+GAME( 1986, jackal,   0,      jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Jackal (World, 8-way Joystick)",               0 )
+GAME( 1986, jackalr,  jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "Konami",  "Jackal (World, Rotary Joystick)",              0 )
+GAME( 1986, topgunr,  jackal, jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)",              0 )
+GAME( 1986, jackalj,  jackal, jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", 0 )
+GAME( 1986, jackalbl, jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "bootleg", "Jackal (bootleg, Rotary Joystick)",            0 )
+GAME( 1986, topgunbl, jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)",        0 )

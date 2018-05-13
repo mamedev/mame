@@ -35,7 +35,7 @@ TODO:
 #include "speaker.h"
 
 
-DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)
+void nbmj8900_state::init_ohpaipee()
 {
 #if 0
 	uint8_t *prot = memregion("protdata")->base();
@@ -64,7 +64,7 @@ DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8900_state,togenkyo)
+void nbmj8900_state::init_togenkyo()
 {
 #if 0
 	uint8_t *prot = memregion("protdata")->base();
@@ -75,7 +75,7 @@ DRIVER_INIT_MEMBER(nbmj8900_state,togenkyo)
 	   game doesn't do anything else with that ROM, this is more than enough. I
 	   could just fill this are with fake data, the only thing that matters is
 	   the checksum. */
-	for (i = 0;i < 0x20000;i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
 		prot[i] = bitswap<8>(prot[i],2,7,3,5,0,6,4,1);
 	}
@@ -398,5 +398,5 @@ ROM_START( togenkyo )
 ROM_END
 
 //    YEAR,     NAME,   PARENT,  MACHINE,    INPUT,     INIT, MONITOR,COMPANY,FULLNAME,FLAGS)
-GAME( 1989, ohpaipee,        0, ohpaipee, ohpaipee, nbmj8900_state, ohpaipee,  ROT270, "Nichibutsu", "Oh! Paipee (Japan 890227)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, togenkyo,        0, togenkyo, togenkyo, nbmj8900_state, togenkyo,    ROT0, "Nichibutsu", "Tougenkyou (Japan 890418)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ohpaipee,        0, ohpaipee, ohpaipee, nbmj8900_state, init_ohpaipee,  ROT270, "Nichibutsu", "Oh! Paipee (Japan 890227)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, togenkyo,        0, togenkyo, togenkyo, nbmj8900_state, init_togenkyo,    ROT0, "Nichibutsu", "Tougenkyou (Japan 890418)", MACHINE_SUPPORTS_SAVE )

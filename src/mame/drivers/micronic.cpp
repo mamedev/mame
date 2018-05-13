@@ -399,5 +399,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY            FULLNAME         FLAGS
-COMP( 198?, micronic, 0,      0,      micronic, micronic, micronic_state, 0,    "Victor Micronic", "Micronic 1000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY            FULLNAME         FLAGS
+COMP( 198?, micronic, 0,      0,      micronic, micronic, micronic_state, empty_init, "Victor Micronic", "Micronic 1000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

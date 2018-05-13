@@ -50,15 +50,15 @@ class naomi_state : public dc_state
 	optional_shared_ptr<uint64_t> m_rombase;
 
 	DECLARE_MACHINE_RESET(naomi);
-	DECLARE_DRIVER_INIT(naomigd);
-	DECLARE_DRIVER_INIT(ggxx);
-	DECLARE_DRIVER_INIT(ggxxrl);
-	DECLARE_DRIVER_INIT(ggxxsla);
-	DECLARE_DRIVER_INIT(naomi);
-	DECLARE_DRIVER_INIT(naomigd_mp);
-	DECLARE_DRIVER_INIT(sfz3ugd);
-	DECLARE_DRIVER_INIT(hotd2);
-	DECLARE_DRIVER_INIT(naomi_mp);
+	void init_naomigd();
+	void init_ggxx();
+	void init_ggxxrl();
+	void init_ggxxsla();
+	void init_naomi();
+	void init_naomigd_mp();
+	void init_sfz3ugd();
+	void init_hotd2();
+	void init_naomi_mp();
 
 	DECLARE_READ16_MEMBER( naomi_g2bus_r );
 	DECLARE_READ64_MEMBER( eeprom_93c46a_r );
@@ -106,7 +106,7 @@ public:
 	required_shared_ptr<uint64_t> m_elan_ram;
 	required_device<powervr2_device> m_powervr2_slave;
 
-	DECLARE_DRIVER_INIT(naomi2);
+	void init_naomi2();
 	DECLARE_WRITE32_MEMBER(both_pvr2_ta_w);
 	void naomi2_base(machine_config &config);
 	void naomi2m2(machine_config &config);
@@ -130,8 +130,8 @@ public:
 	DECLARE_READ64_MEMBER( aw_modem_r );
 	DECLARE_WRITE64_MEMBER( aw_modem_w );
 
-	DECLARE_DRIVER_INIT(atomiswave);
-	DECLARE_DRIVER_INIT(xtrmhnt2);
+	void init_atomiswave();
+	void init_xtrmhnt2();
 
 	DECLARE_READ64_MEMBER( xtrmhnt2_hack_r );
 

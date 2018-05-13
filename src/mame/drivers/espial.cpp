@@ -451,6 +451,6 @@ ROM_END
 
 
 
-GAME( 1983, espial,  0,      espial,  espial,  espial_state, 0, ROT0,  "Orca / Thunderbolt", "Espial (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, espialu, espial, espial,  espial,  espial_state, 0, ROT0,  "Orca / Thunderbolt", "Espial (US?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, netwars, 0,      netwars, netwars, espial_state, 0, ROT90, "Orca (Esco Trading Co license)", "Net Wars", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, espial,  0,      espial,  espial,  espial_state, empty_init, ROT0,  "Orca / Thunderbolt", "Espial (Europe)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, espialu, espial, espial,  espial,  espial_state, empty_init, ROT0,  "Orca / Thunderbolt", "Espial (US?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, netwars, 0,      netwars, netwars, espial_state, empty_init, ROT90, "Orca (Esco Trading Co license)", "Net Wars", MACHINE_SUPPORTS_SAVE )

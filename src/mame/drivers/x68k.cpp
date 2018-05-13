@@ -1568,7 +1568,7 @@ void x68k_state::machine_start()
 	m_fdc.motor = 0;
 }
 
-DRIVER_INIT_MEMBER(x68k_state,x68000)
+void x68k_state::init_x68000()
 {
 	unsigned char* rom = memregion("maincpu")->base();
 	unsigned char* user2 = memregion("user2")->base();
@@ -1606,16 +1606,16 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 	save_item(NAME(m_spritereg));
 }
 
-DRIVER_INIT_MEMBER(x68k_state,x68kxvi)
+void x68k_state::init_x68kxvi()
 {
-	DRIVER_INIT_CALL( x68000 );
+	init_x68000();
 	m_sysport.cputype = 0xfe; // 68000, 16MHz
 	m_is_32bit = false;
 }
 
-DRIVER_INIT_MEMBER(x68k_state,x68030)
+void x68k_state::init_x68030()
 {
-	DRIVER_INIT_CALL( x68000 );
+	init_x68000();
 	m_sysport.cputype = 0xdc; // 68030, 25MHz
 	m_is_32bit = true;
 }
@@ -1864,8 +1864,8 @@ ROM_START( x68030 )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   STATE       INIT    COMPANY     FULLNAME        FLAGS
-COMP( 1987, x68000,   0,      0,      x68000,   x68000, x68k_state, x68000, "Sharp",    "X68000",       MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1990, x68ksupr, x68000, 0,      x68ksupr, x68000, x68k_state, x68000, "Sharp",    "X68000 Super", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-COMP( 1991, x68kxvi,  x68000, 0,      x68kxvi,  x68000, x68k_state, x68kxvi,"Sharp",    "X68000 XVI",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-COMP( 1993, x68030,   x68000, 0,      x68030,   x68000, x68k_state, x68030, "Sharp",    "X68030",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS       INIT         COMPANY  FULLNAME        FLAGS
+COMP( 1987, x68000,   0,      0,      x68000,   x68000, x68k_state, init_x68000, "Sharp", "X68000",       MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1990, x68ksupr, x68000, 0,      x68ksupr, x68000, x68k_state, init_x68000, "Sharp", "X68000 Super", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+COMP( 1991, x68kxvi,  x68000, 0,      x68kxvi,  x68000, x68k_state, init_x68kxvi,"Sharp", "X68000 XVI",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+COMP( 1993, x68030,   x68000, 0,      x68030,   x68000, x68k_state, init_x68030, "Sharp", "X68030",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

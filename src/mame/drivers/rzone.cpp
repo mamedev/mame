@@ -320,6 +320,6 @@ ROM_START( rzbatfor )
 ROM_END
 
 
-//    YEAR  NAME       PARENT  COMP MACHINE    INPUT      STATE        INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1995, rzindy500, 0,        0, rzindy500, rzone,     rzone_state,    0, "Tiger Electronics (licensed from Sega)", "R-Zone: Indy 500", MACHINE_SUPPORTS_SAVE )
-CONS( 1995, rzbatfor,  0,        0, rzbatfor,  rzone,     rzone_state,    0, "Tiger Electronics", "R-Zone: Batman Forever", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS        INIT        COMPANY                                   FULLNAME                  FLAGS
+CONS( 1995, rzindy500, 0,      0,      rzindy500, rzone, rzone_state, empty_init, "Tiger Electronics (licensed from Sega)", "R-Zone: Indy 500",       MACHINE_SUPPORTS_SAVE )
+CONS( 1995, rzbatfor,  0,      0,      rzbatfor,  rzone, rzone_state, empty_init, "Tiger Electronics",                      "R-Zone: Batman Forever", MACHINE_SUPPORTS_SAVE )

@@ -199,7 +199,7 @@ private:
 	address_space *     m_program;              // program space (ROM or flash)
 	address_space *     m_data;                 // internal RAM/register
 	address_space *     m_io;                   // I/O ports
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 
 	// timers
 	static const device_timer_id BASE_TIMER = 1;

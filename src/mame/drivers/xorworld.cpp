@@ -210,7 +210,7 @@ ROM_END
 
 #define PATCH(data) *rom = data; rom++
 
-DRIVER_INIT_MEMBER(xorworld_state,xorworld)
+void xorworld_state::init_xorworld()
 {
 	/*  patch some strange protection (without this, strange characters appear
 	    after level 5 and some pieces don't rotate properly some times) */
@@ -230,4 +230,4 @@ DRIVER_INIT_MEMBER(xorworld_state,xorworld)
 }
 
 
-GAME( 1990, xorworld, 0, xorworld, xorworld, xorworld_state, xorworld, ROT0, "Gaelco", "Xor World (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, xorworld, 0, xorworld, xorworld, xorworld_state, init_xorworld, ROT0, "Gaelco", "Xor World (prototype)", MACHINE_SUPPORTS_SAVE )

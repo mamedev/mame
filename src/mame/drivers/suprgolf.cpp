@@ -84,7 +84,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	DECLARE_DRIVER_INIT(suprgolf);
+	void init_suprgolf();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -669,7 +669,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(suprgolf_state,suprgolf)
+void suprgolf_state::init_suprgolf()
 {
 	uint8_t *ROM = memregion("user2")->base();
 
@@ -678,6 +678,6 @@ DRIVER_INIT_MEMBER(suprgolf_state,suprgolf)
 	ROM[0x6d72+(0x4000*3)-0x4000] = 0x20; //patch ROM check
 }
 
-GAME( 1989, suprgolf,  0,         suprgolf,  suprgolf, suprgolf_state, 0,        ROT0, "Nasco", "Super Crowns Golf (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, suprgolfj, suprgolf,  suprgolf,  suprgolf, suprgolf_state, suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, albatross, suprgolf,  suprgolf,  suprgolf, suprgolf_state, 0,        ROT0, "Nasco", "Albatross (US Prototype?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL| MACHINE_SUPPORTS_SAVE )
+GAME( 1989, suprgolf,  0,         suprgolf,  suprgolf, suprgolf_state, empty_init,    ROT0, "Nasco", "Super Crowns Golf (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, suprgolfj, suprgolf,  suprgolf,  suprgolf, suprgolf_state, init_suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, albatross, suprgolf,  suprgolf,  suprgolf, suprgolf_state, empty_init,    ROT0, "Nasco", "Albatross (US Prototype?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL| MACHINE_SUPPORTS_SAVE )

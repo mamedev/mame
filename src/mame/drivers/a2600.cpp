@@ -506,7 +506,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(a2600_state::a2600)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6507, MASTER_CLOCK_NTSC / 3)
-	MCFG_M6502_DISABLE_DIRECT()
+	MCFG_M6502_DISABLE_CACHE()
 	MCFG_DEVICE_PROGRAM_MAP(a2600_mem)
 
 	/* video hardware */
@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(a2600_state::a2600p)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(a2600_mem)
-	MCFG_M6502_DISABLE_DIRECT()
+	MCFG_M6502_DISABLE_CACHE()
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
@@ -604,6 +604,6 @@ ROM_END
 
 #define rom_a2600p rom_a2600
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE        INIT    COMPANY     FULLNAME */
-CONS( 1977, a2600,  0,      0,      a2600,  a2600, a2600_state, 0,      "Atari",    "Atari 2600 (NTSC)" , MACHINE_SUPPORTS_SAVE )
-CONS( 1978, a2600p, a2600,  0,      a2600p, a2600, a2600_state, 0,      "Atari",    "Atari 2600 (PAL)",   MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME */
+CONS( 1977, a2600,  0,      0,      a2600,   a2600, a2600_state, empty_init, "Atari",    "Atari 2600 (NTSC)" , MACHINE_SUPPORTS_SAVE )
+CONS( 1978, a2600p, a2600,  0,      a2600p,  a2600, a2600_state, empty_init, "Atari",    "Atari 2600 (PAL)",   MACHINE_SUPPORTS_SAVE )

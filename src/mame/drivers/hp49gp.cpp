@@ -35,7 +35,7 @@ public:
 	required_device<s3c2410_device> m_s3c2410;
 	required_shared_ptr<uint32_t> m_steppingstone;
 	lcd_spi_t m_lcd_spi;
-	DECLARE_DRIVER_INIT(hp49gp);
+	void init_hp49gp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
@@ -272,7 +272,7 @@ void hp49gp_state::hp49gp_map(address_map &map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(hp49gp_state,hp49gp)
+void hp49gp_state::init_hp49gp()
 {
 	uint8_t *rom = (uint8_t *)memregion( "maincpu")->base();
 	memcpy( m_steppingstone, rom, 1024);
@@ -339,4 +339,4 @@ ROM_START( hp49gp )
 	ROMX_LOAD( "31504.bin", 0x0000, 0x4000, CRC(9c71825e) SHA1(0a12b2b70a8573bc90ab5be06e6b2f814b8544ae), ROM_BIOS(2) )
 ROM_END
 
-COMP(2009, hp49gp, 0, 0, hp49gp, hp49gp, hp49gp_state, hp49gp, "Hewlett Packard", "HP49G+", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(2009, hp49gp, 0, 0, hp49gp, hp49gp, hp49gp_state, init_hp49gp, "Hewlett Packard", "HP49G+", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

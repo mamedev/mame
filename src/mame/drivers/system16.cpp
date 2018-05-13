@@ -301,15 +301,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_tilebank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		switch (offset & 1)
-		{
-			case 0:
-				m_tile_bank0 = data & 0x0f;
-				break;
-			case 1:
-				m_tile_bank1 = data & 0x0f;
-				break;
-		}
+		m_tile_bank[offset & 1] = data & 0x0f;
 	}
 }
 
@@ -393,7 +385,7 @@ READ8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_r)
 
 WRITE8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_w)
 {
-	uint8_t *mem = memregion("soundcpu")->base();
+	uint8_t *mem = m_soundcpu_region->base();
 
 	switch(data)
 	{
@@ -493,11 +485,11 @@ void segas1x_bootleg_state::sound_7759_map(address_map &map)
 
 WRITE8_MEMBER(segas1x_bootleg_state::upd7759_bank_w)//*
 {
-	int offs, size = memregion("soundcpu")->bytes() - 0x10000;
+	int offs, size = m_soundcpu_region->bytes() - 0x10000;
 
 	m_upd7759->reset_w(data & 0x40);
 	offs = 0x10000 + (data * 0x4000) % size;
-	membank("bank1")->set_base(memregion("soundcpu")->base() + offs);
+	membank("bank1")->set_base(m_soundcpu_region->base() + offs);
 }
 
 
@@ -515,24 +507,24 @@ void segas1x_bootleg_state::sound_7759_io_map(address_map &map)
 
 void segas1x_bootleg_state::set_tile_bank( int data )
 {
-	m_tile_bank0 = (data >> 4) & 0x0f;
-	m_tile_bank1 = data & 0x0f;
+	m_tile_bank[0] = (data >> 4) & 0x0f;
+	m_tile_bank[1] = data & 0x0f;
 }
 
 void segas1x_bootleg_state::set_fg_page( int data )
 {
-	m_fg_page[0] = data >> 12;
-	m_fg_page[1] = (data >> 8) & 0x0f;
-	m_fg_page[2] = (data >> 4) & 0x0f;
-	m_fg_page[3] = data & 0x0f;
+	m_fg_page[0][0] = data >> 12;
+	m_fg_page[0][1] = (data >> 8) & 0x0f;
+	m_fg_page[0][2] = (data >> 4) & 0x0f;
+	m_fg_page[0][3] = data & 0x0f;
 }
 
 void segas1x_bootleg_state::set_bg_page( int data )
 {
-	m_bg_page[0] = data >> 12;
-	m_bg_page[1] = (data >> 8) & 0x0f;
-	m_bg_page[2] = (data >> 4) & 0x0f;
-	m_bg_page[3] = data & 0x0f;
+	m_bg_page[0][0] = data >> 12;
+	m_bg_page[0][1] = (data >> 8) & 0x0f;
+	m_bg_page[0][2] = (data >> 4) & 0x0f;
+	m_bg_page[0][3] = data & 0x0f;
 }
 
 
@@ -668,27 +660,10 @@ void segas1x_bootleg_state::datsu_set_pages(  )
 	set_bg_page(page);
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::datsu_page0_w)
+template<int Page>
+WRITE16_MEMBER(segas1x_bootleg_state::datsu_page_w)
 {
-	COMBINE_DATA(&m_datsu_page[0]);
-	datsu_set_pages();
-}
-
-WRITE16_MEMBER(segas1x_bootleg_state::datsu_page1_w)
-{
-	COMBINE_DATA(&m_datsu_page[1]);
-	datsu_set_pages();
-}
-
-WRITE16_MEMBER(segas1x_bootleg_state::datsu_page2_w)
-{
-	COMBINE_DATA(&m_datsu_page[2]);
-	datsu_set_pages();
-}
-
-WRITE16_MEMBER(segas1x_bootleg_state::datsu_page3_w)
-{
-	COMBINE_DATA(&m_datsu_page[3]);
+	COMBINE_DATA(&m_datsu_page[Page]);
 	datsu_set_pages();
 }
 
@@ -703,10 +678,10 @@ void segas1x_bootleg_state::bayrouteb2_map(address_map &map)
 	map(0x718008, 0x718009).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrollx_bank_w)); // and tile bank
 	map(0x718010, 0x718011).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
 	map(0x718018, 0x718019).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
-	map(0x718020, 0x718021).w(this, FUNC(segas1x_bootleg_state::datsu_page0_w));
-	map(0x718022, 0x718023).w(this, FUNC(segas1x_bootleg_state::datsu_page1_w));
-	map(0x718024, 0x718025).w(this, FUNC(segas1x_bootleg_state::datsu_page2_w));
-	map(0x718026, 0x718027).w(this, FUNC(segas1x_bootleg_state::datsu_page3_w));
+	map(0x718020, 0x718021).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<0>));
+	map(0x718022, 0x718023).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<1>));
+	map(0x718024, 0x718025).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<2>));
+	map(0x718026, 0x718027).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<3>));
 
 	map(0x800000, 0x800fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
 	map(0x900000, 0x900001).portr("DSW1");
@@ -737,10 +712,10 @@ void segas1x_bootleg_state::dduxbl_map(address_map &map)
 	map(0xC46008, 0xC46009).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrollx_w));
 	map(0xC46010, 0xC46011).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
 	map(0xC46018, 0xC46019).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
-	map(0xC46020, 0xC46021).w(this, FUNC(segas1x_bootleg_state::datsu_page0_w));
-	map(0xC46022, 0xC46023).w(this, FUNC(segas1x_bootleg_state::datsu_page1_w));
-	map(0xC46024, 0xC46025).w(this, FUNC(segas1x_bootleg_state::datsu_page2_w));
-	map(0xC46026, 0xC46027).w(this, FUNC(segas1x_bootleg_state::datsu_page3_w));
+	map(0xC46020, 0xC46021).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<0>));
+	map(0xC46022, 0xC46023).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<1>));
+	map(0xC46024, 0xC46025).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<2>));
+	map(0xC46026, 0xC46027).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<3>));
 
 	map(0xffc000, 0xffffff).ram(); // work ram
 }
@@ -1000,10 +975,10 @@ void segas1x_bootleg_state::tturfbl_map(address_map &map)
 	map(0xC46008, 0xC46009).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrollx_w));
 	map(0xC46010, 0xC46011).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
 	map(0xC46018, 0xC46019).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
-	map(0xC46020, 0xC46021).w(this, FUNC(segas1x_bootleg_state::datsu_page0_w));
-	map(0xc46022, 0xc46023).w(this, FUNC(segas1x_bootleg_state::datsu_page1_w));
-	map(0xC46024, 0xC46025).w(this, FUNC(segas1x_bootleg_state::datsu_page2_w));
-	map(0xC46026, 0xC46027).w(this, FUNC(segas1x_bootleg_state::datsu_page3_w));
+	map(0xC46020, 0xC46021).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<0>));
+	map(0xc46022, 0xc46023).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<1>));
+	map(0xC46024, 0xC46025).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<2>));
+	map(0xC46026, 0xC46027).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<3>));
 }
 
 /***************************************************************************/
@@ -1020,8 +995,8 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys18_tilebank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_tile_bank0 = (data >> 0) & 0x0f;
-		m_tile_bank1 = (data >> 4) & 0x0f;
+		m_tile_bank[0] = (data >> 0) & 0x0f;
+		m_tile_bank[1] = (data >> 4) & 0x0f;
 	}
 }
 
@@ -1046,7 +1021,7 @@ void segas1x_bootleg_state::sound_18_map(address_map &map)
 
 WRITE8_MEMBER(segas1x_bootleg_state::sys18_soundbank_w)
 {
-	uint8_t *mem = memregion("soundcpu")->base();
+	uint8_t *mem = m_soundcpu_region->base();
 	int rom = (data >> 6) & 3;
 	int bank = (data & 0x3f);
 	int mask = m_sound_info[rom * 2 + 0];
@@ -1065,6 +1040,12 @@ void segas1x_bootleg_state::sound_18_io_map(address_map &map)
 	map(0x90, 0x93).rw("3438.1", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
 	map(0xa0, 0xa0).w(this, FUNC(segas1x_bootleg_state::sys18_soundbank_w));
 	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
+
+void segas1x_bootleg_state::pcm_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).ram();
 }
 
 
@@ -1211,7 +1192,7 @@ READ8_MEMBER(segas1x_bootleg_state::shdancbl_soundbank_r)
 
 WRITE8_MEMBER(segas1x_bootleg_state::shdancbl_bankctrl_w)
 {
-	uint8_t *mem = memregion("soundcpu")->base();
+	uint8_t *mem = m_soundcpu_region->base();
 
 	switch (data)
 	{
@@ -1326,7 +1307,7 @@ void segas1x_bootleg_state::mwalkbl_map(address_map &map)
 WRITE8_MEMBER(segas1x_bootleg_state::sys18bl_okibank_w) // TODO: verify correctness
 {
 	//popmessage("okibank: %02x\n", data);
-	membank("okibank")->set_entry(data & 0x07);
+	m_okibank->set_entry(data & 0x07);
 }
 
 /* bootleg doesn't have real vdp or i/o */
@@ -1382,17 +1363,17 @@ void segas1x_bootleg_state::sys18bl_oki_map(address_map &map)
 
 WRITE16_MEMBER(segas1x_bootleg_state::ddcrewbl_spritebank_w)
 {
-//  printf("banking write %08x: %04x (%04x %04x)\n", m_maincpu->pc(), offset*2, data&mem_mask, mem_mask);
+//  printf("banking write %08x: %04x (%04x %04x)\n", m_maincpu->pc(), offset<<1, data&mem_mask, mem_mask);
 
 	data &= mem_mask;
 //  offset &= 0x7;
 	offset += 4;
 
-	int maxbanks = memregion("sprites")->bytes() / 0x40000;
+	int maxbanks = m_sprites_region->bytes() >> 18;
 	if (data >= maxbanks)
 		data = 255;
-	m_sprites->set_bank((offset) * 2 + 0, data * 2 + 0);
-	m_sprites->set_bank((offset) * 2 + 1, data * 2 + 1);
+	m_sprites->set_bank((offset << 1) | 0, (data << 1) | 0);
+	m_sprites->set_bank((offset << 1) | 1, (data << 1) | 1);
 }
 
 
@@ -2481,18 +2462,15 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::system18)
 	MCFG_DEVICE_ADD("3438.0", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.40)
 
 	MCFG_DEVICE_ADD("3438.1", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.40)
 
 	MCFG_DEVICE_ADD("5c68", RF5C68, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, pcm_map)
 MACHINE_CONFIG_END
 
 
@@ -3762,7 +3740,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,common)
+void segas1x_bootleg_state::init_common()
 {
 	m_bg1_trans = 0;
 	m_splittab_bg_x = nullptr;
@@ -3784,30 +3762,30 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,common)
 
 	if (m_soundbank.found())
 	{
-		m_soundbank->configure_entries(0, 8, memregion("soundcpu")->base(), 0x4000);
+		m_soundbank->configure_entries(0, 8, m_soundcpu_region->base(), 0x4000);
 		m_soundbank->set_entry(0);
 	}
 }
 
 /* Sys16A */
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,shinobl)
+void segas1x_bootleg_state::init_shinobl()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 
 	m_spritebank_type = 1;
 }
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,passsht)
+void segas1x_bootleg_state::init_passsht()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 
 	m_spritebank_type = 1;
 	m_back_yscroll = 3;
 }
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,wb3bbl)
+void segas1x_bootleg_state::init_wb3bbl()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 
 	m_spritebank_type = 1;
 	m_back_yscroll = 2;
@@ -3816,15 +3794,14 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,wb3bbl)
 
 
 /* Sys16B */
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,goldnaxeb1)
+void segas1x_bootleg_state::init_goldnaxeb1()
 {
-	int i;
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 	uint8_t *KEY = memregion("decryption")->base();
 	uint16_t data[0x800];
 
 	// the decryption key is in a rom (part of an MSDOS executable...)
-	for (i = 0; i < 0x800; i++)
+	for (int i = 0; i < 0x800; i++)
 	{
 		uint8_t k = KEY[i] ^ 0xff;
 		data[i] = ((k & 0x80) << 7) | ((k & 0x40) << 6) | ((k & 0x20) << 5) | ((k & 0x10) << 4) | ((k & 0x08) << 3) | ((k & 0x04) << 2) | ((k & 0x02) << 1) | ((k & 0x01) << 0);
@@ -3832,18 +3809,18 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,goldnaxeb1)
 
 	memcpy(m_decrypted_opcodes, ROM, 0xc0000);
 
-	for (i = 0; i < 0x20000; i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
 		m_decrypted_opcodes[i] = ROM[i] ^ data[i & 0x7ff];
 	}
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 
 	m_spritebank_type = 1;
 }
 
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,bayrouteb1)
+void segas1x_bootleg_state::init_bayrouteb1()
 {
 	// it has the same encryption as the golden axe bootleg!
 	//
@@ -3853,7 +3830,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,bayrouteb1)
 	// and modify the rom to use it
 
 	// decrypt
-	DRIVER_INIT_CALL(goldnaxeb1);
+	init_goldnaxeb1();
 
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
 
@@ -3867,39 +3844,39 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,bayrouteb1)
 	m_decrypted_opcodes[0x1082/2] = 0xf000;
 }
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,bayrouteb2)
+void segas1x_bootleg_state::init_bayrouteb2()
 {
-	uint8_t *mem = memregion("soundcpu")->base();
+	uint8_t *mem = m_soundcpu_region->base();
 
 	memcpy(mem, mem + 0x10000, 0x8000);
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 }
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,goldnaxeb2)
+void segas1x_bootleg_state::init_goldnaxeb2()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 
 	m_spritebank_type = 1;
 }
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,tturfbl)
+void segas1x_bootleg_state::init_tturfbl()
 {
-	uint8_t *mem = memregion("soundcpu")->base();
+	uint8_t *mem = m_soundcpu_region->base();
 
 	memcpy(mem, mem + 0x10000, 0x8000);
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 }
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,dduxbl)
+void segas1x_bootleg_state::init_dduxbl()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 }
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,eswatbl)
+void segas1x_bootleg_state::init_eswatbl()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 	//m_splittab_fg_x = &sys16_textram[0x0f80];
 
 	m_spritebank_type = 1;
@@ -3907,9 +3884,9 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,eswatbl)
 
 
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,ddcrewbl)
+void segas1x_bootleg_state::init_ddcrewbl()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 }
 
 
@@ -3937,45 +3914,43 @@ WRITE16_MEMBER(segas1x_bootleg_state::altbeastbl_gfx_w)
 		}
 
 		case 0x10: {
-			m_bg_page[0] = (data >> 0) & 0x0f;
-			m_fg_page[0] = (data >> 4) & 0x0f;
+			m_bg_page[0][0] = (data >> 0) & 0x0f;
+			m_fg_page[0][0] = (data >> 4) & 0x0f;
 			break;
 		}
 
 		case 0x11: {
-			m_bg_page[1] = (data >> 0) & 0x0f;
-			m_fg_page[1] = (data >> 4) & 0x0f;
+			m_bg_page[0][1] = (data >> 0) & 0x0f;
+			m_fg_page[0][1] = (data >> 4) & 0x0f;
 			break;
 		}
 
 		case 0x12: {
-			m_bg_page[2] = (data >> 0) & 0x0f;
-			m_fg_page[2] = (data >> 4) & 0x0f;
+			m_bg_page[0][2] = (data >> 0) & 0x0f;
+			m_fg_page[0][2] = (data >> 4) & 0x0f;
 			break;
 		}
 
 		case 0x13: {
-			m_bg_page[3] = (data >> 0) & 0x0f;
-			m_fg_page[3] = (data >> 4) & 0x0f;
+			m_bg_page[0][3] = (data >> 0) & 0x0f;
+			m_fg_page[0][3] = (data >> 4) & 0x0f;
 			break;
 		}
 	}
 }
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,altbeastbl)
+void segas1x_bootleg_state::init_altbeastbl()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x418000, 0x418029, write16_delegate(FUNC(segas1x_bootleg_state::altbeastbl_gfx_w),this));
 }
 
 /* Tetris-based */
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,beautyb)
+void segas1x_bootleg_state::init_beautyb()
 {
 	uint16_t*rom = (uint16_t*)memregion( "maincpu" )->base();
-	int x;
-
-	for (x = 0; x < 0x8000; x++)
+	for (int x = 0; x < 0x8000; x++)
 	{
 		rom[x] = rom[x] ^ 0x2400;
 
@@ -3983,28 +3958,28 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,beautyb)
 									7,6,5,4,   3,2,1,0 );
 	}
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 }
 
 
 /* Sys18 */
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,shdancbl)
+void segas1x_bootleg_state::init_shdancbl()
 {
-	uint8_t *mem = memregion("soundcpu")->base();;
+	uint8_t *mem = m_soundcpu_region->base();;
 
 	/* Copy first 32K of IC45 to Z80 address space */
 	memcpy(mem, mem + 0x10000, 0x8000);
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 
 	m_spritebank_type = 1;
 	m_splittab_fg_x = &m_textram[0x0f80/2];
 	m_splittab_bg_x = &m_textram[0x0fc0/2];
 }
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state,astormbl)
+void segas1x_bootleg_state::init_astormbl()
 {
-	uint8_t *RAM =  memregion("soundcpu")->base();
+	uint8_t *RAM =  m_soundcpu_region->base();
 	static const int astormbl_sound_info[]  =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K
@@ -4016,27 +3991,27 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,astormbl)
 	memcpy(m_sound_info, astormbl_sound_info, sizeof(m_sound_info));
 	memcpy(RAM, &RAM[0x10000], 0xa000);
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 
 	m_spritebank_type = 1;
 	m_splittab_fg_x = &m_textram[0x0f80/2];
 	m_splittab_bg_x = &m_textram[0x0fc0/2];
 }
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state, sys18bl_oki)
+void segas1x_bootleg_state::init_sys18bl_oki()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 
 	m_spritebank_type = 1;
 	m_splittab_fg_x = &m_textram[0x0f80/2];
 	m_splittab_bg_x = &m_textram[0x0fc0/2];
 
-	membank("okibank")->configure_entries(0, 8, memregion("oki")->base() + 0x30000, 0x10000);
+	m_okibank->configure_entries(0, 8, memregion("oki")->base() + 0x30000, 0x10000);
 }
 
-DRIVER_INIT_MEMBER(segas1x_bootleg_state, astormb2)
+void segas1x_bootleg_state::init_astormb2()
 {
-	DRIVER_INIT_CALL(sys18bl_oki);
+	init_sys18bl_oki();
 
 	m_maincpu->space(AS_PROGRAM).unmap_write(0xa00006, 0xa00007);
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00006, 0xa00007, write8_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch), 0x00ff);
@@ -4049,34 +4024,34 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state, astormb2)
  *************************************/
 
 /* System 16A based bootlegs (less complex tilemap system) */
-GAME( 1987, shinobld,    shinobi,   shinobi_datsu, shinobi,  segas1x_bootleg_state,  shinobl,    ROT0,   "bootleg (Datsu)", "Shinobi (Datsu bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, shinoblda,   shinobi,   shinobi_datsu, shinobi,  segas1x_bootleg_state,  shinobl,    ROT0,   "bootleg (Datsu)", "Shinobi (Datsu bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1988, passshtb,    passsht,   passshtb,      passsht,  segas1x_bootleg_state,  passsht,    ROT270, "bootleg", "Passing Shot (2 Players) (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1988, passht4b,    passsht,   passsht4b,     passht4b, segas1x_bootleg_state,  shinobl,    ROT270, "bootleg", "Passing Shot (4 Players) (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1988, wb3bbl,      wb3,       wb3bb,         wb3b,     segas1x_bootleg_state,  wb3bbl,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1988, wb3bble,     wb3,       wb3bb,         wb3b,     segas1x_bootleg_state,  wb3bbl,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (encrypted bootleg)", MACHINE_NOT_WORKING )
+GAME( 1987, shinobld,    shinobi,   shinobi_datsu, shinobi,  segas1x_bootleg_state,  init_shinobl,    ROT0,   "bootleg (Datsu)", "Shinobi (Datsu bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, shinoblda,   shinobi,   shinobi_datsu, shinobi,  segas1x_bootleg_state,  init_shinobl,    ROT0,   "bootleg (Datsu)", "Shinobi (Datsu bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, passshtb,    passsht,   passshtb,      passsht,  segas1x_bootleg_state,  init_passsht,    ROT270, "bootleg", "Passing Shot (2 Players) (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, passht4b,    passsht,   passsht4b,     passht4b, segas1x_bootleg_state,  init_shinobl,    ROT270, "bootleg", "Passing Shot (4 Players) (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, wb3bbl,      wb3,       wb3bb,         wb3b,     segas1x_bootleg_state,  init_wb3bbl,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1988, wb3bble,     wb3,       wb3bb,         wb3b,     segas1x_bootleg_state,  init_wb3bbl,     ROT0,   "bootleg", "Wonder Boy III - Monster Lair (encrypted bootleg)", MACHINE_NOT_WORKING )
 
 /* System 16B based bootlegs */
-GAME( 1989, bayrouteb1,  bayroute,  bayrouteb1,    bayroute, segas1x_bootleg_state,  bayrouteb1, ROT0,   "bootleg (Datsu)", "Bay Route (encrypted, protected bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // broken sprites (due to missing/wrong irq code?)
-GAME( 1989, bayrouteb2,  bayroute,  bayrouteb2,    bayroute, segas1x_bootleg_state,  bayrouteb2, ROT0,   "bootleg (Datsu)", "Bay Route (Datsu bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1989, goldnaxeb1,  goldnaxe,  goldnaxeb1,    goldnaxe, segas1x_bootleg_state,  goldnaxeb1, ROT0,   "bootleg", "Golden Axe (encrypted bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, goldnaxeb2,  goldnaxe,  goldnaxeb2,    goldnaxe, segas1x_bootleg_state,  goldnaxeb2, ROT0,   "bootleg", "Golden Axe (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, tturfbl,     tturf,     tturfbl,       tturf,    segas1x_bootleg_state,  tturfbl,    ROT0,   "bootleg (Datsu)", "Tough Turf (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, dduxbl,      ddux,      dduxbl,        ddux,     segas1x_bootleg_state,  dduxbl,     ROT0,   "bootleg (Datsu)", "Dynamite Dux (Datsu bootleg)", MACHINE_NOT_WORKING )
-GAME( 1988, altbeastbl,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  altbeastbl, ROT0,   "bootleg (Datsu)", "Altered Beast (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1988, mutantwarr,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  altbeastbl, ROT0,   "bootleg (Datsu)", "Mutant Warrior (Altered Beast - Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, eswatbl,     eswat,     eswatbl,       eswat,    segas1x_bootleg_state,  eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, eswatbl2,    eswat,     eswatbl2,      eswat,    segas1x_bootleg_state,  eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1988, tetrisbl,    tetris,    tetrisbl,      tetris,   segas1x_bootleg_state,  dduxbl,     ROT0,   "bootleg", "Tetris (bootleg)", 0 )
+GAME( 1989, bayrouteb1,  bayroute,  bayrouteb1,    bayroute, segas1x_bootleg_state,  init_bayrouteb1, ROT0,   "bootleg (Datsu)", "Bay Route (encrypted, protected bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // broken sprites (due to missing/wrong irq code?)
+GAME( 1989, bayrouteb2,  bayroute,  bayrouteb2,    bayroute, segas1x_bootleg_state,  init_bayrouteb2, ROT0,   "bootleg (Datsu)", "Bay Route (Datsu bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1989, goldnaxeb1,  goldnaxe,  goldnaxeb1,    goldnaxe, segas1x_bootleg_state,  init_goldnaxeb1, ROT0,   "bootleg", "Golden Axe (encrypted bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, goldnaxeb2,  goldnaxe,  goldnaxeb2,    goldnaxe, segas1x_bootleg_state,  init_goldnaxeb2, ROT0,   "bootleg", "Golden Axe (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, tturfbl,     tturf,     tturfbl,       tturf,    segas1x_bootleg_state,  init_tturfbl,    ROT0,   "bootleg (Datsu)", "Tough Turf (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, dduxbl,      ddux,      dduxbl,        ddux,     segas1x_bootleg_state,  init_dduxbl,     ROT0,   "bootleg (Datsu)", "Dynamite Dux (Datsu bootleg)", MACHINE_NOT_WORKING )
+GAME( 1988, altbeastbl,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg (Datsu)", "Altered Beast (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, mutantwarr,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg (Datsu)", "Mutant Warrior (Altered Beast - Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, eswatbl,     eswat,     eswatbl,       eswat,    segas1x_bootleg_state,  init_eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, eswatbl2,    eswat,     eswatbl2,      eswat,    segas1x_bootleg_state,  init_eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, tetrisbl,    tetris,    tetrisbl,      tetris,   segas1x_bootleg_state,  init_dduxbl,     ROT0,   "bootleg", "Tetris (bootleg)", 0 )
 
 /* Tetris-based hardware */
-GAME( 1991, beautyb,     0,         beautyb,       tetris,   segas1x_bootleg_state,  beautyb,    ROT0,   "AMT", "Beauty Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1991, iqpipe,      0,         beautyb,       tetris,   segas1x_bootleg_state,  beautyb,    ROT0,   "AMT", "IQ Pipe", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, beautyb,     0,         beautyb,       tetris,   segas1x_bootleg_state,  init_beautyb,    ROT0,   "AMT", "Beauty Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, iqpipe,      0,         beautyb,       tetris,   segas1x_bootleg_state,  init_beautyb,    ROT0,   "AMT", "IQ Pipe", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 /* System 18 bootlegs */
-GAME( 1990, astormbl,    astorm,    astormbl,      astormbl, segas1x_bootleg_state,  astormbl,   ROT0,   "bootleg", "Alien Storm (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1990, astormb2,    astorm,    astormb2,      astormbl, segas1x_bootleg_state,  astormb2,   ROT0,   "bootleg", "Alien Storm (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS ) // sound verified on real hardware
-GAME( 1990, mwalkbl,     mwalk,     mwalkbl,       mwalkbl,  segas1x_bootleg_state,  sys18bl_oki,ROT0,   "bootleg", "Michael Jackson's Moonwalker (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, shdancbl,    shdancer,  shdancbl,      shdancbl, segas1x_bootleg_state,  shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, shdancbla,   shdancer,  shdancbla,     shdancbl, segas1x_bootleg_state,  shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1990, ddcrewbl,    ddcrew,    ddcrewbl,      ddcrewbl, segas1x_bootleg_state,  ddcrewbl,   ROT0,   "bootleg", "D. D. Crew (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1990, astormbl,    astorm,    astormbl,      astormbl, segas1x_bootleg_state,  init_astormbl,   ROT0,   "bootleg", "Alien Storm (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1990, astormb2,    astorm,    astormb2,      astormbl, segas1x_bootleg_state,  init_astormb2,   ROT0,   "bootleg", "Alien Storm (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS ) // sound verified on real hardware
+GAME( 1990, mwalkbl,     mwalk,     mwalkbl,       mwalkbl,  segas1x_bootleg_state,  init_sys18bl_oki,ROT0,   "bootleg", "Michael Jackson's Moonwalker (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, shdancbl,    shdancer,  shdancbl,      shdancbl, segas1x_bootleg_state,  init_shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, shdancbla,   shdancer,  shdancbla,     shdancbl, segas1x_bootleg_state,  init_shdancbl,   ROT0,   "bootleg", "Shadow Dancer (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1990, ddcrewbl,    ddcrew,    ddcrewbl,      ddcrewbl, segas1x_bootleg_state,  init_ddcrewbl,   ROT0,   "bootleg", "D. D. Crew (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

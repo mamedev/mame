@@ -49,7 +49,7 @@ public:
 		, m_bank(*this, "bank%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(pengadvb);
+	void init_pengadvb();
 	void pengadvb(machine_config &config);
 
 protected:
@@ -313,7 +313,7 @@ void pengadvb_state::pengadvb_decrypt(const char* region)
 		mem[i] = buf[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,5,11,10,9,8,7,6,12,4,3,2,1,0)];
 }
 
-DRIVER_INIT_MEMBER(pengadvb_state,pengadvb)
+void pengadvb_state::init_pengadvb()
 {
 	pengadvb_decrypt("maincpu");
 	pengadvb_decrypt("game");
@@ -342,4 +342,4 @@ ROM_START( pengadvb )
 ROM_END
 
 
-GAME( 1988, pengadvb, 0, pengadvb, pengadvb, pengadvb_state, pengadvb, ROT0, "bootleg (Screen) / Konami", "Penguin Adventure (bootleg of MSX version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, pengadvb, 0, pengadvb, pengadvb, pengadvb_state, init_pengadvb, ROT0, "bootleg (Screen) / Konami", "Penguin Adventure (bootleg of MSX version)", MACHINE_SUPPORTS_SAVE )

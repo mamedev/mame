@@ -90,7 +90,7 @@ public:
 	// Master
 	DECLARE_READ8_MEMBER(master_input_r);
 	DECLARE_WRITE8_MEMBER(master_control_w);
-	DECLARE_DRIVER_INIT(master);
+	void init_master();
 	DECLARE_READ8_MEMBER(master_trampoline_r);
 	DECLARE_WRITE8_MEMBER(master_trampoline_w);
 	void master_map(address_map &map);
@@ -254,7 +254,7 @@ READ8_MEMBER(ckz80_state::master_input_r)
 	return ~read_inputs(10);
 }
 
-DRIVER_INIT_MEMBER(ckz80_state, master)
+void ckz80_state::init_master()
 {
 	u8 *rom = memregion("maincpu")->base();
 	const u32 len = memregion("maincpu")->bytes();
@@ -473,5 +473,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE  INPUT   STATE         INIT    COMPANY, FULLNAME, FLAGS */
-CONS( 1984, ckmaster,  0,        0,      master,  master, ckz80_state,  master, "Chess King", "Master (Chess King)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT         COMPANY       FULLNAME               FLAGS */
+CONS( 1984, ckmaster, 0,      0,      master,  master, ckz80_state, init_master, "Chess King", "Master (Chess King)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

@@ -538,14 +538,14 @@ void crshrace_state::crshrace_patch_code( uint16_t offset )
 #endif
 
 
-DRIVER_INIT_MEMBER(crshrace_state,crshrace)
+void crshrace_state::init_crshrace()
 {
 	#if CRSHRACE_3P_HACK
 	crshrace_patch_code(0x003778);
 	#endif
 }
 
-DRIVER_INIT_MEMBER(crshrace_state,crshrace2)
+void crshrace_state::init_crshrace2()
 {
 	#if CRSHRACE_3P_HACK
 	crshrace_patch_code(0x003796);
@@ -553,5 +553,5 @@ DRIVER_INIT_MEMBER(crshrace_state,crshrace2)
 }
 
 
-GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace_state, crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, crshrace2, ROT270, "Video System Co.", "Lethal Crash Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace_state, init_crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, init_crshrace2, ROT270, "Video System Co.", "Lethal Crash Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

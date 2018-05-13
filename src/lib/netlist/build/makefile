@@ -118,6 +118,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_ne555.o \
 	$(NLOBJ)/devices/nld_r2r_dac.o \
 	$(NLOBJ)/devices/nld_tristate.o \
+	$(NLOBJ)/devices/nld_schmitt.o \
 	$(NLOBJ)/devices/nld_legacy.o \
 	$(NLOBJ)/devices/net_lib.o \
 	$(NLOBJ)/devices/nld_log.o \

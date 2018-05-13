@@ -757,8 +757,8 @@ ROM_START( butasanj )
 ROM_END
 
 
-/*  ( YEAR   NAME     PARENT  MACHINE   INPUT    STATE         INIT  MONITOR  COMPANY                 FULLNAME ) */
-GAME( 1986, argus,    0,      argus,    argus,   argus_state,  0,    ROT270,  "NMK (Jaleco license)", "Argus",                                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, valtric,  0,      valtric,  valtric, argus_state,  0,    ROT270,  "NMK (Jaleco license)", "Valtric",                                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, butasan,  0,      butasan,  butasan, argus_state,  0,    ROT0,    "NMK (Jaleco license)", "Butasan - Pig's & Bomber's (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, butasanj, butasan,butasan,  butasan, argus_state,  0,    ROT0,    "NMK (Jaleco license)", "Butasan (Japan, Japanese)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+/*  ( YEAR   NAME     PARENT   MACHINE   INPUT    STATE        INIT        MONITOR COMPANY                 FULLNAME ) */
+GAME( 1986, argus,    0,       argus,    argus,   argus_state, empty_init, ROT270, "NMK (Jaleco license)", "Argus",                                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, valtric,  0,       valtric,  valtric, argus_state, empty_init, ROT270, "NMK (Jaleco license)", "Valtric",                                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, butasan,  0,       butasan,  butasan, argus_state, empty_init, ROT0,   "NMK (Jaleco license)", "Butasan - Pig's & Bomber's (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, butasanj, butasan, butasan,  butasan, argus_state, empty_init, ROT0,   "NMK (Jaleco license)", "Butasan (Japan, Japanese)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

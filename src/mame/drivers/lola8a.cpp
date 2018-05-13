@@ -307,5 +307,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT    COMPANY                      FULLNAME       FLAGS
-COMP( 1986, lola8a, 0,      0,      lola8a,   lola8a,  lola8a_state,  0,      "Institut Ivo Lola Ribar",   "Lola 8A",     MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                    FULLNAME   FLAGS
+COMP( 1986, lola8a, 0,      0,      lola8a,  lola8a, lola8a_state, empty_init, "Institut Ivo Lola Ribar", "Lola 8A", MACHINE_NOT_WORKING )

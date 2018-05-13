@@ -159,5 +159,5 @@ ROM_START( hexapres )
 	ROM_LOAD( "ghp_voib.bin",  0x00000, 0x80000, CRC(8be745fe) SHA1(840bbb212c8c519f2e4633f8db731fcf3f55635a) )
 ROM_END
 
-GAME( 200?, goldhexa, 0, goldhexa, goldhexa, yuvomz80_state, 0, ROT0, "Yubis", "Golden Hexa", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hexapres, 0, hexapres, goldhexa, yuvomz80_state, 0, ROT0, "Yubis", "Hexa President", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, goldhexa, 0, goldhexa, goldhexa, yuvomz80_state, empty_init, ROT0, "Yubis", "Golden Hexa", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hexapres, 0, hexapres, goldhexa, yuvomz80_state, empty_init, ROT0, "Yubis", "Hexa President", MACHINE_IS_SKELETON_MECHANICAL )

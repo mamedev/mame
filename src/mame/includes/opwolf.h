@@ -41,9 +41,9 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_x_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_y_r);
-	DECLARE_DRIVER_INIT(opwolf);
-	DECLARE_DRIVER_INIT(opwolfb);
-	DECLARE_DRIVER_INIT(opwolfp);
+	void init_opwolf();
+	void init_opwolfb();
+	void init_opwolfp();
 	void opwolf(machine_config &config);
 	void opwolfb(machine_config &config);
 	void opwolfp(machine_config &config);

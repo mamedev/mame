@@ -248,7 +248,7 @@ ROM_END
 
 ***************************************************************************/
 
-//   YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     STATE          INIT  MONITOR  COMPANY                         FULLNAME
-CONS(1982, vectrex,  0,        0,       vectrex,  vectrex,  vectrex_state, 0,             "General Consumer Electronics", "Vectrex" , ROT270)
+//   YEAR  NAME       PARENT    COMPAT   MACHINE   INPUT     STATE          INIT        MONITOR  COMPANY                         FULLNAME
+CONS( 1982, vectrex,  0,        0,       vectrex,  vectrex,  vectrex_state, empty_init,          "General Consumer Electronics", "Vectrex" , ROT270)
 
-GAME(1984, raaspec,  0,                 raaspec,  raaspec,  raaspec_state, 0,    ROT270,  "Roy Abel & Associates",        "Spectrum I+", MACHINE_NOT_WORKING ) //TODO: button labels & timings, a mandatory artwork too?
+GAME( 1984, raaspec,  0,                 raaspec,  raaspec,  raaspec_state, empty_init, ROT270,  "Roy Abel & Associates",        "Spectrum I+", MACHINE_NOT_WORKING ) //TODO: button labels & timings, a mandatory artwork too?

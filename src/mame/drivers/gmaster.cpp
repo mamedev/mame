@@ -40,7 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gmaster_portc_w);
 	DECLARE_WRITE8_MEMBER(gmaster_portd_w);
 	DECLARE_WRITE8_MEMBER(gmaster_portf_w);
-	DECLARE_DRIVER_INIT(gmaster) { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
+	void init_gmaster() { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
 	uint32_t screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void gmaster(machine_config &config);
@@ -372,5 +372,5 @@ ROM_START(gmaster)
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT    MACHINE   INPUT    CLASS          INIT      COMPANY    FULLNAME */
-CONS( 1990, gmaster,  0,      0,        gmaster,  gmaster, gmaster_state, gmaster, "Hartung", "Game Master", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME */
+CONS( 1990, gmaster, 0,      0,      gmaster, gmaster, gmaster_state, init_gmaster, "Hartung", "Game Master", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

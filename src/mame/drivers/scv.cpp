@@ -720,6 +720,6 @@ ROM_START( scv_pal )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE      INIT    COMPANY  FULLNAME                       FLAGS */
-CONS( 1984, scv,     0,      0,      scv,     scv,   scv_state, 0,      "Epoch", "Super Cassette Vision",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 198?, scv_pal, scv,    0,      scv_pal, scv,   scv_state, 0,      "Yeno",  "Super Cassette Vision (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                       FLAGS */
+CONS( 1984, scv,     0,      0,      scv,     scv,   scv_state, empty_init, "Epoch", "Super Cassette Vision",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 198?, scv_pal, scv,    0,      scv_pal, scv,   scv_state, empty_init, "Yeno",  "Super Cassette Vision (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -119,7 +119,7 @@ public:
 	DECLARE_WRITE8_MEMBER(re_mux_port_A_w);
 	DECLARE_WRITE8_MEMBER(re_mux_port_B_w);
 
-	DECLARE_DRIVER_INIT(re900);
+	void init_re900();
 	void re900(machine_config &config);
 	void bs94(machine_config &config);
 	void mem_io(address_map &map);
@@ -438,7 +438,7 @@ ROM_END
 *      Driver Init      *
 ************************/
 
-DRIVER_INIT_MEMBER(re900_state,re900)
+void re900_state::init_re900()
 {
 	m_player = 1;
 	m_stat_a = 1;
@@ -457,6 +457,6 @@ DRIVER_INIT_MEMBER(re900_state,re900)
 *      Game Drivers      *
 *************************/
 
-//     YEAR  NAME   PARENT MACHINE INPUT  STATE        INIT   ROT    COMPANY                     FULLNAME            FLAGS                  LAYOUT
-GAMEL( 1993, re900, 0,     re900,  re900, re900_state, re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    MACHINE_SUPPORTS_SAVE, layout_re900 )
-GAME ( 1994, bs94 , 0,     bs94,   bs94 , re900_state, 0,     ROT0,  "Entretenimientos GEMINIS", "Buena Suerte '94", MACHINE_SUPPORTS_SAVE )
+//     YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        ROT    COMPANY                     FULLNAME            FLAGS                  LAYOUT
+GAMEL( 1993, re900, 0,      re900,   re900, re900_state, init_re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    MACHINE_SUPPORTS_SAVE, layout_re900 )
+GAME(  1994, bs94,  0,      bs94,    bs94,  re900_state, empty_init, ROT0,  "Entretenimientos GEMINIS", "Buena Suerte '94", MACHINE_SUPPORTS_SAVE )

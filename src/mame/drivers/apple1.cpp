@@ -632,5 +632,5 @@ ROM_START(apple1)
 	ROM_LOAD("s2513.d2", 0x0000, 0x0200, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee)) // apple1.vid
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE          INIT  COMPANY            FULLNAME */
-COMP( 1976, apple1,  0,     0,      apple1,     apple1, apple1_state,  0,    "Apple Computer",  "Apple I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY           FULLNAME */
+COMP( 1976, apple1, 0,      0,      apple1,  apple1, apple1_state, empty_init, "Apple Computer", "Apple I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

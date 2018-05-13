@@ -48,22 +48,22 @@ public:
 
 	optional_device<cpu_device> m_prot;
 
-	DECLARE_DRIVER_INIT(photoy2k);
-	DECLARE_DRIVER_INIT(kovsh);
-	DECLARE_DRIVER_INIT(kovshp);
-	DECLARE_DRIVER_INIT(kovshxas);
-	DECLARE_DRIVER_INIT(kovlsqh2);
-	DECLARE_DRIVER_INIT(kovqhsgs);
-	DECLARE_DRIVER_INIT(ddp3);
-	DECLARE_DRIVER_INIT(ket);
-	DECLARE_DRIVER_INIT(espgal);
-	DECLARE_DRIVER_INIT(puzzli2);
-	DECLARE_DRIVER_INIT(py2k2);
-	DECLARE_DRIVER_INIT(pgm3in1);
-	DECLARE_DRIVER_INIT(pstar);
-	DECLARE_DRIVER_INIT(kov);
-	DECLARE_DRIVER_INIT(kovboot);
-	DECLARE_DRIVER_INIT(oldsplus);
+	void init_photoy2k();
+	void init_kovsh();
+	void init_kovshp();
+	void init_kovshxas();
+	void init_kovlsqh2();
+	void init_kovqhsgs();
+	void init_ddp3();
+	void init_ket();
+	void init_espgal();
+	void init_puzzli2();
+	void init_py2k2();
+	void init_pgm3in1();
+	void init_pstar();
+	void init_kov();
+	void init_kovboot();
+	void init_oldsplus();
 	DECLARE_MACHINE_START(pgm_arm_type1);
 
 	DECLARE_READ32_MEMBER( pgm_arm7_type1_protlatch_r );
@@ -141,5 +141,6 @@ INPUT_PORTS_EXTERN( photoy2k );
 INPUT_PORTS_EXTERN( oldsplus );
 INPUT_PORTS_EXTERN( pstar );
 INPUT_PORTS_EXTERN( py2k2 );
+INPUT_PORTS_EXTERN( pgm3in1 );
 INPUT_PORTS_EXTERN( puzzli2 );
 INPUT_PORTS_EXTERN( kovsh );

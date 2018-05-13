@@ -370,7 +370,7 @@ WRITE8_MEMBER( s11_state::pia40_pb_w )
 	m_pia34->portb_w(data);
 }
 
-DRIVER_INIT_MEMBER( s11_state, s11 )
+void s11_state::init_s11()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 	membank("bank0")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
@@ -685,17 +685,17 @@ ROM_START(shfin_l1)
 	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
 ROM_END
 
-GAME( 1986, grand_l4, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Grand Lizard (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, grand_l3, grand_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Grand Lizard (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, hs_l4,    0,        s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, hs_l3,    hs_l4,    s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l4, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l1, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-1)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l2, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-2)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1986, rdkng_l3, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, grand_l4, 0,        s11, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, grand_l3, grand_l4, s11, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, hs_l4,    0,        s11, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, hs_l3,    hs_l4,    s11, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l4, 0,        s11, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-4)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l1, rdkng_l4, s11, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-1)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l2, rdkng_l4, s11, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-2)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, rdkng_l3, rdkng_l4, s11, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-3)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
 
-GAME( 1986, tts_l2,   0,        s11, s11, s11_state, s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1986, tts_l1,   tts_l2,   s11, s11, s11_state, s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1987, gmine_l2, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1987, tdawg_l1, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME( 1987, shfin_l1, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1986, tts_l2,   0,        s11, s11, s11_state, init_s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1986, tts_l1,   tts_l2,   s11, s11, s11_state, init_s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1987, gmine_l2, 0,        s11, s11, s11_state, init_s11, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1987, tdawg_l1, 0,        s11, s11, s11_state, init_s11, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME( 1987, shfin_l1, 0,        s11, s11, s11_state, init_s11, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

@@ -81,4 +81,4 @@ ROM_START( gamepock )
 ROM_END
 
 
-CONS( 1984, gamepock, 0, 0, gamepock, gamepock, gamepock_state, 0, "Epoch", "Game Pocket Computer", 0 )
+CONS( 1984, gamepock, 0, 0, gamepock, gamepock, gamepock_state, empty_init, "Epoch", "Game Pocket Computer", 0 )

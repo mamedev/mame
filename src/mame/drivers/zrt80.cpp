@@ -317,5 +317,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT  COMPANY                       FULLNAME   FLAGS */
-COMP( 1982, zrt80,  0,       0,      zrt80,     zrt80, zrt80_state, 0,    "Digital Research Computers", "ZRT-80",  0)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                       FULLNAME   FLAGS */
+COMP( 1982, zrt80, 0,      0,      zrt80,   zrt80, zrt80_state, empty_init, "Digital Research Computers", "ZRT-80",  0)

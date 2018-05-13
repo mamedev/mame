@@ -283,20 +283,18 @@ ROM_START( mouserc )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(mouser_state,mouser)
+void mouser_state::init_mouser()
 {
 	/* Decode the opcodes */
-
-	offs_t i;
 	uint8_t *rom = memregion("maincpu")->base();
 	uint8_t *table = memregion("user1")->base();
 
-	for (i = 0; i < 0x6000; i++)
+	for (offs_t i = 0; i < 0x6000; i++)
 	{
 		m_decrypted_opcodes[i] = table[rom[i]];
 	}
 }
 
 
-GAME( 1983, mouser,   0,      mouser, mouser, mouser_state, mouser, ROT90, "UPL",                  "Mouser",          MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mouserc,  mouser, mouser, mouser, mouser_state, mouser, ROT90, "UPL (Cosmos license)", "Mouser (Cosmos)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mouser,   0,      mouser, mouser, mouser_state, init_mouser, ROT90, "UPL",                  "Mouser",          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mouserc,  mouser, mouser, mouser, mouser_state, init_mouser, ROT90, "UPL (Cosmos license)", "Mouser (Cosmos)", MACHINE_SUPPORTS_SAVE )

@@ -57,7 +57,7 @@ protected:
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
 public:
-	DECLARE_DRIVER_INIT(wpc_dot);
+	void init_wpc_dot();
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);

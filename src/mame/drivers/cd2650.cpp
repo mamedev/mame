@@ -348,5 +348,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY         FULLNAME   FLAGS
-COMP( 1977, cd2650, 0,      0,       cd2650,    cd2650, cd2650_state,  0,    "Central Data", "2650 Computer System", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME                FLAGS
+COMP( 1977, cd2650, 0,      0,      cd2650,  cd2650, cd2650_state, empty_init, "Central Data", "2650 Computer System", 0 )

@@ -131,5 +131,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT    STATE          INIT   COMPANY   FULLNAME         FLAGS
-COMP( 1977, al8800bt,  0,       0,       altair,    altair,  altair_state,  0,     "MITS",   "Altair 8800bt", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY  FULLNAME         FLAGS
+COMP( 1977, al8800bt, 0,      0,      altair,  altair,  altair_state, empty_init, "MITS",  "Altair 8800bt", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

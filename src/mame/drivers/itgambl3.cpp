@@ -518,10 +518,10 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT ROT   COMPANY                  FULLNAME                          FLAGS
-GAME( 200?, ejollyx5, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "Solar Games",           "Euro Jolly X5",                  MACHINE_IS_SKELETON )
-GAME( 200?, grandprx, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "4fun",                  "Grand Prix",                     MACHINE_IS_SKELETON )
-GAME( 200?, supjolly, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "<unknown>",             "Super Jolly",                    MACHINE_IS_SKELETON )
-GAME( 200?, x5jokers, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "Electronic Projects",   "X Five Jokers (Version 1.12)",   MACHINE_IS_SKELETON )
-GAME( 200?, queenotg, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "<unknown>",             "Queen of the Games",             MACHINE_IS_SKELETON )
-GAME( 200?, ejollyx9, 0,      itgambl3, itgambl3, itgambl3_state, 0,   ROT0, "Solar Games",           "Euro Jolly X9",                  MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY                  FULLNAME                          FLAGS
+GAME( 200?, ejollyx5, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "Solar Games",           "Euro Jolly X5",                  MACHINE_IS_SKELETON )
+GAME( 200?, grandprx, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "4fun",                  "Grand Prix",                     MACHINE_IS_SKELETON )
+GAME( 200?, supjolly, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "<unknown>",             "Super Jolly",                    MACHINE_IS_SKELETON )
+GAME( 200?, x5jokers, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "Electronic Projects",   "X Five Jokers (Version 1.12)",   MACHINE_IS_SKELETON )
+GAME( 200?, queenotg, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "<unknown>",             "Queen of the Games",             MACHINE_IS_SKELETON )
+GAME( 200?, ejollyx9, 0,      itgambl3, itgambl3, itgambl3_state, empty_init, ROT0, "Solar Games",           "Euro Jolly X9",                  MACHINE_IS_SKELETON )

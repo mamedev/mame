@@ -253,7 +253,7 @@ public:
 	DECLARE_WRITE8_MEMBER(int_ack_w);
 	DECLARE_WRITE8_MEMBER(led_mux_data_w);
 	DECLARE_WRITE8_MEMBER(led_mux_select_w);
-	DECLARE_DRIVER_INIT(kas89);
+	void init_kas89();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
@@ -841,22 +841,20 @@ ROM_END
    A13-> A06
    A14-> A14
 */
-DRIVER_INIT_MEMBER(kas89_state,kas89)
+void kas89_state::init_kas89()
 {
-	int i;
 	uint8_t *mem = memregion("maincpu")->base();
 	int memsize = memregion("maincpu")->bytes();
+	std::vector<uint8_t> buf;
 
 	/* Unscrambling data lines */
-	for ( i = 0; i < memsize; i++ )
+	for (int i = 0; i < memsize; i++)
 	{
-		mem[i] = bitswap<8>(mem[i], 3, 1, 0, 5, 6, 4, 7, 2);
+		buf.push_back(bitswap<8>(mem[i], 3, 1, 0, 5, 6, 4, 7, 2));
 	}
 
 	/* Unscrambling address lines */
-	std::vector<uint8_t> buf(memsize);
-	memcpy(&buf[0], mem, memsize);
-	for ( i = 0; i < memsize; i++ )
+	for (int i = 0; i < memsize; i++)
 	{
 		mem[bitswap<16>(i, 15, 14, 5, 6, 3, 0, 12, 1, 9, 13, 4, 7, 10, 8, 2, 11)] = buf[i];
 	}
@@ -867,5 +865,5 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 *           Game Driver(s)            *
 **************************************/
 
-//     YEAR  NAME    PARENT  MACHINE  INPUT  STATE        INIT   ROT    COMPANY       FULLNAME      FLAGS                    LAYOUT
-GAMEL( 1989, kas89,  0,      kas89,   kas89, kas89_state, kas89, ROT90, "SFC S.R.L.", "Kasino '89", MACHINE_IMPERFECT_SOUND, layout_kas89 )
+//     YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        ROT    COMPANY       FULLNAME      FLAGS                    LAYOUT
+GAMEL( 1989, kas89, 0,      kas89,   kas89, kas89_state, init_kas89, ROT90, "SFC S.R.L.", "Kasino '89", MACHINE_IMPERFECT_SOUND, layout_kas89 )

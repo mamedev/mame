@@ -298,4 +298,4 @@ ROM_END
 
 /* Game Driver */
 
-GAME( 1985, bogeyman, 0, bogeyman, bogeyman, bogeyman_state, 0, ROT0, "Technos Japan", "Bogey Manor", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bogeyman, 0, bogeyman, bogeyman, bogeyman_state, empty_init, ROT0, "Technos Japan", "Bogey Manor", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

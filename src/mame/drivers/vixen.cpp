@@ -836,7 +836,7 @@ ROM_END
 //-------------------------------------------------
 
 
-DRIVER_INIT_MEMBER(vixen_state,vixen)
+void vixen_state::init_vixen()
 {
 	m_program = &m_maincpu->space(AS_PROGRAM);
 }
@@ -847,5 +847,5 @@ DRIVER_INIT_MEMBER(vixen_state,vixen)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT    CLASS         INIT    COMPANY      FULLNAME      FLAGS
-COMP( 1984, vixen,  0,       0,     vixen,     vixen,   vixen_state,  vixen,  "Osborne",   "Vixen",      0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY    FULLNAME  FLAGS
+COMP( 1984, vixen, 0,       0,     vixen,   vixen,  vixen_state, init_vixen, "Osborne", "Vixen",  0 )

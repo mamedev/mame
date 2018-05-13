@@ -108,9 +108,9 @@ public:
 	DECLARE_WRITE16_MEMBER(funcube_outputs_w);
 	DECLARE_READ16_MEMBER(funcube_battery_r);
 
-	DECLARE_DRIVER_INIT(funcube3);
-	DECLARE_DRIVER_INIT(funcube);
-	DECLARE_DRIVER_INIT(funcube2);
+	void init_funcube3();
+	void init_funcube();
+	void init_funcube2();
 
 	DECLARE_MACHINE_START(mj4simai);
 	DECLARE_MACHINE_START(funcube);

@@ -469,6 +469,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT  ROT    COMPANY          FULLNAME                    FLAGS   */
-GAME( 1993, bingoman,  0,        bingoman,  bingoman, bingoman_state, 0,    ROT0, "HP Automaten",  "Bingo Mania (P03-P07-P14)", MACHINE_IS_SKELETON )
-GAME( 1993, bingomana, bingoman, bingoman,  bingoman, bingoman_state, 0,    ROT0, "HP Automaten",  "Bingo Mania (A03)",         MACHINE_IS_SKELETON )
+/*    YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT        ROT    COMPANY          FULLNAME                    FLAGS   */
+GAME( 1993, bingoman,  0,        bingoman,  bingoman, bingoman_state, empty_init, ROT0, "HP Automaten",  "Bingo Mania (P03-P07-P14)", MACHINE_IS_SKELETON )
+GAME( 1993, bingomana, bingoman, bingoman,  bingoman, bingoman_state, empty_init, ROT0, "HP Automaten",  "Bingo Mania (A03)",         MACHINE_IS_SKELETON )

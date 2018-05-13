@@ -48,4 +48,4 @@ ROM_START( mightyframe )
 	ROM_LOAD( "72-01231.26c", 0x0000, 0x8000, CRC(41faf884) SHA1(d0c6f35394b4006bbe9a3f81b658ded37f41d86f) )
 ROM_END
 
-COMP( 1985?, mightyframe, 0, 0, mightyframe, mightyframe, mightyframe_state, 0, "Convergent Technologies", "Mightyframe", MACHINE_IS_SKELETON )
+COMP( 1985?, mightyframe, 0, 0, mightyframe, mightyframe, mightyframe_state, empty_init, "Convergent Technologies", "Mightyframe", MACHINE_IS_SKELETON )

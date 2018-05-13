@@ -271,5 +271,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY  FULLNAME             FLAGS
-COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, 0,    "VTech", "Laser Compumate 2", MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME             FLAGS
+COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, empty_init, "VTech", "Laser Compumate 2", MACHINE_NOT_WORKING )

@@ -711,5 +711,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT   COMPANY    FULLNAME                     FLAGS
-GAME( 1985, jubileep, 0,      jubileep, jubileep, jubilee_state, 0,    ROT0, "Jubilee", "Double-Up Poker (Jubilee)", MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT        ROT   COMPANY    FULLNAME                     FLAGS
+GAME( 1985, jubileep, 0,      jubileep, jubileep, jubilee_state, empty_init, ROT0, "Jubilee", "Double-Up Poker (Jubilee)", MACHINE_NO_SOUND )

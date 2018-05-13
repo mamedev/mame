@@ -145,8 +145,8 @@ protected:
 
 	unsigned    rdmem(u32 addr)             { return unsigned(m_program->read_byte(addr)); }
 	void        wrmem(u32 addr, u8 value)   { m_program->write_byte(addr, value); }
-	unsigned    rdop(u32 addr)              { return unsigned(m_direct->read_byte(addr)); }
-	unsigned    rdop_arg(u32 addr)          { return unsigned(m_direct->read_byte(addr)); }
+	unsigned    rdop(u32 addr)              { return unsigned(m_cache->read_byte(addr)); }
+	unsigned    rdop_arg(u32 addr)          { return unsigned(m_cache->read_byte(addr)); }
 
 	unsigned    rm(u32 addr)                { return rdmem(addr); }
 	void        rm16(u32 addr, PAIR &p);
@@ -277,7 +277,7 @@ protected:
 
 	// address spaces
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 };
 
 

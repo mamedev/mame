@@ -193,5 +193,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY      FULLNAME    FLAGS */
-COMP( 19??, vta2000,  0,      0,       vta2000,   vta2000, vta2000_state, 0,    "<unknown>", "VTA-2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS */
+COMP( 19??, vta2000, 0,      0,      vta2000, vta2000, vta2000_state, empty_init, "<unknown>", "VTA-2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

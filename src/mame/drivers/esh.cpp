@@ -57,7 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER(misc_write);
 	DECLARE_WRITE8_MEMBER(led_writes);
 	DECLARE_WRITE8_MEMBER(nmi_line_w);
-	DECLARE_DRIVER_INIT(esh);
+	void init_esh();
 	bool m_nmi_enable;
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(esh);
@@ -467,11 +467,11 @@ ROM_START( eshb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(esh_state,esh)
+void esh_state::init_esh()
 {
 }
 
-//    YEAR  NAME   PARENT   MACHINE  INPUT  STATE      INIT     MONITOR  COMPANY          FULLNAME                     FLAGS
-GAME( 1983, esh,   0,       esh,     esh,   esh_state, esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 1)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
-GAME( 1983, esha,  esh,     esh,     esh,   esh_state, esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 2)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
-GAME( 1983, eshb,  esh,     esh,     esh,   esh_state, esh,     ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 3)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
+//    YEAR  NAME   PARENT   MACHINE  INPUT  STATE      INIT      MONITOR  COMPANY          FULLNAME                     FLAGS
+GAME( 1983, esh,   0,       esh,     esh,   esh_state, init_esh, ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 1)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
+GAME( 1983, esha,  esh,     esh,     esh,   esh_state, init_esh, ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 2)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)
+GAME( 1983, eshb,  esh,     esh,     esh,   esh_state, init_esh, ROT0,    "Funai/Gakken",  "Esh's Aurunmilla (set 3)",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_COLORS)

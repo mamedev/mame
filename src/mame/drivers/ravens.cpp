@@ -395,6 +395,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE  INPUT   CLASS         INIT  COMPANY                            FULLNAME                               FLAGS */
-COMP( 1984, ravens,  0,       0,       ravens,  ravens, ravens_state, 0,    "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", MACHINE_NO_SOUND_HW )
-COMP( 1985, ravens2, ravens,  0,       ravens2, ravens, ravens_state, 0,    "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V2.0", MACHINE_NO_SOUND_HW )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                            FULLNAME                               FLAGS */
+COMP( 1984, ravens,  0,      0,      ravens,  ravens, ravens_state, empty_init, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", MACHINE_NO_SOUND_HW )
+COMP( 1985, ravens2, ravens, 0,      ravens2, ravens, ravens_state, empty_init, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V2.0", MACHINE_NO_SOUND_HW )

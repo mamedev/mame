@@ -64,7 +64,7 @@ public:
 	required_device<generic_slot_device> m_cart;
 
 	uint8_t m_ram[256];
-	DECLARE_DRIVER_INIT(unichamp);
+	void init_unichamp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(unichamp);
@@ -155,7 +155,7 @@ READ8_MEMBER(unichamp_state::bext_r)
 }
 
 
-DRIVER_INIT_MEMBER(unichamp_state,unichamp)
+void unichamp_state::init_unichamp()
 {
 }
 
@@ -289,4 +289,4 @@ ROM_START(unichamp)
 ROM_END
 
 
-CONS( 1977, unichamp, 0,  0, unichamp, unichamp,  unichamp_state,   unichamp,  "Unisonic", "Champion 2711", 0/*MACHINE_IMPERFECT_GRAPHICS*/ )
+CONS( 1977, unichamp, 0, 0, unichamp, unichamp, unichamp_state, init_unichamp, "Unisonic", "Champion 2711", 0/*MACHINE_IMPERFECT_GRAPHICS*/ )

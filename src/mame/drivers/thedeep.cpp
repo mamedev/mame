@@ -543,5 +543,5 @@ ROM_START( rundeep )
 	ROM_LOAD( "fi-3", 0x400, 0x200, CRC(f61a9686) SHA1(24082f60b72268d240ceca6999bdf18872625cd2) )
 ROM_END
 
-GAME( 1987, thedeep, 0,       thedeep, thedeep, thedeep_state, 0, ROT270, "Wood Place Inc.", "The Deep (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, rundeep, thedeep, thedeep, thedeep, thedeep_state, 0, ROT270, "bootleg (Cream)", "Run Deep",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, thedeep, 0,       thedeep, thedeep, thedeep_state, empty_init, ROT270, "Wood Place Inc.", "The Deep (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rundeep, thedeep, thedeep, thedeep, thedeep_state, empty_init, ROT270, "bootleg (Cream)", "Run Deep",         MACHINE_SUPPORTS_SAVE )

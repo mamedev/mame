@@ -68,7 +68,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_DRIVER_INIT(mirage);
+	void init_mirage();
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_porta);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_portb);
@@ -255,7 +255,7 @@ ROM_START( enmirage )
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE)
 ROM_END
 
-DRIVER_INIT_MEMBER(enmirage_state,mirage)
+void enmirage_state::init_mirage()
 {
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : nullptr;
@@ -292,4 +292,4 @@ DRIVER_INIT_MEMBER(enmirage_state,mirage)
 	m_via->write_pb7(0);
 }
 
-CONS( 1984, enmirage, 0, 0, mirage, mirage, enmirage_state, mirage, "Ensoniq", "Ensoniq Mirage", MACHINE_NOT_WORKING )
+CONS( 1984, enmirage, 0, 0, mirage, mirage, enmirage_state, init_mirage, "Ensoniq", "Ensoniq Mirage", MACHINE_NOT_WORKING )

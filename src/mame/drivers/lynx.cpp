@@ -200,6 +200,6 @@ QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE         INIT    COMPANY   FULLNAME      FLAGS */
-CONS( 1989, lynx,   0,      0,      lynx,   lynx, lynx_state,   0,      "Atari",  "Lynx",       MACHINE_SUPPORTS_SAVE )
-// CONS( 1991, lynx2,  lynx,  0,      lynx2,  lynx, lynx_state,   0,      "Atari",  "Lynx II",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME  FLAGS */
+CONS( 1989, lynx, 0,      0,      lynx,    lynx,  lynx_state, empty_init, "Atari", "Lynx",   MACHINE_SUPPORTS_SAVE )
+// CONS( 1991, lynx2,  lynx,  0,      lynx2,  lynx, lynx_state, empty_init, "Atari",  "Lynx II",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

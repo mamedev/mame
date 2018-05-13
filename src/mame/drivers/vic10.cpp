@@ -699,7 +699,7 @@ MACHINE_CONFIG_START(vic10_state::vic10)
 	// basic hardware
 	MCFG_DEVICE_ADD(M6510_TAG, M6510, XTAL(8'000'000)/8)
 	MCFG_DEVICE_PROGRAM_MAP(vic10_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_M6510_PORT_CALLBACKS(READ8(*this, vic10_state, cpu_r), WRITE8(*this, vic10_state, cpu_w))
 	MCFG_M6510_PORT_PULLS(0x10, 0x20)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
@@ -768,4 +768,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1982, vic10,      0,    0,    vic10, vic10, vic10_state,     0, "Commodore Business Machines", "VIC-10 / Max Machine / UltiMax (NTSC)", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, vic10, 0, 0, vic10, vic10, vic10_state, empty_init, "Commodore Business Machines", "VIC-10 / Max Machine / UltiMax (NTSC)", MACHINE_SUPPORTS_SAVE )

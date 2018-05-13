@@ -91,7 +91,7 @@ public:
 	{ }
 
 	DECLARE_MACHINE_RESET(wmg);
-	DECLARE_DRIVER_INIT(wmg);
+	void init_wmg();
 	DECLARE_READ8_MEMBER(wmg_nvram_r);
 	DECLARE_WRITE8_MEMBER(wmg_nvram_w);
 	DECLARE_READ8_MEMBER(wmg_pia_0_r);
@@ -474,7 +474,7 @@ READ8_MEMBER( wmg_state::wmg_pia_0_r )
  *  Driver Initialisation
  *
  *************************************/
-DRIVER_INIT_MEMBER( wmg_state, wmg )
+void wmg_state::init_wmg()
 {
 	uint8_t *cpu = memregion("maincpu")->base();
 	uint8_t *snd = memregion("soundcpu")->base();
@@ -577,4 +577,4 @@ ROM_END
  *
  *******************************************************/
 
-GAME( 2001, wmg, 0, wmg, wmg, wmg_state, wmg, ROT0, "hack (Clay Cowgill)", "Williams Multigame", 0 )
+GAME( 2001, wmg, 0, wmg, wmg, wmg_state, init_wmg, ROT0, "hack (Clay Cowgill)", "Williams Multigame", 0 )

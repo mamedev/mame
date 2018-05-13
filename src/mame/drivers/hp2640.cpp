@@ -1029,4 +1029,4 @@ ROM_START(hp2645)
 	ROM_LOAD("1816-1425.bin", 0x0000, 0x400, CRC(69a34fef) SHA1(816929cadd53c2fe42b3ca561c029cb1ccd4ca24))
 ROM_END
 
-COMP(1976 , hp2645 , 0 , 0 , hp2645 , hp2645 , hp2645_state , 0 , "HP" , "HP 2645A" , 0)
+COMP( 1976, hp2645, 0, 0, hp2645, hp2645, hp2645_state, empty_init, "HP", "HP 2645A", 0)

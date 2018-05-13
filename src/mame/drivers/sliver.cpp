@@ -596,5 +596,5 @@ ROM_START( slivera )
 ROM_END
 
 
-GAME( 1996, sliver,  0,        sliver, sliver, sliver_state, 0, ROT0,  "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, slivera, sliver,   sliver, sliver, sliver_state, 0, ROT0,  "Hollow Corp", "Sliver (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sliver,  0,        sliver, sliver, sliver_state, empty_init, ROT0, "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, slivera, sliver,   sliver, sliver, sliver_state, empty_init, ROT0, "Hollow Corp", "Sliver (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

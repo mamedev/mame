@@ -121,7 +121,7 @@ protected:
 	const address_space_config  m_space_config;
 
 private:
-	direct_read_data<0> *m_direct;
+	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_cache;
 	sound_stream *m_stream;
 
 	struct

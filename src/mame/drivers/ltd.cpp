@@ -61,10 +61,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(atla_ltd);
-	DECLARE_DRIVER_INIT(bhol_ltd);
-	DECLARE_DRIVER_INIT(zephy);
-	DECLARE_DRIVER_INIT(ltd);
+	void init_atla_ltd();
+	void init_bhol_ltd();
+	void init_zephy();
+	void init_ltd();
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(port1_r);
@@ -379,22 +379,22 @@ void ltd_state::machine_reset()
 	m_timer_r = 0;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, ltd )
+void ltd_state::init_ltd()
 {
 	m_game = 0;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, atla_ltd )
+void ltd_state::init_atla_ltd()
 {
 	m_game = 1;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, bhol_ltd )
+void ltd_state::init_bhol_ltd()
 {
 	m_game = 2;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, zephy )
+void ltd_state::init_zephy()
 {
 	m_game = 3;
 }
@@ -750,24 +750,24 @@ ROM_START(tricksht)
 ROM_END
 
 // system 3
-GAME(1981, arizona,          0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Arizona",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, atla_ltd,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1981, discodan,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Disco Dancing",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, hustlerp,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Hustler",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, kkongltd,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "King Kong",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?, vikngkng,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Viking King",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, force,            0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Force",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, bhol_ltd,         0,  ltd3,  ltd3, ltd_state, bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1981, cowboy,           0,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Cowboy Eight Ball",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, zephy,            0,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Zephy",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, zephya,       zephy,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Zephy (alternate set)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, arizona,  0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Arizona",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, atla_ltd, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1981, discodan, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Disco Dancing",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, hustlerp, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Hustler",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, kkongltd, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "King Kong",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?, vikngkng, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Viking King",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, force,    0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Force",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, bhol_ltd, 0,        ltd3, ltd3, ltd_state, init_bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1981, cowboy,   0,        ltd3, ltd3, ltd_state, init_zephy,    ROT0, "LTD", "Cowboy Eight Ball",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, zephy,    0,        ltd3, ltd3, ltd_state, init_zephy,    ROT0, "LTD", "Zephy",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, zephya,   zephy,    ltd3, ltd3, ltd_state, init_zephy,    ROT0, "LTD", "Zephy (alternate set)",             MACHINE_IS_SKELETON_MECHANICAL)
 
 // system 4
-GAME(1982, cowboy2,          0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Cowboy Eight Ball 2",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, hhotel,           0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Haunted Hotel",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, pecmen,           0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Mr. & Mrs. Pec-Men",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, alcapone,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Al Capone",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982, columbia,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Columbia",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, tmacltd4,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Time Machine (LTD, 4 players)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, tmacltd2,  tmacltd4,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Time Machine (LTD, 2 players)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982, tricksht,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Trick Shooter",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, cowboy2,  0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Cowboy Eight Ball 2",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, hhotel,   0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Haunted Hotel",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, pecmen,   0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Mr. & Mrs. Pec-Men",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, alcapone, 0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Al Capone",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, columbia, 0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Columbia",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, tmacltd4, 0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Time Machine (LTD, 4 players)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, tmacltd2, tmacltd4, ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Time Machine (LTD, 2 players)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, tricksht, 0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Trick Shooter",                     MACHINE_IS_SKELETON_MECHANICAL)

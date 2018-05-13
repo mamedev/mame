@@ -471,4 +471,4 @@ ROM_START( istreb )
 	ROM_LOAD( "003-w3.bin", 0x000, 0x200, CRC(54eb4893) SHA1(c7a4724045c645ab728074ed7fef1882d9776005) )
 ROM_END
 
-GAME( 198?, istreb,  0,        istreb,  istreb,  istrebiteli_state,  0, ROT0, "Terminal", "Istrebiteli", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 198?, istreb, 0, istreb, istreb, istrebiteli_state, empty_init, ROT0, "Terminal", "Istrebiteli", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

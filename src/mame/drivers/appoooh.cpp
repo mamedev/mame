@@ -603,7 +603,7 @@ ROM_END
  *************************************/
 
 
-DRIVER_INIT_MEMBER(appoooh_state,robowresb)
+void appoooh_state::init_robowresb()
 {
 	memcpy(m_decrypted_opcodes, memregion("maincpu")->base() + 0x1c000, 0x8000);
 }
@@ -615,6 +615,6 @@ DRIVER_INIT_MEMBER(appoooh_state,robowresb)
  *
  *************************************/
 
-GAME( 1984, appoooh,   0,        appoooh,  appoooh,  appoooh_state, 0,         ROT0, "Sanritsu / Sega", "Appoooh",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, robowres,  0,        robowrese,robowres, appoooh_state, 0,         ROT0, "Sanritsu / Sega", "Robo Wres 2001",           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, robowresb, robowres, robowres, robowres, appoooh_state, robowresb, ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, appoooh,   0,        appoooh,   appoooh,  appoooh_state, empty_init,     ROT0, "Sanritsu / Sega", "Appoooh",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, robowres,  0,        robowrese, robowres, appoooh_state, empty_init,     ROT0, "Sanritsu / Sega", "Robo Wres 2001",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, robowresb, robowres, robowres,  robowres, appoooh_state, init_robowresb, ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", MACHINE_SUPPORTS_SAVE )

@@ -5393,21 +5393,18 @@ ROM_START( blktouch )
 	ROM_LOAD( "u13",  0x000, 0x200, CRC(6984aaa9) SHA1(91645cd944cb21266edd13e55a8dc846f6edc419) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dynax_state,blktouch)
+void dynax_state::init_blktouch()
 {
 	// fearsome encryption ;-)
-	uint8_t   *src = (uint8_t *)memregion("maincpu")->base();
-	int i;
-
-	for (i = 0; i < 0x90000; i++)
+	uint8_t *src = (uint8_t *)memregion("maincpu")->base();
+	for (int i = 0; i < 0x90000; i++)
 	{
 		src[i] = bitswap<8>(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
 
 	}
 
 	src = (uint8_t *)memregion("gfx1")->base();
-
-	for (i = 0; i < 0xc0000; i++)
+	for (int i = 0; i < 0xc0000; i++)
 	{
 		src[i] = bitswap<8>(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
 
@@ -5415,10 +5412,10 @@ DRIVER_INIT_MEMBER(dynax_state,blktouch)
 }
 
 
-DRIVER_INIT_MEMBER(dynax_state, maya_common)
+void dynax_state::init_maya_common()
 {
 	/* Address lines scrambling on 1 z80 rom */
-	uint8_t   *rom = memregion("maincpu")->base() + 0x28000, *end = rom + 0x10000;
+	uint8_t *rom = memregion("maincpu")->base() + 0x28000, *end = rom + 0x10000;
 	for ( ; rom < end; rom += 8)
 	{
 		uint8_t temp[8];
@@ -5431,37 +5428,29 @@ DRIVER_INIT_MEMBER(dynax_state, maya_common)
 }
 
 
-DRIVER_INIT_MEMBER(dynax_state,maya)
+void dynax_state::init_maya()
 {
-	DRIVER_INIT_CALL(maya_common);
+	init_maya_common();
 
-	uint8_t   *gfx = (uint8_t *)memregion("gfx1")->base();
-	int i;
-
+	uint8_t *gfx = (uint8_t *)memregion("gfx1")->base();
 	/* Address lines scrambling on the blitter data roms */
-	{
-		std::vector<uint8_t> rom(0xc0000);
-		memcpy(&rom[0], gfx, 0xc0000);
-		for (i = 0; i < 0xc0000; i++)
-			gfx[i] = rom[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 14, 15, 16, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
-	}
+	std::vector<uint8_t> rom(0xc0000);
+	memcpy(&rom[0], gfx, 0xc0000);
+	for (int i = 0; i < 0xc0000; i++)
+		gfx[i] = rom[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 14, 15, 16, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
 }
 
 
-DRIVER_INIT_MEMBER(dynax_state,mayac)
+void dynax_state::init_mayac()
 {
-	DRIVER_INIT_CALL(maya_common);
+	init_maya_common();
 
-	uint8_t   *gfx = (uint8_t *)memregion("gfx1")->base();
-	int i;
-
+	uint8_t *gfx = (uint8_t *)memregion("gfx1")->base();
 	/* Address lines scrambling on the blitter data roms */
-	{
-		std::vector<uint8_t> rom(0xc0000);
-		memcpy(&rom[0], gfx, 0xc0000);
-		for (i = 0; i < 0xc0000; i++)
-			gfx[i] = rom[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 14, 16, 15, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
-	}
+	std::vector<uint8_t> rom(0xc0000);
+	memcpy(&rom[0], gfx, 0xc0000);
+	for (int i = 0; i < 0xc0000; i++)
+		gfx[i] = rom[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 14, 16, 15, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
 }
 
 
@@ -6433,30 +6422,28 @@ ROM_START( intrgirl )
 ROM_END
 
 // Decrypted by yong
-DRIVER_INIT_MEMBER(dynax_state,mjelct3)
+void dynax_state::init_mjelct3()
 {
-	int i;
-	uint8_t   *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	size_t  size = memregion("maincpu")->bytes();
 	std::vector<uint8_t> rom1(size);
 
 	memcpy(&rom1[0], rom, size);
-	for (i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 		rom[i] = bitswap<8>(rom1[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8, 1,6,5,4,3,2,7, 0)], 7,6, 1,4,3,2,5,0);
 }
 
-DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
+void dynax_state::init_mjelct3a()
 {
-	int i, j;
-	uint8_t   *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	size_t  size = memregion("maincpu")->bytes();
 	std::vector<uint8_t> rom1(size);
 
 	memcpy(&rom1[0], rom, size);
-	for (i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
-		j = i & ~0x7e00;
-		switch(i & 0x7000)
+		int j = i & ~0x7e00;
+		switch (i & 0x7000)
 		{
 			case 0x0000:    j |= 0x0400;    break;
 			case 0x1000:    j |= 0x4400;    break;
@@ -6467,7 +6454,7 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
 //              case 0x6000:    j |= 0x0000;    break;
 			case 0x7000:    j |= 0x0600;    break;
 		}
-		switch(i & 0x0e00)
+		switch (i & 0x0e00)
 		{
 			case 0x0000:    j |= 0x2000;    break;
 			case 0x0200:    j |= 0x3800;    break;
@@ -6481,7 +6468,7 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
 		rom[j] = rom1[i];
 	}
 
-	DRIVER_INIT_CALL(mjelct3);
+	init_mjelct3();
 }
 
 
@@ -7453,52 +7440,52 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1988, janyuki,  0,        janyuki,  janyuki,  dynax_state, 0,        ROT0,   "Dynax",                    "Jong Yu Ki (Japan)",                                            MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hnkochou, 0,        hanamai,  hnkochou, dynax_state, 0,        ROT180, "Dynax",                    "Hana Kochou (Japan, Bet)",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hanamai,  hnkochou, hanamai,  hanamai,  dynax_state, 0,        ROT180, "Dynax",                    "Hana no Mai (Japan)",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hjingi,   0,        hjingi,   hjingi,   dynax_state, 0,        ROT180, "Dynax",                    "Hana Jingi (Japan, Bet)",                                       MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
-GAME( 1990, hjingia,  hjingi,   hjingi,   hjingi,   dynax_state, 0,        ROT180, "Dynax",                    "Hana Jingi (Japan, Bet, alt.)",                                 MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
-GAME( 1989, hnoridur, hjingi,   hnoridur, hnoridur, dynax_state, 0,        ROT180, "Dynax",                    "Hana Oriduru (Japan)",                                          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, drgpunch, 0,        sprtmtch, drgpunch, dynax_state, 0,        ROT0,   "Dynax",                    "Dragon Punch (Japan)",                                          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, dynax_state, 0,        ROT0,   "Dynax (Fabtek license)",   "Sports Match",                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, janyuki,  0,        janyuki,  janyuki,  dynax_state, empty_init,    ROT0,   "Dynax",                    "Jong Yu Ki (Japan)",                                            MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hnkochou, 0,        hanamai,  hnkochou, dynax_state, empty_init,    ROT180, "Dynax",                    "Hana Kochou (Japan, Bet)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hanamai,  hnkochou, hanamai,  hanamai,  dynax_state, empty_init,    ROT180, "Dynax",                    "Hana no Mai (Japan)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hjingi,   0,        hjingi,   hjingi,   dynax_state, empty_init,    ROT180, "Dynax",                    "Hana Jingi (Japan, Bet)",                                       MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
+GAME( 1990, hjingia,  hjingi,   hjingi,   hjingi,   dynax_state, empty_init,    ROT180, "Dynax",                    "Hana Jingi (Japan, Bet, alt.)",                                 MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
+GAME( 1989, hnoridur, hjingi,   hnoridur, hnoridur, dynax_state, empty_init,    ROT180, "Dynax",                    "Hana Oriduru (Japan)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, drgpunch, 0,        sprtmtch, drgpunch, dynax_state, empty_init,    ROT0,   "Dynax",                    "Dragon Punch (Japan)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, dynax_state, empty_init,    ROT0,   "Dynax (Fabtek license)",   "Sports Match",                                                  MACHINE_SUPPORTS_SAVE )
 /* these 3 are Korean hacks / bootlegs of Dragon Punch / Sports Match */
-GAME( 1994, maya,     0,        sprtmtch, drgpunch, dynax_state, maya,     ROT0,   "Promat",                   "Maya (set 1)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
-GAME( 1994, mayaa,    maya,     sprtmtch, drgpunch, dynax_state, maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
-GAME( 1994, mayab,    maya,     sprtmtch, drgpunch, dynax_state, maya,     ROT0,   "Promat",                   "Maya (set 3)",                                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mayac,    maya,     sprtmtch, drgpunch, dynax_state, mayac,    ROT0,   "Promat",                   "Maya (set 4, clean)",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 199?, inca,     0,        sprtmtch, drgpunch, dynax_state, maya,     ROT0,   "<unknown>",                "Inca",                                                          MACHINE_SUPPORTS_SAVE )
-GAME( 199?, blktouch, 0,        sprtmtch, drgpunch, dynax_state, blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1994, maya,     0,        sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "Promat",                   "Maya (set 1)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
+GAME( 1994, mayaa,    maya,     sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
+GAME( 1994, mayab,    maya,     sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "Promat",                   "Maya (set 3)",                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mayac,    maya,     sprtmtch, drgpunch, dynax_state, init_mayac,    ROT0,   "Promat",                   "Maya (set 4, clean)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 199?, inca,     0,        sprtmtch, drgpunch, dynax_state, init_maya,     ROT0,   "<unknown>",                "Inca",                                                          MACHINE_SUPPORTS_SAVE )
+GAME( 199?, blktouch, 0,        sprtmtch, drgpunch, dynax_state, init_blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                           MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, mjfriday, 0,        mjfriday, mjfriday, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Friday (Japan)",                                        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gekisha,  0,        gekisha,  gekisha,  dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Gekisha",                                               MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mcnpshnt, 0,        mcnpshnt, mcnpshnt, dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Campus Hunting (Japan)",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1990, 7jigen,   0,        nanajign, nanajign, dynax_state, 0,        ROT180, "Dynax",                    "7jigen no Youseitachi - Mahjong 7 Dimensions (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, jantouki, 0,        jantouki, jantouki, dynax_state, 0,        ROT0,   "Dynax",                    "Jong Tou Ki (Japan)",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjdialq2, 0,        mjdialq2, mjdialq2, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan)",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjdialq2a,mjdialq2, mjdialq2, mjdialq2, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan, alt.)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1991, yarunara, 0,        yarunara, yarunara, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Yarunara (Japan)",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjangels, 0,        mjangels, yarunara, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Angels - Comic Theater Vol.2 (Japan)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, warahana, 0,        mjangels, warahana, dynax_state, 0,        ROT180, "Dynax",                    "Warai no Hana Tenshi (Japan)",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1992, quiztvqq, 0,        quiztvqq, quiztvqq, dynax_state, 0,        ROT180, "Dynax",                    "Quiz TV Gassyuukoku Q&Q (Japan)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjembase, mjelctrn, mjembase, mjembase, dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong Electromagnetic Base",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, Japan)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  dynax_state, mjelct3a, ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, alt., Japan)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mjelctrb, mjelctrn, mjelctrn, mjelct3,  dynax_state, mjelct3,  ROT180, "bootleg",                  "Mahjong Electron Base (parts 2 & 4, Japan, bootleg)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1990, majxtal7, 0,        neruton,  majxtal7, dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, neruton,  0,        neruton,  neruton,  dynax_state, mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. B?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, nerutona, neruton,  neruton,  neruton,  dynax_state, mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. A?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, hanayara, 0,        yarunara, hanayara, dynax_state, 0,        ROT180, "Dynax",                    "Hana wo Yaraneba! (Japan)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjcomv1,  0,        mjangels, yarunara, dynax_state, 0,        ROT180, "Dynax",                    "Mahjong Comic Gekijou Vol.1 (Japan)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tenkai,   0,        tenkai,   tenkai,   dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen",                                             MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen Part 2 (bootleg)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg b)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg c)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhai, 0,        tenkai,   tenkai,   dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Ougon No Hai",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhaib,ougonhai, tenkai,   tenkai,   dynax_state, 0,        ROT0,   "bootleg",                  "Mahjong Ougon No Hai (bootleg)",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mjreach,  0,        mjreach,  mjreach,  dynax_state, 0,        ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1994, cdracula, 0,        cdracula, cdracula, dynax_state, 0,        ROT0,   "Yun Sung (Escape license)","Castle Of Dracula",                                             MACHINE_SUPPORTS_SAVE ) // not a dynax board
-GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, dynax_state, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a dynax board. proms?
-GAME( 1995, intrgirl, 0,        sprtmtch, drgpunch, dynax_state, 0,        ROT0,   "Barko",                    "Intergirl",                                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // not a dynax board.
-GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   dynax_state, 0,        ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjfriday, 0,        mjfriday, mjfriday, dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Friday (Japan)",                                        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gekisha,  0,        gekisha,  gekisha,  dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Gekisha",                                               MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mcnpshnt, 0,        mcnpshnt, mcnpshnt, dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Campus Hunting (Japan)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1990, 7jigen,   0,        nanajign, nanajign, dynax_state, empty_init,    ROT180, "Dynax",                    "7jigen no Youseitachi - Mahjong 7 Dimensions (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, jantouki, 0,        jantouki, jantouki, dynax_state, empty_init,    ROT0,   "Dynax",                    "Jong Tou Ki (Japan)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjdialq2, 0,        mjdialq2, mjdialq2, dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjdialq2a,mjdialq2, mjdialq2, mjdialq2, dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Dial Q2 (Japan, alt.)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1991, yarunara, 0,        yarunara, yarunara, dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Yarunara (Japan)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjangels, 0,        mjangels, yarunara, dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Angels - Comic Theater Vol.2 (Japan)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, warahana, 0,        mjangels, warahana, dynax_state, empty_init,    ROT180, "Dynax",                    "Warai no Hana Tenshi (Japan)",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quiztvqq, 0,        quiztvqq, quiztvqq, dynax_state, empty_init,    ROT180, "Dynax",                    "Quiz TV Gassyuukoku Q&Q (Japan)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, dynax_state, init_mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjembase, mjelctrn, mjembase, mjembase, dynax_state, init_mjelct3,  ROT180, "Dynax",                    "Mahjong Electromagnetic Base",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  dynax_state, init_mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, Japan)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  dynax_state, init_mjelct3a, ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, alt., Japan)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mjelctrb, mjelctrn, mjelctrn, mjelct3,  dynax_state, init_mjelct3,  ROT180, "bootleg",                  "Mahjong Electron Base (parts 2 & 4, Japan, bootleg)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, majxtal7, 0,        neruton,  majxtal7, dynax_state, init_mjelct3,  ROT180, "Dynax",                    "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, neruton,  0,        neruton,  neruton,  dynax_state, init_mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. B?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, nerutona, neruton,  neruton,  neruton,  dynax_state, init_mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. A?)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hanayara, 0,        yarunara, hanayara, dynax_state, empty_init,    ROT180, "Dynax",                    "Hana wo Yaraneba! (Japan)",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjcomv1,  0,        mjangels, yarunara, dynax_state, empty_init,    ROT180, "Dynax",                    "Mahjong Comic Gekijou Vol.1 (Japan)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tenkai,   0,        tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Tenkaigen",                                             MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Tenkaigen Part 2 (bootleg)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg b)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg c)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                     MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhai, 0,        tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Ougon No Hai",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib,ougonhai, tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Ougon No Hai (bootleg)",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mjreach,  0,        mjreach,  mjreach,  dynax_state, empty_init,    ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, cdracula, 0,        cdracula, cdracula, dynax_state, empty_init,    ROT0,   "Yun Sung (Escape license)","Castle Of Dracula",                                             MACHINE_SUPPORTS_SAVE ) // not a dynax board
+GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, dynax_state, empty_init,    ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a dynax board. proms?
+GAME( 1995, intrgirl, 0,        sprtmtch, drgpunch, dynax_state, empty_init,    ROT0,   "Barko",                    "Intergirl",                                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // not a dynax board.
+GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

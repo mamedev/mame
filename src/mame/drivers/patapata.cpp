@@ -345,4 +345,4 @@ ROM_START( patapata )
 ROM_END
 
 // cabinet shows Atlus logo, though there's no copyright on the title screen and PCB is NTC / NMK
-GAME( 1993, patapata, 0, patapata, patapata, patapata_state, 0, ROT0,  "Atlus", "Pata Pata Panic", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, patapata, 0, patapata, patapata, patapata_state, empty_init, ROT0,  "Atlus", "Pata Pata Panic", MACHINE_SUPPORTS_SAVE )

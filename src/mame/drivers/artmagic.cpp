@@ -1157,7 +1157,7 @@ void artmagic_state::decrypt_cheesech()
 }
 
 
-DRIVER_INIT_MEMBER(artmagic_state,ultennis)
+void artmagic_state::init_ultennis()
 {
 	decrypt_ultennis();
 	m_is_stoneball = 0;
@@ -1168,7 +1168,7 @@ DRIVER_INIT_MEMBER(artmagic_state,ultennis)
 }
 
 
-DRIVER_INIT_MEMBER(artmagic_state,cheesech)
+void artmagic_state::init_cheesech()
 {
 	decrypt_cheesech();
 	m_is_stoneball = 0;
@@ -1176,14 +1176,14 @@ DRIVER_INIT_MEMBER(artmagic_state,cheesech)
 }
 
 
-DRIVER_INIT_MEMBER(artmagic_state,stonebal)
+void artmagic_state::init_stonebal()
 {
 	decrypt_ultennis();
 	m_is_stoneball = 1; /* blits 1 line high are NOT encrypted, also different first pixel decrypt */
 	m_protection_handler = &artmagic_state::stonebal_protection;
 }
 
-DRIVER_INIT_MEMBER(artmagic_state,shtstar)
+void artmagic_state::init_shtstar()
 {
 	/* wrong */
 	decrypt_ultennis();
@@ -1199,10 +1199,10 @@ DRIVER_INIT_MEMBER(artmagic_state,shtstar)
  *
  *************************************/
 
-GAME( 1993, ultennis,   0,        artmagic, ultennis, artmagic_state, ultennis, ROT0, "Art & Magic", "Ultimate Tennis", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ultennisj,  ultennis, artmagic, ultennis, artmagic_state, ultennis, ROT0, "Art & Magic (Banpresto license)", "Ultimate Tennis (v 1.4, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, cheesech,   0,        cheesech, cheesech, artmagic_state, cheesech, ROT0, "Art & Magic", "Cheese Chase", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stonebal,   0,        stonebal, stonebal, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players, v1-20 13/12/1994)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stonebal2,  stonebal, stonebal, stoneba2, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 7/11/1994)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stonebal2o, stonebal, stonebal, stoneba2, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 21/10/1994)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, shtstar,    0,        shtstar,  shtstar,  artmagic_state, shtstar,  ROT0, "Nova", "Shooting Star", MACHINE_NOT_WORKING )
+GAME( 1993, ultennis,   0,        artmagic, ultennis, artmagic_state, init_ultennis, ROT0, "Art & Magic", "Ultimate Tennis", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ultennisj,  ultennis, artmagic, ultennis, artmagic_state, init_ultennis, ROT0, "Art & Magic (Banpresto license)", "Ultimate Tennis (v 1.4, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, cheesech,   0,        cheesech, cheesech, artmagic_state, init_cheesech, ROT0, "Art & Magic", "Cheese Chase", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stonebal,   0,        stonebal, stonebal, artmagic_state, init_stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players, v1-20 13/12/1994)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stonebal2,  stonebal, stonebal, stoneba2, artmagic_state, init_stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 7/11/1994)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stonebal2o, stonebal, stonebal, stoneba2, artmagic_state, init_stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 21/10/1994)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, shtstar,    0,        shtstar,  shtstar,  artmagic_state, init_shtstar,  ROT0, "Nova", "Shooting Star", MACHINE_NOT_WORKING )

@@ -650,5 +650,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS           INIT  COMPANY          FULLNAME        FLAGS
-COMP( 1984, excali64, 0,      0,       excali64,  excali64, excali64_state, 0,    "BGR Computers", "Excalibur 64", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY          FULLNAME        FLAGS
+COMP( 1984, excali64, 0,      0,      excali64, excali64, excali64_state, empty_init, "BGR Computers", "Excalibur 64", 0 )

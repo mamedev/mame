@@ -623,14 +623,11 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(skykid_state,skykid)
+void skykid_state::init_skykid()
 {
-	uint8_t *rom;
-	int i;
-
 	/* unpack the third sprite ROM */
-	rom = memregion("gfx3")->base() + 0x4000;
-	for (i = 0;i < 0x2000;i++)
+	uint8_t *rom = memregion("gfx3")->base() + 0x4000;
+	for (int i = 0;i < 0x2000;i++)
 	{
 		rom[i + 0x4000] = rom[i];       // sprite set #1, plane 3
 		rom[i + 0x6000] = rom[i] >> 4;  // sprite set #2, plane 3
@@ -639,11 +636,11 @@ DRIVER_INIT_MEMBER(skykid_state,skykid)
 	}
 }
 
-GAME( 1984, drgnbstr, 0,      skykid, drgnbstr, skykid_state, skykid,  ROT0,   "Namco", "Dragon Buster", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, skykid,   0,      skykid, skykid, skykid_state,   skykid,  ROT180, "Namco", "Sky Kid (new version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
-GAME( 1985, skykido,  skykid, skykid, skykid, skykid_state,   skykid,  ROT180, "Namco", "Sky Kid (old version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
-GAME( 1985, skykidd,  skykid, skykid, skykid, skykid_state,   skykid,  ROT180, "Namco", "Sky Kid (CUS60 version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS60 aka 60a1 */
+GAME( 1984, drgnbstr, 0,      skykid, drgnbstr, skykid_state, init_skykid, ROT0,   "Namco", "Dragon Buster", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, skykid,   0,      skykid, skykid,   skykid_state, init_skykid, ROT180, "Namco", "Sky Kid (new version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
+GAME( 1985, skykido,  skykid, skykid, skykid,   skykid_state, init_skykid, ROT180, "Namco", "Sky Kid (old version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
+GAME( 1985, skykidd,  skykid, skykid, skykid,   skykid_state, init_skykid, ROT180, "Namco", "Sky Kid (CUS60 version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS60 aka 60a1 */
 
 // no license text is displayed but the PCB was licensed by Namco for production by Sipem (formerly Sidam) with Namco supplying the Custom chips (MCU etc.)
 // the level select is handled in a much more user-friendly way in this set and the dip for it is inverted (although this is displayed incorrectly in the test mode)
-GAME( 1985, skykids,  skykid, skykid, skykids, skykid_state,  skykid,  ROT180, "Namco (Sipem license)", "Sky Kid (Sipem)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
+GAME( 1985, skykids,  skykid, skykid, skykids,  skykid_state, init_skykid, ROT180, "Namco (Sipem license)", "Sky Kid (Sipem)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */

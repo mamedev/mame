@@ -685,18 +685,16 @@ ROM_START( untoucha )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(hnayayoi_state,hnfubuki)
+void hnayayoi_state::init_hnfubuki()
 {
 	uint8_t *rom = memregion("gfx1")->base();
 	int len = memregion("gfx1")->bytes();
-	int i, j;
 
 	/* interestingly, the blitter data has a slight encryption */
-
 	/* swap address bits 4 and 5 */
-	for (i = 0; i < len; i += 0x40)
+	for (int i = 0; i < len; i += 0x40)
 	{
-		for (j = 0; j < 0x10; j++)
+		for (int j = 0; j < 0x10; j++)
 		{
 			uint8_t t = rom[i + j + 0x10];
 			rom[i + j + 0x10] = rom[i + j + 0x20];
@@ -705,13 +703,13 @@ DRIVER_INIT_MEMBER(hnayayoi_state,hnfubuki)
 	}
 
 	/* swap data bits 0 and 1 */
-	for (i = 0; i < len; i++)
+	for (int i = 0; i < len; i++)
 	{
 		rom[i] = bitswap<8>(rom[i],7,6,5,4,3,2,0,1);
 	}
 }
 
 
-GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, hnayayoi_state, 0,        ROT0, "Dyna Electronics", "Hana Yayoi (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnayayoi_state, hnfubuki, ROT0, "Dynax",            "Hana Fubuki [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, untoucha, 0,        untoucha, untoucha, hnayayoi_state, 0,        ROT0, "Dynax",            "Untouchable (Ver. 2.10)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, hnayayoi_state, empty_init,    ROT0, "Dyna Electronics", "Hana Yayoi (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnayayoi_state, init_hnfubuki, ROT0, "Dynax",            "Hana Fubuki [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, untoucha, 0,        untoucha, untoucha, hnayayoi_state, empty_init,    ROT0, "Dynax",            "Untouchable (Ver. 2.10)",   MACHINE_SUPPORTS_SAVE )

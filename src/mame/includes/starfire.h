@@ -62,8 +62,8 @@ public:
 	DECLARE_READ8_MEMBER(starfire_colorram_r);
 	DECLARE_WRITE8_MEMBER(starfire_videoram_w);
 	DECLARE_READ8_MEMBER(starfire_videoram_r);
-	DECLARE_DRIVER_INIT(starfire);
-	DECLARE_DRIVER_INIT(fireone);
+	void init_starfire();
+	void init_fireone();
 	virtual void video_start() override;
 	uint32_t screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(starfire_scanline_callback);

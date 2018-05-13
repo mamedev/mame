@@ -990,10 +990,10 @@ ROM_START( super80v )
 	ROM_REGION( 0x1000, "colorram", ROMREGION_ERASEFF )
 ROM_END
 
-/*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     CLASS           INIT      COMPANY       FULLNAME */
-COMP( 1981, super80,  0,       0,   super80,  super80,  super80_state,  super80, "Dick Smith Electronics", "Super-80 (V1.2)" , 0)
-COMP( 1981, super80d, super80, 0,   super80d, super80d, super80_state,  super80, "Dick Smith Electronics", "Super-80 (V2.2)" , 0)
-COMP( 1981, super80e, super80, 0,   super80e, super80d, super80_state,  super80, "Dick Smith Electronics", "Super-80 (El Graphix 4)" , MACHINE_UNOFFICIAL)
-COMP( 1981, super80m, super80, 0,   super80m, super80m, super80_state,  super80, "Dick Smith Electronics", "Super-80 (with colour)" , MACHINE_UNOFFICIAL)
-COMP( 1981, super80r, super80, 0,   super80r, super80r, super80_state,  super80, "Dick Smith Electronics", "Super-80 (with VDUEB)" , MACHINE_UNOFFICIAL)
-COMP( 1981, super80v, super80, 0,   super80v, super80v, super80_state,  super80, "Dick Smith Electronics", "Super-80 (with enhanced VDUEB)" , MACHINE_UNOFFICIAL)
+/*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     CLASS          INIT          COMPANY                   FULLNAME */
+COMP( 1981, super80,  0,       0,   super80,  super80,  super80_state, init_super80, "Dick Smith Electronics", "Super-80 (V1.2)" , 0)
+COMP( 1981, super80d, super80, 0,   super80d, super80d, super80_state, init_super80, "Dick Smith Electronics", "Super-80 (V2.2)" , 0)
+COMP( 1981, super80e, super80, 0,   super80e, super80d, super80_state, init_super80, "Dick Smith Electronics", "Super-80 (El Graphix 4)" , MACHINE_UNOFFICIAL)
+COMP( 1981, super80m, super80, 0,   super80m, super80m, super80_state, init_super80, "Dick Smith Electronics", "Super-80 (with colour)" , MACHINE_UNOFFICIAL)
+COMP( 1981, super80r, super80, 0,   super80r, super80r, super80_state, init_super80, "Dick Smith Electronics", "Super-80 (with VDUEB)" , MACHINE_UNOFFICIAL)
+COMP( 1981, super80v, super80, 0,   super80v, super80v, super80_state, init_super80, "Dick Smith Electronics", "Super-80 (with enhanced VDUEB)" , MACHINE_UNOFFICIAL)

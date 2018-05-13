@@ -30,7 +30,7 @@ public:
 		m_io_config(*this, "CONFIG")
 	{ }
 
-	DECLARE_DRIVER_INIT(alto2);
+	void init_alto2();
 	DECLARE_MACHINE_RESET(alto2);
 
 	void alto2(machine_config &config);
@@ -312,7 +312,7 @@ MACHINE_CONFIG_END
 
 /* Driver Init */
 
-DRIVER_INIT_MEMBER( alto2_state, alto2 )
+void alto2_state::init_alto2()
 {
 	// Make the diablo drives known to the CPU core
 	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
@@ -336,5 +336,5 @@ void alto2_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 /* Game Drivers */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT   COMPANY  FULLNAME   FLAGS
-COMP( 1977, alto2,  0,      0,      alto2,   alto2, alto2_state, alto2, "Xerox", "Alto-II", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1977, alto2, 0,      0,      alto2,   alto2, alto2_state, init_alto2, "Xerox", "Alto-II", 0 )

@@ -1425,8 +1425,8 @@ ROM_START( wheelrun )
 ROM_END
 
 
-GAME( 19??, borntofi,  0,        borntofi, borntofi, fantland_state, 0, ROT0,  "International Games",       "Born To Fight",        MACHINE_SUPPORTS_SAVE )
-GAME( 19??, fantland,  0,        fantland, fantland, fantland_state, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, fantlanda, fantland, fantland, fantland, fantland_state, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, fantland_state, 0, ROT0,  "International Games",       "Wheels Runner",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, galaxygn,  0,        galaxygn, galaxygn, fantland_state, 0, ROT90, "Electronic Devices Italy",  "Galaxy Gunners",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, borntofi,  0,        borntofi, borntofi, fantland_state, empty_init, ROT0,  "International Games",       "Born To Fight",        MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantland,  0,        fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantlanda, fantland, fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, fantland_state, empty_init, ROT0,  "International Games",       "Wheels Runner",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, galaxygn,  0,        galaxygn, galaxygn, fantland_state, empty_init, ROT90, "Electronic Devices Italy",  "Galaxy Gunners",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -594,5 +594,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT  ROTATION  COMPANY  FULLNAME  FLAGS
-GAME( 1983, popper, 0,      popper,  popper, popper_state, 0,    ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY  FULLNAME  FLAGS
+GAME( 1983, popper, 0,      popper,  popper, popper_state, empty_init, ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )

@@ -951,17 +951,17 @@ ROM_START( 1942p )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(_1942_state,1942)
+void _1942_state::init_1942()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
 
-GAME( 1984, 1942,     0,    _1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (Revision B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 1942a,    1942, _1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (Revision A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 1942abl,  1942, _1942, 1942, _1942_state, 1942, ROT270, "bootleg", "1942 (Revision A, bootleg)", MACHINE_SUPPORTS_SAVE ) // data is the same as 1942a set, different rom format
-GAME( 1991, 1942h,    1942, _1942, 1942, _1942_state, 1942, ROT270, "hack (Two Bit Score)", "Supercharger 1942", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 1942b,    1942, _1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (First Version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, 1942w,    1942, _1942, 1942, _1942_state, 1942, ROT270, "Capcom (Williams Electronics license)", "1942 (Williams Electronics license)", MACHINE_SUPPORTS_SAVE ) /* Based on 1942 (Revision B) */
-GAME( 1984, 1942p,    1942, _1942p,1942p,_1942_state, 1942, ROT270, "bootleg", "1942 (Tecfri PCB, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 1942,    0,    _1942, 1942, _1942_state, init_1942, ROT270, "Capcom", "1942 (Revision B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 1942a,   1942, _1942, 1942, _1942_state, init_1942, ROT270, "Capcom", "1942 (Revision A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 1942abl, 1942, _1942, 1942, _1942_state, init_1942, ROT270, "bootleg", "1942 (Revision A, bootleg)", MACHINE_SUPPORTS_SAVE ) // data is the same as 1942a set, different rom format
+GAME( 1991, 1942h,   1942, _1942, 1942, _1942_state, init_1942, ROT270, "hack (Two Bit Score)", "Supercharger 1942", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 1942b,   1942, _1942, 1942, _1942_state, init_1942, ROT270, "Capcom", "1942 (First Version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, 1942w,   1942, _1942, 1942, _1942_state, init_1942, ROT270, "Capcom (Williams Electronics license)", "1942 (Williams Electronics license)", MACHINE_SUPPORTS_SAVE ) /* Based on 1942 (Revision B) */
+GAME( 1984, 1942p,   1942, _1942p,1942p,_1942_state, init_1942, ROT270, "bootleg", "1942 (Tecfri PCB, bootleg?)", MACHINE_SUPPORTS_SAVE )

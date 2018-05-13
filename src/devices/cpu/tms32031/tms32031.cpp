@@ -290,7 +290,7 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 		m_is_idling(false),
 		m_icount(0),
 		m_program(nullptr),
-		m_direct(nullptr),
+		m_cache(nullptr),
 		m_mcbl_mode(false),
 		m_xf0_cb(*this),
 		m_xf1_cb(*this),
@@ -362,7 +362,7 @@ inline uint32_t tms3203x_device::ROPCODE(offs_t pc)
 	if (m_mcbl_mode && pc < 0x1000)
 		return m_bootrom[pc];
 
-	return m_direct->read_dword(pc);
+	return m_cache->read_dword(pc);
 }
 
 
@@ -397,7 +397,7 @@ void tms3203x_device::device_start()
 {
 	// find address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-2>();
+	m_cache = m_program->cache<2, -2, ENDIANNESS_LITTLE>();
 
 	// resolve devcb handlers
 	m_xf0_cb.resolve_safe();
@@ -745,7 +745,7 @@ void tms3203x_device::execute_set_input(int inputnum, int state)
 	{
 		// switch between microcomputer/boot loader and microprocessor modes
 		m_mcbl_mode = (state == ASSERT_LINE);
-		m_direct->force_update();
+		m_cache->force_update();
 		return;
 	}
 

@@ -241,4 +241,4 @@ ROM_END
 // For a generic system:
 // SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
 
-CONS( 2001, xbox,  0,  0,   xbox,  xbox, xbox_state,  0,       "Microsoft",      "XBOX", MACHINE_IS_SKELETON )
+CONS( 2001, xbox, 0, 0, xbox,  xbox, xbox_state, empty_init, "Microsoft", "XBOX", MACHINE_IS_SKELETON )

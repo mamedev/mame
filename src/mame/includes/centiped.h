@@ -40,8 +40,8 @@ public:
 	void warlords(machine_config &config);
 	void multiped(machine_config &config);
 
-	DECLARE_DRIVER_INIT(multiped);
-	DECLARE_DRIVER_INIT(bullsdrt);
+	void init_multiped();
+	void init_bullsdrt();
 
 private:
 	optional_shared_ptr<uint8_t> m_rambase;

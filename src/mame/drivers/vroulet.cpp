@@ -331,4 +331,4 @@ ROM_END
 
 /* Game Driver */
 
-GAME( 1989, vroulet, 0, vroulet, vroulet, vroulet_state, 0, ROT90, "World Game", "Vegas Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vroulet, 0, vroulet, vroulet, vroulet_state, empty_init, ROT90, "World Game", "Vegas Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

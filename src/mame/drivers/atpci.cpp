@@ -253,8 +253,8 @@ ROM_START(m55hipl)
 	ROMX_LOAD("m55hi03.rom", 0x20000, 0x20000, CRC(bd476200) SHA1(7633ba27819ad45c6253abb728b1ef0c49229743), ROM_BIOS(4))
 ROM_END
 
-//     Year  Name      Parent      Machine        Input    Class        Init Company       Fullname              Flags
-COMP ( 1990, at586,    ibm5170, 0,      at586,      0,     at586_state,   0,  "<generic>",  "PC/AT 586 (PIIX4)", MACHINE_NOT_WORKING )
-COMP ( 1990, at586x3,  ibm5170, 0,      at586x3,    0    , at586_state,   0,  "<generic>",  "PC/AT 586 (PIIX3)", MACHINE_NOT_WORKING )
-COMP ( 1997, ficvt503, ibm5170, 0,      at586,      0,     at586_state,   0,  "FIC",        "VT-503",            MACHINE_NOT_WORKING )
-COMP ( 1990, m55hipl,  ibm5170, 0,      at586m55,at586m55, at586_state,   0,  "Micronics",  "M55Hi-Plus",        MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     CLASS        INIT        COMPANY      FULLNAME             FLAGS
+COMP( 1990, at586,    ibm5170, 0,       at586,    0,        at586_state, empty_init, "<generic>", "PC/AT 586 (PIIX4)", MACHINE_NOT_WORKING )
+COMP( 1990, at586x3,  ibm5170, 0,       at586x3,  0,        at586_state, empty_init, "<generic>", "PC/AT 586 (PIIX3)", MACHINE_NOT_WORKING )
+COMP( 1997, ficvt503, ibm5170, 0,       at586,    0,        at586_state, empty_init, "FIC",       "VT-503",            MACHINE_NOT_WORKING )
+COMP( 1990, m55hipl,  ibm5170, 0,       at586m55, at586m55, at586_state, empty_init, "Micronics", "M55Hi-Plus",        MACHINE_NOT_WORKING )

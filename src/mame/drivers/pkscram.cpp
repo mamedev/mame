@@ -348,4 +348,4 @@ ROM_START( pkscram )
 ROM_END
 
 
-GAME( 1993, pkscram, 0, pkscramble, pkscramble, pkscram_state, 0, ROT0, "Cosmo Electronics Corporation", "PK Scramble", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, pkscram, 0, pkscramble, pkscramble, pkscram_state, empty_init, ROT0, "Cosmo Electronics Corporation", "PK Scramble", MACHINE_SUPPORTS_SAVE )

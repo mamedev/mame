@@ -52,9 +52,9 @@ public:
 		, m_solenoids(*this, "solenoid%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(by17);
-	DECLARE_DRIVER_INIT(matahari);
-	DECLARE_DRIVER_INIT(pwerplay);
+	void init_by17();
+	void init_matahari();
+	void init_pwerplay();
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
@@ -849,7 +849,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_d_pulse )
 
 
 
-DRIVER_INIT_MEMBER( by17_state, by17 )
+void by17_state::init_by17()
 {
 	static const uint8_t solenoid_features_default[20][4] =
 	{
@@ -889,7 +889,7 @@ DRIVER_INIT_MEMBER( by17_state, by17 )
 }
 
 
-DRIVER_INIT_MEMBER( by17_state, matahari )
+void by17_state::init_matahari()
 {
 	static const uint8_t solenoid_features_matahari[20][4] =
 	{
@@ -925,7 +925,7 @@ DRIVER_INIT_MEMBER( by17_state, matahari )
 }
 
 
-DRIVER_INIT_MEMBER( by17_state, pwerplay )
+void by17_state::init_pwerplay()
 {
 	static const uint8_t solenoid_features_pwerplay[20][4] =
 	{
@@ -1140,14 +1140,14 @@ ROM_END
 /---------------------------------------------------------------*/
 
 
-GAME(  1976, bowarrow, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Bow & Arrow (Prototype)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, freedom,  0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Freedom",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, nightrdr, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Night Rider (rev. 21)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, nightr20, nightrdr, by17, by17,     by17_state, by17,     ROT0, "Bally", "Night Rider (rev. 20)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1978, blackjck, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Black Jack (Pinball)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, evelknie, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Evel Knievel",            MACHINE_IS_SKELETON_MECHANICAL)
-GAMEL( 1978, matahari, 0,        by17, matahari, by17_state, matahari, ROT0, "Bally", "Mata Hari",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_matahari)
-GAME(  1977, eightbll, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Eight Ball (rev. 20)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(  1977, eightblo, eightbll, by17, by17,     by17_state, by17,     ROT0, "Bally", "Eight Ball (rev. 17)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAMEL( 1978, pwerplay, 0,        by17, pwerplay, by17_state, pwerplay, ROT0, "Bally", "Power Play (Pinball)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_pwerplay)
-GAME(  1978, stk_sprs, 0,        by17, by17,     by17_state, by17,     ROT0, "Bally", "Strikes and Spares",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1976, bowarrow, 0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Bow & Arrow (Prototype)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, freedom,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Freedom",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, nightrdr, 0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Night Rider (rev. 21)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, nightr20, nightrdr, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Night Rider (rev. 20)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1978, blackjck, 0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Black Jack (Pinball)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, evelknie, 0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Evel Knievel",            MACHINE_IS_SKELETON_MECHANICAL)
+GAMEL( 1978, matahari, 0,        by17, matahari, by17_state, init_matahari, ROT0, "Bally", "Mata Hari",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_matahari)
+GAME(  1977, eightbll, 0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Eight Ball (rev. 20)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1977, eightblo, eightbll, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Eight Ball (rev. 17)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAMEL( 1978, pwerplay, 0,        by17, pwerplay, by17_state, init_pwerplay, ROT0, "Bally", "Power Play (Pinball)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING, layout_by17_pwerplay)
+GAME(  1978, stk_sprs, 0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Strikes and Spares",      MACHINE_IS_SKELETON_MECHANICAL)

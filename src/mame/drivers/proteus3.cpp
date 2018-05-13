@@ -482,5 +482,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY                  FULLNAME       FLAGS
-COMP( 1978, proteus3, 0,      0,      proteus3, proteus3, proteus3_state, 0,    "Proteus International", "Proteus III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                  FULLNAME       FLAGS
+COMP( 1978, proteus3, 0,      0,      proteus3, proteus3, proteus3_state, empty_init, "Proteus International", "Proteus III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

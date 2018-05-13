@@ -324,4 +324,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, drmicro, 0, drmicro, drmicro, drmicro_state, 0, ROT270, "Sanritsu", "Dr. Micro", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, drmicro, 0, drmicro, drmicro, drmicro_state, empty_init, ROT270, "Sanritsu", "Dr. Micro", MACHINE_SUPPORTS_SAVE )
