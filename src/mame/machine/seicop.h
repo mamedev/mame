@@ -27,7 +27,10 @@ public:
 	DECLARE_WRITE16_MEMBER( cmd_trigger_w );
 	DECLARE_READ16_MEMBER( d104_move_r );
 	DECLARE_WRITE16_MEMBER( d104_move_w );
-
+	DECLARE_READ16_MEMBER( prng_max_r );
+	DECLARE_WRITE16_MEMBER( prng_max_w );
+	DECLARE_READ16_MEMBER( prng_r );
+	
 	void seibucopbl_map(address_map &map);
 protected:
 	// device-level overrides
@@ -46,6 +49,7 @@ private:
 	uint16_t m_angle,m_dist,m_status;
 	int m_dx,m_dy;
 	uint32_t m_d104_move_offset;
+	uint16_t m_prng_max;
 	//required_device<raiden2cop_device> m_raiden2cop;
 };
 

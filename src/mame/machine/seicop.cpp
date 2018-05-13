@@ -70,6 +70,8 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			m_host_space->write_word((m_reg[6] + offs + 4), ((m_host_space->read_word(m_reg[5] + offs + 4) + dir_offset) / div));
 			break;
 		}
+		
+		
 		case 0x0205:
 		{
 			int ppos = m_host_space->read_dword(m_reg[0] + 4 + offs);
@@ -80,7 +82,24 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			m_host_space->write_word(m_reg[0] + 0x1c + offs, m_host_space->read_word(m_reg[0] + 0x1c + offs) + delta);
 			break;
 		}
+		
+		// jumping is done with this
+		case 0x0905:
+		{
+			//printf("%08x %08x\n",m_reg[0],offs);
+			
+			int val = m_host_space->read_dword(m_reg[0] + 16 + offs);
+			int delta = m_host_space->read_dword(m_reg[0] + 0x28 + offs);
+		
+			//printf("%08x + %08x = ",val,delta);
+			val += delta;
+			//printf("%08x\n",val);
+			
+			m_host_space->write_dword(m_reg[0] + 16 + offs, val);
 
+			break;
+		}
+		
 		case 0x130e:
 		case 0x138e:
 		case 0xe30e:
@@ -232,15 +251,40 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::d104_move_w)
 		m_d104_move_offset = (m_d104_move_offset & 0xffff) | (data << 16);
 }
 
+READ16_MEMBER(seibu_cop_bootleg_device::prng_max_r)
+{
+	return m_prng_max;
+}
+
+WRITE16_MEMBER(seibu_cop_bootleg_device::prng_max_w)
+{
+	COMBINE_DATA(&m_prng_max);
+}
+
+READ16_MEMBER(seibu_cop_bootleg_device::prng_r)
+{
+	return m_host_cpu->total_cycles() % (m_prng_max + 1);
+}
+
+
 // anything that is read thru ROM range 0xc**** is replacement code, therefore on this HW they are latches.
 void seibu_cop_bootleg_device::seibucopbl_map(address_map &map)
 {
 	map(0x01e, 0x01f).ram(); // angle step, PC=0xc0186
+	map(0x028, 0x02b).ram(); // DMA fill latches
+	map(0x02c, 0x02d).rw(this, FUNC(seibu_cop_bootleg_device::prng_max_r), FUNC(seibu_cop_bootleg_device::prng_max_w));
+	map(0x040, 0x045).ram(); // n/a
 	map(0x046, 0x049).rw(this, FUNC(seibu_cop_bootleg_device::d104_move_r), FUNC(seibu_cop_bootleg_device::d104_move_w));
+	map(0x04a, 0x04f).ram(); // n/a
+	map(0x050, 0x05f).ram(); // n/a
 	map(0x070, 0x07f).ram(); // DMA registers, PC=0xc0034
+
 	map(0x0a0, 0x0af).rw(this, FUNC(seibu_cop_bootleg_device::reg_hi_addr_r), FUNC(seibu_cop_bootleg_device::reg_hi_addr_w));
+	map(0x0b0, 0x0b3).ram(); // unknown, not in original COP
 	map(0x0c0, 0x0cf).rw(this, FUNC(seibu_cop_bootleg_device::reg_lo_addr_r), FUNC(seibu_cop_bootleg_device::reg_lo_addr_w));
+
 	map(0x100, 0x105).w(this, FUNC(seibu_cop_bootleg_device::cmd_trigger_w));
+	map(0x1a0, 0x1a7).r(this, FUNC(seibu_cop_bootleg_device::prng_r));
 	map(0x1b0, 0x1b1).r(this, FUNC(seibu_cop_bootleg_device::status_r));
 	map(0x1b2, 0x1b3).r(this, FUNC(seibu_cop_bootleg_device::dist_r));
 	map(0x1b4, 0x1b5).r(this, FUNC(seibu_cop_bootleg_device::angle_r));
@@ -281,6 +325,10 @@ void seibu_cop_bootleg_device::device_reset()
 	m_host_cpu = machine().device<cpu_device>("maincpu");
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 }
+
+//-------------------------------------------------
+//  read_word - read a word at the given address
+//-------------------------------------------------
 
 inline uint16_t seibu_cop_bootleg_device::read_word(offs_t address)
 {
