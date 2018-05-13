@@ -149,7 +149,7 @@ public:
 uint32_t vcombat_state::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
 {
 	int y;
-	const rgb_t *const pens = m_tlc34076->get_pens();
+	const pen_t *const pens = m_tlc34076->pens();
 
 	uint16_t *m68k_buf = m_m68k_framebuffer[(*m_framebuffer_ctrl & 0x20) ? 1 : 0].get();
 	uint16_t *i860_buf = m_i860_framebuffer[index][0].get();
