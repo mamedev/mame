@@ -50892,7 +50892,7 @@ GAMEL( 200?, sc4rhxs,   sc4rhx,   sc4_200_altb, sc4, sc4_state, init_sc4rhx,    
 GAMEL( 200?, sc4rhxt,   sc4rhx,   sc4_200_altb, sc4, sc4_state, init_sc4rhx,      ROT0, "Mazooma", "Red Hot X (Mazooma) (Scorpion 4) (set 21)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4rhxu,   sc4rhx,   sc4_200_altb, sc4, sc4_state, init_sc4rhx,      ROT0, "Mazooma", "Red Hot X (Mazooma) (Scorpion 4) (set 22)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4rhxv,   sc4rhx,   sc4_200_altb, sc4, sc4_state, init_sc4rhx,      ROT0, "Mazooma", "Red Hot X (Mazooma) (Scorpion 4) (set 23)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4rhxw,   csc4rhx,  sc4_200_altb, sc4, sc4_state, init_sc4rhx,      ROT0, "Mazooma", "Red Hot X (Mazooma) (Scorpion 4) (set 24)", MACHINE_FLAGS, layout_bfm_sc4 )
+GAMEL( 200?, sc4rhxw,   sc4rhx,   sc4_200_altb, sc4, sc4_state, init_sc4rhx,      ROT0, "Mazooma", "Red Hot X (Mazooma) (Scorpion 4) (set 24)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
 // PR2056  RED HOT X CLUB         REDX SOUNDS         RED HOT X CLUB
