@@ -385,7 +385,7 @@ MACHINE_CONFIG_START(tugboat_state::tugboat)
 	MCFG_PALETTE_INIT_OWNER(tugboat_state, tugboat)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(10'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
@@ -475,6 +475,6 @@ ROM_START( berenstn )
 ROM_END
 
 
-GAME( 1982, tugboat,  0, tugboat, tugboat,  tugboat_state,  0, ROT90, "Enter-Tech, Ltd.", "Tugboat",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, noahsark, 0, tugboat, noahsark, tugboat_state,  0, ROT90, "Enter-Tech, Ltd.", "Noah's Ark",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, berenstn, 0, tugboat, noahsark, tugboat_state,  0, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tugboat,  0, tugboat, tugboat,  tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Tugboat",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, noahsark, 0, tugboat, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Noah's Ark",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, berenstn, 0, tugboat, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

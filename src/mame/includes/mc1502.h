@@ -56,7 +56,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_ioport_array<12> m_kbdio;
 
-	DECLARE_DRIVER_INIT(mc1502);
+	void init_mc1502();
 	DECLARE_MACHINE_START(mc1502);
 	DECLARE_MACHINE_RESET(mc1502);
 

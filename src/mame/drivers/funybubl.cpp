@@ -246,7 +246,7 @@ MACHINE_CONFIG_START(funybubl_state::funybubl)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -317,5 +317,5 @@ ROM_START( funybublc )
 ROM_END
 
 
-GAME( 1999, funybubl, 0,        funybubl, funybubl, funybubl_state, 0, ROT0, "In Chang Electronic Co", "Funny Bubble", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, funybublc,funybubl, funybubl, funybubl, funybubl_state, 0, ROT0, "Comad", "Funny Bubble (Comad version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, funybubl, 0,        funybubl, funybubl, funybubl_state, empty_init, ROT0, "In Chang Electronic Co", "Funny Bubble", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, funybublc,funybubl, funybubl, funybubl, funybubl_state, empty_init, ROT0, "Comad", "Funny Bubble (Comad version)", MACHINE_SUPPORTS_SAVE )

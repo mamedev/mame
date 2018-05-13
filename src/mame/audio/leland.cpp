@@ -134,7 +134,7 @@ WRITE_LINE_MEMBER(leland_80186_sound_device::i80186_tmr1_w)
 }
 
 MACHINE_CONFIG_START(leland_80186_sound_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u31 + ad7524.u46
 	MCFG_DEVICE_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u32 + ad7524.u47
 	MCFG_DEVICE_ADD("dac3", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u33 + ad7524.u48
@@ -175,7 +175,7 @@ MACHINE_CONFIG_START(leland_80186_sound_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(redline_80186_sound_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_DEVICE_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_DEVICE_ADD("dac3", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
@@ -225,7 +225,7 @@ MACHINE_CONFIG_START(redline_80186_sound_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ataxx_80186_sound_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_DEVICE_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_DEVICE_ADD("dac3", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
@@ -252,7 +252,7 @@ MACHINE_CONFIG_START(ataxx_80186_sound_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wsf_80186_sound_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_DEVICE_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_DEVICE_ADD("dac3", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC

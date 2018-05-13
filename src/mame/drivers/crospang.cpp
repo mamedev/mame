@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(crospang_state::crospang)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -625,12 +625,12 @@ void crospang_state::tumblepb_gfx1_rearrange()
 	}
 }
 
-DRIVER_INIT_MEMBER(crospang_state,crospang)
+void crospang_state::init_crospang()
 {
 	tumblepb_gfx1_rearrange();
 }
 
-GAME( 1998, crospang,        0, crospang, crospang, crospang_state, crospang, ROT0, "F2 System",         "Cross Pang", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, heuksun,         0, crospang,  heuksun, crospang_state, crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bestri,          0,   bestri,   bestri, crospang_state, crospang, ROT0, "F2 System",         "Bestri (Korea, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bestria,    bestri,  bestria,   bestri, crospang_state, crospang, ROT0, "F2 System",         "Bestri (Korea, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, crospang, 0,      crospang, crospang, crospang_state, init_crospang, ROT0, "F2 System",         "Cross Pang", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, heuksun,  0,      crospang, heuksun,  crospang_state, init_crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bestri,   0,      bestri,   bestri,   crospang_state, init_crospang, ROT0, "F2 System",         "Bestri (Korea, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bestria,  bestri, bestria,  bestri,   crospang_state, init_crospang, ROT0, "F2 System",         "Bestri (Korea, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

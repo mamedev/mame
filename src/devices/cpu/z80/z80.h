@@ -239,13 +239,13 @@ protected:
 
 	// address spaces
 	const address_space_config m_program_config;
-	const address_space_config m_decrypted_opcodes_config;
+	const address_space_config m_opcodes_config;
 	const address_space_config m_io_config;
 	address_space *m_program;
-	address_space *m_decrypted_opcodes;
+	address_space *m_opcodes;
 	address_space *m_io;
-	direct_read_data<0> *m_direct;
-	direct_read_data<0> *m_decrypted_opcodes_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_opcodes_cache;
 	devcb_write_line m_irqack_cb;
 	devcb_write8 m_refresh_cb;
 	devcb_write_line m_halt_cb;

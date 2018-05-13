@@ -364,5 +364,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT   STATE         INIT  ROT   COMPANY   FULLNAME    FLAGS
-GAME( 19??, l9nibble, 0,      nibble,  nibble, nibble_state, 0,    ROT0, "Nibble", "Lucky 9",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE  INPUT   STATE         INIT        ROT   COMPANY   FULLNAME    FLAGS
+GAME( 19??, l9nibble, 0,      nibble,  nibble, nibble_state, empty_init, ROT0, "Nibble", "Lucky 9",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

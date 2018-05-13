@@ -69,7 +69,7 @@ MACHINE_CONFIG_START(clowndwn_state::clowndwn)
 	MCFG_DEVICE_ADD("pia4", PIA6821, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 
@@ -83,4 +83,4 @@ ROM_START( clowndwn )
 	ROM_LOAD( "clwnroll.z9", 0x1000, 0x1000, CRC(aeef885e) SHA1(bc6805b638625a347e1288a927ce30e030afe9e3) )
 ROM_END
 
-GAME( 1987, clowndwn,  0,    clowndwn, clowndwn, clowndwn_state,  0, ROT0, "Elwood Electronics", "Clown Roll Down (Elwood)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, clowndwn, 0, clowndwn, clowndwn, clowndwn_state, empty_init, ROT0, "Elwood Electronics", "Clown Roll Down (Elwood)", MACHINE_IS_SKELETON_MECHANICAL )

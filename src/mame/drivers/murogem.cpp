@@ -272,7 +272,7 @@ MACHINE_CONFIG_START(murogem_state::murogem)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
@@ -335,7 +335,7 @@ ROM_START( lasvegas )
 	ROM_LOAD( "a3.1b", 0x0000, 0x0020, CRC(abddfb6b) SHA1(ed78b93701b5a3bf2053d2584e9a354fb6cec203) )   /* 74s288 at 1B */
 ROM_END
 
-GAME( 198?, murogem,  0,       murogem, murogem, murogem_state, 0, ROT0, "<unknown>", "Muroge Monaco (set 1)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, murogema, murogem, murogem, murogem, murogem_state, 0, ROT0, "<unknown>", "Muroge Monaco (set 2)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, murogemb, murogem, murogem, murogem, murogem_state, 0, ROT0, "<unknown>", "Muroge Monaco (set 3)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, lasvegas, murogem, murogem, murogem, murogem_state, 0, ROT0, "hack",      "Las Vegas, Nevada",     MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, murogem,  0,       murogem, murogem, murogem_state, empty_init, ROT0, "<unknown>", "Muroge Monaco (set 1)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, murogema, murogem, murogem, murogem, murogem_state, empty_init, ROT0, "<unknown>", "Muroge Monaco (set 2)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, murogemb, murogem, murogem, murogem, murogem_state, empty_init, ROT0, "<unknown>", "Muroge Monaco (set 3)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, lasvegas, murogem, murogem, murogem, murogem_state, empty_init, ROT0, "hack",      "Las Vegas, Nevada",     MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

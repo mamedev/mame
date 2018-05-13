@@ -582,7 +582,7 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", multi8)
 
 	/* Audio */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8912, 1500000) //unknown clock / divider
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, multi8_state, ym2203_porta_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -638,5 +638,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT   COMPANY       FULLNAME                FLAGS
-COMP( 1983, multi8, 0,      0,       multi8,    multi8, multi8_state,  0,     "Mitsubishi", "Multi 8 (Mitsubishi)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY       FULLNAME                FLAGS
+COMP( 1983, multi8, 0,      0,      multi8,  multi8, multi8_state, empty_init, "Mitsubishi", "Multi 8 (Mitsubishi)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

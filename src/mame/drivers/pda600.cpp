@@ -240,5 +240,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT    STATE          INIT  COMPANY        FULLNAME          FLAGS */
-COMP( 1993, pda600,  0,      0,      pda600,    pda600,  pda600_state,  0,    "Amstrad plc", "PenPad PDA 600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME          FLAGS */
+COMP( 1993, pda600, 0,      0,      pda600,  pda600, pda600_state, empty_init, "Amstrad plc", "PenPad PDA 600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -434,7 +434,8 @@ MACHINE_CONFIG_START(sshangha_state::sshangha)
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") /* sure it's stereo? */
+	SPEAKER(config, "lspeaker").front_left(); // sure it's stereo?
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 16000000/4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -496,7 +497,7 @@ ROM_START( sshanghab )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(sshangha_state,sshangha)
+void sshangha_state::init_sshangha()
 {
 #if SSHANGHA_HACK
 	/* This is a hack to allow you to use the extra features
@@ -513,5 +514,5 @@ DRIVER_INIT_MEMBER(sshangha_state,sshangha)
 }
 
 
-GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha_state, sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (Japan)", 0 )
-GAME( 1992, sshanghab,sshangha, sshanghb, sshangha, sshangha_state, sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", 0 )
+GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (Japan)", 0 )
+GAME( 1992, sshanghab,sshangha, sshanghb, sshangha, sshangha_state, init_sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", 0 )

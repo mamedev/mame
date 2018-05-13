@@ -146,7 +146,7 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, apple3_state, apple3_via_1_irq_func))
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("bell", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
 	MCFG_DEVICE_ADD("dac", DAC_6BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // 6522.b5(pb0-pb5) + 320k,160k,80k,40k,20k,10k
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -354,5 +354,5 @@ ROM_START(apple3)
 	ROM_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(55e8eec9) SHA1(579ee4cd2b208d62915a0aa482ddc2744ff5e967))
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE    INPUT   STATE         INIT    COMPANY           FULLNAME */
-COMP( 1980, apple3,     0,      0,      apple3,    apple3, apple3_state, apple3, "Apple Computer", "Apple ///", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY           FULLNAME */
+COMP( 1980, apple3, 0,      0,      apple3,  apple3, apple3_state, init_apple3, "Apple Computer", "Apple ///", MACHINE_SUPPORTS_SAVE )

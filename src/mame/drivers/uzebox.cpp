@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(uzebox_state::uzebox)
 	MCFG_SCREEN_UPDATE_DRIVER(uzebox_state, screen_update_uzebox)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(0, "mono", 1.00)
 
@@ -321,5 +321,5 @@ ROM_START( uzebox )
 	ROM_REGION( 0x800, "eeprom", ROMREGION_ERASE00 )  /* on-die eeprom */
 ROM_END
 
-/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT   STATE          INIT  COMPANY    FULLNAME */
-CONS(2010, uzebox,   0,        0,        uzebox,   uzebox, uzebox_state,  0,    "Belogic", "Uzebox", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING)
+/*   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME */
+CONS(2010, uzebox, 0,      0,      uzebox,  uzebox, uzebox_state, empty_init, "Belogic", "Uzebox", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING)

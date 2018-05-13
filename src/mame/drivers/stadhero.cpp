@@ -234,7 +234,7 @@ MACHINE_CONFIG_START(stadhero_state::stadhero)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -290,4 +290,4 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1988, stadhero, 0, stadhero, stadhero, stadhero_state, 0, ROT0, "Data East Corporation", "Stadium Hero (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, stadhero, 0, stadhero, stadhero, stadhero_state, empty_init, ROT0, "Data East Corporation", "Stadium Hero (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -163,7 +163,7 @@ MACHINE_CONFIG_START(ssrj_state::ssrj)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/5)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN3"))
@@ -191,4 +191,4 @@ ROM_START( ssrj )
 
 ROM_END
 
-GAME( 1985, ssrj,  0,       ssrj,  ssrj, ssrj_state,  0, ROT90, "Taito Corporation", "Super Speed Race Junior (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ssrj,  0,       ssrj,  ssrj, ssrj_state, empty_init, ROT90, "Taito Corporation", "Super Speed Race Junior (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

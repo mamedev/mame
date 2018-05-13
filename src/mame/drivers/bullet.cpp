@@ -1300,7 +1300,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT    COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY      FULLNAME               FLAGS
+//    YEAR  NAME       PARENT    COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME               FLAGS
 // the setname 'bullet' is used by Sega's Bullet in MAME.
-COMP( 1982, wmbullet,  0,        0,      bullet,  bullet,  bullet_state,  0,    "Wave Mate", "Bullet",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1984, wmbulletf, wmbullet, 0,      bulletf, bulletf, bulletf_state, 0,    "Wave Mate", "Bullet (Revision F)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1982, wmbullet,  0,        0,      bullet,  bullet,  bullet_state,  empty_init, "Wave Mate", "Bullet",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1984, wmbulletf, wmbullet, 0,      bulletf, bulletf, bulletf_state, empty_init, "Wave Mate", "Bullet (Revision F)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

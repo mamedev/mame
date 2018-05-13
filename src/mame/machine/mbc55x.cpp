@@ -318,7 +318,7 @@ void mbc55x_state::set_ram_size()
 	space.install_readwrite_bank(BLUE_PLANE_MEMBASE, BLUE_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), BLUE_PLANE_TAG);
 }
 
-DRIVER_INIT_MEMBER(mbc55x_state,mbc55x)
+void mbc55x_state::init_mbc55x()
 {
 }
 

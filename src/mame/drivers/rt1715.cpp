@@ -389,7 +389,7 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  STATE         INIT  COMPANY     FULLNAME                             FLAGS
-COMP( 1986, rt1715,   0,      0,      rt1715,  k7658, rt1715_state, 0,    "Robotron", "Robotron PC-1715",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658, rt1715_state, 0,    "Robotron", "Robotron PC-1715 (latin/cyrillic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, k7658, rt1715_state, 0,    "Robotron", "Robotron PC-1715W",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY     FULLNAME                             FLAGS
+COMP( 1986, rt1715,   0,      0,      rt1715,  k7658, rt1715_state, empty_init, "Robotron", "Robotron PC-1715",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658, rt1715_state, empty_init, "Robotron", "Robotron PC-1715 (latin/cyrillic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, k7658, rt1715_state, empty_init, "Robotron", "Robotron PC-1715W",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

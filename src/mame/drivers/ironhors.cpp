@@ -406,7 +406,7 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 	MCFG_PALETTE_INIT_OWNER(ironhors_state, ironhors)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -574,7 +574,7 @@ ROM_END
  *
  *************************************/
 // versions are taken from the letters on the program ROMs' labels
-GAME( 1986, ironhors,  0,        ironhors, ironhors, ironhors_state, 0, ROT0, "Konami", "Iron Horse (version K)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ironhorsh, ironhors, ironhors, ironhors, ironhors_state, 0, ROT0, "Konami", "Iron Horse (version H)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dairesya,  ironhors, ironhors, dairesya, ironhors_state, 0, ROT0, "Konami (Kawakusu license)", "Dai Ressya Goutou (Japan, version K)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, farwest,   ironhors, farwest,  ironhors, ironhors_state, 0, ROT0, "bootleg?", "Far West", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ironhors,  0,        ironhors, ironhors, ironhors_state, empty_init, ROT0, "Konami", "Iron Horse (version K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ironhorsh, ironhors, ironhors, ironhors, ironhors_state, empty_init, ROT0, "Konami", "Iron Horse (version H)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dairesya,  ironhors, ironhors, dairesya, ironhors_state, empty_init, ROT0, "Konami (Kawakusu license)", "Dai Ressya Goutou (Japan, version K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, farwest,   ironhors, farwest,  ironhors, ironhors_state, empty_init, ROT0, "bootleg?", "Far West", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

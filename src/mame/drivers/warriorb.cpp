@@ -498,7 +498,8 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	MCFG_TC0110PCR_PALETTE("palette2")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -584,7 +585,8 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	MCFG_TC0110PCR_PALETTE("palette2")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -785,8 +787,8 @@ ROM_END
 
 /* Working Games */
 
-//    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    STATE,          INIT,MONITOR,COMPANY,FULLNAME,          FLAGS
-GAME( 1989, sagaia,    darius2, darius2d, sagaia,   warriorb_state, 0,   ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, darius2d,  darius2, darius2d, darius2d, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, darius2do, darius2, darius2d, darius2d, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1991, warriorb,  0,       warriorb, warriorb, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Warrior Blade - Rastan Saga Episode III (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    STATE,          INIT,       MONITOR,COMPANY,FULLNAME,          FLAGS
+GAME( 1989, sagaia,    darius2, darius2d, sagaia,   warriorb_state, empty_init, ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, darius2d,  darius2, darius2d, darius2d, warriorb_state, empty_init, ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, darius2do, darius2, darius2d, darius2d, warriorb_state, empty_init, ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1991, warriorb,  0,       warriorb, warriorb, warriorb_state, empty_init, ROT0,   "Taito Corporation",       "Warrior Blade - Rastan Saga Episode III (Japan)", MACHINE_SUPPORTS_SAVE )

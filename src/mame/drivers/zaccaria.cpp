@@ -370,7 +370,7 @@ MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 	MCFG_PALETTE_INIT_OWNER(zaccaria_state, zaccaria)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("audiopcb", ZACCARIA_1B11142)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -570,8 +570,8 @@ ROM_END
 
 
 
-GAME( 1983, monymony,  0,        zaccaria, monymony, zaccaria_state, 0, ROT90, "Zaccaria", "Money Money (set 1)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, monymony2, monymony, zaccaria, monymony, zaccaria_state, 0, ROT90, "Zaccaria", "Money Money (set 2)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jackrabt,  0,        zaccaria, jackrabt, zaccaria_state, 0, ROT90, "Zaccaria", "Jack Rabbit (set 1)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jackrabt2, jackrabt, zaccaria, jackrabt, zaccaria_state, 0, ROT90, "Zaccaria", "Jack Rabbit (set 2)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jackrabts, jackrabt, zaccaria, jackrabt, zaccaria_state, 0, ROT90, "Zaccaria", "Jack Rabbit (special)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, monymony,  0,        zaccaria, monymony, zaccaria_state, empty_init, ROT90, "Zaccaria", "Money Money (set 1)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, monymony2, monymony, zaccaria, monymony, zaccaria_state, empty_init, ROT90, "Zaccaria", "Money Money (set 2)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jackrabt,  0,        zaccaria, jackrabt, zaccaria_state, empty_init, ROT90, "Zaccaria", "Jack Rabbit (set 1)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jackrabt2, jackrabt, zaccaria, jackrabt, zaccaria_state, empty_init, ROT90, "Zaccaria", "Jack Rabbit (set 2)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jackrabts, jackrabt, zaccaria, jackrabt, zaccaria_state, empty_init, ROT90, "Zaccaria", "Jack Rabbit (special)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

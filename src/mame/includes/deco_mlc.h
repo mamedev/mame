@@ -74,8 +74,8 @@ public:
 	DECLARE_READ16_MEMBER( sh96_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( sh96_protection_region_0_146_w );
 
-	DECLARE_DRIVER_INIT(mlc);
-	DECLARE_DRIVER_INIT(avengrgs);
+	void init_mlc();
+	void init_avengrgs();
 	DECLARE_MACHINE_RESET(mlc);
 	DECLARE_VIDEO_START(mlc);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

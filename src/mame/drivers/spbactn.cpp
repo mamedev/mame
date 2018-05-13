@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(spbactn_state::spbactn)
 	MCFG_TECMO_MIXER_BGPEN(0x800 + 0x300)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(spbactn_state::spbactnp)
 	MCFG_TECMO_MIXER_BGPEN(0x800 + 0x300)
 
 	/* sound hardware  - different? */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -606,6 +606,6 @@ ROM_START( spbactnp )
 	ROM_LOAD( "tcm1.19g.bin", 0x00000, 0x53, CRC(2c54354a) SHA1(11d8b6cdaf052b5a9fbcf6b6fbf99c5f89575cfa) )
 ROM_END
 
-GAME( 1991, spbactn,  0,       spbactn,  spbactn, spbactn_state, 0, ROT90, "Tecmo", "Super Pinball Action (US)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, spbactnj, spbactn, spbactn,  spbactn, spbactn_state, 0, ROT90, "Tecmo", "Super Pinball Action (Japan)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, spbactnp, spbactn, spbactnp, spbactn, spbactn_state, 0, ROT90, "Tecmo", "Super Pinball Action (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // early proto, (c) date is 2 years earlier!
+GAME( 1991, spbactn,  0,       spbactn,  spbactn, spbactn_state, empty_init, ROT90, "Tecmo", "Super Pinball Action (US)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, spbactnj, spbactn, spbactn,  spbactn, spbactn_state, empty_init, ROT90, "Tecmo", "Super Pinball Action (Japan)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, spbactnp, spbactn, spbactnp, spbactn, spbactn_state, empty_init, ROT90, "Tecmo", "Super Pinball Action (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // early proto, (c) date is 2 years earlier!

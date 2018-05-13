@@ -51,8 +51,8 @@ public:
 	void bsharkjjs(machine_config &config);
 	void enforce(machine_config &config);
 
-	DECLARE_DRIVER_INIT(taitoz);
-	DECLARE_DRIVER_INIT(bshark);
+	void init_taitoz();
+	void init_bshark();
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

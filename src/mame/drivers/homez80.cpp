@@ -314,5 +314,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY             FULLNAME                 FLAGS */
-COMP( 2008, homez80,  0,     0,      homez80,   homez80, homez80_state, 0,    "Kun-Szabo Marton", "Homebrew Z80 Computer", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME                 FLAGS */
+COMP( 2008, homez80, 0,      0,      homez80, homez80, homez80_state, empty_init, "Kun-Szabo Marton", "Homebrew Z80 Computer", MACHINE_NO_SOUND_HW)

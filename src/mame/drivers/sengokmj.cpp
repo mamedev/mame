@@ -603,7 +603,7 @@ MACHINE_CONFIG_START(sengokmj_state::sengokmj)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
@@ -656,5 +656,5 @@ ROM_START( sengokmj )
 	ROM_LOAD( "rs006.89", 0x000, 0x200, CRC(96f7646e) SHA1(400a831b83d6ac4d2a46ef95b97b1ee237099e44) ) /* Priority */
 ROM_END
 
-GAME( 1991, sengokmj, 0, sengokmj, sengokmj, sengokmj_state, 0, ROT0, "Sigma", "Sengoku Mahjong [BET] (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, sengokmj, 0, sengokmj, sengokmj, sengokmj_state, empty_init, ROT0, "Sigma", "Sengoku Mahjong [BET] (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /*Non-Bet Version?*/

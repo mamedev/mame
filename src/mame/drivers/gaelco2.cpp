@@ -201,7 +201,8 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -631,7 +632,8 @@ MACHINE_CONFIG_START(gaelco2_state::play2000)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -735,7 +737,8 @@ MACHINE_CONFIG_START(bang_state::bang)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_CG1V, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -972,7 +975,8 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -1286,7 +1290,8 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	/* sound hardware */
 	/* the chip is stereo, but the game sound is mono because the right channel
 	   output is for cabinet 1 and the left channel output is for cabinet 2 */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -1582,7 +1587,8 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_CG1V, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -1624,7 +1630,8 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -1880,7 +1887,8 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	/* sound hardware */
 	/* the chip is stereo, but the game sound is mono because the right channel
 	   output is for cabinet 1 and the left channel output is for cabinet 2 */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
 	MCFG_GAELCO_SND_DATA("gfx1")
@@ -2176,31 +2184,31 @@ ROM_END
 
 
 
-GAME( 1994, aligator,   0,       alighunt_d5002fp, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (World, protected)", 0 )
-GAME( 1994, aligators,  aligator,alighunt_d5002fp, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (Spain, protected)", 0 )
-GAME( 1994, aligatorun, aligator,alighunt,         alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 1)", 0 )
-GAME( 1994, aligatoruna,aligator,alighunt,         alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 2)", 0 ) // strange version, starts on space stages, but clearly a recompile not a trivial hack of the above, show version maybe?
+GAME( 1994, aligator,    0,         alighunt_d5002fp, alighunt, gaelco2_state, init_alighunt, ROT0, "Gaelco", "Alligator Hunt (World, protected)", 0 )
+GAME( 1994, aligators,   aligator,  alighunt_d5002fp, alighunt, gaelco2_state, init_alighunt, ROT0, "Gaelco", "Alligator Hunt (Spain, protected)", 0 )
+GAME( 1994, aligatorun,  aligator,  alighunt,         alighunt, gaelco2_state, init_alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 1)", 0 )
+GAME( 1994, aligatoruna, aligator,  alighunt,         alighunt, gaelco2_state, init_alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 2)", 0 ) // strange version, starts on space stages, but clearly a recompile not a trivial hack of the above, show version maybe?
 
-GAME( 1995, touchgo,  0,        touchgo_d5002fp,   touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (World)", MACHINE_IMPERFECT_SOUND )
-GAME( 1995, touchgon, touchgo,  touchgo_d5002fp,   touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_IMPERFECT_SOUND )
-GAME( 1995, touchgoe, touchgo,  touchgo_d5002fp,   touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)",  MACHINE_IMPERFECT_SOUND )
-GAME( 1995, touchgok, touchgo,  touchgo,           touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
+GAME( 1995, touchgo,     0,         touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,  ROT0, "Gaelco", "Touch & Go (World)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, touchgon,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,  ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, touchgoe,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)",  MACHINE_IMPERFECT_SOUND )
+GAME( 1995, touchgok,    touchgo,   touchgo,          touchgo,  gaelco2_state, init_touchgo,  ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
 
-GAME( 1995, wrally2,  0,        wrally2,           wrally2,  wrally2_state, wrally2,  ROT0, "Gaelco", "World Rally 2: Twin Racing (mask ROM version)", 0 )
-GAME( 1995, wrally2a, wrally2,  wrally2,           wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing (EPROM version)", 0 )
+GAME( 1995, wrally2,     0,         wrally2,          wrally2,  wrally2_state, init_wrally2,  ROT0, "Gaelco", "World Rally 2: Twin Racing (mask ROM version)", 0 )
+GAME( 1995, wrally2a,    wrally2,   wrally2,          wrally2,  wrally2_state, empty_init,    ROT0, "Gaelco", "World Rally 2: Twin Racing (EPROM version)", 0 )
 
 // All sets identify as Version 1.0, but are clearly different revisions
-GAME( 1996, maniacsq,  0,        maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", 0 )
-GAME( 1996, maniacsqa, maniacsq, maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum CF2D)", 0 )
-GAME( 1996, maniacsqu, maniacsq, maniacsq,         maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum BB73)", 0 )
-GAME( 1996, maniacsqs, maniacsq, maniacsqs,        snowboar, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum 66B1, 960419/1 PCB)", 0 ) // Official version on Snow Board Championship PCB, doesn't use the protection
+GAME( 1996, maniacsq,    0,         maniacsq_d5002fp, maniacsq, gaelco2_state, empty_init,    ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", 0 )
+GAME( 1996, maniacsqa,   maniacsq,  maniacsq_d5002fp, maniacsq, gaelco2_state, empty_init,    ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum CF2D)", 0 )
+GAME( 1996, maniacsqu,   maniacsq,  maniacsq,         maniacsq, gaelco2_state, empty_init,    ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum BB73)", 0 )
+GAME( 1996, maniacsqs,   maniacsq,  maniacsqs,        snowboar, gaelco2_state, empty_init,    ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum 66B1, 960419/1 PCB)", 0 ) // Official version on Snow Board Championship PCB, doesn't use the protection
 
-GAME( 1996, snowboar, 0,        snowboar, snowboar, gaelco2_state, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", 0 )
-GAME( 1996, snowboara,snowboar, snowboar, snowboar, gaelco2_state, snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", 0 )
+GAME( 1996, snowboar,    0,         snowboar,         snowboar, gaelco2_state, empty_init,    ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", 0 )
+GAME( 1996, snowboara,   snowboar,  snowboar,         snowboar, gaelco2_state, init_snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", 0 )
 
-GAME( 1998, bang,     0,        bang,     bang,     bang_state,    bang,     ROT0, "Gaelco", "Bang!", 0 )
-GAME( 1998, bangj,    bang,     bang,     bang,     bang_state,    bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
+GAME( 1998, bang,        0,         bang,             bang,     bang_state,    init_bang,     ROT0, "Gaelco", "Bang!", 0 )
+GAME( 1998, bangj,       bang,      bang,             bang,     bang_state,    init_bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
 
 // 2-in-1 gambling game, appears to be cloned Gaelco hardware complete with DS5002FP, or possibly manufactured by Gaelco for Nova Desitec but without any Gaelco branding.
-GAME( 1999, play2000,   0,        play2000, play2000, gaelco2_state, 0,        ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0) (Italy)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1999, play2000a,  play2000, play2000, play2000, gaelco2_state, 0,        ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.01) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // bad dump
+GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state, empty_init,    ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0) (Italy)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1999, play2000a,   play2000,  play2000,         play2000, gaelco2_state, empty_init,    ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.01) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // bad dump

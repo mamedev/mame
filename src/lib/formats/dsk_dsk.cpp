@@ -419,8 +419,11 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 					sects[j].actual_size = sector.data_length;
 				else
 					sects[j].actual_size = 128 << tr.sector_size_code;
-				sects[j].deleted     = sector.fdc_status_reg1 == 0xb2;
-				sects[j].bad_crc     = sector.fdc_status_reg1 == 0xb5;
+
+				if (sector.fdc_status_reg1 == 0xb2 || (sector.fdc_status_reg2 & 0x40))
+					sects[j].deleted = 1;
+				if (sector.fdc_status_reg1 == 0xb5 || (sector.fdc_status_reg2 & 0x20))
+					sects[j].bad_crc = 1;
 
 				if(!sects[j].deleted) {
 					sects[j].data = sect_data + sdatapos;

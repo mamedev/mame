@@ -516,7 +516,7 @@ MACHINE_CONFIG_START(flower_state::flower)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("flower", FLOWER_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -610,5 +610,5 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 ROM_END
 
 
-GAME( 1986, flower,  0,      flower, flower, flower_state, 0, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
-GAME( 1986, flowerj, flower, flower, flower, flower_state, 0, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flower,  0,      flower, flower, flower_state, empty_init, ROT0, "Clarue (Komax license)",                   "Flower (US)",    MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )
+GAME( 1986, flowerj, flower, flower, flower, flower_state, empty_init, ROT0, "Clarue (Sega / Alpha Denshi Co. license)", "Flower (Japan)", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS|MACHINE_NO_COCKTAIL )

@@ -326,7 +326,7 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	MCFG_MC6845_UPDATE_ROW_CB(mbc200_state, update_row)
 
 	// sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 1000) // frequency unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
@@ -371,5 +371,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY   FULLNAME   FLAGS
-COMP( 1982, mbc200,  0,       0,       mbc200,    mbc200, mbc200_state,  0,    "Sanyo",  "MBC-200", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1982, mbc200, 0,      0,      mbc200,  mbc200, mbc200_state, empty_init, "Sanyo", "MBC-200", 0 )

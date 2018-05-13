@@ -582,5 +582,5 @@ ROM_START( pasogo )
 	ROM_REGION( 0x10000, "empty", ROMREGION_ERASEFF )
 ROM_END
 
-//    YEAR   NAME    PARENT  COMPAT    MACHINE  INPUT   STATE         INIT  COMPANY  FULLNAME  FLAGS
-CONS( 1996, pasogo,   0,      0,       pasogo,  pasogo, pasogo_state, 0,    "KOEI",  "PasoGo", MACHINE_NO_SOUND|MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME  FLAGS
+CONS( 1996, pasogo, 0,      0,      pasogo,  pasogo, pasogo_state, empty_init, "KOEI",  "PasoGo", MACHINE_NO_SOUND|MACHINE_NOT_WORKING)

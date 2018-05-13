@@ -418,7 +418,8 @@ MACHINE_CONFIG_START(vball_state::vball)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	// The sound system comes all but verbatim from Double Dragon
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
@@ -560,7 +561,7 @@ ROM_START( vball2pjb ) /* bootleg of the Japan set with unmoddified program rom 
 ROM_END
 
 
-GAME( 1988, vball,    0,     vball,    vball,    vball_state, 0, ROT0, "Technos Japan", "U.S. Championship V'ball (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vball2pj, vball, vball,    vball2pj, vball_state, 0, ROT0, "Technos Japan", "U.S. Championship V'ball (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vballb,   vball, vball,    vball,    vball_state, 0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of US set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vball2pjb,vball, vball,    vball,    vball_state, 0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of Japan set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vball,    0,     vball,    vball,    vball_state, empty_init, ROT0, "Technos Japan", "U.S. Championship V'ball (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vball2pj, vball, vball,    vball2pj, vball_state, empty_init, ROT0, "Technos Japan", "U.S. Championship V'ball (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vballb,   vball, vball,    vball,    vball_state, empty_init, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of US set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vball2pjb,vball, vball,    vball,    vball_state, empty_init, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of Japan set)", MACHINE_SUPPORTS_SAVE )

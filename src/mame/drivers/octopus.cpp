@@ -970,7 +970,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_PIT8253_CLK2(2457500)  // speaker frequency
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, octopus_state,spk_freq_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -1036,5 +1036,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY                 FULLNAME       FLAGS
-COMP( 1986, octopus,  0,      0,       octopus,   octopus, octopus_state, 0,    "Digital Microsystems", "LSI Octopus", MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                 FULLNAME       FLAGS
+COMP( 1986, octopus, 0,      0,      octopus, octopus, octopus_state, empty_init, "Digital Microsystems", "LSI Octopus", MACHINE_NOT_WORKING)

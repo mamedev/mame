@@ -260,5 +260,5 @@ ROM_START( sm_ultng )
 ROM_END
 
 
-GAME( 1981, sm_ngacc,  0,    summit, summit, sumt8035_state,  0, ROT270, "Summit Coin", "Nudge Accumulator (Summit Coin)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981, sm_ultng,  0,    summit, summit, sumt8035_state,  0, ROT270, "Summit Coin", "Ultimate Nudge (Summit Coin)",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981, sm_ngacc,  0,    summit, summit, sumt8035_state, empty_init, ROT270, "Summit Coin", "Nudge Accumulator (Summit Coin)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981, sm_ultng,  0,    summit, summit, sumt8035_state, empty_init, ROT270, "Summit Coin", "Ultimate Nudge (Summit Coin)",    MACHINE_IS_SKELETON_MECHANICAL )

@@ -64,7 +64,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_DRIVER_INIT(chinsan);
+	void init_chinsan();
 
 	void chinsan(machine_config &config);
 	void mayumi(machine_config &config);
@@ -493,7 +493,7 @@ void chinsan_state::machine_reset()
 	m_trigger = 0;
 }
 
-DRIVER_INIT_MEMBER( chinsan_state, chinsan )
+void chinsan_state::init_chinsan()
 {
 	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0x18000);
 	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), 0x18000);
@@ -532,7 +532,7 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(10'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
@@ -613,6 +613,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT    CLASS          INIT     ROTATION  COMPANY           FULLNAME                                         FLAGS
-GAME( 1987, chinsan,  0,      chinsan, chinsan, chinsan_state, chinsan, ROT0,     "Sanritsu",       "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mayumi,   0,      mayumi,  mayumi,  chinsan_state, 0,       ROT0,     "Victory L.L.C.", "Kiki-Ippatsu Mayumi-chan",                      MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT          ROT   COMPANY           FULLNAME                                         FLAGS
+GAME( 1987, chinsan, 0,      chinsan, chinsan, chinsan_state, init_chinsan, ROT0, "Sanritsu",       "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mayumi,  0,      mayumi,  mayumi,  chinsan_state, empty_init,   ROT0, "Victory L.L.C.", "Kiki-Ippatsu Mayumi-chan",                      MACHINE_SUPPORTS_SAVE )

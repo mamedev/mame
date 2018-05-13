@@ -53,7 +53,8 @@ WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pc9801_86_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("opna", YM2608, 7.987_MHz_XTAL)
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(*this, pc9801_86_device, sound_irq))
 	MCFG_AY8910_OUTPUT_TYPE(0)
@@ -274,8 +275,8 @@ WRITE8_MEMBER(pc9801_86_device::pcm_w)
 				if(!(data & 0x10))
 				{
 					machine().device<pic8259_device>(":pic8259_slave")->ir4_w(m_fmirq ? ASSERT_LINE : CLEAR_LINE);
-					if(!(queue_count() < m_irq_rate))
-						m_pcmirq = false;
+					if(!(queue_count() < m_irq_rate) || !(data & 0x80))
+						m_pcmirq = false; //TODO: this needs research
 				}
 				m_init = true;
 				m_pcm_ctrl = data & ~0x10;

@@ -446,7 +446,7 @@ MACHINE_CONFIG_START(supercrd_state::supercrd)
 //  MCFG_MC6845_CHAR_WIDTH(4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
@@ -513,6 +513,6 @@ ROM_START( fruitstr )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT    ROT   COMPANY      FULLNAME                  FLAGS
-GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, 0,      ROT0, "Fun World", "Super Card (encrypted)", MACHINE_NOT_WORKING )
-GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, 0,      ROT0, "Fun World", "Fruit Star (encrypted)", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY      FULLNAME                  FLAGS
+GAME( 1992, supercrd, 0,      supercrd, supercrd, supercrd_state, empty_init, ROT0, "Fun World", "Super Card (encrypted)", MACHINE_NOT_WORKING )
+GAME( 1992, fruitstr, 0,      supercrd, supercrd, supercrd_state, empty_init, ROT0, "Fun World", "Fruit Star (encrypted)", MACHINE_NOT_WORKING )

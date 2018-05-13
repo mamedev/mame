@@ -439,7 +439,7 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
@@ -738,12 +738,11 @@ void kchamp_state::decrypt_code()
 }
 
 
-DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
+void kchamp_state::init_kchampvs()
 {
 	decrypt_code();
 
 	uint8_t *rom = memregion("maincpu")->base();
-	int A;
 
 	/*
 	    Note that the first 4 opcodes that the program
@@ -755,7 +754,7 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 	    encrypted address for the jump.
 	 */
 	m_decrypted_opcodes[0] = rom[0];  /* this is a jump */
-	A = rom[1] + 256 * rom[2];
+	int A = rom[1] + 256 * rom[2];
 	m_decrypted_opcodes[A] = rom[A];  /* fix opcode on first jump address (again, a jump) */
 	rom[A+1] ^= 0xee;       /* fix address of the second jump */
 	A = rom[A+1] + 256 * rom[A+2];
@@ -768,7 +767,7 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 }
 
 
-DRIVER_INIT_MEMBER(kchamp_state,kchampvs2)
+void kchamp_state::init_kchampvs2()
 {
 	decrypt_code();
 	m_msm_play_lo_nibble = true;
@@ -776,8 +775,8 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs2)
 
 
 
-GAME( 1984, kchamp,    0,      kchamp,   kchamp,   kchamp_state,  0,         ROT90, "Data East USA",         "Karate Champ (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, karatedo,  kchamp, kchamp,   kchamp,   kchamp_state,  0,         ROT90, "Data East Corporation", "Karate Dou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs,  kchamp, kchampvs, kchampvs, kchamp_state,  kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs2, kchamp, kchampvs, kchampvs, kchamp_state,  kchampvs2, ROT90, "Data East USA",         "Karate Champ (US VS version, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, karatevs,  kchamp, kchampvs, kchampvs, kchamp_state,  kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchamp,    0,      kchamp,   kchamp,   kchamp_state,  empty_init,     ROT90, "Data East USA",         "Karate Champ (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, karatedo,  kchamp, kchamp,   kchamp,   kchamp_state,  empty_init,     ROT90, "Data East Corporation", "Karate Dou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs,  kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs2, kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs2, ROT90, "Data East USA",         "Karate Champ (US VS version, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, karatevs,  kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", MACHINE_SUPPORTS_SAVE )

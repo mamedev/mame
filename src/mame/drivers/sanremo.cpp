@@ -385,7 +385,7 @@ MACHINE_CONFIG_START(sanremo_state::sanremo)
 	MCFG_PALETTE_INIT_OWNER(sanremo_state, sanremo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8910", AY8910, SND_CLOCK)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -420,5 +420,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//     YEAR  NAME     PARENT  MACHINE  INPUT    STATE          INIT   ROT   COMPANY           FULLNAME       FLAGS                    LAYOUT
-GAMEL( 1996, number1, 0,      sanremo, number1, sanremo_state, 0,     ROT0, "San Remo Games", "Number One",  MACHINE_SUPPORTS_SAVE,   layout_sanremo )
+//     YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        ROT   COMPANY           FULLNAME       FLAGS                    LAYOUT
+GAMEL( 1996, number1, 0,      sanremo, number1, sanremo_state, empty_init, ROT0, "San Remo Games", "Number One",  MACHINE_SUPPORTS_SAVE,   layout_sanremo )

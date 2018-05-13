@@ -217,7 +217,7 @@ private:
 	uint8_t m_pending_interrupt;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_data;
 	int m_icount;
 

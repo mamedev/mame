@@ -771,7 +771,7 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -953,6 +953,6 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1981, grchamp,        0, grchamp, grchamp, grchamp_state, 0, ROT270, "Taito", "Grand Champion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
-GAMEL( 1981, grchampa, grchamp, grchamp, grchamp, grchamp_state, 0, ROT270, "Taito", "Grand Champion (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp ) // uses different ports. Bad dump?
-GAMEL( 1981, grchampb, grchamp, grchamp, grchamp, grchamp_state, 0, ROT270, "Taito", "Grand Champion (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
+GAMEL( 1981, grchamp,        0, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
+GAMEL( 1981, grchampa, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp ) // uses different ports. Bad dump?
+GAMEL( 1981, grchampb, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )

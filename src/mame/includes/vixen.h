@@ -69,7 +69,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rxrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( txrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_DRIVER_INIT(vixen);
+	void init_vixen();
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_tick);
 	IRQ_CALLBACK_MEMBER(vixen_int_ack);
 	DECLARE_READ8_MEMBER(opram_r);

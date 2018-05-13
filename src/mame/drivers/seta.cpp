@@ -7841,7 +7841,8 @@ MACHINE_CONFIG_START(seta_state::tndrcade)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 16000000/4)   /* 4 MHz */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, seta_state, dsw1_r))     /* input A: DSW 1 */
@@ -7895,7 +7896,7 @@ MACHINE_CONFIG_START(seta_state::twineagl)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,twineagl_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -7941,7 +7942,7 @@ MACHINE_CONFIG_START(seta_state::downtown)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -8025,7 +8026,7 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
@@ -8083,7 +8084,7 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
@@ -8133,7 +8134,7 @@ MACHINE_CONFIG_START(seta_state::metafox)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -8173,7 +8174,7 @@ MACHINE_CONFIG_START(seta_state::atehate)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -8221,7 +8222,7 @@ MACHINE_CONFIG_START(seta_state::blandia)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -8258,7 +8259,7 @@ MACHINE_CONFIG_START(seta_state::blandiap)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -8295,7 +8296,7 @@ MACHINE_CONFIG_START(seta_state::blockcar)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -8369,7 +8370,7 @@ MACHINE_CONFIG_START(seta_state::daioh)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz, Verified from PCB audio */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -8406,7 +8407,7 @@ MACHINE_CONFIG_START(seta_state::daiohp)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz, Verified from PCB audio */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -8449,7 +8450,7 @@ MACHINE_CONFIG_START(seta_state::drgnunit)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -8485,7 +8486,8 @@ MACHINE_CONFIG_START(seta_state::qzkklgy2)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -8548,7 +8550,8 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_VIDEO_START_OVERRIDE(setaroul_state,setaroul_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -8589,7 +8592,7 @@ MACHINE_CONFIG_START(seta_state::eightfrc)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -8635,7 +8638,8 @@ MACHINE_CONFIG_START(seta_state::extdwnhl)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -8702,7 +8706,7 @@ MACHINE_CONFIG_START(seta_state::gundhara)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -8763,7 +8767,7 @@ MACHINE_CONFIG_START(seta_state::jjsquawk)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -8798,7 +8802,7 @@ MACHINE_CONFIG_START(seta_state::jjsquawb)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -8840,7 +8844,7 @@ MACHINE_CONFIG_START(seta_state::kamenrid)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -8878,7 +8882,8 @@ MACHINE_CONFIG_START(seta_state::orbs)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 14318180)   /* 14.318180 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -8920,7 +8925,8 @@ MACHINE_CONFIG_START(seta_state::keroppij)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 14318180)   /* 14.318180 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -8970,7 +8976,7 @@ MACHINE_CONFIG_START(seta_state::krzybowl)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -9017,7 +9023,7 @@ MACHINE_CONFIG_START(seta_state::madshark)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -9060,7 +9066,7 @@ MACHINE_CONFIG_START(seta_state::magspeed)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -9104,7 +9110,7 @@ MACHINE_CONFIG_START(seta_state::msgundam)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -9142,7 +9148,8 @@ MACHINE_CONFIG_START(seta_state::oisipuzl)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,oisipuzl_2_layers) // flip is inverted for the tilemaps
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -9181,7 +9188,8 @@ MACHINE_CONFIG_START(seta_state::triplfun)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,oisipuzl_2_layers) // flip is inverted for the tilemaps
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 792000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -9224,7 +9232,8 @@ MACHINE_CONFIG_START(seta_state::kiwame)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -9266,7 +9275,7 @@ MACHINE_CONFIG_START(seta_state::rezon)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -9306,7 +9315,7 @@ MACHINE_CONFIG_START(seta_state::thunderl)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -9382,7 +9391,7 @@ MACHINE_CONFIG_START(seta_state::wiggie)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -9423,7 +9432,7 @@ MACHINE_CONFIG_START(seta_state::wits)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -9460,7 +9469,7 @@ MACHINE_CONFIG_START(seta_state::umanclub)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -9501,7 +9510,8 @@ MACHINE_CONFIG_START(seta_state::utoukond)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
@@ -9558,7 +9568,7 @@ MACHINE_CONFIG_START(seta_state::wrofaero)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -9607,7 +9617,7 @@ MACHINE_CONFIG_START(seta_state::zingzip)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -9660,7 +9670,7 @@ MACHINE_CONFIG_START(seta_state::pairlove)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -9711,7 +9721,7 @@ MACHINE_CONFIG_START(seta_state::crazyfgt)
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 16000000/4) /* 4 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -9781,7 +9791,8 @@ MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 	MCFG_VIDEO_START_OVERRIDE(jockeyc_state,jockeyc_1_layer)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -11764,7 +11775,7 @@ READ16_MEMBER(seta_state::twineagl_debug_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(seta_state,bank6502)
+void seta_state::init_bank6502()
 {
 	uint8_t *rom = memregion("sub")->base();
 	uint32_t max = (memregion("sub")->bytes() - 0xc000) / 0x4000;
@@ -11797,9 +11808,9 @@ WRITE16_MEMBER(seta_state::twineagl_200100_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(seta_state,twineagl)
+void seta_state::init_twineagl()
 {
-	DRIVER_INIT_CALL(bank6502);
+	init_bank6502();
 	/* debug? */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800000, 0x8000ff, read16_delegate(FUNC(seta_state::twineagl_debug_r),this));
 
@@ -11831,9 +11842,9 @@ WRITE16_MEMBER(seta_state::downtown_protection_w)
 	COMBINE_DATA(&m_downtown_protection[offset]);
 }
 
-DRIVER_INIT_MEMBER(seta_state,downtown)
+void seta_state::init_downtown()
 {
-	DRIVER_INIT_CALL(bank6502);
+	init_bank6502();
 
 	m_downtown_protection = make_unique_clear<uint16_t[]>(0x200/2);
 	save_pointer(NAME(m_downtown_protection.get()),0x200/2);
@@ -11856,9 +11867,9 @@ READ16_MEMBER(seta_state::arbalest_debug_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(seta_state,arbalest)
+void seta_state::init_arbalest()
 {
-	DRIVER_INIT_CALL(bank6502);
+	init_bank6502();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x8000f, read16_delegate(FUNC(seta_state::arbalest_debug_r),this));
 }
 
@@ -11885,26 +11896,22 @@ READ16_MEMBER(seta_state::metafox_protection_r)
 	return offset * 0x1f;
 }
 
-DRIVER_INIT_MEMBER(seta_state,metafox)
+void seta_state::init_metafox()
 {
-	DRIVER_INIT_CALL(bank6502);
+	init_bank6502();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x21c000, 0x21ffff,read16_delegate(FUNC(seta_state::metafox_protection_r),this));
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,blandia)
+void seta_state::init_blandia()
 {
 	/* rearrange the gfx data so it can be decoded in the same way as the other set */
-
-	int rom_size;
-	uint8_t *rom;
-	int rpos;
-
-	rom_size = 0x80000;
+	int rom_size = 0x80000;
 	std::vector<uint8_t> buf(rom_size);
 
-	rom = memregion("gfx2")->base() + 0x40000;
+	uint8_t *rom = memregion("gfx2")->base() + 0x40000;
 
+	int rpos;
 	for (rpos = 0; rpos < rom_size/2; rpos++) {
 		buf[rpos+0x40000] = rom[rpos*2];
 		buf[rpos] = rom[rpos*2+1];
@@ -11923,13 +11930,13 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,eightfrc)
+void seta_state::init_eightfrc()
 {
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500004, 0x500005);   // watchdog??
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,kiwame)
+void seta_state::init_kiwame()
 {
 	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
@@ -11941,12 +11948,12 @@ DRIVER_INIT_MEMBER(seta_state,kiwame)
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,rezon)
+void seta_state::init_rezon()
 {
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500006, 0x500007);   // irq ack?
 }
 
-DRIVER_INIT_MEMBER(seta_state,pairlove)
+void seta_state::init_pairlove()
 {
 	m_pairslove_protram = make_unique_clear<uint16_t[]>(0x200/2);
 	m_pairslove_protram_old = make_unique_clear<uint16_t[]>(0x200/2);
@@ -11954,19 +11961,15 @@ DRIVER_INIT_MEMBER(seta_state,pairlove)
 	save_pointer(NAME(m_pairslove_protram_old.get()), 0x200/2);
 }
 
-DRIVER_INIT_MEMBER(seta_state,wiggie)
+void seta_state::init_wiggie()
 {
-	uint8_t *src;
-	int len;
 	uint8_t temp[16];
-	int i,j;
-
-	src = memregion("maincpu")->base();
-	len = memregion("maincpu")->bytes();
-	for (i = 0;i < len;i += 16)
+	uint8_t *src = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+	for (int i = 0;i < len;i += 16)
 	{
-		std::copy(&src[i],&src[i+16],std::begin(temp));
-		for (j = 0;j < 16;j++)
+		std::copy(&src[i], &src[i+16], std::begin(temp));
+		for (int j = 0;j < 16;j++)
 		{
 			static const int convtable[16] =
 			{
@@ -11983,7 +11986,7 @@ DRIVER_INIT_MEMBER(seta_state,wiggie)
 	}
 }
 
-DRIVER_INIT_MEMBER(seta_state,crazyfgt)
+void seta_state::init_crazyfgt()
 {
 	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
@@ -11993,10 +11996,10 @@ DRIVER_INIT_MEMBER(seta_state,crazyfgt)
 	// fixed priorities?
 	m_vregs.allocate(3);
 
-	DRIVER_INIT_CALL(blandia);
+	init_blandia();
 }
 
-DRIVER_INIT_MEMBER(jockeyc_state,inttoote)
+void jockeyc_state::init_inttoote()
 {
 	// code patches due to unemulated protection (to be removed...)
 	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
@@ -12015,115 +12018,115 @@ DRIVER_INIT_MEMBER(jockeyc_state,inttoote)
 ***************************************************************************/
 
 /* 68000 + 65C02 */
-GAME( 1987, tndrcade,  0,        tndrcade,  tndrcade,  seta_state,     bank6502,  ROT270, "Seta (Taito license)",      "Thundercade / Twin Formation" , 0) // Title/License: DSW
-GAME( 1987, tndrcadej, tndrcade, tndrcade,  tndrcadj,  seta_state,     bank6502,  ROT270, "Seta (Taito license)",      "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
+GAME( 1987, tndrcade,  0,        tndrcade,  tndrcade,  seta_state,     init_bank6502,  ROT270, "Seta (Taito license)",      "Thundercade / Twin Formation" , 0) // Title/License: DSW
+GAME( 1987, tndrcadej, tndrcade, tndrcade,  tndrcadj,  seta_state,     init_bank6502,  ROT270, "Seta (Taito license)",      "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
 
-GAME( 1988, twineagl,  0,        twineagl,  twineagl,  seta_state,     twineagl,  ROT270, "Seta (Taito license)",      "Twin Eagle - Revenge Joe's Brother" , 0) // Country/License: DSW
+GAME( 1988, twineagl,  0,        twineagl,  twineagl,  seta_state,     init_twineagl,  ROT270, "Seta (Taito license)",      "Twin Eagle - Revenge Joe's Brother" , 0) // Country/License: DSW
 
-GAME( 1989, downtown,  0,        downtown,  downtown,  seta_state,     downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (set 1)" , 0) // Country/License: DSW
-GAME( 1989, downtown2, downtown, downtown,  downtown,  seta_state,     downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (set 2)" , 0) // Country/License: DSW
-GAME( 1989, downtownj, downtown, downtown,  downtown,  seta_state,     downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (joystick hack)" , 0) // Country/License: DSW
-GAME( 1989, downtownp, downtown, downtown,  downtown,  seta_state,     downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (prototype)" , 0) // Country/License: DSW
+GAME( 1989, downtown,  0,        downtown,  downtown,  seta_state,     init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (set 1)" , 0) // Country/License: DSW
+GAME( 1989, downtown2, downtown, downtown,  downtown,  seta_state,     init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (set 2)" , 0) // Country/License: DSW
+GAME( 1989, downtownj, downtown, downtown,  downtown,  seta_state,     init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (joystick hack)" , 0) // Country/License: DSW
+GAME( 1989, downtownp, downtown, downtown,  downtown,  seta_state,     init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (prototype)" , 0) // Country/License: DSW
 
-GAME( 1989, usclssic,  0,        usclssic,  usclssic,  seta_state,     bank6502,  ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
+GAME( 1989, usclssic,  0,        usclssic,  usclssic,  seta_state,     init_bank6502,  ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
 
-GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     bank6502,  ROT270, "Athena / Seta",             "Caliber 50" , 0) // Country/License: DSW
+GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     init_bank6502,  ROT270, "Athena / Seta",             "Caliber 50" , 0) // Country/License: DSW
 
-GAME( 1989, arbalest,  0,        metafox,   arbalest,  seta_state,     arbalest,  ROT270, "Seta",                      "Arbalester" , 0) // Country/License: DSW
+GAME( 1989, arbalest,  0,        metafox,   arbalest,  seta_state,     init_arbalest,  ROT270, "Seta",                      "Arbalester" , 0) // Country/License: DSW
 
-GAME( 1989, metafox,   0,        metafox,   metafox,   seta_state,     metafox,   ROT270, "Seta",                      "Meta Fox" , 0) // Country/License: DSW
+GAME( 1989, metafox,   0,        metafox,   metafox,   seta_state,     init_metafox,   ROT270, "Seta",                      "Meta Fox" , 0) // Country/License: DSW
 
 /* 68000 */
 
-GAME( 1989?,setaroul,  0,        setaroul,  setaroul,  setaroul_state, 0,         ROT270, "Visco",                     "The Roulette (Visco)", 0 )
+GAME( 1989?,setaroul,  0,        setaroul,  setaroul,  setaroul_state, empty_init,     ROT270, "Visco",                     "The Roulette (Visco)", 0 )
 
-GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     0,         ROT0,   "Seta",                      "Dragon Unit / Castle of Dragon", 0 )
+GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_init,     ROT0,   "Seta",                      "Dragon Unit / Castle of Dragon", 0 )
 
-GAME( 1989, wits,      0,        wits,      wits,      seta_state,     0,         ROT0,   "Athena (Visco license)",    "Wit's (Japan)" , 0) // Country/License: DSW
+GAME( 1989, wits,      0,        wits,      wits,      seta_state,     empty_init,     ROT0,   "Athena (Visco license)",    "Wit's (Japan)" , 0) // Country/License: DSW
 
-GAME( 1990, thunderl,  0,        thunderl,  thunderl,  seta_state,     0,         ROT270, "Seta",                      "Thunder & Lightning" , 0) // Country/License: DSW
-GAME( 1990, thunderlbl,thunderl, thunderlbl,thunderlbl,seta_state,     0,         ROT90,  "bootleg",                   "Thunder & Lightning (bootleg with Tetris sound)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
+GAME( 1990, thunderl,  0,        thunderl,  thunderl,  seta_state,     empty_init,     ROT270, "Seta",                      "Thunder & Lightning" , 0) // Country/License: DSW
+GAME( 1990, thunderlbl,thunderl, thunderlbl,thunderlbl,seta_state,     empty_init,     ROT90,  "bootleg",                   "Thunder & Lightning (bootleg with Tetris sound)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
 
-GAME( 1994, wiggie,    0,        wiggie,    thunderl,  seta_state,     wiggie,    ROT270, "Promat",                    "Wiggie Waggie", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
-GAME( 1994, superbar,  wiggie,   superbar,  thunderl,  seta_state,     wiggie,    ROT270, "Promat",                    "Super Bar", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
+GAME( 1994, wiggie,    0,        wiggie,    thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Wiggie Waggie", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
+GAME( 1994, superbar,  wiggie,   superbar,  thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Super Bar", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 
-GAME( 1990, jockeyc,   0,        jockeyc,   jockeyc,   jockeyc_state,  0,         ROT0,   "Seta (Visco license)",      "Jockey Club (v1.18)", 0 )
-GAME( 1993, inttoote2, jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  0,         ROT0,   "bootleg (Coinmaster)",      "International Toote II (v1.24, P387.V01)", 0 )
-GAME( 1998, inttoote,  jockeyc,  inttoote,  inttoote,  jockeyc_state,  inttoote,  ROT0,   "bootleg (Coinmaster)",      "International Toote (Germany, P523.V01)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1990, jockeyc,   0,        jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "Seta (Visco license)",      "Jockey Club (v1.18)", 0 )
+GAME( 1993, inttoote2, jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "bootleg (Coinmaster)",      "International Toote II (v1.24, P387.V01)", 0 )
+GAME( 1998, inttoote,  jockeyc,  inttoote,  inttoote,  jockeyc_state,  init_inttoote,  ROT0,   "bootleg (Coinmaster)",      "International Toote (Germany, P523.V01)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1991, rezon,     0,        rezon,     rezon,     seta_state,     rezon,     ROT0,   "Allumer",                   "Rezon", 0 )
-GAME( 1992, rezont,    rezon,    rezon,     rezont,    seta_state,     rezon,     ROT0,   "Allumer (Taito license)",   "Rezon (Taito)", 0 )
+GAME( 1991, rezon,     0,        rezon,     rezon,     seta_state,     init_rezon,     ROT0,   "Allumer",                   "Rezon", 0 )
+GAME( 1992, rezont,    rezon,    rezon,     rezont,    seta_state,     init_rezon,     ROT0,   "Allumer (Taito license)",   "Rezon (Taito)", 0 )
 
-GAME( 1991, stg,       0,        drgnunit,  stg,       seta_state,     0,         ROT270, "Athena / Tecmo",            "Strike Gunner S.T.G", 0 )
+GAME( 1991, stg,       0,        drgnunit,  stg,       seta_state,     empty_init,     ROT270, "Athena / Tecmo",            "Strike Gunner S.T.G", 0 )
 
-GAME( 1991, pairlove,  0,        pairlove,  pairlove,  seta_state,     pairlove,  ROT270, "Athena",                    "Pairs Love", 0 )
+GAME( 1991, pairlove,  0,        pairlove,  pairlove,  seta_state,     init_pairlove,  ROT270, "Athena",                    "Pairs Love", 0 )
 
-GAME( 1992, blandia,   0,        blandia,   blandia,   seta_state,     blandia,   ROT0,   "Allumer",                   "Blandia", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, blandiap,  blandia,  blandiap,  blandia,   seta_state,     0,         ROT0,   "Allumer",                   "Blandia (prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, blandia,   0,        blandia,   blandia,   seta_state,     init_blandia,   ROT0,   "Allumer",                   "Blandia", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, blandiap,  blandia,  blandiap,  blandia,   seta_state,     empty_init,     ROT0,   "Allumer",                   "Blandia (prototype)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, blockcar,  0,        blockcar,  blockcar,  seta_state,     0,         ROT90,  "Visco",                     "Block Carnival / Thunder & Lightning 2" , 0) // Title: DSW
-GAME( 1992, blockcarb, blockcar, blockcarb, blockcar,  seta_state,     0,         ROT90,  "bootleg",                   "Block Carnival / Thunder & Lightning 2 (bootleg)", MACHINE_IMPERFECT_SOUND)
+GAME( 1992, blockcar,  0,        blockcar,  blockcar,  seta_state,     empty_init,     ROT90,  "Visco",                     "Block Carnival / Thunder & Lightning 2" , 0) // Title: DSW
+GAME( 1992, blockcarb, blockcar, blockcarb, blockcar,  seta_state,     empty_init,     ROT90,  "bootleg",                   "Block Carnival / Thunder & Lightning 2 (bootleg)", MACHINE_IMPERFECT_SOUND)
 
-GAME( 1992, qzkklogy,  0,        drgnunit,  qzkklogy,  seta_state,     0,         ROT0,   "Tecmo",                     "Quiz Kokology", 0 )
+GAME( 1992, qzkklogy,  0,        drgnunit,  qzkklogy,  seta_state,     empty_init,     ROT0,   "Tecmo",                     "Quiz Kokology", 0 )
 
-GAME( 1992, neobattl,  0,        umanclub,  neobattl,  seta_state,     0,         ROT270, "Banpresto / Sotsu Agency. Sunrise", "SD Gundam Neo Battling (Japan)", 0 )
+GAME( 1992, neobattl,  0,        umanclub,  neobattl,  seta_state,     empty_init,     ROT270, "Banpresto / Sotsu Agency. Sunrise", "SD Gundam Neo Battling (Japan)", 0 )
 
-GAME( 1992, umanclub,  0,        umanclub,  umanclub,  seta_state,     0,         ROT0,   "Banpresto / Tsuburaya Productions", "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
+GAME( 1992, umanclub,  0,        umanclub,  umanclub,  seta_state,     empty_init,     ROT0,   "Banpresto / Tsuburaya Productions", "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
 
-GAME( 1992, zingzip,   0,        zingzip,   zingzip,   seta_state,     0,         ROT270, "Allumer / Tecmo",           "Zing Zing Zip", 0 ) // This set has Chinese Characters in Title screen, it distributed for Chinese market/or Title: DSW?
-GAME( 1992, zingzipbl, zingzip,  zingzipbl, zingzip,   seta_state,     0,         ROT270, "bootleg",                   "Zing Zing Zip (bootleg)", MACHINE_NOT_WORKING )
+GAME( 1992, zingzip,   0,        zingzip,   zingzip,   seta_state,     empty_init,     ROT270, "Allumer / Tecmo",           "Zing Zing Zip", 0 ) // This set has Chinese Characters in Title screen, it distributed for Chinese market/or Title: DSW?
+GAME( 1992, zingzipbl, zingzip,  zingzipbl, zingzip,   seta_state,     empty_init,     ROT270, "bootleg",                   "Zing Zing Zip (bootleg)", MACHINE_NOT_WORKING )
 
-GAME( 1993, atehate,   0,        atehate,   atehate,   seta_state,     0,         ROT0,   "Athena",                    "Athena no Hatena ?", 0 )
+GAME( 1993, atehate,   0,        atehate,   atehate,   seta_state,     empty_init,     ROT0,   "Athena",                    "Athena no Hatena ?", 0 )
 
-GAME( 1993, daioh,     0,        daioh,     daioh,     seta_state,     0,         ROT270, "Athena",                    "Daioh", 0 )
-GAME( 1993, daioha,    daioh,    daioh,     daioh,     seta_state,     0,         ROT270, "Athena",                    "Daioh (earlier)", 0 )
-GAME( 1993, daiohp,    daioh,    daiohp,    daiohp,    seta_state,     0,         ROT270, "Athena",                    "Daioh (prototype)", 0 )
-GAME( 1993, daiohc,    daioh,    wrofaero,  daioh,     seta_state,     0,         ROT270, "Athena",                    "Daioh (93111A PCB conversion)", 0 )
+GAME( 1993, daioh,     0,        daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh", 0 )
+GAME( 1993, daioha,    daioh,    daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (earlier)", 0 )
+GAME( 1993, daiohp,    daioh,    daiohp,    daiohp,    seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype)", 0 )
+GAME( 1993, daiohc,    daioh,    wrofaero,  daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (93111A PCB conversion)", 0 )
 
-GAME( 1993, jjsquawk,  0,        jjsquawk,  jjsquawk,  seta_state,     0,         ROT0,   "Athena / Able",             "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, jjsquawko, jjsquawk, jjsquawk,  jjsquawk,  seta_state,     0,         ROT0,   "Athena / Able",             "J. J. Squawkers (older)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     0,         ROT0,   "bootleg",                   "J. J. Squawkers (bootleg)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     0,         ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
-GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     0,         ROT0,   "bootleg",                   "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
+GAME( 1993, jjsquawk,  0,        jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )
+GAME( 1993, jjsquawko, jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers (older)", MACHINE_IMPERFECT_SOUND )
+GAME( 1993, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg)", MACHINE_IMPERFECT_SOUND )
+GAME( 1993, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
+GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     0,         ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race", 0 )
+GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race", 0 )
 
-GAME( 1993, madshark,  0,        madshark,  madshark,  seta_state,     0,         ROT270, "Allumer",                   "Mad Shark", 0 )
+GAME( 1993, madshark,  0,        madshark,  madshark,  seta_state,     empty_init,     ROT270, "Allumer",                   "Mad Shark", 0 )
 
-GAME( 1993, msgundam,  0,        msgundam,  msgundam,  seta_state,     0,         ROT0,   "Banpresto",                 "Mobile Suit Gundam", 0 )
-GAME( 1993, msgundam1, msgundam, msgundam,  msgunda1,  seta_state,     0,         ROT0,   "Banpresto",                 "Mobile Suit Gundam (Japan)", 0 )
+GAME( 1993, msgundam,  0,        msgundam,  msgundam,  seta_state,     empty_init,     ROT0,   "Banpresto",                 "Mobile Suit Gundam", 0 )
+GAME( 1993, msgundam1, msgundam, msgundam,  msgunda1,  seta_state,     empty_init,     ROT0,   "Banpresto",                 "Mobile Suit Gundam (Japan)", 0 )
 
-GAME( 1993, oisipuzl,  0,        oisipuzl,  oisipuzl,  seta_state,     0,         ROT0,   "Sunsoft / Atlus",           "Oishii Puzzle Ha Irimasenka", 0 )
-GAME( 1993, triplfun,  oisipuzl, triplfun,  oisipuzl,  seta_state,     0,         ROT0,   "bootleg",                   "Triple Fun", 0 )
+GAME( 1993, oisipuzl,  0,        oisipuzl,  oisipuzl,  seta_state,     empty_init,     ROT0,   "Sunsoft / Atlus",           "Oishii Puzzle Ha Irimasenka", 0 )
+GAME( 1993, triplfun,  oisipuzl, triplfun,  oisipuzl,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Triple Fun", 0 )
 
-GAME( 1993, qzkklgy2,  0,        qzkklgy2,  qzkklgy2,  seta_state,     0,         ROT0,   "Tecmo",                     "Quiz Kokology 2", 0 )
+GAME( 1993, qzkklgy2,  0,        qzkklgy2,  qzkklgy2,  seta_state,     empty_init,     ROT0,   "Tecmo",                     "Quiz Kokology 2", 0 )
 
-GAME( 1993, utoukond,  0,        utoukond,  utoukond,  seta_state,     0,         ROT0,   "Banpresto / Tsuburaya Productions", "Ultra Toukon Densetsu (Japan)", 0 )
+GAME( 1993, utoukond,  0,        utoukond,  utoukond,  seta_state,     empty_init,     ROT0,   "Banpresto / Tsuburaya Productions", "Ultra Toukon Densetsu (Japan)", 0 )
 
-GAME( 1993, wrofaero,  0,        wrofaero,  wrofaero,  seta_state,     0,         ROT270, "Yang Cheng",                "War of Aero - Project MEIOU", 0 )
+GAME( 1993, wrofaero,  0,        wrofaero,  wrofaero,  seta_state,     empty_init,     ROT270, "Yang Cheng",                "War of Aero - Project MEIOU", 0 )
 
-GAME( 1994, eightfrc,  0,        eightfrc,  eightfrc,  seta_state,     eightfrc,  ROT90,  "Tecmo",                     "Eight Forces", 0 )
+GAME( 1994, eightfrc,  0,        eightfrc,  eightfrc,  seta_state,     init_eightfrc,  ROT90,  "Tecmo",                     "Eight Forces", 0 )
 
-GAME( 1994, kiwame,    0,        kiwame,    kiwame,    seta_state,     kiwame,    ROT0,   "Athena",                    "Pro Mahjong Kiwame", 0 )
+GAME( 1994, kiwame,    0,        kiwame,    kiwame,    seta_state,     init_kiwame,    ROT0,   "Athena",                    "Pro Mahjong Kiwame", 0 )
 
-GAME( 1994, krzybowl,  0,        krzybowl,  krzybowl,  seta_state,     0,         ROT270, "American Sammy",            "Krazy Bowl", 0 )
+GAME( 1994, krzybowl,  0,        krzybowl,  krzybowl,  seta_state,     empty_init,     ROT270, "American Sammy",            "Krazy Bowl", 0 )
 
-GAME( 1994, magspeed,  0,        magspeed,  magspeed,  seta_state,     0,         ROT0,   "Allumer",                   "Magical Speed", 0 )
+GAME( 1994, magspeed,  0,        magspeed,  magspeed,  seta_state,     empty_init,     ROT0,   "Allumer",                   "Magical Speed", 0 )
 
-GAME( 1994, orbs,      0,        orbs,      orbs,      seta_state,     0,         ROT0,   "American Sammy",            "Orbs (10/7/94 prototype?)", 0 )
+GAME( 1994, orbs,      0,        orbs,      orbs,      seta_state,     empty_init,     ROT0,   "American Sammy",            "Orbs (10/7/94 prototype?)", 0 )
 
-GAME( 1995, keroppi,   0,        keroppi,   keroppi,   seta_state,     0,         ROT0,   "American Sammy",            "Kero Kero Keroppi's Let's Play Together (USA, Version 2.0)", 0 ) // ROM labels are all v1.0 tho.
-GAME( 1993, keroppij,  keroppi,  keroppij,  keroppij,  seta_state,     0,         ROT0,   "Sammy Industries",          "Kero Kero Keroppi no Issyoni Asobou (Japan)", 0 )
+GAME( 1995, keroppi,   0,        keroppi,   keroppi,   seta_state,     empty_init,     ROT0,   "American Sammy",            "Kero Kero Keroppi's Let's Play Together (USA, Version 2.0)", 0 ) // ROM labels are all v1.0 tho.
+GAME( 1993, keroppij,  keroppi,  keroppij,  keroppij,  seta_state,     empty_init,     ROT0,   "Sammy Industries",          "Kero Kero Keroppi no Issyoni Asobou (Japan)", 0 )
 
-GAME( 1995, extdwnhl,  0,        extdwnhl,  extdwnhl,  seta_state,     0,         ROT0,   "Sammy Industries Japan",    "Extreme Downhill (v1.5)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, extdwnhl,  0,        extdwnhl,  extdwnhl,  seta_state,     empty_init,     ROT0,   "Sammy Industries Japan",    "Extreme Downhill (v1.5)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1995, gundhara,  0,        gundhara,  gundhara,  seta_state,     0,         ROT270, "Banpresto",                 "Gundhara", 0 )
-GAME( 1995, gundharac, gundhara, gundhara,  gundhara,  seta_state,     0,         ROT270, "Banpresto",                 "Gundhara (Chinese, bootleg?)", 0 )
+GAME( 1995, gundhara,  0,        gundhara,  gundhara,  seta_state,     empty_init,     ROT270, "Banpresto",                 "Gundhara", 0 )
+GAME( 1995, gundharac, gundhara, gundhara,  gundhara,  seta_state,     empty_init,     ROT270, "Banpresto",                 "Gundhara (Chinese, bootleg?)", 0 )
 
-GAME( 1995, sokonuke,  0,        extdwnhl,  sokonuke,  seta_state,     0,         ROT0,   "Sammy Industries",          "Sokonuke Taisen Game (Japan)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, sokonuke,  0,        extdwnhl,  sokonuke,  seta_state,     empty_init,     ROT0,   "Sammy Industries",          "Sokonuke Taisen Game (Japan)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1995, zombraid,  0,        zombraid,  zombraid,  seta_state,     0,         ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
-GAME( 1995, zombraidp, zombraid, zombraid,  zombraid,  seta_state,     0,         ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
-GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  seta_state,     0,         ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
+GAME( 1995, zombraid,  0,        zombraid,  zombraid,  seta_state,     empty_init,     ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
+GAME( 1995, zombraidp, zombraid, zombraid,  zombraid,  seta_state,     empty_init,     ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
+GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  seta_state,     empty_init,     ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
 
-GAME( 1996, crazyfgt,  0,        crazyfgt,  crazyfgt,  seta_state,     crazyfgt,  ROT0,   "Subsino",                   "Crazy Fight", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, crazyfgt,  0,        crazyfgt,  crazyfgt,  seta_state,     init_crazyfgt,  ROT0,   "Subsino",                   "Crazy Fight", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

@@ -219,11 +219,9 @@ MACHINE_CONFIG_START(pp01_state::pp01)
 	MCFG_PALETTE_INIT_OWNER(pp01_state, pp01)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	//MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+	//WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
@@ -277,5 +275,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS        INIT  COMPANY  FULLNAME  FLAGS
-COMP( 198?, pp01,   0,      0,      pp01,       pp01,   pp01_state,  0,    "ZVT",   "PP-01",  MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME  FLAGS
+COMP( 198?, pp01, 0,      0,      pp01,    pp01,  pp01_state, empty_init, "ZVT",   "PP-01",  MACHINE_NOT_WORKING )

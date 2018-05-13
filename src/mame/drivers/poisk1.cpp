@@ -93,7 +93,7 @@ public:
 
 	required_ioport_array<8> m_kbdio;
 
-	DECLARE_DRIVER_INIT(poisk1);
+	void init_poisk1();
 	DECLARE_MACHINE_START(poisk1);
 	DECLARE_MACHINE_RESET(poisk1);
 
@@ -594,7 +594,7 @@ WRITE8_MEMBER(p1_state::p1_ppi_w)
  *
  **********************************************************/
 
-DRIVER_INIT_MEMBER(p1_state, poisk1)
+void p1_state::init_poisk1()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -692,7 +692,7 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","poisk1_flop")
 //  MCFG_SOFTWARE_LIST_ADD("cass_list","poisk1_cass")
 
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "speaker", SPEAKER_SOUND )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
@@ -748,5 +748,5 @@ ROM_END
 
 ***************************************************************************/
 
-//     YEAR     NAME       PARENT      COMPAT  MACHINE   INPUT    STATE     INIT    COMPANY          FULLNAME   FLAGS
-COMP ( 1989,    poisk1,    ibm5150,    0,      poisk1,   poisk1,  p1_state, poisk1, "Electronmash",  "Poisk-1", 0 )
+//    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT   CLASS     INIT         COMPANY         FULLNAME   FLAGS
+COMP( 1989, poisk1, ibm5150, 0,      poisk1,  poisk1, p1_state, init_poisk1, "Electronmash", "Poisk-1", 0 )

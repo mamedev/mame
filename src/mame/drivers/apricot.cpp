@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(apricot_state::apricot)
 	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, apricot_state, apricot_hd6845_de))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ic7", SN76489, XTAL(4'000'000) / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -500,6 +500,6 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS          INIT  COMPANY  FULLNAME      FLAGS
-COMP( 1983, apricot,   0,       0,      apricot,   0,     apricot_state, 0,    "ACT",   "Apricot PC", 0 )
-COMP( 1984, apricotxi, apricot, 0,      apricotxi, 0,     apricot_state, 0,    "ACT",   "Apricot Xi", 0 )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS          INIT        COMPANY  FULLNAME      FLAGS
+COMP( 1983, apricot,   0,       0,      apricot,   0,     apricot_state, empty_init, "ACT",   "Apricot PC", 0 )
+COMP( 1984, apricotxi, apricot, 0,      apricotxi, 0,     apricot_state, empty_init, "ACT",   "Apricot Xi", 0 )

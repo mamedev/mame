@@ -86,7 +86,7 @@ MACHINE_CONFIG_START(blocktax_state::blocktax)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 30_MHz_XTAL/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.00)
@@ -108,4 +108,4 @@ ROM_START( blocktax )
 ROM_END
 
 
-GAME( 2002, blocktax, 0, blocktax, blocktax, blocktax_state, 0, ROT0,  "TAX / Game Revival", "Blockout (TAX)", MACHINE_IS_SKELETON )
+GAME( 2002, blocktax, 0, blocktax, blocktax, blocktax_state, empty_init, ROT0, "TAX / Game Revival", "Blockout (TAX)", MACHINE_IS_SKELETON )

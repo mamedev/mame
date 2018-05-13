@@ -181,5 +181,5 @@ ROM_END
 
 
 
-COMP( 1986, mt420, 0, 0, mt420, microterm, microterm_state, 0, "Micro-Term", "Micro-Term 420", MACHINE_IS_SKELETON )
-COMP( 1988, mt5510, 0, 0, mt5510, microterm, microterm_state, 0, "Micro-Term", "Micro-Term 5510", MACHINE_IS_SKELETON )
+COMP( 1986, mt420,  0, 0, mt420,  microterm, microterm_state, empty_init, "Micro-Term", "Micro-Term 420", MACHINE_IS_SKELETON )
+COMP( 1988, mt5510, 0, 0, mt5510, microterm, microterm_state, empty_init, "Micro-Term", "Micro-Term 5510", MACHINE_IS_SKELETON )

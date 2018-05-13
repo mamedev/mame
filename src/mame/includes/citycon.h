@@ -40,7 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(citycon_videoram_w);
 	DECLARE_WRITE8_MEMBER(citycon_linecolor_w);
 	DECLARE_WRITE8_MEMBER(citycon_background_w);
-	DECLARE_DRIVER_INIT(citycon);
+	void init_citycon();
 	TILEMAP_MAPPER_MEMBER(citycon_scan);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

@@ -256,7 +256,7 @@ MACHINE_CONFIG_START(skeetsht_state::skeetsht)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -302,5 +302,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, skeetsht, 0, skeetsht, skeetsht, skeetsht_state, 0, ROT0, "Dynamo", "Skeet Shot",           MACHINE_NOT_WORKING )
-GAME( 1991, popshot,  0, skeetsht, skeetsht, skeetsht_state, 0, ROT0, "Dynamo", "Pop Shot (prototype)", MACHINE_NOT_WORKING )
+GAME( 1991, skeetsht, 0, skeetsht, skeetsht, skeetsht_state, empty_init, ROT0, "Dynamo", "Skeet Shot",           MACHINE_NOT_WORKING )
+GAME( 1991, popshot,  0, skeetsht, skeetsht, skeetsht_state, empty_init, ROT0, "Dynamo", "Pop Shot (prototype)", MACHINE_NOT_WORKING )

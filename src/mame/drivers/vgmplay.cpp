@@ -1628,7 +1628,8 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_DEVICE_ADD("file", BITBANGER, 0)
 	MCFG_BITBANGER_READONLY(true)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ym2612", YM2612, 7670454)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
@@ -1777,4 +1778,4 @@ ROM_START( vgmplay )
 	ROM_REGION( 0x80000, "ym2608", ROMREGION_ERASE00 )
 ROM_END
 
-CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, 0, "MAME", "VGM player", 0 )
+CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, empty_init, "MAME", "VGM player", 0 )

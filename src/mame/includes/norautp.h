@@ -34,9 +34,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mainlamps_w);
 	DECLARE_WRITE8_MEMBER(soundlamps_w);
 	DECLARE_WRITE8_MEMBER(counterlamps_w);
-	DECLARE_DRIVER_INIT(ssa);
-	DECLARE_DRIVER_INIT(enc);
-	DECLARE_DRIVER_INIT(deb);
+	void init_ssa();
+	void init_enc();
+	void init_deb();
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(norautp);
 	uint32_t screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

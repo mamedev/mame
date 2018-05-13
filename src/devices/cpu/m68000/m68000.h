@@ -236,54 +236,21 @@ protected:
 
 	/* Redirect memory calls */
 
-	typedef delegate<uint8_t (offs_t)> m68k_read8_delegate;
-	typedef delegate<uint16_t (offs_t)> m68k_readimm16_delegate;
-	typedef delegate<uint16_t (offs_t)> m68k_read16_delegate;
-	typedef delegate<uint32_t (offs_t)> m68k_read32_delegate;
-	typedef delegate<void (offs_t, uint8_t)> m68k_write8_delegate;
-	typedef delegate<void (offs_t, uint16_t)> m68k_write16_delegate;
-	typedef delegate<void (offs_t, uint32_t)> m68k_write32_delegate;
+	void init8(address_space &space, address_space &ospace);
+	void init16(address_space &space, address_space &ospace);
+	void init32(address_space &space, address_space &ospace);
+	void init32mmu(address_space &space, address_space &ospace);
+	void init32hmmu(address_space &space, address_space &ospace);
 
-		void init8(address_space &space, address_space &ospace);
-		void init16(address_space &space, address_space &ospace);
-		void init32(address_space &space, address_space &ospace);
-		void init32mmu(address_space &space, address_space &ospace);
-		void init32hmmu(address_space &space, address_space &ospace);
-
-		offs_t  m_opcode_xor;                     // Address Calculation
-		m68k_readimm16_delegate m_readimm16;      // Immediate read 16 bit
-		m68k_read8_delegate m_read8;
-		m68k_read16_delegate m_read16;
-		m68k_read32_delegate m_read32;
-		m68k_write8_delegate m_write8;
-		m68k_write16_delegate m_write16;
-		m68k_write32_delegate m_write32;
-
-		uint16_t m68008_read_immediate_16(offs_t address);
-		uint16_t read_immediate_16(offs_t address);
-		uint16_t simple_read_immediate_16(offs_t address);
-
-		void m68000_write_byte(offs_t address, uint8_t data);
-
-		uint8_t read_byte_32_mmu(offs_t address);
-		void write_byte_32_mmu(offs_t address, uint8_t data);
-		uint16_t read_immediate_16_mmu(offs_t address);
-		uint16_t readword_d32_mmu(offs_t address);
-		void writeword_d32_mmu(offs_t address, uint16_t data);
-		uint32_t readlong_d32_mmu(offs_t address);
-		void writelong_d32_mmu(offs_t address, uint32_t data);
-
-		uint8_t read_byte_32_hmmu(offs_t address);
-		void write_byte_32_hmmu(offs_t address, uint8_t data);
-		uint16_t read_immediate_16_hmmu(offs_t address);
-		uint16_t readword_d32_hmmu(offs_t address);
-		void writeword_d32_hmmu(offs_t address, uint16_t data);
-		uint32_t readlong_d32_hmmu(offs_t address);
-		void writelong_d32_hmmu(offs_t address, uint32_t data);
-
+	std::function<u16 (offs_t)> m_readimm16;      // Immediate read 16 bit
+	std::function<u8  (offs_t)> m_read8;
+	std::function<u16 (offs_t)> m_read16;
+	std::function<u32 (offs_t)> m_read32;
+	std::function<void (offs_t, u8 )> m_write8;
+	std::function<void (offs_t, u16)> m_write16;
+	std::function<void (offs_t, u32)> m_write32;
 
 	address_space *m_space, *m_ospace;
-	direct_read_data<0> *m_direct, *m_odirect;
 
 	uint32_t      m_iotemp;
 

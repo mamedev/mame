@@ -380,7 +380,7 @@ MACHINE_CONFIG_START(videopin_state::videopin)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, videopin_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -465,5 +465,5 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1979, videopin, 0, videopin, videopin, videopin_state, 0, ROT270, "Atari", "Video Pinball", MACHINE_SUPPORTS_SAVE, layout_videopin )
-GAMEL( 1979, solarwar, 0, videopin, solarwar, videopin_state, 0, ROT270, "Atari", "Solar War", MACHINE_SUPPORTS_SAVE, layout_videopin )
+GAMEL( 1979, videopin, 0, videopin, videopin, videopin_state, empty_init, ROT270, "Atari", "Video Pinball", MACHINE_SUPPORTS_SAVE, layout_videopin )
+GAMEL( 1979, solarwar, 0, videopin, solarwar, videopin_state, empty_init, ROT270, "Atari", "Solar War", MACHINE_SUPPORTS_SAVE, layout_videopin )

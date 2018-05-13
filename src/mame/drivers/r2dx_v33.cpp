@@ -112,9 +112,9 @@ public:
 	DECLARE_WRITE16_MEMBER(rdx_v33_eeprom_w);
 	DECLARE_WRITE16_MEMBER(zerotm2k_eeprom_w);
 	DECLARE_WRITE16_MEMBER(r2dx_rom_bank_w);
-	DECLARE_DRIVER_INIT(rdx_v33);
-	DECLARE_DRIVER_INIT(nzerotea);
-	DECLARE_DRIVER_INIT(zerotm2k);
+	void init_rdx_v33();
+	void init_nzerotea();
+	void init_zerotm2k();
 
 	DECLARE_WRITE16_MEMBER(r2dx_tilemapdma_w);
 	DECLARE_WRITE16_MEMBER(r2dx_paldma_w);
@@ -768,7 +768,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, raiden2_state, tile_scroll_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
@@ -806,7 +806,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, raiden2_state, tile_scroll_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'636'363)/8)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
@@ -830,7 +830,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::zerotm2k)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
+void r2dx_v33_state::init_rdx_v33()
 {
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
@@ -852,7 +852,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 
 }
 
-DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
+void r2dx_v33_state::init_nzerotea()
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
@@ -861,7 +861,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
 	zeroteam_decrypt_sprites(machine());
 }
 
-DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
+void r2dx_v33_state::init_zerotm2k()
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
@@ -871,11 +871,10 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 
 	// BG tile rom has 2 lines swapped
 	uint8_t *src = memregion("gfx2")->base()+0x100000;
-	int len = 0x080000;
+	const int len = 0x080000;
 
 	std::vector<uint8_t> buffer(len);
-	int i;
-	for (i = 0; i < len; i ++)
+	for (int i = 0; i < len; i ++)
 		buffer[i] = src[bitswap<32>(i,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,5,6,4,3,2,1,0)];
 	memcpy(src, &buffer[0], len);
 }
@@ -1096,17 +1095,17 @@ ROM_END
 
 // newer PCB, with V33 CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, the rom contains both
 // is there a switching method? for now I've split it into 2 sets with different EEPROM, the game checks that on startup and runs different code depending on what it finds
-GAME( 1996, r2dx_v33,    0,          rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden DX EEPROM)", MACHINE_SUPPORTS_SAVE)
-GAME( 1996, r2dx_v33_r2, r2dx_v33,   rdx_v33,  rdx_v33, r2dx_v33_state,  rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden II EEPROM)", MACHINE_SUPPORTS_SAVE)
+GAME( 1996, r2dx_v33,    0,        rdx_v33,  rdx_v33,  r2dx_v33_state, init_rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden DX EEPROM)", MACHINE_SUPPORTS_SAVE)
+GAME( 1996, r2dx_v33_r2, r2dx_v33, rdx_v33,  rdx_v33,  r2dx_v33_state, init_rdx_v33,   ROT270, "Seibu Kaihatsu", "Raiden II New / Raiden DX (newer V33 PCB) (Raiden II EEPROM)", MACHINE_SUPPORTS_SAVE)
 
 // 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system, DSW for settings
-GAME( 1997, nzeroteam, zeroteam,  nzerotea, nzerotea, r2dx_v33_state, nzerotea,  ROT0,   "Seibu Kaihatsu",                                     "New Zero Team (V33 SYSTEM TYPE_B hardware)", MACHINE_SUPPORTS_SAVE)
-GAME( 1997, nzeroteama,zeroteam,  nzerotea, nzerotea, r2dx_v33_state, nzerotea,  ROT0,   "Seibu Kaihatsu (Haoyunlai Trading Company license)", "New Zero Team (V33 SYSTEM TYPE_B hardware, China?)", MACHINE_SUPPORTS_SAVE) // license text translated from title screen
+GAME( 1997, nzeroteam,   zeroteam, nzerotea, nzerotea, r2dx_v33_state, init_nzerotea,  ROT0,   "Seibu Kaihatsu",                                     "New Zero Team (V33 SYSTEM TYPE_B hardware)", MACHINE_SUPPORTS_SAVE)
+GAME( 1997, nzeroteama,  zeroteam, nzerotea, nzerotea, r2dx_v33_state, init_nzerotea,  ROT0,   "Seibu Kaihatsu (Haoyunlai Trading Company license)", "New Zero Team (V33 SYSTEM TYPE_B hardware, China?)", MACHINE_SUPPORTS_SAVE) // license text translated from title screen
 
 // 'V33 SYSTEM TYPE_C' - uses V33 CPU, basically the same board as TYPE_C VER2
 // there is a version of New Zero Team on "V33 SYSTEM TYPE_C" board with EEPROM rather than dipswitches like Zero Team 2000
 
 // 'V33 SYSTEM TYPE_C VER2' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system, unencrypted sprites, EEPROM for settings.  PCB also seen without 'VER2', looks the same
-GAME( 2000, zerotm2k,  zeroteam,  zerotm2k, zerotm2k, r2dx_v33_state, zerotm2k,  ROT0,   "Seibu Kaihatsu", "Zero Team 2000", MACHINE_SUPPORTS_SAVE)
+GAME( 2000, zerotm2k,    zeroteam, zerotm2k, zerotm2k, r2dx_v33_state, init_zerotm2k,  ROT0,  "Seibu Kaihatsu", "Zero Team 2000", MACHINE_SUPPORTS_SAVE)
 
 // there is also a 'Raiden 2 2000' on unknown hardware.

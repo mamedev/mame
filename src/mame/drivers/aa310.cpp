@@ -113,7 +113,7 @@ public:
 	DECLARE_WRITE32_MEMBER(aa310_psy_wram_w);
 	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(aa310_wd177x_drq_w);
-	DECLARE_DRIVER_INIT(aa310);
+	void init_aa310();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
@@ -168,7 +168,7 @@ WRITE32_MEMBER(aa310_state::aa310_psy_wram_w)
 }
 
 
-DRIVER_INIT_MEMBER(aa310_state, aa310)
+void aa310_state::init_aa310()
 {
 	uint32_t ram_size = m_ram->size();
 
@@ -434,7 +434,7 @@ MACHINE_CONFIG_START(aa310_state::aa310)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "archimedes")
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
 	MCFG_DEVICE_ADD("dac2", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
@@ -742,18 +742,18 @@ ROM_END
 #define rom_aa3020 rom_aa3010
 #define rom_aa4000 rom_aa3010
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT    COMPANY  FULLNAME             FLAGS */
-COMP( 1987, aa305,   aa310,  0,      aa305,   aa310,  aa310_state, aa310,  "Acorn", "Archimedes 305",    MACHINE_NOT_WORKING)
-COMP( 1987, aa310,   0,      0,      aa310,   aa310,  aa310_state, aa310,  "Acorn", "Archimedes 310",    MACHINE_NOT_WORKING)
-COMP( 1987, aa440,   aa310,  0,      aa440,   aa310,  aa310_state, aa310,  "Acorn", "Archimedes 440",    MACHINE_NOT_WORKING)
-COMP( 1989, aa3000,  aa310,  0,      aa3000,  aa310,  aa310_state, aa310,  "Acorn", "BBC A3000",         MACHINE_NOT_WORKING)
-COMP( 1989, aa4101,  aa310,  0,      aa4101,  aa310,  aa310_state, aa310,  "Acorn", "Archimedes 410/1",  MACHINE_NOT_WORKING)
-COMP( 1989, aa4201,  aa310,  0,      aa4201,  aa310,  aa310_state, aa310,  "Acorn", "Archimedes 420/1",  MACHINE_NOT_WORKING)
-COMP( 1989, aa4401,  aa310,  0,      aa4401,  aa310,  aa310_state, aa310,  "Acorn", "Archimedes 440/1",  MACHINE_NOT_WORKING)
-COMP( 1990, aa540,   aa310,  0,      aa540,   aa310,  aa310_state, aa310,  "Acorn", "Archimedes 540",    MACHINE_NOT_WORKING)
-COMP( 1991, aa5000,  0,      0,      aa5000,  aa310,  aa310_state, aa310,  "Acorn", "Acorn A5000",       MACHINE_NOT_WORKING)
-COMP( 1992, aa4,     aa5000, 0,      aa4,     aa310,  aa310_state, aa310,  "Acorn", "Acorn A4",          MACHINE_NOT_WORKING)
-COMP( 1992, aa3010,  aa4000, 0,      aa3010,  aa310,  aa310_state, aa310,  "Acorn", "Acorn A3010",       MACHINE_NOT_WORKING)
-COMP( 1992, aa3020,  aa4000, 0,      aa3020,  aa310,  aa310_state, aa310,  "Acorn", "Acorn A3020",       MACHINE_NOT_WORKING)
-COMP( 1992, aa4000,  0,      0,      aa4000,  aa310,  aa310_state, aa310,  "Acorn", "Acorn A4000",       MACHINE_NOT_WORKING)
-COMP( 1993, aa5000a, aa5000, 0,      aa5000a, aa310,  aa310_state, aa310,  "Acorn", "Acorn A5000 Alpha", MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME             FLAGS */
+COMP( 1987, aa305,   aa310,  0,      aa305,   aa310, aa310_state, init_aa310, "Acorn", "Archimedes 305",    MACHINE_NOT_WORKING)
+COMP( 1987, aa310,   0,      0,      aa310,   aa310, aa310_state, init_aa310, "Acorn", "Archimedes 310",    MACHINE_NOT_WORKING)
+COMP( 1987, aa440,   aa310,  0,      aa440,   aa310, aa310_state, init_aa310, "Acorn", "Archimedes 440",    MACHINE_NOT_WORKING)
+COMP( 1989, aa3000,  aa310,  0,      aa3000,  aa310, aa310_state, init_aa310, "Acorn", "BBC A3000",         MACHINE_NOT_WORKING)
+COMP( 1989, aa4101,  aa310,  0,      aa4101,  aa310, aa310_state, init_aa310, "Acorn", "Archimedes 410/1",  MACHINE_NOT_WORKING)
+COMP( 1989, aa4201,  aa310,  0,      aa4201,  aa310, aa310_state, init_aa310, "Acorn", "Archimedes 420/1",  MACHINE_NOT_WORKING)
+COMP( 1989, aa4401,  aa310,  0,      aa4401,  aa310, aa310_state, init_aa310, "Acorn", "Archimedes 440/1",  MACHINE_NOT_WORKING)
+COMP( 1990, aa540,   aa310,  0,      aa540,   aa310, aa310_state, init_aa310, "Acorn", "Archimedes 540",    MACHINE_NOT_WORKING)
+COMP( 1991, aa5000,  0,      0,      aa5000,  aa310, aa310_state, init_aa310, "Acorn", "Acorn A5000",       MACHINE_NOT_WORKING)
+COMP( 1992, aa4,     aa5000, 0,      aa4,     aa310, aa310_state, init_aa310, "Acorn", "Acorn A4",          MACHINE_NOT_WORKING)
+COMP( 1992, aa3010,  aa4000, 0,      aa3010,  aa310, aa310_state, init_aa310, "Acorn", "Acorn A3010",       MACHINE_NOT_WORKING)
+COMP( 1992, aa3020,  aa4000, 0,      aa3020,  aa310, aa310_state, init_aa310, "Acorn", "Acorn A3020",       MACHINE_NOT_WORKING)
+COMP( 1992, aa4000,  0,      0,      aa4000,  aa310, aa310_state, init_aa310, "Acorn", "Acorn A4000",       MACHINE_NOT_WORKING)
+COMP( 1993, aa5000a, aa5000, 0,      aa5000a, aa310, aa310_state, init_aa310, "Acorn", "Acorn A5000 Alpha", MACHINE_NOT_WORKING)

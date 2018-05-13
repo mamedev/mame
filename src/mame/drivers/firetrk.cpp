@@ -876,7 +876,7 @@ MACHINE_CONFIG_START(firetrk_state::firetrk)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firetrk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, firetrk_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1007,6 +1007,6 @@ ROM_START( montecar )
 ROM_END
 
 
-GAMEL(1977, superbug, 0, superbug, superbug, firetrk_state, 0, ROT270, "Atari (Kee Games)", "Super Bug", 0, layout_superbug )
-GAME( 1978, firetrk,  0, firetrk,  firetrk,  firetrk_state, 0, ROT270, "Atari", "Fire Truck / Smokey Joe", 0 )
-GAME( 1979, montecar, 0, montecar, montecar, firetrk_state, 0, ROT270, "Atari", "Monte Carlo", 0 )
+GAMEL( 1977, superbug, 0, superbug, superbug, firetrk_state, empty_init, ROT270, "Atari (Kee Games)", "Super Bug", 0, layout_superbug )
+GAME(  1978, firetrk,  0, firetrk,  firetrk,  firetrk_state, empty_init, ROT270, "Atari", "Fire Truck / Smokey Joe", 0 )
+GAME(  1979, montecar, 0, montecar, montecar, firetrk_state, empty_init, ROT270, "Atari", "Monte Carlo", 0 )

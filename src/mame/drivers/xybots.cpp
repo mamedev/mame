@@ -208,7 +208,8 @@ MACHINE_CONFIG_START(xybots_state::xybots)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xybots_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_2))
 	MCFG_ATARI_JSA_TEST_PORT("FFE200", 8)
@@ -383,7 +384,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(xybots_state,xybots)
+void xybots_state::init_xybots()
 {
 	m_h256 = 0x0400;
 	slapstic_configure(*m_maincpu, 0x008000, 0, memregion("maincpu")->base() + 0x8000);
@@ -397,8 +398,8 @@ DRIVER_INIT_MEMBER(xybots_state,xybots)
  *
  *************************************/
 
-GAME( 1987, xybots,  0,      xybots, xybots, xybots_state, xybots, ROT0, "Atari Games", "Xybots (rev 2)", 0 )
-GAME( 1987, xybotsg, xybots, xybots, xybots, xybots_state, xybots, ROT0, "Atari Games", "Xybots (German, rev 3)", 0 )
-GAME( 1987, xybotsf, xybots, xybots, xybots, xybots_state, xybots, ROT0, "Atari Games", "Xybots (French, rev 3)", 0 )
-GAME( 1987, xybots1, xybots, xybots, xybots, xybots_state, xybots, ROT0, "Atari Games", "Xybots (rev 1)", 0 )
-GAME( 1987, xybots0, xybots, xybots, xybots, xybots_state, xybots, ROT0, "Atari Games", "Xybots (rev 0)", 0 )
+GAME( 1987, xybots,  0,      xybots, xybots, xybots_state, init_xybots, ROT0, "Atari Games", "Xybots (rev 2)", 0 )
+GAME( 1987, xybotsg, xybots, xybots, xybots, xybots_state, init_xybots, ROT0, "Atari Games", "Xybots (German, rev 3)", 0 )
+GAME( 1987, xybotsf, xybots, xybots, xybots, xybots_state, init_xybots, ROT0, "Atari Games", "Xybots (French, rev 3)", 0 )
+GAME( 1987, xybots1, xybots, xybots, xybots, xybots_state, init_xybots, ROT0, "Atari Games", "Xybots (rev 1)", 0 )
+GAME( 1987, xybots0, xybots, xybots, xybots, xybots_state, init_xybots, ROT0, "Atari Games", "Xybots (rev 0)", 0 )

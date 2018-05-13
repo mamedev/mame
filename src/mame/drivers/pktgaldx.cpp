@@ -385,7 +385,8 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE(8,9,  4,5,6,7    ,1,0,3,2) // hopefully this is correct, nothing else uses this arrangement!
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
@@ -419,7 +420,8 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldb)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bootleg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 32220000/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
@@ -490,12 +492,12 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(pktgaldx_state,pktgaldx)
+void pktgaldx_state::init_pktgaldx()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x42ba, 0x00, 0x00);
 }
 
-GAME( 1992, pktgaldx,  0,        pktgaldx, pktgaldx, pktgaldx_state, pktgaldx,  ROT0, "Data East Corporation", "Pocket Gal Deluxe (Euro v3.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, pktgaldxj, pktgaldx, pktgaldx, pktgaldx, pktgaldx_state, pktgaldx,  ROT0, "Data East Corporation (Nihon System license)", "Pocket Gal Deluxe (Japan v3.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, pktgaldxb, pktgaldx, pktgaldb, pktgaldx, pktgaldx_state, 0,         ROT0, "bootleg",               "Pocket Gal Deluxe (Euro v3.00, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pktgaldx,  0,        pktgaldx, pktgaldx, pktgaldx_state, init_pktgaldx, ROT0, "Data East Corporation", "Pocket Gal Deluxe (Euro v3.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, pktgaldxj, pktgaldx, pktgaldx, pktgaldx, pktgaldx_state, init_pktgaldx, ROT0, "Data East Corporation (Nihon System license)", "Pocket Gal Deluxe (Japan v3.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pktgaldxb, pktgaldx, pktgaldb, pktgaldx, pktgaldx_state, empty_init,    ROT0, "bootleg",               "Pocket Gal Deluxe (Euro v3.00, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

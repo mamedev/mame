@@ -278,4 +278,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, dorachan, 0, dorachan, dorachan, dorachan_state, 0, ROT270, "Alpha Denshi Co. / Craul Denshi", "Dora-chan (Japan)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, dorachan, 0, dorachan, dorachan, dorachan_state, empty_init, ROT270, "Alpha Denshi Co. / Craul Denshi", "Dora-chan (Japan)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

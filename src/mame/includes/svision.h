@@ -58,8 +58,8 @@ public:
 	DECLARE_WRITE8_MEMBER(svision_w);
 	DECLARE_READ8_MEMBER(tvlink_r);
 	DECLARE_WRITE8_MEMBER(tvlink_w);
-	DECLARE_DRIVER_INIT(svisions);
-	DECLARE_DRIVER_INIT(svision);
+	void init_svisions();
+	void init_svision();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(svision);

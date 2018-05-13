@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(k3_state::flagrall)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_HIGH)  /* dividers? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -528,8 +528,8 @@ ROM_START( flagrall )
 ROM_END
 
 
-GAME( 2000, 1945kiii,  0,        k3,       k3,       k3_state, 0, ROT270, "Oriental Soft", "1945k III (newer, OPCX2 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, 1945kiiin, 1945kiii, k3,       k3,       k3_state, 0, ROT270, "Oriental Soft", "1945k III (newer, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, 1945kiiio, 1945kiii, k3,       k3,       k3_state, 0, ROT270, "Oriental Soft", "1945k III (older, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, 1945kiii,  0,        k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (newer, OPCX2 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, 1945kiiin, 1945kiii, k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (newer, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, 1945kiiio, 1945kiii, k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (older, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, flagrall,  0,        flagrall, flagrall, k3_state, 0, ROT0,   "Promat?",       "'96 Flag Rally",               MACHINE_SUPPORTS_SAVE )
+GAME( 1996, flagrall,  0,        flagrall, flagrall, k3_state, empty_init, ROT0,   "Promat?",       "'96 Flag Rally",               MACHINE_SUPPORTS_SAVE )

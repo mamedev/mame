@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(xxmissio_state::xxmissio)
 	MCFG_PALETTE_FORMAT_CLASS(1, xxmissio_state, BBGGRRII)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 12000000/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
@@ -336,4 +336,4 @@ ROM_START( xxmissio )
 	ROM_LOAD16_BYTE( "xx11.4b", 0x0001,  0x8000, CRC(d9dd827c) SHA1(aea3a5abd871adf7f75ad4d6cc57eff0833135c7) )
 ROM_END
 
-GAME( 1986, xxmissio, 0, xxmissio, xxmissio, xxmissio_state, 0, ROT90, "UPL", "XX Mission", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, xxmissio, 0, xxmissio, xxmissio, xxmissio_state, empty_init, ROT90, "UPL", "XX Mission", MACHINE_SUPPORTS_SAVE )

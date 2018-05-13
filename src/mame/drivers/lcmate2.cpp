@@ -254,7 +254,7 @@ MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -271,5 +271,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY  FULLNAME             FLAGS
-COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, 0,    "VTech", "Laser Compumate 2", MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME             FLAGS
+COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, empty_init, "VTech", "Laser Compumate 2", MACHINE_NOT_WORKING )

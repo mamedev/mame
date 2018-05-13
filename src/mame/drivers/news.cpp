@@ -152,7 +152,7 @@ MACHINE_CONFIG_START(news_state::news)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -184,5 +184,5 @@ ROM_START( newsa )
 	ROM_LOAD( "virus.1", 0x00000, 0x40000, CRC(41f5935a) SHA1(1566d243f165019660cd4dd69df9f049e0130f15) )
 ROM_END
 
-GAME( 1993, news,  0,    news, news,  news_state, 0, ROT0, "Poby / Virus", "News (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, newsa, news, news, newsa, news_state, 0, ROT0, "Poby",         "News (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, news,  0,    news, news,  news_state, empty_init, ROT0, "Poby / Virus", "News (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, newsa, news, news, newsa, news_state, empty_init, ROT0, "Poby",         "News (set 2)", MACHINE_SUPPORTS_SAVE )

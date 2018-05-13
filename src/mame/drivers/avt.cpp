@@ -985,7 +985,7 @@ MACHINE_CONFIG_START(avt_state::avt)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, avt_state, avtbingo_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, CPU_CLOCK/2)    /* 1.25 MHz.?? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -1095,8 +1095,8 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE       INIT  ROT   COMPANY                      FULLNAME             FLAGS */
-GAME( 1985, avtsym14, 0,        avt,      symbols,  avt_state,  0,    ROT0, "Advanced Video Technology", "Symbols (ver 1.4)", MACHINE_NOT_WORKING )
-GAME( 1985, avtsym25, avtsym14, avt,      symbols,  avt_state,  0,    ROT0, "Advanced Video Technology", "Symbols (ver 2.5)", MACHINE_NOT_WORKING )
-GAME( 1985, avtbingo, 0,        avt,      avtbingo, avt_state,  0,    ROT0, "Advanced Video Technology", "Arrow Bingo",       MACHINE_NOT_WORKING )
-GAME( 1989, avtnfl,   0,        avtnfl,   symbols,  avt_state,  0,    ROT0, "Advanced Video Technology", "NFL (ver 109)",     MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE       INIT        ROT   COMPANY                      FULLNAME             FLAGS */
+GAME( 1985, avtsym14, 0,        avt,      symbols,  avt_state,  empty_init, ROT0, "Advanced Video Technology", "Symbols (ver 1.4)", MACHINE_NOT_WORKING )
+GAME( 1985, avtsym25, avtsym14, avt,      symbols,  avt_state,  empty_init, ROT0, "Advanced Video Technology", "Symbols (ver 2.5)", MACHINE_NOT_WORKING )
+GAME( 1985, avtbingo, 0,        avt,      avtbingo, avt_state,  empty_init, ROT0, "Advanced Video Technology", "Arrow Bingo",       MACHINE_NOT_WORKING )
+GAME( 1989, avtnfl,   0,        avtnfl,   symbols,  avt_state,  empty_init, ROT0, "Advanced Video Technology", "NFL (ver 109)",     MACHINE_NOT_WORKING )

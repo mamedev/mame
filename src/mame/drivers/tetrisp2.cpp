@@ -1648,25 +1648,25 @@ void tetrisp2_state::init_rockn_timer()
 	save_item(NAME(m_rocknms_sub2main));
 }
 
-DRIVER_INIT_MEMBER(tetrisp2_state,rockn)
+void tetrisp2_state::init_rockn()
 {
 	init_rockn_timer();
 	m_rockn_protectdata = 1;
 }
 
-DRIVER_INIT_MEMBER(tetrisp2_state,rockn1)
+void tetrisp2_state::init_rockn1()
 {
 	init_rockn_timer();
 	m_rockn_protectdata = 1;
 }
 
-DRIVER_INIT_MEMBER(tetrisp2_state,rockn2)
+void tetrisp2_state::init_rockn2()
 {
 	init_rockn_timer();
 	m_rockn_protectdata = 2;
 }
 
-DRIVER_INIT_MEMBER(tetrisp2_state,rocknms)
+void tetrisp2_state::init_rocknms()
 {
 	init_rockn_timer();
 
@@ -1679,13 +1679,13 @@ DRIVER_INIT_MEMBER(tetrisp2_state,rocknms)
 
 }
 
-DRIVER_INIT_MEMBER(tetrisp2_state,rockn3)
+void tetrisp2_state::init_rockn3()
 {
 	init_rockn_timer();
 	m_rockn_protectdata = 4;
 }
 
-DRIVER_INIT_MEMBER(stepstag_state,stepstag)
+void stepstag_state::init_stepstag()
 {
 	init_rockn_timer();        // used
 	m_rockn_protectdata = 1;    // unused?
@@ -1719,7 +1719,8 @@ MACHINE_CONFIG_START(tetrisp2_state::tetrisp2)
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,tetrisp2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1753,7 +1754,7 @@ MACHINE_CONFIG_START(tetrisp2_state::nndmseal)
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,nndmseal)  // bg layer offset
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(2'000'000), okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1786,7 +1787,8 @@ MACHINE_CONFIG_START(tetrisp2_state::rockn)
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1820,7 +1822,8 @@ MACHINE_CONFIG_START(tetrisp2_state::rockn2)
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1870,7 +1873,8 @@ MACHINE_CONFIG_START(tetrisp2_state::rocknms)
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rocknms)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1933,7 +1937,8 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	MCFG_DEFAULT_LAYOUT(layout_stepstag)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
@@ -2005,7 +2010,8 @@ MACHINE_CONFIG_START(stepstag_state::vjdash)    // 4 Screens
 	MCFG_DEFAULT_LAYOUT(layout_vjdash)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
@@ -2807,24 +2813,24 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,     STATE,          INIT,     MONITOR, COMPANY,                       FULLNAME,                               FLAGS
-GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  tetrisp2_state, 0,        ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, 0,        ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, 0,        ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",          MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, nndmseal,  0,        nndmseal, nndmseal,  tetrisp2_state, rockn,    ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1997, nndmseala, nndmseal, nndmseal, nndmseal,  tetrisp2_state, rockn,    ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver.)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseal,  0,        nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseala, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver.)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-GAME( 1999, rockn,     0,        rockn,    rockn,     tetrisp2_state, rockn,    ROT270, "Jaleco",         "Rock'n Tread (Japan)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rockna,    rockn,    rockn,    rockn,     tetrisp2_state, rockn1,   ROT270, "Jaleco",         "Rock'n Tread (Japan, alternate)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rockn2,    0,        rockn2,   rockn,     tetrisp2_state, rockn2,   ROT270, "Jaleco",         "Rock'n Tread 2 (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rocknms,   0,        rocknms,  rocknms,   tetrisp2_state, rocknms,  ROT0,   "Jaleco",         "Rock'n MegaSession (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, rockn3,    0,        rockn2,   rockn,     tetrisp2_state, rockn3,   ROT270, "Jaleco",         "Rock'n 3 (Japan)",                MACHINE_SUPPORTS_SAVE )
-GAME( 2000, rockn4,    0,        rockn2,   rockn,     tetrisp2_state, rockn3,   ROT270, "Jaleco / PCCWJ", "Rock'n 4 (Japan, prototype)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockn,     0,        rockn,    rockn,     tetrisp2_state, init_rockn,   ROT270, "Jaleco",         "Rock'n Tread (Japan)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockna,    rockn,    rockn,    rockn,     tetrisp2_state, init_rockn1,  ROT270, "Jaleco",         "Rock'n Tread (Japan, alternate)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockn2,    0,        rockn2,   rockn,     tetrisp2_state, init_rockn2,  ROT270, "Jaleco",         "Rock'n Tread 2 (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rocknms,   0,        rocknms,  rocknms,   tetrisp2_state, init_rocknms, ROT0,   "Jaleco",         "Rock'n MegaSession (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, rockn3,    0,        rockn2,   rockn,     tetrisp2_state, init_rockn3,  ROT270, "Jaleco",         "Rock'n 3 (Japan)",                MACHINE_SUPPORTS_SAVE )
+GAME( 2000, rockn4,    0,        rockn2,   rockn,     tetrisp2_state, init_rockn3,  ROT270, "Jaleco / PCCWJ", "Rock'n 4 (Japan, prototype)",     MACHINE_SUPPORTS_SAVE )
 
 // Undumped:
 // - Stepping Stage <- the original Game
 // - Stepping Stage 2 Supreme
 // Dumped (partly):
-GAME( 1999, vjdash,    0,        vjdash,   vjdash,    stepstag_state, stepstag, ROT0,   "Jaleco",         "VJ Visual & Music Slap",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-GAME( 1999, stepstag,  0,        stepstag, stepstag,  stepstag_state, stepstag, ROT0,   "Jaleco",         "Stepping Stage Special",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-GAME( 1999, step3,     0,        stepstag, stepstag,  stepstag_state, stepstag, ROT0,   "Jaleco",         "Stepping 3 Superior",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME( 1999, vjdash,    0,        vjdash,   vjdash,    stepstag_state, init_stepstag, ROT0,   "Jaleco",         "VJ Visual & Music Slap",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME( 1999, stepstag,  0,        stepstag, stepstag,  stepstag_state, init_stepstag, ROT0,   "Jaleco",         "Stepping Stage Special",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME( 1999, step3,     0,        stepstag, stepstag,  stepstag_state, init_stepstag, ROT0,   "Jaleco",         "Stepping 3 Superior",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

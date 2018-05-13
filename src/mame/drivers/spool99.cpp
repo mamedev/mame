@@ -131,7 +131,7 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_clockline_w);
 	DECLARE_WRITE8_MEMBER(eeprom_dataline_w);
 
-	DECLARE_DRIVER_INIT(spool99);
+	void init_spool99();
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -383,7 +383,8 @@ MACHINE_CONFIG_START(spool99_state::spool99)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
@@ -461,7 +462,7 @@ ROM_START( vcarn )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(spool99_state,spool99)
+void spool99_state::init_spool99()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 //  vram = std::make_unique<uint8_t[]>(0x2000);
@@ -470,8 +471,8 @@ DRIVER_INIT_MEMBER(spool99_state,spool99)
 
 
 
-GAME( 1998, spool99,    0,        spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.36)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, spool99a,   spool99,  spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.33)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, spool99b,   spool99,  spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.31)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, spool99c,   spool99,  spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.26)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, vcarn,      0,        vcarn,      spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Video Carnival 1999 / Super Royal Card (Version 0.11)", MACHINE_SUPPORTS_SAVE ) //MAME screen says '98, PCB screen says '99?
+GAME( 1998, spool99,    0,        spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.36)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, spool99a,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.33)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, spool99b,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.31)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, spool99c,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.26)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, vcarn,      0,        vcarn,      spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Video Carnival 1999 / Super Royal Card (Version 0.11)", MACHINE_SUPPORTS_SAVE ) //MAME screen says '98, PCB screen says '99?

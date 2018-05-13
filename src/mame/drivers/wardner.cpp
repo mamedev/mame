@@ -150,7 +150,7 @@ public:
 	required_device<address_map_bank_device> m_membank;
 
 	DECLARE_WRITE8_MEMBER(wardner_bank_w);
-	DECLARE_DRIVER_INIT(wardner);
+	void init_wardner();
 
 	void wardner(machine_config &config);
 	void DSP_io_map(address_map &map);
@@ -439,7 +439,7 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	MCFG_VIDEO_START_OVERRIDE(wardner_state,toaplan0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'000'000)/4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -608,6 +608,6 @@ ROM_START( wardnerj )
 ROM_END
 
 
-GAME( 1987, wardner,  0,       wardner, wardner,  wardner_state, 0, ROT0, "Toaplan / Taito Corporation Japan",   "Wardner (World)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pyros,    wardner, wardner, pyros,    wardner_state, 0, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wardnerj, wardner, wardner, wardnerj, wardner_state, 0, ROT0, "Toaplan / Taito Corporation",         "Wardner no Mori (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardner,  0,       wardner, wardner,  wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation Japan",   "Wardner (World)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pyros,    wardner, wardner, pyros,    wardner_state, empty_init, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerj, wardner, wardner, wardnerj, wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation",         "Wardner no Mori (Japan)", MACHINE_SUPPORTS_SAVE )

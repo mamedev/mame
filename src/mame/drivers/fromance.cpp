@@ -934,7 +934,7 @@ MACHINE_CONFIG_START(fromance_state::nekkyoku)
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,nekkyoku)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/6) // type not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
@@ -980,7 +980,7 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(12'000'000) / 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
@@ -1026,7 +1026,7 @@ MACHINE_CONFIG_START(fromance_state::fromance)
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
@@ -1257,11 +1257,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, fromance_state, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, idolmj,    0,       idolmj,   idolmj,   fromance_state, 0, ROT0, "System Service",   "Idol-Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjnatsu,   0,       fromance, mjnatsu,  fromance_state, 0, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, natsuiro,  mjnatsu, fromance, mjnatsu,  fromance_state, 0, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mfunclub,  0,       fromance, mjnatsu,  fromance_state, 0, ROT0, "Video System Co.", "Mahjong Fun Club - Idol Saizensen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, daiyogen,  0,       fromance, daiyogen, fromance_state, 0, ROT0, "Video System Co.", "Mahjong Daiyogen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, nmsengen,  0,       fromance, nmsengen, fromance_state, 0, ROT0, "Video System Co.", "Nekketsu Mahjong Sengen! AFTER 5 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, fromance,  0,       fromance, fromance, fromance_state, 0, ROT0, "Video System Co.", "Idol-Mahjong Final Romance (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nekkyoku, 0,       nekkyoku, nekkyoku, fromance_state, empty_init, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, idolmj,   0,       idolmj,   idolmj,   fromance_state, empty_init, ROT0, "System Service",   "Idol-Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjnatsu,  0,       fromance, mjnatsu,  fromance_state, empty_init, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, natsuiro, mjnatsu, fromance, mjnatsu,  fromance_state, empty_init, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mfunclub, 0,       fromance, mjnatsu,  fromance_state, empty_init, ROT0, "Video System Co.", "Mahjong Fun Club - Idol Saizensen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, daiyogen, 0,       fromance, daiyogen, fromance_state, empty_init, ROT0, "Video System Co.", "Mahjong Daiyogen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, nmsengen, 0,       fromance, nmsengen, fromance_state, empty_init, ROT0, "Video System Co.", "Nekketsu Mahjong Sengen! AFTER 5 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, fromance, 0,       fromance, fromance, fromance_state, empty_init, ROT0, "Video System Co.", "Idol-Mahjong Final Romance (Japan)", MACHINE_SUPPORTS_SAVE )

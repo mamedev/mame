@@ -194,7 +194,7 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym1", YM2203, 3000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
@@ -268,6 +268,6 @@ ROM_START( labyrunrk )
 ROM_END
 
 
-GAME( 1987, tricktrp, 0,        labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Trick Trap (World?)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1987, labyrunr, tricktrp, labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Labyrinth Runner (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, labyrunrk,tricktrp, labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tricktrp,  0,        labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Trick Trap (World?)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, labyrunr,  tricktrp, labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Labyrinth Runner (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, labyrunrk, tricktrp, labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", MACHINE_SUPPORTS_SAVE )

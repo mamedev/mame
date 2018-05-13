@@ -147,7 +147,7 @@ MACHINE_CONFIG_START(gomoku_state::gomoku)
 	MCFG_PALETTE_INIT_OWNER(gomoku_state, gomoku)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("gomoku", GOMOKU_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -186,5 +186,5 @@ ROM_START( gomoku )
 ROM_END
 
 
-//    YEAR,   NAME,   PARENT,  MACHINE,  INPUT,  STATE         INIT,   MONITOR, COMPANY,      FULLNAME,              FLAGS
-GAME( 1981,   gomoku, 0,       gomoku,   gomoku, gomoku_state, 0,      ROT90,   "Nichibutsu", "Gomoku Narabe Renju", 0 )
+//    YEAR,   NAME,   PARENT,  MACHINE,  INPUT,  STATE         INIT,       MONITOR, COMPANY,      FULLNAME,              FLAGS
+GAME( 1981,   gomoku, 0,       gomoku,   gomoku, gomoku_state, empty_init, ROT90,   "Nichibutsu", "Gomoku Narabe Renju", 0 )

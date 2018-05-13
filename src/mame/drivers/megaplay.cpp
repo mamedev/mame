@@ -83,7 +83,7 @@ public:
 	DECLARE_WRITE8_MEMBER(game_w);
 	DECLARE_READ8_MEMBER(vdp1_count_r);
 
-	DECLARE_DRIVER_INIT(megaplay);
+	void init_megaplay();
 	DECLARE_VIDEO_START(megplay);
 	DECLARE_MACHINE_RESET(megaplay);
 	uint32_t screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -909,7 +909,7 @@ WRITE16_MEMBER(mplay_state::extra_ram_w )
 }
 
 
-DRIVER_INIT_MEMBER(mplay_state,megaplay)
+void mplay_state::init_megaplay()
 {
 	// copy game instruction rom to main map. maybe this should just be accessed
 	// through a handler instead?
@@ -928,7 +928,7 @@ DRIVER_INIT_MEMBER(mplay_state,megaplay)
 	m_ic36_ram = std::make_unique<uint16_t[]>(0x10000 / 2);
 	m_ic37_ram = std::make_unique<uint8_t[]>(0x10000);
 
-	DRIVER_INIT_CALL(megadrij);
+	init_megadrij();
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
 
@@ -972,21 +972,21 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 ** Probably reused cart case
 */
 
-/* -- */ GAME( 1993, megaplay, 0,        megaplay, megaplay, mplay_state, megaplay, ROT0, "Sega",                  "Mega Play BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
-/* 01 */ GAME( 1993, mp_sonic, megaplay, megaplay, mp_sonic, mplay_state, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog (Mega Play)", MACHINE_NOT_WORKING )
-/* 02 */ GAME( 1993, mp_gaxe2, megaplay, megaplay, mp_gaxe2, mplay_state, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play) (Rev B)", MACHINE_NOT_WORKING )
-/* 02 */ GAME( 1993, mp_gaxe2a,mp_gaxe2, megaplay, mp_gaxe2, mplay_state, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)", MACHINE_NOT_WORKING )
-/* 03 */ GAME( 1993, mp_gslam, megaplay, megaplay, mp_gslam, mplay_state, megaplay, ROT0, "Sega",                  "Grand Slam (Mega Play)", MACHINE_NOT_WORKING )
-/* 04 */ GAME( 1993, mp_twcup, megaplay, megaplay, mp_twc,   mplay_state, megaplay, ROT0, "Sega",                  "Tecmo World Cup (Mega Play)", MACHINE_NOT_WORKING )
-/* 05 */ GAME( 1993, mp_sor2,  megaplay, megaplay, mp_sor2,  mplay_state, megaplay, ROT0, "Sega",                  "Streets of Rage II (Mega Play)", MACHINE_NOT_WORKING )
-/* 06 */ GAME( 1993, mp_bio,   megaplay, megaplay, mp_bio,   mplay_state, megaplay, ROT0, "Sega",                  "Bio-hazard Battle (Mega Play)", MACHINE_NOT_WORKING )
-/* 07 */ GAME( 1993, mp_soni2, megaplay, megaplay, mp_soni2, mplay_state, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega Play)", MACHINE_NOT_WORKING )
+/* -- */ GAME( 1993, megaplay, 0,        megaplay, megaplay, mplay_state, init_megaplay, ROT0, "Sega",                  "Mega Play BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+/* 01 */ GAME( 1993, mp_sonic, megaplay, megaplay, mp_sonic, mplay_state, init_megaplay, ROT0, "Sega",                  "Sonic The Hedgehog (Mega Play)", MACHINE_NOT_WORKING )
+/* 02 */ GAME( 1993, mp_gaxe2, megaplay, megaplay, mp_gaxe2, mplay_state, init_megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play) (Rev B)", MACHINE_NOT_WORKING )
+/* 02 */ GAME( 1993, mp_gaxe2a,mp_gaxe2, megaplay, mp_gaxe2, mplay_state, init_megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)", MACHINE_NOT_WORKING )
+/* 03 */ GAME( 1993, mp_gslam, megaplay, megaplay, mp_gslam, mplay_state, init_megaplay, ROT0, "Sega",                  "Grand Slam (Mega Play)", MACHINE_NOT_WORKING )
+/* 04 */ GAME( 1993, mp_twcup, megaplay, megaplay, mp_twc,   mplay_state, init_megaplay, ROT0, "Sega",                  "Tecmo World Cup (Mega Play)", MACHINE_NOT_WORKING )
+/* 05 */ GAME( 1993, mp_sor2,  megaplay, megaplay, mp_sor2,  mplay_state, init_megaplay, ROT0, "Sega",                  "Streets of Rage II (Mega Play)", MACHINE_NOT_WORKING )
+/* 06 */ GAME( 1993, mp_bio,   megaplay, megaplay, mp_bio,   mplay_state, init_megaplay, ROT0, "Sega",                  "Bio-hazard Battle (Mega Play)", MACHINE_NOT_WORKING )
+/* 07 */ GAME( 1993, mp_soni2, megaplay, megaplay, mp_soni2, mplay_state, init_megaplay, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega Play)", MACHINE_NOT_WORKING )
 /* 08 - Columns 3? see below */
-/* 09 */ GAME( 1993, mp_shnb3, megaplay, megaplay, mp_shnb3, mplay_state, megaplay, ROT0, "Sega",                  "Shinobi III (Mega Play)", MACHINE_NOT_WORKING )
-/* 10 */ GAME( 1993, mp_gunhe, megaplay, megaplay, mp_gunhe, mplay_state, megaplay, ROT0, "Sega",                  "Gunstar Heroes (Mega Play)", MACHINE_NOT_WORKING )
-/* 11 */ GAME( 1993, mp_mazin, megaplay, megaplay, mp_mazin, mplay_state, megaplay, ROT0, "Sega",                  "Mazin Wars / Mazin Saga (Mega Play)", MACHINE_NOT_WORKING )
+/* 09 */ GAME( 1993, mp_shnb3, megaplay, megaplay, mp_shnb3, mplay_state, init_megaplay, ROT0, "Sega",                  "Shinobi III (Mega Play)", MACHINE_NOT_WORKING )
+/* 10 */ GAME( 1993, mp_gunhe, megaplay, megaplay, mp_gunhe, mplay_state, init_megaplay, ROT0, "Sega",                  "Gunstar Heroes (Mega Play)", MACHINE_NOT_WORKING )
+/* 11 */ GAME( 1993, mp_mazin, megaplay, megaplay, mp_mazin, mplay_state, init_megaplay, ROT0, "Sega",                  "Mazin Wars / Mazin Saga (Mega Play)", MACHINE_NOT_WORKING )
 
-/* ?? */ GAME( 1993, mp_col3,  megaplay, megaplay, megaplay, mplay_state, megaplay, ROT0, "Sega",                  "Columns III (Mega Play)", MACHINE_NOT_WORKING )
+/* ?? */ GAME( 1993, mp_col3,  megaplay, megaplay, megaplay, mplay_state, init_megaplay, ROT0, "Sega",                  "Columns III (Mega Play)", MACHINE_NOT_WORKING )
 
 
 /* Not confirmed to exist:

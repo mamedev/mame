@@ -512,7 +512,7 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) /* 720kHz? needs verify */
@@ -633,5 +633,5 @@ ROM_START(aussieby)
 	ROM_REGION(0x00800, "aram", ROMREGION_ERASEFF) // attribute ram, 2k static
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT        CLASS             INIT        COMPANY         FULLNAME           FLAGS
-COMP( 1984, aussieby,     0,        0,  aussiebyte, aussiebyte,  aussiebyte_state, 0,          "SME Systems",  "Aussie Byte II" , MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY        FULLNAME          FLAGS
+COMP( 1984, aussieby, 0,      0,      aussiebyte, aussiebyte, aussiebyte_state, empty_init, "SME Systems", "Aussie Byte II", MACHINE_IMPERFECT_GRAPHICS )

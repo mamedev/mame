@@ -63,7 +63,8 @@ MACHINE_CONFIG_START(segam1audio_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(M68000_TAG, M68000, 10000000)  // verified on real h/w
 	MCFG_DEVICE_PROGRAM_MAP(segam1audio_map)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD(YM3438_TAG, YM3438, 8000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)

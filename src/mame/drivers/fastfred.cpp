@@ -671,7 +671,7 @@ MACHINE_CONFIG_START(fastfred_state::fastfred)
 	MCFG_VIDEO_START_OVERRIDE(fastfred_state,fastfred)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1014,40 +1014,40 @@ ROM_START( imagoa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(fastfred_state,flyboy)
+void fastfred_state::init_flyboy()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc085, 0xc099, read8_delegate(FUNC(fastfred_state::flyboy_custom1_io_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc8fb, 0xc900, read8_delegate(FUNC(fastfred_state::flyboy_custom2_io_r),this));
 	m_hardware_type = 1;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,flyboyb)
+void fastfred_state::init_flyboyb()
 {
 	m_hardware_type = 1;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,fastfred)
+void fastfred_state::init_fastfred()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::fastfred_custom_io_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 1;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,jumpcoas)
+void fastfred_state::init_jumpcoas()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 0;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,boggy84b)
+void fastfred_state::init_boggy84b()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 2;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,boggy84)
+void fastfred_state::init_boggy84()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::boggy84_custom_io_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
@@ -1055,18 +1055,18 @@ DRIVER_INIT_MEMBER(fastfred_state,boggy84)
 }
 
 
-DRIVER_INIT_MEMBER(fastfred_state,imago)
+void fastfred_state::init_imago()
 {
 	m_hardware_type = 3;
 }
 
-GAME( 1982, flyboy,   0,        fastfred, flyboy,   fastfred_state, flyboy,   ROT90, "Kaneko", "Fly-Boy", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, flyboyb,  flyboy,   fastfred, flyboy,   fastfred_state, flyboyb,  ROT90, "bootleg", "Fly-Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, fastfred, flyboy,   fastfred, fastfred, fastfred_state, fastfred, ROT90, "Kaneko (Atari license)", "Fast Freddie", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jumpcoas, 0,        jumpcoas, jumpcoas, fastfred_state, jumpcoas, ROT90, "Kaneko", "Jump Coaster", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jumpcoast,jumpcoas, jumpcoas, jumpcoas, fastfred_state, jumpcoas, ROT90, "Kaneko (Taito license)", "Jump Coaster (Taito)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, boggy84,  0,        jumpcoas, boggy84,  fastfred_state, boggy84,  ROT90, "Kaneko", "Boggy '84", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, boggy84b, boggy84,  jumpcoas, boggy84,  fastfred_state, boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, redrobin, 0,        fastfred, redrobin, fastfred_state, flyboyb,  ROT90, "Elettronolo", "Red Robin", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, imago,    0,        imago,    imago,    fastfred_state, imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
-GAME( 1983, imagoa,   imago,    imago,    imagoa,   fastfred_state, imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )
+GAME( 1982, flyboy,    0,        fastfred, flyboy,   fastfred_state, init_flyboy,   ROT90, "Kaneko", "Fly-Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, flyboyb,   flyboy,   fastfred, flyboy,   fastfred_state, init_flyboyb,  ROT90, "bootleg", "Fly-Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, fastfred,  flyboy,   fastfred, fastfred, fastfred_state, init_fastfred, ROT90, "Kaneko (Atari license)", "Fast Freddie", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jumpcoas,  0,        jumpcoas, jumpcoas, fastfred_state, init_jumpcoas, ROT90, "Kaneko", "Jump Coaster", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jumpcoast, jumpcoas, jumpcoas, jumpcoas, fastfred_state, init_jumpcoas, ROT90, "Kaneko (Taito license)", "Jump Coaster (Taito)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boggy84,   0,        jumpcoas, boggy84,  fastfred_state, init_boggy84,  ROT90, "Kaneko", "Boggy '84", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boggy84b,  boggy84,  jumpcoas, boggy84,  fastfred_state, init_boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, redrobin,  0,        fastfred, redrobin, fastfred_state, init_flyboyb,  ROT90, "Elettronolo", "Red Robin", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, imago,     0,        imago,    imago,    fastfred_state, init_imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
+GAME( 1983, imagoa,    imago,    imago,    imagoa,   fastfred_state, init_imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )

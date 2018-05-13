@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(skullxbo_state::skullxbo)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, skullxbo_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_4))
 	MCFG_ATARI_JSA_TEST_PORT("FF5802", 7)
@@ -595,7 +595,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(skullxbo_state,skullxbo)
+void skullxbo_state::init_skullxbo()
 {
 	memset(memregion("gfx1")->base() + 0x170000, 0, 0x20000);
 }
@@ -608,8 +608,8 @@ DRIVER_INIT_MEMBER(skullxbo_state,skullxbo)
  *
  *************************************/
 
-GAME( 1989, skullxbo,  0,        skullxbo, skullxbo, skullxbo_state, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 5)", 0 )
-GAME( 1989, skullxbo4, skullxbo, skullxbo, skullxbo, skullxbo_state, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 4)", 0 )
-GAME( 1989, skullxbo3, skullxbo, skullxbo, skullxbo, skullxbo_state, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 3)", 0 )
-GAME( 1989, skullxbo2, skullxbo, skullxbo, skullxbo, skullxbo_state, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 2)", 0 )
-GAME( 1989, skullxbo1, skullxbo, skullxbo, skullxbo, skullxbo_state, skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 1)", 0 )
+GAME( 1989, skullxbo,  0,        skullxbo, skullxbo, skullxbo_state, init_skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 5)", 0 )
+GAME( 1989, skullxbo4, skullxbo, skullxbo, skullxbo, skullxbo_state, init_skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 4)", 0 )
+GAME( 1989, skullxbo3, skullxbo, skullxbo, skullxbo, skullxbo_state, init_skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 3)", 0 )
+GAME( 1989, skullxbo2, skullxbo, skullxbo, skullxbo, skullxbo_state, init_skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 2)", 0 )
+GAME( 1989, skullxbo1, skullxbo, skullxbo, skullxbo, skullxbo_state, init_skullxbo, ROT0, "Atari Games", "Skull & Crossbones (rev 1)", 0 )

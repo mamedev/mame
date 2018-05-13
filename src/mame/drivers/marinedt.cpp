@@ -646,7 +646,7 @@ MACHINE_CONFIG_START(marinedt_state::marinedt)
 	MCFG_PALETTE_INIT_OWNER(marinedt_state, marinedt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 //  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -686,4 +686,4 @@ ROM_START( marinedt )
 	ROM_LOAD( "mg17.bpr", 0x0060, 0x0020, CRC(13261a02) SHA1(050edd18e4f79d19d5206f55f329340432fd4099) ) // sea bitmap colors
 ROM_END
 
-GAME( 1981, marinedt,  0,   marinedt,  marinedt, marinedt_state,  0,       ROT270, "Taito",      "Marine Date", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )
+GAME( 1981, marinedt, 0, marinedt, marinedt, marinedt_state, empty_init, ROT270, "Taito", "Marine Date", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )

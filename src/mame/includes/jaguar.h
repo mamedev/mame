@@ -220,21 +220,21 @@ public:
 	DECLARE_WRITE16_MEMBER(butch_regs_w16);
 	DECLARE_READ32_MEMBER(butch_regs_r);
 	DECLARE_WRITE32_MEMBER(butch_regs_w);
-	DECLARE_DRIVER_INIT(jaguar);
-	DECLARE_DRIVER_INIT(jaguarcd);
-	DECLARE_DRIVER_INIT(area51mx);
-	DECLARE_DRIVER_INIT(maxforce);
-	DECLARE_DRIVER_INIT(freezeat);
-	DECLARE_DRIVER_INIT(fishfren);
-	DECLARE_DRIVER_INIT(a51mxr3k);
-	DECLARE_DRIVER_INIT(area51);
-	DECLARE_DRIVER_INIT(freezeat4);
-	DECLARE_DRIVER_INIT(freezeat5);
-	DECLARE_DRIVER_INIT(freezeat6);
-	DECLARE_DRIVER_INIT(vcircle);
-	DECLARE_DRIVER_INIT(freezeat3);
-	DECLARE_DRIVER_INIT(freezeat2);
-	DECLARE_DRIVER_INIT(area51a);
+	void init_jaguar();
+	void init_jaguarcd();
+	void init_area51mx();
+	void init_maxforce();
+	void init_freezeat();
+	void init_fishfren();
+	void init_a51mxr3k();
+	void init_area51();
+	void init_freezeat4();
+	void init_freezeat5();
+	void init_freezeat6();
+	void init_vcircle();
+	void init_freezeat3();
+	void init_freezeat2();
+	void init_area51a();
 
 	// from audio/jaguar.c
 	DECLARE_READ16_MEMBER( jerry_regs_r );

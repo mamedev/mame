@@ -264,7 +264,8 @@ MACHINE_CONFIG_START(cybstorm_state::cybstorm)
 	round2(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ATARI_JSA_IIIS_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("9F0010", 22)
@@ -345,9 +346,8 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cybstorm_state, cybstorm)
+void cybstorm_state::init_cybstorm()
 {
-
 }
 
 
@@ -358,4 +358,4 @@ DRIVER_INIT_MEMBER(cybstorm_state, cybstorm)
  *
  *************************************/
 
-GAME( 1993, cybstorm, 0, cybstorm, cybstorm, cybstorm_state, cybstorm, ROT0, "Atari Games", "Cyberstorm (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cybstorm, 0, cybstorm, cybstorm, cybstorm_state, init_cybstorm, ROT0, "Atari Games", "Cyberstorm (prototype)", MACHINE_SUPPORTS_SAVE )

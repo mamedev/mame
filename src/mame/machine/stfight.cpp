@@ -37,7 +37,7 @@ Encryption PAL 16R4 on CPU board
 */
 
 
-DRIVER_INIT_MEMBER(stfight_state, empcity)
+void stfight_state::init_empcity()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -64,12 +64,12 @@ DRIVER_INIT_MEMBER(stfight_state, empcity)
 
 }
 
-DRIVER_INIT_MEMBER(stfight_state, stfight)
+void stfight_state::init_stfight()
 {
-	DRIVER_INIT_CALL(empcity);
+	init_empcity();
 }
 
-DRIVER_INIT_MEMBER(stfight_state, cshooter)
+void stfight_state::init_cshooter()
 {
 }
 

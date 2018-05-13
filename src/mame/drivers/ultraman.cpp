@@ -224,7 +224,8 @@ MACHINE_CONFIG_START(ultraman_state::ultraman)
 	MCFG_K051316_CB(ultraman_state, zoom_callback_3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -277,4 +278,4 @@ ROM_START( ultraman )
 ROM_END
 
 
-GAME( 1991, ultraman, 0, ultraman, ultraman, ultraman_state, 0, ROT0, "Banpresto / Bandai", "Ultraman (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ultraman, 0, ultraman, ultraman, ultraman_state, empty_init, ROT0, "Banpresto / Bandai", "Ultraman (Japan)", MACHINE_SUPPORTS_SAVE )

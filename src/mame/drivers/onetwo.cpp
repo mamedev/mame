@@ -385,7 +385,7 @@ MACHINE_CONFIG_START(onetwo_state::onetwo)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -443,5 +443,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1997, onetwo,       0, onetwo, onetwo, onetwo_state, 0, ROT0, "Barko", "One + Two", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, onetwoe, onetwo, onetwo, onetwo, onetwo_state, 0, ROT0, "Barko", "One + Two (earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, onetwo,       0, onetwo, onetwo, onetwo_state, empty_init, ROT0, "Barko", "One + Two", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, onetwoe, onetwo, onetwo, onetwo, onetwo_state, empty_init, ROT0, "Barko", "One + Two (earlier)", MACHINE_SUPPORTS_SAVE )

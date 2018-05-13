@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(taxidriv_state::taxidriv)
 	MCFG_PALETTE_INIT_OWNER(taxidriv_state, taxidriv)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, taxidriv_state, p8910_0a_r))
@@ -452,4 +452,4 @@ ROM_START( taxidriv )
 ROM_END
 
 
-GAME( 1984, taxidriv,  0,        taxidriv, taxidriv, taxidriv_state, 0, ROT90, "Graphic Techno", "Taxi Driver", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, taxidriv,  0,        taxidriv, taxidriv, taxidriv_state, empty_init, ROT90, "Graphic Techno", "Taxi Driver", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -401,7 +401,8 @@ MACHINE_CONFIG_START(sprint4_state::sprint4)
 	MCFG_PALETTE_INIT_OWNER(sprint4_state, sprint4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("latch", F9334, 0) // at E11
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // START LAMP 1
@@ -460,5 +461,5 @@ ROM_START( sprint4a )
 ROM_END
 
 
-GAME( 1977, sprint4,  0,       sprint4,  sprint4, sprint4_state,  0, ROT180, "Atari", "Sprint 4 (set 1)", MACHINE_SUPPORTS_SAVE ) /* large cars */
-GAME( 1977, sprint4a, sprint4, sprint4,  sprint4, sprint4_state,  0, ROT180, "Atari", "Sprint 4 (set 2)", MACHINE_SUPPORTS_SAVE ) /* small cars */
+GAME( 1977, sprint4,  0,       sprint4,  sprint4, sprint4_state, empty_init, ROT180, "Atari", "Sprint 4 (set 1)", MACHINE_SUPPORTS_SAVE ) /* large cars */
+GAME( 1977, sprint4a, sprint4, sprint4,  sprint4, sprint4_state, empty_init, ROT180, "Atari", "Sprint 4 (set 2)", MACHINE_SUPPORTS_SAVE ) /* small cars */

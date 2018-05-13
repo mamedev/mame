@@ -116,7 +116,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	DECLARE_WRITE8_MEMBER(esripsys_dac_w);
-	DECLARE_DRIVER_INIT(esripsys);
+	void init_esripsys();
 	virtual void video_start() override;
 	uint32_t screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(esripsys_vblank_irq);

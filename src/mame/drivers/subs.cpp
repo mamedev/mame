@@ -207,7 +207,8 @@ MACHINE_CONFIG_START(subs_state::subs)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, subs_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -259,4 +260,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, subs, 0, subs, subs, subs_state, 0, ROT0, "Atari", "Subs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, subs, 0, subs, subs, subs_state, empty_init, ROT0, "Atari", "Subs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

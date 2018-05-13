@@ -657,7 +657,7 @@ MACHINE_CONFIG_START(vpoker_state::vpoker)
 	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, vpoker_state, ptm_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 //  MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/4 /* guess */)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -705,6 +705,6 @@ ROM_START( 5acespkr )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT     STATE         INIT  ROT   COMPANY               FULLNAME                   FLAGS
-GAME( 198?, vpoker,   0,      vpoker,  vpoker,   vpoker_state, 0,    ROT0, "Videotronics, Inc.", "Videotronics Draw Poker", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, vpoker_state, 0,    ROT0, "<unknown>",          "5-Aces Poker",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  MACHINE  INPUT     STATE         INIT        ROT   COMPANY               FULLNAME                   FLAGS
+GAME( 198?, vpoker,   0,      vpoker,  vpoker,   vpoker_state, empty_init, ROT0, "Videotronics, Inc.", "Videotronics Draw Poker", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, vpoker_state, empty_init, ROT0, "<unknown>",          "5-Aces Poker",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

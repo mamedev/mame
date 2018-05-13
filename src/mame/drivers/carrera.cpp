@@ -338,7 +338,7 @@ MACHINE_CONFIG_START(carrera_state::carrera)
 	MCFG_PALETTE_INIT_OWNER(carrera_state, carrera)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/12)
 	/* these are set as input, but I have no idea which input port it uses is for the AY */
@@ -364,4 +364,4 @@ ROM_START( carrera )
 ROM_END
 
 
-GAME( 19??, carrera, 0, carrera, carrera, carrera_state, 0, ROT0, "BS Electronics", "Carrera (Version 6.7)", 0 )
+GAME( 19??, carrera, 0, carrera, carrera, carrera_state, empty_init, ROT0, "BS Electronics", "Carrera (Version 6.7)", 0 )

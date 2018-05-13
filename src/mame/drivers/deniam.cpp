@@ -277,7 +277,7 @@ MACHINE_CONFIG_START(deniam_state::deniam16b)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -313,7 +313,7 @@ MACHINE_CONFIG_START(deniam_state::deniam16c)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
@@ -416,7 +416,7 @@ ROM_END
 
 
 
-GAME( 1996, logicpro, 0,        deniam16b, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Logic Pro (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Croquis (Germany)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1996, karianx,  0,        deniam16b, karianx,  deniam_state, karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996, logicpro, 0,        deniam16b, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Logic Pro (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Croquis (Germany)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, karianx,  0,        deniam16b, karianx,  deniam_state, init_karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)",     MACHINE_SUPPORTS_SAVE )

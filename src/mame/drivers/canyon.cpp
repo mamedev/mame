@@ -270,7 +270,8 @@ MACHINE_CONFIG_START(canyon_state::canyon)
 	MCFG_PALETTE_INIT_OWNER(canyon_state, canyon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, canyon_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -329,5 +330,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, canyon,  0,      canyon, canyon, canyon_state, 0, ROT0, "Atari", "Canyon Bomber", MACHINE_SUPPORTS_SAVE )
-GAME( 1977, canyonp, canyon, canyon, canyon, canyon_state, 0, ROT0, "Atari", "Canyon Bomber (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1977, canyon,  0,      canyon, canyon, canyon_state, empty_init, ROT0, "Atari", "Canyon Bomber", MACHINE_SUPPORTS_SAVE )
+GAME( 1977, canyonp, canyon, canyon, canyon, canyon_state, empty_init, ROT0, "Atari", "Canyon Bomber (prototype)", MACHINE_SUPPORTS_SAVE )

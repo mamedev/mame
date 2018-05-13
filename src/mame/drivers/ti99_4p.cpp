@@ -1035,11 +1035,10 @@ MACHINE_CONFIG_START(ti99_4p_state::ti99_4p_60hz)
 	MCFG_RAM_DEFAULT_VALUE(0)
 
 	// Cassette drives
-	MCFG_SPEAKER_STANDARD_MONO("cass_out")
+	SPEAKER(config, "cass_out").front_center();
 	MCFG_CASSETTE_ADD( "cassette" )
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( TI_JOYPORT_TAG )
@@ -1054,5 +1053,5 @@ ROM_START(ti99_4p)
 	ROM_LOAD16_BYTE("sgcpu_lb.bin", 0x0001, 0x8000, CRC(2a5dc818) SHA1(dec141fe2eea0b930859cbe1ebd715ac29fa8ecb) ) /* system ROMs */
 ROM_END
 
-//    YEAR  NAME      PARENT   COMPAT   MACHINE       INPUT    STATE          INIT  COMPANY                 FULLNAME                 FLAGS
-COMP( 1996, ti99_4p,  0,       0,       ti99_4p_60hz, ti99_4p, ti99_4p_state, 0,    "System-99 User Group", "SGCPU (aka TI-99/4P)" , MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE       INPUT    CLASS          INIT        COMPANY                 FULLNAME                FLAGS
+COMP( 1996, ti99_4p, 0,      0,      ti99_4p_60hz, ti99_4p, ti99_4p_state, empty_init, "System-99 User Group", "SGCPU (aka TI-99/4P)", MACHINE_SUPPORTS_SAVE )

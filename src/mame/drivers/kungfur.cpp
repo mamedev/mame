@@ -315,7 +315,8 @@ MACHINE_CONFIG_START(kungfur_state::kungfur)
 	/* no video! */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("adpcm1", MSM5205, XTAL(384'000))  // clock verified with recording
 	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, kungfur_state, kfr_adpcm1_int))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
@@ -348,4 +349,4 @@ ROM_START( kungfur )
 	ROM_LOAD( "kr6.bin",   0x20000, 0x10000, CRC(9ea75d4a) SHA1(57445ccb961acb11a25cdac81f2e543d92bcb7f9) )
 ROM_END
 
-GAMEL(1987, kungfur,  0,       kungfur,  kungfur, kungfur_state,  0, ROT0, "Namco", "Kung-Fu Roushi", MACHINE_SUPPORTS_SAVE, layout_kungfur )
+GAMEL( 1987, kungfur, 0, kungfur,  kungfur, kungfur_state, empty_init, ROT0, "Namco", "Kung-Fu Roushi", MACHINE_SUPPORTS_SAVE, layout_kungfur )

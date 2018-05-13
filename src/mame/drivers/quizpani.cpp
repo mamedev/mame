@@ -213,7 +213,7 @@ MACHINE_CONFIG_START(quizpani_state::quizpani)
 	MCFG_SCREEN_PALETTE("palette")
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -249,4 +249,4 @@ ROM_START( quizpani )
 	ROM_LOAD( "qz8.121", 0x200, 0x100, CRC(b4c19741) SHA1(a6d3686bad6ef2336463b89bc2d249003d9b4bcc) ) /* unknown */
 ROM_END
 
-GAME( 1993, quizpani, 0, quizpani, quizpani, quizpani_state, 0, ROT0, "NMK", "Quiz Panicuru Fantasy", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, quizpani, 0, quizpani, quizpani, quizpani_state, empty_init, ROT0, "NMK", "Quiz Panicuru Fantasy", MACHINE_SUPPORTS_SAVE )

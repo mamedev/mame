@@ -669,7 +669,7 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 	MCFG_RAM_EXTRA_OPTIONS("32K,64K,128K")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -771,6 +771,6 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY                 FULLNAME                        FLAGS
-COMP( 1985, digel804, 0,        0,      digel804, digel804, digel804_state, 0,    "Digelec, Inc",         "Digelec 804 EPROM Programmer", MACHINE_NOT_WORKING )
-COMP( 1982, ep804,    digel804, 0,      ep804,    digel804, ep804_state,    0,    "Wavetek/Digelec, Inc", "EP804 EPROM Programmer",       MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME                        FLAGS
+COMP( 1985, digel804, 0,        0,      digel804, digel804, digel804_state, empty_init, "Digelec, Inc",         "Digelec 804 EPROM Programmer", MACHINE_NOT_WORKING )
+COMP( 1982, ep804,    digel804, 0,      ep804,    digel804, ep804_state,    empty_init, "Wavetek/Digelec, Inc", "EP804 EPROM Programmer",       MACHINE_NOT_WORKING )

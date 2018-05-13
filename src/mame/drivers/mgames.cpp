@@ -683,5 +683,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT   STATE         INIT   ROT    COMPANY  FULLNAME      FLAGS...                                 LAYOUT  */
-GAMEL( 1981, mgames,   0,      mgames,   mgames, mgames_state, 0,     ROT0, "Merit", "Match Games", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND, layout_mgames )
+/*     YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROT   COMPANY  FULLNAME       FLAGS...                                 LAYOUT  */
+GAMEL( 1981, mgames, 0,      mgames,  mgames, mgames_state, empty_init, ROT0, "Merit", "Match Games", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND, layout_mgames )

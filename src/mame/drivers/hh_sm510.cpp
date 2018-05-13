@@ -264,7 +264,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kdribble_state::kdribble)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -281,7 +281,7 @@ MACHINE_CONFIG_START(kdribble_state::kdribble)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -337,7 +337,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ktopgun_state::ktopgun)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -354,7 +354,7 @@ MACHINE_CONFIG_START(ktopgun_state::ktopgun)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -412,7 +412,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kcontra_state::kcontra)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(kcontra_state::kcontra)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -485,7 +485,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ktmnt_state::ktmnt)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -501,7 +501,7 @@ MACHINE_CONFIG_START(ktmnt_state::ktmnt)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -555,7 +555,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kgradius_state::kgradius)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -571,7 +571,7 @@ MACHINE_CONFIG_START(kgradius_state::kgradius)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -623,7 +623,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kloneran_state::kloneran)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -639,7 +639,7 @@ MACHINE_CONFIG_START(kloneran_state::kloneran)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -695,7 +695,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kblades_state::kblades)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -710,7 +710,7 @@ MACHINE_CONFIG_START(kblades_state::kblades)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -768,7 +768,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(knfl_state::knfl)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -783,7 +783,7 @@ MACHINE_CONFIG_START(knfl_state::knfl)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -840,7 +840,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kbilly_state::kbilly)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -855,7 +855,7 @@ MACHINE_CONFIG_START(kbilly_state::kbilly)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -906,7 +906,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kbucky_state::kbucky)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -921,7 +921,7 @@ MACHINE_CONFIG_START(kbucky_state::kbucky)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -976,7 +976,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kgarfld_state::kgarfld)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -991,7 +991,7 @@ MACHINE_CONFIG_START(kgarfld_state::kgarfld)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1069,7 +1069,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_mmouse_state::gnw_mmouse)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM5A, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM5A)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // ?
 	MCFG_SM500_WRITE_O_CB(WRITE8(*this, hh_sm510_state, sm500_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1086,7 +1086,7 @@ MACHINE_CONFIG_START(gnw_mmouse_state::gnw_mmouse)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1104,7 +1104,7 @@ MACHINE_CONFIG_START(gnw_mmouse_state::nupogodi)
 	gnw_mmouse(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", KB1013VK12, 32.768_kHz_XTAL)
+	MCFG_DEVICE_REPLACE("maincpu", KB1013VK12)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM500_WRITE_O_CB(WRITE8(*this, hh_sm510_state, sm500_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1178,7 +1178,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_mickdon_state::gnw_mickdon)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1201,7 +1201,7 @@ MACHINE_CONFIG_START(gnw_mickdon_state::gnw_mickdon)
 	MCFG_DEFAULT_LAYOUT(layout_gnw_dualv)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1262,7 +1262,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_dkong2_state::gnw_dkong2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1285,7 +1285,7 @@ MACHINE_CONFIG_START(gnw_dkong2_state::gnw_dkong2)
 	MCFG_DEFAULT_LAYOUT(layout_gnw_dualv)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1347,7 +1347,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_mario_state::gnw_mario)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1371,7 +1371,7 @@ MACHINE_CONFIG_START(gnw_mario_state::gnw_mario)
 	MCFG_DEFAULT_LAYOUT(layout_gnw_dualh)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1439,7 +1439,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_dkjr_state::gnw_dkjr)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1458,7 +1458,7 @@ MACHINE_CONFIG_START(gnw_dkjr_state::gnw_dkjr)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1521,7 +1521,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_mariocm_state::gnw_mariocm)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1540,7 +1540,7 @@ MACHINE_CONFIG_START(gnw_mariocm_state::gnw_mariocm)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1606,7 +1606,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_smb_state::gnw_smb)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -1623,7 +1623,7 @@ MACHINE_CONFIG_START(gnw_smb_state::gnw_smb)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1708,7 +1708,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gnw_boxing_state::gnw_boxing)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -1726,7 +1726,7 @@ MACHINE_CONFIG_START(gnw_boxing_state::gnw_boxing)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1818,7 +1818,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tgaunt_state::tgaunt)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1837,7 +1837,7 @@ MACHINE_CONFIG_START(tgaunt_state::tgaunt)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1921,7 +1921,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tddragon_state::tddragon)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -1940,7 +1940,7 @@ MACHINE_CONFIG_START(tddragon_state::tddragon)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2016,7 +2016,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tkarnov_state::tkarnov)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2035,7 +2035,7 @@ MACHINE_CONFIG_START(tkarnov_state::tkarnov)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2110,7 +2110,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tvindictr_state::tvindictr)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2129,7 +2129,7 @@ MACHINE_CONFIG_START(tvindictr_state::tvindictr)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2227,7 +2227,7 @@ void tgaiden_state::machine_start()
 MACHINE_CONFIG_START(tgaiden_state::tgaiden)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2246,7 +2246,7 @@ MACHINE_CONFIG_START(tgaiden_state::tgaiden)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2317,7 +2317,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tbatman_state::tbatman)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2336,7 +2336,7 @@ MACHINE_CONFIG_START(tbatman_state::tbatman)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2411,7 +2411,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tsharr2_state::tsharr2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2430,7 +2430,7 @@ MACHINE_CONFIG_START(tsharr2_state::tsharr2)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2502,7 +2502,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tstrider_state::tstrider)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2521,7 +2521,7 @@ MACHINE_CONFIG_START(tstrider_state::tstrider)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2597,7 +2597,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tgoldnaxe_state::tgoldnaxe)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2616,7 +2616,7 @@ MACHINE_CONFIG_START(tgoldnaxe_state::tgoldnaxe)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2692,7 +2692,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(trobocop2_state::trobocop2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2711,7 +2711,7 @@ MACHINE_CONFIG_START(trobocop2_state::trobocop2)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2791,7 +2791,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(taltbeast_state::taltbeast)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2810,7 +2810,7 @@ MACHINE_CONFIG_START(taltbeast_state::taltbeast)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2886,7 +2886,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tsf2010_state::tsf2010)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2905,7 +2905,7 @@ MACHINE_CONFIG_START(tsf2010_state::tsf2010)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -2977,7 +2977,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tswampt_state::tswampt)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -2996,7 +2996,7 @@ MACHINE_CONFIG_START(tswampt_state::tswampt)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -3072,7 +3072,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tspidman_state::tspidman)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3091,7 +3091,7 @@ MACHINE_CONFIG_START(tspidman_state::tspidman)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -3167,7 +3167,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tddragon3_state::tddragon3)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3186,7 +3186,7 @@ MACHINE_CONFIG_START(tddragon3_state::tddragon3)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -3262,7 +3262,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tflash_state::tflash)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3281,7 +3281,7 @@ MACHINE_CONFIG_START(tflash_state::tflash)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -3358,7 +3358,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tmchammer_state::tmchammer)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -3376,7 +3376,7 @@ MACHINE_CONFIG_START(tmchammer_state::tmchammer)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -3452,7 +3452,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tbtoads_state::tbtoads)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3471,7 +3471,7 @@ MACHINE_CONFIG_START(tbtoads_state::tbtoads)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -3547,7 +3547,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(thook_state::thook)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3566,7 +3566,7 @@ MACHINE_CONFIG_START(thook_state::thook)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -3641,7 +3641,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tbttf_state::tbttf)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3660,7 +3660,7 @@ MACHINE_CONFIG_START(tbttf_state::tbttf)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -3738,7 +3738,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(taddams_state::taddams)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3757,7 +3757,7 @@ MACHINE_CONFIG_START(taddams_state::taddams)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -3833,7 +3833,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(thalone_state::thalone)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3852,7 +3852,7 @@ MACHINE_CONFIG_START(thalone_state::thalone)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -3924,7 +3924,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(txmenpx_state::txmenpx)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -3943,7 +3943,7 @@ MACHINE_CONFIG_START(txmenpx_state::txmenpx)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -4019,7 +4019,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(thalone2_state::thalone2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4038,7 +4038,7 @@ MACHINE_CONFIG_START(thalone2_state::thalone2)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -4138,7 +4138,7 @@ static const s16 tsonic_speaker_levels[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff }
 MACHINE_CONFIG_START(tsonic_state::tsonic)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, tsonic_state, write_s))
@@ -4155,7 +4155,7 @@ MACHINE_CONFIG_START(tsonic_state::tsonic)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, tsonic_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -4232,7 +4232,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(trobocop3_state::trobocop3)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4251,7 +4251,7 @@ MACHINE_CONFIG_START(trobocop3_state::trobocop3)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -4323,7 +4323,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tdummies_state::tdummies)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4342,7 +4342,7 @@ MACHINE_CONFIG_START(tdummies_state::tdummies)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -4418,7 +4418,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tsfight2_state::tsfight2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4437,7 +4437,7 @@ MACHINE_CONFIG_START(tsfight2_state::tsfight2)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -4509,7 +4509,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tjpark_state::tjpark)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4528,7 +4528,7 @@ MACHINE_CONFIG_START(tjpark_state::tjpark)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -4628,7 +4628,7 @@ static const s16 tsonic2_speaker_levels[] = { 0, 0x7fff/3*1, 0x7fff/3*2, 0x7fff 
 MACHINE_CONFIG_START(tsonic2_state::tsonic2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, tsonic2_state, write_s))
@@ -4645,7 +4645,7 @@ MACHINE_CONFIG_START(tsonic2_state::tsonic2)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, tsonic2_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -4727,7 +4727,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tsddragon_state::tsddragon)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4746,7 +4746,7 @@ MACHINE_CONFIG_START(tsddragon_state::tsddragon)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -4823,7 +4823,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tdennis_state::tdennis)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4842,7 +4842,7 @@ MACHINE_CONFIG_START(tdennis_state::tdennis)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -4922,7 +4922,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tnmarebc_state::tnmarebc)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -4941,7 +4941,7 @@ MACHINE_CONFIG_START(tnmarebc_state::tnmarebc)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -5017,7 +5017,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ttransf2_state::ttransf2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5036,7 +5036,7 @@ MACHINE_CONFIG_START(ttransf2_state::ttransf2)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -5113,7 +5113,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tmkombat_state::tmkombat)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5132,7 +5132,7 @@ MACHINE_CONFIG_START(tmkombat_state::tmkombat)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -5208,7 +5208,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tshadow_state::tshadow)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5227,7 +5227,7 @@ MACHINE_CONFIG_START(tshadow_state::tshadow)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -5303,7 +5303,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tskelwarr_state::tskelwarr)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5322,7 +5322,7 @@ MACHINE_CONFIG_START(tskelwarr_state::tskelwarr)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -5399,7 +5399,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tbatfor_state::tbatfor)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5418,7 +5418,7 @@ MACHINE_CONFIG_START(tbatfor_state::tbatfor)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -5495,7 +5495,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tjdredd_state::tjdredd)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5514,7 +5514,7 @@ MACHINE_CONFIG_START(tjdredd_state::tjdredd)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -5591,7 +5591,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tapollo13_state::tapollo13)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5610,7 +5610,7 @@ MACHINE_CONFIG_START(tapollo13_state::tapollo13)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -5687,7 +5687,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tgoldeye_state::tgoldeye)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5706,7 +5706,7 @@ MACHINE_CONFIG_START(tgoldeye_state::tgoldeye)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -5778,7 +5778,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tinday_state::tinday)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5797,7 +5797,7 @@ MACHINE_CONFIG_START(tinday_state::tinday)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -5869,7 +5869,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tsjam_state::tsjam)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL) // no external XTAL
+	MCFG_DEVICE_ADD("maincpu", SM510) // no external XTAL
 	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5888,7 +5888,7 @@ MACHINE_CONFIG_START(tsjam_state::tsjam)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -5974,7 +5974,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tigarden_state::tigarden)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM510)
 	MCFG_SM510_R_MASK_OPTION(2) // confirmed
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
@@ -5991,7 +5991,7 @@ MACHINE_CONFIG_START(tigarden_state::tigarden)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -6075,7 +6075,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(nummunch_state::nummunch)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", SM511)
 	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
 	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
 	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
@@ -6091,7 +6091,7 @@ MACHINE_CONFIG_START(nummunch_state::nummunch)
 	MCFG_DEFAULT_LAYOUT(layout_svg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -6769,79 +6769,79 @@ ROM_END
 
 
 
-//    YEAR  NAME         PARENT   COMP  MACHINE      INPUT        STATE           INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1989, kdribble,    0,          0, kdribble,    kdribble,    kdribble_state,    0, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, ktopgun,     0,          0, ktopgun,     ktopgun,     ktopgun_state,     0, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kcontra,     0,          0, kcontra,     kcontra,     kcontra_state,     0, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, ktmnt,       0,          0, ktmnt,       ktmnt,       ktmnt_state,       0, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kgradius,    0,          0, kgradius,    kgradius,    kgradius_state,    0, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kloneran,    0,          0, kloneran,    kloneran,    kloneran_state,    0, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kblades,     0,          0, kblades,     kblades,     kblades_state,     0, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, knfl,        0,          0, knfl,        knfl,        knfl_state,        0, "Konami", "NFL Football (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, kbilly,      0,          0, kbilly,      kbilly,      kbilly_state,      0, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1991, kbucky,      0,          0, kbucky,      kbucky,      kbucky_state,      0, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,     0, "Konami", "Garfield (handheld)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME         PARENT   COMP  MACHINE      INPUT        CLASS              INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1989, kdribble,    0,          0, kdribble,    kdribble,    kdribble_state,    empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, ktopgun,     0,          0, ktopgun,     ktopgun,     ktopgun_state,     empty_init, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kcontra,     0,          0, kcontra,     kcontra,     kcontra_state,     empty_init, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, ktmnt,       0,          0, ktmnt,       ktmnt,       ktmnt_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kgradius,    0,          0, kgradius,    kgradius,    kgradius_state,    empty_init, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kloneran,    0,          0, kloneran,    kloneran,    kloneran_state,    empty_init, "Konami", "Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kblades,     0,          0, kblades,     kblades,     kblades_state,     empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, knfl,        0,          0, knfl,        knfl,        knfl_state,        empty_init, "Konami", "NFL Football (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, kbilly,      0,          0, kbilly,      kbilly,      kbilly_state,      empty_init, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, kbucky,      0,          0, kbucky,      kbucky,      kbucky_state,      empty_init, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,     empty_init, "Konami", "Garfield (handheld)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  0, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  0, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  0, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, exospace,    gnw_mmouse, 0, exospace,    exospace,    gnw_mmouse_state,  0, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, exospace,    gnw_mmouse, 0, exospace,    exospace,    gnw_mmouse_state,  empty_init, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, gnw_mickdon, 0,          0, gnw_mickdon, gnw_mickdon, gnw_mickdon_state, 0, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_dkong2,  0,          0, gnw_dkong2,  gnw_dkong2,  gnw_dkong2_state,  0, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_mario,   0,          0, gnw_mario,   gnw_mario,   gnw_mario_state,   0, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gnw_mickdon, 0,          0, gnw_mickdon, gnw_mickdon, gnw_mickdon_state, empty_init, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_dkong2,  0,          0, gnw_dkong2,  gnw_dkong2,  gnw_dkong2_state,  empty_init, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_mario,   0,          0, gnw_mario,   gnw_mario,   gnw_mario_state,   empty_init, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, gnw_dkjr,    0,          0, gnw_dkjr,    gnw_dkjr,    gnw_dkjr_state,    0, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gnw_mariocm, 0,          0, gnw_mariocm, gnw_mariocm, gnw_mariocm_state, 0, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
-CONS( 1988, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     0, "Nintendo", "Game & Watch: Super Mario Bros. (new wide screen)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1982, gnw_dkjr,    0,          0, gnw_dkjr,    gnw_dkjr,    gnw_dkjr_state,    empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_mariocm, 0,          0, gnw_mariocm, gnw_mariocm, gnw_mariocm_state, empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (new wide screen)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  0, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  empty_init, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1989, tgaunt,      0,          0, tgaunt,      tgaunt,      tgaunt_state,      0, "Tiger Electronics (licensed from Tengen)", "Gauntlet (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1991, trobhood,    tgaunt,     0, trobhood,    trobhood,    tgaunt_state,      0, "Tiger Electronics", "Robin Hood (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, tddragon,    0,          0, tddragon,    tddragon,    tddragon_state,    0, "Tiger Electronics (licensed from Technos/Tradewest)", "Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, tkarnov,     0,          0, tkarnov,     tkarnov,     tkarnov_state,     0, "Tiger Electronics (licensed from Data East)", "Karnov (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, tvindictr,   0,          0, tvindictr,   tvindictr,   tvindictr_state,   0, "Tiger Electronics (licensed from Tengen)", "Vindicators (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1989, tgaiden,     0,          0, tgaiden,     tgaiden,     tgaiden_state,     0, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1989, tbatman,     0,          0, tbatman,     tbatman,     tbatman_state,     0, "Tiger Electronics", "Batman (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1990, tsharr2,     0,          0, tsharr2,     tsharr2,     tsharr2_state,     0, "Tiger Electronics (licensed from Sega)", "Space Harrier II (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1990, tstrider,    0,          0, tstrider,    tstrider,    tstrider_state,    0, "Tiger Electronics (licensed from Capcom)", "Strider (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1990, tgoldnaxe,   0,          0, tgoldnaxe,   tgoldnaxe,   tgoldnaxe_state,   0, "Tiger Electronics (licensed from Sega)", "Golden Axe (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1990, trobocop2,   0,          0, trobocop2,   trobocop2,   trobocop2_state,   0, "Tiger Electronics", "Robocop 2 (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1990, taltbeast,   0,          0, taltbeast,   taltbeast,   taltbeast_state,   0, "Tiger Electronics (licensed from Sega)", "Altered Beast (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1990, tsf2010,     0,          0, tsf2010,     tsf2010,     tsf2010_state,     0, "Tiger Electronics (licensed from Capcom)", "Street Fighter 2010 - The Final Fight (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1991, tswampt,     0,          0, tswampt,     tswampt,     tswampt_state,     0, "Tiger Electronics", "Swamp Thing (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1991, tspidman,    0,          0, tspidman,    tspidman,    tspidman_state,    0, "Tiger Electronics", "Spider-Man (handheld, Tiger 1991 version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1991, tddragon3,   0,          0, tddragon3,   tddragon3,   tddragon3_state,   0, "Tiger Electronics (licensed from Technos)", "Double Dragon 3 - The Rosetta Stone (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1991, tflash,      0,          0, tflash,      tflash,      tflash_state,      0, "Tiger Electronics", "The Flash (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1991, tmchammer,   0,          0, tmchammer,   tmchammer,   tmchammer_state,   0, "Tiger Electronics", "MC Hammer: U Can't Touch This (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1991, tbtoads,     0,          0, tbtoads,     tbtoads,     tbtoads_state,     0, "Tiger Electronics (licensed from Rare/Tradewest)", "Battletoads (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1991, thook,       0,          0, thook,       thook,       thook_state,       0, "Tiger Electronics", "Hook (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1992, tbttf,       0,          0, tbttf,       tbttf,       tbttf_state,       0, "Tiger Electronics", "Back to the Future (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1992, taddams,     0,          0, taddams,     taddams,     taddams_state,     0, "Tiger Electronics", "The Addams Family (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1992, thalone,     0,          0, thalone,     thalone,     thalone_state,     0, "Tiger Electronics", "Home Alone (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1993, txmenpx,     0,          0, txmenpx,     txmenpx,     txmenpx_state,     0, "Tiger Electronics", "X-Men - Project X (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1992, thalone2,    0,          0, thalone2,    thalone2,    thalone2_state,    0, "Tiger Electronics", "Home Alone 2 - Lost in New York (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1992, tsonic,      0,          0, tsonic,      tsonic,      tsonic_state,      0, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1992, trobocop3,   0,          0, trobocop3,   trobocop3,   trobocop3_state,   0, "Tiger Electronics", "Robocop 3 (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1993, tdummies,    0,          0, tdummies,    tdummies,    tdummies_state,    0, "Tiger Electronics", "The Incredible Crash Dummies (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1993, tsfight2,    0,          0, tsfight2,    tsfight2,    tsfight2_state,    0, "Tiger Electronics (licensed from Capcom)", "Street Fighter II (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1993, tjpark,      0,          0, tjpark,      tjpark,      tjpark_state,      0, "Tiger Electronics", "Jurassic Park (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1993, tsonic2,     0,          0, tsonic2,     tsonic2,     tsonic2_state,     0, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog 2 (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1993, tsddragon,   0,          0, tsddragon,   tsddragon,   tsddragon_state,   0, "Tiger Electronics (licensed from Technos)", "Super Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1993, tdennis,     0,          0, tdennis,     tdennis,     tdennis_state,     0, "Tiger Electronics", "Dennis the Menace (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1993, tnmarebc,    0,          0, tnmarebc,    tnmarebc,    tnmarebc_state,    0, "Tiger Electronics", "Nightmare Before Christmas (handheld)", MACHINE_SUPPORTS_SAVE ) // note: title has no "The"
-CONS( 1993, ttransf2,    0,          0, ttransf2,    ttransf2,    ttransf2_state,    0, "Tiger Electronics", "Transformers - Generation 2 (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1993, tmkombat,    0,          0, tmkombat,    tmkombat,    tmkombat_state,    0, "Tiger Electronics (licensed from Midway)", "Mortal Kombat (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1994, tshadow,     0,          0, tshadow,     tshadow,     tshadow_state,     0, "Tiger Electronics", "The Shadow (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1994, tskelwarr,   0,          0, tskelwarr,   tskelwarr,   tskelwarr_state,   0, "Tiger Electronics", "Skeleton Warriors - The Dark Crusade (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1995, tbatfor,     0,          0, tbatfor,     tbatfor,     tbatfor_state,     0, "Tiger Electronics", "Batman Forever - Double Dose of Doom (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1995, tjdredd,     0,          0, tjdredd,     tjdredd,     tjdredd_state,     0, "Tiger Electronics", "Judge Dredd (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1995, tapollo13,   0,          0, tapollo13,   tapollo13,   tapollo13_state,   0, "Tiger Electronics", "Apollo 13 (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1995, tgoldeye,    0,          0, tgoldeye,    tgoldeye,    tgoldeye_state,    0, "Tiger Electronics", "007: GoldenEye (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1996, tinday,      0,          0, tinday,      tinday,      tinday_state,      0, "Tiger Electronics", "Independence Day (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1996, tsjam,       0,          0, tsjam,       tsjam,       tsjam_state,       0, "Tiger Electronics", "Space Jam (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, tgaunt,      0,          0, tgaunt,      tgaunt,      tgaunt_state,      empty_init, "Tiger Electronics (licensed from Tengen)", "Gauntlet (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, trobhood,    tgaunt,     0, trobhood,    trobhood,    tgaunt_state,      empty_init, "Tiger Electronics", "Robin Hood (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, tddragon,    0,          0, tddragon,    tddragon,    tddragon_state,    empty_init, "Tiger Electronics (licensed from Technos/Tradewest)", "Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, tkarnov,     0,          0, tkarnov,     tkarnov,     tkarnov_state,     empty_init, "Tiger Electronics (licensed from Data East)", "Karnov (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, tvindictr,   0,          0, tvindictr,   tvindictr,   tvindictr_state,   empty_init, "Tiger Electronics (licensed from Tengen)", "Vindicators (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, tgaiden,     0,          0, tgaiden,     tgaiden,     tgaiden_state,     empty_init, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1989, tbatman,     0,          0, tbatman,     tbatman,     tbatman_state,     empty_init, "Tiger Electronics", "Batman (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1990, tsharr2,     0,          0, tsharr2,     tsharr2,     tsharr2_state,     empty_init, "Tiger Electronics (licensed from Sega)", "Space Harrier II (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1990, tstrider,    0,          0, tstrider,    tstrider,    tstrider_state,    empty_init, "Tiger Electronics (licensed from Capcom)", "Strider (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1990, tgoldnaxe,   0,          0, tgoldnaxe,   tgoldnaxe,   tgoldnaxe_state,   empty_init, "Tiger Electronics (licensed from Sega)", "Golden Axe (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1990, trobocop2,   0,          0, trobocop2,   trobocop2,   trobocop2_state,   empty_init, "Tiger Electronics", "Robocop 2 (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1990, taltbeast,   0,          0, taltbeast,   taltbeast,   taltbeast_state,   empty_init, "Tiger Electronics (licensed from Sega)", "Altered Beast (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1990, tsf2010,     0,          0, tsf2010,     tsf2010,     tsf2010_state,     empty_init, "Tiger Electronics (licensed from Capcom)", "Street Fighter 2010 - The Final Fight (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, tswampt,     0,          0, tswampt,     tswampt,     tswampt_state,     empty_init, "Tiger Electronics", "Swamp Thing (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, tspidman,    0,          0, tspidman,    tspidman,    tspidman_state,    empty_init, "Tiger Electronics", "Spider-Man (handheld, Tiger 1991 version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, tddragon3,   0,          0, tddragon3,   tddragon3,   tddragon3_state,   empty_init, "Tiger Electronics (licensed from Technos)", "Double Dragon 3 - The Rosetta Stone (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, tflash,      0,          0, tflash,      tflash,      tflash_state,      empty_init, "Tiger Electronics", "The Flash (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, tmchammer,   0,          0, tmchammer,   tmchammer,   tmchammer_state,   empty_init, "Tiger Electronics", "MC Hammer: U Can't Touch This (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, tbtoads,     0,          0, tbtoads,     tbtoads,     tbtoads_state,     empty_init, "Tiger Electronics (licensed from Rare/Tradewest)", "Battletoads (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, thook,       0,          0, thook,       thook,       thook_state,       empty_init, "Tiger Electronics", "Hook (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1992, tbttf,       0,          0, tbttf,       tbttf,       tbttf_state,       empty_init, "Tiger Electronics", "Back to the Future (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1992, taddams,     0,          0, taddams,     taddams,     taddams_state,     empty_init, "Tiger Electronics", "The Addams Family (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1992, thalone,     0,          0, thalone,     thalone,     thalone_state,     empty_init, "Tiger Electronics", "Home Alone (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1993, txmenpx,     0,          0, txmenpx,     txmenpx,     txmenpx_state,     empty_init, "Tiger Electronics", "X-Men - Project X (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1992, thalone2,    0,          0, thalone2,    thalone2,    thalone2_state,    empty_init, "Tiger Electronics", "Home Alone 2 - Lost in New York (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1992, tsonic,      0,          0, tsonic,      tsonic,      tsonic_state,      empty_init, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1992, trobocop3,   0,          0, trobocop3,   trobocop3,   trobocop3_state,   empty_init, "Tiger Electronics", "Robocop 3 (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1993, tdummies,    0,          0, tdummies,    tdummies,    tdummies_state,    empty_init, "Tiger Electronics", "The Incredible Crash Dummies (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1993, tsfight2,    0,          0, tsfight2,    tsfight2,    tsfight2_state,    empty_init, "Tiger Electronics (licensed from Capcom)", "Street Fighter II (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1993, tjpark,      0,          0, tjpark,      tjpark,      tjpark_state,      empty_init, "Tiger Electronics", "Jurassic Park (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1993, tsonic2,     0,          0, tsonic2,     tsonic2,     tsonic2_state,     empty_init, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog 2 (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1993, tsddragon,   0,          0, tsddragon,   tsddragon,   tsddragon_state,   empty_init, "Tiger Electronics (licensed from Technos)", "Super Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1993, tdennis,     0,          0, tdennis,     tdennis,     tdennis_state,     empty_init, "Tiger Electronics", "Dennis the Menace (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1993, tnmarebc,    0,          0, tnmarebc,    tnmarebc,    tnmarebc_state,    empty_init, "Tiger Electronics", "Nightmare Before Christmas (handheld)", MACHINE_SUPPORTS_SAVE ) // note: title has no "The"
+CONS( 1993, ttransf2,    0,          0, ttransf2,    ttransf2,    ttransf2_state,    empty_init, "Tiger Electronics", "Transformers - Generation 2 (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1993, tmkombat,    0,          0, tmkombat,    tmkombat,    tmkombat_state,    empty_init, "Tiger Electronics (licensed from Midway)", "Mortal Kombat (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1994, tshadow,     0,          0, tshadow,     tshadow,     tshadow_state,     empty_init, "Tiger Electronics", "The Shadow (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1994, tskelwarr,   0,          0, tskelwarr,   tskelwarr,   tskelwarr_state,   empty_init, "Tiger Electronics", "Skeleton Warriors - The Dark Crusade (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1995, tbatfor,     0,          0, tbatfor,     tbatfor,     tbatfor_state,     empty_init, "Tiger Electronics", "Batman Forever - Double Dose of Doom (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1995, tjdredd,     0,          0, tjdredd,     tjdredd,     tjdredd_state,     empty_init, "Tiger Electronics", "Judge Dredd (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1995, tapollo13,   0,          0, tapollo13,   tapollo13,   tapollo13_state,   empty_init, "Tiger Electronics", "Apollo 13 (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1995, tgoldeye,    0,          0, tgoldeye,    tgoldeye,    tgoldeye_state,    empty_init, "Tiger Electronics", "007: GoldenEye (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1996, tinday,      0,          0, tinday,      tinday,      tinday_state,      empty_init, "Tiger Electronics", "Independence Day (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1996, tsjam,       0,          0, tsjam,       tsjam,       tsjam_state,       empty_init, "Tiger Electronics", "Space Jam (handheld)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1983, tigarden,    0,          0, tigarden,    tigarden,    tigarden_state,    0, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, tigarden,    0,          0, tigarden,    tigarden,    tigarden_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1989, nummunch,    0,          0, nummunch,    nummunch,    nummunch_state,    0, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE )
+CONS( 1989, nummunch,    0,          0, nummunch,    nummunch,    nummunch_state,    empty_init, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE )

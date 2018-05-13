@@ -48,7 +48,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram") { }
 
-	DECLARE_DRIVER_INIT(rmhaihai);
+	void init_rmhaihai();
 	void rmhaihai(machine_config &config);
 
 protected:
@@ -526,7 +526,7 @@ MACHINE_CONFIG_START(rmhaihai_state::rmhaihai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 20000000/16)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
@@ -738,21 +738,17 @@ ROM_START( themj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(rmhaihai_state,rmhaihai)
+void rmhaihai_state::init_rmhaihai()
 {
-	uint8_t *rom = memregion("gfx1")->base();
-	int size = memregion("gfx1")->bytes();
-	int a,b;
-
-	size /= 2;
-	rom += size;
+	int size = memregion("gfx1")->bytes() / 2;
+	uint8_t *rom = memregion("gfx1")->base() + size;
 
 	/* unpack the high bit of gfx */
-	for (b = size - 0x4000;b >= 0;b -= 0x4000)
+	for (int b = size - 0x4000; b >= 0; b -= 0x4000)
 	{
-		if (b) memcpy(rom + b,rom + b/2,0x2000);
+		if (b) memcpy(rom + b, rom + b/2, 0x2000);
 
-		for (a = 0;a < 0x2000;a++)
+		for (int a = 0; a < 0x2000;a++)
 		{
 			rom[a + b + 0x2000] = rom[a + b] >> 4;
 		}
@@ -760,9 +756,9 @@ DRIVER_INIT_MEMBER(rmhaihai_state,rmhaihai)
 }
 
 
-GAME( 1985, rmhaihai,  0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, newer)", MACHINE_SUPPORTS_SAVE ) // writes Homedata in NVRAM
-GAME( 1985, rmhaihai2, rmhaihai, rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, rmhaihib,  rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rmhaijin,  0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rmhaisei,  0,        rmhaisei, rmhaihai, rmhaisei_state, rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, themj,     0,        themj,    rmhaihai, themj_state,    rmhaihai, ROT0, "Visco", "The Mah-jong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rmhaihai,  0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, newer)", MACHINE_SUPPORTS_SAVE ) // writes Homedata in NVRAM
+GAME( 1985, rmhaihai2, rmhaihai, rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rmhaihib,  rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rmhaijin,  0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rmhaisei,  0,        rmhaisei, rmhaihai, rmhaisei_state, init_rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, themj,     0,        themj,    rmhaihai, themj_state,    init_rmhaihai, ROT0, "Visco", "The Mah-jong (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -533,10 +533,8 @@ void towns_state::towns_update_palette()
 	switch(m_video.towns_video_reg[1] & 0x30)  // Palette select
 	{
 		case 0x00:
-			m_palette16_0->set_pen_color(entry, r, g, b);
-			break;
 		case 0x20:
-			m_palette16_1->set_pen_color(entry, r, g, b);
+			m_palette16[(m_video.towns_video_reg[1] & 0x20) >> 5]->set_pen_color(entry, r, g, b);
 			break;
 		case 0x10:
 		case 0x30:
@@ -562,10 +560,8 @@ READ8_MEMBER(towns_state::towns_video_fd90_r)
 
 	if(m_video.towns_video_reg[1] & 0x10)
 		pal = m_palette;
-	else if(m_video.towns_video_reg[1] & 0x20)
-		pal = m_palette16_1;
 	else
-		pal = m_palette16_0;
+		pal = m_palette16[(m_video.towns_video_reg[1] & 0x20) >> 5];
 //    if(LOG_VID) logerror("VID: read port %04x\n",offset+0xfd90);
 	switch(offset)
 	{
@@ -1199,7 +1195,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 	uint32_t scroll;
 	int pixel;
 	int page = 0;
-	palette_device* pal = (layer == 0) ? m_palette16_0 : m_palette16_1;
+	palette_device* pal = m_palette16[layer];
 	bool sphscroll = !(m_video.towns_crtc_reg[28] & (layer ? 0x20 : 0x10));
 
 	if(m_video.towns_display_page_sel != 0)

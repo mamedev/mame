@@ -36,6 +36,10 @@
     - (fixed) several if not all enemies definitely wants some sort of "axis aligned bounding box" in order to stop from going out of range
         (when i.e. first boss goes to bottom of the screen and become unreachable)
     - (btanb) Throw is made by quickly double jumping (!)
+	- (btanb) seldomly enemies thrown animates weirdly (bounces to the left when thrown to the right). 
+	  Culprit is with command 0x905 param +0x28, but it looks like this parameter is coming 
+	  from program ROM itself. Also a PCB recording video shows the same phenomenon, it's just sloppy 
+	  programming basically.
     Heated Barrel
     - (btanb) if player moves in diagonal a bogus projectile is fired.
     - gives random value to hi-score if you continue (only the first time, not a bug?);
@@ -47,10 +51,9 @@
     - (fixed) barrels seen in later levels seems to fail an axis aligned bounding box, not unlike Legionnaire.
 	Godzilla
 	- few elements doesn't collide properly (i.e. Super X missiles, Tokyo's tower in stage 1), 
-	  Z axis check makes no sense whatsoever. 
-	  Kludged to work in per-game driver_init.
+	  Z axis check makes no sense whatsoever. Kludged to work in per-game driver_init.
     SD Gundam
-    - stage 3 mid-boss still has the sprite garbage bug;
+    - stage 3: mid-boss still has the sprite garbage bug;
     - stage 4: has sprite stuck on bottom-left of screen;
     Seibu Cup Soccer
     - Handles collision detection via the 130e/3bb0 macros

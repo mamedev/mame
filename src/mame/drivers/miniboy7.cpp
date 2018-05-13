@@ -539,7 +539,7 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE("pia0", pia6821_device, ca1_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK / 8)    /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, miniboy7_state, ay_pa_w))
@@ -627,6 +627,6 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT   ROT   COMPANY                     FULLNAME              FLAGS                LAYOUT
-GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
-GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROT   COMPANY                     FULLNAME              FLAGS                LAYOUT
+GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", MACHINE_NO_COCKTAIL, layout_miniboy7 )
+GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, miniboy7_state, empty_init, ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", MACHINE_NO_COCKTAIL, layout_miniboy7 )

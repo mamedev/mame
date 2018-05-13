@@ -378,13 +378,13 @@ WRITE8_MEMBER(isa8_pgc_device::lut_w)
 
 	if (offset & 1)
 	{
-		m_lut[o + 2] = (data & 15) << 4;
+		m_lut[o + 2] = (data & 15) * 17;
 		m_palette->set_pen_color( offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] );
 		LOG("lut W @ %02X <- %d %d %d\n",
 			offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] );
 	} else {
-		m_lut[o    ] = data & 0xf0;
-		m_lut[o + 1] = (data & 15) << 4;
+		m_lut[o    ] = (data >> 4) * 17;
+		m_lut[o + 1] = (data & 15) * 17;
 	}
 }
 

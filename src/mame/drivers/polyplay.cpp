@@ -347,7 +347,7 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	MCFG_PALETTE_INIT_OWNER(polyplay_state, polyplay)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker1", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADD("speaker2", SPEAKER_SOUND)
@@ -438,6 +438,6 @@ ROM_START( polyplay2c )
 ROM_END
 
 /* game driver */
-GAMEL( 1986, polyplay,   0,         polyplay_zre,   polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE)",            0, layout_polyplay )
-GAMEL( 1989, polyplay2,  0,         polyplay_zrepp, polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP)",         0, layout_polyplay )
-GAMEL( 1989, polyplay2c, polyplay2, polyplay_zrepp, polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP - Czech)", 0, layout_polyplay )
+GAMEL( 1986, polyplay,   0,         polyplay_zre,   polyplay, polyplay_state, empty_init, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE)",            0, layout_polyplay )
+GAMEL( 1989, polyplay2,  0,         polyplay_zrepp, polyplay, polyplay_state, empty_init, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP)",         0, layout_polyplay )
+GAMEL( 1989, polyplay2c, polyplay2, polyplay_zrepp, polyplay, polyplay_state, empty_init, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP - Czech)", 0, layout_polyplay )

@@ -619,7 +619,7 @@ MACHINE_CONFIG_START(sderby_state::sderby)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -644,7 +644,7 @@ MACHINE_CONFIG_START(sderby_state::sderbya)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -669,7 +669,7 @@ MACHINE_CONFIG_START(sderby_state::luckboom)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -694,7 +694,7 @@ MACHINE_CONFIG_START(sderby_state::spacewin)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -719,7 +719,7 @@ MACHINE_CONFIG_START(sderby_state::shinygld)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -744,7 +744,7 @@ MACHINE_CONFIG_START(sderby_state::pmroulet)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1041,11 +1041,11 @@ ROM_END
 *        Game Drivers         *
 ******************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE         INIT   ROT   COMPANY     FULLNAME                                FLAGS                                                LAYOUT
-GAMEL( 1996, sderby,    0,        sderby,   sderby,   sderby_state, 0,     ROT0, "Playmark", "Super Derby (v.07.03)",                0,                                                   layout_sderby   )
-GAMEL( 1996, sderbya,   sderby,   sderbya,  sderbya,  sderby_state, 0,     ROT0, "Playmark", "Super Derby (v.10.04)",                0,                                                   layout_sderby   )
-GAMEL( 1996, spacewin,  0,        spacewin, spacewin, sderby_state, 0,     ROT0, "Playmark", "Scacco Matto / Space Win",             0,                                                   layout_spacewin )
-GAME ( 1996, shinygld,  0,        shinygld, shinygld, sderby_state, 0,     ROT0, "Playmark", "Shiny Golds",                          0                                                                    )
-GAMEL( 1997, croupier,  0,        pmroulet, pmroulet, sderby_state, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
-GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet, sderby_state, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
-GAME ( 1996, luckboom,  0,        luckboom, luckboom, sderby_state, 0,     ROT0, "Playmark", "Lucky Boom",                           0                                                                    )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS         INIT        ROT   COMPANY     FULLNAME                                FLAGS                                                LAYOUT
+GAMEL( 1996, sderby,    0,        sderby,   sderby,   sderby_state, empty_init, ROT0, "Playmark", "Super Derby (v.07.03)",                0,                                                   layout_sderby   )
+GAMEL( 1996, sderbya,   sderby,   sderbya,  sderbya,  sderby_state, empty_init, ROT0, "Playmark", "Super Derby (v.10.04)",                0,                                                   layout_sderby   )
+GAMEL( 1996, spacewin,  0,        spacewin, spacewin, sderby_state, empty_init, ROT0, "Playmark", "Scacco Matto / Space Win",             0,                                                   layout_spacewin )
+GAME(  1996, shinygld,  0,        shinygld, shinygld, sderby_state, empty_init, ROT0, "Playmark", "Shiny Golds",                          0                                                                    )
+GAMEL( 1997, croupier,  0,        pmroulet, pmroulet, sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
+GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet, sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
+GAME(  1996, luckboom,  0,        luckboom, luckboom, sderby_state, empty_init, ROT0, "Playmark", "Lucky Boom",                           0                                                                    )

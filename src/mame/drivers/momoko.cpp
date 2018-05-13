@@ -282,7 +282,7 @@ MACHINE_CONFIG_START(momoko_state::momoko)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -425,6 +425,6 @@ ROM_START( momokob ) // bootleg board, almost exact copy of an original one
 	ROM_LOAD( "momoko-b.bin", 0x0100,  0x0020, CRC(427b0e5c) SHA1(aa2797b899571527cc96013fd3420b841954ee67) )
 ROM_END
 
-GAME( 1986, momoko,       0, momoko, momoko, momoko_state, 0, ROT0, "Jaleco",  "Momoko 120% (Japanese text)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, momokoe, momoko, momoko, momoko, momoko_state, 0, ROT0, "Jaleco",  "Momoko 120% (English text)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, momokob, momoko, momoko, momoko, momoko_state, 0, ROT0, "bootleg", "Momoko 120% (bootleg)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, momoko,       0, momoko, momoko, momoko_state, empty_init, ROT0, "Jaleco",  "Momoko 120% (Japanese text)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, momokoe, momoko, momoko, momoko, momoko_state, empty_init, ROT0, "Jaleco",  "Momoko 120% (English text)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, momokob, momoko, momoko, momoko, momoko_state, empty_init, ROT0, "bootleg", "Momoko 120% (bootleg)",       MACHINE_SUPPORTS_SAVE )

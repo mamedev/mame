@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(diverboy_state::diverboy)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -345,4 +345,4 @@ ROM_END
 
 
 
-GAME( 1992, diverboy, 0, diverboy, diverboy, diverboy_state, 0, ORIENTATION_FLIP_X, "Gamart (Electronic Devices Italy license)", "Diver Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, diverboy, 0, diverboy, diverboy, diverboy_state, empty_init, ORIENTATION_FLIP_X, "Gamart (Electronic Devices Italy license)", "Diver Boy", MACHINE_SUPPORTS_SAVE )

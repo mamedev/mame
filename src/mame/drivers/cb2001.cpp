@@ -850,7 +850,7 @@ MACHINE_CONFIG_START(cb2001_state::cb2001)
 	MCFG_PALETTE_INIT_OWNER(cb2001_state, cb2001)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) // wrong
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
@@ -882,5 +882,5 @@ ROM_START( scherrym )
 	ROM_LOAD( "n82s135-2.bin", 0x200, 0x100, CRC(a19821db) SHA1(62dda90dd67dfbc0b96f161f1f2b7a46a5805eae) )
 ROM_END
 
-GAME( 2001, cb2001,    0,      cb2001,      cb2001, cb2001_state,   0, ROT0,  "Dyna", "Cherry Bonus 2001",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 2001, scherrym,  0,      cb2001,      cb2001, cb2001_state,   0, ROT0,  "Dyna", "Super Cherry Master", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
+GAME( 2001, cb2001,   0, cb2001, cb2001, cb2001_state, empty_init, ROT0, "Dyna", "Cherry Bonus 2001",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2001, scherrym, 0, cb2001, cb2001, cb2001_state, empty_init, ROT0, "Dyna", "Super Cherry Master", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)

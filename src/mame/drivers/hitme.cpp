@@ -335,7 +335,7 @@ MACHINE_CONFIG_START(hitme_state::hitme)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("discrete", DISCRETE, hitme_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -692,9 +692,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1976, hitme,    0,        hitme,    hitme,    hitme_state, 0, ROT0, "Ramtek",      "Hit Me (set 1)",   MACHINE_SUPPORTS_SAVE )   // 05/1976
-GAME( 1976, hitme1,   hitme,    hitme,    hitme,    hitme_state, 0, ROT0, "Ramtek",      "Hit Me (set 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1976, m21,      hitme,    hitme,    hitme,    hitme_state, 0, ROT0, "Mirco Games", "21 (Mirco)",       MACHINE_SUPPORTS_SAVE )   // 08/1976, licensed?
-GAME( 1978, super21,  0,        hitme,    super21,  hitme_state, 0, ROT0, "Mirco Games", "Super Twenty One", MACHINE_SUPPORTS_SAVE )
-GAMEL(1976, barricad, 0,        barricad, barricad, hitme_state, 0, ROT0, "Ramtek",      "Barricade",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )
-GAMEL(1976, brickyrd, barricad, barricad, barricad, hitme_state, 0, ROT0, "Ramtek",      "Brickyard",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )
+GAME( 1976, hitme,    0,        hitme,    hitme,    hitme_state, empty_init, ROT0, "Ramtek",      "Hit Me (set 1)",   MACHINE_SUPPORTS_SAVE )   // 05/1976
+GAME( 1976, hitme1,   hitme,    hitme,    hitme,    hitme_state, empty_init, ROT0, "Ramtek",      "Hit Me (set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1976, m21,      hitme,    hitme,    hitme,    hitme_state, empty_init, ROT0, "Mirco Games", "21 (Mirco)",       MACHINE_SUPPORTS_SAVE )   // 08/1976, licensed?
+GAME( 1978, super21,  0,        hitme,    super21,  hitme_state, empty_init, ROT0, "Mirco Games", "Super Twenty One", MACHINE_SUPPORTS_SAVE )
+GAMEL(1976, barricad, 0,        barricad, barricad, hitme_state, empty_init, ROT0, "Ramtek",      "Barricade",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )
+GAMEL(1976, brickyrd, barricad, barricad, barricad, hitme_state, empty_init, ROT0, "Ramtek",      "Brickyard",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )

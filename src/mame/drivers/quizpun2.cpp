@@ -611,7 +611,7 @@ MACHINE_CONFIG_START(quizpun2_state::quizpun2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -709,5 +709,5 @@ ROM_START( quizpun )
 	ROM_LOAD( "93c46eeprom.bin", 0, 0x80, CRC(4d244cc8) SHA1(6593d5b7ac1ebb77fee4648ad1d3d9b59a25fdc8) BAD_DUMP ) // backup ram error
 ROM_END
 
-GAME( 1988, quizpun,  0, quizpun,  quizpun2, quizpun2_state, 0, ROT270, "Space Computer", "Quiz Punch",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, quizpun2, 0, quizpun2, quizpun2, quizpun2_state, 0, ROT270, "Space Computer", "Quiz Punch II", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, quizpun,  0, quizpun,  quizpun2, quizpun2_state, empty_init, ROT270, "Space Computer", "Quiz Punch",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, quizpun2, 0, quizpun2, quizpun2, quizpun2_state, empty_init, ROT270, "Space Computer", "Quiz Punch II", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

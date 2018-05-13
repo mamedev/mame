@@ -413,7 +413,7 @@ INTERRUPT_GEN_MEMBER(laserbat_state_base::laserbat_interrupt)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x0a);
 }
 
-DRIVER_INIT_MEMBER(laserbat_state_base, laserbat)
+void laserbat_state_base::init_laserbat()
 {
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 
@@ -504,7 +504,7 @@ MACHINE_CONFIG_START(laserbat_state::laserbat)
 	MCFG_PALETTE_INIT_OWNER(laserbat_state, laserbat)
 
 	// sound board devices
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD(m_csg, SN76477) // audio output not used
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(270), CAP_P(1000)) // R21, switchable R30/R23/R24/R25/R29/R28/R27/R26, C21
@@ -537,7 +537,7 @@ MACHINE_CONFIG_START(catnmous_state::catnmous)
 	MCFG_PALETTE_INIT_OWNER(catnmous_state, catnmous)
 
 	// sound board devices
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD(m_audiopcb, ZACCARIA_1B11107)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
@@ -728,7 +728,7 @@ ROM_START( catnmousa )
 ROM_END
 
 
-GAME( 1981, laserbat,  0,        laserbat, laserbat, laserbat_state, laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, lazarian,  laserbat, laserbat, lazarian, laserbat_state, laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmous,  0,        catnmous, catnmous, catnmous_state, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, catnmousa, catnmous, catnmous, catnmous, catnmous_state, laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, laserbat,  0,        laserbat, laserbat, laserbat_state, init_laserbat, ROT0,  "Zaccaria", "Laser Battle",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, lazarian,  laserbat, laserbat, lazarian, laserbat_state, init_laserbat, ROT0,  "Zaccaria (Bally Midway license)", "Lazarian", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmous,  0,        catnmous, catnmous, catnmous_state, init_laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, catnmousa, catnmous, catnmous, catnmous, catnmous_state, init_laserbat, ROT90, "Zaccaria", "Cat and Mouse (set 2)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

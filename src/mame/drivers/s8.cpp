@@ -91,7 +91,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s8);
-	DECLARE_DRIVER_INIT(s8);
+	void init_s8();
 	void s8(machine_config &config);
 	void s8_audio_map(address_map &map);
 	void s8_main_map(address_map &map);
@@ -306,7 +306,7 @@ MACHINE_RESET_MEMBER( s8_state, s8 )
 {
 }
 
-DRIVER_INIT_MEMBER( s8_state, s8 )
+void s8_state::init_s8()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
@@ -362,7 +362,7 @@ MACHINE_CONFIG_START(s8_state::s8)
 	MCFG_DEVICE_ADD("audiocpu", M6808, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(s8_audio_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -396,5 +396,5 @@ ROM_START(pfevr_p3)
 ROM_END
 
 
-GAME(1984, pfevr_l2, 0,        s8, s8, s8_state, s8, ROT0, "Williams", "Pennant Fever (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1984, pfevr_p3, pfevr_l2, s8, s8, s8_state, s8, ROT0, "Williams", "Pennant Fever (P-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1984, pfevr_l2, 0,        s8, s8, s8_state, init_s8, ROT0, "Williams", "Pennant Fever (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1984, pfevr_p3, pfevr_l2, s8, s8, s8_state, init_s8, ROT0, "Williams", "Pennant Fever (P-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

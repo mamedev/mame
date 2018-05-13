@@ -335,7 +335,7 @@ MACHINE_CONFIG_START(speedatk_state::speedatk)
 	MCFG_PALETTE_INIT_OWNER(speedatk_state, speedatk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/4) //divider is unknown
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
@@ -364,4 +364,4 @@ ROM_START( speedatk )
 	ROM_LOAD( "cb2.bpr",      0x0020, 0x0100, CRC(a604cf96) SHA1(a4ef6e77dcd3abe4c27e8e636222a5ee711a51f5) ) /* lookup table */
 ROM_END
 
-GAME( 1984, speedatk, 0, speedatk, speedatk, speedatk_state, 0, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, speedatk, 0, speedatk, speedatk, speedatk_state, empty_init, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -765,7 +765,8 @@ MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ldac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("rdac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -797,4 +798,4 @@ ROM_START( wheelfir )
 	ROM_LOAD16_WORD_SWAP( "eeprom", 0x000000, 0x000080, CRC(961e4bc9) SHA1(8944504bf56a272e9aa08185e73c6b4212d52383) )
 ROM_END
 
-GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, 0, ROT0,  "TCH", "Wheels & Fire", MACHINE_IMPERFECT_GRAPHICS)
+GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, empty_init, ROT0,  "TCH", "Wheels & Fire", MACHINE_IMPERFECT_GRAPHICS)

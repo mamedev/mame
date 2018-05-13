@@ -266,7 +266,7 @@ MACHINE_CONFIG_START(dogfgt_state::dogfgt)
 	MCFG_PALETTE_INIT_OWNER(dogfgt_state, dogfgt)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -381,6 +381,6 @@ ROM_END
 
 
 
-GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, dogfgt_state, 0, ROT0, "Technos Japan",                               "Acrobatic Dog-Fight",       MACHINE_SUPPORTS_SAVE )
-GAME( 1985, dogfgtu, dogfgt, dogfgt, dogfgt, dogfgt_state, 0, ROT0, "Technos Japan (Data East USA, Inc. license)", "Acrobatic Dog-Fight (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, dogfgt_state, 0, ROT0, "Technos Japan",                               "Dog-Fight (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan",                               "Acrobatic Dog-Fight",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, dogfgtu, dogfgt, dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan (Data East USA, Inc. license)", "Acrobatic Dog-Fight (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan",                               "Dog-Fight (Japan)",         MACHINE_SUPPORTS_SAVE )

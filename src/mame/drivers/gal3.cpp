@@ -652,7 +652,8 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 
 	MCFG_VIDEO_START_OVERRIDE(gal3_state,gal3)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_C140_ADD("c140_16g", 8000000/374)
 	MCFG_C140_BANK_TYPE(SYSTEM21)    //to be verified
@@ -877,6 +878,6 @@ ROM_START( gal3 )
 	DISK_IMAGE_READONLY( "gal3_ld2", 0, NO_DUMP )
 ROM_END
 
-/*    YEAR,  NAME     PARENT, MACHINE, INPUT, STATE,      INIT, MONITOR, COMPANY, FULLNAME,                                   FLAGS */
-GAMEL( 1992, gal3,    0,      gal3,    gal3,  gal3_state, 0,    ROT0,    "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dualhsxs )
+/*     YEAR  NAME     PARENT  MACHINE  INPUT  CLASS       INIT        MONITOR  COMPANY  FULLNAME                                    FLAGS */
+GAMEL( 1992, gal3,    0,      gal3,    gal3,  gal3_state, empty_init, ROT0,    "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dualhsxs )
 //GAMEL( 1994, gal3zlgr,    0,        gal3,    gal3, driver_device,    0, ROT0,  "Namco", "Galaxian 3 - Theater 6 J2 : Attack of The Zolgear", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dualhsxs )

@@ -67,7 +67,7 @@ public:
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_READ8_MEMBER(bus_r);
 	DECLARE_READ8_MEMBER(drw80pkr_io_r);
-	DECLARE_DRIVER_INIT(drw80pkr);
+	void init_drw80pkr();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -391,7 +391,7 @@ GFXDECODE_END
 * Driver Init *
 ***************/
 
-DRIVER_INIT_MEMBER(drw80pkr_state,drw80pkr)
+void drw80pkr_state::init_drw80pkr()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base(), 0x1000);
 }
@@ -477,7 +477,7 @@ MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8912, 20000000/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -517,6 +517,6 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY                                FULLNAME                FLAGS
-GAME( 1982, drw80pkr, 0,      drw80pkr, drw80pkr, drw80pkr_state, drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker",        MACHINE_NOT_WORKING )
-GAME( 1983, drw80pk2, 0,      drw80pkr, drw80pkr, drw80pkr_state, drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker - Minn", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT    COMPANY                                FULLNAME                FLAGS
+GAME( 1982, drw80pkr, 0,      drw80pkr, drw80pkr, drw80pkr_state, init_drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker",        MACHINE_NOT_WORKING )
+GAME( 1983, drw80pk2, 0,      drw80pkr, drw80pkr, drw80pkr_state, init_drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker - Minn", MACHINE_NOT_WORKING )

@@ -331,7 +331,8 @@ MACHINE_CONFIG_START(uapce_state::uapce)
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
 	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
 	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
@@ -376,7 +377,7 @@ ROM_START(paclandp)
 	ROM_LOAD( "u1.bin", 0x0000, 0x800, CRC(f5e538a9) SHA1(19ac9525c9ad6bea1789cc9e63cdb7fe949867d9) )
 ROM_END
 
-GAME( 1989, blazlaz, 0, uapce, uapce, uapce_state, pce_common, ROT0, "Hudson Soft", "Blazing Lazers (United Amusements PC Engine)",                         MACHINE_IMPERFECT_SOUND )
-GAME( 1989, keith,   0, uapce, uapce, uapce_state, pce_common, ROT0, "Hudson Soft", "Keith Courage In Alpha Zones (United Amusements PC Engine)",           MACHINE_IMPERFECT_SOUND )
-GAME( 1989, aliencr, 0, uapce, uapce, uapce_state, pce_common, ROT0, "Hudson Soft", "Alien Crush (United Amusements PC Engine)",                            MACHINE_IMPERFECT_SOUND )
-GAME( 1989, paclandp,0, uapce, uapce, uapce_state, pce_common, ROT0, "Namco",       "Pac-Land (United Amusements PC Engine)",                               MACHINE_IMPERFECT_SOUND )
+GAME( 1989, blazlaz, 0, uapce, uapce, uapce_state, init_pce_common, ROT0, "Hudson Soft", "Blazing Lazers (United Amusements PC Engine)",                         MACHINE_IMPERFECT_SOUND )
+GAME( 1989, keith,   0, uapce, uapce, uapce_state, init_pce_common, ROT0, "Hudson Soft", "Keith Courage In Alpha Zones (United Amusements PC Engine)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1989, aliencr, 0, uapce, uapce, uapce_state, init_pce_common, ROT0, "Hudson Soft", "Alien Crush (United Amusements PC Engine)",                            MACHINE_IMPERFECT_SOUND )
+GAME( 1989, paclandp,0, uapce, uapce, uapce_state, init_pce_common, ROT0, "Namco",       "Pac-Land (United Amusements PC Engine)",                               MACHINE_IMPERFECT_SOUND )

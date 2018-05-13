@@ -736,7 +736,7 @@ MACHINE_CONFIG_START(combatsc_state::combatsc)
 	MCFG_K007121_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -781,7 +781,7 @@ MACHINE_CONFIG_START(combatsc_state::combatscb)
 	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatscb)
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatscb)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -991,7 +991,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(combatsc_state,combatsc)
+void combatsc_state::init_combatsc()
 {
 	/* joystick instead of trackball */
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x0404, 0x0404, "IN1");
@@ -1004,9 +1004,9 @@ DRIVER_INIT_MEMBER(combatsc_state,combatsc)
  *
  *************************************/
 
-GAME( 1988, combatsc,  0,        combatsc,  combatsc,  combatsc_state, combatsc,  ROT0, "Konami",  "Combat School (joystick)",        0 )
-GAME( 1987, combatsct, combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Combat School (trackball)",       MACHINE_NOT_WORKING )
-GAME( 1987, combatscj, combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Combat School (Japan trackball)", MACHINE_NOT_WORKING )
-GAME( 1987, bootcamp,  combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Boot Camp (set 1)",               MACHINE_NOT_WORKING )
-GAME( 1987, bootcampa, combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Boot Camp (set 2)",               MACHINE_NOT_WORKING )
-GAME( 1988, combatscb, combatsc, combatscb, combatscb, combatsc_state, 0,         ROT0, "bootleg", "Combat School (bootleg)",         MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, combatsc,  0,        combatsc,  combatsc,  combatsc_state, init_combatsc, ROT0, "Konami",  "Combat School (joystick)",        0 )
+GAME( 1987, combatsct, combatsc, combatsc,  combatsct, combatsc_state, empty_init,    ROT0, "Konami",  "Combat School (trackball)",       MACHINE_NOT_WORKING )
+GAME( 1987, combatscj, combatsc, combatsc,  combatsct, combatsc_state, empty_init,    ROT0, "Konami",  "Combat School (Japan trackball)", MACHINE_NOT_WORKING )
+GAME( 1987, bootcamp,  combatsc, combatsc,  combatsct, combatsc_state, empty_init,    ROT0, "Konami",  "Boot Camp (set 1)",               MACHINE_NOT_WORKING )
+GAME( 1987, bootcampa, combatsc, combatsc,  combatsct, combatsc_state, empty_init,    ROT0, "Konami",  "Boot Camp (set 2)",               MACHINE_NOT_WORKING )
+GAME( 1988, combatscb, combatsc, combatscb, combatscb, combatsc_state, empty_init,    ROT0, "bootleg", "Combat School (bootleg)",         MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )

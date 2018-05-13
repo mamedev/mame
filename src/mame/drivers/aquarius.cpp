@@ -190,7 +190,7 @@ READ8_MEMBER(aquarius_state::cartridge_r)
     DRIVER INIT
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(aquarius_state,aquarius)
+void aquarius_state::init_aquarius()
 {
 	/* install expansion memory if available */
 	if (m_ram->size() > 0x1000)
@@ -372,7 +372,7 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	MCFG_PALETTE_INIT_OWNER(aquarius_state, aquarius)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -422,6 +422,6 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME         PARENT    COMPAT  MACHINE      INPUT     STATE           INIT      COMPANY   FULLNAME               FLAGS
-COMP( 1983, aquarius,    0,        0,      aquarius,    aquarius, aquarius_state, aquarius, "Mattel", "Aquarius (NTSC)",     0 )
-//COMP( 1984, aquariu2,    aquarius, 0,      aquarius,    aquarius, aquarius_state, 0,        "Mattel", "Aquarius II",         MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY   FULLNAME           FLAGS
+COMP( 1983, aquarius, 0,        0,      aquarius, aquarius, aquarius_state, init_aquarius, "Mattel", "Aquarius (NTSC)", 0 )
+//COMP( 1984, aquariu2, aquarius, 0,      aquarius, aquarius, aquarius_state, empty_init,    "Mattel", "Aquarius II",     MACHINE_NOT_WORKING )

@@ -248,7 +248,7 @@ MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 	MCFG_TECMO_SPRITE_BOOTLEG(1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -321,5 +321,5 @@ ROM_START( hotpinbl )
 ROM_END
 
 
-GAME( 1995, hotpinbl, 0, galspnbl, hotpinbl, galspnbl_state, 0, ROT90, "Comad & New Japan System", "Hot Pinball", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, galspnbl, 0, galspnbl, galspnbl, galspnbl_state, 0, ROT90, "Comad", "Gals Pinball", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotpinbl, 0, galspnbl, hotpinbl, galspnbl_state, empty_init, ROT90, "Comad & New Japan System", "Hot Pinball", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, galspnbl, 0, galspnbl, galspnbl, galspnbl_state, empty_init, ROT90, "Comad", "Gals Pinball", MACHINE_SUPPORTS_SAVE )

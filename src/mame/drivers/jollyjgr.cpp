@@ -699,7 +699,7 @@ MACHINE_CONFIG_START(jollyjgr_state::jollyjgr)
 	MCFG_PALETTE_ADD_3BIT_RGB("bm_palette") // bitmap
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(3'579'545)/2) /* 1.7897725MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
@@ -789,5 +789,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, fspiderb, 0, fspider,  fspider,  jollyjgr_state, 0, ROT90, "Taito Corporation", "Frog & Spiders (bootleg?)", MACHINE_SUPPORTS_SAVE ) // comes from a Fawaz Group bootleg(?) board
-GAME( 1982, jollyjgr, 0, jollyjgr, jollyjgr, jollyjgr_state, 0, ROT90, "Taito Corporation", "Jolly Jogger",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fspiderb, 0, fspider,  fspider,  jollyjgr_state, empty_init, ROT90, "Taito Corporation", "Frog & Spiders (bootleg?)", MACHINE_SUPPORTS_SAVE ) // comes from a Fawaz Group bootleg(?) board
+GAME( 1982, jollyjgr, 0, jollyjgr, jollyjgr, jollyjgr_state, empty_init, ROT90, "Taito Corporation", "Jolly Jogger",              MACHINE_SUPPORTS_SAVE )

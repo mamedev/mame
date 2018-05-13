@@ -238,7 +238,7 @@ MACHINE_CONFIG_START(tonton_state::tonton)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", YM2149, YM2149_CLOCK)   /* Guess. According to other MSX2 based gambling games */
 	/*
 	  AY8910: Port A out: FF
@@ -266,5 +266,5 @@ ROM_START( tonton )
 ROM_END
 
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT  ROT    COMPANY                   FULLNAME                                 FLAGS
-GAME( 1987, tonton,  0,      tonton,  tonton, tonton_state, 0,    ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )
+//    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT        ROT   COMPANY                   FULLNAME                                 FLAGS
+GAME( 1987, tonton,  0,      tonton,  tonton, tonton_state, empty_init, ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )

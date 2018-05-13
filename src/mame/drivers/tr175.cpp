@@ -123,4 +123,4 @@ ROM_START( tr175 )
 	ROM_LOAD16_BYTE( "v6.05.u45", 0x00000, 0x10000, CRC(e220befe) SHA1(8402280577e6de4b85843222bbd6b06a3f625b3b) )
 ROM_END
 
-COMP( 1982, tr175, 0, 0, tr175, tr175, tr175_state, 0, "Relisys", "TR-175 II", MACHINE_IS_SKELETON )
+COMP( 1982, tr175, 0, 0, tr175, tr175, tr175_state, empty_init, "Relisys", "TR-175 II", MACHINE_IS_SKELETON )

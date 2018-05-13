@@ -65,7 +65,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_DRIVER_INIT(cavepc);
+	void init_cavepc();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -131,7 +131,7 @@ MACHINE_CONFIG_END
 
 
 
-DRIVER_INIT_MEMBER(cavepc_state,cavepc)
+void cavepc_state::init_cavepc()
 {
 }
 
@@ -179,4 +179,4 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(2009, deathsm2, 0,        cavepc, cavepc, cavepc_state, cavepc, ROT0, "Cave", "Deathsmiles II: Makai no Merry Christmas (2009/10/14 MASTER VER 4.00)", MACHINE_IS_SKELETON )
+GAME(2009, deathsm2, 0, cavepc, cavepc, cavepc_state, init_cavepc, ROT0, "Cave", "Deathsmiles II: Makai no Merry Christmas (2009/10/14 MASTER VER 4.00)", MACHINE_IS_SKELETON )

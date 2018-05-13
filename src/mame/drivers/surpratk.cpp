@@ -210,7 +210,8 @@ MACHINE_CONFIG_START(surpratk_state::surpratk)
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_FIRQ_LINE))
@@ -273,6 +274,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1990, suratk,  0,      surpratk, surpratk, surpratk_state, 0, ROT0, "Konami", "Surprise Attack (World ver. K)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, suratka, suratk, surpratk, surpratk, surpratk_state, 0, ROT0, "Konami", "Surprise Attack (Asia ver. L)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, suratkj, suratk, surpratk, surpratk, surpratk_state, 0, ROT0, "Konami", "Surprise Attack (Japan ver. M)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, suratk,  0,      surpratk, surpratk, surpratk_state, empty_init, ROT0, "Konami", "Surprise Attack (World ver. K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, suratka, suratk, surpratk, surpratk, surpratk_state, empty_init, ROT0, "Konami", "Surprise Attack (Asia ver. L)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, suratkj, suratk, surpratk, surpratk, surpratk_state, empty_init, ROT0, "Konami", "Surprise Attack (Japan ver. M)", MACHINE_SUPPORTS_SAVE )

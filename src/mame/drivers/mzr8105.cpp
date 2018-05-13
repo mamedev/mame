@@ -231,5 +231,5 @@ ROM_START (mzr8105)
 ROM_END
 
 /* Driver */
-//    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT    CLASS           INIT  COMPANY      FULLNAME          FLAGS
-COMP (1987, mzr8105,      0,      0,       mzr8105,        mzr8105, mzr8105_state,  0,    "Mizar Inc", "Mizar VME8105",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME         FLAGS
+COMP( 1987, mzr8105, 0,      0,      mzr8105, mzr8105, mzr8105_state, empty_init, "Mizar Inc", "Mizar VME8105", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

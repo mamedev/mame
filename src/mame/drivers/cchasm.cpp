@@ -174,7 +174,7 @@ MACHINE_CONFIG_START(cchasm_state::cchasm)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -266,5 +266,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cchasm,  0,      cchasm, cchasm, cchasm_state, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, cchasm1, cchasm, cchasm, cchasm, cchasm_state, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cchasm,  0,      cchasm, cchasm, cchasm_state, empty_init, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cchasm1, cchasm, cchasm, cchasm, cchasm_state, empty_init, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 2)", MACHINE_SUPPORTS_SAVE )

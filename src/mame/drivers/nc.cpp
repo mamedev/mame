@@ -1421,7 +1421,7 @@ MACHINE_CONFIG_START(nc_state::nc100)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep.1", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADD("beep.2", BEEP, 0)
@@ -1554,8 +1554,8 @@ ROM_START(nc200)
 	ROM_LOAD("nc200.rom", 0x010000, 0x080000, CRC(bb8180e7) SHA1(fb5c93b0a3e199202c6a12548d2617f7a09bae47))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE      INIT     COMPANY         FULLNAME    FLAGS */
-COMP( 1992, nc100,  0,      0,      nc100,  nc100, nc_state,  nc,      "Amstrad plc",  "NC100",    0 )
-COMP( 1992, dw225,  nc100,  0,      nc100,  nc100, nc_state,  nc,      "NTS Computer Systems", "DreamWriter 225",    0 )
-COMP( 1992, nc150,  nc100,  0,      nc100,  nc100, nc_state,  nc,      "Amstrad plc",  "NC150",    0 )
-COMP( 1993, nc200,  0,      0,      nc200,  nc200, nc_state,  nc,      "Amstrad plc",  "NC200",    MACHINE_NOT_WORKING ) // boot hangs while checking the MC146818 UIP (update in progress) bit
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS     INIT     COMPANY                 FULLNAME           FLAGS */
+COMP( 1992, nc100, 0,      0,      nc100,   nc100, nc_state, init_nc, "Amstrad plc",          "NC100",           0 )
+COMP( 1992, dw225, nc100,  0,      nc100,   nc100, nc_state, init_nc, "NTS Computer Systems", "DreamWriter 225", 0 )
+COMP( 1992, nc150, nc100,  0,      nc100,   nc100, nc_state, init_nc, "Amstrad plc",          "NC150",           0 )
+COMP( 1993, nc200, 0,      0,      nc200,   nc200, nc_state, init_nc, "Amstrad plc",          "NC200",           MACHINE_NOT_WORKING ) // boot hangs while checking the MC146818 UIP (update in progress) bit

@@ -17,10 +17,11 @@
 DEFINE_DEVICE_TYPE(KONPPC, konppc_device, "konppc", "Konami PowerPC Common Functions")
 
 konppc_device::konppc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, KONPPC, tag, owner, clock),
-	cgboard_type(0),
-	num_cgboards(0)/*,
-	cgboard_id(MAX_CG_BOARDS)*/
+	: device_t(mconfig, KONPPC, tag, owner, clock)
+	, m_voodoo(*this, "^voodoo%u", 0U)
+	, cgboard_type(0)
+	, num_cgboards(0)
+	//, cgboard_id(MAX_CG_BOARDS)
 {
 }
 
@@ -427,7 +428,6 @@ WRITE32_MEMBER( konppc_device::K033906_1_w)
 
 WRITE32_MEMBER( konppc_device::nwk_fifo_0_w)
 {
-	voodoo_device *device = machine().device<voodoo_device>("voodoo0");
 	if (nwk_device_sel[0] & 0x01)
 	{
 		nwk_fifo_w(0, data);
@@ -439,13 +439,12 @@ WRITE32_MEMBER( konppc_device::nwk_fifo_0_w)
 	}
 	else
 	{
-		device->voodoo_w(space, offset ^ 0x80000, data, mem_mask);
+		m_voodoo[0]->voodoo_w(space, offset ^ 0x80000, data, mem_mask);
 	}
 }
 
 WRITE32_MEMBER( konppc_device::nwk_fifo_1_w)
 {
-	voodoo_device *device = machine().device<voodoo_device>("voodoo1");
 	if (nwk_device_sel[1] & 0x01)
 	{
 		nwk_fifo_w(1, data);
@@ -457,39 +456,36 @@ WRITE32_MEMBER( konppc_device::nwk_fifo_1_w)
 	}
 	else
 	{
-		device->voodoo_w(space, offset ^ 0x80000, data, mem_mask);
+		m_voodoo[1]->voodoo_w(space, offset ^ 0x80000, data, mem_mask);
 	}
 }
 
 READ32_MEMBER( konppc_device::nwk_voodoo_0_r)
 {
-	voodoo_device *device = machine().device<voodoo_device>("voodoo0");
 	if ((nwk_device_sel[0] == 0x4) && offset >= 0x100000 && offset < 0x200000)
 	{
 		return nwk_ram[0][offset & 0x1fff];
 	}
 	else
 	{
-		return device->voodoo_r(space, offset, mem_mask);
+		return m_voodoo[0]->voodoo_r(space, offset, mem_mask);
 	}
 }
 
 READ32_MEMBER( konppc_device::nwk_voodoo_1_r)
 {
-	voodoo_device *device = machine().device<voodoo_device>("voodoo1");
 	if ((nwk_device_sel[1] == 0x4) && offset >= 0x100000 && offset < 0x200000)
 	{
 		return nwk_ram[1][offset & 0x1fff];
 	}
 	else
 	{
-		return device->voodoo_r(space, offset, mem_mask);
+		return m_voodoo[1]->voodoo_r(space, offset, mem_mask);
 	}
 }
 
 WRITE32_MEMBER( konppc_device::nwk_voodoo_0_w)
 {
-	voodoo_device *device = machine().device<voodoo_device>("voodoo0");
 	if (nwk_device_sel[0] & 0x01)
 	{
 		nwk_fifo_w(0, data);
@@ -501,13 +497,12 @@ WRITE32_MEMBER( konppc_device::nwk_voodoo_0_w)
 	}
 	else
 	{
-		device->voodoo_w(space, offset, data, mem_mask);
+		m_voodoo[0]->voodoo_w(space, offset, data, mem_mask);
 	}
 }
 
 WRITE32_MEMBER( konppc_device::nwk_voodoo_1_w)
 {
-	voodoo_device *device = machine().device<voodoo_device>("voodoo0");
 	if (nwk_device_sel[1] & 0x01)
 	{
 		nwk_fifo_w(1, data);
@@ -519,7 +514,7 @@ WRITE32_MEMBER( konppc_device::nwk_voodoo_1_w)
 	}
 	else
 	{
-		device->voodoo_w(space, offset, data, mem_mask);
+		m_voodoo[1]->voodoo_w(space, offset, data, mem_mask);
 	}
 }
 

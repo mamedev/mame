@@ -306,7 +306,8 @@ MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
 	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
@@ -343,5 +344,5 @@ ROM_START(smf)
 	ROM_LOAD( "gal16v8b.u8", 0x400, 0x117, NO_DUMP )
 ROM_END
 
-GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1997, smf,      0, ggconnie, smf, ggconnie_state, pce_common, ROT0, "Eighting", "Super Medal Fighters (Japan 970228)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, init_pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, smf,      0, ggconnie, smf,      ggconnie_state, init_pce_common, ROT0, "Eighting", "Super Medal Fighters (Japan 970228)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

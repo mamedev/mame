@@ -1071,7 +1071,7 @@ MACHINE_CONFIG_START(adam_state::adam)
 	MCFG_SCREEN_UPDATE_DEVICE(TMS9928A_TAG, tms9928a_device, screen_update)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76489A_TAG, SN76489A, XTAL(7'159'090)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	// TODO: enable when Z80 has better WAIT pin emulation
@@ -1151,5 +1151,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       STATE        INIT    COMPANY         FULLNAME            FLAGS
-COMP( 1982, adam,       0,          coleco, adam,       adam,       adam_state,  0,      "Coleco",       "Adam",             MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY   FULLNAME  FLAGS
+COMP( 1982, adam, 0,      coleco, adam,    adam,  adam_state, empty_init, "Coleco", "Adam",   MACHINE_SUPPORTS_SAVE )

@@ -196,7 +196,7 @@ void lc8670_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -1075,7 +1075,7 @@ WRITE8_MEMBER(lc8670_cpu_device::regs_w)
 
 inline uint8_t lc8670_cpu_device::fetch()
 {
-	uint8_t data = m_direct->read_byte(m_pc);
+	uint8_t data = m_cache->read_byte(m_pc);
 
 	set_pc(m_pc + 1);
 

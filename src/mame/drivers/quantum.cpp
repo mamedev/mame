@@ -295,7 +295,7 @@ MACHINE_CONFIG_START(quantum_state::quantum)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, 600000)
 	MCFG_POKEY_POT0_R_CB(READ8(*this, quantum_state, input_1_r))
@@ -403,6 +403,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, quantum,  0,       quantum, quantum, quantum_state, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, quantum1, quantum, quantum, quantum, quantum_state, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, quantump, quantum, quantum, quantum, quantum_state, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, quantum,  0,       quantum, quantum, quantum_state, empty_init, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, quantum1, quantum, quantum, quantum, quantum_state, empty_init, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, quantump, quantum, quantum, quantum, quantum_state, empty_init, ROT270, "General Computer Corporation (Atari license)", "Quantum (prototype)", MACHINE_SUPPORTS_SAVE )

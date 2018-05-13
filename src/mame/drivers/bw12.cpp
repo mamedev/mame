@@ -570,7 +570,7 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_MC6845_UPDATE_ROW_CB(bw12_state, crtc_update_row)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // ls273.ic5 + mc1408.ic4
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -680,6 +680,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE         INIT    COMPANY               FULLNAME        FLAGS */
-COMP( 1984, bw12,   0,      0,      bw12,   bw12, bw12_state,   0,      "Bondwell Holding",   "Bondwell 12",  MACHINE_SUPPORTS_SAVE )
-COMP( 1984, bw14,   bw12,   0,      bw14,   bw12, bw12_state,   0,      "Bondwell Holding",   "Bondwell 14",  MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME       FLAGS */
+COMP( 1984, bw12, 0,      0,      bw12,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell 12", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, bw14, bw12,   0,      bw14,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell 14", MACHINE_SUPPORTS_SAVE )

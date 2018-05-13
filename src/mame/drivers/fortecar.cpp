@@ -345,7 +345,7 @@ public:
 
 	void fortecar(machine_config &config);
 
-	DECLARE_DRIVER_INIT(fortecar);
+	void init_fortecar();
 
 protected:
 	virtual void machine_start() override;
@@ -722,7 +722,7 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLOCK)   /* 1.5 MHz, measured */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, fortecar_state, ayporta_w))
@@ -779,7 +779,7 @@ ROM_END
 *           Driver Init            *
 ***********************************/
 
-DRIVER_INIT_MEMBER(fortecar_state, fortecar)
+void fortecar_state::init_fortecar()
 {
 	// ...
 }
@@ -789,6 +789,6 @@ DRIVER_INIT_MEMBER(fortecar_state, fortecar)
 *          Game Drivers            *
 ***********************************/
 
-//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT   COMPANY        FULLNAME                        FLAGS                LAYOUT
-GAMEL( 1994, fortecrd, 0,        fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 110, Spanish)", 0,                   layout_fortecrd )
-GAMEL( 1994, fortecar, fortecrd, fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 103, English)", MACHINE_NOT_WORKING, layout_fortecrd )
+//     YEAR  NAME      PARENT    MACHINE   INPUT     CLASS           INIT           ROT   COMPANY       FULLNAME                         FLAGS                LAYOUT
+GAMEL( 1994, fortecrd, 0,        fortecar, fortecar, fortecar_state, init_fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 110, Spanish)", 0,                   layout_fortecrd )
+GAMEL( 1994, fortecar, fortecrd, fortecar, fortecar, fortecar_state, init_fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 103, English)", MACHINE_NOT_WORKING, layout_fortecrd )

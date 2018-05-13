@@ -255,7 +255,8 @@ MACHINE_CONFIG_START(lemmings_state::lemmings)
 	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -301,4 +302,4 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1991, lemmings, 0, lemmings, lemmings, lemmings_state, 0, ROT0, "Data East USA", "Lemmings (US prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, lemmings, 0, lemmings, lemmings, lemmings_state, empty_init, ROT0, "Data East USA", "Lemmings (US prototype)", MACHINE_SUPPORTS_SAVE )

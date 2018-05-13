@@ -607,7 +607,7 @@ MACHINE_CONFIG_START(cc40_state::cc40)
 	MCFG_HD44780_PIXEL_UPDATE_CB(cc40_state, cc40_pixel_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
@@ -637,5 +637,5 @@ ROM_START( cc40 )
 ROM_END
 
 
-//    YEAR  NAME  PARENT CMP MACHINE INPUT STATE    INIT  COMPANY, FULLNAME, FLAGS
-COMP( 1983, cc40, 0,      0, cc40,   cc40, cc40_state, 0, "Texas Instruments", "Compact Computer 40", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY              FULLNAME               FLAGS
+COMP( 1983, cc40, 0,      0, cc40,    cc40,  cc40_state, empty_init, "Texas Instruments", "Compact Computer 40", MACHINE_SUPPORTS_SAVE )

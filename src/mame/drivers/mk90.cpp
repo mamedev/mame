@@ -102,5 +102,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY        FULLNAME  FLAGS */
-COMP( 1988, mk90,   0,      0,       mk90,      mk90,  mk90_state, 0,    "Elektronika", "MK-90",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY        FULLNAME  FLAGS */
+COMP( 1988, mk90, 0,      0,      mk90,    mk90,  mk90_state, empty_init, "Elektronika", "MK-90",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

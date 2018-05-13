@@ -318,7 +318,7 @@ MACHINE_CONFIG_START(mmagic_state::mmagic)
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(mmagic_sample_names)
@@ -354,5 +354,5 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  MACHINE INPUT   CLASS         INIT  ROT     COMPANY     FULLNAME        FLAGS
-GAME( 1979, mmagic, 0,      mmagic, mmagic, mmagic_state, 0,    ROT270, "Nintendo", "Monkey Magic", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME    PARENT  MACHINE INPUT   CLASS         INIT        ROT     COMPANY     FULLNAME        FLAGS
+GAME( 1979, mmagic, 0,      mmagic, mmagic, mmagic_state, empty_init, ROT270, "Nintendo", "Monkey Magic", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

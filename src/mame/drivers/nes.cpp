@@ -70,7 +70,7 @@ MACHINE_CONFIG_START(nes_state::nes)
 	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	// note APU sound level here was specified as 0.90, not 0.50 like the others
 	// not sure how to adjust it when it's inside the CPU?
 
@@ -339,38 +339,38 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME       PARENT      COMPAT  MACHINE    INPUT    STATE          INIT     COMPANY          FULLNAME
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS      INIT          COMPANY          FULLNAME
 
 // Nintendo Entertainment System hardware
-CONS( 1985, nes,       0,          0,      nes,       nes,     nes_state,     0,       "Nintendo",      "Nintendo Entertainment System / Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1987, nespal,    nes,        0,      nespal,    nes,     nes_state,     0,       "Nintendo",      "Nintendo Entertainment System (PAL)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1985, nes,      0,       0,      nes,      nes,     nes_state, empty_init,   "Nintendo",      "Nintendo Entertainment System / Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1987, nespal,   nes,     0,      nespal,   nes,     nes_state, empty_init,   "Nintendo",      "Nintendo Entertainment System (PAL)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 // M82 Display Unit
 // supports up to twelve cartridge slots
-CONS( 198?, m82,       nes,        0,      nes,       nes,     nes_state,     0,       "Nintendo",      "M82 Display Unit (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-CONS( 198?, m82p,      nes,        0,      nespal,    nes,     nes_state,     0,       "Nintendo",      "M82 Display Unit (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 198?, m82,      nes,     0,      nes,      nes,     nes_state, empty_init,   "Nintendo",      "M82 Display Unit (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 198?, m82p,     nes,     0,      nespal,   nes,     nes_state, empty_init,   "Nintendo",      "M82 Display Unit (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Famicom hardware
-CONS( 1983, famicom,   0,          nes,    famicom,   famicom, nes_state,     famicom, "Nintendo",      "Famicom",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1983, fds,       famicom,    0,      fds,       famicom, nes_state,     famicom, "Nintendo",      "Famicom (w/ Disk System add-on)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1986, famitwin,  famicom,    0,      famitwin,  famicom, nes_state,     famicom, "Sharp",         "Famicom Twin",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1983, famicom,  0,       nes,    famicom,  famicom, nes_state, init_famicom, "Nintendo",      "Famicom",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1983, fds,      famicom, 0,      fds,      famicom, nes_state, init_famicom, "Nintendo",      "Famicom (w/ Disk System add-on)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1986, famitwin, famicom, 0,      famitwin, famicom, nes_state, init_famicom, "Sharp",         "Famicom Twin",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Clone hardware
 // Many knockoffs using derivatives of the UMC board design, later incorporated into single CMOS chips, were manufactured before and past the end of the Famicom's timeline.
 
 // !! PAL clones documented here !!
 // Famicom-based
-CONS( 1992, iq501,     0,          nes,    famipalc,  nes,     nes_state,     famicom, "Micro Genius",  "IQ-501",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1992, iq502,     0,          nes,    famipalc,  nes,     nes_state,     famicom, "Micro Genius",  "IQ-502",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1992, dendy,     iq501,      0,      famipalc,  nes,     nes_state,     famicom, "Steepler",      "Dendy Classic 1",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 1992, dendy2,    iq502,      0,      famipalc,  nes,     nes_state,     famicom, "Steepler",      "Dendy Classic 2",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-CONS( 198?, gchinatv,  0,          nes,    famipalc,  nes,     nes_state,     famicom, "Golden China",  "Golden China TV Game", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1992, iq501,    0,       nes,    famipalc, nes,     nes_state, init_famicom, "Micro Genius",  "IQ-501",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1992, iq502,    0,       nes,    famipalc, nes,     nes_state, init_famicom, "Micro Genius",  "IQ-502",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1992, dendy,    iq501,   0,      famipalc, nes,     nes_state, init_famicom, "Steepler",      "Dendy Classic 1",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 1992, dendy2,   iq502,   0,      famipalc, nes,     nes_state, init_famicom, "Steepler",      "Dendy Classic 2",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+CONS( 198?, gchinatv, 0,       nes,    famipalc, nes,     nes_state, init_famicom, "Golden China",  "Golden China TV Game", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Subor/Xiao Ba Wang hardware and derivatives
 // These clones implement a keyboard and a parallel port for printing from a word processor. Later models have mice, PS/2 ports, serial ports and a floppy drive.
-CONS( 1993, sb486,     0,          nes,    suborkbd,  nes,     nes_state,     famicom, "Subor",         "SB-486", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1993, sb486,    0,       nes,    suborkbd, nes,     nes_state, init_famicom, "Subor",         "SB-486", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // !! NTSC clones documented here !!
 // Famicom-based
 // Bung hardware
 // Mice, keyboard, etc, including a floppy drive that allows you to run games with a selection of 4 internal "mappers" available on the system.
-CONS( 1996, drpcjr,    0,          nes,    famicom,   famicom, nes_state,     famicom, "Bung",          "Doctor PC Jr", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1996, drpcjr,   0,       nes,    famicom,  famicom, nes_state, init_famicom, "Bung",          "Doctor PC Jr", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

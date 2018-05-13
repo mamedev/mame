@@ -234,7 +234,7 @@ MACHINE_CONFIG_START(tagteam_state::tagteam)
 	MCFG_PALETTE_INIT_OWNER(tagteam_state, tagteam)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6502_IRQ_LINE))
@@ -316,5 +316,5 @@ ROM_END
 
 
 
-GAME( 1983, bigprowr, 0,        tagteam, bigprowr, tagteam_state, 0, ROT270, "Technos Japan",                     "The Big Pro Wrestling!", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tagteam,  bigprowr, tagteam, tagteam,  tagteam_state, 0, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling",     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bigprowr, 0,        tagteam, bigprowr, tagteam_state, empty_init, ROT270, "Technos Japan",                     "The Big Pro Wrestling!", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tagteam,  bigprowr, tagteam, tagteam,  tagteam_state, empty_init, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling",     MACHINE_SUPPORTS_SAVE )

@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(battlane_state::battlane)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, 3000000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
@@ -403,6 +403,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, battlane,  0,        battlane, battlane, battlane_state, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, battlane2, battlane, battlane, battlane, battlane_state, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, battlane3, battlane, battlane, battlane, battlane_state, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, battlane,  0,        battlane, battlane, battlane_state, empty_init, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, battlane2, battlane, battlane, battlane, battlane_state, empty_init, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, battlane3, battlane, battlane, battlane, battlane_state, empty_init, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 3)", MACHINE_SUPPORTS_SAVE )

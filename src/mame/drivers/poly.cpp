@@ -167,7 +167,7 @@ MACHINE_CONFIG_START(poly_state::poly)
 	MCFG_SCREEN_UPDATE_DEVICE("saa5050", saa5050_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -228,5 +228,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT  COMPANY     FULLNAME                       FLAGS
-COMP( 1981, poly1, 0,      0,      poly,    poly,  poly_state, 0,    "Polycorp", "Poly-1 Educational Computer", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY     FULLNAME                       FLAGS
+COMP( 1981, poly1, 0,      0,      poly,    poly,  poly_state, empty_init, "Polycorp", "Poly-1 Educational Computer", MACHINE_NOT_WORKING )

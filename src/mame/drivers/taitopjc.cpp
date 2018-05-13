@@ -147,7 +147,7 @@ public:
 	TILEMAP_MAPPER_MEMBER(tile_scan_layer0);
 	TILEMAP_MAPPER_MEMBER(tile_scan_layer1);
 
-	DECLARE_DRIVER_INIT(optiger);
+	void init_optiger();
 
 	uint16_t m_dsp_ram[0x1000];
 	uint16_t m_io_share_ram[0x2000];
@@ -812,7 +812,7 @@ MACHINE_CONFIG_START(taitopjc_state::taitopjc)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(taitopjc_state, optiger)
+void taitopjc_state::init_optiger()
 {
 	uint8_t *rom = (uint8_t*)memregion("io_cpu")->base();
 
@@ -869,4 +869,4 @@ ROM_START( optiger )
 	// TODO: There are 6 PALs in total on the main PCB.
 ROM_END
 
-GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, optiger, ROT0, "Taito", "Operation Tiger (Ver 2.14 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, init_optiger, ROT0, "Taito", "Operation Tiger (Ver 2.14 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

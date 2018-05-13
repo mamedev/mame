@@ -300,7 +300,8 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, orbit_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -351,4 +352,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1978, orbit, 0, orbit, orbit, orbit_state, 0, 0, "Atari", "Orbit", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, orbit, 0, orbit, orbit, orbit_state, empty_init, 0, "Atari", "Orbit", MACHINE_SUPPORTS_SAVE )

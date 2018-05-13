@@ -318,7 +318,7 @@ MACHINE_CONFIG_START(zorba_keyboard_device::device_add_mconfig)
 	MCFG_M68705_PORTC_W_CB(WRITE8(*this, zorba_keyboard_device, mcu_pc_w));
 
 	// TODO: beeper frequency is unknown, using value from Sun keyboard for now
-	MCFG_SPEAKER_STANDARD_MONO("bell")
+	SPEAKER(config, "bell").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 0.4)
 MACHINE_CONFIG_END

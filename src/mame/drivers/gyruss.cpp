@@ -514,7 +514,8 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 	MCFG_PALETTE_INIT_OWNER(gyruss_state, gyruss)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -712,7 +713,7 @@ ROM_START( venus )
 ROM_END
 
 
-GAME( 1983, gyruss,   0,        gyruss,   gyruss,   gyruss_state, 0, ROT90, "Konami", "Gyruss", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, gyrussce, gyruss,   gyruss,   gyrussce, gyruss_state, 0, ROT90, "Konami (Centuri license)", "Gyruss (Centuri)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, gyrussb,  gyruss,   gyruss,   gyruss,   gyruss_state, 0, ROT90, "bootleg?", "Gyruss (bootleg?)", MACHINE_SUPPORTS_SAVE ) /* Supposed Taito NZ license, but (c) Konami */
-GAME( 1983, venus,    gyruss,   gyruss,   gyruss,   gyruss_state, 0, ROT90, "bootleg", "Venus (bootleg of Gyruss)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, gyruss,   0,      gyruss, gyruss,   gyruss_state, empty_init, ROT90, "Konami", "Gyruss", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, gyrussce, gyruss, gyruss, gyrussce, gyruss_state, empty_init, ROT90, "Konami (Centuri license)", "Gyruss (Centuri)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, gyrussb,  gyruss, gyruss, gyruss,   gyruss_state, empty_init, ROT90, "bootleg?", "Gyruss (bootleg?)", MACHINE_SUPPORTS_SAVE ) /* Supposed Taito NZ license, but (c) Konami */
+GAME( 1983, venus,    gyruss, gyruss, gyruss,   gyruss_state, empty_init, ROT90, "bootleg", "Venus (bootleg of Gyruss)", MACHINE_SUPPORTS_SAVE )

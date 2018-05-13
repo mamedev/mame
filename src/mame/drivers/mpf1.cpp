@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(mpf1_state::mpf1)
 	MCFG_DEFAULT_LAYOUT(layout_mpf1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -417,7 +417,7 @@ MACHINE_CONFIG_START(mpf1_state::mpf1b)
 	MCFG_DEFAULT_LAYOUT(layout_mpf1b)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -454,7 +454,7 @@ MACHINE_CONFIG_START(mpf1_state::mpf1p)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -484,11 +484,11 @@ ROM_END
 
 /* System Drivers */
 
-DRIVER_INIT_MEMBER(mpf1_state,mpf1)
+void mpf1_state::init_mpf1()
 {
 	m_program = &m_maincpu->space(AS_PROGRAM);
 }
 
-COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1_state, mpf1, "Multitech", "Micro Professor 1",      0 )
-COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1B",     0 )
-COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1 Plus", MACHINE_NOT_WORKING )
+COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1_state, init_mpf1, "Multitech", "Micro Professor 1",      0 )
+COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1_state, init_mpf1, "Multitech", "Micro Professor 1B",     0 )
+COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1_state, init_mpf1, "Multitech", "Micro Professor 1 Plus", MACHINE_NOT_WORKING )

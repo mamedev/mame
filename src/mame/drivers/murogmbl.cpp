@@ -355,7 +355,7 @@ MACHINE_CONFIG_START(murogmbl_state::murogmbl)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(murogmbl_state, murogmbl)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -381,7 +381,7 @@ MACHINE_CONFIG_START(slotunbl_state::slotunbl)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(slotunbl_state, slotunbl)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -413,6 +413,6 @@ ROM_START(slotunbl)
 	ROM_LOAD( "74s288.a8",  0x0000, 0x0020, NO_DUMP )
 ROM_END
 
-GAME( 1982, murogmbl,  murogem,   murogmbl, murogmbl, murogmbl_state, 0, ROT0, "bootleg?", "Muroge Monaco (bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, murogmbl,  murogem,   murogmbl, murogmbl, murogmbl_state, empty_init, ROT0, "bootleg?", "Muroge Monaco (bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, slotunbl,  0,   slotunbl, slotunbl, slotunbl_state, 0, ROT0, "bootleg?", "Slot (unknown bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, slotunbl,  0,   slotunbl, slotunbl, slotunbl_state, empty_init, ROT0, "bootleg?", "Slot (unknown bootleg?)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

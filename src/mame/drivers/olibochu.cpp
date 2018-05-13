@@ -490,7 +490,7 @@ MACHINE_CONFIG_START(olibochu_state::olibochu)
 	MCFG_PALETTE_INIT_OWNER(olibochu_state, olibochu)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -543,4 +543,4 @@ ROM_END
 
 
 
-GAME( 1981, olibochu, 0, olibochu, olibochu, olibochu_state, 0, ROT270, "Irem / GDI", "Oli-Boo-Chu", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, olibochu, 0, olibochu, olibochu, olibochu_state, empty_init, ROT270, "Irem / GDI", "Oli-Boo-Chu", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

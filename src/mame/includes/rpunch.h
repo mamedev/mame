@@ -55,8 +55,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(hi_bits_r);
 	DECLARE_WRITE8_MEMBER(upd_control_w);
 	DECLARE_WRITE8_MEMBER(upd_data_w);
-	DECLARE_DRIVER_INIT(rabiolep);
-	DECLARE_DRIVER_INIT(svolley);
+	void init_rabiolep();
+	void init_svolley();
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	virtual void machine_start() override;

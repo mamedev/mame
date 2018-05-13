@@ -351,7 +351,8 @@ MACHINE_CONFIG_START(superdq_state::superdq)
 	MCFG_PALETTE_INIT_OWNER(superdq_state, superdq)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("snsnd", SN76496, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.8)
@@ -419,6 +420,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, superdq,  0,        superdq, superdq, superdq_state, 0, ROT0, "Universal", "Super Don Quix-ote (Long Scenes)",       MACHINE_NOT_WORKING )
-GAME( 1984, superdqs, superdq,  superdq, superdq, superdq_state, 0, ROT0, "Universal", "Super Don Quix-ote (Short Scenes)",      MACHINE_NOT_WORKING )
-GAME( 1984, superdqa, superdq,  superdq, superdq, superdq_state, 0, ROT0, "Universal", "Super Don Quix-ote (Short Scenes, Alt)", MACHINE_NOT_WORKING )
+GAME( 1984, superdq,  0,        superdq, superdq, superdq_state, empty_init, ROT0, "Universal", "Super Don Quix-ote (Long Scenes)",       MACHINE_NOT_WORKING )
+GAME( 1984, superdqs, superdq,  superdq, superdq, superdq_state, empty_init, ROT0, "Universal", "Super Don Quix-ote (Short Scenes)",      MACHINE_NOT_WORKING )
+GAME( 1984, superdqa, superdq,  superdq, superdq, superdq_state, empty_init, ROT0, "Universal", "Super Don Quix-ote (Short Scenes, Alt)", MACHINE_NOT_WORKING )

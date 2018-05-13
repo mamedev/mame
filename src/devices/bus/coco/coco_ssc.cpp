@@ -167,7 +167,7 @@ MACHINE_CONFIG_START(coco_ssc_device::device_add_mconfig)
 	MCFG_RAM_DEFAULT_SIZE("2K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 
-	MCFG_SPEAKER_STANDARD_MONO("ssc_audio")
+	SPEAKER(config, "ssc_audio").front_center();
 
 	MCFG_DEVICE_ADD(SP0256_TAG, SP0256, XTAL(3'120'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ssc_audio", SP0256_GAIN)

@@ -172,7 +172,7 @@ MACHINE_CONFIG_START(subhuntr_state::subhuntr)
 	MCFG_PALETTE_INIT_OWNER(subhuntr_state, subhuntr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* discrete sound */
 MACHINE_CONFIG_END
@@ -192,4 +192,4 @@ ROM_START( subhuntr )
 	ROM_LOAD( "82s115.2b",   0x0000, 0x0200, CRC(6946c9de) SHA1(956b4bebe6960a73609deb75e1493c4127fd7f77) ) // ASCII, not much else
 ROM_END
 
-GAME(1979, subhuntr,  0,        subhuntr, subhuntr, subhuntr_state, 0, ROT0, "Model Racing", "Sub Hunter (Model Racing)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1979, subhuntr,  0,        subhuntr, subhuntr, subhuntr_state, empty_init, ROT0, "Model Racing", "Sub Hunter (Model Racing)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

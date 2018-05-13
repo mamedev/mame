@@ -91,5 +91,5 @@ ROM_START( alesqs7 )
 //  ROM_LOAD( "?.u?", 0x00000, 0x200000, NO_DUMP )
 ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT          COMPANY   FULLNAME                       FLAGS
-COMP( 1996, alesqs7, 0,      0,      qs7,     qs7,   qs_state, 0,  "Alesis", "Alesis QS7 musical keyboard", MACHINE_IS_SKELETON )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS     INIT        COMPANY   FULLNAME                       FLAGS
+COMP( 1996, alesqs7, 0,      0,      qs7,     qs7,   qs_state, empty_init, "Alesis", "Alesis QS7 musical keyboard", MACHINE_IS_SKELETON )

@@ -341,4 +341,4 @@ ROM_START( hp2100 )
 	ROM_LOAD( "92835-80003.bin", 0x000000, 0x000400, CRC(1df52f66) SHA1(84fd048d50f6fde9a79e8df618b5a3435a087f85) )
 ROM_END
 
-COMP( 1966, hp2100, 0, 0, hp2100, hp2100, hp2100_state, 0, "Hewlett-Packard", "HP 2100", MACHINE_IS_SKELETON )
+COMP( 1966, hp2100, 0, 0, hp2100, hp2100, hp2100_state, empty_init, "Hewlett-Packard", "HP 2100", MACHINE_IS_SKELETON )

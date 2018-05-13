@@ -370,7 +370,7 @@ MACHINE_CONFIG_START(inufuku_state::inufuku)
 	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -461,5 +461,5 @@ ROM_END
 
 ******************************************************************************/
 
-GAME( 1998, inufuku,  0, inufuku,   inufuku, inufuku_state, 0, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, 3on3dunk, 0, _3on3dunk, inufuku, inufuku_state, 0, ROT0, "Video System Co.", "3 On 3 Dunk Madness (US, prototype? 1997/02/04)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // tilemap priority is wrong in places (basketball before explosion in attract, highscores)
+GAME( 1998, inufuku,  0, inufuku,   inufuku, inufuku_state, empty_init, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, 3on3dunk, 0, _3on3dunk, inufuku, inufuku_state, empty_init, ROT0, "Video System Co.", "3 On 3 Dunk Madness (US, prototype? 1997/02/04)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // tilemap priority is wrong in places (basketball before explosion in attract, highscores)

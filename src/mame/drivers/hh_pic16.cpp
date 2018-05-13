@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(touchme_state::touchme)
 	MCFG_DEFAULT_LAYOUT(layout_touchme)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, touchme_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -500,7 +500,7 @@ MACHINE_CONFIG_START(pabball_state::pabball)
 	MCFG_DEFAULT_LAYOUT(layout_hh_pic16_test)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(melodym_state::melodym)
 	MCFG_DEFAULT_LAYOUT(layout_melodym)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -714,7 +714,7 @@ MACHINE_CONFIG_START(maniac_state::maniac)
 	MCFG_DEFAULT_LAYOUT(layout_maniac)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, maniac_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -864,7 +864,7 @@ MACHINE_CONFIG_START(matchme_state::matchme)
 	MCFG_DEFAULT_LAYOUT(layout_matchme)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1020,7 +1020,7 @@ MACHINE_CONFIG_START(leboom_state::leboom)
 	MCFG_DEFAULT_LAYOUT(layout_leboom)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", leboom_state, speaker_decay_sim, attotime::from_msec(25))
@@ -1130,7 +1130,7 @@ MACHINE_CONFIG_START(tbaskb_state::tbaskb)
 	MCFG_DEFAULT_LAYOUT(layout_tbaskb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1246,7 +1246,7 @@ MACHINE_CONFIG_START(rockpin_state::rockpin)
 	MCFG_DEFAULT_LAYOUT(layout_rockpin)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(4, rockpin_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -1357,7 +1357,7 @@ MACHINE_CONFIG_START(hccbaskb_state::hccbaskb)
 	MCFG_DEFAULT_LAYOUT(layout_hccbaskb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1509,7 +1509,7 @@ MACHINE_CONFIG_START(ttfball_state::ttfball)
 	MCFG_DEFAULT_LAYOUT(layout_ttfball)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1620,7 +1620,7 @@ MACHINE_CONFIG_START(uspbball_state::uspbball)
 	MCFG_DEFAULT_LAYOUT(layout_hh_pic16_test)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1755,7 +1755,7 @@ MACHINE_CONFIG_START(us2pfball_state::us2pfball)
 	MCFG_DEFAULT_LAYOUT(layout_us2pfball)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1848,26 +1848,26 @@ ROM_END
 
 
 
-//    YEAR  NAME       PARENT  CMP MACHINE    INPUT      STATE         INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1979, touchme,   0,       0, touchme,   touchme,   touchme_state,   0, "Atari", "Touch Me (handheld, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1979, touchme,   0,       0, touchme,   touchme,   touchme_state,   empty_init, "Atari", "Touch Me (handheld, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, pabball,   0,       0, pabball,   pabball,   pabball_state,   0, "Caprice / Calfax", "Pro-Action Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, pabball,   0,       0, pabball,   pabball,   pabball_state,   empty_init, "Caprice / Calfax", "Pro-Action Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1980, melodym,   0,       0, melodym,   melodym,   melodym_state,   0, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, melodym,   0,       0, melodym,   melodym,   melodym_state,   empty_init, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, maniac,    0,       0, maniac,    maniac,    maniac_state,    0, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, maniac,    0,       0, maniac,    maniac,    maniac_state,    empty_init, "Ideal", "Maniac", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, matchme,   0,       0, matchme,   matchme,   matchme_state,   0, "Kingsford", "Match Me", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, matchme,   0,       0, matchme,   matchme,   matchme_state,   empty_init, "Kingsford", "Match Me", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, leboom,    0,       0, leboom,    leboom,    leboom_state,    0, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, leboom,    0,       0, leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, tbaskb,    0,       0, tbaskb,    tbaskb,    tbaskb_state,    0, "Tandy Radio Shack", "Electronic Basketball (Tandy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, tbaskb,    0,       0, tbaskb,    tbaskb,    tbaskb_state,    empty_init, "Tandy Radio Shack", "Electronic Basketball (Tandy)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, rockpin,   0,       0, rockpin,   rockpin,   rockpin_state,   0, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, hccbaskb,  0,       0, hccbaskb,  hccbaskb,  hccbaskb_state,  0, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, rockpin,   0,       0, rockpin,   rockpin,   rockpin_state,   empty_init, "Tiger Electronics", "Rocket Pinball", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, hccbaskb,  0,       0, hccbaskb,  hccbaskb,  hccbaskb_state,  empty_init, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, ttfball,   0,       0, ttfball,   ttfball,   ttfball_state,   0, "Toytronic", "Football (Toytronic, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-CONS( 1979, ttfballa,  ttfball, 0, ttfball,   ttfballa,  ttfball_state,   0, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ttfball,   0,       0, ttfball,   ttfball,   ttfball_state,   empty_init, "Toytronic", "Football (Toytronic, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+CONS( 1979, ttfballa,  ttfball, 0, ttfball,   ttfballa,  ttfball_state,   empty_init, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, uspbball,  0,       0, uspbball,  uspbball,  uspbball_state,  0, "U.S. Games", "Programmable Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1981, us2pfball, 0,       0, us2pfball, us2pfball, us2pfball_state, 0, "U.S. Games", "Electronic 2-Player Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, uspbball,  0,       0, uspbball,  uspbball,  uspbball_state,  empty_init, "U.S. Games", "Programmable Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1981, us2pfball, 0,       0, us2pfball, us2pfball, us2pfball_state, empty_init, "U.S. Games", "Electronic 2-Player Football", MACHINE_SUPPORTS_SAVE )

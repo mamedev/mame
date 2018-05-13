@@ -304,7 +304,7 @@ static const char *const safarir_sample_names[] =
 
 
 MACHINE_CONFIG_START(safarir_state::safarir_audio)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(6)
 	MCFG_SAMPLES_NAMES(safarir_sample_names)
@@ -504,5 +504,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, safarir, 0,        safarir, safarir, safarir_state, 0, ROT90, "SNK (Taito license)", "Safari Rally (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1979, safarirj, safarir, safarir, safarir, safarir_state, 0, ROT90, "SNK",                 "Safari Rally (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, safarir, 0,        safarir, safarir, safarir_state, empty_init, ROT90, "SNK (Taito license)", "Safari Rally (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, safarirj, safarir, safarir, safarir, safarir_state, empty_init, ROT90, "SNK",                 "Safari Rally (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

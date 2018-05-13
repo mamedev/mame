@@ -342,7 +342,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port_04_w);
 	DECLARE_WRITE8_MEMBER(port_07_w);
 
-	DECLARE_DRIVER_INIT(nss);
+	void init_nss();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
 	virtual void machine_start() override;
@@ -851,7 +851,8 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_M6M80011AP_ADD("m6m80011ap")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("spc700", SNES_SOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
@@ -1071,26 +1072,26 @@ ROM_START( nss_sten )
 	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(2fd8475b) SHA1(38af97734649b90e0ea74cb1daeaa431e4295eb9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(nss_state,nss)
+void nss_state::init_nss()
 {
 	uint8_t *PROM = memregion("rp5h01")->base();
 
 	for (int i = 0; i < 0x10; i++)
 		PROM[i] = bitswap<8>(PROM[i],0,1,2,3,4,5,6,7) ^ 0xff;
 
-	DRIVER_INIT_CALL(snes);
+	init_snes();
 }
 
-GAME( 199?, nss,       0,     nss,      snes, nss_state,    snes,   ROT0, "Nintendo",                    "Nintendo Super System BIOS", MACHINE_IS_BIOS_ROOT )
-GAME( 1992, nss_actr,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1992, nss_adam,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "The Addams Family (Nintendo Super System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1992, nss_aten,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Absolute Entertainment Inc.", "David Crane's Amazing Tennis (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1992, nss_con3,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Konami",                      "Contra 3: The Alien Wars (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1992, nss_lwep,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "Lethal Weapon (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1992, nss_ncaa,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Sculptured Software Inc.",    "NCAA Basketball (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1992, nss_rob3,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "Robocop 3 (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1992, nss_skin,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Irem",                        "Skins Game (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // can't start
-GAME( 1992, nss_ssoc,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Human Inc.",                  "Super Soccer (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1991, nss_smw,   nss,   nss,      snes, nss_state,    nss,    ROT0, "Nintendo",                    "Super Mario World (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1991, nss_fzer,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Nintendo",                    "F-Zero (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1991, nss_sten,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Nintendo",                    "Super Tennis (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, nss,       0,     nss,      snes, nss_state, init_snes, ROT0, "Nintendo",                    "Nintendo Super System BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1992, nss_actr,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, nss_adam,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Ocean",                       "The Addams Family (Nintendo Super System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, nss_aten,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Absolute Entertainment Inc.", "David Crane's Amazing Tennis (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1992, nss_con3,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Konami",                      "Contra 3: The Alien Wars (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1992, nss_lwep,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Ocean",                       "Lethal Weapon (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1992, nss_ncaa,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Sculptured Software Inc.",    "NCAA Basketball (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1992, nss_rob3,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Ocean",                       "Robocop 3 (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1992, nss_skin,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Irem",                        "Skins Game (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // can't start
+GAME( 1992, nss_ssoc,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Human Inc.",                  "Super Soccer (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, nss_smw,   nss,   nss,      snes, nss_state, init_nss,  ROT0, "Nintendo",                    "Super Mario World (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, nss_fzer,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Nintendo",                    "F-Zero (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, nss_sten,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Nintendo",                    "Super Tennis (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

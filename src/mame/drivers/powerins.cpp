@@ -328,7 +328,7 @@ MACHINE_CONFIG_START(powerins_state::powerins)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -741,8 +741,8 @@ ROM_END
 
 
 /* all supported sets give a 93.10.20 date */
-GAME( 1993, powerins,  0,        powerins,  powerins, powerins_state, 0, ROT0, "Atlus", "Power Instinct (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, powerinsj, powerins, powerins,  powerinj, powerins_state, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, powerinsp, powerins, powerins,  powerinj, powerins_state, 0, ROT0, "Atlus", "Power Instinct (USA, prototype)", MACHINE_SUPPORTS_SAVE ) // boots as 93.10.20 just like the other sets, but code is different
-GAME( 1993, powerinsa, powerins, powerinsa, powerins, powerins_state, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, powerinsb, powerins, powerinsb, powerins, powerins_state, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerins,  0,        powerins,  powerins, powerins_state, empty_init, ROT0, "Atlus", "Power Instinct (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerinsj, powerins, powerins,  powerinj, powerins_state, empty_init, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerinsp, powerins, powerins,  powerinj, powerins_state, empty_init, ROT0, "Atlus", "Power Instinct (USA, prototype)", MACHINE_SUPPORTS_SAVE ) // boots as 93.10.20 just like the other sets, but code is different
+GAME( 1993, powerinsa, powerins, powerinsa, powerins, powerins_state, empty_init, ROT0, "bootleg", "Power Instinct (USA, bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerinsb, powerins, powerinsb, powerins, powerins_state, empty_init, ROT0, "bootleg", "Power Instinct (USA, bootleg set 2)", MACHINE_SUPPORTS_SAVE )

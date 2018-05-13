@@ -61,7 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(astron_COLOR_write);
 	DECLARE_WRITE8_MEMBER(astron_FIX_write);
 	DECLARE_WRITE8_MEMBER(astron_io_bankswitch_w);
-	DECLARE_DRIVER_INIT(astron);
+	void init_astron();
 	virtual void machine_start() override;
 	uint32_t screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect);
@@ -392,7 +392,8 @@ MACHINE_CONFIG_START(segald_state::astron)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardare */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -603,7 +604,7 @@ ROM_START( cobraseg )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(segald_state,astron)
+void segald_state::init_astron()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x8000], 0x4000);
@@ -611,9 +612,9 @@ DRIVER_INIT_MEMBER(segald_state,astron)
 
 
 //    YEAR, NAME,     PARENT,  MACHINE,INPUT,  STATE,        INIT,   MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1983, astron,   0,       astron, astron, segald_state, astron, ROT0,   "Sega", "Astron Belt",                             MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, astronp,  astron,  astron, astron, segald_state, astron, ROT0,   "Sega", "Astron Belt (Pioneer LDV1000)",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, cobraseg, astron,  astron, astron, segald_state, astron, ROT0,   "Sega", "Cobra Command (Sega LaserDisc Hardware)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, galaxyr,  0,       astron, astron, segald_state, astron, ROT0,   "Sega", "Galaxy Ranger",                           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, galaxyrp, galaxyr, astron, astron, segald_state, astron, ROT0,   "Sega", "Galaxy Ranger (Pioneer LDV1000)",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, sblazerp, galaxyr, astron, astron, segald_state, astron, ROT0,   "Sega", "Star Blazer (Pioneer LDV1000)",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, astron,   0,       astron, astron, segald_state, init_astron, ROT0,   "Sega", "Astron Belt",                             MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, astronp,  astron,  astron, astron, segald_state, init_astron, ROT0,   "Sega", "Astron Belt (Pioneer LDV1000)",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, cobraseg, astron,  astron, astron, segald_state, init_astron, ROT0,   "Sega", "Cobra Command (Sega LaserDisc Hardware)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, galaxyr,  0,       astron, astron, segald_state, init_astron, ROT0,   "Sega", "Galaxy Ranger",                           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, galaxyrp, galaxyr, astron, astron, segald_state, init_astron, ROT0,   "Sega", "Galaxy Ranger (Pioneer LDV1000)",         MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, sblazerp, galaxyr, astron, astron, segald_state, init_astron, ROT0,   "Sega", "Star Blazer (Pioneer LDV1000)",           MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

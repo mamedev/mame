@@ -324,9 +324,8 @@ MACHINE_CONFIG_START(binbug_state::binbug)
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", binbug_state, binbug, "pgm", 1)
@@ -345,8 +344,8 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT  COMPANY      FULLNAME      FLAGS
-COMP( 1980, binbug, pipbug,   0,     binbug,    binbug, binbug_state, 0,    "MicroByte", "BINBUG 3.6", 0 )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT        COMPANY      FULLNAME      FLAGS
+COMP( 1980, binbug, pipbug,   0,     binbug,    binbug, binbug_state, empty_init, "MicroByte", "BINBUG 3.6", 0 )
 
 
 
@@ -560,9 +559,8 @@ MACHINE_CONFIG_START(dg680_state::dg680)
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(8'000'000) / 4)
@@ -595,5 +593,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  CLASS        INIT  COMPANY            FULLNAME                   FLAGS
-COMP( 1980, dg680, 0,      0,       dg680,   dg680, dg680_state, 0,    "David Griffiths", "DG680 with DGOS-Z80 1.4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY            FULLNAME                   FLAGS
+COMP( 1980, dg680, 0,      0,      dg680,   dg680, dg680_state, empty_init, "David Griffiths", "DG680 with DGOS-Z80 1.4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

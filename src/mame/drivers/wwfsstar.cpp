@@ -434,7 +434,8 @@ MACHINE_CONFIG_START(wwfsstar_state::wwfsstar)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -661,9 +662,9 @@ ROM_END
 // There is only 1 ROM difference between US revision 6 & 7.  Rev 7 has a patch to the way the 2nd coin slot works
 
 
-GAME( 1989, wwfsstar,   0,        wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (Europe)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstaru7, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (US revision 7)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstaru6, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (US revision 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstaru4, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (US revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstarj,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstarb,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "bootleg",       "WWF Superstars (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstar,   0,        wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (Europe)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstaru7, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (US revision 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstaru6, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (US revision 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstaru4, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstarj,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstarb,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "bootleg",       "WWF Superstars (bootleg)",   MACHINE_SUPPORTS_SAVE )

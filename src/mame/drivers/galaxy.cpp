@@ -200,9 +200,8 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(gtp_cassette_formats)
@@ -243,10 +242,9 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL/4)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL/4) // FIXME: really no output routes for this AY?
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(gtp_cassette_formats)
@@ -277,6 +275,6 @@ ROM_START (galaxyp)
 	ROM_LOAD ("galchr.bin", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT    STATE         INIT    COMPANY                                   FULLNAME */
-COMP(1983,  galaxy,     0,      0,  galaxy, galaxy,  galaxy_state, galaxy, "Voja Antonic / Elektronika inzenjering", "Galaksija",      0)
-COMP(1985,  galaxyp,    galaxy, 0,  galaxyp,galaxyp, galaxy_state, galaxyp,"Nenad Dunjic",                           "Galaksija plus", 0)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT          COMPANY                                   FULLNAME */
+COMP( 1983, galaxy,  0,      0,      galaxy,  galaxy,  galaxy_state, init_galaxy,  "Voja Antonic / Elektronika inzenjering", "Galaksija",      0)
+COMP( 1985, galaxyp, galaxy, 0,      galaxyp, galaxyp, galaxy_state, init_galaxyp, "Nenad Dunjic",                           "Galaksija plus", 0)

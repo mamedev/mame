@@ -518,7 +518,8 @@ MACHINE_CONFIG_START(champbwl_state::champbwl)
 	MCFG_PALETTE_INIT_OWNER(champbwl_state,champbwl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -582,7 +583,7 @@ MACHINE_CONFIG_START(champbwl_state::doraemon)
 	MCFG_PALETTE_INIT_OWNER(champbwl_state,champbwl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(14'318'181))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -709,5 +710,5 @@ ROM_START( doraemon )
 	ROM_LOAD( "u27-01.bin", 0x00200, 0x200, CRC(66245fc7) SHA1(c94d9dce7b557c21a3dc1f3f8a1b29594715c994) )
 ROM_END
 
-GAME( 1993?,doraemon, 0, doraemon, doraemon, champbwl_state, 0, ROT0,   "Sunsoft / Epoch",     "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
-GAME( 1989, champbwl, 0, champbwl, champbwl, champbwl_state, 0, ROT270, "Seta / Romstar Inc.", "Championship Bowling",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1993?,doraemon, 0, doraemon, doraemon, champbwl_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
+GAME( 1989, champbwl, 0, champbwl, champbwl, champbwl_state, empty_init, ROT270, "Seta / Romstar Inc.", "Championship Bowling",                   MACHINE_SUPPORTS_SAVE )

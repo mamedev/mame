@@ -551,4 +551,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1978, boxer, 0, boxer, boxer, boxer_state, 0, 0, "Atari", "Boxer (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, boxer, 0, boxer, boxer, boxer_state, empty_init, 0, "Atari", "Boxer (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

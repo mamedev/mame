@@ -386,7 +386,7 @@ MACHINE_CONFIG_START(oneshot_state::oneshot)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -497,6 +497,6 @@ ROM_END
 
 
 
-GAME( 1995, maddonna, 0,        maddonna, maddonna, oneshot_state, 0, ROT0, "Tuning",  "Mad Donna (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, maddonnb, maddonna, maddonna, maddonna, oneshot_state, 0, ROT0, "Tuning",  "Mad Donna (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, oneshot,  0,        oneshot,  oneshot , oneshot_state, 0, ROT0, "Promat",  "One Shot One Kill", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, maddonna, 0,        maddonna, maddonna, oneshot_state, empty_init, ROT0, "Tuning",  "Mad Donna (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, maddonnb, maddonna, maddonna, maddonna, oneshot_state, empty_init, ROT0, "Tuning",  "Mad Donna (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, oneshot,  0,        oneshot,  oneshot , oneshot_state, empty_init, ROT0, "Promat",  "One Shot One Kill", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

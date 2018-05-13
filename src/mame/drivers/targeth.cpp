@@ -299,7 +299,7 @@ MACHINE_CONFIG_START(targeth_state::targeth)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) // 1MHz resonator - pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
@@ -384,6 +384,6 @@ ROM_START( targeth10 )
 	ROM_LOAD( "targeth.c3",     0x080000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
 ROM_END
 
-GAME( 1994, targeth,   0,       targeth, targeth, targeth_state, 0, ROT0, "Gaelco", "Target Hits (ver 1.1, Checksum 5152)", 0 )
-GAME( 1994, targetha,  targeth, targeth, targeth, targeth_state, 0, ROT0, "Gaelco", "Target Hits (ver 1.1, Checksum 86E1)", 0 )
-GAME( 1994, targeth10, targeth, targeth, targeth, targeth_state, 0, ROT0, "Gaelco", "Target Hits (ver 1.0, Checksum FBCB)", 0 )
+GAME( 1994, targeth,   0,       targeth, targeth, targeth_state, empty_init, ROT0, "Gaelco", "Target Hits (ver 1.1, Checksum 5152)", 0 )
+GAME( 1994, targetha,  targeth, targeth, targeth, targeth_state, empty_init, ROT0, "Gaelco", "Target Hits (ver 1.1, Checksum 86E1)", 0 )
+GAME( 1994, targeth10, targeth, targeth, targeth, targeth_state, empty_init, ROT0, "Gaelco", "Target Hits (ver 1.0, Checksum FBCB)", 0 )

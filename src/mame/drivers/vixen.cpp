@@ -759,7 +759,7 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, vixen_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
@@ -836,7 +836,7 @@ ROM_END
 //-------------------------------------------------
 
 
-DRIVER_INIT_MEMBER(vixen_state,vixen)
+void vixen_state::init_vixen()
 {
 	m_program = &m_maincpu->space(AS_PROGRAM);
 }
@@ -847,5 +847,5 @@ DRIVER_INIT_MEMBER(vixen_state,vixen)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT    CLASS         INIT    COMPANY      FULLNAME      FLAGS
-COMP( 1984, vixen,  0,       0,     vixen,     vixen,   vixen_state,  vixen,  "Osborne",   "Vixen",      0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY    FULLNAME  FLAGS
+COMP( 1984, vixen, 0,       0,     vixen,   vixen,  vixen_state, init_vixen, "Osborne", "Vixen",  0 )

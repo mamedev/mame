@@ -409,7 +409,7 @@ MACHINE_CONFIG_START(shougi_state::shougi)
 	MCFG_PALETTE_INIT_OWNER(shougi_state, shougi)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(10'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -469,6 +469,6 @@ ROM_START( shougi2 )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT  MONITOR  COMPANY                              FULLNAME          FLAGS */
-GAME( 1982, shougi,  0,      shougi,  shougi,  shougi_state, 0,    ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi",         MACHINE_SUPPORTS_SAVE )
-GAME( 1982, shougi2, 0,      shougi,  shougi2, shougi_state, 0,    ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi Part II", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT        MONITOR  COMPANY                              FULLNAME          FLAGS */
+GAME( 1982, shougi,  0,      shougi,  shougi,  shougi_state, empty_init, ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, shougi2, 0,      shougi,  shougi2, shougi_state, empty_init, ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi Part II", MACHINE_SUPPORTS_SAVE )

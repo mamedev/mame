@@ -65,9 +65,9 @@ public:
 	DECLARE_WRITE16_MEMBER(dbz_bg2_videoram_w);
 	DECLARE_WRITE16_MEMBER(dbz_bg1_videoram_w);
 	DECLARE_WRITE_LINE_MEMBER(dbz_irq2_ack_w);
-	DECLARE_DRIVER_INIT(dbza);
-	DECLARE_DRIVER_INIT(dbz);
-	DECLARE_DRIVER_INIT(dbz2);
+	void init_dbza();
+	void init_dbz();
+	void init_dbz2();
 	TILE_GET_INFO_MEMBER(get_dbz_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_dbz_bg1_tile_info);
 	virtual void machine_start() override;

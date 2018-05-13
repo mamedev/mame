@@ -397,7 +397,7 @@ MACHINE_CONFIG_START(brkthru_state::brkthru)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, brkthru_state, vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -449,7 +449,7 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, brkthru_state, vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -641,7 +641,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(brkthru_state,brkthru)
+void brkthru_state::init_brkthru()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
@@ -653,7 +653,7 @@ DRIVER_INIT_MEMBER(brkthru_state,brkthru)
  *
  *************************************/
 
-GAME( 1986, brkthru,  0,       brkthru, brkthru,  brkthru_state, brkthru, ROT0,   "Data East USA",         "Break Thru (US)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthruj, brkthru, brkthru, brkthruj, brkthru_state, brkthru, ROT0,   "Data East Corporation", "Kyohkoh-Toppa (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, forcebrk, brkthru, brkthru, brkthruj, brkthru_state, brkthru, ROT0,   "bootleg",               "Force Break (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, darwin,   0,       darwin,  darwin,   brkthru_state, brkthru, ROT270, "Data East Corporation", "Darwin 4078 (Japan)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthru,  0,       brkthru, brkthru,  brkthru_state, init_brkthru, ROT0,   "Data East USA",         "Break Thru (US)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthruj, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "Data East Corporation", "Kyohkoh-Toppa (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, forcebrk, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "bootleg",               "Force Break (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darwin,   0,       darwin,  darwin,   brkthru_state, init_brkthru, ROT270, "Data East Corporation", "Darwin 4078 (Japan)",   MACHINE_SUPPORTS_SAVE )

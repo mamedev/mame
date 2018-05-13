@@ -122,5 +122,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                  FULLNAME  FLAGS */
-COMP( 1980, zsbc3,  0,      0,       zsbc3,     zsbc3,  zsbc3_state,  0,    "Digital Microsystems",  "ZSBC-3", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY                 FULLNAME  FLAGS */
+COMP( 1980, zsbc3, 0,      0,      zsbc3,   zsbc3, zsbc3_state, empty_init, "Digital Microsystems", "ZSBC-3", MACHINE_NO_SOUND_HW)

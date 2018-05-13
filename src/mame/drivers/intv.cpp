@@ -488,7 +488,7 @@ MACHINE_CONFIG_START(intv_state::intv)
 	MCFG_INTV_CONTROL_PORT_ADD("iopt_left_ctrl", intv_control_port_devices, "handctrl")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay8914", AY8914, XTAL(3'579'545)/2)
 	MCFG_AY8910_PORT_A_READ_CB(READ8("iopt_right_ctrl", intv_control_port_device, ctrl_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8("iopt_left_ctrl",  intv_control_port_device, ctrl_r))
@@ -642,14 +642,14 @@ ROM_START(intvkbd) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 an
 	ROM_LOAD( "0370.u74", 0x20, 0x20, CRC(19da5096) SHA1(76af50e4fd29649fc4837120c245321a8fc84cd3))
 ROM_END
 
-DRIVER_INIT_MEMBER(intv_state,intv)
+void intv_state::init_intv()
 {
 	m_stic->set_x_scale(INTV_X_SCALE);
 	m_stic->set_y_scale(INTV_Y_SCALE);
 	m_is_keybd = 0;
 }
 
-DRIVER_INIT_MEMBER(intv_state,intvkbd)
+void intv_state::init_intvkbd()
 {
 	m_stic->set_x_scale(INTVKBD_X_SCALE);
 	m_stic->set_y_scale(INTVKBD_Y_SCALE);
@@ -663,12 +663,12 @@ DRIVER_INIT_MEMBER(intv_state,intvkbd)
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT        COMPANY   FULLNAME */
-CONS( 1979, intv,       0,      0,      intv,       0,       intv_state,    intv,       "Mattel", "Intellivision", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, intvsrs,    intv,   0,      intv,       0,       intv_state,    intv,       "Sears",  "Super Video Arcade", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, intvkbd,    intv,   0,      intvkbd,    intvkbd, intv_state,    intvkbd,    "Mattel", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-CONS( 1982, intv2,      intv,   0,      intv2,      0,       intv_state,    intv,       "Mattel", "Intellivision II", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT          COMPANY   FULLNAME */
+CONS( 1979, intv,     0,      0,      intv,     0,       intv_state, init_intv,    "Mattel", "Intellivision", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, intvsrs,  intv,   0,      intv,     0,       intv_state, init_intv,    "Sears",  "Super Video Arcade", MACHINE_SUPPORTS_SAVE )
+COMP( 1981, intvkbd,  intv,   0,      intvkbd,  intvkbd, intv_state, init_intvkbd, "Mattel", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1982, intv2,    intv,   0,      intv2,    0,       intv_state, init_intv,    "Mattel", "Intellivision II", MACHINE_SUPPORTS_SAVE )
 
 // made up, user friendlier machines with pre-mounted passthu expansions
-COMP( 1982, intvoice,   intv,   0,      intvoice,   0,       intv_state,    intv,       "Mattel", "Intellivision w/IntelliVoice expansion", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, intvecs,    intv,   0,      intvecs,    0,       intv_state,    intv,       "Mattel", "Intellivision w/Entertainment Computer System + Intellivoice expansions", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, intvoice, intv,   0,      intvoice, 0,       intv_state, init_intv,    "Mattel", "Intellivision w/IntelliVoice expansion", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, intvecs,  intv,   0,      intvecs,  0,       intv_state, init_intv,    "Mattel", "Intellivision w/Entertainment Computer System + Intellivoice expansions", MACHINE_SUPPORTS_SAVE )

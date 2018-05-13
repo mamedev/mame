@@ -593,7 +593,8 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1122000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
@@ -673,5 +674,5 @@ ROM_START( rbspm )
 	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, NO_DUMP )
 ROM_END
 
-GAME( 1998, rbmk,  0, rbmk,  rbmk,  rbmk_state, 0, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",     MACHINE_NOT_WORKING )
-GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, 0, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)", MACHINE_NOT_WORKING )
+GAME( 1998, rbmk,  0, rbmk,  rbmk,  rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",     MACHINE_NOT_WORKING )
+GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)", MACHINE_NOT_WORKING )

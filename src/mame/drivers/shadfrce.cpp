@@ -557,7 +557,8 @@ MACHINE_CONFIG_START(shadfrce_state::shadfrce)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -663,6 +664,6 @@ ROM_START( shadfrcej )
 ROM_END
 
 
-GAME( 1993, shadfrce,   0,        shadfrce, shadfrce, shadfrce_state, 0, ROT0, "Technos Japan", "Shadow Force (World, Version 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shadfrceu,  shadfrce, shadfrce, shadfrce, shadfrce_state, 0, ROT0, "Technos Japan", "Shadow Force (US, Version 2)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, shadfrcej,  shadfrce, shadfrce, shadfrce, shadfrce_state, 0, ROT0, "Technos Japan", "Shadow Force (Japan, Version 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrce,   0,        shadfrce, shadfrce, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force (World, Version 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrceu,  shadfrce, shadfrce, shadfrce, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force (US, Version 2)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, shadfrcej,  shadfrce, shadfrce, shadfrce, shadfrce_state, empty_init, ROT0, "Technos Japan", "Shadow Force (Japan, Version 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

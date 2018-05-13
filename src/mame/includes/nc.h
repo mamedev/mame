@@ -90,7 +90,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nc200_rxrdy_callback);
 	DECLARE_WRITE_LINE_MEMBER(nc200_fdc_interrupt);
 
-	DECLARE_DRIVER_INIT( nc );
+	void init_nc();
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nc_pcmcia_card );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nc_pcmcia_card );
 

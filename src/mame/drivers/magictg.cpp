@@ -921,7 +921,8 @@ MACHINE_CONFIG_START(magictg_state::magictg)
 	MCFG_DEVICE_DATA_MAP(adsp_data_map)
 	MCFG_DEVICE_IO_MAP(adsp_io_map)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -1026,5 +1027,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1997, magictg,  0,       magictg, magictg, magictg_state, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, magictga, magictg, magictg, magictg, magictg_state, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, magictg,  0,       magictg, magictg, magictg_state, empty_init, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, magictga, magictg, magictg, magictg, magictg_state, empty_init, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

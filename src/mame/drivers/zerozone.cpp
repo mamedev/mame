@@ -197,7 +197,7 @@ MACHINE_CONFIG_START(zerozone_state::zerozone)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -247,5 +247,5 @@ ROM_START( lvgirl94 )
 ROM_END
 
 
-GAME( 1993, zerozone, 0, zerozone, zerozone, zerozone_state, 0, ROT0, "Comad", "Zero Zone", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lvgirl94, 0, zerozone, zerozone, zerozone_state, 0, ROT0, "Comad", "Las Vegas Girl (Girl '94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, zerozone, 0, zerozone, zerozone, zerozone_state, empty_init, ROT0, "Comad", "Zero Zone", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lvgirl94, 0, zerozone, zerozone, zerozone_state, empty_init, ROT0, "Comad", "Las Vegas Girl (Girl '94)", MACHINE_SUPPORTS_SAVE )

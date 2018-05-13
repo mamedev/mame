@@ -346,7 +346,7 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	/* sound hardware */
 	/* the initialization order is important, the port callbacks being
 	   called at initialization time */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, M6809_IRQ_LINE))
@@ -448,6 +448,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, bladestl,  0,        bladestl, bladestl_joy,   bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version T, Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bladestll, bladestl, bladestl, bladestl_track, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version L, Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bladestle, bladestl, bladestl, bladestl_track, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version E, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestl,  0,        bladestl, bladestl_joy,   bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version T, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestll, bladestl, bladestl, bladestl_track, bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version L, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestle, bladestl, bladestl, bladestl_track, bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version E, Trackball)", MACHINE_SUPPORTS_SAVE )

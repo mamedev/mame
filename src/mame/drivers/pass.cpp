@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(pass_state::pass)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -302,4 +302,4 @@ ROM_START( pass )
 ROM_END
 
 
-GAME( 1992, pass, 0, pass, pass, pass_state, 0, ROT0, "Oksan", "Pass", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pass, 0, pass, pass, pass_state, empty_init, ROT0, "Oksan", "Pass", MACHINE_SUPPORTS_SAVE )

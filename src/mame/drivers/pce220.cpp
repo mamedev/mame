@@ -956,7 +956,7 @@ MACHINE_CONFIG_START(pce220_state::pce220)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -992,7 +992,7 @@ MACHINE_CONFIG_START(pcg850v_state::pcg815)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -1028,7 +1028,7 @@ MACHINE_CONFIG_START(pcg850v_state::pcg850v)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -1114,7 +1114,7 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT  COMPANY    FULLNAME        FLAGS
-COMP( 1991, pce220,  0,      0,      pce220,   pce220,  pce220_state,  0,    "Sharp",   "PC-E220",      MACHINE_NOT_WORKING )
-COMP( 1992, pcg815,  0,      0,      pcg815,   pcg850v, pcg850v_state, 0,    "Sharp",   "PC-G815",      MACHINE_NOT_WORKING )
-COMP( 2001, pcg850v, 0,      0,      pcg850v,  pcg850v, pcg850v_state, 0,    "Sharp",   "PC-G850V",     MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME    FLAGS
+COMP( 1991, pce220,  0,      0,      pce220,  pce220,  pce220_state,  empty_init, "Sharp", "PC-E220",  MACHINE_NOT_WORKING )
+COMP( 1992, pcg815,  0,      0,      pcg815,  pcg850v, pcg850v_state, empty_init, "Sharp", "PC-G815",  MACHINE_NOT_WORKING )
+COMP( 2001, pcg850v, 0,      0,      pcg850v, pcg850v, pcg850v_state, empty_init, "Sharp", "PC-G850V", MACHINE_NOT_WORKING )

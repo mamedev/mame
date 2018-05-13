@@ -447,7 +447,7 @@ MACHINE_CONFIG_START(changela_state::changela)
 	MCFG_PALETTE_ADD("palette", 0x40)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 1250000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
@@ -496,4 +496,4 @@ ROM_START( changela )
 	ROM_LOAD( "cl88",   0x0000, 0x0020, CRC(da4d6625) SHA1(2d9a268973518252eb36f479ab650af8c16c885c) ) /* math train state machine */
 ROM_END
 
-GAMEL( 1983, changela, 0, changela, changela, changela_state, 0,   ROT180, "Taito Corporation", "Change Lanes", MACHINE_SUPPORTS_SAVE, layout_changela )
+GAMEL( 1983, changela, 0, changela, changela, changela_state, empty_init, ROT180, "Taito Corporation", "Change Lanes", MACHINE_SUPPORTS_SAVE, layout_changela )

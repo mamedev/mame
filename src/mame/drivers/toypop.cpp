@@ -707,7 +707,7 @@ MACHINE_CONFIG_START(namcos16_state::liblrabl)
 	MCFG_PALETTE_INIT_OWNER(namcos16_state, toypop)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("namco", NAMCO_15XX, 24000)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -778,5 +778,5 @@ ROM_START( toypop )
 	ROM_LOAD( "tp1-6.3d", 0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
 ROM_END
 
-GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, namcos16_state, 0,   ROT0,   "Namco", "Libble Rabble", MACHINE_NO_COCKTAIL )
-GAME( 1986, toypop,   0,     toypop,   toypop,   namcos16_state, 0,   ROT0,   "Namco", "Toypop",        MACHINE_NO_COCKTAIL )
+GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, namcos16_state, empty_init, ROT0, "Namco", "Libble Rabble", MACHINE_NO_COCKTAIL )
+GAME( 1986, toypop,   0,     toypop,   toypop,   namcos16_state, empty_init, ROT0, "Namco", "Toypop",        MACHINE_NO_COCKTAIL )

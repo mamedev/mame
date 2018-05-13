@@ -43,7 +43,7 @@ public:
 	DECLARE_READ8_MEMBER(portff_r);
 	DECLARE_WRITE8_MEMBER(portff_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_DRIVER_INIT(dps1);
+	void init_dps1();
 	DECLARE_MACHINE_RESET(dps1);
 
 	void dps1(machine_config &config);
@@ -176,7 +176,7 @@ MACHINE_RESET_MEMBER( dps1_state, dps1 )
 	floppy->mon_w(0);
 }
 
-DRIVER_INIT_MEMBER( dps1_state, dps1 )
+void dps1_state::init_dps1()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -233,4 +233,4 @@ ROM_START( dps1 )
 	ROM_LOAD( "boot 1280", 0x000, 0x400, CRC(9c2e98fa) SHA1(78e6c9d00aa6e8f6c4d3c65984cfdf4e99434c66) ) // actually on the FDC-2 board
 ROM_END
 
-COMP( 1979, dps1, 0, 0, dps1, dps1, dps1_state, dps1, "Ithaca InterSystems", "DPS-1", MACHINE_NO_SOUND_HW )
+COMP( 1979, dps1, 0, 0, dps1, dps1, dps1_state, init_dps1, "Ithaca InterSystems", "DPS-1", MACHINE_NO_SOUND_HW )

@@ -533,7 +533,7 @@ MACHINE_CONFIG_START(apf_state::apfm1000)
 	// other lines not connected
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -562,8 +562,7 @@ MACHINE_CONFIG_START(apf_state::apfimag)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("16K")
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(*this, apf_state, pia1_porta_r))
@@ -615,6 +614,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT     COMPAT  MACHINE     INPUT      CLASS       INIT  COMPANY                 FULLNAME */
-COMP( 1979, apfimag,  apfm1000,  0,      apfimag,    apfimag,   apf_state,  0,    "APF Electronics Inc.", "APF Imagination Machine", 0 )
-CONS( 1978, apfm1000, 0,         0,      apfm1000,   apfm1000,  apf_state,  0,    "APF Electronics Inc.", "APF M-1000", 0 )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY                 FULLNAME */
+COMP( 1979, apfimag,  apfm1000, 0,      apfimag,  apfimag,  apf_state, empty_init, "APF Electronics Inc.", "APF Imagination Machine", 0 )
+CONS( 1978, apfm1000, 0,        0,      apfm1000, apfm1000, apf_state, empty_init, "APF Electronics Inc.", "APF M-1000", 0 )

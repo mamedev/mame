@@ -65,9 +65,9 @@ public:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(amerdart_scanline);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_scanline);
-	DECLARE_DRIVER_INIT(coolpool);
-	DECLARE_DRIVER_INIT(amerdart);
-	DECLARE_DRIVER_INIT(9ballsht);
+	void init_coolpool();
+	void init_amerdart();
+	void init_9ballsht();
 	DECLARE_MACHINE_RESET(amerdart);
 	DECLARE_MACHINE_RESET(coolpool);
 	TIMER_DEVICE_CALLBACK_MEMBER(nvram_write_timeout);

@@ -346,7 +346,7 @@ MACHINE_CONFIG_START(sparkz_state::sparkz)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sparkz_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK/4/3, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -399,5 +399,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1992, arcadecl, 0, arcadecl, arcadecl, arcadecl_state, 0, ROT0, "Atari Games", "Arcade Classics (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sparkz,   0, sparkz,   sparkz,   sparkz_state,   0, ROT0, "Atari Games", "Sparkz (prototype)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1992, arcadecl, 0, arcadecl, arcadecl, arcadecl_state, empty_init, ROT0, "Atari Games", "Arcade Classics (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sparkz,   0, sparkz,   sparkz,   sparkz_state,   empty_init, ROT0, "Atari Games", "Sparkz (prototype)",          MACHINE_SUPPORTS_SAVE )

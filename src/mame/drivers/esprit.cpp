@@ -30,7 +30,7 @@ public:
 	{ }
 
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_DRIVER_INIT(init);
+	void init_init();
 
 	void esprit(machine_config &config);
 	void esprit3(machine_config &config);
@@ -110,7 +110,7 @@ static GFXDECODE_START( esprit )
 	GFXDECODE_ENTRY( "chargen", 0x0000, esprit_charlayout, 0, 1 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER( esprit_state, init )
+void esprit_state::init_init()
 {
 	// chargen is incomplete, copy the first half into the vacant second half
 	for (u16 i = 0; i < 0x800; i++)
@@ -161,5 +161,5 @@ ROM_START( esprit3 )
 	ROM_LOAD( "hazeltine_espritiii.u19", 0x0000, 0x1000, CRC(33e4a8ef) SHA1(e19c84a3c5f94812928ea84bab3ede7970dd5e72) )
 ROM_END
 
-COMP( 1981, esprit,  0,         0, esprit,  esprit, esprit_state, init, "Hazeltine", "Esprit", MACHINE_IS_SKELETON )
-COMP( 1981, esprit3, esprit,    0, esprit3, esprit, esprit_state, 0,    "Hazeltine", "Esprit III", MACHINE_IS_SKELETON )
+COMP( 1981, esprit,  0,      0, esprit,  esprit, esprit_state, init_init,  "Hazeltine", "Esprit",     MACHINE_IS_SKELETON )
+COMP( 1981, esprit3, esprit, 0, esprit3, esprit, esprit_state, empty_init, "Hazeltine", "Esprit III", MACHINE_IS_SKELETON )

@@ -57,4 +57,4 @@ ROM_START(lckydraw)
 ROM_END
 
 
-GAME( 1979, lckydraw, 0, lckydraw, lckydraw, lckydraw_state, 0, ROT0, "Mirco", "Lucky Draw (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, lckydraw, 0, lckydraw, lckydraw, lckydraw_state, empty_init, ROT0, "Mirco", "Lucky Draw (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )

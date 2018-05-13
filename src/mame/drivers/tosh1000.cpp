@@ -73,7 +73,7 @@ public:
 		{ }
 
 	DECLARE_MACHINE_RESET(tosh1000);
-	DECLARE_DRIVER_INIT(tosh1000);
+	void init_tosh1000();
 
 	DECLARE_WRITE8_MEMBER(romdos_bank_w);
 	DECLARE_READ8_MEMBER(romdos_bank_r);
@@ -102,7 +102,7 @@ private:
 };
 
 
-DRIVER_INIT_MEMBER(tosh1000_state, tosh1000)
+void tosh1000_state::init_tosh1000()
 {
 }
 
@@ -306,5 +306,5 @@ ROM_START( tosh1000 )
 ROM_END
 
 
-//     YEAR     ROM NAME    PARENT      COMPAT  MACHINE     INPUT     STATE             INIT        COMPANY     FULLNAME         FLAGS
-COMP ( 1987,    tosh1000,   ibm5150,    0,      tosh1000,   0,        tosh1000_state,   tosh1000,   "Toshiba",  "Toshiba T1000", MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS           INIT           COMPANY    FULLNAME         FLAGS
+COMP( 1987, tosh1000, ibm5150, 0,      tosh1000, 0,     tosh1000_state, init_tosh1000, "Toshiba", "Toshiba T1000", MACHINE_IS_SKELETON )

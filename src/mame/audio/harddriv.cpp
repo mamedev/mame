@@ -453,7 +453,7 @@ MACHINE_CONFIG_START(harddriv_sound_board_device::device_add_mconfig)
 	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, harddriv_sound_board_device, hdsnddsp_get_bio))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("dac", AM6012, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // ls374d.75e + ls374d.90e + am6012
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

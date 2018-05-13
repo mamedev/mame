@@ -363,10 +363,11 @@ MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, apple2_state, ay3600_iie_data_ready_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("a2speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ES5503_ADD("es5503", APPLE2GS_7M)
 	MCFG_ES5503_OUTPUT_CHANNELS(2)
@@ -587,10 +588,10 @@ ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing
 	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
-/*    YEAR  NAME          PARENT    COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY           FULLNAME */
-COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
-COMP( 198?, apple2gsr3p,  apple2gs, 0,      apple2gs,   apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
-COMP( 1987, apple2gsr1,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM01)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM00)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0p,  apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, apple2gsr0p2, apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, 0,    "Apple Computer", "Apple IIgs (ROM00 prototype 3/10/1986)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME          PARENT    COMPAT  MACHINE     INPUT     CLASS           INIT        COMPANY           FULLNAME */
+COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
+COMP( 198?, apple2gsr3p,  apple2gs, 0,      apple2gs,   apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
+COMP( 1987, apple2gsr1,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM01)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM00)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0p,  apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2gsr0p2, apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, empty_init, "Apple Computer", "Apple IIgs (ROM00 prototype 3/10/1986)", MACHINE_SUPPORTS_SAVE )

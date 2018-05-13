@@ -299,7 +299,7 @@ MACHINE_CONFIG_START(thoop2_state::thoop2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) // 1MHz resonator - pin 7 not connected
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
@@ -354,5 +354,5 @@ ROM_START( thoop2a ) /* REF.940411 PCB */
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched */
 ROM_END
 
-GAME( 1994, thoop2,       0, thoop2, thoop2, thoop2_state,  0, ROT0, "Gaelco", "TH Strikes Back (Non North America, Version 1.0, Checksum 020E0867)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, thoop2a, thoop2, thoop2, thoop2, thoop2_state,  0, ROT0, "Gaelco", "TH Strikes Back (Non North America, Version 1.0, Checksum 020EB356)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, thoop2,       0, thoop2, thoop2, thoop2_state, empty_init, ROT0, "Gaelco", "TH Strikes Back (Non North America, Version 1.0, Checksum 020E0867)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, thoop2a, thoop2, thoop2, thoop2, thoop2_state, empty_init, ROT0, "Gaelco", "TH Strikes Back (Non North America, Version 1.0, Checksum 020EB356)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
