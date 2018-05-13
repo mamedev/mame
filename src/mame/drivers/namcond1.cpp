@@ -366,6 +366,7 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 	MCFG_YGV608_PALETTE("palette")
 	MCFG_YGV608_VBLANK_HANDLER(WRITELINE(*this, namcond1_state, vblank_irq_w))
 	MCFG_YGV608_RASTER_HANDLER(WRITELINE(*this, namcond1_state, raster_irq_w))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
