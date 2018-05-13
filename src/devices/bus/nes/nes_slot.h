@@ -245,7 +245,7 @@ protected:
 
 	// HACK: to reduce tagmap lookups for PPU-related IRQs, we add a hook to the
 	// main NES CPU here, even if it does not belong to this device.
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 
 	// these are specific of some boards but must be accessible from the driver
 	// E.g. additional save ram for HKROM, X1-005 & X1-017 boards, or ExRAM for MMC5
@@ -414,18 +414,12 @@ DECLARE_DEVICE_TYPE(NES_CART_SLOT, nes_cart_slot_device)
 #define NESSLOT_CHRROM_REGION_TAG ":cart:chr_rom"
 
 
-#define MCFG_NES_CARTRIDGE_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, NES_CART_SLOT, 0) \
+#define MCFG_NES_CARTRIDGE_ADD(_tag, _clock, _slot_intf, _def_slot) \
+	MCFG_DEVICE_ADD(_tag, NES_CART_SLOT, _clock) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_NES_CARTRIDGE_NOT_MANDATORY                                     \
 	static_cast<nes_cart_slot_device *>(device)->set_must_be_loaded(false);
 
-
-// Hacky configuration to add a slot with fixed disksys interface
-#define MCFG_DISKSYS_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, NES_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, true) \
-	MCFG_NES_CARTRIDGE_NOT_MANDATORY
 
 #endif // MAME_BUS_NES_NES_SLOT_H

@@ -111,7 +111,9 @@ device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconf
 	, m_ciram(nullptr)
 	, m_prg_size(0)
 	, m_vrom_size(0)
-	, m_maincpu(nullptr)
+	// HACK: to reduce tagmap lookups for PPU-related IRQs, we add a hook to the
+	// main NES CPU here, even if it does not belong to this device.
+	, m_maincpu(*this, ":maincpu")
 	, m_mapper_sram(nullptr)
 	, m_mapper_sram_size(0)
 	, m_ce_mask(0)
@@ -671,10 +673,6 @@ WRITE8_MEMBER(device_nes_cart_interface::write_h)
 
 void device_nes_cart_interface::pcb_start(running_machine &machine, uint8_t *ciram_ptr, bool cart_mounted)
 {
-	// HACK: to reduce tagmap lookups for PPU-related IRQs, we add a hook to the
-	// main NES CPU here, even if it does not belong to this device.
-	m_maincpu = machine.device<cpu_device>("maincpu");
-
 	if (cart_mounted)       // disksys expansion can arrive here without the memory banks!
 	{
 		// Setup PRG
