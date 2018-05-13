@@ -34,14 +34,15 @@ DEFINE_DEVICE_TYPE(HPDIO_98544, dio16_98544_device, "dio98544", "HP98544 high-re
 MACHINE_CONFIG_START(dio16_98544_device::device_add_mconfig)
 	MCFG_SCREEN_ADD(HP98544_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, dio16_98544_device, screen_update)
-	MCFG_SCREEN_SIZE(1024,768)
+	MCFG_SCREEN_SIZE(1024,1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 	MCFG_SCREEN_REFRESH_RATE(70)
 
 	MCFG_DEVICE_ADD("topcat", TOPCAT, XTAL(35904000))
 	MCFG_TOPCAT_FB_WIDTH(1024)
 	MCFG_TOPCAT_FB_HEIGHT(768)
-	MCFG_TOPCAT_PLANES(1)
+	MCFG_TOPCAT_PLANEMASK(1)
+	MCFG_TOPCAT_VRAM(&m_vram)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -71,6 +72,7 @@ dio16_98544_device::dio16_98544_device(const machine_config &mconfig, device_typ
 	device_dio16_card_interface(mconfig, *this),
 	m_topcat(*this, "topcat")
 {
+	m_vram.resize(0x100000);
 }
 
 //-------------------------------------------------
@@ -117,5 +119,11 @@ WRITE16_MEMBER(dio16_98544_device::rom_w)
 
 uint32_t dio16_98544_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return m_topcat->screen_update(screen, bitmap, cliprect);
+        for (int y = 0; y < 768; y++) {
+                uint32_t *scanline = &bitmap.pix32(y);
+                for (int x = 0; x < 1024; x++)
+                        *scanline++ = m_vram[y * 1024 + x] ? rgb_t(255,255,255) : rgb_t(0, 0, 0);
+        }
+        return 0;
 }
+

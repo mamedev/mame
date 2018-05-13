@@ -39,6 +39,7 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 private:
 	uint8_t *m_rom;
+	std::vector<uint8_t> m_vram;
 };
 
 // device type definition
