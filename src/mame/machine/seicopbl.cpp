@@ -70,7 +70,15 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			break;
 		}
 		
-		
+		/*
+			read32 10(r0)
+			add32 4(r0)
+			addmem32 4(r0)
+			addmem16 1c(r0)
+			write16h 1c(r0)
+		*/
+		// 0x0204 variant used from time to time (goal post collision)
+		case 0x0204:
 		case 0x0205:
 		{
 			int ppos = m_host_space->read_dword(m_reg[0] + 4 + offs);
@@ -99,22 +107,70 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			break;
 		}
 		
+		/*
+			0x138e
+			write16h 8(r0)
+			sub32 8(r1)
+			? 4(r0)
+			sub32 4(r1)
+			? 36(r0)
+			addmem16 34(r0)
+			addmem16 34(r0)
+			sub32 34(r0)
+			0xe38e
+			write16h 8(r0)
+			sub32 8(r2)
+			? 4(r0)
+			sub32 4(r2)
+			? 36(r0)
+			addmem16 34(r0)
+			addmem16 34(r0)
+			sub32 34(r0)
+
+		*/
+		// normal tackle
+		case 0x118e: 
 		case 0x130e:
 		case 0x138e:
+		// tackling ball hit?
+		case 0x330e: 
 		case 0xe30e:
 		case 0xe18e:
 		{
-			int target_reg = data & 0x200 ? 2 : 1;
-			int dy = (m_host_space->read_dword(m_reg[target_reg]+4) >> 16) - (m_host_space->read_dword(m_reg[0]+4) >> 16);
-			int dx = (m_host_space->read_dword(m_reg[target_reg]+8) >> 16) - (m_host_space->read_dword(m_reg[0]+8) >> 16);
+			int target_reg = ((data & 0xf000) == 0xe000) ? 2 : 1;
+			int sy = (m_host_space->read_dword(m_reg[0]+4) >> 16);
+			int sx = (m_host_space->read_dword(m_reg[0]+8) >> 16);
+			int dy = (m_host_space->read_dword(m_reg[target_reg]+4) >> 16);
+			int dx = (m_host_space->read_dword(m_reg[target_reg]+8) >> 16);
 
+			#if 0
+			if(data == 0xe30e)
+			{
+				if(dx != 0 && m_reg[0] == 0x111f30)
+					printf("%08x %08x | %08x %08x\n",sx,sy,dx,dy);
+			}
+			#endif
+			dy -= sy;
+			dx -= sx;
+	
+			#if 0
+			if(data == 0xe30e)
+			{
+				if(dx != 0 && m_reg[0] == 0x111f30)
+					printf("%08x %08x\n",dx,dy);
+			}
+			#endif
+			
 			//m_status = 7;
-			if(!dy) {
+			if(!dx) 
+			{
 				m_status = 0x8000;
 				m_angle = 0;
-			} else {
+			} 
+			else
+			{
 				m_status = 0;
-				m_angle =  atan(double(dx)/double(dy)) * 128.0 / M_PI;
+				m_angle =  atan(double(dy)/double(dx)) * 128.0 / M_PI;
 
 				if(dx<0)
 				{
@@ -125,6 +181,12 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			m_dy = dy;
 			m_dx = dx;
 
+			// TODO: for some reason tackling go in inverted direction with this on
+			if(data == 0x118e)
+			{
+				return;
+			}
+			
 			if(data & 0x80)
 				m_host_space->write_byte(m_reg[0]+(0x37), m_angle & 0xff);
 
@@ -136,8 +198,6 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			int dy = m_dy;
 			int dx = m_dx;
 
-			dx >>= 16;
-			dy >>= 16;
 			m_dist = sqrt((double)(dx*dx+dy*dy));
 
 			// TODO: is this right?
@@ -146,22 +206,31 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			break;
 		}
 
-		// TODO: wrong
 		case 0x42c2:
 		{
 			int div = m_host_space->read_word(m_reg[0] + (0x34));
-
+			
 			if (!div)
 			{
-				m_status |= 0x8000;
+				//m_status |= 0x8000;
 				m_host_space->write_dword(m_reg[0] + (0x38), 0);
 				break;
 			}
 
-			m_host_space->write_dword(m_reg[0] + (0x38), (m_dist << (5 - 1)) / div);
+			// TODO: scaling is wrong
+			m_host_space->write_dword(m_reg[0] + (0x38), m_dist / (div << 10));
 			break;
 		}
 
+		// shoot/pass is done with this
+		// TODO: wrong
+		case 0x5105:
+		case 0x5905:
+		{
+			m_host_space->write_dword(m_reg[1], m_host_space->read_dword(m_reg[0]));
+			break;
+		}
+		
 		/*
 		    00000-0ffff:
 		    amp = x/256
