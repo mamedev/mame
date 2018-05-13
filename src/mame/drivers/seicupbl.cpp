@@ -160,13 +160,12 @@ void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 		// is the low bit REALLY priority?
 
-		#if 0
 		switch (cur_pri)
 		{
 			case 0: pri_mask = -256; break; // gumdam swamp monster l2
-			case 1: pri_mask = -256; break; // cupsoc
+			case 1: pri_mask = 0xfffc; break; // cupsoc (players and football goal)
 			case 2: pri_mask = -4; break; // masking effect for gundam l2 monster
-			case 3: pri_mask = -4; break; // cupsoc (not sure what..)
+			case 3: pri_mask = 0x0000; break; // cupsoc (radar dots)
 			case 4: pri_mask = -32; break; // gundam level 2/3 player
 			//case 5: pri_mask = 0; break;
 			case 6: pri_mask = 0; break; // insert coin in gundam
@@ -174,8 +173,6 @@ void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 			default: printf("unhandled pri %d\n",cur_pri); pri_mask=0;
 		}
-		#endif
-		pri_mask = 0;
 
 		sprite = spriteram16[offs+1];
 
@@ -290,16 +287,16 @@ uint32_t seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	}
 
 	if (!(m_layer_disable&0x0001)) 
-		m_sc_layer[0]->draw(screen, bitmap, cliprect, 0, 0);
+		m_sc_layer[0]->draw(screen, bitmap, cliprect, 0, 1);
 	
 	if (!(m_layer_disable&0x0002)) 
-		m_sc_layer[1]->draw(screen, bitmap, cliprect, 0, 1);
+		m_sc_layer[1]->draw(screen, bitmap, cliprect, 0, 2);
 	
 	if (!(m_layer_disable&0x0004)) 
-		m_sc_layer[2]->draw(screen, bitmap, cliprect, 0, 2);
+		m_sc_layer[2]->draw(screen, bitmap, cliprect, 0, 4);
 	
 	if (!(m_layer_disable&0x0008)) 
-		m_sc_layer[3]->draw(screen, bitmap, cliprect, 0, 4);
+		m_sc_layer[3]->draw(screen, bitmap, cliprect, 0, 8);
 
 	if (!(m_layer_disable&0x0010))
 		draw_sprites(screen,bitmap,cliprect);
