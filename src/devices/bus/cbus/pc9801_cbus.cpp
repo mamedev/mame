@@ -55,7 +55,8 @@ device_pc9801cbus_card_interface::~device_pc9801cbus_card_interface()
 pc9801_slot_device::pc9801_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC9801CBUS_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
-	m_cpu(*this, "^maincpu")
+	m_cpu(*this, "^maincpu"),
+	m_int_callback{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 {
 }
 
@@ -69,6 +70,19 @@ pc9801_slot_device::pc9801_slot_device(const machine_config &mconfig, const char
 void pc9801_slot_device::device_config_complete()
 {
 	// ...
+}
+
+
+//-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void pc9801_slot_device::device_resolve_objects()
+{
+	for (auto &cb : m_int_callback)
+		cb.resolve_safe();
 }
 
 
