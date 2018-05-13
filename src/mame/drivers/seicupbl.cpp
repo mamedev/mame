@@ -18,7 +18,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "machine/seicop.h"
+#include "machine/seicopbl.h"
 #include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
@@ -325,7 +325,7 @@ void seicupbl_state::cupsocbl_mem(address_map &map)
 {
 //  AM_IMPORT_FROM( legionna_cop_mem )
 	map(0x000000, 0x0fffff).rom();
-	map(0x100400, 0x1005ff).rw("seibucop_boot", FUNC(seibu_cop_bootleg_device::copdxbl_0_r), FUNC(seibu_cop_bootleg_device::copdxbl_0_w)).share("cop_mcu_ram");
+	map(0x100400, 0x1005ff).rw("seibucop_boot", FUNC(seibu_cop_bootleg_device::read), FUNC(seibu_cop_bootleg_device::write));
 	map(0x100660, 0x10066f).ram().share("vregs");
 	map(0x100700, 0x100701).portr("DSW1");
 	map(0x100704, 0x100705).portr("PLAYERS12");

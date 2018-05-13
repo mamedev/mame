@@ -14,8 +14,7 @@
 ********************************************************************************************/
 
 #include "emu.h"
-#include "seicop.h"
-#include "includes/legionna.h"
+#include "seicopbl.h"
 
 
 DEFINE_DEVICE_TYPE(SEIBU_COP_BOOTLEG, seibu_cop_bootleg_device, "seibu_cop_boot", "Seibu COP (bootleg)")
@@ -344,12 +343,12 @@ inline void seibu_cop_bootleg_device::write_word(offs_t address, uint16_t data)
 	space().write_word(address << 1, data);
 }
 
-READ16_MEMBER( seibu_cop_bootleg_device::copdxbl_0_r )
+READ16_MEMBER( seibu_cop_bootleg_device::read )
 {
 	return read_word(offset);
 }
 
-WRITE16_MEMBER( seibu_cop_bootleg_device::copdxbl_0_w )
+WRITE16_MEMBER( seibu_cop_bootleg_device::write )
 {
 	write_word(offset,data);
 }

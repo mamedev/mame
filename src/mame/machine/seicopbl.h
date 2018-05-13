@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "seibucop/seibucop.h"
-
 
 
 class seibu_cop_bootleg_device : public device_t, public device_memory_interface
@@ -14,8 +12,8 @@ class seibu_cop_bootleg_device : public device_t, public device_memory_interface
 public:
 	seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER( copdxbl_0_r );
-	DECLARE_WRITE16_MEMBER( copdxbl_0_w );
+	DECLARE_READ16_MEMBER( read );
+	DECLARE_WRITE16_MEMBER( write );
 
 	DECLARE_READ16_MEMBER( reg_lo_addr_r );
 	DECLARE_READ16_MEMBER( reg_hi_addr_r );
