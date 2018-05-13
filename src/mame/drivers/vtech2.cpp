@@ -438,11 +438,9 @@ MACHINE_CONFIG_START(vtech2_state::laser350)
 	MCFG_PALETTE_INIT_OWNER(vtech2_state, vtech2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(vtech2_cassette_formats)
@@ -508,7 +506,7 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     STATE         INIT   COMPANY             FULLNAME      FLAGS
-COMP( 1984?, laser350, 0,        0,      laser350, laser350, vtech2_state, laser, "Video Technology", "Laser 350" , 0)
-COMP( 1984?, laser500, laser350, 0,      laser500, laser500, vtech2_state, laser, "Video Technology", "Laser 500" , 0)
-COMP( 1984?, laser700, laser350, 0,      laser700, laser500, vtech2_state, laser, "Video Technology", "Laser 700" , 0)
+//    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS         INIT        COMPANY             FULLNAME      FLAGS
+COMP( 1984?, laser350, 0,        0,      laser350, laser350, vtech2_state, init_laser, "Video Technology", "Laser 350" , 0)
+COMP( 1984?, laser500, laser350, 0,      laser500, laser500, vtech2_state, init_laser, "Video Technology", "Laser 500" , 0)
+COMP( 1984?, laser700, laser350, 0,      laser700, laser500, vtech2_state, init_laser, "Video Technology", "Laser 700" , 0)

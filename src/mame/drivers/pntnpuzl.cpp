@@ -170,7 +170,7 @@ public:
 	DECLARE_READ16_MEMBER(irq2_ack_r);
 	DECLARE_READ16_MEMBER(irq4_ack_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_DRIVER_INIT(pip);
+	void init_pip();
 	required_device<via6522_device> m_via;
 	void pntnpuzl(machine_config &config);
 	void mcu_map(address_map &map);
@@ -392,7 +392,7 @@ ROM_START( pntnpuzl )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(pntnpuzl_state,pip)
+void pntnpuzl_state::init_pip()
 {
 //  uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 //  rom[0x2696/2] = 0x4e71;
@@ -400,4 +400,4 @@ DRIVER_INIT_MEMBER(pntnpuzl_state,pip)
 
 }
 
-GAME( 1993, pntnpuzl, 0, pntnpuzl, pntnpuzl, pntnpuzl_state, pip, ROT90, "Century Vending", "Paint 'N Puzzle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, pntnpuzl, 0, pntnpuzl, pntnpuzl, pntnpuzl_state, init_pip, ROT90, "Century Vending", "Paint 'N Puzzle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

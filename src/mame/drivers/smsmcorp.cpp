@@ -574,7 +574,7 @@ MACHINE_CONFIG_START(smsmfg_state::sms)
 	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(16'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -947,9 +947,9 @@ ROM_START( secondch )
 	ROM_RELOAD(         0x1000, 0x1000 )
 ROM_END
 
-GAME( 1984, trvhang,  0, sms,      sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 1)",   MACHINE_SUPPORTS_SAVE ) /* Version Trivia-1-050185 */
-GAME( 1984, trvhanga, 0, sms,      sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 2)",   MACHINE_NOT_WORKING ) /* Version Trivia-2-011586 */
-GAME( 1984, sms4in1,  0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "4-in-1",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, smsjoker, 0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Joker Poker With Hi-Lo Double-Up", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sureshot, 0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Sure Shot",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, secondch, 0, sureshot, sms, smsmfg_state, 0, ROT0, "SMS Manufacturing Corp.", "Second Chance",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trvhang,  0, sms,      sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 1)",   MACHINE_SUPPORTS_SAVE ) /* Version Trivia-1-050185 */
+GAME( 1984, trvhanga, 0, sms,      sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Trivia Hangup (question set 2)",   MACHINE_NOT_WORKING ) /* Version Trivia-2-011586 */
+GAME( 1984, sms4in1,  0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "4-in-1",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, smsjoker, 0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Joker Poker With Hi-Lo Double-Up", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sureshot, 0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Sure Shot",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, secondch, 0, sureshot, sms, smsmfg_state, empty_init, ROT0, "SMS Manufacturing Corp.", "Second Chance",                    MACHINE_SUPPORTS_SAVE )

@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(fresh_state::fresh)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fresh)
 
 	/* sound hw? */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, 4000000) // actual clock and type unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -638,4 +638,4 @@ ROM_END
 
 
 // title shows Fruit Fresh but on resetting you get text strings of 'Dream World V2.41SI 97. 1.28'
-GAME( 1996, fresh, 0, fresh, fresh, fresh_state, 0, ROT0, "Chain Leisure", "Fruit Fresh (Italy)", MACHINE_NOT_WORKING )
+GAME( 1996, fresh, 0, fresh, fresh, fresh_state, empty_init, ROT0, "Chain Leisure", "Fruit Fresh (Italy)", MACHINE_NOT_WORKING )

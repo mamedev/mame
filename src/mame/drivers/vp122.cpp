@@ -118,4 +118,4 @@ ROM_START( vp122 )
 	ROM_LOAD( "223-48700.uk4", 0x0000, 0x2000, CRC(4dbab4bd) SHA1(18e9a23ba22e2096fa529541fa329f5a56740e62) )
 ROM_END
 
-COMP( 1985, vp122, 0, 0, vp122, vp122, vp122_state, 0, "ADDS", "Viewpoint 122", MACHINE_IS_SKELETON )
+COMP( 1985, vp122, 0, 0, vp122, vp122, vp122_state, empty_init, "ADDS", "Viewpoint 122", MACHINE_IS_SKELETON )

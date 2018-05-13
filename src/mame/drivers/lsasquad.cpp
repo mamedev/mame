@@ -596,7 +596,7 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", YM2149, MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
@@ -662,7 +662,7 @@ MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", YM2149, MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
@@ -799,6 +799,6 @@ ROM_START( daikaiju )
 ROM_END
 
 
-GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, lsasquad_state, 0, ROT270, "Taito",   "Land Sea Air Squad / Riku Kai Kuu Saizensen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, storming, lsasquad, storming, storming, lsasquad_state, 0, ROT270, "bootleg", "Storming Party / Riku Kai Kuu Saizensen",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, daikaiju, 0,        daikaiju, daikaiju, lsasquad_state, 0, ROT270, "Taito",   "Daikaiju no Gyakushu",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, lsasquad_state, empty_init, ROT270, "Taito",   "Land Sea Air Squad / Riku Kai Kuu Saizensen", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, storming, lsasquad, storming, storming, lsasquad_state, empty_init, ROT270, "bootleg", "Storming Party / Riku Kai Kuu Saizensen",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, daikaiju, 0,        daikaiju, daikaiju, lsasquad_state, empty_init, ROT270, "Taito",   "Daikaiju no Gyakushu",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

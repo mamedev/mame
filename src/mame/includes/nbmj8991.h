@@ -61,10 +61,10 @@ public:
 	DECLARE_WRITE8_MEMBER(clut_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 
-	DECLARE_DRIVER_INIT(galkaika);
-	DECLARE_DRIVER_INIT(tokimbsj);
-	DECLARE_DRIVER_INIT(tokyogal);
-	DECLARE_DRIVER_INIT(finalbny);
+	void init_galkaika();
+	void init_tokimbsj();
+	void init_tokyogal();
+	void init_finalbny();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 

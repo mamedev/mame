@@ -60,7 +60,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(laserbat);
+	void init_laserbat();
 
 	void laserbat_base(machine_config &config);
 	void laserbat_io_map(address_map &map);

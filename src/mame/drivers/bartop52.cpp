@@ -152,7 +152,7 @@ MACHINE_CONFIG_START(bartop52_state::a5200)
 	MCFG_PALETTE_INIT_OWNER(bartop52_state, atari)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
 	MCFG_POKEY_POT0_R_CB(IOPORT("analog_0"))
@@ -172,4 +172,4 @@ ROM_START(barbball)
 	ROM_LOAD( "5200.rom",     0xf800, 0x0800, BAD_DUMP CRC(4248d3e3) SHA1(6ad7a1e8c9fad486fbec9498cb48bf5bc3adc530) )
 ROM_END
 
-GAME( 1983, barbball, 0, a5200, bartop52, bartop52_state, 0, ROT0, "Atari", "Barroom Baseball (prototype)", MACHINE_NOT_WORKING )
+GAME( 1983, barbball, 0, a5200, bartop52, bartop52_state, empty_init, ROT0, "Atari", "Barroom Baseball (prototype)", MACHINE_NOT_WORKING )

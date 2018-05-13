@@ -515,5 +515,5 @@ ROM_START( sprint8a )
 ROM_END
 
 
-GAME( 1977, sprint8,  0,       sprint8, sprint8,  sprint8_state, 0, ROT0, "Atari", "Sprint 8",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1977, sprint8a, sprint8, sprint8, sprint8p, sprint8_state, 0, ROT0, "Atari", "Sprint 8 (play tag & chase)", MACHINE_SUPPORTS_SAVE )
+GAME( 1977, sprint8,  0,       sprint8, sprint8,  sprint8_state, empty_init, ROT0, "Atari", "Sprint 8",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1977, sprint8a, sprint8, sprint8, sprint8p, sprint8_state, empty_init, ROT0, "Atari", "Sprint 8 (play tag & chase)", MACHINE_SUPPORTS_SAVE )

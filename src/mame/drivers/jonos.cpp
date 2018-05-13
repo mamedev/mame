@@ -208,5 +208,5 @@ ROM_END
 
 /* Driver */
 
-//   YEAR   NAME    PARENT  COMPAT   MACHINE  INPUT  CLASS        INIT     COMPANY  FULLNAME  FLAGS
-COMP( 198?, jonos,  0,      0,       jonos,   jonos, jonos_state, 0,       "Jonos", "Escort", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR   NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
+COMP( 198?, jonos, 0,      0,      jonos,   jonos, jonos_state, empty_init, "Jonos", "Escort", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

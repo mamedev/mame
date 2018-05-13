@@ -49,6 +49,7 @@ public:
 	void dau_set_y(u16 op, s16 value) { op_x(op) ? dau_set_y(value) : dau_set_yl(value); }
 	void dau_set_y(s16 value) { dau_y = (u32(u16(value)) << 16) | u32(BIT(dau_auc, 6) ? u16(u32(dau_y)) : u16(0)); }
 	void dau_set_yl(s16 value) { dau_y = (dau_y & ~((u32(1) << 16) - 1)) | u16(value); }
+	s64 &dau_set_atx(u16 op, s16 value);
 	s64 &dau_set_at(u16 op, s16 value);
 	template <unsigned T> void dau_extend_a() { dau_a[T] = (dau_a[T] & DAU_A_MASK) | ((dau_a[T] & DAU_A_SIGN) ? DAU_A_EXT : 0); }
 	u16 dau_export_psw()

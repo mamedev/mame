@@ -420,7 +420,7 @@ MACHINE_CONFIG_START(dai3wksi_state::dai3wksi)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 #if (USE_SAMPLES)
 	MCFG_DEVICE_ADD("samples", SAMPLES)
@@ -554,4 +554,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, dai3wksi, 0, dai3wksi, dai3wksi, dai3wksi_state, 0, ROT270, "Sun Electronics", "Dai San Wakusei Meteor (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, dai3wksi, 0, dai3wksi, dai3wksi, dai3wksi_state, empty_init, ROT270, "Sun Electronics", "Dai San Wakusei Meteor (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

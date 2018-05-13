@@ -116,7 +116,7 @@ public:
 	u32 m_copro_ram_adr;
 
 	uint16_t m_r360_state;
-	DECLARE_DRIVER_INIT(wingwar360);
+	void init_wingwar360();
 	DECLARE_READ16_MEMBER(r360_r);
 	DECLARE_WRITE16_MEMBER(r360_w);
 

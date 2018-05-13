@@ -436,7 +436,7 @@ MACHINE_CONFIG_START(cloud9_state::cloud9)
 	MCFG_DEVICE_ADD("videolatch", LS259, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -506,5 +506,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cloud9,   0, cloud9, cloud9,   cloud9_state, 0, ROT0, "Atari", "Cloud 9 (prototype)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, firebeas, 0, cloud9, firebeas, cloud9_state, 0, ROT0, "Atari", "Firebeast (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloud9,   0, cloud9, cloud9,   cloud9_state, empty_init, ROT0, "Atari", "Cloud 9 (prototype)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, firebeas, 0, cloud9, firebeas, cloud9_state, empty_init, ROT0, "Atari", "Firebeast (prototype)", MACHINE_SUPPORTS_SAVE )

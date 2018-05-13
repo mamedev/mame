@@ -320,7 +320,7 @@ MACHINE_CONFIG_START(d9final_state::d9final)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
@@ -346,4 +346,4 @@ ROM_END
 
 
 
-GAME( 1992, d9final, 0, d9final, d9final, d9final_state, 0, ROT0, "Excellent System", "Dream 9 Final (v2.24)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, d9final, 0, d9final, d9final, d9final_state, empty_init, ROT0, "Excellent System", "Dream 9 Final (v2.24)", MACHINE_SUPPORTS_SAVE )

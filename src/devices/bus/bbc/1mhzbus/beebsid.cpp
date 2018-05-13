@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(BBC_BEEBSID, bbc_beebsid_device, "beebsid", "BeebSID")
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bbc_beebsid_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD(MOS8580_TAG, MOS8580, XTAL(16'000'000) / 16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 

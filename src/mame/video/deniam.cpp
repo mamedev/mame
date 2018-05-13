@@ -7,8 +7,6 @@
 
 void deniam_state::deniam_common_init(  )
 {
-	int i;
-
 	m_bg_scrollx_reg = 0x00a4/2;
 	m_bg_scrolly_reg = 0x00a8/2;
 	m_bg_page_reg    = 0x00ac/2;
@@ -19,14 +17,14 @@ void deniam_state::deniam_common_init(  )
 	m_display_enable = 0;
 	m_coinctrl = 0;
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_bg_page[i] = 0;
 		m_fg_page[i] = 0;
 	}
 }
 
-DRIVER_INIT_MEMBER(deniam_state,logicpro)
+void deniam_state::init_logicpro()
 {
 	deniam_common_init();
 
@@ -36,7 +34,7 @@ DRIVER_INIT_MEMBER(deniam_state,logicpro)
 	m_fg_scrolly_offs = 0x000;
 }
 
-DRIVER_INIT_MEMBER(deniam_state,karianx)
+void deniam_state::init_karianx()
 {
 	deniam_common_init();
 
@@ -117,11 +115,10 @@ void deniam_state::video_start()
 
 WRITE16_MEMBER(deniam_state::deniam_videoram_w)
 {
-	int page, i;
 	COMBINE_DATA(&m_videoram[offset]);
 
-	page = offset >> 11;
-	for (i = 0; i < 4; i++)
+	const int page = offset >> 11;
+	for (int i = 0; i < 4; i++)
 	{
 		if (m_bg_page[i] == page)
 			m_bg_tilemap->mark_tile_dirty(i * 0x800 + (offset & 0x7ff));
@@ -140,13 +137,10 @@ WRITE16_MEMBER(deniam_state::deniam_textram_w)
 
 WRITE16_MEMBER(deniam_state::deniam_palette_w)
 {
-	int r, g, b;
-
 	data = COMBINE_DATA(&m_paletteram[offset]);
-
-	r = ((data << 1) & 0x1e) | ((data >> 12) & 0x01);
-	g = ((data >> 3) & 0x1e) | ((data >> 13) & 0x01);
-	b = ((data >> 7) & 0x1e) | ((data >> 14) & 0x01);
+	int r = ((data << 1) & 0x1e) | ((data >> 12) & 0x01);
+	int g = ((data >> 3) & 0x1e) | ((data >> 13) & 0x01);
+	int b = ((data >> 7) & 0x1e) | ((data >> 14) & 0x01);
 	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
@@ -202,26 +196,24 @@ WRITE16_MEMBER(deniam_state::deniam_coinctrl_w)
  */
 void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int offs;
 	uint8_t *gfx = memregion("gfx2")->base();
 
-	for (offs = m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
+	for (int offs = m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
 	{
-		int sx, starty, endy, x, y, start, color, width, flipx, primask;
 		uint8_t *rom = gfx;
 
-		sx = (m_spriteram[offs + 1] & 0x01ff) + 16 * 8 - 1;
+		int sx = (m_spriteram[offs + 1] & 0x01ff) + 16 * 8 - 1;
 		if (sx >= 512) sx -= 512;
-		starty = m_spriteram[offs + 0] & 0xff;
-		endy = m_spriteram[offs + 0] >> 8;
+		int starty = m_spriteram[offs + 0] & 0xff;
+		int endy = m_spriteram[offs + 0] >> 8;
 
-		width = m_spriteram[offs + 2] & 0x007f;
-		flipx = m_spriteram[offs + 2] & 0x0100;
+		int width = m_spriteram[offs + 2] & 0x007f;
+		int flipx = m_spriteram[offs + 2] & 0x0100;
 		if (flipx) sx++;
 
-		color = 0x40 + (m_spriteram[offs + 4] & 0x3f);
+		int color = 0x40 + (m_spriteram[offs + 4] & 0x3f);
 
-		primask = 8;
+		int primask = 8;
 		switch (m_spriteram[offs + 4] & 0xc0)
 		{
 			case 0x00: primask |= 4 | 2 | 1; break; /* below everything */
@@ -231,16 +223,16 @@ void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 		}
 
 
-		start = m_spriteram[offs + 3] + ((m_spriteram[offs + 4] & 0x1f00) << 8);
+		int start = m_spriteram[offs + 3] + ((m_spriteram[offs + 4] & 0x1f00) << 8);
 		rom += 2 * start;
 
-		for (y = starty + 1; y <= endy; y++)
+		for (int y = starty + 1; y <= endy; y++)
 		{
 			int drawing = 0;
 			int i = 0;
 
 			rom += 2 * width;   /* note that the first line is skipped */
-			x = 0;
+			int x = 0;
 			while (i < 512) /* safety check */
 			{
 				if (flipx)

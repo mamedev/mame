@@ -184,7 +184,7 @@ DISCRETE_RESET( skyraid_missle_custom_charge )
 
 
 
-DISCRETE_SOUND_START( skyraid )
+DISCRETE_SOUND_START( skyraid_discrete )
 	/************************************************
 	 * Input register mapping
 	 ************************************************/

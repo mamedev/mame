@@ -54,7 +54,7 @@ const tiny_rom_entry *spectrum_uspeech_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(spectrum_uspeech_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SP0256_TAG, SP0256, XTAL(14'000'000) / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

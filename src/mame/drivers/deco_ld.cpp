@@ -490,7 +490,8 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 
 	/* sound hardware */
 	/* TODO: mixing */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -663,9 +664,9 @@ ROM_END
 
 
 
-GAME( 1983, begas,  0,       rblaster,  begas,    deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )
-GAME( 1983, begas1, begas,   rblaster,  begas,    deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 1)", MACHINE_NOT_WORKING )
-GAME( 1984, cobra,  0,       rblaster,  cobra,    deco_ld_state,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", MACHINE_NOT_WORKING )
-GAME( 1984, cobraa, cobra,   rblaster,  cobra,    deco_ld_state,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
+GAME( 1983, begas,    0,     rblaster, begas,    deco_ld_state, empty_init, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )
+GAME( 1983, begas1,   begas, rblaster, begas,    deco_ld_state, empty_init, ROT0, "Data East", "Bega's Battle (Revision 1)", MACHINE_NOT_WORKING )
+GAME( 1984, cobra,    0,     rblaster, cobra,    deco_ld_state, empty_init, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", MACHINE_NOT_WORKING )
+GAME( 1984, cobraa,   cobra, rblaster, cobra,    deco_ld_state, empty_init, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
 // Thunder Storm (Cobra Command Japanese version)
-GAME( 1985, rblaster,  0,    rblaster,  rblaster, deco_ld_state,  0, ROT0, "Data East", "Road Blaster (Data East LD)", MACHINE_NOT_WORKING )
+GAME( 1985, rblaster, 0,     rblaster, rblaster, deco_ld_state, empty_init, ROT0, "Data East", "Road Blaster (Data East LD)", MACHINE_NOT_WORKING )

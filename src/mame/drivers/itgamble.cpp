@@ -231,8 +231,8 @@ MACHINE_CONFIG_START(itgamble_state::itgamble)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", SND_CLOCK, PIN7_HIGH) /* 1MHz resonator */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, SND_CLOCK, okim6295_device::PIN7_HIGH) /* 1MHz resonator */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(itgamble_state::mnumber)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(MNUMBER_MAIN_CLOCK/2)    /* probably the wrong CPU */
 
-	MCFG_OKIM6295_REPLACE("oki", MNUMBER_SND_CLOCK/16, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, MNUMBER_SND_CLOCK/16, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -254,7 +254,7 @@ static MACHINE_CONFIG_START( ejollyx5 )
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(EJOLLYX5_MAIN_CLOCK/2)   /* up to 10MHz.*/
 
-	MCFG_OKIM6295_REPLACE("oki", MNUMBER_SND_CLOCK/16, PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, MNUMBER_SND_CLOCK/16, okim6295_device::PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 #endif
@@ -709,16 +709,16 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT ROT   COMPANY                  FULLNAME                         FLAGS
-GAME( 2000, capunc,   0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "Capitan Uncino (Ver 1.2)",      MACHINE_IS_SKELETON )
-GAME( 2001, capcor,   0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "Capitani Coraggiosi (Ver 1.3)", MACHINE_IS_SKELETON )
-GAME( 2002, laperla,  0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "La Perla Nera (Ver 2.0)",       MACHINE_IS_SKELETON )
-GAME( 2001, laperlag, 0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "La Perla Nera Gold (Ver 2.0)",  MACHINE_IS_SKELETON )
-GAME( 2001, euro2k2,  0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 1)",  MACHINE_IS_SKELETON )
-GAME( 2001, euro2k2a, euro2k2, itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 2)",  MACHINE_IS_SKELETON )
-GAME( 2002, euro2k2s, euro2k2, itgamble, itgamble, itgamble_state, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 Space (Ver 3.0)",   MACHINE_IS_SKELETON )
-GAME( 200?, abacus,   0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "<unknown>",             "Abacus (Ver 1.0)",              MACHINE_IS_SKELETON )
-GAME( 200?, bookthr,  0,       itgamble, itgamble, itgamble_state, 0,   ROT0, "<unknown>",             "Book Theatre (Ver 1.2)",        MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT        ROT   COMPANY                  FULLNAME                         FLAGS
+GAME( 2000, capunc,   0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Capitan Uncino (Ver 1.2)",      MACHINE_IS_SKELETON )
+GAME( 2001, capcor,   0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Capitani Coraggiosi (Ver 1.3)", MACHINE_IS_SKELETON )
+GAME( 2002, laperla,  0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "La Perla Nera (Ver 2.0)",       MACHINE_IS_SKELETON )
+GAME( 2001, laperlag, 0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "La Perla Nera Gold (Ver 2.0)",  MACHINE_IS_SKELETON )
+GAME( 2001, euro2k2,  0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 1)",  MACHINE_IS_SKELETON )
+GAME( 2001, euro2k2a, euro2k2, itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 2)",  MACHINE_IS_SKELETON )
+GAME( 2002, euro2k2s, euro2k2, itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 Space (Ver 3.0)",   MACHINE_IS_SKELETON )
+GAME( 200?, abacus,   0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "<unknown>",             "Abacus (Ver 1.0)",              MACHINE_IS_SKELETON )
+GAME( 200?, bookthr,  0,       itgamble, itgamble, itgamble_state, empty_init, ROT0, "<unknown>",             "Book Theatre (Ver 1.2)",        MACHINE_IS_SKELETON )
 
 /* different hardware */
-GAME( 2000, mnumber,  0,       mnumber,  itgamble, itgamble_state, 0,   ROT0, "MM / BRL Bologna",      "Mystery Number",                MACHINE_IS_SKELETON )
+GAME( 2000, mnumber,  0,       mnumber,  itgamble, itgamble_state, empty_init, ROT0, "MM / BRL Bologna",      "Mystery Number",                MACHINE_IS_SKELETON )

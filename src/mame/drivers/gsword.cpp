@@ -308,7 +308,7 @@ INTERRUPT_GEN_MEMBER(gsword_state::sound_interrupt)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-DRIVER_INIT_MEMBER(gsword_state, gsword)
+void gsword_state::init_gsword()
 {
 #if 0
 	uint8_t *ROM2 = memregion("sub")->base();
@@ -323,7 +323,7 @@ DRIVER_INIT_MEMBER(gsword_state, gsword)
 #endif
 }
 
-DRIVER_INIT_MEMBER(gsword_state, gsword2)
+void gsword_state::init_gsword2()
 {
 #if 0
 	uint8_t *ROM2 = memregion("sub")->base();
@@ -824,7 +824,7 @@ MACHINE_CONFIG_START(gsword_state::gsword)
 	MCFG_PALETTE_INIT_OWNER(gsword_state,gsword)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -892,7 +892,7 @@ MACHINE_CONFIG_START(josvolly_state::josvolly)
 	MCFG_PALETTE_INIT_OWNER(josvolly_state, josvolly)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -1050,6 +1050,6 @@ ROM_START( josvolly )
 ROM_END
 
 
-GAME( 1983, josvolly, 0,      josvolly, josvolly, josvolly_state, 0,       ROT90, "Allumer / Taito Corporation", "Joshi Volleyball",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gsword,   0,      gsword,   gsword,   gsword_state,   gsword,  ROT0,  "Allumer / Taito Corporation", "Great Swordsman (World?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gsword2,  gsword, gsword,   gsword,   gsword_state,   gsword2, ROT0,  "Allumer / Taito Corporation", "Great Swordsman (Japan?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, josvolly, 0,      josvolly, josvolly, josvolly_state, empty_init,   ROT90, "Allumer / Taito Corporation", "Joshi Volleyball",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gsword,   0,      gsword,   gsword,   gsword_state,   init_gsword,  ROT0,  "Allumer / Taito Corporation", "Great Swordsman (World?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gsword2,  gsword, gsword,   gsword,   gsword_state,   init_gsword2, ROT0,  "Allumer / Taito Corporation", "Great Swordsman (Japan?)", MACHINE_SUPPORTS_SAVE )

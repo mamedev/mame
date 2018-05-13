@@ -646,7 +646,7 @@ MACHINE_CONFIG_START(meadows_state::meadows)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -707,7 +707,7 @@ MACHINE_CONFIG_START(meadows_state::bowl3d)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -844,7 +844,7 @@ ROM_END
  *************************************/
 
 /* A fake for the missing ball sprites #3 and #4 */
-DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
+void meadows_state::init_gypsyjug()
 {
 	static const uint8_t ball[16*2] =
 	{
@@ -853,7 +853,6 @@ DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
 		0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
 		0x01,0x80, 0x03,0xc0, 0x03,0xc0, 0x01,0x80
 	};
-	int i;
 	uint8_t *gfx2 = memregion("gfx2")->base();
 	uint8_t *gfx3 = memregion("gfx3")->base();
 	uint8_t *gfx4 = memregion("gfx4")->base();
@@ -863,7 +862,7 @@ DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
 
 	memcpy(gfx3,gfx2,len3);
 
-	for (i = 0; i < len4; i += 16*2)
+	for (int i = 0; i < len4; i += 16*2)
 	{
 		memcpy(gfx4 + i, ball, sizeof(ball));
 		memcpy(gfx5 + i, ball, sizeof(ball));
@@ -872,16 +871,13 @@ DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
 
 
 /* A fake for inverting the data bus */
-DRIVER_INIT_MEMBER(meadows_state,minferno)
+void meadows_state::init_minferno()
 {
-	int i, length;
-	uint8_t *mem;
-
 	/* create an inverted copy of the graphics data */
-	mem = memregion("gfx1")->base();
-	length = memregion("gfx1")->bytes();
-	for (i = 0; i < length/2; i++)
-		mem[i] = ~mem[i + length/2];
+	uint8_t *mem = memregion("gfx1")->base();
+	int length = memregion("gfx1")->bytes();
+	for (int i = 0; i < length / 2; i++)
+		mem[i] = ~mem[i + length / 2];
 }
 
 
@@ -892,7 +888,7 @@ DRIVER_INIT_MEMBER(meadows_state,minferno)
  *
  *************************************/
 
-GAMEL( 1978, deadeye,  0, meadows,  meadows,  meadows_state, 0,        ROT0,  "Meadows Games, Inc.", "Dead Eye",          0, layout_deadeye )
-GAME ( 1978, bowl3d,   0, bowl3d,   bowl3d,   meadows_state, 0,        ROT90, "Meadows Games, Inc.", "3-D Bowling",       MACHINE_NO_SOUND )
-GAMEL( 1978, gypsyjug, 0, meadows,  meadows,  meadows_state, gypsyjug, ROT0,  "Meadows Games, Inc.", "Gypsy Juggler",     MACHINE_IMPERFECT_GRAPHICS, layout_gypsyjug )
-GAMEL( 1978, minferno, 0, minferno, minferno, meadows_state, minferno, ROT0,  "Meadows Games, Inc.", "Inferno (Meadows)", MACHINE_NO_SOUND, layout_minferno )
+GAMEL( 1978, deadeye,  0, meadows,  meadows,  meadows_state, empty_init,    ROT0,  "Meadows Games, Inc.", "Dead Eye",          0, layout_deadeye )
+GAME(  1978, bowl3d,   0, bowl3d,   bowl3d,   meadows_state, empty_init,    ROT90, "Meadows Games, Inc.", "3-D Bowling",       MACHINE_NO_SOUND )
+GAMEL( 1978, gypsyjug, 0, meadows,  meadows,  meadows_state, init_gypsyjug, ROT0,  "Meadows Games, Inc.", "Gypsy Juggler",     MACHINE_IMPERFECT_GRAPHICS, layout_gypsyjug )
+GAMEL( 1978, minferno, 0, minferno, minferno, meadows_state, init_minferno, ROT0,  "Meadows Games, Inc.", "Inferno (Meadows)", MACHINE_NO_SOUND, layout_minferno )

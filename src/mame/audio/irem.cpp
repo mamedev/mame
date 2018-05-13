@@ -321,7 +321,7 @@ static const discrete_mixer_desc m52_sound_c_mix1 =
 		CAP_U(1),               /* cAmp                 */
 		0, 1};
 
-static DISCRETE_SOUND_START( m52_sound_c )
+static DISCRETE_SOUND_START( m52_sound_c_discrete )
 
 	/* Chip AY8910/1 */
 	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
@@ -412,7 +412,7 @@ MACHINE_CONFIG_START(m62_audio_device::device_add_mconfig)
 	MCFG_DEVICE_IO_MAP(irem_sound_portmap)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay_45m", AY8910, XTAL(3'579'545)/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(m52_soundc_audio_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(m52_small_sound_map)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay_45m", AY8910, XTAL(3'579'545)/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
@@ -502,8 +502,7 @@ MACHINE_CONFIG_START(m52_soundc_audio_device::device_add_mconfig)
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* default to 4KHz, but can be changed at run time */
 	MCFG_SOUND_ROUTE(0, "filtermix", 1.0, 2)
 
-	MCFG_DEVICE_ADD("filtermix", DISCRETE)
-	MCFG_DISCRETE_INTF(m52_sound_c)
+	MCFG_DEVICE_ADD("filtermix", DISCRETE, m52_sound_c_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -516,7 +515,7 @@ MACHINE_CONFIG_START(m52_large_audio_device::device_add_mconfig)  /* 10 yard fig
 	MCFG_DEVICE_IO_MAP(irem_sound_portmap)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay_45m", AY8910, XTAL(3'579'545)/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)

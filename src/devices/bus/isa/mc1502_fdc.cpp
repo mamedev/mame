@@ -116,7 +116,7 @@ void mc1502_fdc_device::mc1502_wd17xx_aux_w(uint8_t data)
 }
 
 /*
- * Accesses to this port block (halt the CPU until DRQ, INTRQ or MOTOR ON)
+ * Accessing this port halts the CPU via READY line until DRQ, INTRQ or MOTOR ON
  */
 uint8_t mc1502_fdc_device::mc1502_wd17xx_drq_r()
 {

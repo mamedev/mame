@@ -120,7 +120,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
 
-	DECLARE_DRIVER_INIT(mc1000);
+	void init_mc1000();
 	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tick);
 	void mc1000(machine_config &config);
 	void mc1000_banking_mem(address_map &map);
@@ -564,7 +564,7 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, mc1000_state, videoram_r))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, 3579545/2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(2.2), 0, 0)
@@ -601,5 +601,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   STATE         INIT  COMPANY   FULLNAME        FLAGS */
-COMP( 1985, mc1000,     0,          0,      mc1000,     mc1000, mc1000_state, 0,    "CCE",    "MC-1000",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS */
+COMP( 1985, mc1000, 0,      0,      mc1000,  mc1000, mc1000_state, empty_init, "CCE",   "MC-1000", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

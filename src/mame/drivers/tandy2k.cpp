@@ -815,7 +815,7 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	MCFG_TIMER_DRIVER_ADD("vidldsh", tandy2k_state, vidldsh_tick)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -920,6 +920,6 @@ ROM_END
 
 // System Drivers
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT    STATE          INIT  COMPANY              FULLNAME        FLAGS
-COMP( 1983, tandy2k,    0,          0,      tandy2k,    tandy2k, tandy2k_state, 0,    "Tandy Radio Shack", "Tandy 2000",   MACHINE_NOT_WORKING )
-COMP( 1983, tandy2khd,  tandy2k,    0,      tandy2k_hd, tandy2k, tandy2k_state, 0,    "Tandy Radio Shack", "Tandy 2000HD", MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT    CLASS          INIT        COMPANY              FULLNAME        FLAGS
+COMP( 1983, tandy2k,   0,       0,      tandy2k,    tandy2k, tandy2k_state, empty_init, "Tandy Radio Shack", "Tandy 2000",   MACHINE_NOT_WORKING )
+COMP( 1983, tandy2khd, tandy2k, 0,      tandy2k_hd, tandy2k, tandy2k_state, empty_init, "Tandy Radio Shack", "Tandy 2000HD", MACHINE_NOT_WORKING )

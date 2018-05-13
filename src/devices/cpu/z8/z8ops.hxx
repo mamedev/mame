@@ -149,7 +149,7 @@ void z8_device::load_from_memory(address_space &space)
 
 	uint8_t data;
 	if (&space == m_program && address < m_rom_size)
-		data = m_direct->read_byte(address);
+		data = m_cache->read_byte(address);
 	else
 		data = space.read_byte(mask_external_address(address));
 
@@ -181,7 +181,7 @@ void z8_device::load_from_memory_autoinc(address_space &space)
 
 	uint8_t data;
 	if (&space == m_program && address < m_rom_size)
-		data = m_direct->read_byte(address);
+		data = m_cache->read_byte(address);
 	else
 		data = space.read_byte(mask_external_address(address));
 	register_write(real_dst, data);

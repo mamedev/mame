@@ -207,7 +207,7 @@ MACHINE_CONFIG_START(markham_state::markham)
 	MCFG_PALETTE_INIT_OWNER(markham_state, markham)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76496, 8000000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -247,4 +247,4 @@ ROM_START( markham )
 ROM_END
 
 
-GAME( 1983, markham, 0, markham, markham, markham_state, 0, ROT0, "Sun Electronics", "Markham", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, markham, 0, markham, markham, markham_state, empty_init, ROT0, "Sun Electronics", "Markham", MACHINE_SUPPORTS_SAVE )

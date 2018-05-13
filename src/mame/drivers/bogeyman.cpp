@@ -254,7 +254,7 @@ MACHINE_CONFIG_START(bogeyman_state::bogeyman)
 	MCFG_PALETTE_INIT_OWNER(bogeyman_state, bogeyman)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// verified to be YM2149s from PCB pic
 	MCFG_DEVICE_ADD("ay1", YM2149, 1500000)  /* Verified */
@@ -298,4 +298,4 @@ ROM_END
 
 /* Game Driver */
 
-GAME( 1985, bogeyman, 0, bogeyman, bogeyman, bogeyman_state, 0, ROT0, "Technos Japan", "Bogey Manor", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bogeyman, 0, bogeyman, bogeyman, bogeyman_state, empty_init, ROT0, "Technos Japan", "Bogey Manor", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

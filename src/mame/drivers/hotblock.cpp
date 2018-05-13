@@ -224,7 +224,7 @@ MACHINE_CONFIG_START(hotblock_state::hotblock)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", YM2149, 1000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
@@ -238,4 +238,4 @@ ROM_START( hotblock )
 	ROM_LOAD( "hotblk6.ic5", 0x080000, 0x080000, CRC(3176d231) SHA1(ac22fd0e9820c6714f51a3d8315eb5d43ef91eeb) )
 ROM_END
 
-GAME( 1993, hotblock, 0,        hotblock, hotblock, hotblock_state, 0, ROT0,  "NIX?", "Hot Blocks - Tetrix II", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hotblock, 0, hotblock, hotblock, hotblock_state, empty_init, ROT0, "NIX?", "Hot Blocks - Tetrix II", MACHINE_SUPPORTS_SAVE )

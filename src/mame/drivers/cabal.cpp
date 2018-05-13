@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(cabal_state::cabal)
 	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
@@ -612,7 +612,7 @@ MACHINE_CONFIG_START(cabal_state::cabalbl)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -967,19 +967,19 @@ ROM_START( cabalbl2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(cabal_state,cabal)
+void cabal_state::init_cabal()
 {
 	m_adpcm1->decrypt();
 	m_adpcm2->decrypt();
 }
 
 
-GAME( 1988, cabal,    0,     cabal,   cabalj,  cabal_state,  cabal,  ROT0, "TAD Corporation",                         "Cabal (World, Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cabala,   cabal, cabal,   cabalj,  cabal_state,  cabal,  ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Korea?, Joystick)", MACHINE_SUPPORTS_SAVE ) // korea?
-GAME( 1989, cabalukj, cabal, cabal,   cabalj,  cabal_state,  cabal,  ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalbl,  cabal, cabalbl, cabalbl, cabal_state,  0,      ROT0, "bootleg (Red Corporation)",               "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalbl2, cabal, cabalbl2,cabalj,  cabal_state,  cabal,  ROT0, "bootleg",                                 "Cabal (bootleg of Joystick version, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabal,    0,     cabal,    cabalj,  cabal_state, init_cabal, ROT0, "TAD Corporation",                         "Cabal (World, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cabala,   cabal, cabal,    cabalj,  cabal_state, init_cabal, ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Korea?, Joystick)", MACHINE_SUPPORTS_SAVE ) // korea?
+GAME( 1989, cabalukj, cabal, cabal,    cabalj,  cabal_state, init_cabal, ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalbl,  cabal, cabalbl,  cabalbl, cabal_state, empty_init, ROT0, "bootleg (Red Corporation)",               "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalbl2, cabal, cabalbl2, cabalj,  cabal_state, init_cabal, ROT0, "bootleg",                                 "Cabal (bootleg of Joystick version, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, cabalus,  cabal, cabalt,  cabalt,  cabal_state,  cabal,  ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 1, Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cabalus2, cabal, cabalt,  cabalt,  cabal_state,  cabal,  ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 2, Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cabaluk,  cabal, cabalt,  cabalt,  cabal_state,  cabal,  ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalus,  cabal, cabalt,   cabalt,  cabal_state, init_cabal, ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 1, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cabalus2, cabal, cabalt,   cabalt,  cabal_state, init_cabal, ROT0, "TAD Corporation (Fabtek license)",        "Cabal (US set 2, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cabaluk,  cabal, cabalt,   cabalt,  cabal_state, init_cabal, ROT0, "TAD Corporation (Electrocoin license)",   "Cabal (UK, Trackball)", MACHINE_SUPPORTS_SAVE )

@@ -349,4 +349,4 @@ ROM_START( pushover )
 ROM_END
 
 
-GAME( 1981, pushover,  0,    summit, summit, summit_state,  0, ROT270, "Summit Coin", "Push Over (Summit Coin)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_WRONG_COLORS )
+GAME( 1981, pushover,  0,    summit, summit, summit_state, empty_init, ROT270, "Summit Coin", "Push Over (Summit Coin)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_WRONG_COLORS )

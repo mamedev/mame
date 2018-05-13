@@ -21,24 +21,23 @@ class deco32_state : public driver_device
 {
 public:
 	deco32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_ioprot(*this, "ioprot"),
-		m_deco_irq(*this, "irq"),
-		m_decobsmt(*this, "decobsmt"),
-		m_sprgen(*this, "spritegen%u", 1),
-		m_sprgenzoom(*this, "spritegen_zoom"),
-		m_eeprom(*this, "eeprom"),
-		m_ym2151(*this, "ymsnd"),
-		m_oki(*this, "oki%u", 1),
-		m_deco_tilegen(*this, "tilegen%u", 1),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
-		m_pf_rowscroll32(*this, "pf%u_rowscroll32", 1),
-		m_generic_paletteram_32(*this, "paletteram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_ioprot(*this, "ioprot")
+		, m_deco_irq(*this, "irq")
+		, m_decobsmt(*this, "decobsmt")
+		, m_sprgen(*this, "spritegen%u", 1)
+		, m_eeprom(*this, "eeprom")
+		, m_ym2151(*this, "ymsnd")
+		, m_oki(*this, "oki%u", 1)
+		, m_deco_tilegen(*this, "tilegen%u", 1)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+		, m_pf_rowscroll32(*this, "pf%u_rowscroll32", 1)
+		, m_generic_paletteram_32(*this, "paletteram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -47,14 +46,13 @@ public:
 	optional_device<deco_irq_device> m_deco_irq;
 	optional_device<decobsmt_device> m_decobsmt;
 	optional_device_array<decospr_device, 2> m_sprgen;
-	optional_device<deco_zoomspr_device> m_sprgenzoom;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<ym2151_device> m_ym2151;
 	optional_device_array<okim6295_device, 3> m_oki;
 	required_device_array<deco16ic_device, 2> m_deco_tilegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	optional_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 	// we use the pointers below to store a 32-bit copy..
@@ -62,9 +60,9 @@ public:
 	optional_shared_ptr<uint32_t> m_generic_paletteram_32;
 
 	std::unique_ptr<uint8_t[]> m_dirty_palette; // all but captaven
-	int m_pri; // captaven, fghthist, nslasher and tattass
-	std::unique_ptr<uint16_t[]> m_spriteram16[2]; // captaven, fghthist, nslasher and tattass
-	std::unique_ptr<uint16_t[]> m_spriteram16_buffered[2]; // captaven, fghthist, nslasher and tattass
+	int m_pri; // all but dragngun
+	std::unique_ptr<uint16_t[]> m_spriteram16[2]; // all but dragngun
+	std::unique_ptr<uint16_t[]> m_spriteram16_buffered[2]; // all but dragngun
 	std::unique_ptr<uint16_t[]> m_pf_rowscroll[4]; // common
 
 	// common
@@ -115,7 +113,7 @@ public:
 	DECLARE_READ8_MEMBER(captaven_soundcpu_status_r);
 
 	DECLARE_VIDEO_START(captaven);
-	DECLARE_DRIVER_INIT(captaven);
+	void init_captaven();
 
 	uint32_t screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -139,7 +137,7 @@ public:
 	DECLARE_READ16_MEMBER(fghthist_in1_r);
 	DECLARE_READ32_MEMBER(unk_status_r);
 
-	DECLARE_DRIVER_INIT(fghthist);
+	void init_fghthist();
 	DECLARE_VIDEO_START(fghthist);
 
 	uint32_t screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -159,8 +157,8 @@ class nslasher_state : public deco32_state
 {
 public:
 	nslasher_state(const machine_config &mconfig, device_type type, const char *tag)
-		: deco32_state(mconfig, type, tag),
-		m_deco_ace(*this, "deco_ace")
+		: deco32_state(mconfig, type, tag)
+		, m_deco_ace(*this, "deco_ace")
 	{ }
 	required_device<deco_ace_device> m_deco_ace;
 
@@ -168,8 +166,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tattass_sound_irq_w);
 	DECLARE_READ16_MEMBER(nslasher_debug_r);
 
-	DECLARE_DRIVER_INIT(tattass);
-	DECLARE_DRIVER_INIT(nslasher);
+	void init_tattass();
+	void init_nslasher();
 	DECLARE_VIDEO_START(nslasher);
 
 	uint32_t screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -200,15 +198,17 @@ class dragngun_state : public deco32_state
 {
 public:
 	dragngun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: deco32_state(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"),
-		m_sprite_layout_ram(*this, "lay%u", 0),
-		m_sprite_lookup_ram(*this, "look%u", 0),
-		m_vol_main(*this, "vol_main"),
-		m_vol_gun(*this, "vol_gun"),
-		m_gun_speaker_disabled(true)
+		: deco32_state(mconfig, type, tag)
+		, m_sprgenzoom(*this, "spritegen_zoom")
+		, m_spriteram(*this, "spriteram")
+		, m_sprite_layout_ram(*this, "lay%u", 0)
+		, m_sprite_lookup_ram(*this, "look%u", 0)
+		, m_vol_main(*this, "vol_main")
+		, m_vol_gun(*this, "vol_gun")
+		, m_gun_speaker_disabled(true)
 	{ }
 
+	required_device<deco_zoomspr_device> m_sprgenzoom;
 	required_device<buffered_spriteram32_device> m_spriteram;
 
 	required_shared_ptr_array<uint32_t, 2> m_sprite_layout_ram;
@@ -238,9 +238,9 @@ public:
 	DECLARE_WRITE8_MEMBER(lockload_okibank_lo_w);
 	DECLARE_WRITE8_MEMBER(lockload_okibank_hi_w); // lockload
 
-	DECLARE_DRIVER_INIT(dragngun);
-	DECLARE_DRIVER_INIT(dragngunj);
-	DECLARE_DRIVER_INIT(lockload);
+	void init_dragngun();
+	void init_dragngunj();
+	void init_lockload();
 	DECLARE_VIDEO_START(dragngun);
 	void dragngun_init_common();
 	DECLARE_INPUT_CHANGED_MEMBER(lockload_gun_trigger);

@@ -350,7 +350,7 @@ MACHINE_CONFIG_START(runaway_state::runaway)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, 12096000 / 8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("6008"))
@@ -416,5 +416,5 @@ ROM_START( qwak )
 ROM_END
 
 
-GAME( 1982, qwak,    0, qwak,    qwak,    runaway_state, 0, ROT270, "Atari", "Qwak (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, runaway, 0, runaway, runaway, runaway_state, 0, ROT0,   "Atari", "Runaway (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qwak,    0, qwak,    qwak,    runaway_state, empty_init, ROT270, "Atari", "Qwak (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, runaway, 0, runaway, runaway, runaway_state, empty_init, ROT0,   "Atari", "Runaway (prototype)", MACHINE_SUPPORTS_SAVE )

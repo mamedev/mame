@@ -217,9 +217,8 @@ MACHINE_CONFIG_START(poly88_state::poly88)
 
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -264,6 +263,6 @@ ROM_START( poly8813 )
 ROM_END
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT    COMPANY                  FULLNAME     FLAGS
-COMP( 1976, poly88,  0,     0,       poly88,    poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-88",   0 )
-COMP( 1977, poly8813,poly88,0,       poly8813,  poly88, poly88_state,  poly88, "PolyMorphic Systems",   "Poly-8813", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT         COMPANY                FULLNAME     FLAGS
+COMP( 1976, poly88,   0,      0,      poly88,   poly88, poly88_state, init_poly88, "PolyMorphic Systems", "Poly-88",   0 )
+COMP( 1977, poly8813, poly88, 0,      poly8813, poly88, poly88_state, init_poly88, "PolyMorphic Systems", "Poly-8813", MACHINE_NOT_WORKING )

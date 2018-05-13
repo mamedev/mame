@@ -513,7 +513,7 @@ MACHINE_CONFIG_START(pb1000_state::pb1000)
 	MCFG_NVRAM_ADD_0FILL("nvram2")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
@@ -575,7 +575,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT    STATE          INIT    COMPANY   FULLNAME     FLAGS */
-COMP( 1987, pb1000,  0,       0,       pb1000,    pb1000,  pb1000_state,  0,      "Casio",  "PB-1000",   MACHINE_NOT_WORKING)
-COMP( 1989, pb2000c, 0,       0,       pb2000c,   pb2000c, pb1000_state,  0,      "Casio",  "PB-2000c",  MACHINE_NOT_WORKING)
-COMP( 1989, ai1000,  pb2000c, 0,       pb2000c,   pb2000c, pb1000_state,  0,      "Casio",  "AI-1000",   MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY  FULLNAME    FLAGS */
+COMP( 1987, pb1000,  0,       0,      pb1000,  pb1000,  pb1000_state, empty_init, "Casio", "PB-1000",  MACHINE_NOT_WORKING)
+COMP( 1989, pb2000c, 0,       0,      pb2000c, pb2000c, pb1000_state, empty_init, "Casio", "PB-2000c", MACHINE_NOT_WORKING)
+COMP( 1989, ai1000,  pb2000c, 0,      pb2000c, pb2000c, pb1000_state, empty_init, "Casio", "AI-1000",  MACHINE_NOT_WORKING)

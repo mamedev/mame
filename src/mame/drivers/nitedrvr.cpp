@@ -166,10 +166,9 @@ MACHINE_CONFIG_START(nitedrvr_state::nitedrvr)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(nitedrvr)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, nitedrvr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -204,4 +203,4 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1976, nitedrvr, 0, nitedrvr, nitedrvr, nitedrvr_state, 0, ROT0, "Atari", "Night Driver", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, nitedrvr, 0, nitedrvr, nitedrvr, nitedrvr_state, empty_init, ROT0, "Atari", "Night Driver", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -118,7 +118,7 @@ MACHINE_CONFIG_START(neptunp2_state::neptunp2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 MACHINE_CONFIG_END
 
@@ -144,4 +144,4 @@ ROM_START( neptunp2 )
 ROM_END
 
 
-GAME( 199?, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state,  0, ROT0, "Unidesa?", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa?", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

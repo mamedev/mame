@@ -257,7 +257,7 @@ MACHINE_CONFIG_START(sonson_state::sonson)
 	MCFG_PALETTE_INIT_OWNER(sonson_state, sonson)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -338,5 +338,5 @@ ROM_START( sonsonj )
 ROM_END
 
 
-GAME( 1984, sonson,  0,      sonson, sonson, sonson_state, 0, ROT0, "Capcom", "Son Son",         MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sonsonj, sonson, sonson, sonson, sonson_state, 0, ROT0, "Capcom", "Son Son (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sonson,  0,      sonson, sonson, sonson_state, empty_init, ROT0, "Capcom", "Son Son",         MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sonsonj, sonson, sonson, sonson, sonson_state, empty_init, ROT0, "Capcom", "Son Son (Japan)", MACHINE_SUPPORTS_SAVE )

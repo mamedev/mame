@@ -56,7 +56,7 @@ ROM_END
 
 MACHINE_CONFIG_START(electron_m2105_device::device_add_mconfig)
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, electron_m2105_device, intrq_w))

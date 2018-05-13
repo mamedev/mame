@@ -211,7 +211,8 @@ MACHINE_CONFIG_START(bingoc_state::bingoc)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") //might just be mono...
+	SPEAKER(config, "lspeaker").front_left(); //might just be mono...
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -241,4 +242,4 @@ ROM_START( bingoc )
 	ROM_COPY( "upd",       0x20000, 0x00000, 0x20000 )
 ROM_END
 
-GAME( 1989, bingoc,  0,    bingoc, bingoc, bingoc_state,  0, ROT0, "Sega", "Bingo Circus (Rev. A 891001)", MACHINE_NOT_WORKING )
+GAME( 1989, bingoc, 0, bingoc, bingoc, bingoc_state, empty_init, ROT0, "Sega", "Bingo Circus (Rev. A 891001)", MACHINE_NOT_WORKING )

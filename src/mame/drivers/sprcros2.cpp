@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(sprcros2_state::sprcros2)
 	MCFG_PALETTE_INIT_OWNER(sprcros2_state, sprcros2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("sn1", SN76489, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -576,5 +576,5 @@ ROM_START( sprcros2a )
 	ROM_LOAD( "sc-60.4k",    0x0320, 0x0100, CRC(d7a4e57d) SHA1(6db02ec6aa55b05422cb505e63c71e36b4b11b4a) ) //fg clut
 ROM_END
 
-GAME( 1986, sprcros2,  0,        sprcros2, sprcros2, sprcros2_state, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sprcros2a, sprcros2, sprcros2, sprcros2, sprcros2_state, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sprcros2,  0,        sprcros2, sprcros2, sprcros2_state, empty_init, ROT0, "GM Shoji", "Super Cross II (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sprcros2a, sprcros2, sprcros2, sprcros2, sprcros2_state, empty_init, ROT0, "GM Shoji", "Super Cross II (Japan, set 2)", MACHINE_SUPPORTS_SAVE )

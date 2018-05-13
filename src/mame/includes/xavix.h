@@ -50,9 +50,9 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
-	DECLARE_DRIVER_INIT(xavix);
-	DECLARE_DRIVER_INIT(taitons1);
-	DECLARE_DRIVER_INIT(rad_box);
+	void init_xavix();
+	void init_taitons1();
+	void init_rad_box();
 
 protected:
 	// driver_device overrides

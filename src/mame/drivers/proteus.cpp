@@ -427,5 +427,5 @@ ROM_START(proteus)
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT  COMPANY     FULLNAME                     FLAGS */
-COMP( 1982, proteus, 0,      0,       proteus, proteus, proteus_state, 0,    "Polycorp", "Poly Proteus (Standalone)", MACHINE_NOT_WORKING )
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME                     FLAGS */
+COMP( 1982, proteus, 0,      0,       proteus, proteus, proteus_state, empty_init, "Polycorp", "Poly Proteus (Standalone)", MACHINE_NOT_WORKING )

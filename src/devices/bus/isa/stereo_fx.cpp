@@ -123,7 +123,8 @@ MACHINE_CONFIG_START(stereo_fx_device::device_add_mconfig)
 	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, stereo_fx_device, p3_r))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, stereo_fx_device, p3_w))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ym3812", YM3812, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)

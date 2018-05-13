@@ -845,7 +845,7 @@ MACHINE_CONFIG_START(vic20_state::ntsc)
 	// basic machine hardware
 	MCFG_DEVICE_ADD(M6502_TAG, M6502, MOS6560_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(vic20_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, MOS6560_CLOCK)
 	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vic20_state, via1_pa_r))
@@ -865,14 +865,14 @@ MACHINE_CONFIG_START(vic20_state::ntsc)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	// video/sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_MOS6560_ADD(M6560_TAG, SCREEN_TAG, MOS6560_CLOCK, vic_videoram_map, vic_colorram_map)
 	MCFG_MOS6560_POTX_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_x_r))
 	MCFG_MOS6560_POTY_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, MOS6560_CLOCK, vic20_expansion_cards, nullptr)
+	MCFG_DEVICE_ADD(VIC20_EXPANSION_SLOT_TAG, VIC20_EXPANSION_SLOT, MOS6560_CLOCK, vic20_expansion_cards, nullptr)
 	MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 	MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(INPUTLINE(M6502_TAG, M6502_NMI_LINE))
 	MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(WRITELINE(*this, vic20_state, exp_reset_w))
@@ -893,7 +893,7 @@ MACHINE_CONFIG_START(vic20_state::pal)
 	// basic machine hardware
 	MCFG_DEVICE_ADD(M6502_TAG, M6502, MOS6561_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(vic20_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, MOS6561_CLOCK)
 	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vic20_state, via1_pa_r))
@@ -913,14 +913,14 @@ MACHINE_CONFIG_START(vic20_state::pal)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	// video/sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_MOS6561_ADD(M6560_TAG, SCREEN_TAG, MOS6561_CLOCK, vic_videoram_map, vic_colorram_map)
 	MCFG_MOS6560_POTX_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_x_r))
 	MCFG_MOS6560_POTY_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, MOS6561_CLOCK, vic20_expansion_cards, nullptr)
+	MCFG_DEVICE_ADD(VIC20_EXPANSION_SLOT_TAG, VIC20_EXPANSION_SLOT, MOS6561_CLOCK, vic20_expansion_cards, nullptr)
 	MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 	MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(INPUTLINE(M6502_TAG, M6502_NMI_LINE))
 	MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(WRITELINE(*this, vic20_state, exp_reset_w))
@@ -1012,8 +1012,8 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       STATE         INIT        COMPANY                             FULLNAME                    FLAGS
-COMP( 1980, vic1001,    0,          0,      ntsc,       vic1001,    vic20_state,  0,          "Commodore Business Machines",      "VIC-1001 (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, vic20,      vic1001,    0,      ntsc,       vic20,      vic20_state,  0,          "Commodore Business Machines",      "VIC-20 (NTSC)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, vic20p,     vic1001,    0,      pal,        vic20,      vic20_state,  0,          "Commodore Business Machines",      "VIC-20 / VC-20 (PAL)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, vic20_se,   vic1001,    0,      pal,        vic20s,     vic20_state,  0,          "Commodore Business Machines",      "VIC-20 (Sweden/Finland)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY                        FULLNAME                   FLAGS
+COMP( 1980, vic1001,  0,       0,      ntsc,    vic1001, vic20_state, empty_init, "Commodore Business Machines", "VIC-1001 (Japan)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, vic20,    vic1001, 0,      ntsc,    vic20,   vic20_state, empty_init, "Commodore Business Machines", "VIC-20 (NTSC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, vic20p,   vic1001, 0,      pal,     vic20,   vic20_state, empty_init, "Commodore Business Machines", "VIC-20 / VC-20 (PAL)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, vic20_se, vic1001, 0,      pal,     vic20s,  vic20_state, empty_init, "Commodore Business Machines", "VIC-20 (Sweden/Finland)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

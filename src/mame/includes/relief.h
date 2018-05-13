@@ -28,7 +28,7 @@ public:
 		m_okibank(*this, "okibank")
 	{ }
 
-	DECLARE_DRIVER_INIT(relief);
+	void init_relief();
 	void relief(machine_config &config);
 
 protected:

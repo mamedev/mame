@@ -65,7 +65,7 @@ offs_t xavix_device::pc_to_external(u16 pc)
 
 void xavix_device::device_start()
 {
-	if(direct_disabled)
+	if(cache_disabled)
 		mintf = std::make_unique<mi_xavix_nd>(this);
 	else
 		mintf = std::make_unique<mi_xavix_normal>(this);
@@ -106,7 +106,7 @@ uint8_t xavix_device::mi_xavix_normal::read_sync(uint16_t adr)
 	else if (adr == 0xff)
 		return base->m_databank;
 
-	return sdirect->read_byte(base->adr_with_codebank(adr));
+	return scache->read_byte(base->adr_with_codebank(adr));
 }
 
 uint8_t xavix_device::mi_xavix_normal::read_arg(uint16_t adr)
@@ -116,7 +116,7 @@ uint8_t xavix_device::mi_xavix_normal::read_arg(uint16_t adr)
 	else if (adr == 0xff)
 		return base->m_databank;
 
-	return direct->read_byte(base->adr_with_codebank(adr));
+	return cache->read_byte(base->adr_with_codebank(adr));
 }
 
 void xavix_device::mi_xavix_normal::write(uint16_t adr, uint8_t val)

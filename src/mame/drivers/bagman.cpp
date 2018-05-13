@@ -468,7 +468,7 @@ MACHINE_CONFIG_START(bagman_state::bagman)
 	MCFG_TMSPROM_CTL_CB(WRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, BAGMAN_H0 / 2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(bagman_state::pickin)
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
@@ -594,7 +594,7 @@ MACHINE_CONFIG_START(bagman_state::botanic)
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
@@ -1061,21 +1061,21 @@ ROM_START( squaitsa )
 ROM_END
 
 
-GAME( 1982, bagman,   0,       bagman,   bagman,   bagman_state,   0,       ROT270, "Valadon Automation", "Bagman", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagnard,  bagman,  bagman,   bagman,   bagman_state,   0,       ROT270, "Valadon Automation", "Le Bagnard (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagnarda, bagman,  bagman,   bagman,   bagman_state,   0,       ROT270, "Valadon Automation", "Le Bagnard (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagnardi, bagman,  bagman,   bagman,   bagman_state,   0,       ROT90,  "Valadon Automation (Itisa license)", "Le Bagnard (Itisa, Spain)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagmans,  bagman,  bagman,   bagmans,  bagman_state,   0,       ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagmans2, bagman,  bagman,   bagman,   bagman_state,   0,       ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bagmanj,  bagman,  bagman,   bagman,   bagman_state,   0,       ROT270, "Valadon Automation (Taito license)", "Bagman (Taito)", MACHINE_SUPPORTS_SAVE ) // title screen actually doesn't mention Valadon, only Stern and Taito
+GAME( 1982, bagman,   0,       bagman,   bagman,   bagman_state,   empty_init, ROT270, "Valadon Automation", "Bagman", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagnard,  bagman,  bagman,   bagman,   bagman_state,   empty_init, ROT270, "Valadon Automation", "Le Bagnard (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagnarda, bagman,  bagman,   bagman,   bagman_state,   empty_init, ROT270, "Valadon Automation", "Le Bagnard (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagnardi, bagman,  bagman,   bagman,   bagman_state,   empty_init, ROT90,  "Valadon Automation (Itisa license)", "Le Bagnard (Itisa, Spain)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmans,  bagman,  bagman,   bagmans,  bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmans2, bagman,  bagman,   bagman,   bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmanj,  bagman,  bagman,   bagman,   bagman_state,   empty_init, ROT270, "Valadon Automation (Taito license)", "Bagman (Taito)", MACHINE_SUPPORTS_SAVE ) // title screen actually doesn't mention Valadon, only Stern and Taito
 
-GAME( 1984, sbagman,  0,       sbagman,  sbagman,  bagman_state,   0,       ROT270, "Valadon Automation", "Super Bagman", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sbagmani, sbagman, sbagmani, sbagman,  bagman_state,   0,       ROT90,  "Valadon Automation (Itisa license)", "Super Bagman (Itisa, Spain)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // different color PROMs, needs correct decoding
-GAME( 1984, sbagmans, sbagman, sbagman,  sbagman,  bagman_state,   0,       ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbagman,  0,       sbagman,  sbagman,  bagman_state,   empty_init, ROT270, "Valadon Automation", "Super Bagman", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbagmani, sbagman, sbagmani, sbagman,  bagman_state,   empty_init, ROT90,  "Valadon Automation (Itisa license)", "Super Bagman (Itisa, Spain)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // different color PROMs, needs correct decoding
+GAME( 1984, sbagmans, sbagman, sbagman,  sbagman,  bagman_state,   empty_init, ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, pickin,   0,       pickin,   pickin,   bagman_state,   0,       ROT270, "Valadon Automation", "Pickin'", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pickin,   0,       pickin,   pickin,   bagman_state,   empty_init, ROT270, "Valadon Automation", "Pickin'", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, botanic,  0,       botanic,  botanici, bagman_state,   0,       ROT90,  "Itisa",                              "Botanic (English / Spanish)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, botanicf, botanic, botanic,  botanicf, bagman_state,   0,       ROT270, "Itisa (Valadon Automation license)", "Botanic (French)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, botanic,  0,       botanic,  botanici, bagman_state,   empty_init, ROT90,  "Itisa",                              "Botanic (English / Spanish)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, botanicf, botanic, botanic,  botanicf, bagman_state,   empty_init, ROT270, "Itisa (Valadon Automation license)", "Botanic (French)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, squaitsa, 0,       botanic,  squaitsa, squaitsa_state, 0,       ROT0,   "Itisa", "Squash (Itisa)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, squaitsa, 0,       botanic,  squaitsa, squaitsa_state, empty_init, ROT0,   "Itisa", "Squash (Itisa)", MACHINE_SUPPORTS_SAVE )

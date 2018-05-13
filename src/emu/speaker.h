@@ -23,23 +23,6 @@ DECLARE_DEVICE_TYPE(SPEAKER, speaker_device)
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-// add/remove speakers
-#define MCFG_SPEAKER_ADD(_tag, _x, _y, _z) \
-	MCFG_DEVICE_ADD(_tag, SPEAKER, _x, _y, _z)
-
-#define MCFG_SPEAKER_STANDARD_MONO(_tag) \
-	MCFG_SPEAKER_ADD(_tag, 0.0, 0.0, 1.0)
-
-#define MCFG_SPEAKER_STANDARD_STEREO(_tagl, _tagr) \
-	MCFG_SPEAKER_ADD(_tagl, -0.2, 0.0, 1.0) \
-	MCFG_SPEAKER_ADD(_tagr, 0.2, 0.0, 1.0)
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -59,9 +42,9 @@ public:
 
 	// inline configuration helpers
 	speaker_device &set_position(double x, double y, double z) { m_x = x; m_y = y; m_z = z; return *this; }
-	speaker_device &standard_mono() { set_position(0.0, 0.0, 1.0); return *this; }
-	speaker_device &standard_left() { set_position(-0.2, 0.0, 1.0); return *this; }
-	speaker_device &standard_right() { set_position(0.2, 0.0, 1.0); return *this; }
+	speaker_device &front_center() { set_position(0.0, 0.0, 1.0); return *this; }
+	speaker_device &front_left() { set_position(-0.2, 0.0, 1.0); return *this; }
+	speaker_device &front_right() { set_position(0.2, 0.0, 1.0); return *this; }
 
 	// internally for use by the sound system
 	void mix(s32 *leftmix, s32 *rightmix, int &samples_this_update, bool suppress);

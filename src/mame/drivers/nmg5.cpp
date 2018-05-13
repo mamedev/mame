@@ -283,10 +283,10 @@ public:
 	DECLARE_WRITE16_MEMBER(gfx_bank_w);
 	DECLARE_WRITE16_MEMBER(priority_reg_w);
 	DECLARE_WRITE8_MEMBER(oki_banking_w);
-	DECLARE_DRIVER_INIT(prot_val_00);
-	DECLARE_DRIVER_INIT(prot_val_10);
-	DECLARE_DRIVER_INIT(prot_val_20);
-	DECLARE_DRIVER_INIT(prot_val_40);
+	void init_prot_val_00();
+	void init_prot_val_10();
+	void init_prot_val_20();
+	void init_prot_val_40();
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	virtual void machine_start() override;
@@ -1023,7 +1023,7 @@ MACHINE_CONFIG_START(nmg5_state::nmg5)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1031,7 +1031,7 @@ MACHINE_CONFIG_START(nmg5_state::nmg5)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1000000 , PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000 , okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1580,35 +1580,35 @@ ROM_START( 7ordi )
 	ROM_RELOAD(0x60000,0x20000)
 ROM_END
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_00)
+void nmg5_state::init_prot_val_00()
 {
 	m_prot_val = 0x00;
 }
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_10)
+void nmg5_state::init_prot_val_10()
 {
 	m_prot_val = 0x10;
 }
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_20)
+void nmg5_state::init_prot_val_20()
 {
 	m_prot_val = 0x20;
 }
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_40)
+void nmg5_state::init_prot_val_40()
 {
 	m_prot_val = 0x40;
 }
 
-GAME( 1998, nmg5,      0,        nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, nmg5a,     nmg5,     nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 2, censored)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, nmg5e,     nmg5,     nmg5,     nmg5,      nmg5_state, prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 3, earlier)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, searchey,  0,        nmg5,     searchey,  nmg5_state, prot_val_10, ROT0, "Yun Sung", "Search Eye (English / Korean / Japanese / Italian)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, searcheya, searchey, nmg5,     searcheya, nmg5_state, prot_val_10, ROT0, "Yun Sung", "Search Eye (English / Korean)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, searchp2,  0,        searchp2, searchp2,  nmg5_state, prot_val_10, ROT0, "Yun Sung", "Search Eye Plus V2.0", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, pclubys,   0,        pclubys,  pclubys,   nmg5_state, prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, pclubysa,  pclubys,  pclubys,  pclubys,   nmg5_state, prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, garogun,   0,        garogun,  garogun,   nmg5_state, prot_val_40, ROT0, "Yun Sung", "Garogun Seroyang (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, 7ordi,     0,        _7ordi,   7ordi,     nmg5_state, prot_val_20, ROT0, "Yun Sung", "7 Ordi (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( ????, wondstck,  0,        nmg5,     wondstck,  nmg5_state, prot_val_00, ROT0, "Yun Sung", "Wonder Stick (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( ????, wondstcka, wondstck, nmg5,     wondstck,  nmg5_state, prot_val_00, ROT0, "Yun Sung", "Wonder Stick (set 2, censored)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, nmg5,      0,        nmg5,     nmg5,      nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, nmg5a,     nmg5,     nmg5,     nmg5,      nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 2, censored)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, nmg5e,     nmg5,     nmg5,     nmg5,      nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 3, earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, searchey,  0,        nmg5,     searchey,  nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Search Eye (English / Korean / Japanese / Italian)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, searcheya, searchey, nmg5,     searcheya, nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Search Eye (English / Korean)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, searchp2,  0,        searchp2, searchp2,  nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Search Eye Plus V2.0", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, pclubys,   0,        pclubys,  pclubys,   nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, pclubysa,  pclubys,  pclubys,  pclubys,   nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, garogun,   0,        garogun,  garogun,   nmg5_state, init_prot_val_40, ROT0, "Yun Sung", "Garogun Seroyang (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, 7ordi,     0,        _7ordi,   7ordi,     nmg5_state, init_prot_val_20, ROT0, "Yun Sung", "7 Ordi (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( ????, wondstck,  0,        nmg5,     wondstck,  nmg5_state, init_prot_val_00, ROT0, "Yun Sung", "Wonder Stick (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( ????, wondstcka, wondstck, nmg5,     wondstck,  nmg5_state, init_prot_val_00, ROT0, "Yun Sung", "Wonder Stick (set 2, censored)", MACHINE_SUPPORTS_SAVE )

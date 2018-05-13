@@ -40,6 +40,12 @@ public:
 	required_device<timer_device> m_irq_timer_1;
 	optional_device<s32comm_device> m_s32comm;
 
+	required_region_ptr<uint32_t> m_sprite_region;
+	required_memory_region m_maincpu_region;
+	required_memory_bank m_soundrom_bank;
+	optional_memory_bank m_multipcm_bank_hi;
+	optional_memory_bank m_multipcm_bank_lo;
+
 	typedef void (segas32_state::*sys32_output_callback)(int which, uint16_t data);
 
 	struct layer_info
@@ -174,7 +180,6 @@ public:
 	void signal_v60_irq(int which);
 	void update_sound_irq_state();
 	void segas32_common_init();
-	void multi32_common_init();
 	void radm_sw1_output( int which, uint16_t data );
 	void radm_sw2_output( int which, uint16_t data );
 	void radr_sw2_output( int which, uint16_t data );
@@ -234,6 +239,7 @@ public:
 	void multi32_sound_map(address_map &map);
 	void multi32_sound_portmap(address_map &map);
 	void multipcm_map(address_map &map);
+	void rf5c68_map(address_map &map);
 	void system32_4player_map(address_map &map);
 	void system32_analog_map(address_map &map);
 	void system32_cd_map(address_map &map);

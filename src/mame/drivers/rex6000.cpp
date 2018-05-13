@@ -955,7 +955,7 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
@@ -1022,7 +1022,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
@@ -1066,7 +1066,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT    STATE           INIT  COMPANY             FULLNAME          FLAGS */
-COMP( 199?, oz750,    0,       0,   oz750,      oz750,   oz750_state,    0,    "Sharp",            "Wizard OZ-750",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 2000, rex6000,  0,       0,   rex6000,    rex6000, rex6000_state,  0,    "Xircom / Intel",   "REX 6000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 2000, ds2,      rex6000, 0,   rex6000,    rex6000, rex6000_state,  0,    "Citizen",          "DataSlim 2",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY           FULLNAME         FLAGS */
+COMP( 199?, oz750,   0,       0,      oz750,   oz750,   oz750_state,   empty_init, "Sharp",          "Wizard OZ-750", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 2000, rex6000, 0,       0,      rex6000, rex6000, rex6000_state, empty_init, "Xircom / Intel", "REX 6000",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 2000, ds2,     rex6000, 0,      rex6000, rex6000, rex6000_state, empty_init, "Citizen",        "DataSlim 2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -330,7 +330,7 @@ MACHINE_CONFIG_START(ashnojoe_state::ashnojoe)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -420,7 +420,7 @@ ROM_START( ashnojoe )
 	ROM_LOAD( "sj401-nw.10r", 0x00000, 0x80000, CRC(25dfab59) SHA1(7d50159204ba05323a2442778f35192e66117dda) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ashnojoe_state,ashnojoe)
+void ashnojoe_state::init_ashnojoe()
 {
 	uint8_t *ROM = memregion("adpcm")->base();
 	membank("bank4")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
@@ -428,5 +428,5 @@ DRIVER_INIT_MEMBER(ashnojoe_state,ashnojoe)
 	membank("bank4")->set_entry(0);
 }
 
-GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe_state, ashnojoe, ROT0, "Taito Corporation / Wave", "Success Joe (World)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe_state, ashnojoe, ROT0, "Taito Corporation / Wave", "Ashita no Joe (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe_state, init_ashnojoe, ROT0, "Taito Corporation / Wave", "Success Joe (World)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe_state, init_ashnojoe, ROT0, "Taito Corporation / Wave", "Ashita no Joe (Japan)", MACHINE_SUPPORTS_SAVE )

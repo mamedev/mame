@@ -274,7 +274,7 @@ MACHINE_CONFIG_START(ginganin_state::ginganin)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -364,12 +364,10 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(ginganin_state,ginganin)
+void ginganin_state::init_ginganin()
 {
-	uint16_t *rom;
-
 	/* main cpu patches */
-	rom = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	/* avoid writes to rom getting to the log */
 	rom[0x408 / 2] = 0x6000;
 	rom[0x40a / 2] = 0x001c;
@@ -381,5 +379,5 @@ DRIVER_INIT_MEMBER(ginganin_state,ginganin)
 }
 
 
-GAME( 1987, ginganin,  0,        ginganin, ginganin, ginganin_state, ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ginganina, ginganin, ginganin, ginganin, ginganin_state, ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ginganin,  0,        ginganin, ginganin, ginganin_state, init_ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ginganina, ginganin, ginganin, ginganin, ginganin_state, init_ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 2)", MACHINE_SUPPORTS_SAVE )

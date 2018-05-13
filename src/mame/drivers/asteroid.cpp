@@ -1055,14 +1055,14 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(asteroid_state,asteroidb)
+void asteroid_state::init_asteroidb()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x2000, 0x2000, "IN0");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x2003, 0x2003, "HS");
 }
 
 
-DRIVER_INIT_MEMBER(asteroid_state,asterock)
+void asteroid_state::init_asterock()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2007, read8_delegate(FUNC(asteroid_state::asterock_IN0_r),this));
 }
@@ -1074,22 +1074,22 @@ DRIVER_INIT_MEMBER(asteroid_state,asterock)
  *
  *************************************/
 
-GAME( 1979, asteroid,  0,         asteroid,  asteroid,  asteroid_state, 0,         ROT0, "Atari",   "Asteroids (rev 4)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1979, asteroid2, asteroid,  asteroid,  asteroid,  asteroid_state, 0,         ROT0, "Atari",   "Asteroids (rev 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1979, asteroid1, asteroid,  asteroid,  asteroid,  asteroid_state, 0,         ROT0, "Atari",   "Asteroids (rev 1)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1979, asteroidb, asteroid,  asteroid,  asteroidb, asteroid_state, asteroidb, ROT0, "bootleg", "Asteroids (bootleg on Lunar Lander hardware)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1981, spcrocks,  asteroid,  asteroid,  aerolitos, asteroid_state, 0,         ROT0, "Atari (J.Estevez license)", "Space Rocks (Spanish clone of Asteroids)",        MACHINE_SUPPORTS_SAVE ) // Space Rocks seems to be a legit set. Cabinet registered to 'J.Estevez (Barcelona).
-GAME( 1980, aerolitos, asteroid,  asteroid,  aerolitos, asteroid_state, 0,         ROT0, "bootleg (Rodmar Elec.)","Aerolitos (Spanish bootleg of Asteroids)",        MACHINE_SUPPORTS_SAVE ) // 'Aerolitos' appears on the cabinet, this was distributed in Spain, the Spanish text is different to that contained in the original version (corrected)
-GAME( 1979, asterock,  asteroid,  asterock,  asterock,  asteroid_state, asterock,  ROT0, "bootleg (Sidam)",       "Asterock (Sidam bootleg of Asteroids)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1979, asterockv, asteroid,  asterock,  asterock,  asteroid_state, asterock,  ROT0, "bootleg (Videotron)",   "Asterock (Videotron bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, meteorts,  asteroid,  asteroid,  asteroid,  asteroid_state, 0,         ROT0, "bootleg (VGG)",         "Meteorites (bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, meteorho,  asteroid,  asteroid,  asteroid,  asteroid_state, 0,         ROT0, "bootleg (Hoei)",        "Meteor (bootleg of Asteroids)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1979, hyperspc,  asteroid,  asteroid,  asteroid,  asteroid_state, 0,         ROT0, "bootleg (Rumiano)",     "Hyperspace (bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, asteroid,  0,        asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids (rev 4)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1979, asteroid2, asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids (rev 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1979, asteroid1, asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids (rev 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1979, asteroidb, asteroid, asteroid, asteroidb, asteroid_state, init_asteroidb, ROT0, "bootleg", "Asteroids (bootleg on Lunar Lander hardware)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1981, spcrocks,  asteroid, asteroid, aerolitos, asteroid_state, empty_init,     ROT0, "Atari (J.Estevez license)", "Space Rocks (Spanish clone of Asteroids)",        MACHINE_SUPPORTS_SAVE ) // Space Rocks seems to be a legit set. Cabinet registered to 'J.Estevez (Barcelona).
+GAME( 1980, aerolitos, asteroid, asteroid, aerolitos, asteroid_state, empty_init,     ROT0, "bootleg (Rodmar Elec.)","Aerolitos (Spanish bootleg of Asteroids)",        MACHINE_SUPPORTS_SAVE ) // 'Aerolitos' appears on the cabinet, this was distributed in Spain, the Spanish text is different to that contained in the original version (corrected)
+GAME( 1979, asterock,  asteroid, asterock, asterock,  asteroid_state, init_asterock,  ROT0, "bootleg (Sidam)",       "Asterock (Sidam bootleg of Asteroids)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1979, asterockv, asteroid, asterock, asterock,  asteroid_state, init_asterock,  ROT0, "bootleg (Videotron)",   "Asterock (Videotron bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, meteorts,  asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "bootleg (VGG)",         "Meteorites (bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, meteorho,  asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "bootleg (Hoei)",        "Meteor (bootleg of Asteroids)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1979, hyperspc,  asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "bootleg (Rumiano)",     "Hyperspace (bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1980, astdelux,  0,         astdelux,  astdelux,  asteroid_state, 0,         ROT0, "Atari",   "Asteroids Deluxe (rev 3)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
-GAMEL(1980, astdelux2, astdelux,  astdelux,  astdelux,  asteroid_state, 0,         ROT0, "Atari",   "Asteroids Deluxe (rev 2)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
-GAMEL(1980, astdelux1, astdelux,  astdelux,  astdelux,  asteroid_state, 0,         ROT0, "Atari",   "Asteroids Deluxe (rev 1)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
+GAMEL(1980, astdelux,  0,        astdelux, astdelux,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids Deluxe (rev 3)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
+GAMEL(1980, astdelux2, astdelux, astdelux, astdelux,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids Deluxe (rev 2)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
+GAMEL(1980, astdelux1, astdelux, astdelux, astdelux,  asteroid_state, empty_init,     ROT0, "Atari",   "Asteroids Deluxe (rev 1)", MACHINE_SUPPORTS_SAVE, layout_astdelux )
 
-GAME( 1979, llander,   0,         llander,   llander,   asteroid_state, 0,         ROT0, "Atari",   "Lunar Lander (rev 2)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1979, llander1,  llander,   llander,   llander1,  asteroid_state, 0,         ROT0, "Atari",   "Lunar Lander (rev 1)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1979, llandert,  llander,   llander,   llandert,  asteroid_state, 0,         ROT0, "Atari",   "Lunar Lander (screen test)", MACHINE_SUPPORTS_SAVE ) // no copyright shown, assume it's an in-house diagnostics romset (PCB came from a seller that has had Atari prototypes in his possession before)
+GAME( 1979, llander,   0,        llander,  llander,   asteroid_state, empty_init,     ROT0, "Atari",   "Lunar Lander (rev 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1979, llander1,  llander,  llander,  llander1,  asteroid_state, empty_init,     ROT0, "Atari",   "Lunar Lander (rev 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1979, llandert,  llander,  llander,  llandert,  asteroid_state, empty_init,     ROT0, "Atari",   "Lunar Lander (screen test)", MACHINE_SUPPORTS_SAVE ) // no copyright shown, assume it's an in-house diagnostics romset (PCB came from a seller that has had Atari prototypes in his possession before)

@@ -407,8 +407,8 @@ public:
 	DECLARE_WRITE8_MEMBER(bootleg_w);
 	DECLARE_READ8_MEMBER(bootleg_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
-	DECLARE_DRIVER_INIT(missilem);
-	DECLARE_DRIVER_INIT(suprmatk);
+	void init_missilem();
+	void init_suprmatk();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1007,18 +1007,18 @@ static INPUT_PORTS_START( missile )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("R8")    /* IN3 */
-	PORT_DIPNAME( 0x03, 0x00, "Cities" ) PORT_DIPLOCATION("R8:1,2")
+	PORT_DIPNAME( 0x03, 0x03, "Cities" ) PORT_DIPLOCATION("R8:!1,!2")
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Credit for 4 Coins" ) PORT_DIPLOCATION("R8:3")
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Credit for 4 Coins" ) PORT_DIPLOCATION("R8:!3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Trackball Size" ) PORT_DIPLOCATION("R8:4")
+	PORT_DIPNAME( 0x08, 0x00, "Trackball Size" ) PORT_DIPLOCATION("R8:!4")
 	PORT_DIPSETTING(    0x00, "Large" )
 	PORT_DIPSETTING(    0x08, "Mini" )
-	PORT_DIPNAME( 0x70, 0x70, "Bonus City" ) PORT_DIPLOCATION("R8:5,6,7")
+	PORT_DIPNAME( 0x70, 0x70, "Bonus City" ) PORT_DIPLOCATION("R8:!5,!6,!7")
 	PORT_DIPSETTING(    0x10, "8000" )
 	PORT_DIPSETTING(    0x70, "10000" )
 	PORT_DIPSETTING(    0x60, "12000" )
@@ -1027,7 +1027,7 @@ static INPUT_PORTS_START( missile )
 	PORT_DIPSETTING(    0x30, "18000" )
 	PORT_DIPSETTING(    0x20, "20000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("R8:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("R8:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
@@ -1159,7 +1159,7 @@ MACHINE_CONFIG_START(missile_state::missile)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey", POKEY, MASTER_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("R8"))
@@ -1393,12 +1393,11 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(missile_state,suprmatk)
+void missile_state::init_suprmatk()
 {
-	int i;
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (i = 0; i < 0x40; i++)
+	for (int i = 0; i < 0x40; i++)
 	{
 		rom[0x7CC0+i] = rom[0x8000+i];
 		rom[0x5440+i] = rom[0x8040+i];
@@ -1467,7 +1466,7 @@ DRIVER_INIT_MEMBER(missile_state,suprmatk)
 	}
 }
 
-DRIVER_INIT_MEMBER(missile_state,missilem)
+void missile_state::init_missilem()
 {
 	uint8_t *src = memregion("user1")->base();
 	uint8_t *dest = memregion("maincpu")->base();
@@ -1494,17 +1493,17 @@ DRIVER_INIT_MEMBER(missile_state,missilem)
  *
  *************************************/
 
-GAME( 1980, missile,  0,       missile, missile,  missile_state,        0, ROT0, "Atari", "Missile Command (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, missile2, missile, missile, missile,  missile_state,        0, ROT0, "Atari", "Missile Command (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, missile1, missile, missile, missile,  missile_state,        0, ROT0, "Atari", "Missile Command (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, suprmatk, missile, missile, suprmatk, missile_state, suprmatk, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (for rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, suprmatkd,missile, missile, suprmatk, missile_state,        0, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile,  0,       missile, missile,  missile_state,     empty_init, ROT0, "Atari", "Missile Command (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile2, missile, missile, missile,  missile_state,     empty_init, ROT0, "Atari", "Missile Command (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile1, missile, missile, missile,  missile_state,     empty_init, ROT0, "Atari", "Missile Command (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, suprmatk, missile, missile, suprmatk, missile_state,  init_suprmatk, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (for rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, suprmatkd,missile, missile, suprmatk, missile_state,     empty_init, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (not encrypted)", MACHINE_SUPPORTS_SAVE )
 
 /* the following bootleg has extremely similar program ROMs to missile1, but has different unknown sound hardware and 2 more ROMs */
-GAME( 1981, missilea, missile, missilea, missile, missile_state,        0, ROT0, "bootleg (Ugames)", "Missile Attack", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, missilea, missile, missilea, missile, missile_state,     empty_init, ROT0, "bootleg (Ugames)", "Missile Attack", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* the following bootlegs are on different hardware and don't work */
-GAME( 1980, mcombat,  missile, missileb, missileb, missile_state,        0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", MACHINE_NOT_WORKING )
-GAME( 1980, mcombata, missile, missileb, missileb, missile_state,        0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", MACHINE_NOT_WORKING )
-GAME( 1980, mcombats, missile, missileb, missileb, missile_state,        0, ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", MACHINE_NOT_WORKING )
-GAME( 2005, missilem, missile, missilea, missileb, missile_state, missilem, ROT0, "hack (Braze Technologies)", "Missile Command Multigame", MACHINE_NOT_WORKING )
+GAME( 1980, mcombat,  missile, missileb, missileb, missile_state,    empty_init, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", MACHINE_NOT_WORKING )
+GAME( 1980, mcombata, missile, missileb, missileb, missile_state,    empty_init, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", MACHINE_NOT_WORKING )
+GAME( 1980, mcombats, missile, missileb, missileb, missile_state,    empty_init, ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", MACHINE_NOT_WORKING )
+GAME( 2005, missilem, missile, missilea, missileb, missile_state, init_missilem, ROT0, "hack (Braze Technologies)", "Missile Command Multigame", MACHINE_NOT_WORKING )

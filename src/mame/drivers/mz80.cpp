@@ -297,11 +297,9 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Audio */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
@@ -375,7 +373,7 @@ ROM_START( mz80a )
 	ROM_LOAD( "mz80acg.rom", 0x0000, 0x0800, CRC(a87c2e2b) SHA1(e8aefbdb48a63e5f96692af868c353ca7e1bfcd2) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY    FULLNAME             FLAGS
-COMP( 1979, mz80kj,   0,        0,      mz80kj,  mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80K (Japanese)", 0 )
-COMP( 1979, mz80k,    mz80kj,   0,      mz80k,   mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80K",            0 )
-COMP( 1982, mz80a,    0,        0,      mz80a,   mz80a, mz80_state,  mz80k, "Sharp",   "MZ-80A",            0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME             FLAGS
+COMP( 1979, mz80kj, 0,      0,      mz80kj,  mz80k, mz80_state, init_mz80k, "Sharp", "MZ-80K (Japanese)", 0 )
+COMP( 1979, mz80k,  mz80kj, 0,      mz80k,   mz80k, mz80_state, init_mz80k, "Sharp", "MZ-80K",            0 )
+COMP( 1982, mz80a,  0,      0,      mz80a,   mz80a, mz80_state, init_mz80k, "Sharp", "MZ-80A",            0 )

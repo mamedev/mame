@@ -1813,7 +1813,8 @@ MACHINE_CONFIG_START(kaneko16_berlwall_state::berlwall)
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_berlwall_state,berlwall)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ym2149_1", YM2149, 1000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
@@ -1823,7 +1824,7 @@ MACHINE_CONFIG_START(kaneko16_berlwall_state::berlwall)
 	MCFG_DEVICE_ADD("ym2149_2", YM2149, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki1", 12000000/6, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 12000000/6, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1885,7 +1886,7 @@ MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym2149_1", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1895,7 +1896,7 @@ MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(12'000'000)/6, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(12'000'000)/6, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, bakubrkr_oki1_map)
 MACHINE_CONFIG_END
@@ -1955,7 +1956,8 @@ MACHINE_CONFIG_START(kaneko16_state::blazeon)
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -2010,7 +2012,7 @@ MACHINE_CONFIG_START(kaneko16_state::wingforc)
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -2018,7 +2020,7 @@ MACHINE_CONFIG_START(kaneko16_state::wingforc)
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, bakubrkr_oki1_map)
 MACHINE_CONFIG_END
@@ -2098,13 +2100,13 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_gtmr_state,kaneko16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/8, PIN7_LOW)  /* verified on pcb */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(16'000'000)/8, okim6295_device::PIN7_LOW)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki1_map)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(16'000'000)/8, PIN7_LOW)  /* verified on pcb */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(16'000'000)/8, okim6295_device::PIN7_LOW)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki2_map)
 MACHINE_CONFIG_END
@@ -2223,7 +2225,7 @@ MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym2149_1", YM2149, XTAL(12'000'000)/6) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2233,7 +2235,7 @@ MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(12'000'000)/6, PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(12'000'000)/6, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2346,13 +2348,13 @@ MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/8, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(16'000'000)/8, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki1_map)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(16'000'000)/8, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(16'000'000)/8, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki2_map)
 MACHINE_CONFIG_END
@@ -2464,16 +2466,16 @@ void kaneko16_gtmr_state::kaneko16_common_oki_bank_install(int bankno, size_t fi
 	}
 }
 
-DRIVER_INIT_MEMBER( kaneko16_state, kaneko16 )
+void kaneko16_state::init_kaneko16()
 {
 	kaneko16_unscramble_tiles("gfx2");
 	kaneko16_unscramble_tiles("gfx3");
 }
 
-DRIVER_INIT_MEMBER( kaneko16_state, bakubrkr )
+void kaneko16_state::init_bakubrkr()
 {
 	kaneko16_common_oki_bank_install(0, 0x20000, 0x20000);
-	DRIVER_INIT_CALL(kaneko16);
+	init_kaneko16();
 }
 
 /*
@@ -2530,34 +2532,34 @@ void kaneko16_berlwall_state::patch_protection(uint32_t bra_offset,uint16_t bra_
 	ROM[0x3fffe/2] = checksum;
 }
 
-DRIVER_INIT_MEMBER(kaneko16_berlwall_state, berlwall_common)
+void kaneko16_berlwall_state::init_berlwall_common()
 {
 	kaneko16_unscramble_tiles("gfx2");
 }
 
-DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwall )
+void kaneko16_berlwall_state::init_berlwall()
 {
-	DRIVER_INIT_CALL(berlwall_common);
+	init_berlwall_common();
 	patch_protection(0x1a3ea,0x602c,0xc40d);
 }
 
-DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwallt )
+void kaneko16_berlwall_state::init_berlwallt()
 {
-	DRIVER_INIT_CALL(berlwall_common);
+	init_berlwall_common();
 	patch_protection(0x1cf48,0x602c,0xaed4);
 }
 
-DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwallk )
+void kaneko16_berlwall_state::init_berlwallk()
 {
-	DRIVER_INIT_CALL(berlwall_common);
+	init_berlwall_common();
 	patch_protection(0x1ceb0,0x602c,0x8364);
 }
 
-DRIVER_INIT_MEMBER( kaneko16_gtmr_state, gtmr )
+void kaneko16_gtmr_state::init_gtmr()
 {
 	kaneko16_common_oki_bank_install(0, 0x30000, 0x10000);
 	kaneko16_common_oki_bank_install(1, 0x00000, 0x40000);
-	DRIVER_INIT_CALL(kaneko16);
+	init_kaneko16();
 }
 
 
@@ -4402,21 +4404,21 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, shogwarr )
+void kaneko16_shogwarr_state::init_shogwarr()
 {
 	// default sample banks
 	kaneko16_common_oki_bank_install(0, 0x30000, 0x10000);
 	kaneko16_common_oki_bank_install(1, 0x00000, 0x40000);
-	DRIVER_INIT_CALL(kaneko16);
+	init_kaneko16();
 }
 
 
-DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
+void kaneko16_shogwarr_state::init_brapboys()
 {
 	// default sample banks
 	kaneko16_common_oki_bank_install(0, 0x30000, 0x10000);
 	kaneko16_common_oki_bank_install(1, 0x20000, 0x20000);
-	DRIVER_INIT_CALL(kaneko16);
+	init_kaneko16();
 }
 
 
@@ -4428,40 +4430,40 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 
 ***************************************************************************/
 
-GAME( 1991, berlwall,   0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, berlwallt,  berlwall, berlwall, berlwallt,kaneko16_berlwall_state, berlwallt, ROT0,  "Kaneko", "The Berlin Wall (bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, berlwallk,  berlwall, berlwall, berlwallk,kaneko16_berlwall_state, berlwallk, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, packbang,   0,        berlwall, packbang, kaneko16_berlwall_state, berlwall_common, ROT90, "Kaneko", "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
+GAME( 1991, berlwall,   0,        berlwall, berlwall,  kaneko16_berlwall_state, init_berlwall,  ROT0,  "Kaneko", "The Berlin Wall", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, berlwallt,  berlwall, berlwall, berlwallt, kaneko16_berlwall_state, init_berlwallt, ROT0,  "Kaneko", "The Berlin Wall (bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, berlwallk,  berlwall, berlwall, berlwallk, kaneko16_berlwall_state, init_berlwallk, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, packbang,   0,        berlwall, packbang,  kaneko16_berlwall_state, init_berlwall_common, ROT90, "Kaneko", "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
 
-GAME( 1991, mgcrystl,   0,        mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mgcrystlo,  mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mgcrystlj,  mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, blazeon,    0,        blazeon,  blazeon,  kaneko16_state,          kaneko16, ROT0,  "A.I (Atlus license)",  "Blaze On (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, explbrkr,   0,        bakubrkr, bakubrkr, kaneko16_state,          bakubrkr, ROT90, "Kaneko", "Explosive Breaker (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, explbrkrk,  explbrkr, bakubrkr, bakubrkr, kaneko16_state,          bakubrkr, ROT90, "Kaneko", "Explosive Breaker (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bakubrkr,   explbrkr, bakubrkr, bakubrkr, kaneko16_state,          bakubrkr, ROT90, "Kaneko", "Bakuretsu Breaker (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wingforc,   0,        wingforc, wingforc, kaneko16_state,          bakubrkr, ROT270,"A.I (Atlus license)",  "Wing Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mgcrystl,   0,        mgcrystl, mgcrystl,  kaneko16_state,          init_kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mgcrystlo,  mgcrystl, mgcrystl, mgcrystl,  kaneko16_state,          init_kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mgcrystlj,  mgcrystl, mgcrystl, mgcrystl,  kaneko16_state,          init_kaneko16, ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, blazeon,    0,        blazeon,  blazeon,   kaneko16_state,          init_kaneko16, ROT0,  "A.I (Atlus license)",  "Blaze On (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, explbrkr,   0,        bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Explosive Breaker (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, explbrkrk,  explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Explosive Breaker (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bakubrkr,   explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Bakuretsu Breaker (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wingforc,   0,        wingforc, wingforc,  kaneko16_state,          init_bakubrkr, ROT270,"A.I (Atlus license)",  "Wing Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, bonkadv,    0,        bonkadv,  bonkadv,  kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bloodwar,   0,        bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Blood Warrior", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, oedfight,   bloodwar, bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan Bloodshed Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gtmr,       0,        gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/07/18)", MACHINE_SUPPORTS_SAVE ) // this set shows 'PCB by Jinwei Co Ltd. ROC'
-GAME( 1994, gtmra,      gtmr,     gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/06/13)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gtmrb,      gtmr,     gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/05/26)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gtmro,      gtmr,     gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/05/10)", MACHINE_SUPPORTS_SAVE ) // possible prototype
-GAME( 1994, gtmre,      gtmr,     gtmre,    gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: Evolution Model!!! (94/09/06)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gtmrusa,    gtmr,     gtmre,    gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: U.S.A Version! (94/09/06)", MACHINE_SUPPORTS_SAVE ) // U.S.A version seems part of the title, rather than region
-GAME( 1995, gtmr2,      0,        gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/05/24)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gtmr2a,     gtmr2,    gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/04/04)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gtmr2u,     gtmr2,    gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bonkadv,    0,        bonkadv,  bonkadv,   kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bloodwar,   0,        bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Blood Warrior", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, oedfight,   bloodwar, bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan Bloodshed Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gtmr,       0,        gtmr,     gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/07/18)", MACHINE_SUPPORTS_SAVE ) // this set shows 'PCB by Jinwei Co Ltd. ROC'
+GAME( 1994, gtmra,      gtmr,     gtmr,     gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/06/13)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gtmrb,      gtmr,     gtmr,     gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/05/26)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gtmro,      gtmr,     gtmr,     gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/05/10)", MACHINE_SUPPORTS_SAVE ) // possible prototype
+GAME( 1994, gtmre,      gtmr,     gtmre,    gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: Evolution Model!!! (94/09/06)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gtmrusa,    gtmr,     gtmre,    gtmr,      kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: U.S.A Version! (94/09/06)", MACHINE_SUPPORTS_SAVE ) // U.S.A version seems part of the title, rather than region
+GAME( 1995, gtmr2,      0,        gtmr2,    gtmr2,     kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/05/24)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gtmr2a,     gtmr2,    gtmr2,    gtmr2,     kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/04/04)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gtmr2u,     gtmr2,    gtmr2,    gtmr2,     kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, brapboys,   0,        brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, brapboysp,  brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, brapboyspj, brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, brapboyspu, brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, brapboys,   0,        brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, brapboysp,  brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, brapboyspj, brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, brapboyspu, brapboys, brapboys, brapboys,  kaneko16_shogwarr_state, init_brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (US)", MACHINE_SUPPORTS_SAVE )
 // these 3 are all the same code revision (differ by region byte + extra gfx roms/sample roms)
-GAME( 1992, shogwarr,   0,        shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, shogwarrk,  shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (Korea?)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // censored Japanese flags etc.
-GAME( 1992, fjbuster,   shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Fujiyama Buster (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, shogwarr,   0,        shogwarr, shogwarr,  kaneko16_shogwarr_state, init_shogwarr, ROT0,  "Kaneko", "Shogun Warriors (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, shogwarrk,  shogwarr, shogwarr, shogwarr,  kaneko16_shogwarr_state, init_shogwarr, ROT0,  "Kaneko", "Shogun Warriors (Korea?)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // censored Japanese flags etc.
+GAME( 1992, fjbuster,   shogwarr, shogwarr, shogwarr,  kaneko16_shogwarr_state, init_shogwarr, ROT0,  "Kaneko", "Fujiyama Buster (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 // different revision
-GAME( 1992, shogwarru,  shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, shogwarru,  shogwarr, shogwarr, shogwarr,  kaneko16_shogwarr_state, init_shogwarr, ROT0,  "Kaneko", "Shogun Warriors (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

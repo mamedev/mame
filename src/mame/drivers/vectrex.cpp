@@ -110,7 +110,7 @@ MACHINE_CONFIG_START(vectrex_base_state::vectrex_base)
 	MCFG_SCREEN_UPDATE_DRIVER(vectrex_base_state, screen_update_vectrex)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic301 (also used for vector generation)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -248,7 +248,7 @@ ROM_END
 
 ***************************************************************************/
 
-//   YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     STATE          INIT  MONITOR  COMPANY                         FULLNAME
-CONS(1982, vectrex,  0,        0,       vectrex,  vectrex,  vectrex_state, 0,             "General Consumer Electronics", "Vectrex" , ROT270)
+//   YEAR  NAME       PARENT    COMPAT   MACHINE   INPUT     STATE          INIT        MONITOR  COMPANY                         FULLNAME
+CONS( 1982, vectrex,  0,        0,       vectrex,  vectrex,  vectrex_state, empty_init,          "General Consumer Electronics", "Vectrex" , ROT270)
 
-GAME(1984, raaspec,  0,                 raaspec,  raaspec,  raaspec_state, 0,    ROT270,  "Roy Abel & Associates",        "Spectrum I+", MACHINE_NOT_WORKING ) //TODO: button labels & timings, a mandatory artwork too?
+GAME( 1984, raaspec,  0,                 raaspec,  raaspec,  raaspec_state, empty_init, ROT270,  "Roy Abel & Associates",        "Spectrum I+", MACHINE_NOT_WORKING ) //TODO: button labels & timings, a mandatory artwork too?

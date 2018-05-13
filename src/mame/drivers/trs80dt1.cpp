@@ -340,7 +340,7 @@ MACHINE_CONFIG_START(trs80dt1_state::trs80dt1)
 	MCFG_7474_COMP_OUTPUT_CB(INPUTLINE("maincpu", MCS51_INT1_LINE)) MCFG_DEVCB_INVERT // /Q connects directly to /INT1, so we need to invert?
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -354,4 +354,4 @@ ROM_START( trs80dt1 )
 	ROM_LOAD( "8045716.u8",   0x0000, 0x0800, CRC(e2c5e59b) SHA1(0d571888d5f9fea4e565486ea8d3af8998ca46b1) )
 ROM_END
 
-COMP( 1989, trs80dt1, 0, 0, trs80dt1, trs80dt1, trs80dt1_state, 0, "Radio Shack", "TRS-80 DT-1", MACHINE_NOT_WORKING )
+COMP( 1989, trs80dt1, 0, 0, trs80dt1, trs80dt1, trs80dt1_state, empty_init, "Radio Shack", "TRS-80 DT-1", MACHINE_NOT_WORKING )

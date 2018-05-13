@@ -171,7 +171,8 @@ MACHINE_CONFIG_START(vertigo_state::exidy440_audio)
 	MCFG_DEVICE_PROGRAM_MAP(exidy440_audio_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", driver_device, irq0_line_assert)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("custom", EXIDY440, EXIDY440_MC3418_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -264,4 +265,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, topgunnr, 0, vertigo, vertigo, vertigo_state, 0, ROT0, "Exidy", "Top Gunner (Exidy)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, topgunnr, 0, vertigo, vertigo, vertigo_state, empty_init, ROT0, "Exidy", "Top Gunner (Exidy)", MACHINE_SUPPORTS_SAVE )

@@ -129,7 +129,7 @@ public:
 #define UAPCE_SOUND_EN  NODE_10
 #define UAPCE_TONE_752  NODE_11
 
-static DISCRETE_SOUND_START(uapce)
+static DISCRETE_SOUND_START(uapce_discrete)
 	DISCRETE_INPUT_LOGIC(UAPCE_SOUND_EN)
 	DISCRETE_SQUAREWFIX(UAPCE_TONE_752, UAPCE_SOUND_EN, 752, DEFAULT_TTL_V_LOGIC_1, 50, DEFAULT_TTL_V_LOGIC_1, 0)   // 752Hz
 	DISCRETE_OUTPUT(UAPCE_TONE_752, 100)
@@ -331,14 +331,14 @@ MACHINE_CONFIG_START(uapce_state::uapce)
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
 	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
 	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(uapce)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, uapce_discrete)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
@@ -377,7 +377,7 @@ ROM_START(paclandp)
 	ROM_LOAD( "u1.bin", 0x0000, 0x800, CRC(f5e538a9) SHA1(19ac9525c9ad6bea1789cc9e63cdb7fe949867d9) )
 ROM_END
 
-GAME( 1989, blazlaz, 0, uapce, uapce, uapce_state, pce_common, ROT0, "Hudson Soft", "Blazing Lazers (United Amusements PC Engine)",                         MACHINE_IMPERFECT_SOUND )
-GAME( 1989, keith,   0, uapce, uapce, uapce_state, pce_common, ROT0, "Hudson Soft", "Keith Courage In Alpha Zones (United Amusements PC Engine)",           MACHINE_IMPERFECT_SOUND )
-GAME( 1989, aliencr, 0, uapce, uapce, uapce_state, pce_common, ROT0, "Hudson Soft", "Alien Crush (United Amusements PC Engine)",                            MACHINE_IMPERFECT_SOUND )
-GAME( 1989, paclandp,0, uapce, uapce, uapce_state, pce_common, ROT0, "Namco",       "Pac-Land (United Amusements PC Engine)",                               MACHINE_IMPERFECT_SOUND )
+GAME( 1989, blazlaz, 0, uapce, uapce, uapce_state, init_pce_common, ROT0, "Hudson Soft", "Blazing Lazers (United Amusements PC Engine)",                         MACHINE_IMPERFECT_SOUND )
+GAME( 1989, keith,   0, uapce, uapce, uapce_state, init_pce_common, ROT0, "Hudson Soft", "Keith Courage In Alpha Zones (United Amusements PC Engine)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1989, aliencr, 0, uapce, uapce, uapce_state, init_pce_common, ROT0, "Hudson Soft", "Alien Crush (United Amusements PC Engine)",                            MACHINE_IMPERFECT_SOUND )
+GAME( 1989, paclandp,0, uapce, uapce, uapce_state, init_pce_common, ROT0, "Namco",       "Pac-Land (United Amusements PC Engine)",                               MACHINE_IMPERFECT_SOUND )

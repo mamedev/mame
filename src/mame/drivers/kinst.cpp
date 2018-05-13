@@ -220,8 +220,8 @@ public:
 	DECLARE_WRITE32_MEMBER(ide_w);
 	DECLARE_READ32_MEMBER(ide_extra_r);
 	DECLARE_WRITE32_MEMBER(ide_extra_w);
-	DECLARE_DRIVER_INIT(kinst);
-	DECLARE_DRIVER_INIT(kinst2);
+	void init_kinst();
+	void init_kinst2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -819,7 +819,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(kinst_state,kinst)
+void kinst_state::init_kinst()
 {
 	static const uint8_t kinst_control_map[8] = { 0,1,2,3,4,5,6,7 };
 
@@ -838,7 +838,7 @@ DRIVER_INIT_MEMBER(kinst_state,kinst)
 }
 
 
-DRIVER_INIT_MEMBER(kinst_state,kinst2)
+void kinst_state::init_kinst2()
 {
 	static const uint8_t kinst2_control_map[8] = { 2,4,1,0,3,5,6,7 };
 
@@ -873,8 +873,6 @@ DRIVER_INIT_MEMBER(kinst_state,kinst2)
 
  // versions selectable by changing bioses
 
-GAME( 1994, kinst,    0,      kinst, kinst,  kinst_state, kinst,   ROT0, "Rare", "Killer Instinct", MACHINE_SUPPORTS_SAVE )
-
-GAME( 1995, kinst2,   0,      kinst, kinst2, kinst_state, kinst2,  ROT0, "Rare", "Killer Instinct 2", MACHINE_SUPPORTS_SAVE )
-
-GAME( 1995, kinst2uk, kinst2, kinst, kinst2, kinst_state, kinst2,  ROT0, "Rare", "Killer Instinct 2 (Upgrade kit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, kinst,    0,      kinst, kinst,  kinst_state, init_kinst,  ROT0, "Rare", "Killer Instinct", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kinst2,   0,      kinst, kinst2, kinst_state, init_kinst2, ROT0, "Rare", "Killer Instinct 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kinst2uk, kinst2, kinst, kinst2, kinst_state, init_kinst2, ROT0, "Rare", "Killer Instinct 2 (Upgrade kit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

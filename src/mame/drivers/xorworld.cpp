@@ -186,7 +186,7 @@ MACHINE_CONFIG_START(xorworld_state::xorworld)
 
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SAA1099_ADD("saa", 8000000 /* guess */)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -210,7 +210,7 @@ ROM_END
 
 #define PATCH(data) *rom = data; rom++
 
-DRIVER_INIT_MEMBER(xorworld_state,xorworld)
+void xorworld_state::init_xorworld()
 {
 	/*  patch some strange protection (without this, strange characters appear
 	    after level 5 and some pieces don't rotate properly some times) */
@@ -230,4 +230,4 @@ DRIVER_INIT_MEMBER(xorworld_state,xorworld)
 }
 
 
-GAME( 1990, xorworld, 0, xorworld, xorworld, xorworld_state, xorworld, ROT0, "Gaelco", "Xor World (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, xorworld, 0, xorworld, xorworld, xorworld_state, init_xorworld, ROT0, "Gaelco", "Xor World (prototype)", MACHINE_SUPPORTS_SAVE )

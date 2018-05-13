@@ -1240,7 +1240,7 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alphatp3)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 1060 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
@@ -1321,7 +1321,7 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alphatp3)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 1060 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
@@ -1452,9 +1452,9 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT   COMPAT   MACHINE   INPUT       CLASS           INIT  COMPANY          FULLNAME  FLAGS
-COMP( 198?, alphatp1,  alphatp2, 0,     alphatp2, alphatp2, alphatp_12_state, 0,    "Triumph-Adler", "alphatronic P1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 198?, alphatp2,  0,        0,     alphatp2, alphatp2, alphatp_12_state, 0,    "Triumph-Adler", "alphatronic P2", MACHINE_NOT_WORKING )
-COMP( 198?, alphatp2u, alphatp2, 0,     alphatp2u,alphatp3, alphatp_12_state, 0,    "Triumph-Adler", "alphatronic P2U", MACHINE_NOT_WORKING )
-COMP( 1982, alphatp3,  0,        0,     alphatp3, alphatp3, alphatp_34_state, 0,    "Triumph-Adler", "alphatronic P3", MACHINE_NOT_WORKING )
-COMP( 198?, alphatp30, alphatp3, 0,     alphatp30, alphatp3, alphatp_34_state, 0,    "Triumph-Adler", "alphatronic P30",MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    COMPAT   MACHINE    INPUT     CLASS             INIT        COMPANY          FULLNAME           FLAGS
+COMP( 198?, alphatp1,  alphatp2, 0,       alphatp2,  alphatp2, alphatp_12_state, empty_init, "Triumph-Adler", "alphatronic P1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 198?, alphatp2,  0,        0,       alphatp2,  alphatp2, alphatp_12_state, empty_init, "Triumph-Adler", "alphatronic P2",  MACHINE_NOT_WORKING )
+COMP( 198?, alphatp2u, alphatp2, 0,       alphatp2u, alphatp3, alphatp_12_state, empty_init, "Triumph-Adler", "alphatronic P2U", MACHINE_NOT_WORKING )
+COMP( 1982, alphatp3,  0,        0,       alphatp3,  alphatp3, alphatp_34_state, empty_init, "Triumph-Adler", "alphatronic P3",  MACHINE_NOT_WORKING )
+COMP( 198?, alphatp30, alphatp3, 0,       alphatp30, alphatp3, alphatp_34_state, empty_init, "Triumph-Adler", "alphatronic P30", MACHINE_NOT_WORKING )

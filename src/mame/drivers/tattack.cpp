@@ -72,7 +72,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ball_w);
 	DECLARE_WRITE8_MEMBER(brick_dma_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_DRIVER_INIT(tattack);
+	void init_tattack();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_PALETTE_INIT(tattack);
 
@@ -421,7 +421,7 @@ MACHINE_CONFIG_START(tattack_state::tattack)
 	MCFG_PALETTE_INIT_OWNER(tattack_state, tattack)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(tattack_sample_names)
@@ -447,7 +447,7 @@ ROM_START( tattack )
 	ROM_LOAD( "rom.6c",     0x0000, 0x1000, CRC(88ce45cf) SHA1(c7a43bfc9e9c2aeb75a98f723558bc88e53401a7) )
 ROM_END
 
-DRIVER_INIT_MEMBER(tattack_state,tattack)
+void tattack_state::init_tattack()
 {
 //  uint8_t *rom = memregion("maincpu")->base();
 
@@ -484,5 +484,5 @@ DRIVER_INIT_MEMBER(tattack_state,tattack)
 
 }
 
-GAME( 1983?, tattack, 0, tattack, tattack, tattack_state, tattack, ROT270, "Shonan", "Time Attacker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+GAME( 1983?, tattack, 0, tattack, tattack, tattack_state, init_tattack, ROT270, "Shonan", "Time Attacker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
 // there is another undumped version with katakana Shonan logo and black background

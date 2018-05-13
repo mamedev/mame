@@ -126,8 +126,8 @@ public:
 	DECLARE_WRITE16_MEMBER(crtc_w);
 	DECLARE_WRITE16_MEMBER(vcombat_dac_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_update);
-	DECLARE_DRIVER_INIT(shadfgtr);
-	DECLARE_DRIVER_INIT(vcombat);
+	void init_shadfgtr();
+	void init_vcombat();
 	DECLARE_MACHINE_RESET(vcombat);
 	DECLARE_MACHINE_RESET(shadfgtr);
 	uint32_t update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
@@ -443,7 +443,7 @@ MACHINE_RESET_MEMBER(vcombat_state,shadfgtr)
 }
 
 
-DRIVER_INIT_MEMBER(vcombat_state,vcombat)
+void vcombat_state::init_vcombat()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -475,7 +475,7 @@ DRIVER_INIT_MEMBER(vcombat_state,vcombat)
 	ROM[0x4017] = 0x66;
 }
 
-DRIVER_INIT_MEMBER(vcombat_state,shadfgtr)
+void vcombat_state::init_shadfgtr()
 {
 	/* Allocate th 68000 frame buffers */
 	m_m68k_framebuffer[0] = std::make_unique<uint16_t[]>(0x8000);
@@ -594,7 +594,7 @@ MACHINE_CONFIG_START(vcombat_state::vcombat)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208)
 	MCFG_SCREEN_UPDATE_DRIVER(vcombat_state, screen_update_vcombat_aux)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -628,7 +628,7 @@ MACHINE_CONFIG_START(vcombat_state::shadfgtr)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000) / 4, 320, 0, 256, 277, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(vcombat_state, screen_update_vcombat_main)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -693,5 +693,5 @@ ROM_START( shadfgtr )
 ROM_END
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT      MONITOR              COMPANY         FULLNAME           FLAGS
-GAME( 1993, vcombat,  0,      vcombat,  vcombat,  vcombat_state, vcombat,  ORIENTATION_FLIP_X,  "VR8 Inc.",     "Virtual Combat",  MACHINE_NOT_WORKING )
-GAME( 1993, shadfgtr, 0,      shadfgtr, shadfgtr, vcombat_state, shadfgtr, ROT0,                "Dutech Inc.",  "Shadow Fighters", MACHINE_NOT_WORKING )
+GAME( 1993, vcombat,  0,      vcombat,  vcombat,  vcombat_state, init_vcombat,  ORIENTATION_FLIP_X,  "VR8 Inc.",     "Virtual Combat",  MACHINE_NOT_WORKING )
+GAME( 1993, shadfgtr, 0,      shadfgtr, shadfgtr, vcombat_state, init_shadfgtr, ROT0,                "Dutech Inc.",  "Shadow Fighters", MACHINE_NOT_WORKING )

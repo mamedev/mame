@@ -349,7 +349,7 @@ MACHINE_CONFIG_START(skyarmy_state::skyarmy)
 	MCFG_PALETTE_INIT_OWNER(skyarmy_state, skyarmy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay0", AY8910, 2500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 	MCFG_DEVICE_ADD("ay1", AY8910, 2500000)
@@ -376,4 +376,4 @@ ROM_START( skyarmy )
 	ROM_LOAD( "a6.bin",  0x0000, 0x0020, CRC(c721220b) SHA1(61b3320fb616c0600d56840cb6438616c7e0c6eb) )
 ROM_END
 
-GAME( 1982, skyarmy, 0, skyarmy, skyarmy, skyarmy_state, 0, ROT90, "Shoei", "Sky Army", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, skyarmy, 0, skyarmy, skyarmy, skyarmy_state, empty_init, ROT90, "Shoei", "Sky Army", MACHINE_SUPPORTS_SAVE )

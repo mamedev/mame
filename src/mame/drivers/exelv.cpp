@@ -522,7 +522,7 @@ MACHINE_CONFIG_START(exelv_state::exl100)
 	// MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("tms5220c", TMS5220C, 640000)
 	// MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -578,7 +578,7 @@ MACHINE_CONFIG_START(exelv_state::exeltel)
 	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("tms5220c", TMS5220C, 640000)
 	MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -616,6 +616,6 @@ ROM_START(exeltel)
 ROM_END
 
 
-//   YEAR   NAME     PARENT      COMPAT  MACHINE     INPUT  STATE         INIT    COMPANY         FULLNAME    FLAGS
-COMP(1984,  exl100,  0,          0,      exl100,     exelv, exelv_state,  0,      "Exelvision",   "EXL 100",  MACHINE_NOT_WORKING)
-COMP(1986,  exeltel, exl100,     0,      exeltel,    exelv, exelv_state,  0,      "Exelvision",   "Exeltel",  MACHINE_NOT_WORKING)
+//   YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY       FULLNAME   FLAGS
+COMP(1984,  exl100,  0,      0,      exl100,  exelv, exelv_state, empty_init, "Exelvision", "EXL 100", MACHINE_NOT_WORKING)
+COMP(1986,  exeltel, exl100, 0,      exeltel, exelv, exelv_state, empty_init, "Exelvision", "Exeltel", MACHINE_NOT_WORKING)

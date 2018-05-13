@@ -119,28 +119,24 @@ sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type
 sh3_device::sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh3_base_device(mconfig, SH3LE, tag, owner, clock, ENDIANNESS_LITTLE)
 {
-	m_xor = 1;
 }
 
 
 sh3be_device::sh3be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh3_base_device(mconfig, SH3BE, tag, owner, clock, ENDIANNESS_BIG)
 {
-	m_xor = 2;
 }
 
 
 sh4_device::sh4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh4_base_device(mconfig, SH4LE, tag, owner, clock, ENDIANNESS_LITTLE)
 {
-	m_xor = 1;
 }
 
 
 sh4be_device::sh4be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sh4_base_device(mconfig, SH4BE, tag, owner, clock, ENDIANNESS_BIG)
 {
-	m_xor = 2;
 }
 
 
@@ -1887,7 +1883,7 @@ void sh34_base_device::execute_run()
 
 		uint16_t opcode;
 
-		if (!m_sh4_mmu_enabled) opcode = m_direct->read_word(m_sh2_state->pc & SH34_AM, WORD2_XOR_LE(0));
+		if (!m_sh4_mmu_enabled) opcode = m_pr16(m_sh2_state->pc & SH34_AM);
 		else opcode = RW(m_sh2_state->pc); // should probably use a different function as this needs to go through the ITLB
 
 		if (m_sh2_state->m_delay)
@@ -1928,7 +1924,7 @@ void sh3be_device::execute_run()
 		m_sh2_state->m_ppc = m_sh2_state->pc & SH34_AM;
 		debugger_instruction_hook(m_sh2_state->pc & SH34_AM);
 
-		const uint16_t opcode = m_direct->read_word(m_sh2_state->pc & SH34_AM, WORD_XOR_LE(6));
+		const uint16_t opcode = m_pr16(m_sh2_state->pc & SH34_AM);
 
 		if (m_sh2_state->m_delay)
 		{
@@ -1968,7 +1964,7 @@ void sh4be_device::execute_run()
 		m_sh2_state->m_ppc = m_sh2_state->pc & SH34_AM;
 		debugger_instruction_hook(m_sh2_state->pc & SH34_AM);
 
-		const uint16_t opcode = m_direct->read_word(m_sh2_state->pc & SH34_AM, WORD_XOR_LE(6));
+		const uint16_t opcode = m_pr16(m_sh2_state->pc & SH34_AM);
 
 		if (m_sh2_state->m_delay)
 		{
@@ -2059,7 +2055,41 @@ void sh34_base_device::device_start()
 	m_internal = &space(AS_PROGRAM);
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
-	m_direct = m_program->direct<0>();
+	if (m_program->endianness() == ENDIANNESS_LITTLE)
+	{
+		auto cache = m_program->cache<3, 0, ENDIANNESS_LITTLE>();
+		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address); };
+		if (ENDIANNESS_NATIVE != ENDIANNESS_LITTLE)
+			m_prptr = [cache](offs_t address) -> const void * {
+				const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~7));
+				ptr += (~address >> 1) & 3;
+				return ptr;
+			};
+		else
+			m_prptr = [cache](offs_t address) -> const void * {
+				const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~7));
+				ptr += (address >> 1) & 3;
+				return ptr;
+			};
+	}
+	else
+	{
+		auto cache = m_program->cache<3, 0, ENDIANNESS_BIG>();
+		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address); };
+		if (ENDIANNESS_NATIVE != ENDIANNESS_BIG)
+			m_prptr = [cache](offs_t address) -> const void * {
+				const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~7));
+				ptr += (~address >> 1) & 3;
+				return ptr;
+			};
+		else
+			m_prptr = [cache](offs_t address) -> const void * {
+				const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~7));
+				ptr += (address >> 1) & 3;
+				return ptr;
+			};
+	}
+
 	sh4_default_exception_priorities();
 	m_irln = 15;
 	m_sh2_state->m_test_irq = 0;

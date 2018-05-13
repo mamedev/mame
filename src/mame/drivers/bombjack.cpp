@@ -378,7 +378,7 @@ MACHINE_CONFIG_START(bombjack_state::bombjack)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) /* Confirmed from PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
@@ -503,6 +503,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, bombjack,  0,        bombjack, bombjack, bombjack_state, 0, ROT90, "Tehkan", "Bomb Jack (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bombjack2, bombjack, bombjack, bombjack, bombjack_state, 0, ROT90, "Tehkan", "Bomb Jack (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bombjackt, bombjack, bombjack, bombjack, bombjack_state, 0, ROT90, "Tehkan (Tecfri licence)", "Bomb Jack (Tecfri, Spain)", MACHINE_SUPPORTS_SAVE ) // official licence
+GAME( 1984, bombjack,  0,        bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan", "Bomb Jack (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bombjack2, bombjack, bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan", "Bomb Jack (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bombjackt, bombjack, bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan (Tecfri licence)", "Bomb Jack (Tecfri, Spain)", MACHINE_SUPPORTS_SAVE ) // official licence

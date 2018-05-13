@@ -284,7 +284,7 @@ MACHINE_CONFIG_START(kncljoe_state::kncljoe)
 	MCFG_PALETTE_INIT_OWNER(kncljoe_state, kncljoe)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -400,6 +400,6 @@ ROM_END
 
 
 
-GAME( 1985, kncljoe,  0,       kncljoe, kncljoe, kncljoe_state, 0, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, kncljoea, kncljoe, kncljoe, kncljoe, kncljoe_state, 0, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, bcrusher, kncljoe, kncljoe, kncljoe, kncljoe_state, 0, ROT0, "bootleg",                        "Bone Crusher", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kncljoe,  0,       kncljoe, kncljoe, kncljoe_state, empty_init, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kncljoea, kncljoe, kncljoe, kncljoe, kncljoe_state, empty_init, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bcrusher, kncljoe, kncljoe, kncljoe, kncljoe_state, empty_init, ROT0, "bootleg",                        "Bone Crusher", MACHINE_SUPPORTS_SAVE )

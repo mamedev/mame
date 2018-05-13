@@ -252,4 +252,4 @@ ROM_START(magtouch)
 	ROM_FILL(0x511ba, 1, 0xeb) // skip csum
 ROM_END
 
-GAME( 1995, magtouch,   0,         magtouch,  magtouch, magtouch_state, 0, ROT0, "Micro Manufacturing",     "Magical Touch", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, magtouch, 0, magtouch, magtouch, magtouch_state, empty_init, ROT0, "Micro Manufacturing",     "Magical Touch", MACHINE_UNEMULATED_PROTECTION )

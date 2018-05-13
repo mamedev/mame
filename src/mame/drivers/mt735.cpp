@@ -73,4 +73,4 @@ ROM_START( mt735 )
 	ROM_LOAD16_BYTE( "spg_m_o_ic102.bin", 1, 0x20000, CRC(84d8446b) SHA1(b1cedd8b09556eb8118f79b012aeec5b61e3ff32) )
 ROM_END
 
-COMP( ????, mt735, 0, 0, mt735, mt735, mt735_state, 0, "Brother", "MT735", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+COMP( ????, mt735, 0, 0, mt735, mt735, mt735_state, empty_init, "Brother", "MT735", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

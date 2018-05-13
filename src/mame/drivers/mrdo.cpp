@@ -190,7 +190,7 @@ MACHINE_CONFIG_START(mrdo_state::mrdo)
 	MCFG_PALETTE_INIT_OWNER(mrdo_state, mrdo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("u8106_1", U8106, MAIN_CLOCK/2)  /* sn76489-equivalent?, Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -414,10 +414,10 @@ ROM_END
 
 
 
-GAME( 1982, mrdo,     0,    mrdo, mrdo, mrdo_state, 0, ROT270, "Universal",                 "Mr. Do!",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrdoy,    mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "Universal",                 "Mr. Do! (prototype)", MACHINE_SUPPORTS_SAVE ) /* aka "Yukidaruma" */
-GAME( 1982, mrdot,    mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "Universal (Taito license)", "Mr. Do! (Taito)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrdofix,  mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "Universal (Taito license)", "Mr. Do! (bugfixed)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrlo,     mrdo, mrlo, mrdo, mrdo_state, 0, ROT270, "bootleg",                   "Mr. Lo!",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrdu,     mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "bootleg",                   "Mr. Du!",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, yankeedo, mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "hack",                      "Yankee DO!",          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdo,     0,    mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal",                 "Mr. Do!",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdoy,    mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal",                 "Mr. Do! (prototype)", MACHINE_SUPPORTS_SAVE ) /* aka "Yukidaruma" */
+GAME( 1982, mrdot,    mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal (Taito license)", "Mr. Do! (Taito)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdofix,  mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal (Taito license)", "Mr. Do! (bugfixed)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrlo,     mrdo, mrlo, mrdo, mrdo_state, empty_init, ROT270, "bootleg",                   "Mr. Lo!",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdu,     mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "bootleg",                   "Mr. Du!",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, yankeedo, mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "hack",                      "Yankee DO!",          MACHINE_SUPPORTS_SAVE )

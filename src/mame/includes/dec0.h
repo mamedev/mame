@@ -94,14 +94,14 @@ public:
 	DECLARE_READ8_MEMBER(slyspy_sound_state_r);
 	DECLARE_READ8_MEMBER(slyspy_sound_state_reset_r);
 
-	DECLARE_DRIVER_INIT(robocop);
-	DECLARE_DRIVER_INIT(hippodrm);
-	DECLARE_DRIVER_INIT(hbarrel);
-	DECLARE_DRIVER_INIT(slyspy);
-	DECLARE_DRIVER_INIT(birdtry);
-	DECLARE_DRIVER_INIT(drgninja);
-	DECLARE_DRIVER_INIT(midresb);
-	DECLARE_DRIVER_INIT(ffantasybl);
+	void init_robocop();
+	void init_hippodrm();
+	void init_hbarrel();
+	void init_slyspy();
+	void init_birdtry();
+	void init_drgninja();
+	void init_midresb();
+	void init_ffantasybl();
 
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(slyspy);

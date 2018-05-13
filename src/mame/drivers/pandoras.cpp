@@ -353,7 +353,7 @@ MACHINE_CONFIG_START(pandoras_state::pandoras)
 	MCFG_PALETTE_INIT_OWNER(pandoras_state, pandoras)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -407,4 +407,4 @@ ROM_START( pandoras )
 ROM_END
 
 
-GAME( 1984, pandoras, 0, pandoras, pandoras, pandoras_state, 0, ROT90, "Konami / Interlogic", "Pandora's Palace", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pandoras, 0, pandoras, pandoras, pandoras_state, empty_init, ROT90, "Konami / Interlogic", "Pandora's Palace", MACHINE_SUPPORTS_SAVE )

@@ -250,7 +250,7 @@ MACHINE_CONFIG_START(exedexes_state::exedexes)
 	MCFG_PALETTE_INIT_OWNER(exedexes_state, exedexes)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -352,5 +352,5 @@ ROM_END
 
 
 
-GAME( 1985, exedexes, 0,        exedexes, exedexes, exedexes_state, 0, ROT270, "Capcom", "Exed Exes", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, savgbees, exedexes, exedexes, exedexes, exedexes_state, 0, ROT270, "Capcom (Memetron license)", "Savage Bees", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, exedexes, 0,        exedexes, exedexes, exedexes_state, empty_init, ROT270, "Capcom", "Exed Exes", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, savgbees, exedexes, exedexes, exedexes, exedexes_state, empty_init, ROT270, "Capcom (Memetron license)", "Savage Bees", MACHINE_SUPPORTS_SAVE )

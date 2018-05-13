@@ -122,5 +122,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY           FULLNAME  FLAGS
-COMP( 1985, tricep, 0,      0,       tricep,    tricep, tricep_state, 0,    "Morrow Designs", "Tricep", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY           FULLNAME  FLAGS
+COMP( 1985, tricep, 0,      0,      tricep,  tricep, tricep_state, empty_init, "Morrow Designs", "Tricep", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

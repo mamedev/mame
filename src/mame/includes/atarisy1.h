@@ -82,11 +82,11 @@ public:
 	DECLARE_READ8_MEMBER(via_pa_r);
 	DECLARE_WRITE8_MEMBER(via_pb_w);
 	DECLARE_READ8_MEMBER(via_pb_r);
-	DECLARE_DRIVER_INIT(roadblst);
-	DECLARE_DRIVER_INIT(peterpak);
-	DECLARE_DRIVER_INIT(marble);
-	DECLARE_DRIVER_INIT(roadrunn);
-	DECLARE_DRIVER_INIT(indytemp);
+	void init_roadblst();
+	void init_peterpak();
+	void init_marble();
+	void init_roadrunn();
+	void init_indytemp();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	DECLARE_MACHINE_START(atarisy1);

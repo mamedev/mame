@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	MCFG_PALETTE_INIT_OWNER(stuntair_state, stuntair)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono") // stereo?
+	SPEAKER(config, "mono").front_center(); // stereo?
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -604,4 +604,4 @@ ROM_START( stuntair )
 ROM_END
 
 
-GAME( 1983, stuntair,  0,    stuntair, stuntair, stuntair_state,  0, ROT90, "Nuova Videotron", "Stunt Air",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, stuntair,  0,    stuntair, stuntair, stuntair_state, empty_init, ROT90, "Nuova Videotron", "Stunt Air",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

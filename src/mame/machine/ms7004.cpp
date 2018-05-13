@@ -67,7 +67,7 @@ MACHINE_CONFIG_START(ms7004_device::device_add_mconfig)
 
 	MCFG_I8243_ADD("i8243", NOOP, WRITE8(*this, ms7004_device, i8243_port_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(MS7004_SPK_TAG, BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

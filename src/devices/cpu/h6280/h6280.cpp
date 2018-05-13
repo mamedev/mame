@@ -301,7 +301,7 @@ void h6280_device::device_reset()
 	m_io_buffer = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_io = &space(AS_IO);
 
 	/* set I and B flags */
@@ -2375,7 +2375,7 @@ void h6280_device::pull(uint8_t &value)
  ***************************************************************/
 uint8_t h6280_device::read_opcode()
 {
-	return m_direct->read_byte(translated(PCW));
+	return m_cache->read_byte(translated(PCW));
 }
 
 /***************************************************************
@@ -2383,7 +2383,7 @@ uint8_t h6280_device::read_opcode()
  ***************************************************************/
 uint8_t h6280_device::read_opcode_arg()
 {
-	return m_direct->read_byte(translated(PCW));
+	return m_cache->read_byte(translated(PCW));
 }
 
 

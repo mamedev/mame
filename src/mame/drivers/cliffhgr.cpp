@@ -117,7 +117,7 @@ public:
 	DECLARE_READ8_MEMBER(cliff_irq_ack_r);
 	DECLARE_WRITE8_MEMBER(cliff_ldwire_w);
 	DECLARE_WRITE8_MEMBER(cliff_sound_overlay_w);
-	DECLARE_DRIVER_INIT(cliff);
+	void init_cliff();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(cliff_irq_callback);
@@ -701,14 +701,14 @@ MACHINE_CONFIG_START(cliffhgr_state::cliffhgr)
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(cliffhgr)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, cliffhgr_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -774,7 +774,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cliffhgr_state,cliff)
+void cliffhgr_state::init_cliff()
 {
 }
 
@@ -786,7 +786,7 @@ DRIVER_INIT_MEMBER(cliffhgr_state,cliff)
  *
  *************************************/
 
-GAME( 1983, cliffhgr,  0,        cliffhgr, cliffhgr,  cliffhgr_state, cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 1)", 0 )
-GAME( 1983, cliffhgra, cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 2)", 0 )
-GAME( 1983, cliffhgra2,cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 3)", 0 )
-GAME( 1983, goaltogo,  0,        cliffhgr, goaltogo,  cliffhgr_state, cliff, ROT0, "Stern Electronics", "Goal To Go",           MACHINE_NOT_WORKING )
+GAME( 1983, cliffhgr,  0,        cliffhgr, cliffhgr,  cliffhgr_state, init_cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 1)", 0 )
+GAME( 1983, cliffhgra, cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, init_cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 2)", 0 )
+GAME( 1983, cliffhgra2,cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, init_cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 3)", 0 )
+GAME( 1983, goaltogo,  0,        cliffhgr, goaltogo,  cliffhgr_state, init_cliff, ROT0, "Stern Electronics", "Goal To Go",           MACHINE_NOT_WORKING )

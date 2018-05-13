@@ -709,7 +709,8 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	MCFG_RIOT6532_IRQ_CB(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -839,5 +840,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, firefox,  0,       firefox, firefox, firefox_state, 0, ROT0, "Atari", "Fire Fox (set 1)", 0 )
-GAME( 1984, firefoxa, firefox, firefox, firefox, firefox_state, 0, ROT0, "Atari", "Fire Fox (set 2)", 0 )
+GAME( 1984, firefox,  0,       firefox, firefox, firefox_state, empty_init, ROT0, "Atari", "Fire Fox (set 1)", 0 )
+GAME( 1984, firefoxa, firefox, firefox, firefox, firefox_state, empty_init, ROT0, "Atari", "Fire Fox (set 2)", 0 )

@@ -242,9 +242,9 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME        PARENT     COMPAT   MACHINE   INPUT   CLASS       INIT  COMPANY                   FULLNAME                   FLAGS
-COMP( 1981, mice_6502,  0,         0,       mice,     mice,   mice_state, 0,    "Microtek International", "MICE 6502 (Rev-A)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1984, mice2_z80,  0,         0,       mice2,    micev3, mice_state, 0,    "Microtek International", "MICE-II Z80 (Rev-F)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1987, mice2_6502, mice2_z80, 0,       mice2,    micev3, mice_state, 0,    "Microtek International", "MICE-II 6502 (Rev-F)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1987, mice2_8085, mice2_z80, 0,       mice2,    micev3, mice_state, 0,    "Microtek International", "MICE-II 8085 (Rev-M)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1987, mice2_6809, mice2_z80, 0,       mice2,    micev3, mice_state, 0,    "Microtek International", "MICE-II 6809(E) (Rev-L)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME        PARENT     COMPAT  MACHINE  INPUT   CLASS       INIT        COMPANY                   FULLNAME                   FLAGS
+COMP( 1981, mice_6502,  0,         0,      mice,    mice,   mice_state, empty_init, "Microtek International", "MICE 6502 (Rev-A)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1984, mice2_z80,  0,         0,      mice2,   micev3, mice_state, empty_init, "Microtek International", "MICE-II Z80 (Rev-F)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1987, mice2_6502, mice2_z80, 0,      mice2,   micev3, mice_state, empty_init, "Microtek International", "MICE-II 6502 (Rev-F)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1987, mice2_8085, mice2_z80, 0,      mice2,   micev3, mice_state, empty_init, "Microtek International", "MICE-II 8085 (Rev-M)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1987, mice2_6809, mice2_z80, 0,      mice2,   micev3, mice_state, empty_init, "Microtek International", "MICE-II 6809(E) (Rev-L)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

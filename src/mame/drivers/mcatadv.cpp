@@ -465,7 +465,7 @@ MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
@@ -667,9 +667,9 @@ ROM_START( nostk )
 ROM_END
 
 
-GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Magical Cat Adventure",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Catt (Japan)",                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, nost,     0,       nost,    nost,    mcatadv_state, 0, ROT270, "Face",      "Nostradamus",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, nostj,    nost,    nost,    nost,    mcatadv_state, 0, ROT270, "Face",      "Nostradamus (Japan)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, nostk,    nost,    nost,    nost,    mcatadv_state, 0, ROT270, "Face",      "Nostradamus (Korea)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, mcatadv_state, empty_init, ROT0,   "Wintechno", "Magical Cat Adventure",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, mcatadv_state, empty_init, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, mcatadv_state, empty_init, ROT0,   "Wintechno", "Catt (Japan)",                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nost,     0,       nost,    nost,    mcatadv_state, empty_init, ROT270, "Face",      "Nostradamus",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nostj,    nost,    nost,    nost,    mcatadv_state, empty_init, ROT270, "Face",      "Nostradamus (Japan)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nostk,    nost,    nost,    nost,    mcatadv_state, empty_init, ROT270, "Face",      "Nostradamus (Korea)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

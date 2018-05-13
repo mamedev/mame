@@ -127,8 +127,8 @@ public:
 	DECLARE_WRITE8_MEMBER(samesame_sound_done_w);
 	DECLARE_READ8_MEMBER(samesame_cmdavailable_r);
 
-	DECLARE_DRIVER_INIT(toaplan1);
-	DECLARE_DRIVER_INIT(demonwld);
+	void init_toaplan1();
+	void init_demonwld();
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf3_tile_info);

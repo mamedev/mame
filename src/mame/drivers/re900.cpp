@@ -119,7 +119,7 @@ public:
 	DECLARE_WRITE8_MEMBER(re_mux_port_A_w);
 	DECLARE_WRITE8_MEMBER(re_mux_port_B_w);
 
-	DECLARE_DRIVER_INIT(re900);
+	void init_re900();
 	void re900(machine_config &config);
 	void bs94(machine_config &config);
 	void mem_io(address_map &map);
@@ -398,7 +398,7 @@ MACHINE_CONFIG_START(re900_state::re900)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware   */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay_re900", AY8910, TMS_CLOCK) /* From TMS9128NL - Pin 37 (GROMCLK) */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, re900_state, re_psg_portA_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, re900_state, re_psg_portB_r))
@@ -438,7 +438,7 @@ ROM_END
 *      Driver Init      *
 ************************/
 
-DRIVER_INIT_MEMBER(re900_state,re900)
+void re900_state::init_re900()
 {
 	m_player = 1;
 	m_stat_a = 1;
@@ -457,6 +457,6 @@ DRIVER_INIT_MEMBER(re900_state,re900)
 *      Game Drivers      *
 *************************/
 
-//     YEAR  NAME   PARENT MACHINE INPUT  STATE        INIT   ROT    COMPANY                     FULLNAME            FLAGS                  LAYOUT
-GAMEL( 1993, re900, 0,     re900,  re900, re900_state, re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    MACHINE_SUPPORTS_SAVE, layout_re900 )
-GAME ( 1994, bs94 , 0,     bs94,   bs94 , re900_state, 0,     ROT0,  "Entretenimientos GEMINIS", "Buena Suerte '94", MACHINE_SUPPORTS_SAVE )
+//     YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        ROT    COMPANY                     FULLNAME            FLAGS                  LAYOUT
+GAMEL( 1993, re900, 0,      re900,   re900, re900_state, init_re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    MACHINE_SUPPORTS_SAVE, layout_re900 )
+GAME(  1994, bs94,  0,      bs94,    bs94,  re900_state, empty_init, ROT0,  "Entretenimientos GEMINIS", "Buena Suerte '94", MACHINE_SUPPORTS_SAVE )

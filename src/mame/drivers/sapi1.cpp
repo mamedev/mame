@@ -74,9 +74,9 @@ public:
 	DECLARE_READ8_MEMBER(uart_ready_r);
 	DECLARE_WRITE8_MEMBER(uart_mode_w);
 	DECLARE_WRITE8_MEMBER(uart_reset_w);
-	DECLARE_DRIVER_INIT(sapizps3);
-	DECLARE_DRIVER_INIT(sapizps3a);
-	DECLARE_DRIVER_INIT(sapizps3b);
+	void init_sapizps3();
+	void init_sapizps3a();
+	void init_sapizps3b();
 	DECLARE_MACHINE_RESET(sapi1);
 	DECLARE_MACHINE_RESET(sapizps3);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -595,20 +595,20 @@ MACHINE_RESET_MEMBER( sapi1_state, sapizps3 )
 	m_bank1->set_entry(1);
 }
 
-DRIVER_INIT_MEMBER( sapi1_state, sapizps3 )
+void sapi1_state::init_sapizps3()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
-DRIVER_INIT_MEMBER( sapi1_state, sapizps3a )
+void sapi1_state::init_sapizps3a()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 	m_uart->write_swe(0);
 }
 
-DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )
+void sapi1_state::init_sapizps3b()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0x10000);
@@ -767,9 +767,9 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT  CLASS        INIT       COMPANY  FULLNAME                   FLAGS
-COMP( 1985, sapi1,     0,       0,      sapi1,      sapi1, sapi1_state, 0,         "Tesla", "SAPI-1 ZPS 1",            MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps2,  sapi1,   0,      sapi2,      sapi1, sapi1_state, 0,         "Tesla", "SAPI-1 ZPS 2",            MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps3,  sapi1,   0,      sapi3,      sapi1, sapi1_state, sapizps3,  "Tesla", "SAPI-1 ZPS 3",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps3a, sapi1,   0,      sapi3a,     sapi1, sapi1_state, sapizps3a, "Tesla", "SAPI-1 ZPS 3 (terminal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1985, sapizps3b, sapi1,   0,      sapi3b,     sapi1, sapi1_state, sapizps3b, "Tesla", "SAPI-1 ZPS 3 (6845)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT            COMPANY  FULLNAME                   FLAGS
+COMP( 1985, sapi1,     0,      0,      sapi1,   sapi1, sapi1_state, empty_init,     "Tesla", "SAPI-1 ZPS 1",            MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps2,  sapi1,  0,      sapi2,   sapi1, sapi1_state, empty_init,     "Tesla", "SAPI-1 ZPS 2",            MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3,  sapi1,  0,      sapi3,   sapi1, sapi1_state, init_sapizps3,  "Tesla", "SAPI-1 ZPS 3",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3a, sapi1,  0,      sapi3a,  sapi1, sapi1_state, init_sapizps3a, "Tesla", "SAPI-1 ZPS 3 (terminal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1985, sapizps3b, sapi1,  0,      sapi3b,  sapi1, sapi1_state, init_sapizps3b, "Tesla", "SAPI-1 ZPS 3 (6845)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

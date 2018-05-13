@@ -486,7 +486,8 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -554,7 +555,8 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -659,24 +661,20 @@ ROM_START( opwolf3u )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(slapshot_state,slapshot)
+void slapshot_state::init_slapshot()
 {
-	uint32_t offset,i;
 	uint8_t *gfx = memregion("gfx2")->base();
 	int size = memregion("gfx2")->bytes();
-	int data;
 
-	offset = size / 2;
-	for (i = size / 2 + size / 4; i < size; i++)
+	uint32_t offset = size / 2;
+	for (uint32_t i = size / 2 + size / 4; i < size; i++)
 	{
-		int d1, d2, d3, d4;
-
 		/* Expand 2bits into 4bits format */
-		data = gfx[i];
-		d1 = (data >> 0) & 3;
-		d2 = (data >> 2) & 3;
-		d3 = (data >> 4) & 3;
-		d4 = (data >> 6) & 3;
+		int data = gfx[i];
+		int d1 = (data >> 0) & 3;
+		int d2 = (data >> 2) & 3;
+		int d3 = (data >> 4) & 3;
+		int d4 = (data >> 6) & 3;
 
 		gfx[offset] = (d1 << 2) | (d2 << 6);
 		offset++;
@@ -686,6 +684,6 @@ DRIVER_INIT_MEMBER(slapshot_state,slapshot)
 	}
 }
 
-GAME( 1994, slapshot, 0,       slapshot, slapshot, slapshot_state, slapshot, ROT0, "Taito Corporation",         "Slap Shot (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1994, opwolf3,  0,       opwolf3,  opwolf3,  slapshot_state, slapshot, ROT0, "Taito Corporation Japan",   "Operation Wolf 3 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, opwolf3u, opwolf3, opwolf3,  opwolf3,  slapshot_state, slapshot, ROT0, "Taito America Corporation", "Operation Wolf 3 (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, slapshot, 0,       slapshot, slapshot, slapshot_state, init_slapshot, ROT0, "Taito Corporation",         "Slap Shot (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1994, opwolf3,  0,       opwolf3,  opwolf3,  slapshot_state, init_slapshot, ROT0, "Taito Corporation Japan",   "Operation Wolf 3 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, opwolf3u, opwolf3, opwolf3,  opwolf3,  slapshot_state, init_slapshot, ROT0, "Taito America Corporation", "Operation Wolf 3 (US)",    MACHINE_SUPPORTS_SAVE )

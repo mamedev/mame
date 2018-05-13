@@ -243,7 +243,7 @@ MACHINE_CONFIG_START(compgolf_state::compgolf)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", compgolf)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
@@ -332,7 +332,7 @@ void compgolf_state::compgolf_expand_bg()
 	}
 }
 
-DRIVER_INIT_MEMBER(compgolf_state,compgolf)
+void compgolf_state::init_compgolf()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("user1")->base(), 0x4000);
 	compgolf_expand_bg();
@@ -345,5 +345,5 @@ DRIVER_INIT_MEMBER(compgolf_state,compgolf)
  *
  *************************************/
 
-GAME( 1986, compgolf, 0,        compgolf, compgolf, compgolf_state, compgolf, ROT0, "Data East", "Competition Golf Final Round (revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, compgolfo,compgolf, compgolf, compgolf, compgolf_state, compgolf, ROT0, "Data East", "Competition Golf Final Round (Japan, old version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, compgolf,  0,        compgolf, compgolf, compgolf_state, init_compgolf, ROT0, "Data East", "Competition Golf Final Round (revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, compgolfo, compgolf, compgolf, compgolf, compgolf_state, init_compgolf, ROT0, "Data East", "Competition Golf Final Round (Japan, old version)", MACHINE_SUPPORTS_SAVE )

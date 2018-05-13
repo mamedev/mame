@@ -162,6 +162,8 @@ protected:
 
 	virtual void setup_characteristics() = 0;
 
+	void init_floppy_load(bool write_supported);
+
 	floppy_image_format_t *input_format;
 	floppy_image_format_t *output_format;
 	floppy_image          *image;

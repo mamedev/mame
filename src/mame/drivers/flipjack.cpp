@@ -478,7 +478,7 @@ MACHINE_CONFIG_START(flipjack_state::flipjack)
 	MCFG_PALETTE_INIT_OWNER(flipjack_state, flipjack)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, MASTER_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, flipjack_state, flipjack_soundlatch_r))  /* Port A read */
@@ -512,4 +512,4 @@ ROM_START( flipjack )
 ROM_END
 
 
-GAME( 1983?, flipjack,   0,      flipjack, flipjack, flipjack_state, 0, ROT90, "Jackson Co., Ltd.", "Flipper Jack", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests mid-1983
+GAME( 1983?, flipjack, 0, flipjack, flipjack, flipjack_state, empty_init, ROT90, "Jackson Co., Ltd.", "Flipper Jack", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests mid-1983

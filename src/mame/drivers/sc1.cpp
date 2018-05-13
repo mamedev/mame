@@ -171,7 +171,7 @@ MACHINE_CONFIG_START(sc1_state::sc1)
 	MCFG_Z80PIO_IN_PB_CB(READ8(*this, sc1_state, pio_port_b_r))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -184,5 +184,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT   MACHINE  INPUT  STATE       INIT  COMPANY                       FULLNAME              FLAGS
-COMP( 1989, sc1,  0,      0,       sc1,     sc1,   sc1_state,  0,    "VEB Mikroelektronik Erfurt", "Schachcomputer SC1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                       FULLNAME              FLAGS
+COMP( 1989, sc1,  0,      0,      sc1,     sc1,   sc1_state, empty_init, "VEB Mikroelektronik Erfurt", "Schachcomputer SC1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

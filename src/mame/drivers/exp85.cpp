@@ -189,7 +189,7 @@ MACHINE_CONFIG_START(exp85_state::exp85)
 	MCFG_I8085A_SOD(WRITELINE(*this, exp85_state, sod_w))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -235,5 +235,5 @@ ROM_START( exp85 )
 ROM_END
 
 /* System Drivers */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY         FULLNAME       FLAGS
-COMP( 1979, exp85,  0,      0,      exp85,   exp85, exp85_state, 0,    "Netronics",    "Explorer/85", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME       FLAGS
+COMP( 1979, exp85, 0,      0,      exp85,   exp85, exp85_state, empty_init, "Netronics", "Explorer/85", 0 )

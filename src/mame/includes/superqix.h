@@ -50,11 +50,11 @@ public:
 	DECLARE_WRITE8_MEMBER(superqix_bitmapram_w);
 	DECLARE_WRITE8_MEMBER(superqix_bitmapram2_w);
 	DECLARE_WRITE8_MEMBER(superqix_0410_w);
-	DECLARE_DRIVER_INIT(perestro);
-	DECLARE_DRIVER_INIT(sqix);
-	DECLARE_DRIVER_INIT(sqixr0);
-	DECLARE_DRIVER_INIT(pbillian);
-	DECLARE_DRIVER_INIT(hotsmash);
+	void init_perestro();
+	void init_sqix();
+	void init_sqixr0();
+	void init_pbillian();
+	void init_hotsmash();
 	TILE_GET_INFO_MEMBER(sqix_get_bg_tile_info);
 	DECLARE_VIDEO_START(superqix);
 	DECLARE_PALETTE_DECODER(BBGGRRII);

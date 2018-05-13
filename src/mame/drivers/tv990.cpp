@@ -414,7 +414,7 @@ MACHINE_CONFIG_START(tv990_state::tv990)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 1000); //whats the freq?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -433,5 +433,5 @@ ROM_START( tv995 )
 ROM_END
 
 /* Driver */
-COMP( 1992, tv990, 0, 0, tv990, tv990, tv990_state, 0, "TeleVideo", "TeleVideo 990",    MACHINE_SUPPORTS_SAVE )
-COMP( 1994, tv995, 0, 0, tv990, tv990, tv990_state, 0, "TeleVideo", "TeleVideo 995-65", MACHINE_SUPPORTS_SAVE )
+COMP( 1992, tv990, 0, 0, tv990, tv990, tv990_state, empty_init, "TeleVideo", "TeleVideo 990",    MACHINE_SUPPORTS_SAVE )
+COMP( 1994, tv995, 0, 0, tv990, tv990, tv990_state, empty_init, "TeleVideo", "TeleVideo 995-65", MACHINE_SUPPORTS_SAVE )

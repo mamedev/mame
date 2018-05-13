@@ -10,6 +10,9 @@
   - 1996 Sharp Microcomputer Databook
   - KB1013VK1-2/KB1013VK4-2 manual
 
+  Default external frequency of these is 32.768kHz, forwarding a clockrate in the
+  MAME machine config is optional. Newer revisions can have an internal oscillator.
+
   TODO:
   - source organiziation between files is a mess
   - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)

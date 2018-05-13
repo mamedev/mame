@@ -402,7 +402,7 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("opn", YM2203, MASTER_CLOCK/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN5"))
@@ -423,4 +423,4 @@ ROM_START( dfruit )
 	ROM_LOAD( "c2.ic10", 0x00000, 0x80000, CRC(d869ab24) SHA1(382e874a846855a7f6f8811625aaa30d9dfa1ce2) )
 ROM_END
 
-GAME( 1993, dfruit,  0,   dfruit, dfruit, dfruit_state,  0, ROT0, "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, dfruit, 0, dfruit, dfruit, dfruit_state, empty_init, ROT0, "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", MACHINE_IMPERFECT_GRAPHICS )

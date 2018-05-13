@@ -247,10 +247,9 @@ MACHINE_CONFIG_START(skyraid_state::skyraid)
 	MCFG_PALETTE_INIT_OWNER(skyraid_state, skyraid)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(skyraid)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, skyraid_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -285,4 +284,4 @@ ROM_START( skyraid )
 ROM_END
 
 
-GAME( 1978, skyraid, 0, skyraid, skyraid, skyraid_state, 0, ORIENTATION_FLIP_Y, "Atari", "Sky Raider", MACHINE_IMPERFECT_COLORS )
+GAME( 1978, skyraid, 0, skyraid, skyraid, skyraid_state, empty_init, ORIENTATION_FLIP_Y, "Atari", "Sky Raider", MACHINE_IMPERFECT_COLORS )

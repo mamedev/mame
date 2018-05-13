@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(xain_state::xsleena)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
@@ -780,8 +780,8 @@ ROM_START( xsleenaba )
 ROM_END
 
 
-GAME( 1986, xsleena,   0,       xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan (Taito license)",            "Xain'd Sleena (World)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, xsleenaj,  xsleena, xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan",                            "Xain'd Sleena (Japan)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, solrwarr,  xsleena, xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan (Taito / Memetron license)", "Solar-Warrior (US)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1986, xsleenab,  xsleena, xsleenab, xsleena, xain_state, 0, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1987, xsleenaba, xsleena, xsleenab, xsleena, xain_state, 0, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg, bugfixed)", MACHINE_SUPPORTS_SAVE ) // newer bootleg, fixes some of the issues with the other one
+GAME( 1986, xsleena,   0,       xsleena,  xsleena, xain_state, empty_init, ROT0, "Technos Japan (Taito license)",            "Xain'd Sleena (World)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, xsleenaj,  xsleena, xsleena,  xsleena, xain_state, empty_init, ROT0, "Technos Japan",                            "Xain'd Sleena (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, solrwarr,  xsleena, xsleena,  xsleena, xain_state, empty_init, ROT0, "Technos Japan (Taito / Memetron license)", "Solar-Warrior (US)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, xsleenab,  xsleena, xsleenab, xsleena, xain_state, empty_init, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1987, xsleenaba, xsleena, xsleenab, xsleena, xain_state, empty_init, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg, bugfixed)", MACHINE_SUPPORTS_SAVE ) // newer bootleg, fixes some of the issues with the other one

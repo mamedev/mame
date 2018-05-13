@@ -397,11 +397,9 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz700)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* ne556 timers */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cursor", mz_state, ne556_cursor_callback, attotime::from_hz(1.5))
@@ -524,8 +522,8 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  STATE        INIT    COMPANY      FULLNAME          FLAGS
-COMP( 1982, mz700,    0,        0,      mz700,    mz700, mz_state,    mz700,  "Sharp",     "MZ-700",         0 )
-COMP( 1982, mz700j,   mz700,    0,      mz700,    mz700, mz_state,    mz700,  "Sharp",     "MZ-700 (Japan)", 0 )
-COMP( 1984, mz800,    0,        0,      mz800,    mz800, mz_state,    mz800,  "Sharp",     "MZ-800",         MACHINE_NOT_WORKING )
-COMP( 1984, mz1500,   0,        0,      mz800,    mz800, mz_state,    mz800,  "Sharp",     "MZ-1500",        MACHINE_NOT_WORKING )    // Japanese version of the MZ-800
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS     INIT        COMPANY  FULLNAME          FLAGS
+COMP( 1982, mz700,  0,      0,      mz700,   mz700, mz_state, init_mz700, "Sharp", "MZ-700",         0 )
+COMP( 1982, mz700j, mz700,  0,      mz700,   mz700, mz_state, init_mz700, "Sharp", "MZ-700 (Japan)", 0 )
+COMP( 1984, mz800,  0,      0,      mz800,   mz800, mz_state, init_mz800, "Sharp", "MZ-800",         MACHINE_NOT_WORKING )
+COMP( 1984, mz1500, 0,      0,      mz800,   mz800, mz_state, init_mz800, "Sharp", "MZ-1500",        MACHINE_NOT_WORKING )    // Japanese version of the MZ-800

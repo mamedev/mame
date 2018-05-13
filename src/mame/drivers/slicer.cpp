@@ -153,4 +153,4 @@ ROM_START( slicer )
 	ROM_LOAD( "slvid_e.bin",  0x000000, 0x001000, CRC(8694274f) SHA1(8373baaea8d689bf52699b587942a57f26baf740) )
 ROM_END
 
-COMP( 1983, slicer, 0, 0, slicer, 0, slicer_state, 0, "Slicer Computers", "Slicer", MACHINE_NO_SOUND )
+COMP( 1983, slicer, 0, 0, slicer, 0, slicer_state, empty_init, "Slicer Computers", "Slicer", MACHINE_NO_SOUND )
