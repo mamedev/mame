@@ -65,8 +65,8 @@ public:
 	DECLARE_WRITE8_MEMBER(kchamp_colorram_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
-	DECLARE_DRIVER_INIT(kchampvs);
-	DECLARE_DRIVER_INIT(kchampvs2);
+	void init_kchampvs();
+	void init_kchampvs2();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;

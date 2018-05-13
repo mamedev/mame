@@ -407,8 +407,8 @@ public:
 	DECLARE_WRITE8_MEMBER(bootleg_w);
 	DECLARE_READ8_MEMBER(bootleg_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
-	DECLARE_DRIVER_INIT(missilem);
-	DECLARE_DRIVER_INIT(suprmatk);
+	void init_missilem();
+	void init_suprmatk();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1393,12 +1393,11 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(missile_state,suprmatk)
+void missile_state::init_suprmatk()
 {
-	int i;
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (i = 0; i < 0x40; i++)
+	for (int i = 0; i < 0x40; i++)
 	{
 		rom[0x7CC0+i] = rom[0x8000+i];
 		rom[0x5440+i] = rom[0x8040+i];
@@ -1467,7 +1466,7 @@ DRIVER_INIT_MEMBER(missile_state,suprmatk)
 	}
 }
 
-DRIVER_INIT_MEMBER(missile_state,missilem)
+void missile_state::init_missilem()
 {
 	uint8_t *src = memregion("user1")->base();
 	uint8_t *dest = memregion("maincpu")->base();
@@ -1494,17 +1493,17 @@ DRIVER_INIT_MEMBER(missile_state,missilem)
  *
  *************************************/
 
-GAME( 1980, missile,  0,       missile, missile,  missile_state,        0, ROT0, "Atari", "Missile Command (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, missile2, missile, missile, missile,  missile_state,        0, ROT0, "Atari", "Missile Command (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, missile1, missile, missile, missile,  missile_state,        0, ROT0, "Atari", "Missile Command (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, suprmatk, missile, missile, suprmatk, missile_state, suprmatk, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (for rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, suprmatkd,missile, missile, suprmatk, missile_state,        0, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile,  0,       missile, missile,  missile_state,     empty_init, ROT0, "Atari", "Missile Command (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile2, missile, missile, missile,  missile_state,     empty_init, ROT0, "Atari", "Missile Command (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, missile1, missile, missile, missile,  missile_state,     empty_init, ROT0, "Atari", "Missile Command (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, suprmatk, missile, missile, suprmatk, missile_state,  init_suprmatk, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (for rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, suprmatkd,missile, missile, suprmatk, missile_state,     empty_init, ROT0, "Atari / General Computer Corporation", "Super Missile Attack (not encrypted)", MACHINE_SUPPORTS_SAVE )
 
 /* the following bootleg has extremely similar program ROMs to missile1, but has different unknown sound hardware and 2 more ROMs */
-GAME( 1981, missilea, missile, missilea, missile, missile_state,        0, ROT0, "bootleg (Ugames)", "Missile Attack", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, missilea, missile, missilea, missile, missile_state,     empty_init, ROT0, "bootleg (Ugames)", "Missile Attack", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* the following bootlegs are on different hardware and don't work */
-GAME( 1980, mcombat,  missile, missileb, missileb, missile_state,        0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", MACHINE_NOT_WORKING )
-GAME( 1980, mcombata, missile, missileb, missileb, missile_state,        0, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", MACHINE_NOT_WORKING )
-GAME( 1980, mcombats, missile, missileb, missileb, missile_state,        0, ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", MACHINE_NOT_WORKING )
-GAME( 2005, missilem, missile, missilea, missileb, missile_state, missilem, ROT0, "hack (Braze Technologies)", "Missile Command Multigame", MACHINE_NOT_WORKING )
+GAME( 1980, mcombat,  missile, missileb, missileb, missile_state,    empty_init, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", MACHINE_NOT_WORKING )
+GAME( 1980, mcombata, missile, missileb, missileb, missile_state,    empty_init, ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", MACHINE_NOT_WORKING )
+GAME( 1980, mcombats, missile, missileb, missileb, missile_state,    empty_init, ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", MACHINE_NOT_WORKING )
+GAME( 2005, missilem, missile, missilea, missileb, missile_state, init_missilem, ROT0, "hack (Braze Technologies)", "Missile Command Multigame", MACHINE_NOT_WORKING )

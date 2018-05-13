@@ -495,10 +495,10 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY             FULLNAME                            FLAGS
-CONS( 1982, coleco,   0,        0,      coleco,   coleco, coleco_state, 0,    "Coleco",           "ColecoVision (NTSC)",              0 )
-CONS( 1982, onyx,     coleco,   0,      coleco,   coleco, coleco_state, 0,    "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
-CONS( 1983, colecop,  coleco,   0,      colecop,  coleco, coleco_state, 0,    "Coleco",           "ColecoVision (PAL)",               0 )
-CONS( 1986, czz50,    0,        coleco, czz50,    czz50,  coleco_state, 0,    "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
-CONS( 1988, dina,     czz50,    0,      dina,     czz50,  coleco_state, 0,    "Telegames",        "Dina",                             0 )
-CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50,  coleco_state, 0,    "Telegames",        "Personal Arcade",                  0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY             FULLNAME                            FLAGS
+CONS( 1982, coleco,   0,      0,      coleco,   coleco, coleco_state, empty_init, "Coleco",           "ColecoVision (NTSC)",              0 )
+CONS( 1982, onyx,     coleco, 0,      coleco,   coleco, coleco_state, empty_init, "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
+CONS( 1983, colecop,  coleco, 0,      colecop,  coleco, coleco_state, empty_init, "Coleco",           "ColecoVision (PAL)",               0 )
+CONS( 1986, czz50,    0,      coleco, czz50,    czz50,  coleco_state, empty_init, "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
+CONS( 1988, dina,     czz50,  0,      dina,     czz50,  coleco_state, empty_init, "Telegames",        "Dina",                             0 )
+CONS( 1988, prsarcde, czz50,  0,      czz50,    czz50,  coleco_state, empty_init, "Telegames",        "Personal Arcade",                  0 )

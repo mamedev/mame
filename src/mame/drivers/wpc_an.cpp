@@ -52,7 +52,7 @@ protected:
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
 public:
-	DECLARE_DRIVER_INIT(wpc_an);
+	void init_wpc_an();
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
@@ -306,19 +306,24 @@ void wpc_an_state::machine_reset()
 	m_irq_count = 0;
 }
 
-DRIVER_INIT_MEMBER(wpc_an_state,wpc_an)
+void wpc_an_state::init_wpc_an()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t *fixed = memregion("fixed")->base();
 	uint32_t codeoff = memregion("maincpu")->bytes() - 0x8000;
+
 	m_cpubank->configure_entries(0, 32, &ROM[0x10000], 0x4000);
 	m_cpubank->set_entry(0);
+
 	m_vblank_timer = timer_alloc(TIMER_VBLANK);
 	m_vblank_timer->adjust(attotime::from_hz(60),0,attotime::from_hz(60));
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_hz(976),0,attotime::from_hz(976));
+
 	m_bankmask = ((memregion("maincpu")->bytes()-0x10000) >> 14) - 1;
+
 	logerror("WPC: ROM bank mask = %02x\n",m_bankmask);
+
 	memset(m_ram,0,0x3000);
 	memcpy(fixed,&ROM[codeoff],0x8000);  // copy static code from end of U6 ROM.
 }
@@ -693,21 +698,21 @@ ROM_START(tfa_13)
 	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
-GAME(1990,  tfa_13,     0,      wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",     "WPC Test Fixture: Alphanumeric (1.3)",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  dd_p7,      dd_l2,  wpc_an_dd, wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",     "Dr. Dude (PA-7 WPC)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  dd_p06,     dd_l2,  wpc_an_dd, wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",     "Dr. Dude (PA-6 WPC)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  fh_l9,      0,      wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "Funhouse L-9 (SL-2m)",                                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  fh_l9b,     fh_l9,  wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "Funhouse L-9 (SL-2m) Bootleg Improved German translation", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  fh_905h,    fh_l9,  wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "Funhouse 9.05H",                                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  fh_l3,      fh_l9,  wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "Funhouse L-3",                                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  fh_l4,      fh_l9,  wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "Funhouse L-4",                                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  fh_l5,      fh_l9,  wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "Funhouse L-5",                                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  hd_l3,      0,      wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",     "Harley Davidson (L-3)",                                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  hd_l2,      hd_l3,  wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",     "Harley Davidson (L-2)",                                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  hd_l1,      hd_l3,  wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",     "Harley Davidson (L-1)",                                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  bop_l7,     0,      wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "The Machine: Bride of Pinbot (L-7)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  bop_l6,     bop_l7, wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "The Machine: Bride of Pinbot (L-6)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  bop_l5,     bop_l7, wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "The Machine: Bride of Pinbot (L-5)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  bop_l4,     bop_l7, wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "The Machine: Bride of Pinbot (L-4)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  bop_l3,     bop_l7, wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "The Machine: Bride of Pinbot (L-3)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  bop_l2,     bop_l7, wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "The Machine: Bride of Pinbot (L-2)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  tfa_13,     0,      wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Bally",     "WPC Test Fixture: Alphanumeric (1.3)",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  dd_p7,      dd_l2,  wpc_an_dd, wpc_an, wpc_an_state, init_wpc_an, ROT0, "Bally",     "Dr. Dude (PA-7 WPC)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  dd_p06,     dd_l2,  wpc_an_dd, wpc_an, wpc_an_state, init_wpc_an, ROT0, "Bally",     "Dr. Dude (PA-6 WPC)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  fh_l9,      0,      wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "Funhouse L-9 (SL-2m)",                                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  fh_l9b,     fh_l9,  wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "Funhouse L-9 (SL-2m) Bootleg Improved German translation", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  fh_905h,    fh_l9,  wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "Funhouse 9.05H",                                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  fh_l3,      fh_l9,  wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "Funhouse L-3",                                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  fh_l4,      fh_l9,  wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "Funhouse L-4",                                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  fh_l5,      fh_l9,  wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "Funhouse L-5",                                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  hd_l3,      0,      wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Bally",     "Harley Davidson (L-3)",                                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  hd_l2,      hd_l3,  wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Bally",     "Harley Davidson (L-2)",                                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  hd_l1,      hd_l3,  wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Bally",     "Harley Davidson (L-1)",                                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  bop_l7,     0,      wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "The Machine: Bride of Pinbot (L-7)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  bop_l6,     bop_l7, wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "The Machine: Bride of Pinbot (L-6)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  bop_l5,     bop_l7, wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "The Machine: Bride of Pinbot (L-5)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  bop_l4,     bop_l7, wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "The Machine: Bride of Pinbot (L-4)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  bop_l3,     bop_l7, wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "The Machine: Bride of Pinbot (L-3)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  bop_l2,     bop_l7, wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "The Machine: Bride of Pinbot (L-2)",                       MACHINE_IS_SKELETON_MECHANICAL)

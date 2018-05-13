@@ -270,5 +270,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT  COMPANY              FULLNAME   FLAGS
-COMP( 1979, dauphin,  0,      0,      dauphin,  dauphin, dauphin_state, 0,    "LCD EPFL Stoppani", "Dauphin", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY              FULLNAME   FLAGS
+COMP( 1979, dauphin, 0,      0,      dauphin, dauphin, dauphin_state, empty_init, "LCD EPFL Stoppani", "Dauphin", 0 )

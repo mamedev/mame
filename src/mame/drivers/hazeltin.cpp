@@ -793,5 +793,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     CLASS           INIT    COMPANY                     FULLNAME            FLAGS
-COMP( 1977, hazl1500, 0,        0,       hazl1500, hazl1500, hazl1500_state, 0,      "Hazeltine Corporation",    "Hazeltine 1500",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                  FULLNAME          FLAGS
+COMP( 1977, hazl1500, 0,      0,      hazl1500, hazl1500, hazl1500_state, empty_init, "Hazeltine Corporation", "Hazeltine 1500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

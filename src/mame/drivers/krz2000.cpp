@@ -99,5 +99,5 @@ ROM_START( k2000 )
 	ROM_LOAD( "godot_v5.u10.gal20v8a.jed", 0x002000, 0x00066f, CRC(c6517456) SHA1(b82530d46afdca5f6460e77ac11710cad55a6b89) )
 ROM_END
 
-CONS( 1990, k2000, 0, 0, k2000, k2000, k2000_state, 0, "Kurzweil Music Systems", "K2000", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 1990, k2000, 0, 0, k2000, k2000, k2000_state, empty_init, "Kurzweil Music Systems", "K2000", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 

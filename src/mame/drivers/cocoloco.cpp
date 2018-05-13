@@ -226,7 +226,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
-	DECLARE_DRIVER_INIT(cocob);
+	void init_cocob();
 
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(cocoloco);
@@ -617,7 +617,7 @@ ROM_END
 *           Driver Init            *
 ***********************************/
 
-DRIVER_INIT_MEMBER(cocoloco_state, cocob)
+void cocoloco_state::init_cocob()
 {
 //  Just for testing...
 
@@ -635,7 +635,7 @@ DRIVER_INIT_MEMBER(cocoloco_state, cocob)
 *           Game Drivers           *
 ***********************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT   ROT    COMPANY         FULLNAME             FLAGS
-GAME( 198?, cocoloco,  0,        cocoloco, cocoloco,  cocoloco_state, 0,     ROT90, "Petaco S.A.",  "Coco Loco (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, cocolocoa, cocoloco, cocoloco, cocolocoa, cocoloco_state, 0,     ROT90, "Recel S.A.",   "Coco Loco (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, cocolocob, cocoloco, cocoloco, cocoloco,  cocoloco_state, cocob, ROT90, "Petaco S.A.",  "Coco Loco (set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT        ROT    COMPANY         FULLNAME             FLAGS
+GAME( 198?, cocoloco,  0,        cocoloco, cocoloco,  cocoloco_state, empty_init, ROT90, "Petaco S.A.",  "Coco Loco (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, cocolocoa, cocoloco, cocoloco, cocolocoa, cocoloco_state, empty_init, ROT90, "Recel S.A.",   "Coco Loco (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, cocolocob, cocoloco, cocoloco, cocoloco,  cocoloco_state, init_cocob, ROT90, "Petaco S.A.",  "Coco Loco (set 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -154,6 +154,6 @@ ROM_START( stvboy )
 ROM_END
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE        INIT  COMPANY    FULLNAME
-CONS( 199?, tvboyii, 0,      0,      tvboyii, tvboyii, tvboy_state, 0,    "Systema", "TV Boy II (PAL)" ,    MACHINE_SUPPORTS_SAVE )
-CONS( 1995, stvboy,  0,      0,      tvboyii, tvboyii, tvboy_state, 0,    "Akor",    "Super TV Boy (PAL)" , MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY    FULLNAME
+CONS( 199?, tvboyii, 0,      0,      tvboyii, tvboyii, tvboy_state, empty_init, "Systema", "TV Boy II (PAL)" ,    MACHINE_SUPPORTS_SAVE )
+CONS( 1995, stvboy,  0,      0,      tvboyii, tvboyii, tvboy_state, empty_init, "Akor",    "Super TV Boy (PAL)" , MACHINE_SUPPORTS_SAVE )

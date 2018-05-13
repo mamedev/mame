@@ -69,7 +69,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(avengersb);
+	void init_avengersb();
 	DECLARE_VIDEO_START(trojan);
 	DECLARE_VIDEO_START(avengers);
 	DECLARE_VIDEO_START(avengersb);

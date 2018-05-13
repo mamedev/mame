@@ -2391,21 +2391,20 @@ ROM_END
 
 
 /* Convert the ROM interleaving into something usable by the write handlers */
-DRIVER_INIT_MEMBER(x1_state,x1_kanji)
+void x1_state::init_x1_kanji()
 {
-	uint32_t i,j,k,l;
 	uint8_t *kanji = memregion("kanji")->base();
 	uint8_t *raw_kanji = memregion("raw_kanji")->base();
 
-	k = 0;
-	for(l=0;l<2;l++)
+	uint32_t k = 0;
+	for (uint32_t l=0; l < 2; l++)
 	{
-		for(j=l*16;j<(l*16)+0x10000;j+=32)
+		for (uint32_t j = l*16; j < (l*16) + 0x10000; j += 32)
 		{
-			for(i=0;i<16;i++)
+			for (uint32_t i = 0; i  < 16; i++)
 			{
-				kanji[j+i] = raw_kanji[k];
-				kanji[j+i+0x10000] = raw_kanji[0x10000+k];
+				kanji[j + i] = raw_kanji[k];
+				kanji[j + i + 0x10000] = raw_kanji[0x10000 + k];
 				k++;
 			}
 		}
@@ -2413,9 +2412,9 @@ DRIVER_INIT_MEMBER(x1_state,x1_kanji)
 }
 
 
-//    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT    STATE        INIT      COMPANY  FULLNAME              FLAGS
-COMP( 1982, x1,        0,      0,       x1,      x1,      x1_state,    0,        "Sharp", "X1 (CZ-800C)",       0 )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT    CLASS     INIT           COMPANY  FULLNAME              FLAGS
+COMP( 1982, x1,        0,      0,      x1,      x1,      x1_state, empty_init,    "Sharp", "X1 (CZ-800C)",       0 )
 // x1twin in x1twin.c
-COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 Turbo (CZ-850C)", MACHINE_NOT_WORKING ) //model 10
-COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 Turbo (CZ-862C)", 0 ) //model 40
-//COMP( 1986, x1turboz,  x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 TurboZ", MACHINE_NOT_WORKING )
+COMP( 1984, x1turbo,   x1,     0,      x1turbo, x1turbo, x1_state, init_x1_kanji, "Sharp", "X1 Turbo (CZ-850C)", MACHINE_NOT_WORKING ) //model 10
+COMP( 1985, x1turbo40, x1,     0,      x1turbo, x1turbo, x1_state, init_x1_kanji, "Sharp", "X1 Turbo (CZ-862C)", 0 ) //model 40
+//COMP( 1986, x1turboz,  x1,     0,      x1turbo, x1turbo, x1_state, init_x1_kanji, "Sharp", "X1 TurboZ", MACHINE_NOT_WORKING )

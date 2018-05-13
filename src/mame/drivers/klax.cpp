@@ -441,10 +441,10 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, klax,  0,    klax, klax, klax_state, 0, ROT0, "Atari Games", "Klax (set 1)", 0 )
-GAME( 1989, klax2, klax, klax, klax, klax_state, 0, ROT0, "Atari Games", "Klax (set 2)", 0 )
-GAME( 1989, klax3, klax, klax, klax, klax_state, 0, ROT0, "Atari Games", "Klax (set 3)", 0 )
-GAME( 1989, klaxj, klax, klax, klax, klax_state, 0, ROT0, "Atari Games", "Klax (Japan)", 0 )
-GAME( 1989, klaxd, klax, klax, klax, klax_state, 0, ROT0, "Atari Games", "Klax (Germany)", 0 )
+GAME( 1989, klax,    0,    klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (set 1)", 0 )
+GAME( 1989, klax2,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (set 2)", 0 )
+GAME( 1989, klax3,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (set 3)", 0 )
+GAME( 1989, klaxj,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (Japan)", 0 )
+GAME( 1989, klaxd,   klax, klax,    klax, klax_state, empty_init, ROT0, "Atari Games", "Klax (Germany)", 0 )
 
-GAME( 1989, klax2bl, klax, klax2bl, klax, klax_state, 0, ROT0, "bootleg", "Klax (set 2, bootleg)", MACHINE_NOT_WORKING )
+GAME( 1989, klax2bl, klax, klax2bl, klax, klax_state, empty_init, ROT0, "bootleg",     "Klax (set 2, bootleg)", MACHINE_NOT_WORKING )

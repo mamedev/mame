@@ -728,7 +728,7 @@ ROM_END
 
 /* Driver Initialization */
 
-DRIVER_INIT_MEMBER(airbustr_state,airbustr)
+void airbustr_state::init_airbustr()
 {
 	m_master->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8_delegate(FUNC(airbustr_state::devram_r),this)); // protection device lives here
 }
@@ -736,6 +736,6 @@ DRIVER_INIT_MEMBER(airbustr_state,airbustr)
 
 /* Game Drivers */
 
-GAME( 1990, airbustr,   0,        airbustr, airbustr,  airbustr_state, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)",   MACHINE_SUPPORTS_SAVE ) // 891220
-GAME( 1990, airbustrj,  airbustr, airbustr, airbustrj, airbustr_state, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)",   MACHINE_SUPPORTS_SAVE ) // 891229
-GAME( 1990, airbustrb,  airbustr, airbustrb,airbustrj, airbustr_state, 0,        ROT0, "bootleg",                "Air Buster: Trouble Specialty Raid Unit (bootleg)", MACHINE_SUPPORTS_SAVE ) // based on Japan set (891229)
+GAME( 1990, airbustr,  0,        airbustr,  airbustr,  airbustr_state, init_airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)",   MACHINE_SUPPORTS_SAVE ) // 891220
+GAME( 1990, airbustrj, airbustr, airbustr,  airbustrj, airbustr_state, init_airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)",   MACHINE_SUPPORTS_SAVE ) // 891229
+GAME( 1990, airbustrb, airbustr, airbustrb, airbustrj, airbustr_state, empty_init,    ROT0, "bootleg",                "Air Buster: Trouble Specialty Raid Unit (bootleg)", MACHINE_SUPPORTS_SAVE ) // based on Japan set (891229)

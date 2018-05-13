@@ -413,7 +413,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(blstroid_state,blstroid)
+void blstroid_state::init_blstroid()
 {
 }
 
@@ -425,8 +425,8 @@ DRIVER_INIT_MEMBER(blstroid_state,blstroid)
  *
  *************************************/
 
-GAME( 1987, blstroid,  0,        blstroid, blstroid, blstroid_state, blstroid, ROT0, "Atari Games", "Blasteroids (rev 4)", 0 )
-GAME( 1987, blstroid3, blstroid, blstroid, blstroid, blstroid_state, blstroid, ROT0, "Atari Games", "Blasteroids (rev 3)", 0 )
-GAME( 1987, blstroid2, blstroid, blstroid, blstroid, blstroid_state, blstroid, ROT0, "Atari Games", "Blasteroids (rev 2)", 0 )
-GAME( 1987, blstroidg, blstroid, blstroid, blstroid, blstroid_state, blstroid, ROT0, "Atari Games", "Blasteroids (German, rev 2)", 0 )
-GAME( 1987, blstroidh, blstroid, blstroid, blstroid, blstroid_state, blstroid, ROT0, "Atari Games", "Blasteroids (with heads)", 0 )
+GAME( 1987, blstroid,  0,        blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (rev 4)", 0 )
+GAME( 1987, blstroid3, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (rev 3)", 0 )
+GAME( 1987, blstroid2, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (rev 2)", 0 )
+GAME( 1987, blstroidg, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (German, rev 2)", 0 )
+GAME( 1987, blstroidh, blstroid, blstroid, blstroid, blstroid_state, init_blstroid, ROT0, "Atari Games", "Blasteroids (with heads)", 0 )

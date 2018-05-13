@@ -431,5 +431,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, revx,     0,    midxunit, revx, midxunit_state, revx, ROT0, "Midway",   "Revolution X (rev 1.0 6/16/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, revxp5,   revx, midxunit, revx, midxunit_state, revx, ROT0, "Midway",   "Revolution X (prototype, rev 5.0 5/23/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, revx,     0,    midxunit, revx, midxunit_state, init_revx, ROT0, "Midway",   "Revolution X (rev 1.0 6/16/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, revxp5,   revx, midxunit, revx, midxunit_state, init_revx, ROT0, "Midway",   "Revolution X (prototype, rev 5.0 5/23/94)", MACHINE_SUPPORTS_SAVE )

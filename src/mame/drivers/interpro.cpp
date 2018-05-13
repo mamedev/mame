@@ -218,7 +218,7 @@ void interpro_state::machine_reset()
 	m_sreg_ctrl1 = CTRL1_FLOPLOW;
 }
 
-DRIVER_INIT_MEMBER(interpro_state, common)
+void interpro_state::init_common()
 {
 	// FIXME: not all memory sizes are reported properly using fdm "5 inqhw" and
 	// "optimum_memory" commands
@@ -852,9 +852,9 @@ ROM_START(ip2800)
 	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
-/*    YEAR   NAME        PARENT  COMPAT  MACHINE     INPUT     CLASS            INIT       COMPANY         FULLNAME         FLAGS */
-COMP( 1990,  ip2000,     0,      0,      ip2000,     interpro, turquoise_state, common,    "Intergraph",   "InterPro 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1992,  ip2400,     0,      0,      ip2400,     interpro, sapphire_state,  common,    "Intergraph",   "InterPro 2400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1993,  ip2500,     0,      0,      ip2500,     interpro, sapphire_state,  common,    "Intergraph",   "InterPro 2500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1993,  ip2700,     0,      0,      ip2700,     interpro, sapphire_state,  common,    "Intergraph",   "InterPro 2700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1994,  ip2800,     0,      0,      ip2800,     interpro, sapphire_state,  common,    "Intergraph",   "InterPro 2800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT     CLASS           INIT        COMPANY        FULLNAME         FLAGS */
+COMP( 1990,  ip2000,  0,      0,      ip2000,  interpro, turquoise_state,empty_init, "Intergraph",  "InterPro 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1992,  ip2400,  0,      0,      ip2400,  interpro, sapphire_state, empty_init, "Intergraph",  "InterPro 2400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1993,  ip2500,  0,      0,      ip2500,  interpro, sapphire_state, empty_init, "Intergraph",  "InterPro 2500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1993,  ip2700,  0,      0,      ip2700,  interpro, sapphire_state, empty_init, "Intergraph",  "InterPro 2700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1994,  ip2800,  0,      0,      ip2800,  interpro, sapphire_state, empty_init, "Intergraph",  "InterPro 2800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

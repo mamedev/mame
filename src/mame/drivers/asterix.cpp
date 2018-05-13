@@ -436,7 +436,7 @@ ROM_START( asterixj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(asterix_state,asterix)
+void asterix_state::init_asterix()
 {
 #if 0
 	*(uint16_t *)(memregion("maincpu")->base() + 0x07f34) = 0x602a;
@@ -445,8 +445,8 @@ DRIVER_INIT_MEMBER(asterix_state,asterix)
 }
 
 
-GAME( 1992, asterix,    0,       asterix, asterix, asterix_state, asterix, ROT0, "Konami", "Asterix (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixeac, asterix, asterix, asterix, asterix_state, asterix, ROT0, "Konami", "Asterix (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixeaa, asterix, asterix, asterix, asterix_state, asterix, ROT0, "Konami", "Asterix (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixaad, asterix, asterix, asterix, asterix_state, asterix, ROT0, "Konami", "Asterix (ver AAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixj,   asterix, asterix, asterix, asterix_state, asterix, ROT0, "Konami", "Asterix (ver JAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterix,    0,       asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixeac, asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixeaa, asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixaad, asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver AAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixj,   asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver JAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

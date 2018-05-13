@@ -560,5 +560,5 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME       PARENT   MACHINE    INPUT     STATE            INIT   ROT   COMPANY       FULLNAME           FLAGS  */
-GAME( 1991, 4enlinea,  0,       _4enlinea, 4enlinea, _4enlinea_state, 0,     ROT0, "Compumatic", "Cuatro en Linea", MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT  MACHINE    INPUT     CLASS            INIT        ROT   COMPANY       FULLNAME           FLAGS  */
+GAME( 1991, 4enlinea, 0,      _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic", "Cuatro en Linea", MACHINE_NOT_WORKING )

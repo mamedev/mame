@@ -525,5 +525,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS           INIT  COMPANY    FULLNAME    FLAGS
-COMP( 1982, spc1000,  0,      0,       spc1000,   spc1000, spc1000_state,  0,    "Samsung", "SPC-1000", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME    FLAGS
+COMP( 1982, spc1000, 0,      0,      spc1000, spc1000, spc1000_state, empty_init, "Samsung", "SPC-1000", 0 )

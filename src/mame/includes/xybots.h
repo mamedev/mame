@@ -25,7 +25,7 @@ public:
 		m_mob(*this, "mob")
 	{ }
 
-	DECLARE_DRIVER_INIT(xybots);
+	void init_xybots();
 	void xybots(machine_config &config);
 
 protected:

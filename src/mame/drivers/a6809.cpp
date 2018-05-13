@@ -273,5 +273,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR   NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1980, a6809,  0,      0,       a6809,     a6809, a6809_state,     0,     "Acorn",  "System 3 (6809 CPU)", 0 )
+/*    YEAR   NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME               FLAGS */
+COMP( 1980, a6809, 0,      0,      a6809,   a6809, a6809_state, empty_init, "Acorn", "System 3 (6809 CPU)", 0 )

@@ -2684,7 +2684,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(itech8_state,grmatch)
+void itech8_state::init_grmatch()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0160, 0x0160, write8_delegate(FUNC(itech8_state::grmatch_palette_w),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0180, 0x0180, write8_delegate(FUNC(itech8_state::grmatch_xscroll_w),this));
@@ -2696,7 +2696,7 @@ DRIVER_INIT_MEMBER(itech8_state,grmatch)
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,slikshot)
+void itech8_state::init_slikshot()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x0180, 0x0180, read8_delegate(FUNC(itech8_state::slikshot_z80_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x01cf, 0x01cf, read8_delegate(FUNC(itech8_state::slikshot_z80_control_r),this));
@@ -2723,7 +2723,7 @@ DRIVER_INIT_MEMBER(itech8_state,slikshot)
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,sstrike)
+void itech8_state::init_sstrike()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x1180, 0x1180, read8_delegate(FUNC(itech8_state::slikshot_z80_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x11cf, 0x11cf, read8_delegate(FUNC(itech8_state::slikshot_z80_control_r),this));
@@ -2731,31 +2731,31 @@ DRIVER_INIT_MEMBER(itech8_state,sstrike)
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,hstennis)
+void itech8_state::init_hstennis()
 {
 	m_visarea.set(0, 375, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,arligntn)
+void itech8_state::init_arligntn()
 {
 	m_visarea.set(16, 389, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,peggle)
+void itech8_state::init_peggle()
 {
 	m_visarea.set(18, 367, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,neckneck)
+void itech8_state::init_neckneck()
 {
 	m_visarea.set(8, 375, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,rimrockn)
+void itech8_state::init_rimrockn()
 {
 	/* additional input ports */
 	m_maincpu->space(AS_PROGRAM).install_read_port (0x0161, 0x0161, "161");
@@ -2779,47 +2779,47 @@ DRIVER_INIT_MEMBER(itech8_state,rimrockn)
  *************************************/
 
 /* Wheel of Fortune-style PCB */
-GAME( 1989, wfortune, 0,        wfortune,           wfortune, itech8_state, 0,        ROT0,   "GameTek", "Wheel Of Fortune (set 1)", 0 )
-GAME( 1989, wfortunea,wfortune, wfortune,           wfortune, itech8_state, 0,        ROT0,   "GameTek", "Wheel Of Fortune (set 2)", 0 )
+GAME( 1989, wfortune,   0,        wfortune,          wfortune, itech8_state, empty_init,    ROT0,   "GameTek", "Wheel Of Fortune (set 1)", 0 )
+GAME( 1989, wfortunea,  wfortune, wfortune,          wfortune, itech8_state, empty_init,    ROT0,   "GameTek", "Wheel Of Fortune (set 2)", 0 )
 
 /* Grudge Match-style PCB */
-GAME( 1989, grmatch,  0,        grmatch,            grmatch,  itech8_state, grmatch,  ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )
+GAME( 1989, grmatch,    0,        grmatch,           grmatch,  itech8_state, init_grmatch,  ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )
 
 /* Strata Bowling-style PCB */
-GAME( 1990, stratab,  0,        stratab_hi,         stratab,  itech8_state, 0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 ) // still says V1 in service mode?
-GAME( 1990, stratab1, stratab,  stratab_hi,         stratab,  itech8_state, 0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1)", 0 )
-GAME( 1990, gtg,      0,        stratab_hi,         gtg,      itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 )
-GAME( 1989, gtgt,     gtg,      stratab_hi,         gtgt,     itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.0)", 0 )
-GAME( 1989, gtgt1,    gtg,      stratab_hi,         gtgt,     itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
-GAME( 1989, gtg2t,    gtg2,     stratab_hi,         gtg2t,    itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 )
-GAME( 1991, gtg2j,    gtg2,     stratab_lo,         gtg,      itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
+GAME( 1990, stratab,    0,        stratab_hi,        stratab,  itech8_state, empty_init,    ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 ) // still says V1 in service mode?
+GAME( 1990, stratab1,   stratab,  stratab_hi,        stratab,  itech8_state, empty_init,    ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1)", 0 )
+GAME( 1990, gtg,        0,        stratab_hi,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 )
+GAME( 1989, gtgt,       gtg,      stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.0)", 0 )
+GAME( 1989, gtgt1,      gtg,      stratab_hi,        gtgt,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
+GAME( 1989, gtg2t,      gtg2,     stratab_hi,        gtg2t,    itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 )
+GAME( 1991, gtg2j,      gtg2,     stratab_lo,        gtg,      itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
 
 /* Slick Shot-style PCB */
-GAME( 1990, slikshot,  0,        slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", MACHINE_MECHANICAL )
-GAME( 1990, slikshot17,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", MACHINE_MECHANICAL )
-GAME( 1990, slikshot16,slikshot, slikshot_hi,       slikshot, itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", MACHINE_MECHANICAL )
-GAME( 1990, dynobop,   0,        slikshot_hi,       dynobop,  itech8_state, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop (V1.1)", MACHINE_MECHANICAL )
-GAME( 1990, sstrike,   0,        sstrike,           sstrike,  itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling (V1)", MACHINE_MECHANICAL )
-GAME( 1990, stratabs,  stratab,  sstrike,           stratabs, itech8_state, sstrike,  ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1 4T, Super Strike Bowling type PCB)", MACHINE_NOT_WORKING ) // need to figure out the control hookup for this set, service mode indicates it's still a trackball like stratab
-GAME( 1991, pokrdice,  0,        slikshot_lo_noz80, pokrdice, itech8_state, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
+GAME( 1990, slikshot,   0,        slikshot_hi,       slikshot, itech8_state, init_slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V2.2)", MACHINE_MECHANICAL )
+GAME( 1990, slikshot17, slikshot, slikshot_hi,       slikshot, itech8_state, init_slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", MACHINE_MECHANICAL )
+GAME( 1990, slikshot16, slikshot, slikshot_hi,       slikshot, itech8_state, init_slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", MACHINE_MECHANICAL )
+GAME( 1990, dynobop,    0,        slikshot_hi,       dynobop,  itech8_state, init_slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop (V1.1)", MACHINE_MECHANICAL )
+GAME( 1990, sstrike,    0,        sstrike,           sstrike,  itech8_state, init_sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling (V1)", MACHINE_MECHANICAL )
+GAME( 1990, stratabs,   stratab,  sstrike,           stratabs, itech8_state, init_sstrike,  ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1 4T, Super Strike Bowling type PCB)", MACHINE_NOT_WORKING ) // need to figure out the control hookup for this set, service mode indicates it's still a trackball like stratab
+GAME( 1991, pokrdice,   0,        slikshot_lo_noz80, pokrdice, itech8_state, empty_init,    ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
 
 /* Hot Shots Tennis-style PCB */
-GAME( 1990, hstennis,  0,        hstennis_hi,       hstennis, itech8_state, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 )
-GAME( 1990, hstennis10,hstennis, hstennis_hi,       hstennis, itech8_state, hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.0)", 0 )
-GAME( 1991, arlingtn,  0,        hstennis_hi,       arlingtn, itech8_state, arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.21-D)", 0 )
-GAME( 1991, peggle,    0,        hstennis_lo,       peggle,   itech8_state, peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Joystick, v1.0)", 0 )
-GAME( 1991, pegglet,   peggle,   hstennis_lo,       pegglet,  itech8_state, peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Trackball, v1.0)", 0 )
-GAME( 1992, neckneck,  0,        hstennis_lo,       neckneck, itech8_state, neckneck, ROT0,   "Bundra Games/Incredible Technologies", "Neck-n-Neck (v1.2)", 0 )
+GAME( 1990, hstennis,   0,        hstennis_hi,       hstennis, itech8_state, init_hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.1)", 0 )
+GAME( 1990, hstennis10, hstennis, hstennis_hi,       hstennis, itech8_state, init_hstennis, ROT90,  "Strata/Incredible Technologies", "Hot Shots Tennis (V1.0)", 0 )
+GAME( 1991, arlingtn,   0,        hstennis_hi,       arlingtn, itech8_state, init_arligntn, ROT0,   "Strata/Incredible Technologies", "Arlington Horse Racing (v1.21-D)", 0 )
+GAME( 1991, peggle,     0,        hstennis_lo,       peggle,   itech8_state, init_peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Joystick, v1.0)", 0 )
+GAME( 1991, pegglet,    peggle,   hstennis_lo,       pegglet,  itech8_state, init_peggle,   ROT90,  "Strata/Incredible Technologies", "Peggle (Trackball, v1.0)", 0 )
+GAME( 1992, neckneck,   0,        hstennis_lo,       neckneck, itech8_state, init_neckneck, ROT0,   "Bundra Games/Incredible Technologies", "Neck-n-Neck (v1.2)", 0 )
 
 /* Rim Rockin' Basketball-style PCB */
-GAME( 1991, rimrockn,   0,        rimrockn,         rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
-GAME( 1991, rimrockn20, rimrockn, rimrockn,         rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
-GAME( 1991, rimrockn16, rimrockn, rimrockn,         rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
-GAME( 1991, rimrockn12, rimrockn, rimrockn,         rimrockn, itech8_state, rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
+GAME( 1991, rimrockn,   0,        rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.2)", 0 )
+GAME( 1991, rimrockn20, rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V2.0)", 0 )
+GAME( 1991, rimrockn16, rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.6)", 0 )
+GAME( 1991, rimrockn12, rimrockn, rimrockn,          rimrockn, itech8_state, init_rimrockn, ROT0,   "Strata/Incredible Technologies", "Rim Rockin' Basketball (V1.2)", 0 )
 
 /* Ninja Clowns-style PCB */
-GAME( 1991, ninclown, 0,        ninclown,           ninclown, itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (27 oct 91)", 0 )
+GAME( 1991, ninclown,   0,        ninclown,          ninclown, itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Ninja Clowns (27 oct 91)", 0 )
 
 /* Golden Tee Golf II-style PCB */
-GAME( 1992, gpgolf,   0,        gtg2,               gpgolf,   itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.1)", 0 )
-GAME( 1992, gtg2,     0,        gtg2,               gtg2,     itech8_state, 0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V2.2)", 0 )
+GAME( 1992, gpgolf,     0,        gtg2,              gpgolf,   itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Par Golf (Joystick, V1.1)", 0 )
+GAME( 1992, gtg2,       0,        gtg2,              gtg2,     itech8_state, empty_init,    ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V2.2)", 0 )

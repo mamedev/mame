@@ -772,4 +772,4 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-COMP( 1982, itt3030,  0,   0,  itt3030,  itt3030,  itt3030_state, 0,  "ITT RFA",      "ITT3030", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, itt3030, 0, 0, itt3030, itt3030, itt3030_state, empty_init, "ITT RFA", "ITT3030", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

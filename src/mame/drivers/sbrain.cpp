@@ -75,7 +75,7 @@ public:
 		, m_keyboard(*this, "X%u", 0)
 		{}
 
-	DECLARE_DRIVER_INIT(sbrain);
+	void init_sbrain();
 	DECLARE_MACHINE_RESET(sbrain);
 	DECLARE_READ8_MEMBER(ppi_pa_r);
 	DECLARE_WRITE8_MEMBER(ppi_pa_w);
@@ -458,7 +458,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sbrain_state::kbd_scan)
 	m_term_data = 0xff;
 }
 
-DRIVER_INIT_MEMBER( sbrain_state, sbrain )
+void sbrain_state::init_sbrain()
 {
 	u8 *main = memregion("maincpu")->base();
 	u8 *sub = memregion("subcpu")->base();
@@ -611,4 +611,4 @@ ROM_START( sbrain )
 	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
-COMP( 1981, sbrain, 0, 0, sbrain, sbrain, sbrain_state, sbrain, "Intertec", "Superbrain", MACHINE_NOT_WORKING )
+COMP( 1981, sbrain, 0, 0, sbrain, sbrain, sbrain_state, init_sbrain, "Intertec", "Superbrain", MACHINE_NOT_WORKING )

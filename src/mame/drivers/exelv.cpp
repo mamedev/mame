@@ -616,6 +616,6 @@ ROM_START(exeltel)
 ROM_END
 
 
-//   YEAR   NAME     PARENT      COMPAT  MACHINE     INPUT  STATE         INIT    COMPANY         FULLNAME    FLAGS
-COMP(1984,  exl100,  0,          0,      exl100,     exelv, exelv_state,  0,      "Exelvision",   "EXL 100",  MACHINE_NOT_WORKING)
-COMP(1986,  exeltel, exl100,     0,      exeltel,    exelv, exelv_state,  0,      "Exelvision",   "Exeltel",  MACHINE_NOT_WORKING)
+//   YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY       FULLNAME   FLAGS
+COMP(1984,  exl100,  0,      0,      exl100,  exelv, exelv_state, empty_init, "Exelvision", "EXL 100", MACHINE_NOT_WORKING)
+COMP(1986,  exeltel, exl100, 0,      exeltel, exelv, exelv_state, empty_init, "Exelvision", "Exeltel", MACHINE_NOT_WORKING)

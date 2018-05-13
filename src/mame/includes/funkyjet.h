@@ -36,7 +36,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen;
-	DECLARE_DRIVER_INIT(funkyjet);
+	void init_funkyjet();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER( funkyjet_protection_region_0_146_r );

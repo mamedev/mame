@@ -2603,7 +2603,7 @@ ROM_END
 // debugging features.
 #define CUPSOC_DEBUG_MODE 0
 
-DRIVER_INIT_MEMBER(legionna_state, cupsoc_debug)
+void legionna_state::init_cupsoc_debug()
 {
 #if CUPSOC_DEBUG_MODE
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
@@ -2612,35 +2612,35 @@ DRIVER_INIT_MEMBER(legionna_state, cupsoc_debug)
 #endif
 }
 
-DRIVER_INIT_MEMBER(legionna_state, olysoc92)
+void legionna_state::init_olysoc92()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 	ROM[0xffffe/2] ^= 0x0003; // show Olympic Soccer '92 title
 
-	DRIVER_INIT_CALL(cupsoc_debug);
+	init_cupsoc_debug();
 }
 
-DRIVER_INIT_MEMBER(legionna_state, cupsocs)
+void legionna_state::init_cupsocs()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 	ROM[0xffffa/2] = 0x00ff; // disable debug text (this is already 0x00ff in the bootleg sets for the same reason)
 
-	DRIVER_INIT_CALL(cupsoc_debug);
+	init_cupsoc_debug();
 }
 
-DRIVER_INIT_MEMBER(legionna_state,cupsoc)
+void legionna_state::init_cupsoc()
 {
-	DRIVER_INIT_CALL(cupsoc_debug);
+	init_cupsoc_debug();
 }
 
 
 
-DRIVER_INIT_MEMBER(legionna_state,legiongfx)
+void legionna_state::init_legiongfx()
 {
 	descramble_legionnaire_gfx(memregion("gfx5")->base() );
 }
 
-DRIVER_INIT_MEMBER(legionna_state,godzilla)
+void legionna_state::init_godzilla()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 	// TODO: some game elements doesn't collide properly, @see seibucop.cpp
@@ -2652,26 +2652,26 @@ DRIVER_INIT_MEMBER(legionna_state,godzilla)
 	ROM[0x3fffe/2] = 0x61ba;
 }
 
-GAME( 1992, legionna, 0,        legionna, legionna, legionna_state, legiongfx, ROT0, "TAD Corporation",                  "Legionnaire (World)", 0 )
-GAME( 1992, legionnau,legionna, legionna, legionna, legionna_state, legiongfx, ROT0, "TAD Corporation (Fabtek license)", "Legionnaire (US)", 0 )
-GAME( 1992, legionnaj,legionna, legionna, legionna, legionna_state, legiongfx, ROT0, "TAD Corporation",                  "Legionnaire (Japan)", 0 )
+GAME( 1992, legionna,  0,        legionna, legionna, legionna_state, init_legiongfx, ROT0, "TAD Corporation",                  "Legionnaire (World)", 0 )
+GAME( 1992, legionnau, legionna, legionna, legionna, legionna_state, init_legiongfx, ROT0, "TAD Corporation (Fabtek license)", "Legionnaire (US)", 0 )
+GAME( 1992, legionnaj, legionna, legionna, legionna, legionna_state, init_legiongfx, ROT0, "TAD Corporation",                  "Legionnaire (Japan)", 0 )
 
-GAME( 1992, heatbrl,  0,        heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation", "Heated Barrel (World version 3)", 0 )
-GAME( 1992, heatbrl2, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation", "Heated Barrel (World version 2)", 0 )
-GAME( 1992, heatbrlo, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation", "Heated Barrel (World old version)", 0 )
-GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation", "Heated Barrel (US)", 0 )
-GAME( 1992, heatbrle, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation (Electronic Devices license)", "Heated Barrel (Electronic Devices license)", 0 )
+GAME( 1992, heatbrl,   0,        heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation", "Heated Barrel (World version 3)", 0 )
+GAME( 1992, heatbrl2,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation", "Heated Barrel (World version 2)", 0 )
+GAME( 1992, heatbrlo,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation", "Heated Barrel (World old version)", 0 )
+GAME( 1992, heatbrlu,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation", "Heated Barrel (US)", 0 )
+GAME( 1992, heatbrle,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation (Electronic Devices license)", "Heated Barrel (Electronic Devices license)", 0 )
 
-GAME( 1993, godzilla, 0,        godzilla, godzilla, legionna_state, godzilla,  ROT0, "Banpresto", "Godzilla (Japan)", 0 )
-GAME( 1993, grainbow, 0,        grainbow, grainbow, legionna_state, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, grainbowk,grainbow, grainbow, grainbow, legionna_state, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, legionna_state, 0,         ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", 0 )
+GAME( 1993, godzilla,  0,        godzilla, godzilla, legionna_state, init_godzilla,  ROT0, "Banpresto", "Godzilla (Japan)", 0 )
+GAME( 1993, grainbow,  0,        grainbow, grainbow, legionna_state, empty_init,     ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, grainbowk, grainbow, grainbow, grainbow, legionna_state, empty_init,     ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1993, denjinmk,  0,        denjinmk, denjinmk, legionna_state, empty_init,     ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", 0 )
 
-GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc,   legionna_state, cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsoca,  cupsoc,   cupsoc,   cupsoc,   legionna_state, cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocb,  cupsoc,   cupsoc,   cupsoc,   legionna_state, cupsocs,   ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocs,  cupsoc,   cupsocs,  cupsoc,   legionna_state, cupsocs,   ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocs2, cupsoc,   cupsocs,  cupsoc,   legionna_state, cupsocs,   ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, olysoc92, cupsoc,   cupsoc,   cupsoc,   legionna_state, olysoc92,  ROT0, "Seibu Kaihatsu", "Olympic Soccer '92 (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, olysoc92a,cupsoc,   cupsoc,   cupsoc,   legionna_state, olysoc92,  ROT0, "Seibu Kaihatsu", "Olympic Soccer '92 (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, olysoc92b,cupsoc,   cupsoc,   cupsoc,   legionna_state, olysoc92,  ROT0, "Seibu Kaihatsu", "Olympic Soccer '92 (set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsoc,    0,        cupsoc,   cupsoc,   legionna_state, init_cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsoca,   cupsoc,   cupsoc,   cupsoc,   legionna_state, init_cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocb,   cupsoc,   cupsoc,   cupsoc,   legionna_state, init_cupsocs,   ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocs,   cupsoc,   cupsocs,  cupsoc,   legionna_state, init_cupsocs,   ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocs2,  cupsoc,   cupsocs,  cupsoc,   legionna_state, init_cupsocs,   ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, olysoc92,  cupsoc,   cupsoc,   cupsoc,   legionna_state, init_olysoc92,  ROT0, "Seibu Kaihatsu", "Olympic Soccer '92 (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, olysoc92a, cupsoc,   cupsoc,   cupsoc,   legionna_state, init_olysoc92,  ROT0, "Seibu Kaihatsu", "Olympic Soccer '92 (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, olysoc92b, cupsoc,   cupsoc,   cupsoc,   legionna_state, init_olysoc92,  ROT0, "Seibu Kaihatsu", "Olympic Soccer '92 (set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

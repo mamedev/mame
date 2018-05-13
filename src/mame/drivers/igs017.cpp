@@ -518,19 +518,19 @@ public:
 	void spkrform(machine_config &config);
 	void sdmg2(machine_config &config);
 
-	DECLARE_DRIVER_INIT(iqblocka);
-	DECLARE_DRIVER_INIT(mgdh);
-	DECLARE_DRIVER_INIT(slqz2);
-	DECLARE_DRIVER_INIT(lhzb2);
-	DECLARE_DRIVER_INIT(starzan);
-	DECLARE_DRIVER_INIT(mgcs);
-	DECLARE_DRIVER_INIT(tjsb);
-	DECLARE_DRIVER_INIT(spkrform);
-	DECLARE_DRIVER_INIT(sdmg2);
-	DECLARE_DRIVER_INIT(tarzan);
-	DECLARE_DRIVER_INIT(tarzana);
-	DECLARE_DRIVER_INIT(lhzb2a);
-	DECLARE_DRIVER_INIT(mgdha);
+	void init_iqblocka();
+	void init_mgdh();
+	void init_slqz2();
+	void init_lhzb2();
+	void init_starzan();
+	void init_mgcs();
+	void init_tjsb();
+	void init_spkrform();
+	void init_sdmg2();
+	void init_tarzan();
+	void init_tarzana();
+	void init_lhzb2a();
+	void init_mgdha();
 
 protected:
 	virtual void video_start() override;
@@ -754,11 +754,10 @@ void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4,
 
 // iqblocka, iqblockf, genius6
 
-DRIVER_INIT_MEMBER(igs017_state,iqblocka)
+void igs017_state::init_iqblocka()
 {
 	decrypt_program_rom(0x11, 7, 6, 5, 4, 3, 2, 1, 0);
 }
-
 
 // tjsb
 
@@ -787,7 +786,7 @@ void igs017_state::tjsb_decrypt_sprites()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,tjsb)
+void igs017_state::init_tjsb()
 {
 	decrypt_program_rom(0x05, 7, 6, 3, 2, 5, 4, 1, 0);
 
@@ -895,7 +894,7 @@ void igs017_state::mgcs_patch_rom()
 //  rom[0x4e036/2] = 0x6006;    // 04E036: 6306    bls     $4e03e
 }
 
-DRIVER_INIT_MEMBER(igs017_state,mgcs)
+void igs017_state::init_mgcs()
 {
 	mgcs_decrypt_program_rom();
 	mgcs_patch_rom();
@@ -967,13 +966,13 @@ void igs017_state::tarzana_decrypt_program_rom()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,tarzan)
+void igs017_state::init_tarzan()
 {
 	tarzan_decrypt_program_rom();
 	tarzan_decrypt_tiles();
 }
 
-DRIVER_INIT_MEMBER(igs017_state,tarzana)
+void igs017_state::init_tarzana()
 {
 	tarzana_decrypt_program_rom();
 //  tarzana_decrypt_tiles();    // to do
@@ -1032,7 +1031,7 @@ void igs017_state::starzan_decrypt(uint8_t *ROM, int size, bool isOpcode)
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,starzan)
+void igs017_state::init_starzan()
 {
 	int size = 0x040000;
 
@@ -1049,52 +1048,47 @@ DRIVER_INIT_MEMBER(igs017_state,starzan)
 
 // sdmg2
 
-DRIVER_INIT_MEMBER(igs017_state,sdmg2)
+void igs017_state::init_sdmg2()
 {
-	int i;
 	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
-
 	int rom_size = 0x80000;
-
-	for (i=0; i<rom_size/2; i++)
+	for (int i = 0; i < rom_size / 2; i++)
 	{
 		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
 
-		if( i & 0x20/2 )
+		if (i & 0x20/2)
 		{
-			if( i & 0x02/2 )
+			if (i & 0x02/2)
 			{
 				x ^= 0x0001;
 			}
 		}
 
-		if( !(i & 0x4000/2) )
+		if (!(i & 0x4000/2))
 		{
-			if( !(i & 0x300/2) )
+			if (!(i & 0x300/2))
 			{
 				x ^= 0x0001;
 			}
 		}
 
 		/* bit 9 xor layer */
-
-		if( i & 0x20000/2 )
+		if (i & 0x20000/2)
 		{
 			x ^= 0x0200;
 		}
 		else
 		{
-			if( !(i & 0x400/2) )
+			if (!(i & 0x400/2))
 			{
 				x ^= 0x0200;
 			}
 		}
 
 		/* bit 12 xor layer */
-
-		if( i & 0x20000/2 )
+		if (i & 0x20000/2)
 		{
 			x ^= 0x1000;
 		}
@@ -1106,32 +1100,29 @@ DRIVER_INIT_MEMBER(igs017_state,sdmg2)
 
 // mgdh, mgdha
 
-DRIVER_INIT_MEMBER(igs017_state,mgdha)
+void igs017_state::init_mgdha()
 {
-	int i;
 	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
-
 	int rom_size = 0x80000;
-
-	for (i=0; i<rom_size/2; i++)
+	for (int i = 0; i < rom_size / 2; i++)
 	{
 		uint16_t x = src[i];
 
-		if( (i & 0x20/2) && (i & 0x02/2) )
+		if ((i & 0x20/2) && (i & 0x02/2))
 		{
-			if( (i & 0x300/2) || (i & 0x4000/2) )
+			if ((i & 0x300/2) || (i & 0x4000/2))
 				x ^= 0x0001;
 		}
 		else
 		{
-			if( !(i & 0x300/2) && !(i & 0x4000/2) )
+			if (!(i & 0x300/2) && !(i & 0x4000/2))
 				x ^= 0x0001;
 		}
 
-		if( (i & 0x60000/2) )
+		if ((i & 0x60000/2))
 			x ^= 0x0100;
 
-		if( (i & 0x1000/2) || ((i & 0x4000/2) && (i & 0x40/2) && (i & 0x80/2)) || ((i & 0x2000/2) && (i & 0x400/2)) )
+		if ((i & 0x1000/2) || ((i & 0x4000/2) && (i & 0x40/2) && (i & 0x80/2)) || ((i & 0x2000/2) && (i & 0x400/2)))
 			x ^= 0x0800;
 
 		src[i] = x;
@@ -1140,9 +1131,9 @@ DRIVER_INIT_MEMBER(igs017_state,mgdha)
 	mgcs_flip_sprites();
 }
 
-DRIVER_INIT_MEMBER(igs017_state,mgdh)
+void igs017_state::init_mgdh()
 {
-	DRIVER_INIT_CALL(mgdha);
+	init_mgdha();
 
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -1210,30 +1201,26 @@ void igs017_state::igs025_to_igs022_callback( void )
 	m_igs022->IGS022_handle_command();
 }
 
-DRIVER_INIT_MEMBER(igs017_state,lhzb2)
+void igs017_state::init_lhzb2()
 {
-	int i;
 	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
-
 	int rom_size = 0x80000;
-
-	for (i=0; i<rom_size/2; i++)
+	for (int i = 0; i < rom_size / 2; i++)
 	{
 		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
-
-		if( i & 0x20/2 )
+		if (i & 0x20/2)
 		{
-			if( i & 0x02/2 )
+			if (i & 0x02/2)
 			{
 				x ^= 0x0001;
 			}
 		}
 
-		if( !(i & 0x4000/2) )
+		if (!(i & 0x4000/2))
 		{
-			if( !(i & 0x300/2) )
+			if (!(i & 0x300/2))
 			{
 				x ^= 0x0001;
 			}
@@ -1241,17 +1228,17 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 
 		/* bit 13 xor layer */
 
-		if( !(i & 0x1000/2) )
+		if (!(i & 0x1000/2))
 		{
-			if( i & 0x2000/2 )
+			if (i & 0x2000/2)
 			{
-				if( i & 0x8000/2 )
+				if (i & 0x8000/2)
 				{
-					if( !(i & 0x100/2) )
+					if (!(i & 0x100/2))
 					{
-						if( i & 0x200/2 )
+						if (i & 0x200/2)
 						{
-							if( !(i & 0x40/2) )
+							if (!(i & 0x40/2))
 							{
 								x ^= 0x2000;
 							}
@@ -1264,7 +1251,7 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 				}
 				else
 				{
-					if( !(i & 0x100/2) )
+					if (!(i & 0x100/2))
 					{
 						x ^= 0x2000;
 					}
@@ -1272,11 +1259,11 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 			}
 			else
 			{
-				if( i & 0x8000/2 )
+				if (i & 0x8000/2)
 				{
-					if( i & 0x200/2 )
+					if (i & 0x200/2)
 					{
-						if( !(i & 0x40/2) )
+						if (!(i & 0x40/2))
 						{
 							x ^= 0x2000;
 						}
@@ -1311,30 +1298,26 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 
 // lhzb2a
 
-DRIVER_INIT_MEMBER(igs017_state,lhzb2a)
+void igs017_state::init_lhzb2a()
 {
-	int i;
 	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
-
 	int rom_size = 0x80000;
-
-	for (i=0; i<rom_size/2; i++)
+	for (int i = 0; i < rom_size / 2; i++)
 	{
 		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
-
-		if( i & 0x20/2 )
+		if (i & 0x20/2)
 		{
-			if( i & 0x02/2 )
+			if (i & 0x02/2)
 			{
 				x ^= 0x0001;
 			}
 		}
 
-		if( !(i & 0x4000/2) )
+		if (!(i & 0x4000/2))
 		{
-			if( !(i & 0x300/2) )
+			if (!(i & 0x300/2))
 			{
 				x ^= 0x0001;
 			}
@@ -1342,15 +1325,15 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2a)
 
 		/* bit 5 xor layer */
 
-		if( i & 0x4000/2 )
+		if (i & 0x4000/2)
 		{
-			if( i & 0x8000/2 )
+			if (i & 0x8000/2)
 			{
-				if( i & 0x2000/2 )
+				if (i & 0x2000/2)
 				{
-					if( i & 0x200/2 )
+					if (i & 0x200/2)
 					{
-						if( !(i & 0x40/2) || (i & 0x800/2) )
+						if (!(i & 0x40/2) || (i & 0x800/2))
 						{
 							x ^= 0x0020;
 						}
@@ -1359,7 +1342,7 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2a)
 			}
 			else
 			{
-				if( !(i & 0x40/2) || (i & 0x800/2) )
+				if (!(i & 0x40/2) || (i & 0x800/2))
 				{
 					x ^= 0x0020;
 				}
@@ -1402,30 +1385,27 @@ void igs017_state::slqz2_decrypt_tiles()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,slqz2)
+void igs017_state::init_slqz2()
 {
-	int i;
 	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
-
 	int rom_size = 0x80000;
-
-	for (i=0; i<rom_size/2; i++)
+	for (int i = 0; i < rom_size / 2; i++)
 	{
 		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
 
-		if( i & 0x20/2 )
+		if (i & 0x20/2)
 		{
-			if( i & 0x02/2 )
+			if (i & 0x02/2)
 			{
 				x ^= 0x0001;
 			}
 		}
 
-		if( !(i & 0x4000/2) )
+		if (!(i & 0x4000/2))
 		{
-			if( !(i & 0x300/2) )
+			if (!(i & 0x300/2))
 			{
 				x ^= 0x0001;
 			}
@@ -1433,19 +1413,19 @@ DRIVER_INIT_MEMBER(igs017_state,slqz2)
 
 		/* bit 14 xor layer */
 
-		if( i & 0x1000/2 )
+		if (i & 0x1000/2)
 		{
-			if( i & 0x800/2 )
+			if (i & 0x800/2)
 			{
 				x ^= 0x4000;
 			}
 			else
 			{
-				if( i & 0x200/2 )
+				if (i & 0x200/2)
 				{
-					if( !(i & 0x100/2) )
+					if (!(i & 0x100/2))
 					{
-						if( i & 0x40/2 )
+						if (i & 0x40/2)
 						{
 							x ^= 0x4000;
 						}
@@ -1459,15 +1439,15 @@ DRIVER_INIT_MEMBER(igs017_state,slqz2)
 		}
 		else
 		{
-			if( i & 0x800/2 )
+			if (i & 0x800/2)
 			{
 				x ^= 0x4000;
 			}
 			else
 			{
-				if( !(i & 0x100/2) )
+				if (!(i & 0x100/2))
 				{
-					if( i & 0x40/2 )
+					if (i & 0x40/2)
 					{
 						x ^= 0x4000;
 					}
@@ -1513,7 +1493,7 @@ void igs017_state::spkrform_decrypt_sprites()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,spkrform)
+void igs017_state::init_spkrform()
 {
 	decrypt_program_rom(0x14, 7, 6, 5, 4, 3, 0, 1, 2);
 
@@ -2582,7 +2562,7 @@ static INPUT_PORTS_START( iqblockf )
 	PORT_DIPSETTING(    0x80, "2" )
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
-	
+
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Max Bet" )
 	PORT_DIPSETTING(    0x03, "5" )
@@ -2623,7 +2603,7 @@ static INPUT_PORTS_START( iqblockf )
 
 	PORT_MODIFY("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1          ) PORT_IMPULSE(5) // impulse prevents coin error in gambling mode
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN   ) 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN   )
 	//
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1      )  PORT_NAME( "Start Gambling Toggle" ) // this starts toggling between videogame and gambling
 
@@ -4738,21 +4718,21 @@ ROM_START( spkrform )
 ROM_END
 
 
-GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, iqblocka, ROT0, "IGS",                      "Shuzi Leyuan (V127M, Gambling)",              0 )
-GAME( 1997,  iqblockf, iqblock,  iqblockf, iqblockf, igs017_state, iqblocka, ROT0, "IGS",                      "IQ Block (V113FR, Gambling)",                 0 )
-GAME( 1997,  mgdh,     0,        mgdha,    mgdh,     igs017_state, mgdh,     ROT0, "IGS",                      "Mahjong Man Guan Daheng (Taiwan, V125T1)",    MACHINE_IMPERFECT_COLORS ) // wrong colors in betting screen
-GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh ,    igs017_state, mgdha,    ROT0, "IGS",                      "Mahjong Man Guan Daheng (Taiwan, V123T1)",    0 )
-GAME( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, sdmg2,    ROT0, "IGS",                      "Mahjong Super Da Man Guan II (China, V754C)", 0 )
-GAME( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, tjsb,     ROT0, "IGS",                      "Mahjong Tian Jiang Shen Bing (V137C)",        MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998,  genius6,  0,        genius6,  genius6,  igs017_state, iqblocka, ROT0, "IGS",                      "Genius 6 (V110F)",                            0 )
-GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, mgcs,     ROT0, "IGS",                      "Mahjong Man Guan Caishen (V103CS)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND )
-GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, lhzb2,    ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (set 1)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, lhzb2a,   ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (VS221M)",          0 )
-GAME( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, slqz2,    ROT0, "IGS",                      "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1999,  tarzanc,  0,        iqblocka, iqblocka, igs017_state, tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 1)",      MACHINE_NOT_WORKING )
-GAME( 1999,  tarzan,   tarzanc,  iqblocka, iqblocka, igs017_state, tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 2)",      MACHINE_NOT_WORKING )
-GAME( 1999,  tarzana,  tarzanc,  iqblocka, iqblocka, igs017_state, tarzana,  ROT0, "IGS",                      "Tarzan (V107)",                               MACHINE_NOT_WORKING )
-GAME( 2000?, starzan,  0,        starzan,  iqblocka, igs017_state, starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                 MACHINE_NOT_WORKING )
+GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, init_iqblocka, ROT0, "IGS",                      "Shuzi Leyuan (V127M, Gambling)",              0 )
+GAME( 1997,  iqblockf, iqblock,  iqblockf, iqblockf, igs017_state, init_iqblocka, ROT0, "IGS",                      "IQ Block (V113FR, Gambling)",                 0 )
+GAME( 1997,  mgdh,     0,        mgdha,    mgdh,     igs017_state, init_mgdh,     ROT0, "IGS",                      "Mahjong Man Guan Daheng (Taiwan, V125T1)",    MACHINE_IMPERFECT_COLORS ) // wrong colors in betting screen
+GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh ,    igs017_state, init_mgdha,    ROT0, "IGS",                      "Mahjong Man Guan Daheng (Taiwan, V123T1)",    0 )
+GAME( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, init_sdmg2,    ROT0, "IGS",                      "Mahjong Super Da Man Guan II (China, V754C)", 0 )
+GAME( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, init_tjsb,     ROT0, "IGS",                      "Mahjong Tian Jiang Shen Bing (V137C)",        MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998,  genius6,  0,        genius6,  genius6,  igs017_state, init_iqblocka, ROT0, "IGS",                      "Genius 6 (V110F)",                            0 )
+GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, init_mgcs,     ROT0, "IGS",                      "Mahjong Man Guan Caishen (V103CS)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND )
+GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, init_lhzb2,    ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (set 1)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, init_lhzb2a,   ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (VS221M)",          0 )
+GAME( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, init_slqz2,    ROT0, "IGS",                      "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1999,  tarzanc,  0,        iqblocka, iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 1)",      MACHINE_NOT_WORKING )
+GAME( 1999,  tarzan,   tarzanc,  iqblocka, iqblocka, igs017_state, init_tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 2)",      MACHINE_NOT_WORKING )
+GAME( 1999,  tarzana,  tarzanc,  iqblocka, iqblocka, igs017_state, init_tarzana,  ROT0, "IGS",                      "Tarzan (V107)",                               MACHINE_NOT_WORKING )
+GAME( 2000?, starzan,  0,        starzan,  iqblocka, igs017_state, init_starzan,  ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                 MACHINE_NOT_WORKING )
 
 // Parent spk306us in driver spoker.cpp. Move this set to that driver?
-GAME( ????,  spkrform, spk306us, spkrform, spkrform, igs017_state, spkrform, ROT0, "IGS",                      "Super Poker (v100xD03) / Formosa",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( ????,  spkrform, spk306us, spkrform, spkrform, igs017_state, init_spkrform, ROT0, "IGS",                      "Super Poker (v100xD03) / Formosa",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

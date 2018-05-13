@@ -376,15 +376,14 @@ void irobot_state::load_oproms()
 
 
 /* Init mathbox (only called once) */
-DRIVER_INIT_MEMBER(irobot_state,irobot)
+void irobot_state::init_irobot()
 {
-	int i;
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		m_irmb_stack[i] = &m_mbops[0];
 		m_irmb_regs[i] = 0;
 	}
-	m_irmb_latch=0;
+	m_irmb_latch = 0;
 	load_oproms();
 }
 

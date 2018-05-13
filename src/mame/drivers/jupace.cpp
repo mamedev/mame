@@ -839,5 +839,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT  STATE      INIT  COMPANY           FULLNAME       FLAGS
-COMP( 1981, jupace,  0,        0,      ace,       ace,   ace_state, 0,    "Jupiter Cantab", "Jupiter Ace", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY           FULLNAME       FLAGS
+COMP( 1981, jupace, 0,      0,      ace,     ace,   ace_state, empty_init, "Jupiter Cantab", "Jupiter Ace", 0 )

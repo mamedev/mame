@@ -275,6 +275,6 @@ ROM_START (galaxyp)
 	ROM_LOAD ("galchr.bin", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT    STATE         INIT    COMPANY                                   FULLNAME */
-COMP(1983,  galaxy,     0,      0,  galaxy, galaxy,  galaxy_state, galaxy, "Voja Antonic / Elektronika inzenjering", "Galaksija",      0)
-COMP(1985,  galaxyp,    galaxy, 0,  galaxyp,galaxyp, galaxy_state, galaxyp,"Nenad Dunjic",                           "Galaksija plus", 0)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT          COMPANY                                   FULLNAME */
+COMP( 1983, galaxy,  0,      0,      galaxy,  galaxy,  galaxy_state, init_galaxy,  "Voja Antonic / Elektronika inzenjering", "Galaksija",      0)
+COMP( 1985, galaxyp, galaxy, 0,      galaxyp, galaxyp, galaxy_state, init_galaxyp, "Nenad Dunjic",                           "Galaksija plus", 0)

@@ -2203,22 +2203,22 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       STATE            COMPANY                        FULLNAME                                 FLAGS
-COMP( 1985, c128,       0,      0,      c128,       c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128 (NTSC)",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1985, c128p,      0,      0,      c128pal,    c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128 (PAL)",                   MACHINE_SUPPORTS_SAVE )
-COMP( 1985, c128_de,    c128,   0,      c128pal,    c128_de,    c128_state,  0,  "Commodore Business Machines", "Commodore 128 (Germany)",               MACHINE_SUPPORTS_SAVE )
-//COMP( 1985, c128_fr,   c128,  0,   c128pal,  c128_fr, c128_state, 0,  "Commodore Business Machines", "Commodore 128 (France)", MACHINE_SUPPORTS_SAVE )
-//COMP( 1985, c128_no,   c128,  0,   c128pal,  c128_it, c128_state, 0,  "Commodore Business Machines", "Commodore 128 (Norway)", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, c128_se,    c128,   0,      c128pal,    c128_se,    c128_state,  0,  "Commodore Business Machines", "Commodore 128 (Sweden/Finland)",        MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c128d,      c128,   0,      c128,       c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128D (NTSC, prototype)",      MACHINE_SUPPORTS_SAVE )
-COMP( 1986, c128dp,     c128,   0,      c128pal,    c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128D (PAL)",                  MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT        COMPANY                        FULLNAME                               FLAGS
+COMP( 1985, c128,       0,      0,      c128,     c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (NTSC)",                MACHINE_SUPPORTS_SAVE )
+COMP( 1985, c128p,      0,      0,      c128pal,  c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (PAL)",                 MACHINE_SUPPORTS_SAVE )
+COMP( 1985, c128_de,    c128,   0,      c128pal,  c128_de, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (Germany)",             MACHINE_SUPPORTS_SAVE )
+//COMP( 1985, c128_fr,    c128,   0,      c128pal,  c128_fr, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (France)", MACHINE_SUPPORTS_SAVE )
+//COMP( 1985, c128_no,    c128,   0,      c128pal,  c128_it, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (Norway)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, c128_se,    c128,   0,      c128pal,  c128_se, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (Sweden/Finland)",      MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c128d,      c128,   0,      c128,     c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128D (NTSC, prototype)",    MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c128dp,     c128,   0,      c128pal,  c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128D (PAL)",                MACHINE_SUPPORTS_SAVE )
 
-COMP( 1986, c128cr,     c128,   0,      c128,       c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128CR (NTSC, prototype)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c128cr,     c128,   0,      c128,     c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128CR (NTSC, prototype)",   MACHINE_SUPPORTS_SAVE )
 
-COMP( 1987, c128dcr,    c128,   0,      c128dcr,    c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128DCR (NTSC)",               MACHINE_SUPPORTS_SAVE )
-COMP( 1987, c128dcrp,   c128,   0,      c128dcrp,   c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128DCR (PAL)",                MACHINE_SUPPORTS_SAVE )
-COMP( 1987, c128dcr_de, c128,   0,      c128dcrp,   c128_de,    c128_state,  0,  "Commodore Business Machines", "Commodore 128DCR (Germany)",            MACHINE_SUPPORTS_SAVE )
-//COMP( 1986, c128dcr_it,  c128,  0,   c128dcrp, c128_it, c128_state, 0,"Commodore Business Machines", "Commodore 128DCR (Italy)", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, c128dcr_se, c128,   0,      c128dcrp,   c128_se,    c128_state,  0,  "Commodore Business Machines", "Commodore 128DCR (Sweden/Finland)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr,    c128,   0,      c128dcr,  c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (NTSC)",             MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcrp,   c128,   0,      c128dcrp, c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (PAL)",              MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_de, c128,   0,      c128dcrp, c128_de, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Germany)",          MACHINE_SUPPORTS_SAVE )
+//COMP( 1986, c128dcr_it, c128,   0,      c128dcrp, c128_it, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Italy)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_se, c128,   0,      c128dcrp, c128_se, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Sweden/Finland)",   MACHINE_SUPPORTS_SAVE )
 
-COMP( 1986, c128d81,    c128,   0,      c128d81,    c128,       c128_state,  0,  "Commodore Business Machines", "Commodore 128D/81 (NTSC, prototype)",   MACHINE_SUPPORTS_SAVE )
+COMP( 1986, c128d81,    c128,   0,      c128d81,  c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128D/81 (NTSC, prototype)", MACHINE_SUPPORTS_SAVE )

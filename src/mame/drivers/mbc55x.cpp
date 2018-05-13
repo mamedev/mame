@@ -318,5 +318,5 @@ ROM_START( mbc55x )
 ROM_END
 
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY   FULLNAME    FLAGS
-COMP( 1983, mbc55x,     0,      0,      mbc55x,  mbc55x, mbc55x_state, 0,    "Sanyo",  "MBC-55x",  0 /*MACHINE_NO_SOUND*/)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1983, mbc55x, 0,      0,      mbc55x,  mbc55x, mbc55x_state, empty_init, "Sanyo", "MBC-55x", 0 /*MACHINE_NO_SOUND*/)

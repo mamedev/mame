@@ -404,7 +404,7 @@ void glass_state::ROM16_split_gfx( const char *src_reg, const char *dst_reg, int
 }
 
 
-DRIVER_INIT_MEMBER(glass_state, glass)
+void glass_state::init_glass()
 {
 	/*
 	For "gfx2" we have this memory map:
@@ -436,7 +436,7 @@ DRIVER_INIT_MEMBER(glass_state, glass)
  The unprotected version appears to be a Korean set, is censored, and has different girl pictures.
 */
 
-GAME( 1994, glass,    0,     glass_ds5002fp, glass, glass_state, glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, Checksum 49D5E66B, Version 1994)",                           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, glasskr,  glass, glass,          glass, glass_state, glass, ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, Checksum D419AB69, Version 1994) (censored, unprotected)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // promat stickers on program roms
-GAME( 1993, glass10,  glass, glass_ds5002fp, glass, glass_state, glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, Checksum C5513F3C)",                                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, glass10a, glass, glass_ds5002fp, glass, glass_state, glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, Checksum D3864FDB)",                                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, glass,    0,     glass_ds5002fp, glass, glass_state, init_glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, Checksum 49D5E66B, Version 1994)",                           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, glasskr,  glass, glass,          glass, glass_state, init_glass, ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, Checksum D419AB69, Version 1994) (censored, unprotected)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // promat stickers on program roms
+GAME( 1993, glass10,  glass, glass_ds5002fp, glass, glass_state, init_glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, Checksum C5513F3C)",                                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, glass10a, glass, glass_ds5002fp, glass, glass_state, init_glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, Checksum D3864FDB)",                                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

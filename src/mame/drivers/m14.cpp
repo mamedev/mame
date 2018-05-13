@@ -487,4 +487,4 @@ ROM_START( ptrmj )
 	ROM_LOAD( "mgpa10.bin",  0x0400, 0x0400, CRC(e1a4ebdc) SHA1(d9df42424ede17f0634d8d0a56c0374a33c55333) )
 ROM_END
 
-GAME( 1979, ptrmj,  0,       m14,  m14, m14_state,  0, ROT0, "Irem", "PT Reach Mahjong (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // was already Irem according to the official flyer
+GAME( 1979, ptrmj, 0, m14, m14, m14_state, empty_init, ROT0, "Irem", "PT Reach Mahjong (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // was already Irem according to the official flyer

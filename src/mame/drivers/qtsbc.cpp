@@ -509,5 +509,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY                  FULLNAME       FLAGS
-COMP( 19??, qtsbc,  0,      0,      qtsbc,   qtsbc, qtsbc_state, 0,    "QT Computer Systems Inc.", "SBC + 2/4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                     FULLNAME     FLAGS
+COMP( 19??, qtsbc, 0,      0,      qtsbc,   qtsbc, qtsbc_state, empty_init, "QT Computer Systems Inc.", "SBC + 2/4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -30,7 +30,7 @@ public:
 		m_vpos_ram(*this, "vpos_ram")
 	{ }
 
-	DECLARE_DRIVER_INIT(poolshrk);
+	void init_poolshrk();
 	void poolshrk(machine_config &config);
 
 protected:

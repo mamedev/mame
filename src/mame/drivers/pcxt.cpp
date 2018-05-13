@@ -553,5 +553,5 @@ ROM_START( tetriskr )
 	ROM_LOAD( "b-10.u10", 0x0000, 0x10000, CRC(efc2a0f6) SHA1(5f0f1e90237bee9b78184035a32055b059a91eb3) )
 ROM_END
 
-GAME( 1990, filetto,  0, filetto,  filetto,  pcxt_state,  0,  ROT0,  "Novarmatic", "Filetto (v1.05 901009)",                             MACHINE_IMPERFECT_SOUND )
-GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, pcxt_state,  0,  ROT0,  "bootleg",    "Tetris (Korean bootleg of Mirrorsoft PC-XT Tetris)", MACHINE_IMPERFECT_SOUND )
+GAME( 1990, filetto,  0, filetto,  filetto,  pcxt_state, empty_init, ROT0,  "Novarmatic", "Filetto (v1.05 901009)",                             MACHINE_IMPERFECT_SOUND )
+GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, pcxt_state, empty_init, ROT0,  "bootleg",    "Tetris (Korean bootleg of Mirrorsoft PC-XT Tetris)", MACHINE_IMPERFECT_SOUND )

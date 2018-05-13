@@ -97,8 +97,8 @@ public:
 	DECLARE_WRITE8_MEMBER(wecleman_volume_callback);
 	template<int Chip> DECLARE_READ8_MEMBER(hotchase_k007232_r);
 	template<int Chip> DECLARE_WRITE8_MEMBER(hotchase_k007232_w);
-	DECLARE_DRIVER_INIT(wecleman);
-	DECLARE_DRIVER_INIT(hotchase);
+	void init_wecleman();
+	void init_hotchase();
 	TILE_GET_INFO_MEMBER(wecleman_get_txt_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_fg_tile_info);

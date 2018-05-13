@@ -439,5 +439,5 @@ ROM_END
 
 /***************************************************************************/
 
-GAME( 1991, sdgndmps, 0, sdgndmps, sdgndmps, dcon_state, 0, ROT0, "Banpresto / Bandai", "SD Gundam Psycho Salamander no Kyoui", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dcon,     0, dcon,     dcon,     dcon_state, 0, ROT0, "Success",            "D-Con",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, sdgndmps, 0, sdgndmps, sdgndmps, dcon_state, empty_init, ROT0, "Banpresto / Bandai", "SD Gundam Psycho Salamander no Kyoui", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dcon,     0, dcon,     dcon,     dcon_state, empty_init, ROT0, "Success",            "D-Con",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

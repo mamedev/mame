@@ -265,4 +265,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, topgunnr, 0, vertigo, vertigo, vertigo_state, 0, ROT0, "Exidy", "Top Gunner (Exidy)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, topgunnr, 0, vertigo, vertigo, vertigo_state, empty_init, ROT0, "Exidy", "Top Gunner (Exidy)", MACHINE_SUPPORTS_SAVE )

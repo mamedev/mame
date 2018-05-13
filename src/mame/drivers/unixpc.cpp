@@ -374,5 +374,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY  FULLNAME  FLAGS
-COMP( 1985, 3b1,  0,      0,      unixpc,  unixpc, unixpc_state, 0,    "AT&T",  "3B1",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME  FLAGS
+COMP( 1985, 3b1,  0,      0,      unixpc,  unixpc, unixpc_state, empty_init, "AT&T",  "3B1",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

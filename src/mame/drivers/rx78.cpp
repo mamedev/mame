@@ -84,7 +84,7 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	DECLARE_DRIVER_INIT(rx78);
+	void init_rx78();
 	void rx78(machine_config &config);
 
 protected:
@@ -521,7 +521,7 @@ ROM_START( rx78 )
 	ROM_REGION( 6 * 0x2000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
-DRIVER_INIT_MEMBER(rx78_state,rx78)
+void rx78_state::init_rx78()
 {
 	uint32_t ram_size = m_ram->size();
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
@@ -532,5 +532,5 @@ DRIVER_INIT_MEMBER(rx78_state,rx78)
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS       INIT   COMPANY     FULLNAME     FLAGS */
-COMP( 1983, rx78,   0,      0,       rx78,      rx78,    rx78_state, rx78,  "Bandai", "Gundam RX-78", MACHINE_NOT_WORKING )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY   FULLNAME     FLAGS */
+COMP( 1983, rx78, 0,      0,      rx78,    rx78,  rx78_state, init_rx78, "Bandai", "Gundam RX-78", MACHINE_NOT_WORKING )

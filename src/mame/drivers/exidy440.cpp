@@ -2043,22 +2043,22 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(exidy440_state,exidy440)
+void exidy440_state::init_exidy440()
 {
 	m_showdown_bank_data[0] = m_showdown_bank_data[1] = nullptr;
 }
 
 
-DRIVER_INIT_MEMBER(exidy440_state,claypign)
+void exidy440_state::init_claypign()
 {
-	DRIVER_INIT_CALL(exidy440);
+	init_exidy440();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec0, 0x2ec3, read8_delegate(FUNC(exidy440_state::claypign_protection_r),this));
 }
 
 
-DRIVER_INIT_MEMBER(topsecex_state,topsecex)
+void topsecex_state::init_topsecex()
 {
-	DRIVER_INIT_CALL(exidy440);
+	init_exidy440();
 
 	/* extra input ports and scrolling */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec5, 0x2ec5, read8_delegate(FUNC(topsecex_state::topsecex_input_port_5_r),this));
@@ -2069,7 +2069,7 @@ DRIVER_INIT_MEMBER(topsecex_state,topsecex)
 }
 
 
-DRIVER_INIT_MEMBER(exidy440_state,showdown)
+void exidy440_state::init_showdown()
 {
 	static const uint8_t bankdata0[0x18] =
 	{
@@ -2084,7 +2084,7 @@ DRIVER_INIT_MEMBER(exidy440_state,showdown)
 		0xc5,0x8c,0x4e,0x86,0x1a,0xda,0x50,0xd1
 	};
 
-	DRIVER_INIT_CALL(exidy440);
+	init_exidy440();
 
 	/* set up the fake PLD */
 	m_showdown_bank_data[0] = bankdata0;
@@ -2092,7 +2092,7 @@ DRIVER_INIT_MEMBER(exidy440_state,showdown)
 }
 
 
-DRIVER_INIT_MEMBER(exidy440_state,yukon)
+void exidy440_state::init_yukon()
 {
 	static const uint8_t bankdata0[0x18] =
 	{
@@ -2107,7 +2107,7 @@ DRIVER_INIT_MEMBER(exidy440_state,yukon)
 		0xd1,0x94,0x56,0x92,0x26,0xe6,0x60,0xe1
 	};
 
-	DRIVER_INIT_CALL(exidy440);
+	init_exidy440();
 
 	/* set up the fake PLD */
 	m_showdown_bank_data[0] = bankdata0;
@@ -2122,18 +2122,18 @@ DRIVER_INIT_MEMBER(exidy440_state,yukon)
  *
  *************************************/
 
-GAME( 1983, crossbow, 0,        exidy440, crossbow, exidy440_state, exidy440, ROT0, "Exidy", "Crossbow (version 2.0)",           0 )
-GAME( 1984, cheyenne, 0,        exidy440, cheyenne, exidy440_state, exidy440, ROT0, "Exidy", "Cheyenne (version 1.0)",           0 )
-GAME( 1985, combat,   0,        exidy440, combat,   exidy440_state, exidy440, ROT0, "Exidy", "Combat (version 3.0)",             0 )
-GAME( 1985, catch22,  combat,   exidy440, catch22,  exidy440_state, exidy440, ROT0, "Exidy", "Catch-22 (version 8.0)",           0 )
-GAME( 1985, cracksht, 0,        exidy440, cracksht, exidy440_state, exidy440, ROT0, "Exidy", "Crackshot (version 2.0)",          0 )
-GAME( 1986, claypign, 0,        exidy440, claypign, exidy440_state, claypign, ROT0, "Exidy", "Clay Pigeon (version 2.0)",        0 )
-GAME( 1986, chiller,  0,        exidy440, chiller,  exidy440_state, exidy440, ROT0, "Exidy", "Chiller (version 3.0)",            0 )
-GAME( 1986, topsecex, 0,        topsecex, topsecex, topsecex_state, topsecex, ROT0, "Exidy", "Top Secret (Exidy) (version 1.0)", 0 )
-GAME( 1987, hitnmiss, 0,        exidy440, hitnmiss, exidy440_state, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 3.0)",        0 )
-GAME( 1987, hitnmiss2,hitnmiss, exidy440, hitnmiss, exidy440_state, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 2.0)",        0 )
-GAME( 1988, whodunit, 0,        exidy440, whodunit, exidy440_state, exidy440, ROT0, "Exidy", "Who Dunit (version 9.0)",          0 )
-GAME( 1988, whodunit8,whodunit, exidy440, whodunit, exidy440_state, exidy440, ROT0, "Exidy", "Who Dunit (version 8.0)",          0 )
-GAME( 1988, showdown, 0,        exidy440, showdown, exidy440_state, showdown, ROT0, "Exidy", "Showdown (version 5.0)",           0 )
-GAME( 1989, yukon,    0,        exidy440, showdown, exidy440_state, yukon,    ROT0, "Exidy", "Yukon (version 2.0)",              0 )
-GAME( 1989, yukon1,   yukon,    exidy440, showdown, exidy440_state, yukon,    ROT0, "Exidy", "Yukon (version 1.0)",              0 )
+GAME( 1983, crossbow,  0,        exidy440, crossbow, exidy440_state, init_exidy440, ROT0, "Exidy", "Crossbow (version 2.0)",           0 )
+GAME( 1984, cheyenne,  0,        exidy440, cheyenne, exidy440_state, init_exidy440, ROT0, "Exidy", "Cheyenne (version 1.0)",           0 )
+GAME( 1985, combat,    0,        exidy440, combat,   exidy440_state, init_exidy440, ROT0, "Exidy", "Combat (version 3.0)",             0 )
+GAME( 1985, catch22,   combat,   exidy440, catch22,  exidy440_state, init_exidy440, ROT0, "Exidy", "Catch-22 (version 8.0)",           0 )
+GAME( 1985, cracksht,  0,        exidy440, cracksht, exidy440_state, init_exidy440, ROT0, "Exidy", "Crackshot (version 2.0)",          0 )
+GAME( 1986, claypign,  0,        exidy440, claypign, exidy440_state, init_claypign, ROT0, "Exidy", "Clay Pigeon (version 2.0)",        0 )
+GAME( 1986, chiller,   0,        exidy440, chiller,  exidy440_state, init_exidy440, ROT0, "Exidy", "Chiller (version 3.0)",            0 )
+GAME( 1986, topsecex,  0,        topsecex, topsecex, topsecex_state, init_topsecex, ROT0, "Exidy", "Top Secret (Exidy) (version 1.0)", 0 )
+GAME( 1987, hitnmiss,  0,        exidy440, hitnmiss, exidy440_state, init_exidy440, ROT0, "Exidy", "Hit 'n Miss (version 3.0)",        0 )
+GAME( 1987, hitnmiss2, hitnmiss, exidy440, hitnmiss, exidy440_state, init_exidy440, ROT0, "Exidy", "Hit 'n Miss (version 2.0)",        0 )
+GAME( 1988, whodunit,  0,        exidy440, whodunit, exidy440_state, init_exidy440, ROT0, "Exidy", "Who Dunit (version 9.0)",          0 )
+GAME( 1988, whodunit8, whodunit, exidy440, whodunit, exidy440_state, init_exidy440, ROT0, "Exidy", "Who Dunit (version 8.0)",          0 )
+GAME( 1988, showdown,  0,        exidy440, showdown, exidy440_state, init_showdown, ROT0, "Exidy", "Showdown (version 5.0)",           0 )
+GAME( 1989, yukon,     0,        exidy440, showdown, exidy440_state, init_yukon,    ROT0, "Exidy", "Yukon (version 2.0)",              0 )
+GAME( 1989, yukon1,    yukon,    exidy440, showdown, exidy440_state, init_yukon,    ROT0, "Exidy", "Yukon (version 1.0)",              0 )

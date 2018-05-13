@@ -37,10 +37,10 @@ public:
 	DECLARE_WRITE16_MEMBER(play2000_shareram_68k_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_vram_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_palette_w);
-	DECLARE_DRIVER_INIT(touchgo);
-	DECLARE_DRIVER_INIT(snowboar);
-	DECLARE_DRIVER_INIT(alighunt);
-	DECLARE_DRIVER_INIT(wrally2);
+	void init_touchgo();
+	void init_snowboar();
+	void init_alighunt();
+	void init_wrally2();
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1);
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0_dual);
@@ -114,7 +114,7 @@ public:
 	DECLARE_READ16_MEMBER(p2_gun_y);
 	DECLARE_WRITE16_MEMBER(bang_clr_gun_int_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(bang_irq);
-	DECLARE_DRIVER_INIT(bang);
+	void init_bang();
 	void bang(machine_config &config);
 	void bang_map(address_map &map);
 };

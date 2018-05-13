@@ -933,5 +933,5 @@ ROM_START( tv912b )
 	ROM_LOAD( "televideo912b_rom_a3.bin", 0x0000, 0x0800, CRC(bb9a7fbd) SHA1(5f1c4d41b25bd3ca4dbc336873362935daf283da) ) // AMI 8110QV (A3-2)
 ROM_END
 
-COMP( 1978, tv912c, 0,      0, tv912, tv912c, tv912_state, 0, "TeleVideo Systems", "TVI-912C", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // attributes not emulated
-COMP( 1978, tv912b, tv912c, 0, tv912, tv912b, tv912_state, 0, "TeleVideo Systems", "TVI-912B", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // attributes not emulated
+COMP( 1978, tv912c, 0,      0, tv912, tv912c, tv912_state, empty_init, "TeleVideo Systems", "TVI-912C", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // attributes not emulated
+COMP( 1978, tv912b, tv912c, 0, tv912, tv912b, tv912_state, empty_init, "TeleVideo Systems", "TVI-912B", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // attributes not emulated

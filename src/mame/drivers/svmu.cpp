@@ -387,5 +387,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY   FULLNAME               FLAGS */
-COMP( 1998, svmu, 0,      0,      svmu,    svmu,  svmu_state, 0,    "Sega",   "Visual Memory Unit",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT        COMPANY  FULLNAME              FLAGS */
+COMP( 1998, svmu, 0,      0,      svmu,    svmu,  svmu_state, empty_init, "Sega",  "Visual Memory Unit", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

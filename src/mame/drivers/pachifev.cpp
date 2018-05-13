@@ -388,4 +388,4 @@ ROM_START( pachifev )
 
 ROM_END
 
-GAME( 1983, pachifev,  0,       pachifev,  pachifev, pachifev_state,  0, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )
+GAME( 1983, pachifev,  0,       pachifev,  pachifev, pachifev_state, empty_init, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )

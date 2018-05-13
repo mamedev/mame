@@ -35,7 +35,7 @@ public:
 	indiana_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, M68K_TAG) { }
-	DECLARE_DRIVER_INIT(indiana);
+	void init_indiana();
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	void indiana(machine_config &config);
@@ -67,7 +67,7 @@ void indiana_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(indiana_state,indiana)
+void indiana_state::init_indiana()
 {
 }
 
@@ -128,5 +128,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT    STATE           INIT      COMPANY               FULLNAME                          FLAGS
-COMP( 1993, indiana, 0,      0,      indiana,   indiana, indiana_state,  indiana,  "Indiana University", "Indiana University 68030 board", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY               FULLNAME                          FLAGS
+COMP( 1993, indiana, 0,      0,      indiana, indiana, indiana_state, init_indiana, "Indiana University", "Indiana University 68030 board", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

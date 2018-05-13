@@ -352,5 +352,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY    FULLNAME     FLAGS
-COMP( 1983, pencil2, 0,      0,      pencil2,  pencil2, pencil2_state, 0,    "Hanimex", "Pencil II", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME     FLAGS
+COMP( 1983, pencil2, 0,      0,      pencil2, pencil2, pencil2_state, empty_init, "Hanimex", "Pencil II", 0 )

@@ -17,7 +17,7 @@ Atari Poolshark Driver
 
 
 
-DRIVER_INIT_MEMBER(poolshrk_state,poolshrk)
+void poolshrk_state::init_poolshrk()
 {
 	uint8_t* pSprite = memregion("gfx1")->base();
 	uint8_t* pOffset = memregion("proms")->base();
@@ -262,4 +262,4 @@ ROM_START( poolshrk )
 ROM_END
 
 
-GAME( 1977, poolshrk, 0, poolshrk, poolshrk, poolshrk_state, poolshrk, 0, "Atari", "Poolshark", MACHINE_SUPPORTS_SAVE )
+GAME( 1977, poolshrk, 0, poolshrk, poolshrk, poolshrk_state, init_poolshrk, 0, "Atari", "Poolshark", MACHINE_SUPPORTS_SAVE )

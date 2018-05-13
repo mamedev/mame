@@ -81,7 +81,7 @@ public:
 	DECLARE_WRITE8_MEMBER(misc_io_write);
 	DECLARE_WRITE8_MEMBER(brake_gas_write);
 	DECLARE_WRITE8_MEMBER(palette_write);
-	DECLARE_DRIVER_INIT(gpworld);
+	void init_gpworld();
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback);
@@ -558,7 +558,7 @@ ROM_START( gpworld )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(gpworld_state,gpworld)
+void gpworld_state::init_gpworld()
 {
 	m_nmi_enable = 0;
 	m_start_lamp = 0;
@@ -567,5 +567,5 @@ DRIVER_INIT_MEMBER(gpworld_state,gpworld)
 }
 
 
-/*    YEAR  NAME      PARENT   MACHINE  INPUT    STATE          INIT     MONITOR  COMPANY  FULLNAME     FLAGS) */
-GAME( 1984, gpworld,  0,       gpworld, gpworld, gpworld_state, gpworld, ROT0,    "Sega",  "GP World",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+/*    YEAR  NAME      PARENT   MACHINE  INPUT    STATE          INIT          MONITOR  COMPANY  FULLNAME     FLAGS) */
+GAME( 1984, gpworld,  0,       gpworld, gpworld, gpworld_state, init_gpworld, ROT0,    "Sega",  "GP World",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

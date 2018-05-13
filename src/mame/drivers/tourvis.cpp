@@ -467,4 +467,4 @@ ROM_START(tourvis)
 ROM_END
 
 
-GAME( 19??, tourvis, 0, tourvision, tourvision, tourvision_state, pce_common, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+GAME( 19??, tourvis, 0, tourvision, tourvision, tourvision_state, init_pce_common, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )

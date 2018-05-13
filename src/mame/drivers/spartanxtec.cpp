@@ -449,4 +449,4 @@ ROM_END
 
 
 
-GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, spartanxtec_state,  0, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )
+GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, spartanxtec_state, empty_init, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )

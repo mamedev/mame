@@ -86,15 +86,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(i8751_main_cpu_vblank_w);
 
 	// game-specific driver init
-	DECLARE_DRIVER_INIT(generic);
-	DECLARE_DRIVER_INIT(dumpmtmt);
-	DECLARE_DRIVER_INIT(quartet);
-	DECLARE_DRIVER_INIT(fantzonep);
-	DECLARE_DRIVER_INIT(sjryukoa);
-	DECLARE_DRIVER_INIT(aceattaca);
-	DECLARE_DRIVER_INIT(passsht16a);
-	DECLARE_DRIVER_INIT(mjleague);
-	DECLARE_DRIVER_INIT(sdi);
+	void init_generic();
+	void init_dumpmtmt();
+	void init_quartet();
+	void init_fantzonep();
+	void init_sjryukoa();
+	void init_aceattaca();
+	void init_passsht16a();
+	void init_mjleague();
+	void init_sdi();
 
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

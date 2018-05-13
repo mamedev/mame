@@ -114,7 +114,7 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
-	DECLARE_DRIVER_INIT(amust);
+	void init_amust();
 	DECLARE_MACHINE_RESET(amust);
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_WRITE8_MEMBER(port04_w);
@@ -367,7 +367,7 @@ MACHINE_RESET_MEMBER( amust_state, amust )
 	m_maincpu->set_state_int(Z80_PC, 0xf800);
 }
 
-DRIVER_INIT_MEMBER( amust_state, amust )
+void amust_state::init_amust()
 {
 	u8 *main = memregion("maincpu")->base();
 
@@ -463,5 +463,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY  FULLNAME               FLAGS
-COMP( 1983, amust,  0,      0,       amust,     amust,   amust_state,   amust,  "Amust",  "Amust Executive 816", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME               FLAGS
+COMP( 1983, amust, 0,      0,      amust,   amust, amust_state, init_amust, "Amust", "Amust Executive 816", MACHINE_NOT_WORKING )

@@ -535,13 +535,12 @@ READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
 	return m_work_ram[0];
 }
 
-DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
+void pbaction_state::init_pbactio3()
 {
-	int i;
 	uint8_t *rom = memregion("maincpu")->base();
 
 	/* first of all, do a simple bitswap */
-	for (i = 0; i < 0xc000; i++)
+	for (int i = 0; i < 0xc000; i++)
 	{
 		rom[i] = bitswap<8>(rom[i], 7,6,5,4,1,2,3,0);
 	}
@@ -553,8 +552,8 @@ DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
 
 
 
-GAME( 1985, pbaction,  0,        pbaction,  pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction2, pbaction, pbaction2, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction,  0,        pbaction,  pbaction, pbaction_state, empty_init,    ROT90, "Tehkan", "Pinball Action (set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction2, pbaction, pbaction2, pbaction, pbaction_state, empty_init,    ROT90, "Tehkan", "Pinball Action (set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, init_pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, empty_init,    ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, pbaction_state, empty_init,    ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", MACHINE_SUPPORTS_SAVE )

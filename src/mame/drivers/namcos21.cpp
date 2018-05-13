@@ -2737,7 +2737,7 @@ void namcos21_state::init(int game_type)
 	}
 }
 
-DRIVER_INIT_MEMBER(namcos21_state,winrun)
+void namcos21_state::init_winrun()
 {
 	uint16_t *pMem = (uint16_t *)memregion("dsp")->base();
 	int pc = 0;
@@ -2752,23 +2752,23 @@ DRIVER_INIT_MEMBER(namcos21_state,winrun)
 	m_mbNeedsKickstart = 0;
 }
 
-DRIVER_INIT_MEMBER(namcos21_state,aircomb)
+void namcos21_state::init_aircomb()
 {
 	init(NAMCOS21_AIRCOMBAT);
 }
 
-DRIVER_INIT_MEMBER(namcos21_state,starblad)
+void namcos21_state::init_starblad()
 {
 	init(NAMCOS21_STARBLADE);
 }
 
 
-DRIVER_INIT_MEMBER(namcos21_state,cybsled)
+void namcos21_state::init_cybsled()
 {
 	init(NAMCOS21_CYBERSLED);
 }
 
-DRIVER_INIT_MEMBER(namcos21_state,solvalou)
+void namcos21_state::init_solvalou()
 {
 	uint16_t *mem = (uint16_t *)memregion("maincpu")->base();
 	mem[0x20ce4/2+1] = 0x0000; // $200128
@@ -2779,7 +2779,7 @@ DRIVER_INIT_MEMBER(namcos21_state,solvalou)
 	init(NAMCOS21_SOLVALOU );
 }
 
-DRIVER_INIT_MEMBER(namcos21_state,driveyes)
+void namcos21_state::init_driveyes()
 {
 	uint16_t *pMem = (uint16_t *)memregion("dsp")->base();
 	int pc = 0;
@@ -2792,15 +2792,15 @@ DRIVER_INIT_MEMBER(namcos21_state,driveyes)
 	m_mbNeedsKickstart = 0;
 }
 
-/*    YEAR, NAME,      PARENT,   MACHINE,  INPUT,                      INIT,     MONITOR, COMPANY, FULLNAME,                                FLAGS */
-GAME( 1988, winrun,    0,        winrun,   winrun,     namcos21_state, winrun,   ROT0,    "Namco", "Winning Run",                           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1991, driveyes,  0,        driveyes, driveyes,   namcos21_state, driveyes, ROT0,    "Namco", "Driver's Eyes (Japan)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN)
-GAME( 1991, solvalou,  0,        namcos21, s21default, namcos21_state, solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1991, starblad,  0,        namcos21, starblad,   namcos21_state, starblad, ROT0,    "Namco", "Starblade (World)",                     MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, starbladj, starblad, namcos21, starblad,   namcos21_state, starblad, ROT0,    "Namco", "Starblade (Japan)",                     MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, aircomb,   0,        namcos21, aircomb,    namcos21_state, aircomb,  ROT0,    "Namco", "Air Combat (US)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // There's code for a SCI, is it even possible to play multiplayer?
-GAME( 1992, aircombj,  aircomb,  namcos21, aircomb,    namcos21_state, aircomb,  ROT0,    "Namco", "Air Combat (Japan)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, cybsled,   0,        namcos21, cybsled,    namcos21_state, cybsled,  ROT0,    "Namco", "Cyber Sled (World)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING )
-GAME( 1993, cybsledj,  cybsled,  namcos21, cybsled,    namcos21_state, cybsled,  ROT0,    "Namco", "Cyber Sled (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT       CLASS           INIT           MONITOR  COMPANY  FULLNAME                                 FLAGS */
+GAME( 1988, winrun,    0,        winrun,   winrun,     namcos21_state, init_winrun,   ROT0,    "Namco", "Winning Run",                           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, init_winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, init_winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1991, driveyes,  0,        driveyes, driveyes,   namcos21_state, init_driveyes, ROT0,    "Namco", "Driver's Eyes (Japan)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN)
+GAME( 1991, solvalou,  0,        namcos21, s21default, namcos21_state, init_solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1991, starblad,  0,        namcos21, starblad,   namcos21_state, init_starblad, ROT0,    "Namco", "Starblade (World)",                     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, starbladj, starblad, namcos21, starblad,   namcos21_state, init_starblad, ROT0,    "Namco", "Starblade (Japan)",                     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, aircomb,   0,        namcos21, aircomb,    namcos21_state, init_aircomb,  ROT0,    "Namco", "Air Combat (US)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // There's code for a SCI, is it even possible to play multiplayer?
+GAME( 1992, aircombj,  aircomb,  namcos21, aircomb,    namcos21_state, init_aircomb,  ROT0,    "Namco", "Air Combat (Japan)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, cybsled,   0,        namcos21, cybsled,    namcos21_state, init_cybsled,  ROT0,    "Namco", "Cyber Sled (World)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING )
+GAME( 1993, cybsledj,  cybsled,  namcos21, cybsled,    namcos21_state, init_cybsled,  ROT0,    "Namco", "Cyber Sled (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING )

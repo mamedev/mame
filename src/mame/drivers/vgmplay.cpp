@@ -1778,4 +1778,4 @@ ROM_START( vgmplay )
 	ROM_REGION( 0x80000, "ym2608", ROMREGION_ERASE00 )
 ROM_END
 
-CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, 0, "MAME", "VGM player", 0 )
+CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, empty_init, "MAME", "VGM player", 0 )

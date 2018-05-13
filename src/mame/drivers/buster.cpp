@@ -364,4 +364,4 @@ ROM_START( buster )
 ROM_END
 
 
-GAME( 1982, buster,  0,    buster, buster, buster_state,  0, ROT0, "Marian Electronics Ltd.", "Buster", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1982, buster, 0, buster, buster, buster_state, empty_init, ROT0, "Marian Electronics Ltd.", "Buster", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

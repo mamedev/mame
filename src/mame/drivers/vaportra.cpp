@@ -833,7 +833,7 @@ C3D54*
 */
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(vaportra_state,vaportra)
+void vaportra_state::init_vaportra()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 
@@ -843,7 +843,7 @@ DRIVER_INIT_MEMBER(vaportra_state,vaportra)
 
 /******************************************************************************/
 
-GAME( 1989, vaportra,  0,        vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 1)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1989, vaportra3, vaportra, vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 3?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, vaportrau, vaportra, vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East USA",         "Vapor Trail - Hyper Offence Formation (US)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1989, kuhga,     vaportra, vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East Corporation", "Kuhga - Operation Code 'Vapor Trail' (Japan revision 3)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vaportra,  0,        vaportra, vaportra, vaportra_state, init_vaportra, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vaportra3, vaportra, vaportra, vaportra, vaportra_state, init_vaportra, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 3?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vaportrau, vaportra, vaportra, vaportra, vaportra_state, init_vaportra, ROT270, "Data East USA",         "Vapor Trail - Hyper Offence Formation (US)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, kuhga,     vaportra, vaportra, vaportra, vaportra_state, init_vaportra, ROT270, "Data East Corporation", "Kuhga - Operation Code 'Vapor Trail' (Japan revision 3)",   MACHINE_SUPPORTS_SAVE )

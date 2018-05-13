@@ -865,7 +865,7 @@ WRITE8_MEMBER(bzone_state::analog_select_w)
 }
 
 
-DRIVER_INIT_MEMBER(bzone_state,bradley)
+void bzone_state::init_bradley()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_ram(0x400, 0x7ff);
@@ -883,9 +883,9 @@ DRIVER_INIT_MEMBER(bzone_state,bradley)
  *
  *************************************/
 
-GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    0,       ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
-GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    0,       ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
-GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    0,       ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE|MACHINE_NO_COCKTAIL, layout_bzone )
-GAME( 1980, bradley,   0,        bzone,    bradley,  bzone_state,    bradley, ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
-GAMEL(1980, redbaron,  0,        redbaron, redbaron, redbaron_state, 0,       ROT0, "Atari", "Red Baron (Revised Hardware)", MACHINE_SUPPORTS_SAVE, layout_redbaron )
-GAMEL(1980, redbarona, redbaron, redbaron, redbaron, redbaron_state, 0,       ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE, layout_redbaron )
+GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
+GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
+GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE|MACHINE_NO_COCKTAIL, layout_bzone )
+GAME( 1980, bradley,   0,        bzone,    bradley,  bzone_state,    init_bradley, ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
+GAMEL(1980, redbaron,  0,        redbaron, redbaron, redbaron_state, empty_init,   ROT0, "Atari", "Red Baron (Revised Hardware)", MACHINE_SUPPORTS_SAVE, layout_redbaron )
+GAMEL(1980, redbarona, redbaron, redbaron, redbaron, redbaron_state, empty_init,   ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE, layout_redbaron )

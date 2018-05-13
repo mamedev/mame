@@ -21,7 +21,7 @@ public:
 
 	void m79amb(machine_config &config);
 
-	DECLARE_DRIVER_INIT(m79amb);
+	void init_m79amb();
 
 	DECLARE_WRITE8_MEMBER(ramtek_videoram_w);
 	DECLARE_READ8_MEMBER(gray5bit_controller0_r);

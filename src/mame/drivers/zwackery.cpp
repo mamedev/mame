@@ -610,5 +610,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT  ROTATION  COMPANY         FULLNAME    FLAGS
-GAME( 1984, zwackery, 0,      zwackery, zwackery, zwackery_state, 0,    ROT0,     "Bally Midway", "Zwackery", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY         FULLNAME    FLAGS
+GAME( 1984, zwackery, 0,      zwackery, zwackery, zwackery_state, empty_init, ROT0,     "Bally Midway", "Zwackery", MACHINE_SUPPORTS_SAVE )

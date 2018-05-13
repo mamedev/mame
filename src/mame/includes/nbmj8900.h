@@ -59,8 +59,8 @@ public:
 	DECLARE_WRITE8_MEMBER(vramsel_w);
 	DECLARE_WRITE8_MEMBER(romsel_w);
 
-	DECLARE_DRIVER_INIT(togenkyo);
-	DECLARE_DRIVER_INIT(ohpaipee);
+	void init_togenkyo();
+	void init_ohpaipee();
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

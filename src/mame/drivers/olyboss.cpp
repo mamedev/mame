@@ -601,9 +601,9 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//   YEAR  NAME         PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT  COMPANY                     FULLNAME                FLAGS
-COMP(1981, bossa85,     olybossd,   0,      bossa85,    olyboss,    olyboss_state,  0,    "Olympia International",    "Olympia BOSS A 8085",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(1981, bossb85,     olybossd,   0,      bossb85,    olyboss,    olyboss_state,  0,    "Olympia International",    "Olympia BOSS B 8085",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(1981, olybossb,    olybossd,   0,      olybossb,   olyboss,    olyboss_state,  0,    "Olympia International",    "Olympia BOSS B",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(1981, olybossc,    olybossd,   0,      olybossc,   olyboss,    olyboss_state,  0,    "Olympia International",    "Olympia BOSS C",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(1981, olybossd,    0,          0,      olybossd,   olyboss,    olyboss_state,  0,    "Olympia International",    "Olympia BOSS D",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//   YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY                  FULLNAME               FLAGS
+COMP(1981, bossa85,  olybossd, 0,      bossa85,  olyboss, olyboss_state, empty_init, "Olympia International", "Olympia BOSS A 8085", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, bossb85,  olybossd, 0,      bossb85,  olyboss, olyboss_state, empty_init, "Olympia International", "Olympia BOSS B 8085", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, olybossb, olybossd, 0,      olybossb, olyboss, olyboss_state, empty_init, "Olympia International", "Olympia BOSS B",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, olybossc, olybossd, 0,      olybossc, olyboss, olyboss_state, empty_init, "Olympia International", "Olympia BOSS C",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(1981, olybossd, 0,        0,      olybossd, olyboss, olyboss_state, empty_init, "Olympia International", "Olympia BOSS D",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

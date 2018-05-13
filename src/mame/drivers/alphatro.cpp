@@ -816,4 +816,4 @@ ROM_START( alphatro )
 	ROMX_LOAD( "b40r_ic1067.bin",   0x0000, 0x1000, CRC(543e3ee8) SHA1(3e6c6f8c85d3a5d0735edfec52709c5670ff1646), ROM_BIOS(3) )
 ROM_END
 
-COMP( 1983, alphatro,   0,        0,    alphatro,   alphatro, alphatro_state,  0,  "Triumph-Adler", "Alphatronic PC", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, alphatro, 0, 0, alphatro, alphatro, alphatro_state, empty_init, "Triumph-Adler", "Alphatronic PC", MACHINE_SUPPORTS_SAVE )

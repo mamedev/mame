@@ -366,7 +366,7 @@ public:
 
 	DECLARE_READ8_MEMBER(unk_r);
 
-	DECLARE_DRIVER_INIT(bondwell);
+	void init_bondwell();
 
 	DECLARE_INPUT_CHANGED_MEMBER(pc_turbo_callback);
 
@@ -461,7 +461,7 @@ INPUT_CHANGED_MEMBER(pc_state::pc_turbo_callback)
 	m_maincpu->set_clock_scale((newval & 2) ? 1 : m_turbo_off_speed);
 }
 
-DRIVER_INIT_MEMBER(pc_state,bondwell)
+void pc_state::init_bondwell()
 {
 	m_turbo_off_speed = 4.77/12;
 }
@@ -1073,29 +1073,29 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR    NAME              PARENT      COMPAT      MACHINE         INPUT     STATE     INIT      COMPANY                            FULLNAME                FLAGS
-COMP( 1984,   dgone,            ibm5150,    0,          dgone,          pccga,    pc_state, 0,        "Data General",                    "Data General/One" ,    MACHINE_NOT_WORKING ) // CGA, 2x 3.5" disk drives
-COMP( 1985,   epc,              ibm5150,    0,          epc,            pccga,    pc_state, 0,        "Ericsson Information System",     "Ericsson PC" ,         MACHINE_NOT_WORKING )
-COMP( 1985,   eppc,             ibm5150,    0,          eppc,           pccga,    pc_state, 0,        "Ericsson Information System",     "Ericsson Portable PC", MACHINE_NOT_WORKING )
-COMP( 1985,   bw230,            ibm5150,    0,          bondwell,       bondwell, pc_state, bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)", 0 )
-COMP( 1984,   compc1,           ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Commodore Business Machines",     "Commodore PC-1" ,      MACHINE_NOT_WORKING )
-COMP( 1992,   iskr3104,         ibm5150,    0,          iskr3104,       pccga,    pc_state, 0,        "Schetmash",                       "Iskra 3104",           MACHINE_NOT_WORKING )
-COMP( 1989,   mk88,             ibm5150,    0,          mk88,           pccga,    pc_state, 0,        "<unknown>",                       "MK-88",                MACHINE_NOT_WORKING )
-COMP( 1991,   poisk2,           ibm5150,    0,          poisk2,         pccga,    pc_state, 0,        "<unknown>",                       "Poisk-2",              MACHINE_NOT_WORKING )
-COMP( 1990,   mc1702,           ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "<unknown>",                       "Elektronika MC-1702",  MACHINE_NOT_WORKING )
-COMP( 1987,   zdsupers,         ibm5150,    0,          zenith,         pccga,    pc_state, 0,        "Zenith Data Systems",             "SuperSport",           0 )
-COMP( 1985,   sicpc1605,        ibm5150,    0,          siemens,        pccga,    pc_state, 0,        "Siemens",                         "Sicomp PC16-05",       MACHINE_NOT_WORKING )
-COMP( 1985,   ncrpc4i,          ibm5150,    0,          ncrpc4i,        pccga,    pc_state, 0,        "NCR",                             "PC4i",                 MACHINE_NOT_WORKING )
-COMP( 198?,   olivm15,          ibm5150,    0,          m15,            pccga,    pc_state, 0,        "Olivetti",                        "M15",                  0 )
-COMP( 1983,   ibm5550,          ibm5150,    0,          ibm5550,        pccga,    pc_state, 0,        "International Business Machines", "IBM 5550",             MACHINE_NOT_WORKING )
-COMP( 1985,   pc7000,           ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Sharp",                           "PC-7000",              MACHINE_NOT_WORKING )
-COMP( 1988,   sx16,             ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Sanyo",                           "SX-16",                MACHINE_NOT_WORKING )
-COMP( 198?,   mbc16,            ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Sanyo",                           "MBC-16",               MACHINE_NOT_WORKING )
-COMP( 1987,   ataripc1,         ibm5150,    0,          ataripc1,       pccga,    pc_state, 0,        "Atari",                           "PC1" ,                 0 )
-COMP( 1988,   ataripc3,         ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Atari",                           "PC3" ,                 0 )
-COMP( 1989,   ssam88s,          ibm5150,    0,          pccga,          pccga,    pc_state, 0,        "Samsung",                         "Samtron 88S" ,         MACHINE_NOT_WORKING )
-COMP( 1983,   eagle1600,        ibm5150,    0,          eagle1600,      pccga,    pc_state, 0,        "Eagle",                           "1600" ,                MACHINE_NOT_WORKING )
-COMP( 1988,   laser_turbo_xt,   ibm5150,    0,          laser_turbo_xt, 0,        pc_state, 0,        "VTech",                           "Laser Turbo XT",       0 )
-COMP( 1989,   laser_xt3,        ibm5150,    0,          laser_xt3,      0,        pc_state, 0,        "VTech",                           "Laser XT/3",           0 )
-COMP( 198?,   olytext30,        ibm5150,    0,          olytext30,      pccga,    pc_state, 0,        "AEG Olympia",                     "Olytext 30",            MACHINE_NOT_WORKING )
-COMP( 1985,   kaypro16,         ibm5150,    0,          kaypro16,       pccga,    pc_state, 0,        "Kaypro Corporation",              "Kaypro 16",            0 )
+//    YEAR  NAME            PARENT   COMPAT  MACHINE         INPUT     CLASS     INIT           COMPANY                            FULLNAME                FLAGS
+COMP( 1984, dgone,          ibm5150, 0,      dgone,          pccga,    pc_state, empty_init,    "Data General",                    "Data General/One" ,    MACHINE_NOT_WORKING ) // CGA, 2x 3.5" disk drives
+COMP( 1985, epc,            ibm5150, 0,      epc,            pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson PC" ,         MACHINE_NOT_WORKING )
+COMP( 1985, eppc,           ibm5150, 0,      eppc,           pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC", MACHINE_NOT_WORKING )
+COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)", 0 )
+COMP( 1984, compc1,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Commodore Business Machines",     "Commodore PC-1" ,      MACHINE_NOT_WORKING )
+COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state, empty_init,    "Schetmash",                       "Iskra 3104",           MACHINE_NOT_WORKING )
+COMP( 1989, mk88,           ibm5150, 0,      mk88,           pccga,    pc_state, empty_init,    "<unknown>",                       "MK-88",                MACHINE_NOT_WORKING )
+COMP( 1991, poisk2,         ibm5150, 0,      poisk2,         pccga,    pc_state, empty_init,    "<unknown>",                       "Poisk-2",              MACHINE_NOT_WORKING )
+COMP( 1990, mc1702,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "<unknown>",                       "Elektronika MC-1702",  MACHINE_NOT_WORKING )
+COMP( 1987, zdsupers,       ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "SuperSport",           0 )
+COMP( 1985, sicpc1605,      ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Siemens",                         "Sicomp PC16-05",       MACHINE_NOT_WORKING )
+COMP( 1985, ncrpc4i,        ibm5150, 0,      ncrpc4i,        pccga,    pc_state, empty_init,    "NCR",                             "PC4i",                 MACHINE_NOT_WORKING )
+COMP( 198?, olivm15,        ibm5150, 0,      m15,            pccga,    pc_state, empty_init,    "Olivetti",                        "M15",                  0 )
+COMP( 1983, ibm5550,        ibm5150, 0,      ibm5550,        pccga,    pc_state, empty_init,    "International Business Machines", "IBM 5550",             MACHINE_NOT_WORKING )
+COMP( 1985, pc7000,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sharp",                           "PC-7000",              MACHINE_NOT_WORKING )
+COMP( 1988, sx16,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "SX-16",                MACHINE_NOT_WORKING )
+COMP( 198?, mbc16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "MBC-16",               MACHINE_NOT_WORKING )
+COMP( 1987, ataripc1,       ibm5150, 0,      ataripc1,       pccga,    pc_state, empty_init,    "Atari",                           "PC1" ,                 0 )
+COMP( 1988, ataripc3,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Atari",                           "PC3" ,                 0 )
+COMP( 1989, ssam88s,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Samsung",                         "Samtron 88S" ,         MACHINE_NOT_WORKING )
+COMP( 1983, eagle1600,      ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "Eagle",                           "1600" ,                MACHINE_NOT_WORKING )
+COMP( 1988, laser_turbo_xt, ibm5150, 0,      laser_turbo_xt, 0,        pc_state, empty_init,    "VTech",                           "Laser Turbo XT",       0 )
+COMP( 1989, laser_xt3,      ibm5150, 0,      laser_xt3,      0,        pc_state, empty_init,    "VTech",                           "Laser XT/3",           0 )
+COMP( 198?, olytext30,      ibm5150, 0,      olytext30,      pccga,    pc_state, empty_init,    "AEG Olympia",                     "Olytext 30",            MACHINE_NOT_WORKING )
+COMP( 1985, kaypro16,       ibm5150, 0,      kaypro16,       pccga,    pc_state, empty_init,    "Kaypro Corporation",              "Kaypro 16",            0 )

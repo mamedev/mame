@@ -339,7 +339,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cbasebal_state,cbasebal)
+void cbasebal_state::init_cbasebal()
 {
 	uint8_t *src = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -357,4 +357,4 @@ DRIVER_INIT_MEMBER(cbasebal_state,cbasebal)
  *
  *************************************/
 
-GAME( 1989, cbasebal, 0, cbasebal, cbasebal, cbasebal_state, cbasebal, ROT0, "Capcom", "Capcom Baseball (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cbasebal, 0, cbasebal, cbasebal, cbasebal_state, init_cbasebal, ROT0, "Capcom", "Capcom Baseball (Japan)", MACHINE_SUPPORTS_SAVE )

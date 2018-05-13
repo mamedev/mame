@@ -94,7 +94,7 @@ public:
 	required_device<i82586_base_device> m_eth;
 	required_device<interpro_ioga_device> m_ioga;
 
-	DECLARE_DRIVER_INIT(common);
+	void init_common();
 
 	enum sreg_error_mask
 	{

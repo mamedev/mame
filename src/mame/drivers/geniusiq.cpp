@@ -754,8 +754,8 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE    INPUT        STATE           INIT  COMPANY             FULLNAME                                     FLAGS
-COMP( 1997, iq128,      0,      0,      iq128,     geniusiq_de, geniusiq_state, 0,    "Video Technology", "Genius IQ 128 (Germany)",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1997, iq128_fr,   iq128,  0,      iq128,     geniusiq,    geniusiq_state, 0,    "Video Technology", "Genius IQ 128 (France)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1998, iqtv512,    0,      0,      iqtv512,   geniusiq_de, geniusiq_state, 0,    "Video Technology", "Genius IQ TV 512 (Germany)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1998, itunlim,    0,      0,      iq128,     geniusiq_de, geniusiq_state, 0,    "Video Technology", "VTech IT Unlimited (UK)",                   MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT        CLASS           INIT        COMPANY             FULLNAME                      FLAGS
+COMP( 1997, iq128,    0,      0,      iq128,   geniusiq_de, geniusiq_state, empty_init, "Video Technology", "Genius IQ 128 (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1997, iq128_fr, iq128,  0,      iq128,   geniusiq,    geniusiq_state, empty_init, "Video Technology", "Genius IQ 128 (France)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1998, iqtv512,  0,      0,      iqtv512, geniusiq_de, geniusiq_state, empty_init, "Video Technology", "Genius IQ TV 512 (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1998, itunlim,  0,      0,      iq128,   geniusiq_de, geniusiq_state, empty_init, "Video Technology", "VTech IT Unlimited (UK)",    MACHINE_NO_SOUND)

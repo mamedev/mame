@@ -415,4 +415,4 @@ ROM_START( v100 )
 	ROM_LOAD( "241-001.u29",   0x0000, 0x0800, CRC(ef807141) SHA1(cbf3fed001811c5840b9a131d2d3133843cb3b6a) )
 ROM_END
 
-COMP( 1980, v100, 0, 0, v100, v100, v100_state, 0, "Visual Technology", "Visual 100", MACHINE_IS_SKELETON )
+COMP( 1980, v100, 0, 0, v100, v100, v100_state, empty_init, "Visual Technology", "Visual 100", MACHINE_IS_SKELETON )

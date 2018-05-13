@@ -315,5 +315,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//   YEAR  NAME         PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT    COMPANY    FULLNAME  FLAGS
-COMP(1977, aim65,       0,      0,      aim65,   aim65, aim65_state,  0,     "Rockwell", "AIM 65", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+//   YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
+COMP(1977, aim65, 0,      0,      aim65,   aim65, aim65_state, empty_init, "Rockwell", "AIM 65", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

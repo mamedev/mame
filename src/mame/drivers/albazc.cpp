@@ -329,4 +329,4 @@ ROM_START( hanaroku )
 ROM_END
 
 
-GAME( 1988, hanaroku, 0,        hanaroku, hanaroku, albazc_state, 0, ROT0, "Alba", "Hanaroku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hanaroku, 0, hanaroku, hanaroku, albazc_state, empty_init, ROT0, "Alba", "Hanaroku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

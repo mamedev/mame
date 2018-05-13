@@ -89,10 +89,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vector_control_w);
 	DECLARE_READ8_MEMBER(joystick_read);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_DRIVER_INIT(speedfrk);
-	DECLARE_DRIVER_INIT(boxingb);
-	DECLARE_DRIVER_INIT(sundance);
-	DECLARE_DRIVER_INIT(qb3);
+	void init_speedfrk();
+	void init_boxingb();
+	void init_sundance();
+	void init_qb3();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void sound_start() override;

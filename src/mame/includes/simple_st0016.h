@@ -33,10 +33,10 @@ public:
 	DECLARE_WRITE8_MEMBER(latch8_w);
 
 	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
-	DECLARE_DRIVER_INIT(nratechu);
-	DECLARE_DRIVER_INIT(mayjinsn);
-	DECLARE_DRIVER_INIT(mayjisn2);
-	DECLARE_DRIVER_INIT(renju);
+	void init_nratechu();
+	void init_mayjinsn();
+	void init_mayjisn2();
+	void init_renju();
 	virtual void machine_start() override;
 	DECLARE_VIDEO_START(st0016);
 	uint32_t screen_update_st0016(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

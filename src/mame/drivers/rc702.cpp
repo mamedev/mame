@@ -57,7 +57,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(rc702);
+	void init_rc702();
 	DECLARE_MACHINE_RESET(rc702);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
@@ -243,7 +243,7 @@ static const rgb_t our_palette[3] = {
 	rgb_t(0xff, 0xb4, 0x00), // on
 };
 
-DRIVER_INIT_MEMBER( rc702_state, rc702 )
+void rc702_state::init_rc702()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -416,5 +416,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT     CLASS            INIT    COMPANY            FULLNAME         FLAGS
-COMP( 1979, rc702,     0,       0,      rc702,      rc702,    rc702_state,     rc702,  "Regnecentralen",  "RC702 Piccolo", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY           FULLNAME         FLAGS
+COMP( 1979, rc702, 0,      0,      rc702,   rc702, rc702_state, init_rc702, "Regnecentralen", "RC702 Piccolo", MACHINE_NOT_WORKING )

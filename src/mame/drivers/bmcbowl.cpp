@@ -141,7 +141,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
 	DECLARE_READ8_MEMBER(dips1_r);
 	DECLARE_WRITE8_MEMBER(input_mux_w);
-	DECLARE_DRIVER_INIT(bmcbowl);
+	void init_bmcbowl();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -517,9 +517,9 @@ ROM_START( bmcbowl )
 
 ROM_END
 
-DRIVER_INIT_MEMBER(bmcbowl_state,bmcbowl)
+void bmcbowl_state::init_bmcbowl()
 {
 	save_item(NAME(m_bmc_input));
 }
 
-GAME( 1994, bmcbowl,    0, bmcbowl,    bmcbowl, bmcbowl_state,    bmcbowl, ROT0,  "BMC", "Konkyuu no Hoshi", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1994, bmcbowl, 0, bmcbowl, bmcbowl, bmcbowl_state, init_bmcbowl, ROT0, "BMC", "Konkyuu no Hoshi", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)

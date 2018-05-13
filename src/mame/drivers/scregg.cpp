@@ -69,7 +69,7 @@ public:
 	DECLARE_WRITE8_MEMBER(scregg_irqack_w);
 	DECLARE_READ8_MEMBER(scregg_irqack_r);
 
-	DECLARE_DRIVER_INIT(rockduck);
+	void init_rockduck();
 	DECLARE_MACHINE_START(scregg);
 	DECLARE_MACHINE_RESET(scregg);
 	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
@@ -417,13 +417,12 @@ ROM_START( rockduck )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(scregg_state,rockduck)
+void scregg_state::init_rockduck()
 {
 	// rd2.rdh and rd1.rdj are bitswapped, but not rd3.rdg .. are they really from the same board?
-	int x;
-	uint8_t *src = memregion( "gfx1" )->base();
+	uint8_t *src = memregion("gfx1")->base();
 
-	for (x = 0x2000; x < 0x6000; x++)
+	for (int x = 0x2000; x < 0x6000; x++)
 	{
 		src[x] = bitswap<8>(src[x],2,0,3,6,1,4,7,5);
 
@@ -431,7 +430,7 @@ DRIVER_INIT_MEMBER(scregg_state,rockduck)
 }
 
 
-GAME( 1983, dommy,    0,        dommy,  scregg,   scregg_state,  0,        ROT270, "Technos Japan", "Dommy", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, scregg,   0,        scregg, scregg,   scregg_state,  0,        ROT270, "Technos Japan", "Scrambled Egg", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, eggs,     scregg,   scregg, scregg,   scregg_state,  0,        ROT270, "Technos Japan (Universal USA license)", "Eggs (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rockduck, 0,        scregg, rockduck, scregg_state,  rockduck, ROT270, "Datel SAS", "Rock Duck (prototype?)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dommy,    0,        dommy,  scregg,   scregg_state, empty_init,    ROT270, "Technos Japan", "Dommy", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, scregg,   0,        scregg, scregg,   scregg_state, empty_init,    ROT270, "Technos Japan", "Scrambled Egg", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, eggs,     scregg,   scregg, scregg,   scregg_state, empty_init,    ROT270, "Technos Japan (Universal USA license)", "Eggs (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rockduck, 0,        scregg, rockduck, scregg_state, init_rockduck, ROT270, "Datel SAS", "Rock Duck (prototype?)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

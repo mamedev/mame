@@ -177,7 +177,7 @@ public:
 	DECLARE_READ8_MEMBER(atamanot_prot_r);
 	DECLARE_WRITE8_MEMBER(atamanot_prot_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
-	DECLARE_DRIVER_INIT(ssingles);
+	void init_ssingles();
 	virtual void video_start() override;
 	DECLARE_WRITE_LINE_MEMBER(atamanot_irq);
 	MC6845_UPDATE_ROW(ssingles_update_row);
@@ -672,11 +672,11 @@ ROM_START( atamanot )
 	ROM_LOAD( "3.54",   0x00200, 0x0100, CRC(88acb21e) SHA1(18fe5280dad6687daf6bf42d37dde45157fab5e3) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ssingles_state,ssingles)
+void ssingles_state::init_ssingles()
 {
 	save_item(NAME(m_videoram));
 	save_item(NAME(m_colorram));
 }
 
-GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles_state, ssingles, ROT90, "Yachiyo Denki (Entertainment Enterprises, Ltd. license)", "Swinging Singles (US)", MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND )
-GAME( 1983, atamanot, 0, atamanot, ssingles, ssingles_state, ssingles, ROT90, "Yachiyo Denki / Uni Enterprize", "Computer Quiz Atama no Taisou (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles_state, init_ssingles, ROT90, "Yachiyo Denki (Entertainment Enterprises, Ltd. license)", "Swinging Singles (US)", MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, atamanot, 0, atamanot, ssingles, ssingles_state, init_ssingles, ROT90, "Yachiyo Denki / Uni Enterprize", "Computer Quiz Atama no Taisou (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

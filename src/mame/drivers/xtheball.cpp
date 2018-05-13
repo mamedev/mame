@@ -365,4 +365,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, xtheball, 0, xtheball, xtheball, xtheball_state, 0,  ROT0, "Rare", "X the Ball", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, xtheball, 0, xtheball, xtheball, xtheball_state, empty_init, ROT0, "Rare", "X the Ball", MACHINE_SUPPORTS_SAVE )

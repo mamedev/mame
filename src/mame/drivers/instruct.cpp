@@ -452,5 +452,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY      FULLNAME                   FLAGS
-COMP( 1978, instruct,  0,       0,       instruct,  instruct, instruct_state, 0,    "Signetics", "Signetics Instructor 50", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME                   FLAGS
+COMP( 1978, instruct, 0,      0,      instruct, instruct, instruct_state, empty_init, "Signetics", "Signetics Instructor 50", 0 )

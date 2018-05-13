@@ -807,6 +807,6 @@ ROM_START( cupsocsb3 )
 ROM_END
 
 
-GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc, seicupbl_state,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocsb2,cupsoc,   cupsocbl, cupsoc, seicupbl_state,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocsb3,cupsoc,   cupsocbl, cupsoc, seicupbl_state,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb2,cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb3,cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

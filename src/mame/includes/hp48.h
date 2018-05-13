@@ -63,7 +63,7 @@ public:
 	virtual void machine_reset() override;
 	void base_machine_start(hp48_models model);
 
-	DECLARE_DRIVER_INIT(hp48);
+	void init_hp48();
 	DECLARE_PALETTE_INIT(hp48);
 	DECLARE_MACHINE_START(hp49g);
 	DECLARE_MACHINE_START(hp48gx);

@@ -1013,12 +1013,12 @@ void nova2001_state::lineswap_gfx_roms(const char *region, const int bit)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(nova2001_state,pkunwar)
+void nova2001_state::init_pkunwar()
 {
 	lineswap_gfx_roms("gfx1", 13);
 }
 
-DRIVER_INIT_MEMBER(nova2001_state,raiders5)
+void nova2001_state::init_raiders5()
 {
 	lineswap_gfx_roms("gfx1", 13);
 	lineswap_gfx_roms("gfx2", 13);
@@ -1035,11 +1035,11 @@ DRIVER_INIT_MEMBER(nova2001_state,raiders5)
 // many of these don't explicitly state Japan, eg. Nova 2001 could easily be used anywhere.
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1983, nova2001,  0,        nova2001, nova2001, nova2001_state, 0,        ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nova2001h, nova2001, nova2001, nova2001, nova2001_state, 0,        ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nova2001u, nova2001, nova2001, nova2001, nova2001_state, 0,        ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ninjakun,  0,        ninjakun, ninjakun, nova2001_state, 0,        ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar,  nova2001_state, pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar,  nova2001_state, pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, raiders5,  0,        raiders5, raiders5, nova2001_state, raiders5, ROT0,   "UPL", "Raiders5", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, raiders5t, raiders5, raiders5, raiders5, nova2001_state, raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001,  0,        nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001h, nova2001, nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001u, nova2001, nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ninjakun,  0,        ninjakun, ninjakun, nova2001_state, empty_init,    ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar,  nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar,  nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5,  0,        raiders5, raiders5, nova2001_state, init_raiders5, ROT0,   "UPL", "Raiders5", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5t, raiders5, raiders5, raiders5, nova2001_state, init_raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan)", MACHINE_SUPPORTS_SAVE )

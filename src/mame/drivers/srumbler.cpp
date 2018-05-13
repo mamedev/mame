@@ -474,7 +474,7 @@ ROM_END
 
 
 
-GAME( 1986, srumbler,  0,        srumbler, srumbler, srumbler_state, 0, ROT270, "Capcom", "The Speed Rumbler (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, srumbler2, srumbler, srumbler, srumbler, srumbler_state, 0, ROT270, "Capcom", "The Speed Rumbler (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, srumbler3, srumbler, srumbler, srumbler, srumbler_state, 0, ROT270, "Capcom (Tecfri license)", "The Speed Rumbler (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rushcrsh,  srumbler, srumbler, srumbler, srumbler_state, 0, ROT270, "Capcom", "Rush & Crash (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, srumbler,  0,        srumbler, srumbler, srumbler_state, empty_init, ROT270, "Capcom", "The Speed Rumbler (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, srumbler2, srumbler, srumbler, srumbler, srumbler_state, empty_init, ROT270, "Capcom", "The Speed Rumbler (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, srumbler3, srumbler, srumbler, srumbler, srumbler_state, empty_init, ROT270, "Capcom (Tecfri license)", "The Speed Rumbler (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rushcrsh,  srumbler, srumbler, srumbler, srumbler_state, empty_init, ROT270, "Capcom", "Rush & Crash (Japan)", MACHINE_SUPPORTS_SAVE )

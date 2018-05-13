@@ -105,7 +105,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(pcat_nit_rombank_w);
 	DECLARE_READ8_MEMBER(pcat_nit_io_r);
-	DECLARE_DRIVER_INIT(pcat_nit);
+	void init_pcat_nit();
 	virtual void machine_start() override;
 	void bonanza(machine_config &config);
 	void pcat_nit(machine_config &config);
@@ -422,15 +422,15 @@ ROM_START(streetg2r5)
 	ROM_LOAD("8k_nvram.u9",     0x00000, 0x02000, CRC(44be0b89) SHA1(81666dd369d1d85269833293136d61ffe80e940a))
 ROM_END
 
-DRIVER_INIT_MEMBER(pcat_nit_state,pcat_nit)
+void pcat_nit_state::init_pcat_nit()
 {
 	m_banked_nvram = std::make_unique<uint8_t[]>(0x2000);
 	machine().device<nvram_device>("nvram")->set_base(m_banked_nvram.get(), 0x2000);
 }
 
-GAME( 1993, streetg,    0,         pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 4)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 1993, streetgr3,  streetg,   pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 3)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 1993, streetg2,   0,         pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 7C)", MACHINE_NO_SOUND ) // Street Games II+, 10-0007-07 083194
-GAME( 1993, streetg2r5, streetg2,  pcat_nit,  pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 5)", MACHINE_NO_SOUND )
-GAME( 1994, bonanza,    0,         bonanza,   pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Touchstar Bonanza (Revision 3)", MACHINE_NO_SOUND ) // Bonanza 10-0018-03 090894
-GAME( 1994, bonanzar2,  bonanza,   bonanza,   pcat_nit, pcat_nit_state, pcat_nit, ROT0, "New Image Technologies",  "Touchstar Bonanza (Revision 2)", MACHINE_NO_SOUND ) // Bonanza 10-0018-02 081794
+GAME( 1993, streetg,    0,         pcat_nit,  pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 4)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1993, streetgr3,  streetg,   pcat_nit,  pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Street Games (Revision 3)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1993, streetg2,   0,         pcat_nit,  pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 7C)", MACHINE_NO_SOUND ) // Street Games II+, 10-0007-07 083194
+GAME( 1993, streetg2r5, streetg2,  pcat_nit,  pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Street Games II (Revision 5)", MACHINE_NO_SOUND )
+GAME( 1994, bonanza,    0,         bonanza,   pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Touchstar Bonanza (Revision 3)", MACHINE_NO_SOUND ) // Bonanza 10-0018-03 090894
+GAME( 1994, bonanzar2,  bonanza,   bonanza,   pcat_nit, pcat_nit_state, init_pcat_nit, ROT0, "New Image Technologies",  "Touchstar Bonanza (Revision 2)", MACHINE_NO_SOUND ) // Bonanza 10-0018-02 081794

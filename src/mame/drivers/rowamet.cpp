@@ -260,4 +260,4 @@ ROM_END
 /-------------------------------------------------------------------*/
 
 
-GAME(198?, heavymtl, 0, rowamet, rowamet, rowamet_state, 0,  ROT0,  "Rowamet", "Heavy Metal", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(198?, heavymtl, 0, rowamet, rowamet, rowamet_state, empty_init, ROT0, "Rowamet", "Heavy Metal", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

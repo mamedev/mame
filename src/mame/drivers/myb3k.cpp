@@ -1063,7 +1063,7 @@ ROM_START( stepone )
 	ROM_LOAD( "steponebios-v2.07.bin", 0xe000, 0x2000, CRC(322c1618) SHA1(a7a3cc2af7cc9556007d98014714ba656f6e79d1))
 ROM_END
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT  STATE           INIT   COMPANY        FULLNAME        FLAGS
-COMP( 1982, myb3k,   0,      0,       myb3k,     myb3k, myb3k_state,    0,     "Matsushita",  "MyBrain 3000", 0)
-COMP( 1982, jb3000,  myb3k,  0,       jb3000,    myb3k, myb3k_state,    0,     "Panasonic",   "JB-3000",      0)
-COMP( 1984, stepone, myb3k,  0,       stepone,   myb3k, myb3k_state,    0,     "Ericsson",    "Step/One",     0)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY       FULLNAME        FLAGS
+COMP( 1982, myb3k,   0,      0,      myb3k,   myb3k, myb3k_state, empty_init, "Matsushita", "MyBrain 3000", 0)
+COMP( 1982, jb3000,  myb3k,  0,      jb3000,  myb3k, myb3k_state, empty_init, "Panasonic",  "JB-3000",      0)
+COMP( 1984, stepone, myb3k,  0,      stepone, myb3k, myb3k_state, empty_init, "Ericsson",   "Step/One",     0)

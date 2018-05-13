@@ -174,7 +174,7 @@ WRITE_LINE_MEMBER(mc1502_state::mc1502_speaker_set_spkrdata)
 	m_speaker->level_w(m_spkrdata & m_pit_out2);
 }
 
-DRIVER_INIT_MEMBER(mc1502_state, mc1502)
+void mc1502_state::init_mc1502()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -392,6 +392,6 @@ ROM_END
 
 ***************************************************************************/
 
-//     YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       STATE         INIT      COMPANY               FULLNAME               FLAGS
-COMP ( 1989, mc1502, 0,      0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika MS 1502", MACHINE_IMPERFECT_GRAPHICS )
-COMP ( 1988, pk88,   0,      0,      mc1502,     mc1502,     mc1502_state, mc1502,   "NPO Microprocessor", "Elektronika PK-88",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//     YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT         COMPANY               FULLNAME               FLAGS
+COMP ( 1989, mc1502, 0,      0,      mc1502,  mc1502,  mc1502_state, init_mc1502, "NPO Microprocessor", "Elektronika MS 1502", MACHINE_IMPERFECT_GRAPHICS )
+COMP ( 1988, pk88,   0,      0,      mc1502,  mc1502,  mc1502_state, init_mc1502, "NPO Microprocessor", "Elektronika PK-88",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

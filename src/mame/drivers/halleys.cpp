@@ -270,9 +270,9 @@ public:
 	DECLARE_READ8_MEMBER(io_mirror_r);
 	void blit(int offset);
 	DECLARE_WRITE8_MEMBER(sndnmi_msk_w);
-	DECLARE_DRIVER_INIT(halley87);
-	DECLARE_DRIVER_INIT(benberob);
-	DECLARE_DRIVER_INIT(halleys);
+	void init_halley87();
+	void init_benberob();
+	void init_halleys();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(halleys);
@@ -2202,7 +2202,7 @@ void halleys_state::init_common()
 }
 
 
-DRIVER_INIT_MEMBER(halleys_state,benberob)
+void halleys_state::init_benberob()
 {
 	m_game_id = GAME_BENBEROB;
 
@@ -2212,7 +2212,7 @@ DRIVER_INIT_MEMBER(halleys_state,benberob)
 }
 
 
-DRIVER_INIT_MEMBER(halleys_state,halleys)
+void halleys_state::init_halleys()
 {
 	m_game_id = GAME_HALLEYS;
 	m_collision_detection = 0xb114;
@@ -2220,7 +2220,7 @@ DRIVER_INIT_MEMBER(halleys_state,halleys)
 	init_common();
 }
 
-DRIVER_INIT_MEMBER(halleys_state,halley87)
+void halleys_state::init_halley87()
 {
 	m_game_id = GAME_HALLEYS;
 	m_collision_detection = 0xb10d;
@@ -2232,8 +2232,8 @@ DRIVER_INIT_MEMBER(halleys_state,halley87)
 //**************************************************************************
 // Game Definitions
 
-GAME( 1984, benberob, 0,       benberob, benberob, halleys_state, benberob,  ROT0,  "Taito",                                       "Ben Bero Beh (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halleys,  0,       halleys,  halleys,  halleys_state, halleys,   ROT90, "Taito America Corporation (Coin-It license)", "Halley's Comet (US)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halleysc, halleys, halleys,  halleys,  halleys_state, halleys,   ROT90, "Taito Corporation",                           "Halley's Comet (Japan, Newer)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halleycj, halleys, halleys,  halleys,  halleys_state, halleys,   ROT90, "Taito Corporation",                           "Halley's Comet (Japan, Older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halley87, halleys, halleys,  halleys,  halleys_state, halley87,  ROT90, "Taito Corporation",                           "Halley's Comet '87",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1984, benberob, 0,       benberob, benberob, halleys_state, init_benberob, ROT0,  "Taito",                                       "Ben Bero Beh (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halleys,  0,       halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito America Corporation (Coin-It license)", "Halley's Comet (US)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halleysc, halleys, halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito Corporation",                           "Halley's Comet (Japan, Newer)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halleycj, halleys, halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito Corporation",                           "Halley's Comet (Japan, Older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halley87, halleys, halleys,  halleys,  halleys_state, init_halley87, ROT90, "Taito Corporation",                           "Halley's Comet '87",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )

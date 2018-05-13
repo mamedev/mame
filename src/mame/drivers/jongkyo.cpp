@@ -59,7 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(unknown_w);
 	DECLARE_READ8_MEMBER(input_1p_r);
 	DECLARE_READ8_MEMBER(input_2p_r);
-	DECLARE_DRIVER_INIT(jongkyo);
+	void init_jongkyo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -564,7 +564,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(jongkyo_state,jongkyo)
+void jongkyo_state::init_jongkyo()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -602,4 +602,4 @@ DRIVER_INIT_MEMBER(jongkyo_state,jongkyo)
  *
  *************************************/
 
-GAME( 1985, jongkyo,  0,    jongkyo, jongkyo, jongkyo_state,  jongkyo, ROT0, "Kiwako", "Jongkyo", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, jongkyo, 0, jongkyo, jongkyo, jongkyo_state, init_jongkyo, ROT0, "Kiwako", "Jongkyo", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

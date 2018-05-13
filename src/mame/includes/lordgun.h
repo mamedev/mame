@@ -89,8 +89,8 @@ public:
 	DECLARE_WRITE8_MEMBER(aliencha_dip_w);
 	DECLARE_WRITE8_MEMBER(lordgun_okibank_w);
 
-	DECLARE_DRIVER_INIT(aliencha);
-	DECLARE_DRIVER_INIT(lordgun);
+	void init_aliencha();
+	void init_lordgun();
 
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);

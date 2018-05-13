@@ -147,7 +147,7 @@ public:
 	DECLARE_READ8_MEMBER(apc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(apc_dma_write_byte);
 
-	DECLARE_DRIVER_INIT(apc);
+	void init_apc();
 
 	int m_dack;
 	uint8_t m_dma_offset[4];
@@ -1013,9 +1013,9 @@ ROM_START( apc )
 	ROM_REGION( 0x2000, "aux_pcg", ROMREGION_ERASE00 )
 ROM_END
 
-DRIVER_INIT_MEMBER(apc_state,apc)
+void apc_state::init_apc()
 {
 	// ...
 }
 
-COMP( 1982, apc,  0,   0, apc,  apc, apc_state,  apc,      "NEC",      "APC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, apc, 0, 0, apc, apc, apc_state, init_apc, "NEC", "APC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -810,6 +810,6 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT    STATE          INIT    COMPANY             FULLNAME        FLAGS
-COMP( 1984, kontiki,    0,          0,      tiki100,    tiki100, tiki100_state, 0,      "Kontiki Data A/S", "KONTIKI 100",  MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tiki100,    kontiki,    0,      tiki100,    tiki100, tiki100_state, 0,      "Tiki Data A/S",    "TIKI 100",     MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME        FLAGS
+COMP( 1984, kontiki, 0,       0,      tiki100, tiki100, tiki100_state, empty_init, "Kontiki Data A/S", "KONTIKI 100",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tiki100, kontiki, 0,      tiki100, tiki100, tiki100_state, empty_init, "Tiki Data A/S",    "TIKI 100",     MACHINE_SUPPORTS_SAVE )

@@ -82,9 +82,9 @@ public:
 	DECLARE_WRITE8_MEMBER(out_lamps0);
 	DECLARE_WRITE8_MEMBER(out_lamps1);
 
-	DECLARE_DRIVER_INIT(gaplus);
-	DECLARE_DRIVER_INIT(gaplusd);
-	DECLARE_DRIVER_INIT(galaga3);
+	void init_gaplus();
+	void init_gaplusd();
+	void init_galaga3();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
