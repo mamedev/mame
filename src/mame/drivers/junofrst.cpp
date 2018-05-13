@@ -111,7 +111,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(junofrst);
+	void init_junofrst();
 
 	void junofrst(machine_config &config);
 
@@ -124,7 +124,6 @@ protected:
 	DECLARE_READ8_MEMBER(portA_r);
 	DECLARE_WRITE8_MEMBER(portB_w);
 
-	void init_junofrst();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

@@ -1135,9 +1135,6 @@ ROM_START( pbchmp95 ) /* Licensed for Germany? */
 	ROM_LOAD( "tbp24s10n.10k", 0x000, 0x100, CRC(ee7b9d8f) SHA1(3a7b75befab83bc37e4e403ad3632841c2d37707) ) /* Currently unused, unknown use */
 ROM_END
 
-<<<<<<< HEAD
-void witch_state::init_witch()
-=======
 ROM_START( keirinou ) /* ES8611 PCB */
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
     ROM_LOAD( "y5-03.y5",     0x000000, 0x008000, CRC(df2acc37) SHA1(9ad953843ba7859a55888fb87591cc8d322136ad) )
@@ -1162,7 +1159,7 @@ ROM_START( keirinou ) /* ES8611 PCB */
 	ROM_LOAD( "n82s129an.r8",      0x000000, 0x000100, CRC(ee7b9d8f) SHA1(3a7b75befab83bc37e4e403ad3632841c2d37707) ) /* N82S129AN BPROM stamped  K  */
 ROM_END
 
-void witch_state::witch()
+void witch_state::init_witch()
 {
 	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000 + UNBANKED_SIZE, 0x8000);
 	m_mainbank->set_entry(0);

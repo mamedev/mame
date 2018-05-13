@@ -721,7 +721,7 @@ void deadang_state::init_deadang()
 	m_adpcm2->decrypt();
 }
 
-void popnrun_state::init_popnrun
+void popnrun_state::init_popnrun()
 {
 //	m_adpcm1->decrypt();
 //	m_adpcm2->decrypt();

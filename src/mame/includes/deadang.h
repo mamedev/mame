@@ -78,7 +78,8 @@ public:
 	: deadang_state(mconfig, type, tag)
 	{}
 
-	DECLARE_DRIVER_INIT(popnrun);
+	void init_popnrun();
+
 	TILE_GET_INFO_MEMBER(get_popnrun_text_tile_info);
 	DECLARE_WRITE16_MEMBER(popnrun_text_w);
 	void popnrun_main_map(address_map &map);

@@ -263,20 +263,20 @@ public:
 	void sharkpy(machine_config &config);
 	void victor5(machine_config &config);
 
-	DECLARE_DRIVER_INIT(stbsub);
-	DECLARE_DRIVER_INIT(stisub);
-	DECLARE_DRIVER_INIT(tesorone);
-	DECLARE_DRIVER_INIT(tesorone230);
-	DECLARE_DRIVER_INIT(smoto20);
-	DECLARE_DRIVER_INIT(sharkpy);
-	DECLARE_DRIVER_INIT(smoto16);
-	DECLARE_DRIVER_INIT(crsbingo);
-	DECLARE_DRIVER_INIT(victor21);
-	DECLARE_DRIVER_INIT(victor5);
-	DECLARE_DRIVER_INIT(tisuba);
-	DECLARE_DRIVER_INIT(sharkpye);
-	DECLARE_DRIVER_INIT(tisub);
-	DECLARE_DRIVER_INIT(mtrainnv);
+	void init_stbsub();
+	void init_stisub();
+	void init_tesorone();
+	void init_tesorone230();
+	void init_smoto20();
+	void init_sharkpy();
+	void init_smoto16();
+	void init_crsbingo();
+	void init_victor21();
+	void init_victor5();
+	void init_tisuba();
+	void init_sharkpye();
+	void init_tisub();
+	void init_mtrainnv();
 
 protected:
 	virtual void machine_start() override;
@@ -314,20 +314,6 @@ private:
 	DECLARE_WRITE8_MEMBER(out_c_w);
 	DECLARE_WRITE8_MEMBER(reel_scrollattr_w);
 	DECLARE_READ8_MEMBER(reel_scrollattr_r);
-	void init_stbsub();
-	void init_stisub();
-	void init_tesorone();
-	void init_tesorone230();
-	void init_smoto20();
-	void init_sharkpy();
-	void init_smoto16();
-	void init_crsbingo();
-	void init_victor21();
-	void init_victor5();
-	void init_tisuba();
-	void init_sharkpye();
-	void init_tisub();
-	void init_mtrainnv();
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_stbsub_tile_info);

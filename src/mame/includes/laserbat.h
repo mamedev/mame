@@ -60,7 +60,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(laserbat);
+	void init_laserbat();
 
 	void laserbat_base(machine_config &config);
 	void laserbat_io_map(address_map &map);
@@ -73,7 +73,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(ct_io_w);
 	DECLARE_READ8_MEMBER(rrowx_r);
 
-	void init_laserbat();
 	INTERRUPT_GEN_MEMBER(laserbat_interrupt);
 
 	// video memory and control ports

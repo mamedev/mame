@@ -46,7 +46,7 @@ public:
 	void _60in1(machine_config &config);
 	void _39in1(machine_config &config);
 
-	DECLARE_DRIVER_INIT(39in1);
+	void init_39in1();
 private:
 	uint32_t m_seed;
 	uint32_t m_magic;
@@ -85,7 +85,6 @@ private:
 	DECLARE_READ32_MEMBER(cpld_r);
 	DECLARE_WRITE32_MEMBER(cpld_w);
 	DECLARE_READ32_MEMBER(prot_cheater_r);
-	void init_39in1();
 	DECLARE_MACHINE_START(60in1);
 	virtual void machine_start() override;
 	uint32_t screen_update_39in1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

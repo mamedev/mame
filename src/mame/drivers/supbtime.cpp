@@ -537,7 +537,7 @@ ROM_END
 //  MACHINE
 //**************************************************************************
 
-DRIVER_INIT_MEMBER( supbtime_state, tumblep )
+void supbtime_state::init_tumblep()
 {
 	deco56_decrypt_gfx(machine(), "tiles");
 

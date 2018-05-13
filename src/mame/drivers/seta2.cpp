@@ -4212,4 +4212,3 @@ GAME( 2001, funcube2,  0,        funcube2, funcube,  seta2_state, init_funcube2,
 GAME( 2001, funcube3,  0,        funcube3, funcube,  seta2_state, init_funcube3, ROT0,   "Namco",                 "Funcube 3 (v1.1)",                             MACHINE_NO_COCKTAIL )
 GAME( 2001, funcube4,  0,        funcube2, funcube,  seta2_state, init_funcube2, ROT0,   "Namco",                 "Funcube 4 (v1.0)",                             MACHINE_NO_COCKTAIL )
 GAME( 2002, funcube5,  0,        funcube2, funcube,  seta2_state, init_funcube2, ROT0,   "Namco",                 "Funcube 5 (v1.0)",                             MACHINE_NO_COCKTAIL )
->>>
