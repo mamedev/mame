@@ -476,6 +476,7 @@ static void isa_internal_devices(device_slot_interface &device)
 void pcipc_state::superio_config(device_t *device)
 {
 	devcb_base *devcb = nullptr;
+	(void)devcb;
 	MCFG_FDC37C93X_SYSOPT(1)
 	MCFG_FDC37C93X_GP20_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
 	MCFG_FDC37C93X_GP25_GATEA20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
