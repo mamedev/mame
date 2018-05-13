@@ -593,7 +593,7 @@ MACHINE_CONFIG_START(zodiack_state::zodiack)
 	MCFG_PALETTE_INIT_OWNER(zodiack_state,zodiack)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -729,19 +729,19 @@ ROM_START( bounty2 ) // The PCB uses a large CPU epoxy module marked "CPU PACKII
 	ROM_LOAD( "mb7051.2b",   0x0020, 0x0020, CRC(465e31d4) SHA1(d47a4aa0e8931dcd8f85017ef04c2f6ad79f5725) )
 ROM_END
 
-DRIVER_INIT_MEMBER(zodiack_state,zodiack)
+void zodiack_state::init_zodiack()
 {
 	m_percuss_hardware = false;
 }
 
-DRIVER_INIT_MEMBER(zodiack_state,percuss)
+void zodiack_state::init_percuss()
 {
 	m_percuss_hardware = true;
 }
 
-GAME( 1983, zodiack,  0,      zodiack, zodiack,  zodiack_state, zodiack, ROT270, "Orca (Esco Trading Co., Inc. license)", "Zodiack",                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
-GAME( 1983, dogfight, 0,      zodiack, dogfight, zodiack_state, zodiack, ROT270, "Orca / Thunderbolt",                    "Dog Fight (Thunderbolt)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
-GAME( 1982, moguchan, 0,      zodiack, moguchan, zodiack_state, percuss, ROT270, "Orca (Eastern Commerce Inc. license)",  "Mogu Chan (bootleg?)",    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) /* license copyright taken from ROM string at $0b5c */
-GAME( 1981, percuss,  0,      zodiack, percuss,  zodiack_state, percuss, ROT270, "Orca",                                  "The Percussor",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bounty,   0,      zodiack, bounty,   zodiack_state, percuss, ROT180, "Orca",                                  "The Bounty (set 1)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bounty2,  bounty, zodiack, bounty,   zodiack_state, percuss, ROT180, "Orca",                                  "The Bounty (set 2)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // seems to use a different memory map
+GAME( 1983, zodiack,  0,      zodiack, zodiack,  zodiack_state, init_zodiack, ROT270, "Orca (Esco Trading Co., Inc. license)", "Zodiack",                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
+GAME( 1983, dogfight, 0,      zodiack, dogfight, zodiack_state, init_zodiack, ROT270, "Orca / Thunderbolt",                    "Dog Fight (Thunderbolt)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
+GAME( 1982, moguchan, 0,      zodiack, moguchan, zodiack_state, init_percuss, ROT270, "Orca (Eastern Commerce Inc. license)",  "Mogu Chan (bootleg?)",    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) /* license copyright taken from ROM string at $0b5c */
+GAME( 1981, percuss,  0,      zodiack, percuss,  zodiack_state, init_percuss, ROT270, "Orca",                                  "The Percussor",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bounty,   0,      zodiack, bounty,   zodiack_state, init_percuss, ROT180, "Orca",                                  "The Bounty (set 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bounty2,  bounty, zodiack, bounty,   zodiack_state, init_percuss, ROT180, "Orca",                                  "The Bounty (set 2)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // seems to use a different memory map

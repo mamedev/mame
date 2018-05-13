@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(mikie_state::mikie)
 	MCFG_PALETTE_INIT_OWNER(mikie_state, mikie)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -394,6 +394,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, mikie,   0,     mikie, mikie, mikie_state, 0, ROT270, "Konami", "Mikie",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mikiej,  mikie, mikie, mikie, mikie_state, 0, ROT270, "Konami", "Shinnyuushain Tooru-kun",      MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mikiehs, mikie, mikie, mikie, mikie_state, 0, ROT270, "Konami", "Mikie (High School Graffiti)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikie,   0,     mikie, mikie, mikie_state, empty_init, ROT270, "Konami", "Mikie",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikiej,  mikie, mikie, mikie, mikie_state, empty_init, ROT270, "Konami", "Shinnyuushain Tooru-kun",      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikiehs, mikie, mikie, mikie, mikie_state, empty_init, ROT270, "Konami", "Mikie (High School Graffiti)", MACHINE_SUPPORTS_SAVE )

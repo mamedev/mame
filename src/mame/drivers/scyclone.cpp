@@ -637,7 +637,7 @@ MACHINE_CONFIG_START(scyclone_state::scyclone)
 	MCFG_PALETTE_ADD("palette", 8 + 4*4)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_DEVICE_ADD("snsnd0", SN76477)
 	MCFG_SN76477_ENABLE(1)
@@ -696,4 +696,4 @@ ROM_START( scyclone )
 	ROM_LOAD( "de17.2e.82s123", 0x0020, 0x0020, CRC(3c8572e4) SHA1(c908c4ed99828fff576c3d0963cd8b99edeb993b) )
 ROM_END
 
-GAME( 1980, scyclone,  0,    scyclone, scyclone, scyclone_state, 0, ROT270, "Taito Corporation", "Space Cyclone", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, scyclone,  0,    scyclone, scyclone, scyclone_state, empty_init, ROT270, "Taito Corporation", "Space Cyclone", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -49,7 +49,7 @@ public:
 		, m_bank(*this, "bank%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(pengadvb);
+	void init_pengadvb();
 	void pengadvb(machine_config &config);
 
 protected:
@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(pengadvb_state::pengadvb)
 	MCFG_SCREEN_UPDATE_DEVICE("tms9128", tms9128_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(10'738'635)/6)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pengadvb_state, pengadvb_psg_port_b_w))
@@ -313,7 +313,7 @@ void pengadvb_state::pengadvb_decrypt(const char* region)
 		mem[i] = buf[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,5,11,10,9,8,7,6,12,4,3,2,1,0)];
 }
 
-DRIVER_INIT_MEMBER(pengadvb_state,pengadvb)
+void pengadvb_state::init_pengadvb()
 {
 	pengadvb_decrypt("maincpu");
 	pengadvb_decrypt("game");
@@ -342,4 +342,4 @@ ROM_START( pengadvb )
 ROM_END
 
 
-GAME( 1988, pengadvb, 0, pengadvb, pengadvb, pengadvb_state, pengadvb, ROT0, "bootleg (Screen) / Konami", "Penguin Adventure (bootleg of MSX version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, pengadvb, 0, pengadvb, pengadvb, pengadvb_state, init_pengadvb, ROT0, "bootleg (Screen) / Konami", "Penguin Adventure (bootleg of MSX version)", MACHINE_SUPPORTS_SAVE )

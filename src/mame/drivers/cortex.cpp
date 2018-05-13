@@ -70,7 +70,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vdp_int_w);
 	DECLARE_READ8_MEMBER(pio_r);
 	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_DRIVER_INIT(init);
+	void init_init();
 
 	void cortex(machine_config &config);
 	void io_map(address_map &map);
@@ -170,7 +170,7 @@ void cortex_state::machine_reset()
 	m_maincpu->reset_line(ASSERT_LINE);
 }
 
-DRIVER_INIT_MEMBER( cortex_state, init )
+void cortex_state::init_init()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -210,7 +210,7 @@ MACHINE_CONFIG_START(cortex_state::cortex)
 	//MCFG_DEVICE_ADD("uart2", TMS9902, XTAL(12'000'000) / 4)
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 MACHINE_CONFIG_END
@@ -229,5 +229,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                  FULLNAME  FLAGS
-COMP( 1982, cortex, 0,      0,       cortex,    cortex, cortex_state, init, "Powertran Cybernetics", "Cortex", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT       COMPANY                  FULLNAME  FLAGS
+COMP( 1982, cortex, 0,      0,      cortex,  cortex, cortex_state, init_init, "Powertran Cybernetics", "Cortex", MACHINE_NOT_WORKING )

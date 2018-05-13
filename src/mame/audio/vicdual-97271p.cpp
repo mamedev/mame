@@ -87,7 +87,7 @@ s97271p_device::s97271p_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(s97271p_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* samples */
 	MCFG_DEVICE_ADD("samples", SAMPLES)

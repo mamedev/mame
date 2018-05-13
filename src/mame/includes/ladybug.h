@@ -67,7 +67,7 @@ public:
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
-	DECLARE_DRIVER_INIT(dorodon);
+	void init_dorodon();
 	void dorodon(machine_config &config);
 
 protected:

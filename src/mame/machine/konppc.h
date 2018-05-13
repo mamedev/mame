@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "video/voodoo.h"
+
 #define MCFG_KONPPC_CGBOARD_NUMBER(_num) \
 	downcast<konppc_device &>(*device).set_num_boards(_num);
 
@@ -71,6 +73,9 @@ protected:
 	uint32_t nwk_fifo_r(address_space &space, int board);
 	void nwk_fifo_w(int board, uint32_t data);
 private:
+	// device finders
+	required_device_array<voodoo_device, 2> m_voodoo;
+
 	// internal state
 	uint32_t dsp_comm_ppc[MAX_CG_BOARDS][2];
 	uint32_t dsp_comm_sharc[MAX_CG_BOARDS][2];

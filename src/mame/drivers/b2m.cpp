@@ -235,7 +235,7 @@ MACHINE_CONFIG_START(b2m_state::b2m)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -277,6 +277,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE        INIT     COMPANY   FULLNAME                  FLAGS */
-COMP( 1989, b2m,    0,      0,      b2m,        b2m,   b2m_state,   b2m,     "BNPO",   "Bashkiria-2M",           MACHINE_SUPPORTS_SAVE)
-COMP( 1989, b2mrom, b2m,    0,      b2mrom,     b2m,   b2m_state,   b2m,     "BNPO",   "Bashkiria-2M ROM-disk",  MACHINE_SUPPORTS_SAVE)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                 FLAGS */
+COMP( 1989, b2m,    0,      0,      b2m,     b2m,   b2m_state, empty_init, "BNPO",  "Bashkiria-2M",          MACHINE_SUPPORTS_SAVE)
+COMP( 1989, b2mrom, b2m,    0,      b2mrom,  b2m,   b2m_state, empty_init, "BNPO",  "Bashkiria-2M ROM-disk", MACHINE_SUPPORTS_SAVE)

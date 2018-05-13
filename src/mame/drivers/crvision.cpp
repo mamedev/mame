@@ -763,13 +763,12 @@ MACHINE_CONFIG_START(crvision_state::creativision)
 	MCFG_OUTPUT_LATCH_BIT4_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76489_TAG, SN76489A, XTAL(2'000'000))
 	MCFG_SN76496_READY_HANDLER(WRITELINE(PIA6821_TAG, pia6821_device, cb1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(1, "mono", 0.25);
 
 	// cartridge
 	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
@@ -846,14 +845,13 @@ MACHINE_CONFIG_START(laser2001_state::lasr2001)
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9929a_device, screen_update )
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(SN76489_TAG, SN76489A, XTAL(17'734'470)/9)
 	MCFG_SN76496_READY_HANDLER(WRITELINE(*this, laser2001_state, write_psg_ready))
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(1, "mono", 0.25);
 
 	// cartridge
 	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
@@ -903,14 +901,14 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE   INPUT     STATE               INIT  COMPANY                   FULLNAME                       FLAGS
-CONS( 1982, crvision,   0,          0,      pal,      crvision, crvision_pal_state, 0,    "Video Technology",       "CreatiVision",                0 )
-CONS( 1982, fnvision,   crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Video Technology",       "FunVision",                   0 )
-CONS( 1982, crvisioj,   crvision,   0,      ntsc,     crvision, crvision_state,     0,    "Cheryco",                "CreatiVision (Japan)",        0 )
-CONS( 1982, wizzard,    crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Dick Smith Electronics", "Wizzard (Oceania)",           0 )
-CONS( 1982, rameses,    crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Hanimex",                "Rameses (Oceania)",           0 )
-CONS( 1983, vz2000,     crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Dick Smith Electronics", "VZ 2000 (Oceania)",           0 )
-CONS( 1983, crvisio2,   crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Video Technology",       "CreatiVision MK-II (Europe)", 0 )
-COMP( 1983, lasr2001,   0,          0,      lasr2001, manager,  laser2001_state,    0,    "Video Technology",       "Laser 2001",                  0 )
-//COMP( 1983, vz2001,     lasr2001,   0,      lasr2001, lasr2001, laser2001_state,    0,    "Dick Smith Electronics", "VZ 2001 (Oceania)",           0 )
-COMP( 1983, manager,    0,          0,      lasr2001, manager, laser2001_state,     0,     "Salora",                "Manager (Finland)",           0 )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS               INIT        COMPANY                   FULLNAME                       FLAGS
+CONS( 1982, crvision, 0,        0,      pal,      crvision, crvision_pal_state, empty_init, "Video Technology",       "CreatiVision",                0 )
+CONS( 1982, fnvision, crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Video Technology",       "FunVision",                   0 )
+CONS( 1982, crvisioj, crvision, 0,      ntsc,     crvision, crvision_state,     empty_init, "Cheryco",                "CreatiVision (Japan)",        0 )
+CONS( 1982, wizzard,  crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Dick Smith Electronics", "Wizzard (Oceania)",           0 )
+CONS( 1982, rameses,  crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Hanimex",                "Rameses (Oceania)",           0 )
+CONS( 1983, vz2000,   crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Dick Smith Electronics", "VZ 2000 (Oceania)",           0 )
+CONS( 1983, crvisio2, crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Video Technology",       "CreatiVision MK-II (Europe)", 0 )
+COMP( 1983, lasr2001, 0,        0,      lasr2001, manager,  laser2001_state,    empty_init, "Video Technology",       "Laser 2001",                  0 )
+//COMP( 1983, vz2001,   lasr2001, 0,      lasr2001, lasr2001, laser2001_state,    empty_init, "Dick Smith Electronics", "VZ 2001 (Oceania)",           0 )
+COMP( 1983, manager,  0,        0,      lasr2001, manager, laser2001_state,     empty_init, "Salora",                 "Manager (Finland)",           0 )

@@ -106,7 +106,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(hblank_irq_ack_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gx_rdport1_3_r);
-	DECLARE_DRIVER_INIT(konamigx);
+	void init_konamigx();
 	TILE_GET_INFO_MEMBER(get_gx_psac_tile_info);
 	TILE_GET_INFO_MEMBER(get_gx_psac3_tile_info);
 	TILE_GET_INFO_MEMBER(get_gx_psac3_alt_tile_info);
@@ -260,7 +260,7 @@ public:
 	int m_konamigx_type3_psac2_actual_bank;
 	//int m_konamigx_type3_psac2_actual_last_bank = 0;
 
-	DECLARE_DRIVER_INIT(posthack);
+	void init_posthack();
 	int m_use_68020_post_clock_hack;
 	void konamigx_6bpp(machine_config &config);
 	void gxtype4(machine_config &config);

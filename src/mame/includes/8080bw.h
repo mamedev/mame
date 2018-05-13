@@ -123,10 +123,10 @@ public:
 	DECLARE_READ8_MEMBER(schaser_scattered_colorram_r);
 	DECLARE_WRITE8_MEMBER(schaser_scattered_colorram_w);
 
-	DECLARE_DRIVER_INIT(invmulti);
-	DECLARE_DRIVER_INIT(spacecom);
-	DECLARE_DRIVER_INIT(vortex);
-	DECLARE_DRIVER_INIT(attackfc);
+	void init_invmulti();
+	void init_spacecom();
+	void init_vortex();
+	void init_attackfc();
 
 	DECLARE_MACHINE_START(extra_8080bw);
 	DECLARE_MACHINE_START(rollingc);
@@ -247,9 +247,9 @@ public:
 extern const char *const lrescue_sample_names[];
 extern const char *const lupin3_sample_names[];
 
-DISCRETE_SOUND_EXTERN( ballbomb );
-DISCRETE_SOUND_EXTERN( indianbt );
-DISCRETE_SOUND_EXTERN( polaris );
-DISCRETE_SOUND_EXTERN( schaser );
+DISCRETE_SOUND_EXTERN( ballbomb_discrete );
+DISCRETE_SOUND_EXTERN( indianbt_discrete );
+DISCRETE_SOUND_EXTERN( polaris_discrete );
+DISCRETE_SOUND_EXTERN( schaser_discrete );
 
 #endif // MAME_INCLUDES_8080BW_H

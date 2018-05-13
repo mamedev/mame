@@ -392,11 +392,9 @@ MACHINE_CONFIG_START(jr100_state::jr100)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, jr100_state,jr100_via_write_b))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, jr100_state, jr100_via_write_cb2))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	MCFG_DEVICE_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
@@ -424,6 +422,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT    COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY      FULLNAME   FLAGS
-COMP( 1981, jr100,  0,        0,      jr100,   jr100, jr100_state, 0,     "National",  "JR-100",  0 )
-COMP( 1981, jr100u, jr100,    0,      jr100,   jr100, jr100_state, 0,     "Panasonic", "JR-100U", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME   FLAGS
+COMP( 1981, jr100,  0,      0,      jr100,   jr100, jr100_state, empty_init, "National",  "JR-100",  0 )
+COMP( 1981, jr100u, jr100,  0,      jr100,   jr100, jr100_state, empty_init, "Panasonic", "JR-100U", 0 )

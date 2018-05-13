@@ -386,7 +386,7 @@ MACHINE_CONFIG_START(chaknpop_state::chaknpop)
 	MCFG_PALETTE_INIT_OWNER(chaknpop_state, chaknpop)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'000'000) / 12)  // Verified on PCB
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
@@ -431,5 +431,5 @@ ROM_START( chaknpop )
 ROM_END
 
 
-//  ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      MONITOR  COMPANY              FULLNAME       FLAGS )
-GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, chaknpop_state, 0,        ROT0,    "Taito Corporation", "Chack'n Pop", MACHINE_SUPPORTS_SAVE )
+//  ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY              FULLNAME       FLAGS )
+GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, chaknpop_state, empty_init, ROT0,    "Taito Corporation", "Chack'n Pop", MACHINE_SUPPORTS_SAVE )

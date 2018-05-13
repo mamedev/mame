@@ -75,7 +75,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port60_w);
 	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	DECLARE_DRIVER_INIT(fc100);
+	void init_fc100();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
@@ -501,7 +501,7 @@ WRITE8_MEMBER( fc100_state::port70_w )
 	m_banksw_unlocked = (bool)offset;
 }
 
-DRIVER_INIT_MEMBER( fc100_state, fc100 )
+void fc100_state::init_fc100()
 {
 	uint8_t *ram = memregion("ram")->base();
 	uint8_t *cgen = memregion("chargen")->base()+0x800;
@@ -529,9 +529,8 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	MCFG_PALETTE_ADD_MONOCHROME("f4palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 	MCFG_DEVICE_ADD("psg", AY8910, XTAL(7'159'090)/3/2)  /* AY-3-8910 - clock not verified */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("JOY1"))
@@ -578,5 +577,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS        INIT    COMPANY     FULLNAME  FLAGS
-CONS( 1982, fc100,  0,      0,       fc100,   fc100,  fc100_state, fc100,  "Goldstar", "FC-100", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
+CONS( 1982, fc100, 0,      0,      fc100,   fc100, fc100_state, init_fc100, "Goldstar", "FC-100", MACHINE_NOT_WORKING )

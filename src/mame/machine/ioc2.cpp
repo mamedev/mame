@@ -27,12 +27,12 @@ DEFINE_DEVICE_TYPE(SGI_IOC2_GUINNESS,   ioc2_guinness_device,   "ioc2g", "SGI IO
 DEFINE_DEVICE_TYPE(SGI_IOC2_FULL_HOUSE, ioc2_full_house_device, "ioc2f", "SGI IOC2 (Full House)")
 
 ioc2_guinness_device::ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ioc2_guinness_device(mconfig, SGI_IOC2_GUINNESS, tag, owner, clock)
+	: ioc2_device(mconfig, SGI_IOC2_GUINNESS, tag, owner, clock)
 {
 }
 
 ioc2_full_house_device::ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ioc2_full_house_device(mconfig, SGI_IOC2_FULL_HOUSE, tag, owner, clock)
+	: ioc2_device(mconfig, SGI_IOC2_FULL_HOUSE, tag, owner, clock)
 {
 }
 
@@ -81,7 +81,7 @@ MACHINE_CONFIG_START(ioc2_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 
-ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t id)
+ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_scc(*this, SCC_TAG)
@@ -107,7 +107,6 @@ ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const 
 	, m_int3_err_status_reg(0)
 	, m_par_read_cnt(0)
 	, m_par_cntl(0)
-	, m_system_id(id)
 {
 }
 
@@ -196,7 +195,7 @@ READ32_MEMBER( ioc2_device::read )
 			return m_front_panel_reg;
 
 		case SYSID_REG:
-			return m_system_id;
+			return get_system_id();
 
 		case READ_REG:
 			return m_read_reg;

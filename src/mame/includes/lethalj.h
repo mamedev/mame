@@ -60,9 +60,9 @@ public:
 	DECLARE_WRITE16_MEMBER(lethalj_blitter_w);
 	void do_blit();
 	DECLARE_CUSTOM_INPUT_MEMBER(cclownz_paddle);
-	DECLARE_DRIVER_INIT(cfarm);
-	DECLARE_DRIVER_INIT(ripribit);
-	DECLARE_DRIVER_INIT(cclownz);
+	void init_cfarm();
+	void init_ripribit();
+	void init_cclownz();
 	virtual void video_start() override;
 	inline void get_crosshair_xy(int player, int *x, int *y);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);

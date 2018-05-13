@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_FORMAT(xxxxxxxBBBGGGRRR)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
@@ -573,5 +573,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE          INIT    COMPANY  FULLNAME  FLAGS
-COMP( 198?, pc100,  0,      0,       pc100,     pc100, pc100_state,   0,      "NEC",   "PC-100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
+COMP( 198?, pc100, 0,      0,      pc100,   pc100, pc100_state, empty_init, "NEC",   "PC-100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

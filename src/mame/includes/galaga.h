@@ -72,8 +72,8 @@ public:
 	DECLARE_WRITE8_MEMBER(out_1);
 	DECLARE_READ8_MEMBER(namco_52xx_rom_r);
 	DECLARE_READ8_MEMBER(namco_52xx_si_r);
-	DECLARE_DRIVER_INIT(galaga);
-	DECLARE_DRIVER_INIT(gatsbee);
+	void init_galaga();
+	void init_gatsbee();
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_MACHINE_START(galaga);
@@ -102,7 +102,7 @@ public:
 	void gatsbee_main_map(address_map &map);
 };
 
-DISCRETE_SOUND_EXTERN( galaga );
-DISCRETE_SOUND_EXTERN( bosco );
+DISCRETE_SOUND_EXTERN( galaga_discrete );
+DISCRETE_SOUND_EXTERN( bosco_discrete );
 
 #endif // MAME_INCLUDES_GALAGA_H

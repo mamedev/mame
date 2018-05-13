@@ -85,8 +85,8 @@ public:
 	DECLARE_WRITE8_MEMBER(specialist_8255_porta_w);
 	DECLARE_WRITE8_MEMBER(specialist_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(specialist_8255_portc_w);
-	DECLARE_DRIVER_INIT(erik);
-	DECLARE_DRIVER_INIT(special);
+	void init_erik();
+	void init_special();
 	DECLARE_MACHINE_RESET(special);
 	DECLARE_VIDEO_START(special);
 	DECLARE_MACHINE_RESET(erik);

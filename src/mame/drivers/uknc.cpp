@@ -95,5 +95,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY       FULLNAME  FLAGS */
-COMP( 1987, uknc,   0,      0,       uknc,      uknc,  uknc_state,   0,    "<unknown>",  "UKNC",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT        COMPANY      FULLNAME  FLAGS */
+COMP( 1987, uknc, 0,      0,      uknc,    uknc,  uknc_state, empty_init, "<unknown>", "UKNC",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -67,7 +67,7 @@ public:
 	DECLARE_WRITE32_MEMBER(gba_io_w);
 	DECLARE_READ32_MEMBER(gba_bios_r);
 	DECLARE_READ32_MEMBER(gba_10000000_r);
-	DECLARE_DRIVER_INIT(gbadv);
+	void init_gbadv();
 	DECLARE_WRITE_LINE_MEMBER(int_hblank_callback);
 	DECLARE_WRITE_LINE_MEMBER(int_vblank_callback);
 	DECLARE_WRITE_LINE_MEMBER(int_vcount_callback);

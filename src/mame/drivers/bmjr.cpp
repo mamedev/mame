@@ -44,7 +44,7 @@ public:
 	DECLARE_READ8_MEMBER(tape_stop_r);
 	DECLARE_READ8_MEMBER(tape_start_r);
 	DECLARE_WRITE8_MEMBER(xor_display_w);
-	DECLARE_DRIVER_INIT(bmjr);
+	void init_bmjr();
 	u32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bmjr(machine_config &config);
@@ -356,11 +356,9 @@ MACHINE_CONFIG_START(bmjr_state::bmjr)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bmjr)
 
 	/* Audio */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("beeper", BEEP, 1200) // guesswork
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50); // guesswork
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -378,9 +376,9 @@ ROM_START( bmjr )
 ROM_END
 
 /* Driver */
-DRIVER_INIT_MEMBER(bmjr_state,bmjr)
+void bmjr_state::init_bmjr()
 {
 }
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY    FULLNAME           FLAGS */
-COMP( 1982, bmjr,   0,      0,       bmjr,      bmjr,  bmjr_state,  bmjr,  "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY    FULLNAME           FLAGS */
+COMP( 1982, bmjr, 0,      0,      bmjr,    bmjr,  bmjr_state, init_bmjr, "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING)

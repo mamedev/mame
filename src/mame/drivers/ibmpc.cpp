@@ -563,8 +563,8 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT    STATE        INIT  COMPANY                             FULLNAME                    FLAGS
-COMP( 1981,    ibm5150,    0,          0,      ibm5150,    0,       ibmpc_state, 0,    "International Business Machines",  "IBM PC 5150",              0 )
-COMP( 1982,    ibm5155,    ibm5150,    0,      ibm5150,    0,       ibmpc_state, 0,    "International Business Machines",  "IBM PC 5155",              0 )
-COMP( 1985,    ibm5140,    ibm5150,    0,      ibm5140,    0,       ibmpc_state, 0,    "International Business Machines",  "IBM PC 5140 Convertible",  MACHINE_NOT_WORKING )
-COMP( 1982,    ibm5160,    ibm5150,    0,      ibm5160,    0,       ibmpc_state, 0,    "International Business Machines",  "IBM XT 5160",              0 )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                            FULLNAME                   FLAGS
+COMP( 1981, ibm5150, 0,       0,      ibm5150, 0,     ibmpc_state, empty_init, "International Business Machines", "IBM PC 5150",             0 )
+COMP( 1982, ibm5155, ibm5150, 0,      ibm5150, 0,     ibmpc_state, empty_init, "International Business Machines", "IBM PC 5155",             0 )
+COMP( 1985, ibm5140, ibm5150, 0,      ibm5140, 0,     ibmpc_state, empty_init, "International Business Machines", "IBM PC 5140 Convertible", MACHINE_NOT_WORKING )
+COMP( 1982, ibm5160, ibm5150, 0,      ibm5160, 0,     ibmpc_state, empty_init, "International Business Machines", "IBM XT 5160",             0 )

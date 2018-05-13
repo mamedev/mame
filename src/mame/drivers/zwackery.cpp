@@ -536,7 +536,7 @@ MACHINE_CONFIG_START(zwackery_state::zwackery)
 	MCFG_VIDEO_START_OVERRIDE(zwackery_state, zwackery)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -610,5 +610,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT  ROTATION  COMPANY         FULLNAME    FLAGS
-GAME( 1984, zwackery, 0,      zwackery, zwackery, zwackery_state, 0,    ROT0,     "Bally Midway", "Zwackery", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY         FULLNAME    FLAGS
+GAME( 1984, zwackery, 0,      zwackery, zwackery, zwackery_state, empty_init, ROT0,     "Bally Midway", "Zwackery", MACHINE_SUPPORTS_SAVE )

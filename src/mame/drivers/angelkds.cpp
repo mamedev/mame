@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(angelkds_state::angelkds)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(4'000'000))
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
@@ -680,7 +680,7 @@ ROM_START( spcpostn )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(angelkds_state,angelkds)
+void angelkds_state::init_angelkds()
 {
 	uint8_t *RAM = memregion("user1")->base();
 	membank("bank1")->configure_entries(0, 16, &RAM[0x0000], 0x4000);
@@ -688,5 +688,5 @@ DRIVER_INIT_MEMBER(angelkds_state,angelkds)
 
 
 
-GAME( 1988, angelkds, 0, angelkds, angelkds, angelkds_state, angelkds,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" ,     MACHINE_SUPPORTS_SAVE) /* Nasco not displayed but 'Exa Planning' is */
-GAME( 1986, spcpostn, 0, spcpostn, spcpostn, angelkds_state, angelkds,  ROT90,  "Sega / Nasco",  "Space Position (Japan)" , MACHINE_SUPPORTS_SAVE) /* encrypted */
+GAME( 1988, angelkds, 0, angelkds, angelkds, angelkds_state, init_angelkds, ROT90, "Sega / Nasco?", "Angel Kids (Japan)" ,     MACHINE_SUPPORTS_SAVE) /* Nasco not displayed but 'Exa Planning' is */
+GAME( 1986, spcpostn, 0, spcpostn, spcpostn, angelkds_state, init_angelkds, ROT90, "Sega / Nasco",  "Space Position (Japan)" , MACHINE_SUPPORTS_SAVE) /* encrypted */

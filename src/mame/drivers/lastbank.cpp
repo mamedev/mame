@@ -74,7 +74,7 @@ public:
 	DECLARE_READ8_MEMBER(irq_enable_r);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 
-	DECLARE_DRIVER_INIT(lastbank);
+	void init_lastbank();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline);
 	void lastbank(machine_config &config);
@@ -546,12 +546,12 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 //  MCFG_VIDEO_START_OVERRIDE(lastbank_state,lastbank)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_ES8712_ADD("essnd", 0)
@@ -592,10 +592,10 @@ ROM_START( lastbank )
 	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
 ROM_END
 
-DRIVER_INIT_MEMBER(lastbank_state,lastbank)
+void lastbank_state::init_lastbank()
 {
 	uint32_t max = memregion("maincpu")->bytes() / 0x2000;
 	m_mainbank->configure_entries(0, max, memregion("maincpu")->base(), 0x2000);
 }
 
-GAME( 1994, lastbank,  0,   lastbank, lastbank, lastbank_state, lastbank, ROT0, "Excellent System", "Last Bank (v1.16)", 0 )
+GAME( 1994, lastbank, 0, lastbank, lastbank, lastbank_state, init_lastbank, ROT0, "Excellent System", "Last Bank (v1.16)", 0 )

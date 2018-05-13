@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(funkybee_state::funkybee)
 	MCFG_PALETTE_INIT_OWNER(funkybee_state, funkybee)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8912, 1500000) // AY-3-8912 verified for Sky Lancer
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
@@ -428,7 +428,7 @@ ROM_START( skylancre )
 	ROM_LOAD( "18s030.1a",     0x0000, 0x0020, CRC(e645bacb) SHA1(5f4c299c4cf165fd229731c0e5799a34892bf28e) )
 ROM_END
 
-GAME( 1982, funkybee,  0,        funkybee, funkybee,  funkybee_state, 0, ROT90, "Orca",                           "Funky Bee",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1982, funkybeeb, funkybee, funkybee, funkybeeb, funkybee_state, 0, ROT90, "bootleg",                        "Funky Bee (bootleg, harder)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1983, skylancr,  0,        funkybee, skylancr,  funkybee_state, 0, ROT90, "Orca",                           "Sky Lancer",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1983, skylancre, skylancr, funkybee, skylancre, funkybee_state, 0, ROT90, "Orca (Esco Trading Co license)", "Sky Lancer (Esco Trading Co license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, funkybee,  0,        funkybee, funkybee,  funkybee_state, empty_init, ROT90, "Orca",                           "Funky Bee",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1982, funkybeeb, funkybee, funkybee, funkybeeb, funkybee_state, empty_init, ROT90, "bootleg",                        "Funky Bee (bootleg, harder)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, skylancr,  0,        funkybee, skylancr,  funkybee_state, empty_init, ROT90, "Orca",                           "Sky Lancer",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, skylancre, skylancr, funkybee, skylancre, funkybee_state, empty_init, ROT90, "Orca (Esco Trading Co license)", "Sky Lancer (Esco Trading Co license)", MACHINE_SUPPORTS_SAVE )

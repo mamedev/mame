@@ -519,7 +519,7 @@ MACHINE_CONFIG_START(lastduel_state::lastduel)
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,lastduel)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -564,7 +564,7 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,madgear)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -575,7 +575,7 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(10'000'000)/10, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(10'000'000)/10, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.98)
 MACHINE_CONFIG_END
 
@@ -897,16 +897,16 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1988, lastduel,  0,        lastduel, lastduel, lastduel_state, 0, ROT270, "Capcom",  "Last Duel (US New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, lastduelo, lastduel, lastduel, lastduel, lastduel_state, 0, ROT270, "Capcom",  "Last Duel (US Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, lastduelj, lastduel, lastduel, lastduel, lastduel_state, 0, ROT270, "Capcom",  "Last Duel (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, lastduelb, lastduel, lastduel, lastduel, lastduel_state, 0, ROT270, "bootleg", "Last Duel (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lastduel,  0,        lastduel, lastduel, lastduel_state, empty_init, ROT270, "Capcom",  "Last Duel (US New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lastduelo, lastduel, lastduel, lastduel, lastduel_state, empty_init, ROT270, "Capcom",  "Last Duel (US Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lastduelj, lastduel, lastduel, lastduel, lastduel_state, empty_init, ROT270, "Capcom",  "Last Duel (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lastduelb, lastduel, lastduel, lastduel, lastduel_state, empty_init, ROT270, "bootleg", "Last Duel (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // are both Mad Gear and Led Storm really US sets, both have a (c) Capcom USA, but so do several World sets from Capcom during this era, including Led Storm Rally 2011.  None of these display a region warning, 2011 does.
 // the region warning text is however still present in the ROM (albeit unused) and does appear to indicate both are US sets, so it's possible the title was revised to avoid confusion with the older Led Storm Rally 2011.
-GAME( 1989, madgear,   0,        madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Mad Gear (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, madgearj,  madgear,  madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Mad Gear (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ledstorm,  madgear,  madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Led Storm (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, madgear,   0,        madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Mad Gear (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, madgearj,  madgear,  madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Mad Gear (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ledstorm,  madgear,  madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm (US)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, leds2011,  0,        madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, leds2011u, leds2011, madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011,  0,        madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011u, leds2011, madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_SUPPORTS_SAVE )

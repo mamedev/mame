@@ -133,7 +133,7 @@ public:
 	bool  m_bCalibSecondByte;
 
 public:
-	DECLARE_DRIVER_INIT(kt);
+	void init_kt();
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
 	void kt(machine_config &config);
@@ -237,7 +237,8 @@ MACHINE_CONFIG_START(esqkt_state::kt)
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -297,9 +298,9 @@ ROM_START( kt76 )
 	ROM_REGION(0x200000, "waverom4", ROMREGION_ERASE00)
 ROM_END
 
-DRIVER_INIT_MEMBER(esqkt_state, kt)
+void esqkt_state::init_kt()
 {
 	m_duart_io = 0;
 }
 
-CONS( 1996, kt76, 0, 0, kt, kt, esqkt_state, kt, "Ensoniq", "KT-76", MACHINE_IMPERFECT_SOUND )
+CONS( 1996, kt76, 0, 0, kt, kt, esqkt_state, init_kt, "Ensoniq", "KT-76", MACHINE_IMPERFECT_SOUND )

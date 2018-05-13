@@ -37,12 +37,12 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
 	DECLARE_WRITE8_MEMBER(soundcpu_to_qs1000);
 
-	DECLARE_DRIVER_INIT(eolith);
-	DECLARE_DRIVER_INIT(landbrk);
-	DECLARE_DRIVER_INIT(hidctch2);
-	DECLARE_DRIVER_INIT(hidnc2k);
-	DECLARE_DRIVER_INIT(landbrka);
-	DECLARE_DRIVER_INIT(landbrkb);
+	void init_eolith();
+	void init_landbrk();
+	void init_hidctch2();
+	void init_hidnc2k();
+	void init_landbrka();
+	void init_landbrkb();
 
 	DECLARE_MACHINE_RESET(eolith);
 	DECLARE_VIDEO_START(eolith);

@@ -819,7 +819,8 @@ MACHINE_CONFIG_START(thayers_state::thayers)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	// SSI 263 @ 2MHz
 
 	MCFG_DEVICE_MODIFY("laserdisc")
@@ -855,6 +856,6 @@ ROM_END
 
 /* Game Drivers */
 
-//     YEAR  NAME      PARENT   MACHINE  INPUT    STATE          INIT  MONITOR  COMPANY               FULLNAME                   FLAGS                                   LAYOUT
-GAMEL( 1984, thayers,  0,       thayers, thayers, thayers_state, 0,    ROT0,    "RDI Video Systems",  "Thayer's Quest (set 1)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)
-GAMEL( 1984, thayersa, thayers, thayers, thayers, thayers_state, 0,    ROT0,    "RDI Video Systems",  "Thayer's Quest (set 2)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)
+//     YEAR  NAME      PARENT   MACHINE  INPUT    CLASS          INIT        MONITOR  COMPANY               FULLNAME                   FLAGS                                   LAYOUT
+GAMEL( 1984, thayers,  0,       thayers, thayers, thayers_state, empty_init, ROT0,    "RDI Video Systems",  "Thayer's Quest (set 1)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)
+GAMEL( 1984, thayersa, thayers, thayers, thayers, thayers_state, empty_init, ROT0,    "RDI Video Systems",  "Thayer's Quest (set 2)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)

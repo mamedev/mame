@@ -161,8 +161,8 @@ public:
 	DECLARE_WRITE8_MEMBER(buckrog_i8255_0_w);
 	DECLARE_READ8_MEMBER(spriteram_r);
 	DECLARE_WRITE8_MEMBER(spriteram_w);
-	DECLARE_DRIVER_INIT(turbo_enc);
-	DECLARE_DRIVER_INIT(turbo_noenc);
+	void init_turbo_enc();
+	void init_turbo_noenc();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_VIDEO_START(turbo);
 	DECLARE_PALETTE_INIT(turbo);

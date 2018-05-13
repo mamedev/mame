@@ -216,7 +216,7 @@ MACHINE_CONFIG_START(bfm_sc5_state::bfm_sc5)
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("duart68681", MC68681, 16000000/4) // ?? Mhz
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(16000000/2/8, 16000000/2/16, 16000000/2/16, 16000000/2/8)

@@ -29,7 +29,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
-	DECLARE_DRIVER_INIT(redclash);
+	void init_redclash();
 	void redclash(machine_config &config);
 	void zerohour(machine_config &config);
 

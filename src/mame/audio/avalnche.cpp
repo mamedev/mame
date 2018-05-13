@@ -55,7 +55,7 @@ static const discrete_lfsr_desc avalnche_lfsr={
 #define AVALNCHE_AUD2_SND           NODE_12
 #define AVALNCHE_SOUNDLVL_AUD0_SND  NODE_13
 
-static DISCRETE_SOUND_START(avalnche)
+static DISCRETE_SOUND_START(avalnche_discrete)
 	/************************************************/
 	/* avalnche  Effects Relataive Gain Table       */
 	/*                                              */
@@ -104,10 +104,9 @@ DISCRETE_SOUND_END
 
 
 MACHINE_CONFIG_START(avalnche_state::avalnche_sound)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE)
-	MCFG_DISCRETE_INTF(avalnche)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, avalnche_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_MODIFY("latch")

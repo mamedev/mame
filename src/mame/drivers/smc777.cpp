@@ -1060,7 +1060,7 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	MCFG_QUICKLOAD_ADD("quickload", smc777_state, smc777, "com,cpm", 3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -1086,5 +1086,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY  FULLNAME   FLAGS
-COMP( 1983, smc777,  0,       0,      smc777,   smc777, smc777_state, 0,    "Sony",  "SMC-777", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1983, smc777, 0,      0,      smc777,  smc777, smc777_state, empty_init, "Sony",  "SMC-777", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

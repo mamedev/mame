@@ -208,7 +208,7 @@ MACHINE_CONFIG_START(mastboyo_state::mastboyo)
 	MCFG_PALETTE_INIT_OWNER(mastboyo_state, mastboyo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 20_MHz_XTAL/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0")) // DSW
@@ -239,4 +239,4 @@ ROM_START( mastboyo )
 	ROM_LOAD( "masterboy-1987-82s129-l-ic40.bin", 0x000, 0x100, CRC(4d061216) SHA1(1abf9320da75a3fd23c6bdbcc4088d18e133c4e5) )
 ROM_END
 
-GAME( 1987, mastboyo,  0,    mastboyo, mastboyo,  mastboyo_state, 0, ROT0, "Gaelco (Covielsa license)", "Master Boy (1987, Z80 hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mastboyo, 0, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)", "Master Boy (1987, Z80 hardware)", MACHINE_SUPPORTS_SAVE )

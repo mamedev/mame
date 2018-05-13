@@ -201,5 +201,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY  FULLNAME  FLAGS
-SYST( 1985, sk1,  0,      0,      sk1,     sk1,   sk1_state,  0,    "Casio", "SK-1",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS
+SYST( 1985, sk1,  0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-1",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

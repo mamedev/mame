@@ -594,7 +594,7 @@ MACHINE_CONFIG_START(gatron_state::gat)
 	MCFG_PALETTE_INIT_OWNER(gatron_state, gatron)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("snsnd", SN76489, MASTER_CLOCK/8 )   // Present in Bingo PCB. Clock need to be verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_CONFIG_END
@@ -640,7 +640,7 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE  INPUT      STATE          INIT  ROT   COMPANY         FULLNAME              FLAGS  LAYOUT   */
-GAMEL( 1983, poker41,  0,      gat,     poker41,   gatron_state,  0,    ROT0, "Game-A-Tron",  "Four In One Poker",  0,     layout_poker41  )
-GAMEL( 1983, pulltabs, 0,      gat,     pulltabs,  gatron_state,  0,    ROT0, "Game-A-Tron",  "Pull Tabs",          0,     layout_pulltabs )
-GAMEL( 1983, bingo,    0,      gat,     bingo,     gatron_state,  0,    ROT0, "Game-A-Tron",  "Bingo",              0,     layout_bingo  )
+/*     YEAR  NAME      PARENT  MACHINE  INPUT     CLASS         INIT        ROT   COMPANY         FULLNAME              FLAGS  LAYOUT   */
+GAMEL( 1983, poker41,  0,      gat,     poker41,  gatron_state, empty_init, ROT0, "Game-A-Tron",  "Four In One Poker",  0,     layout_poker41  )
+GAMEL( 1983, pulltabs, 0,      gat,     pulltabs, gatron_state, empty_init, ROT0, "Game-A-Tron",  "Pull Tabs",          0,     layout_pulltabs )
+GAMEL( 1983, bingo,    0,      gat,     bingo,    gatron_state, empty_init, ROT0, "Game-A-Tron",  "Bingo",              0,     layout_bingo  )

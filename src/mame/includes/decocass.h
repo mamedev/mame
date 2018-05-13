@@ -116,9 +116,9 @@ public:
 	/* DS Telejan */
 	uint8_t     m_mux_data;
 
-	DECLARE_DRIVER_INIT(decocass);
-	DECLARE_DRIVER_INIT(decocrom);
-	DECLARE_DRIVER_INIT(cdsteljn);
+	void init_decocass();
+	void init_decocrom();
+	void init_cdsteljn();
 	TILEMAP_MAPPER_MEMBER(fgvideoram_scan_cols);
 	TILEMAP_MAPPER_MEMBER(bgvideoram_scan_cols);
 	TILE_GET_INFO_MEMBER(get_bg_l_tile_info);

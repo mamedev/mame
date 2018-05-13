@@ -319,7 +319,7 @@ static const discrete_mixer_desc ironhors_mixer_desc_final =
 		0,
 		0, 1};
 
-static DISCRETE_SOUND_START( ironhors )
+static DISCRETE_SOUND_START( ironhors_discrete )
 
 	DISCRETE_INPUTX_STREAM(NODE_01, 0, 5.0, 0)
 	DISCRETE_INPUTX_STREAM(NODE_02, 1, 5.0, 0)
@@ -406,7 +406,7 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 	MCFG_PALETTE_INIT_OWNER(ironhors_state, ironhors)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -418,8 +418,7 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 	MCFG_SOUND_ROUTE(2, "disc_ih", 1.0, 2)
 	MCFG_SOUND_ROUTE(3, "disc_ih", 1.0, 3)
 
-	MCFG_DEVICE_ADD("disc_ih", DISCRETE)
-	MCFG_DISCRETE_INTF(ironhors)
+	MCFG_DEVICE_ADD("disc_ih", DISCRETE, ironhors_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -575,7 +574,7 @@ ROM_END
  *
  *************************************/
 // versions are taken from the letters on the program ROMs' labels
-GAME( 1986, ironhors,  0,        ironhors, ironhors, ironhors_state, 0, ROT0, "Konami", "Iron Horse (version K)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ironhorsh, ironhors, ironhors, ironhors, ironhors_state, 0, ROT0, "Konami", "Iron Horse (version H)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dairesya,  ironhors, ironhors, dairesya, ironhors_state, 0, ROT0, "Konami (Kawakusu license)", "Dai Ressya Goutou (Japan, version K)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, farwest,   ironhors, farwest,  ironhors, ironhors_state, 0, ROT0, "bootleg?", "Far West", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ironhors,  0,        ironhors, ironhors, ironhors_state, empty_init, ROT0, "Konami", "Iron Horse (version K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ironhorsh, ironhors, ironhors, ironhors, ironhors_state, empty_init, ROT0, "Konami", "Iron Horse (version H)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dairesya,  ironhors, ironhors, dairesya, ironhors_state, empty_init, ROT0, "Konami (Kawakusu license)", "Dai Ressya Goutou (Japan, version K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, farwest,   ironhors, farwest,  ironhors, ironhors_state, empty_init, ROT0, "bootleg?", "Far West", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

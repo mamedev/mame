@@ -192,7 +192,7 @@ MACHINE_CONFIG_START(gameplan_state::trvquest)
 	trvquest_video(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(6'000'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -239,4 +239,4 @@ ROM_START( trvquest )
 	ROM_LOAD( "roma", 0x16000, 0x2000, CRC(b4bcaf33) SHA1(c6b08fb8d55b2834d0c6c5baff9f544c795e4c15) )
 ROM_END
 
-GAME( 1984, trvquest, 0, trvquest, trvquest, gameplan_state, 0, ROT90, "Sunn / Techstar", "Trivia Quest", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trvquest, 0, trvquest, trvquest, gameplan_state, empty_init, ROT90, "Sunn / Techstar", "Trivia Quest", MACHINE_SUPPORTS_SAVE )

@@ -580,8 +580,8 @@ MACHINE_CONFIG_START(mil4000_state::mil4000)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mil4000)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -771,10 +771,10 @@ ROM_START( chewheel )
 ROM_END
 
 
-//     YEAR  NAME      PARENT    MACHINE   INPUT    STATE          INIT    ROT     COMPANY              FULLNAME                              FLAGS                          LAYOUT
-GAMEL( 2000, mil4000,  0,        mil4000,  mil4000, mil4000_state, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 2.0)", 0,                             layout_mil4000 )
-GAMEL( 2000, mil4000a, mil4000,  mil4000,  mil4000, mil4000_state, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.8)", 0,                             layout_mil4000 )
-GAMEL( 2000, mil4000b, mil4000,  mil4000,  mil4000, mil4000_state, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.5)", 0,                             layout_mil4000 )
-GAMEL( 2000, mil4000c, mil4000,  mil4000,  mil4000, mil4000_state, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.6)", 0,                             layout_mil4000 )
-GAMEL( 200?, top21,    0,        mil4000,  mil4000, mil4000_state, 0,      ROT0,  "Assogiochi Assago", "Top XXI (Version 1.2)",               0,                             layout_mil4000 )
-GAMEL( 200?, chewheel, 0,        chewheel, mil4000, mil4000_state, 0,      ROT0,  "Assogiochi Assago", "Cherry Wheel (Version 1.7)",          MACHINE_UNEMULATED_PROTECTION, layout_mil4000 )
+//     YEAR  NAME      PARENT   MACHINE   INPUT    STATE          INIT        ROT   COMPANY              FULLNAME                               FLAGS                          LAYOUT
+GAMEL( 2000, mil4000,  0,       mil4000,  mil4000, mil4000_state, empty_init, ROT0, "Sure Milano",       "Millennium Nuovo 4000 (Version 2.0)", 0,                             layout_mil4000 )
+GAMEL( 2000, mil4000a, mil4000, mil4000,  mil4000, mil4000_state, empty_init, ROT0, "Sure Milano",       "Millennium Nuovo 4000 (Version 1.8)", 0,                             layout_mil4000 )
+GAMEL( 2000, mil4000b, mil4000, mil4000,  mil4000, mil4000_state, empty_init, ROT0, "Sure Milano",       "Millennium Nuovo 4000 (Version 1.5)", 0,                             layout_mil4000 )
+GAMEL( 2000, mil4000c, mil4000, mil4000,  mil4000, mil4000_state, empty_init, ROT0, "Sure Milano",       "Millennium Nuovo 4000 (Version 1.6)", 0,                             layout_mil4000 )
+GAMEL( 200?, top21,    0,       mil4000,  mil4000, mil4000_state, empty_init, ROT0, "Assogiochi Assago", "Top XXI (Version 1.2)",               0,                             layout_mil4000 )
+GAMEL( 200?, chewheel, 0,       chewheel, mil4000, mil4000_state, empty_init, ROT0, "Assogiochi Assago", "Cherry Wheel (Version 1.7)",          MACHINE_UNEMULATED_PROTECTION, layout_mil4000 )

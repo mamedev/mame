@@ -242,7 +242,8 @@ MACHINE_CONFIG_START(shisen_state::shisen)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
@@ -442,7 +443,7 @@ ROM_START( matchit )
 	/* no samples on this board */
 ROM_END
 
-GAME( 1989, matchit,  0,         shisen,   matchit, shisen_state,  0, ROT0, "Tamtex",  "Match It",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1989, shisen,   matchit,   shisen,   shisen,  shisen_state,  0, ROT0, "Tamtex",  "Shisensho - Joshiryo-Hen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sichuan2, matchit,   shisen,   shisen,  shisen_state,  0, ROT0, "hack",    "Sichuan II (hack, set 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sichuan2a,matchit,   shisen,   shisen,  shisen_state,  0, ROT0, "hack",    "Sichuan II (hack, set 2)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, matchit,  0,         shisen,   matchit, shisen_state, empty_init, ROT0, "Tamtex",  "Match It",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, shisen,   matchit,   shisen,   shisen,  shisen_state, empty_init, ROT0, "Tamtex",  "Shisensho - Joshiryo-Hen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sichuan2, matchit,   shisen,   shisen,  shisen_state, empty_init, ROT0, "hack",    "Sichuan II (hack, set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sichuan2a,matchit,   shisen,   shisen,  shisen_state, empty_init, ROT0, "hack",    "Sichuan II (hack, set 2)",         MACHINE_SUPPORTS_SAVE )

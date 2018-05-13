@@ -189,7 +189,7 @@ MACHINE_CONFIG_START(korgm1_state::korgm1)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 //  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
@@ -211,4 +211,4 @@ ROM_START( korgm1 )
 //  ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 1988, korgm1,  0,   korgm1,  korgm1,  0,       ROT0, "Korg",      "M1", MACHINE_IS_SKELETON )
+GAME( 1988, korgm1,  0,   korgm1,  korgm1,  empty_init, ROT0, "Korg",      "M1", MACHINE_IS_SKELETON )

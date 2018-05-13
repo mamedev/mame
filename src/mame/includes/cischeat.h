@@ -102,9 +102,9 @@ public:
 	DECLARE_WRITE16_MEMBER(f1gpstr2_io_w);
 	DECLARE_WRITE16_MEMBER(cischeat_soundbank_1_w);
 	DECLARE_WRITE16_MEMBER(cischeat_soundbank_2_w);
-	DECLARE_DRIVER_INIT(cischeat);
-	DECLARE_DRIVER_INIT(bigrun);
-	DECLARE_DRIVER_INIT(f1gpstar);
+	void init_cischeat();
+	void init_bigrun();
+	void init_f1gpstar();
 	virtual void video_start() override;
 	uint32_t screen_update_bigrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_scudhamm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -155,7 +155,7 @@ public:
 	uint16_t m_captflag_leds;
 	DECLARE_WRITE16_MEMBER(captflag_leds_w);
 
-	DECLARE_DRIVER_INIT(captflag);
+	void init_captflag();
 	TIMER_DEVICE_CALLBACK_MEMBER(captflag_scanline);
 	void scudhamm(machine_config &config);
 	void armchmp2(machine_config &config);

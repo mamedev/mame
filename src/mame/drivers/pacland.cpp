@@ -452,7 +452,7 @@ MACHINE_CONFIG_START(pacland_state::pacland)
 	MCFG_PALETTE_INIT_OWNER(pacland_state, pacland)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2/1024)
 	MCFG_NAMCO_AUDIO_VOICES(8)
@@ -671,9 +671,9 @@ ROM_END
 
 
 
-GAME( 1984, pacland,   0,       pacland, pacland, pacland_state, 0, ROT0, "Namco", "Pac-Land (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandj,  pacland, pacland, pacland, pacland_state, 0, ROT0, "Namco", "Pac-Land (Japan new)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandjo, pacland, pacland, pacland, pacland_state, 0, ROT0, "Namco", "Pac-Land (Japan old)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandjo2,pacland, pacland, pacland, pacland_state, 0, ROT0, "Namco", "Pac-Land (Japan older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandm,  pacland, pacland, pacland, pacland_state, 0, ROT0, "Namco (Bally Midway license)", "Pac-Land (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, paclandm2, pacland, pacland, pacland, pacland_state, 0, ROT0, "Namco (Bally Midway license)", "Pac-Land (Bally-Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pacland,   0,       pacland, pacland, pacland_state, empty_init, ROT0, "Namco", "Pac-Land (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandj,  pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco", "Pac-Land (Japan new)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandjo, pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco", "Pac-Land (Japan old)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandjo2,pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco", "Pac-Land (Japan older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandm,  pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco (Bally Midway license)", "Pac-Land (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, paclandm2, pacland, pacland, pacland, pacland_state, empty_init, ROT0, "Namco (Bally Midway license)", "Pac-Land (Bally-Midway)", MACHINE_SUPPORTS_SAVE )

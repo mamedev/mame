@@ -117,7 +117,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 
-	DECLARE_DRIVER_INIT(gridcomp);
+	void init_gridcomp();
 	DECLARE_MACHINE_START(gridcomp);
 	DECLARE_MACHINE_RESET(gridcomp);
 
@@ -287,7 +287,7 @@ uint32_t gridcomp_state::screen_update_113x(screen_device &screen, bitmap_ind16 
 }
 
 
-DRIVER_INIT_MEMBER(gridcomp_state, gridcomp)
+void gridcomp_state::init_gridcomp()
 {
 	DBG_LOG(0, "init", ("driver_init()\n"));
 }
@@ -376,7 +376,7 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 	MCFG_DEVICE_ADD(I80130_TAG, I80130, XTAL(15'000'000)/3)
 	MCFG_I80130_IRQ_CALLBACK(INPUTLINE("maincpu", 0))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -617,11 +617,11 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY            FULLNAME   FLAGS
-COMP( 1982, grid1101,  0,        0,      grid1101, gridcomp, gridcomp_state, 0,    "GRiD Computers",  "Compass 1101",    MACHINE_IS_SKELETON )
-COMP( 1982, grid1109,  grid1101, 0,      grid1109, gridcomp, gridcomp_state, 0,    "GRiD Computers",  "Compass 1109",    MACHINE_IS_SKELETON )
-COMP( 1984, grid1121,  0,        0,      grid1121, gridcomp, gridcomp_state, 0,    "GRiD Computers",  "Compass II 1121", MACHINE_IS_SKELETON )
-COMP( 1984, grid1129,  grid1121, 0,      grid1129, gridcomp, gridcomp_state, 0,    "GRiD Computers",  "Compass II 1129", MACHINE_IS_SKELETON )
-COMP( 1984, grid1131,  grid1121, 0,      grid1131, gridcomp, gridcomp_state, 0,    "GRiD Computers",  "Compass II 1131", MACHINE_IS_SKELETON )
-COMP( 1984, grid1139,  grid1121, 0,      grid1139, gridcomp, gridcomp_state, 0,    "GRiD Computers",  "Compass II 1139", MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY           FULLNAME           FLAGS
+COMP( 1982, grid1101, 0,        0,      grid1101, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1101",    MACHINE_IS_SKELETON )
+COMP( 1982, grid1109, grid1101, 0,      grid1109, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1109",    MACHINE_IS_SKELETON )
+COMP( 1984, grid1121, 0,        0,      grid1121, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1121", MACHINE_IS_SKELETON )
+COMP( 1984, grid1129, grid1121, 0,      grid1129, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1129", MACHINE_IS_SKELETON )
+COMP( 1984, grid1131, grid1121, 0,      grid1131, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1131", MACHINE_IS_SKELETON )
+COMP( 1984, grid1139, grid1121, 0,      grid1139, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1139", MACHINE_IS_SKELETON )
 

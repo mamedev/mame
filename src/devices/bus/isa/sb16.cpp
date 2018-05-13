@@ -417,7 +417,8 @@ MACHINE_CONFIG_START(sb16_lle_device::device_add_mconfig)
 	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, sb16_lle_device, p2_r))
 	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, sb16_lle_device, p2_w))
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ymf262", YMF262, XTAL(14'318'181))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)

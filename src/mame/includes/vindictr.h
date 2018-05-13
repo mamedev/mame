@@ -25,7 +25,7 @@ public:
 		m_jsa(*this, "jsa")
 	{ }
 
-	DECLARE_DRIVER_INIT(vindictr);
+	void init_vindictr();
 	void vindictr(machine_config &config);
 
 protected:

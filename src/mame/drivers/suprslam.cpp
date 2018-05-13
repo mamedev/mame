@@ -309,7 +309,8 @@ MACHINE_CONFIG_START(suprslam_state::suprslam)
 	MCFG_K053936_WRAP(1)
 	MCFG_K053936_OFFSETS(-45, -21)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -356,4 +357,4 @@ ROM_END
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1995, suprslam, 0, suprslam, suprslam, suprslam_state, 0, ROT0, "Banpresto / Toei Animation / Video System Co.", "From TV Animation Slam Dunk - Super Slams", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Video System credited in ending screen
+GAME( 1995, suprslam, 0, suprslam, suprslam, suprslam_state, empty_init, ROT0, "Banpresto / Toei Animation / Video System Co.", "From TV Animation Slam Dunk - Super Slams", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Video System credited in ending screen

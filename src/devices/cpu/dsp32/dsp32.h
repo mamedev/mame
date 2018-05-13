@@ -421,7 +421,7 @@ protected:
 	uint8_t           m_lastpins;
 	uint32_t          m_ppc;
 	address_space * m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
 
 	devcb_write32 m_output_pins_changed;
 	// tables

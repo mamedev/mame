@@ -398,7 +398,7 @@ MACHINE_CONFIG_START(icecold_state::icecold)
 	MCFG_DEFAULT_LAYOUT(layout_icecold)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ay0", AY8910, XTAL(6'000'000)/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, icecold_state, ay8910_0_b_w))
@@ -429,5 +429,5 @@ ROM_START(zekepeak)
 ROM_END
 
 
-GAME(1983,  icecold,   0,        icecold,  icecold, icecold_state,  0,  ROT0,  "Taito",    "Ice Cold Beer",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
-GAME(1983,  zekepeak,  icecold,  icecold,  icecold, icecold_state,  0,  ROT0,  "Taito",    "Zeke's Peak",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME( 1983, icecold,  0,       icecold, icecold, icecold_state, empty_init, ROT0, "Taito", "Ice Cold Beer", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME( 1983, zekepeak, icecold, icecold, icecold, icecold_state, empty_init, ROT0, "Taito", "Zeke's Peak",   MACHINE_NOT_WORKING | MACHINE_MECHANICAL)

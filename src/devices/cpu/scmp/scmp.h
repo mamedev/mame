@@ -68,7 +68,7 @@ private:
 	uint8_t   m_SR;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	int                 m_icount;
 
 	devcb_write8       m_flag_out_func;

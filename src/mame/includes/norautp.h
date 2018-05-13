@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Roberto Fresca
+#ifndef MAME_INCLUDES_NORAUTP_H
+#define MAME_INCLUDES_NORAUTP_H
+
+#pragma once
+
 #include "machine/i8255.h"
 #include "sound/discrete.h"
 #include "screen.h"
@@ -29,9 +34,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mainlamps_w);
 	DECLARE_WRITE8_MEMBER(soundlamps_w);
 	DECLARE_WRITE8_MEMBER(counterlamps_w);
-	DECLARE_DRIVER_INIT(ssa);
-	DECLARE_DRIVER_INIT(enc);
-	DECLARE_DRIVER_INIT(deb);
+	void init_ssa();
+	void init_enc();
+	void init_deb();
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(norautp);
 	uint32_t screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -73,6 +78,8 @@ public:
 };
 
 /*----------- defined in audio/norautp.c -----------*/
-DISCRETE_SOUND_EXTERN( norautp );
-DISCRETE_SOUND_EXTERN( dphl );
-DISCRETE_SOUND_EXTERN( kimble );
+DISCRETE_SOUND_EXTERN( norautp_discrete );
+DISCRETE_SOUND_EXTERN( dphl_discrete );
+DISCRETE_SOUND_EXTERN( kimble_discrete );
+
+#endif // MAME_INCLUDES_NORAUTP_H

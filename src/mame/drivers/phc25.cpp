@@ -315,13 +315,12 @@ MACHINE_CONFIG_START(phc25_state::phc25)
 	MCFG_DEVICE_IO_MAP(phc25_io)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, 1996750)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("JOY1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	/* devices */
 	MCFG_CASSETTE_ADD("cassette")
@@ -393,6 +392,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY   FULLNAME            FLAGS
-COMP( 1983, phc25,  0,      0,      pal,     phc25,  phc25_state,  0,    "Sanyo",  "PHC-25 (Europe)",  MACHINE_NO_SOUND )
-COMP( 1983, phc25j, phc25,  0,      ntsc,    phc25j, phc25_state,  0,    "Sanyo",  "PHC-25 (Japan)",   MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY  FULLNAME           FLAGS
+COMP( 1983, phc25,  0,      0,      pal,     phc25,  phc25_state, empty_init, "Sanyo", "PHC-25 (Europe)", MACHINE_NO_SOUND )
+COMP( 1983, phc25j, phc25,  0,      ntsc,    phc25j, phc25_state, empty_init, "Sanyo", "PHC-25 (Japan)",  MACHINE_NO_SOUND )

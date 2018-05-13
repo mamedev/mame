@@ -28,9 +28,9 @@ public:
 	optional_device<samples_device> m_samples;
 
 	int32_t m_xevious_bs[2];
-	DECLARE_DRIVER_INIT(xevious);
-	DECLARE_DRIVER_INIT(xevios);
-	DECLARE_DRIVER_INIT(battles);
+	void init_xevious();
+	void init_xevios();
+	void init_battles();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_VIDEO_START(xevious);

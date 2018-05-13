@@ -452,7 +452,7 @@ MACHINE_CONFIG_START(vastar_state::vastar)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000)/12)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
@@ -656,8 +656,8 @@ ROM_START( pprobe )
 ROM_END
 
 
-GAME( 1983, vastar,  0,      vastar, vastar,  vastar_state, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 1)",            MACHINE_SUPPORTS_SAVE ) // Sesame Japan was a brand of Fujikousan
-GAME( 1983, vastar2, vastar, vastar, vastar,  vastar_state, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1983, vastar3, vastar, vastar, vastar,  vastar_state, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 3)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1983, vastar4, vastar, vastar, vastar4, vastar_state, 0, ROT90, "Orca (Sesame Japan license)", "Vastar (set 4)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pprobe,  0,      vastar, pprobe,  vastar_state, 0, ROT90, "Crux / Kyugo?",               "Planet Probe (prototype?)", MACHINE_SUPPORTS_SAVE ) // has no Copyright, probably because Crux didn't have a trading name at this point?
+GAME( 1983, vastar,  0,      vastar, vastar,  vastar_state, empty_init, ROT90, "Orca (Sesame Japan license)", "Vastar (set 1)",            MACHINE_SUPPORTS_SAVE ) // Sesame Japan was a brand of Fujikousan
+GAME( 1983, vastar2, vastar, vastar, vastar,  vastar_state, empty_init, ROT90, "Orca (Sesame Japan license)", "Vastar (set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1983, vastar3, vastar, vastar, vastar,  vastar_state, empty_init, ROT90, "Orca (Sesame Japan license)", "Vastar (set 3)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1983, vastar4, vastar, vastar, vastar4, vastar_state, empty_init, ROT90, "Orca (Sesame Japan license)", "Vastar (set 4)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pprobe,  0,      vastar, pprobe,  vastar_state, empty_init, ROT90, "Crux / Kyugo?",               "Planet Probe (prototype?)", MACHINE_SUPPORTS_SAVE ) // has no Copyright, probably because Crux didn't have a trading name at this point?

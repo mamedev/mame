@@ -160,7 +160,7 @@ public:
 	DECLARE_READ8_MEMBER(ay8910_pb_r);
 	DECLARE_WRITE8_MEMBER(ay8910_pb_w);
 
-	DECLARE_DRIVER_INIT(vega);
+	void init_vega();
 
 
 	virtual void machine_start() override;
@@ -836,7 +836,7 @@ MACHINE_CONFIG_START(vega_state::vega)
 
 	/* sound hardware */
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ay8910", AY8910, 1500000 )
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, vega_state, ay8910_pa_r))
@@ -881,10 +881,10 @@ ROM_START( vega )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(vega_state, vega)
+void vega_state::init_vega()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x1000], 0x800);
 }
 
-GAME( 1982, vega,   0, vega, vega, vega_state, vega, ROT270, "Olympia", "Vega", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1982, vega,   0, vega, vega, vega_state, init_vega, ROT270, "Olympia", "Vega", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

@@ -34,9 +34,9 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	DECLARE_DRIVER_INIT(primo48);
-	DECLARE_DRIVER_INIT(primo64);
-	DECLARE_DRIVER_INIT(primo32);
+	void init_primo48();
+	void init_primo64();
+	void init_primo32();
 
 	void primob32(machine_config &config);
 	void primob64(machine_config &config);

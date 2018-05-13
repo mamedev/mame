@@ -507,14 +507,15 @@ MACHINE_CONFIG_START(blackt96_state::blackt96)
 	MCFG_SNK68_SPR_SET_TILE_INDIRECT( blackt96_state, tile_callback )
 	MCFG_SNK68_SPR_NO_PARTIAL
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 8000000/8, PIN7_HIGH) // music
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH) // music
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 
-	MCFG_OKIM6295_ADD("oki2", 8000000/8, PIN7_HIGH) // sfx
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH) // sfx
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -554,4 +555,4 @@ ROM_START( blackt96 )
 ROM_END
 
 // I'm not really sure this needs MACHINE_IS_INCOMPLETE just because there are some original game bugs, it's quite typical of this type of Korean release
-GAME( 1996, blackt96,    0,        blackt96,    blackt96, blackt96_state,    0, ROT0,  "D.G.R.M.", "Black Touch '96", MACHINE_IS_INCOMPLETE )
+GAME( 1996, blackt96, 0, blackt96, blackt96, blackt96_state, empty_init, ROT0, "D.G.R.M.", "Black Touch '96", MACHINE_IS_INCOMPLETE )

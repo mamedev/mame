@@ -748,7 +748,7 @@ MACHINE_CONFIG_START(ladybug_state::ladybug)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, ladybug_state, flipscreen_w)) // no other outputs used
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -797,7 +797,7 @@ MACHINE_CONFIG_START(sraider_state::sraider)
 	MCFG_DEVICE_ADD("stars", ZEROHOUR_STARS, 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1020,24 +1020,22 @@ ROM_START( sraider )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(dorodon_state, dorodon)
+void dorodon_state::init_dorodon()
 {
 	/* decode the opcodes */
-
-	offs_t i;
 	uint8_t *rom = memregion("maincpu")->base();
 	uint8_t *table = memregion("user1")->base();
 
-	for (i = 0; i < 0x6000; i++)
+	for (offs_t i = 0; i < 0x6000; i++)
 		m_decrypted_opcodes[i] = table[rom[i]];
 }
 
 
-GAME( 1981, cavenger,  0,       ladybug, cavenger, ladybug_state, 0,       ROT0,   "Universal",              "Cosmic Avenger",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ladybug,   0,       ladybug, ladybug,  ladybug_state, 0,       ROT270, "Universal",              "Lady Bug",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ladybugb,  ladybug, ladybug, ladybug,  ladybug_state, 0,       ROT270, "bootleg",                "Lady Bug (bootleg set 1)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ladybugb2, ladybug, ladybug, ladybug,  ladybug_state, 0,       ROT270, "bootleg (Model Racing)", "Coccinelle (bootleg of Lady Bug, set 2)", MACHINE_SUPPORTS_SAVE ) // title removed, but manual names it Coccinelle
-GAME( 1982, dorodon,   0,       dorodon, dorodon,  dorodon_state, dorodon, ROT270, "UPL (Falcon license?)",  "Dorodon (set 1)",                         MACHINE_SUPPORTS_SAVE ) // license or bootleg?
-GAME( 1982, dorodon2,  dorodon, dorodon, dorodon,  dorodon_state, dorodon, ROT270, "UPL (Falcon license?)",  "Dorodon (set 2)",                         MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1982, snapjack,  0,       ladybug, snapjack, ladybug_state, 0,       ROT0,   "Universal",              "Snap Jack",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, sraider,   0,       sraider, sraider,  sraider_state, 0,       ROT270, "Universal",              "Space Raider",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1981, cavenger,  0,       ladybug, cavenger, ladybug_state, empty_init,   ROT0,   "Universal",              "Cosmic Avenger",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ladybug,   0,       ladybug, ladybug,  ladybug_state, empty_init,   ROT270, "Universal",              "Lady Bug",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ladybugb,  ladybug, ladybug, ladybug,  ladybug_state, empty_init,   ROT270, "bootleg",                "Lady Bug (bootleg set 1)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ladybugb2, ladybug, ladybug, ladybug,  ladybug_state, empty_init,   ROT270, "bootleg (Model Racing)", "Coccinelle (bootleg of Lady Bug, set 2)", MACHINE_SUPPORTS_SAVE ) // title removed, but manual names it Coccinelle
+GAME( 1982, dorodon,   0,       dorodon, dorodon,  dorodon_state, init_dorodon, ROT270, "UPL (Falcon license?)",  "Dorodon (set 1)",                         MACHINE_SUPPORTS_SAVE ) // license or bootleg?
+GAME( 1982, dorodon2,  dorodon, dorodon, dorodon,  dorodon_state, init_dorodon, ROT270, "UPL (Falcon license?)",  "Dorodon (set 2)",                         MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1982, snapjack,  0,       ladybug, snapjack, ladybug_state, empty_init,   ROT0,   "Universal",              "Snap Jack",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sraider,   0,       sraider, sraider,  sraider_state, empty_init,   ROT270, "Universal",              "Space Raider",                            MACHINE_SUPPORTS_SAVE )

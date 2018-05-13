@@ -172,5 +172,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT  COMPANY                           FULLNAME  FLAGS
-COMP( 1974, mod8,   0,       0,      mod8,      mod8,   mod8_state,   0,    "Microsystems International Ltd", "MOD-8",  MACHINE_NO_SOUND_HW )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                           FULLNAME  FLAGS
+COMP( 1974, mod8, 0,      0,      mod8,    mod8,  mod8_state, empty_init, "Microsystems International Ltd", "MOD-8",  MACHINE_NO_SOUND_HW )

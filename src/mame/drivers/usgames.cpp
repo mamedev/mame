@@ -245,7 +245,7 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8912, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -407,11 +407,11 @@ ROM_START( usg182 ) /* Version 18.2 */
 ROM_END
 
 
-GAME( 1987, usg32,    0,        usg32,  usg32, usgames_state, 0, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, superten, 0,        usg32,  usg83, usgames_state, 0, ROT0, "U.S. Games", "Super Ten V8.3",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, usg83x,   superten, usg32,  usg83, usgames_state, 0, ROT0, "U.S. Games", "Super Ten V8.3X",                      MACHINE_SUPPORTS_SAVE ) /* "Experimental" version?? */
-GAME( 1988, usg82,    superten, usg32,  usg83, usgames_state, 0, ROT0, "U.S. Games", "Super Ten V8.2" ,                      MACHINE_SUPPORTS_SAVE )
-GAME( 1992, usgames,  0,        usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V25.4X",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, usg187c,  usgames,  usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V18.7C",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1990, usg185,   usgames,  usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V18.5",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, usg182,   usgames,  usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V18.2",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, usg32,    0,        usg32,  usg32, usgames_state, empty_init, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, superten, 0,        usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Super Ten V8.3",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, usg83x,   superten, usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Super Ten V8.3X",                      MACHINE_SUPPORTS_SAVE ) /* "Experimental" version?? */
+GAME( 1988, usg82,    superten, usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Super Ten V8.2" ,                      MACHINE_SUPPORTS_SAVE )
+GAME( 1992, usgames,  0,        usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V25.4X",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, usg187c,  usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V18.7C",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, usg185,   usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V18.5",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, usg182,   usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V18.2",                          MACHINE_SUPPORTS_SAVE )

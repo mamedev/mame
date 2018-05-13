@@ -329,7 +329,8 @@ MACHINE_CONFIG_START(btoads_state::btoads)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34020_device, tms340x0_rgb32)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_BSMT2000_ADD("bsmt", SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -372,4 +373,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, btoads, 0, btoads, btoads, btoads_state, 0,  ROT0, "Rare / Electronic Arts", "Battletoads", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, btoads, 0, btoads, btoads, btoads_state, empty_init, ROT0, "Rare / Electronic Arts", "Battletoads", MACHINE_SUPPORTS_SAVE )

@@ -216,7 +216,7 @@ MACHINE_CONFIG_START(shaolins_state::shaolins)
 	MCFG_PALETTE_INIT_OWNER(shaolins_state, shaolins)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489A, MASTER_CLOCK/12)        /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -344,7 +344,7 @@ ROM_START( shaolinb )
 ROM_END
 
 
-/*    YEAR, NAME,     PARENT, MACHINE,  INPUT,    STATE,          INIT, MONITOR, COMPANY,  FULLNAME,                  FLAGS */
-GAME( 1985, kicker,   0,      shaolins, shaolins, shaolins_state, 0,    ROT90,  "Konami",  "Kicker",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shaolins, kicker, shaolins, shaolins, shaolins_state, 0,    ROT90,  "Konami",  "Shao-lin's Road (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shaolinb, kicker, shaolins, shaolins, shaolins_state, 0,    ROT90,  "Konami",  "Shao-lin's Road (set 2)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR, NAME,     PARENT, MACHINE,  INPUT,    STATE,          INIT,       MONITOR, COMPANY,  FULLNAME,                  FLAGS */
+GAME( 1985, kicker,   0,      shaolins, shaolins, shaolins_state, empty_init, ROT90,   "Konami",  "Kicker",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shaolins, kicker, shaolins, shaolins, shaolins_state, empty_init, ROT90,   "Konami",  "Shao-lin's Road (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shaolinb, kicker, shaolins, shaolins, shaolins_state, empty_init, ROT90,   "Konami",  "Shao-lin's Road (set 2)", MACHINE_SUPPORTS_SAVE )

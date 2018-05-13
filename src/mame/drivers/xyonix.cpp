@@ -268,7 +268,7 @@ MACHINE_CONFIG_START(xyonix_state::xyonix)
 	MCFG_PALETTE_INIT_OWNER(xyonix_state, xyonix)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76496, 16000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -296,4 +296,4 @@ ROM_END
 
 /* GAME drivers **************************************************************/
 
-GAME( 1989, xyonix, 0, xyonix, xyonix, xyonix_state, 0, ROT0, "Philko", "Xyonix", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, xyonix, 0, xyonix, xyonix, xyonix_state, empty_init, ROT0, "Philko", "Xyonix", MACHINE_SUPPORTS_SAVE )

@@ -159,6 +159,7 @@ enum endianness_t
 	ENDIANNESS_BIG
 };
 
+extern const char *const endianness_names[2];
 
 // declare native endianness to be one or the other
 #ifdef LSB_FIRST

@@ -346,9 +346,9 @@ MACHINE_CONFIG_START(ohmygod_state::ohmygod)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 14000000/8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 14000000/8, okim6295_device::PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -390,16 +390,16 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(ohmygod_state,ohmygod)
+void ohmygod_state::init_ohmygod()
 {
 	m_adpcm_bank_shift = 4;
 }
 
-DRIVER_INIT_MEMBER(ohmygod_state,naname)
+void ohmygod_state::init_naname()
 {
 	m_adpcm_bank_shift = 0;
 }
 
 
-GAME( 1993, ohmygod, 0, ohmygod, ohmygod, ohmygod_state, ohmygod, ROT0, "Atlus", "Oh My God! (Japan)",       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, naname,  0, ohmygod, naname,  ohmygod_state, naname,  ROT0, "Atlus", "Naname de Magic! (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ohmygod, 0, ohmygod, ohmygod, ohmygod_state, init_ohmygod, ROT0, "Atlus", "Oh My God! (Japan)",       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, naname,  0, ohmygod, naname,  ohmygod_state, init_naname,  ROT0, "Atlus", "Naname de Magic! (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

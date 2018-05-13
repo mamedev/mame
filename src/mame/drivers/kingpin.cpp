@@ -176,7 +176,7 @@ MACHINE_CONFIG_START(kingpin_state::kingpin)
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -306,6 +306,6 @@ ROM_END
 
 
 
-GAME( 1983, kingpin,  0, kingpin,  kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "Kingpin",     0 )
-GAME( 1983, maxideal, 0, kingpin,  kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "Maxi-Dealer", 0 )
-GAME( 1981, dealracl, 0, dealracl, kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "The Dealer (ACL)",  MACHINE_NOT_WORKING )
+GAME( 1983, kingpin,  0, kingpin,  kingpin, kingpin_state, empty_init, 0, "ACL Manufacturing", "Kingpin",     0 )
+GAME( 1983, maxideal, 0, kingpin,  kingpin, kingpin_state, empty_init, 0, "ACL Manufacturing", "Maxi-Dealer", 0 )
+GAME( 1981, dealracl, 0, dealracl, kingpin, kingpin_state, empty_init, 0, "ACL Manufacturing", "The Dealer (ACL)",  MACHINE_NOT_WORKING )

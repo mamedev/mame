@@ -277,7 +277,7 @@ MACHINE_CONFIG_START(thunderj_state::thunderj)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260012", 1)
@@ -452,7 +452,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(thunderj_state,thunderj)
+void thunderj_state::init_thunderj()
 {
 }
 
@@ -464,5 +464,5 @@ DRIVER_INIT_MEMBER(thunderj_state,thunderj)
  *
  *************************************/
 
-GAME( 1990, thunderj,         0, thunderj, thunderj, thunderj_state, thunderj, ROT0, "Atari Games", "ThunderJaws (rev 3)", 0 )
-GAME( 1990, thunderja, thunderj, thunderj, thunderj, thunderj_state, thunderj, ROT0, "Atari Games", "ThunderJaws (rev 2)", 0 )
+GAME( 1990, thunderj,         0, thunderj, thunderj, thunderj_state, init_thunderj, ROT0, "Atari Games", "ThunderJaws (rev 3)", 0 )
+GAME( 1990, thunderja, thunderj, thunderj, thunderj, thunderj_state, init_thunderj, ROT0, "Atari Games", "ThunderJaws (rev 2)", 0 )

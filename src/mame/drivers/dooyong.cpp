@@ -1352,11 +1352,9 @@ const gfx_layout spritelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0*4, 1*4, 2*4, 3*4 },
-	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
-			16*32+0, 16*32+1, 16*32+2, 16*32+3, 16*32+16+0, 16*32+16+1, 16*32+16+2, 16*32+16+3 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP4(0,4) },
+	{ STEP4(0,1), STEP4(16,1), STEP4(4*8*16,1), STEP4(4*8*16+16,1) },
+	{ STEP16(0,4*8) },
 	128*8
 };
 
@@ -1365,11 +1363,9 @@ const gfx_layout rshark_spritelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			16*32+0*4, 16*32+1*4, 16*32+2*4, 16*32+3*4, 16*32+4*4, 16*32+5*4, 16*32+6*4, 16*32+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP4(0,1) },
+	{ STEP8(0,4), STEP8(4*8*16,4) },
+	{ STEP16(0,4*8) },
 	128*8
 };
 
@@ -1435,7 +1431,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1451,7 +1447,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1460,12 +1456,12 @@ MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1_MHz_XTAL, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1_MHz_XTAL, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_state::sound_2151_4mhz)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1474,7 +1470,7 @@ MACHINE_CONFIG_START(dooyong_state::sound_2151_4mhz)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 16_MHz_XTAL/16, PIN7_HIGH)  /* 1MHz (16MHz/16 for most, 8Mhz/8 for Super-X) */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 16_MHz_XTAL/16, okim6295_device::PIN7_HIGH)  /* 1MHz (16MHz/16 for most, 8Mhz/8 for Super-X) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -1516,7 +1512,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -2755,35 +2751,35 @@ ROM_END
 
 /* The differences between the two lastday sets are only in the sound program and graphics. The main program is the same. */
 
-GAME( 1990, lastday,  0,        lastday,  lastday,  dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "The Last Day (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, lastdaya, lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "The Last Day (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddaydoo,  lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Chulgyeok D-Day (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lastday,   0,        lastday,  lastday,  dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "The Last Day (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lastdaya,  lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "The Last Day (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddaydoo,   lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Chulgyeok D-Day (Korea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (set 1)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrma,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (set 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrmb,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (set 3)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrmm,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrmk,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (Korea)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrm,  0,        gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrma, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (set 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrmb, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (set 3)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrmm, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrmk, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (Korea)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, pollux,   0,        pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Pollux (set 1)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1991, polluxa,  pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Pollux (set 2)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1991, polluxa2, pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Pollux (set 3)",       MACHINE_SUPPORTS_SAVE ) // Original Dooyong Board distributed by TCH
-GAME( 1991, polluxn,  pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong (NTC / Atlus license)", "Pollux (Japan, NTC license, distributed by Atlus)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pollux,    0,        pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Pollux (set 1)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1991, polluxa,   pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Pollux (set 2)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1991, polluxa2,  pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Pollux (set 3)",       MACHINE_SUPPORTS_SAVE ) // Original Dooyong Board distributed by TCH
+GAME( 1991, polluxn,   pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong (NTC / Atlus license)", "Pollux (Japan, NTC license, distributed by Atlus)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, flytiger, 0,        flytiger, flytiger, dooyong_z80_state,        0, ROT270, "Dooyong",                       "Flying Tiger (set 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1992, flytigera,flytiger, flytiger, flytiger, dooyong_z80_state,        0, ROT270, "Dooyong",                       "Flying Tiger (set 2)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1992, flytiger,  0,        flytiger, flytiger, dooyong_z80_state,        empty_init, ROT270, "Dooyong",                       "Flying Tiger (set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1992, flytigera, flytiger, flytiger, flytiger, dooyong_z80_state,        empty_init, ROT270, "Dooyong",                       "Flying Tiger (set 2)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, bluehawk, 0,        bluehawk, bluehawk, dooyong_z80_state,        0, ROT270, "Dooyong",                       "Blue Hawk",            MACHINE_SUPPORTS_SAVE )
-GAME( 1993, bluehawkn,bluehawk, bluehawk, bluehawk, dooyong_z80_state,        0, ROT270, "Dooyong (NTC license)",         "Blue Hawk (NTC)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1993, bluehawk,  0,        bluehawk, bluehawk, dooyong_z80_state,        empty_init, ROT270, "Dooyong",                       "Blue Hawk",            MACHINE_SUPPORTS_SAVE )
+GAME( 1993, bluehawkn, bluehawk, bluehawk, bluehawk, dooyong_z80_state,        empty_init, ROT270, "Dooyong (NTC license)",         "Blue Hawk (NTC)",      MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, sadari,   0,        primella, sadari,   dooyong_z80_state,        0, ROT0,   "Dooyong (NTC license)",         "Sadari",  MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sadari,    0,        primella, sadari,   dooyong_z80_state,        empty_init, ROT0,   "Dooyong (NTC license)",         "Sadari",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, gundl94,  0,        primella, primella, dooyong_z80_state,        0, ROT0,   "Dooyong",                       "Gun Dealer '94",       MACHINE_SUPPORTS_SAVE )
-GAME( 1994, primella, gundl94,  primella, primella, dooyong_z80_state,        0, ROT0,   "Dooyong (NTC license)",         "Primella",             MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gundl94,   0,        primella, primella, dooyong_z80_state,        empty_init, ROT0,   "Dooyong",                       "Gun Dealer '94",       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, primella,  gundl94,  primella, primella, dooyong_z80_state,        empty_init, ROT0,   "Dooyong (NTC license)",         "Primella",             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, superx,   0,        superx,   superx,   rshark_state,             0, ROT270, "Dooyong (NTC license)",         "Super-X (NTC)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1994, superxm,  superx,   superx,   superx,   rshark_state,             0, ROT270, "Dooyong (Mitchell license)",    "Super-X (Mitchell)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, superx,    0,        superx,   superx,   rshark_state,             empty_init, ROT270, "Dooyong (NTC license)",         "Super-X (NTC)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1994, superxm,   superx,   superx,   superx,   rshark_state,             empty_init, ROT270, "Dooyong (Mitchell license)",    "Super-X (Mitchell)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, rshark,   0,        rshark,   rshark,   rshark_state,             0, ROT270, "Dooyong",                       "R-Shark",              MACHINE_SUPPORTS_SAVE )
+GAME( 1995, rshark,    0,        rshark,   rshark,   rshark_state,             empty_init, ROT270, "Dooyong",                       "R-Shark",              MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, popbingo, 0,        popbingo, popbingo, popbingo_state,           0, ROT0,   "Dooyong",                       "Pop Bingo",            MACHINE_SUPPORTS_SAVE )
+GAME( 1996, popbingo,  0,        popbingo, popbingo, popbingo_state,           empty_init, ROT0,   "Dooyong",                       "Pop Bingo",            MACHINE_SUPPORTS_SAVE )

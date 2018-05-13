@@ -328,7 +328,7 @@ MACHINE_CONFIG_START(wolfpack_state::wolfpack)
 	MCFG_PALETTE_INIT_OWNER(wolfpack_state, wolfpack)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speech", S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -364,4 +364,4 @@ ROM_START( wolfpack )
 ROM_END
 
 
-GAME( 1978, wolfpack, 0, wolfpack, wolfpack, wolfpack_state, 0, ORIENTATION_FLIP_Y, "Atari", "Wolf Pack (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, wolfpack, 0, wolfpack, wolfpack, wolfpack_state, empty_init, ORIENTATION_FLIP_Y, "Atari", "Wolf Pack (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

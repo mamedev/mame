@@ -133,14 +133,14 @@ TODO:
 /* opcodes. In case of system with memory mapped I/O, this function can be  */
 /* used to greatly speed up emulation                                       */
 /****************************************************************************/
-#define M_RDOP(Addr) ((unsigned)m_decrypted_opcodes_direct->read_byte(Addr))
+#define M_RDOP(Addr) ((unsigned)m_opcodes_cache->read_byte(Addr))
 
 /****************************************************************************/
 /* M6800_RDOP_ARG() is identical to M6800_RDOP() but it's used for reading  */
 /* opcode arguments. This difference can be used to support systems that    */
 /* use different encoding mechanisms for opcodes and opcode arguments       */
 /****************************************************************************/
-#define M_RDOP_ARG(Addr) ((unsigned)m_direct->read_byte(Addr))
+#define M_RDOP_ARG(Addr) ((unsigned)m_cache->read_byte(Addr))
 
 /* macros to access memory */
 #define IMMBYTE(b)  b = M_RDOP_ARG(PCD); PC++
@@ -464,9 +464,9 @@ void m6800_cpu_device::EAT_CYCLES()
 void m6800_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
-	m_decrypted_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_decrypted_opcodes_direct = m_decrypted_opcodes->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
+	m_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
+	m_opcodes_cache = m_opcodes->cache<0, 0, ENDIANNESS_BIG>();
 
 	m_pc.d = 0;
 	m_s.d = 0;

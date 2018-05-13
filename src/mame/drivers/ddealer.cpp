@@ -164,7 +164,7 @@ public:
 	DECLARE_WRITE16_MEMBER(mcu_shared_w);
 	DECLARE_READ16_MEMBER(mcu_r);
 
-	DECLARE_DRIVER_INIT(ddealer);
+	void init_ddealer();
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -644,7 +644,7 @@ MACHINE_CONFIG_START(ddealer_state::ddealer)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", ddealer_state, mcu_sim, attotime::from_hz(10000))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(6'000'000) / 8) /* 7.5KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
@@ -672,7 +672,7 @@ READ16_MEMBER(ddealer_state::mcu_r)
 	return res;
 }
 
-DRIVER_INIT_MEMBER(ddealer_state,ddealer)
+void ddealer_state::init_ddealer()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfe01c, 0xfe01d, read16_delegate(FUNC(ddealer_state::mcu_r), this));
 }
@@ -696,4 +696,4 @@ ROM_START( ddealer )
 	ROM_LOAD( "6.ic86", 0x100, 0x100, NO_DUMP )
 ROM_END
 
-GAME( 1991, ddealer,  0, ddealer, ddealer, ddealer_state, ddealer,  ROT0, "NMK", "Double Dealer", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1991, ddealer, 0, ddealer, ddealer, ddealer_state, init_ddealer, ROT0, "NMK", "Double Dealer", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )

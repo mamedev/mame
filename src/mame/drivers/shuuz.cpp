@@ -261,9 +261,9 @@ MACHINE_CONFIG_START(shuuz_state::shuuz)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, ATARI_CLOCK_14MHz/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -350,5 +350,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1990, shuuz,  0,     shuuz, shuuz,  shuuz_state,  0, ROT0, "Atari Games", "Shuuz (version 8.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, shuuz_state,  0, ROT0, "Atari Games", "Shuuz (version 7.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, shuuz,  0,     shuuz, shuuz,  shuuz_state, empty_init, ROT0, "Atari Games", "Shuuz (version 8.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, shuuz_state, empty_init, ROT0, "Atari Games", "Shuuz (version 7.1)", MACHINE_SUPPORTS_SAVE )

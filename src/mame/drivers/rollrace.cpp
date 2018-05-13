@@ -283,7 +283,8 @@ MACHINE_CONFIG_START(rollrace_state::rollrace)
 	MCFG_PALETTE_INIT_OWNER(rollrace_state, rollrace)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -456,6 +457,6 @@ ROM_START( rollace2 )
 ROM_END
 
 
-GAME( 1983, fightrol, 0,        rollrace, rollrace, rollrace_state, 0, ROT270, "Kaneko (Taito license)",    "Fighting Roller",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rollace,  fightrol, rollrace, rollrace, rollrace_state, 0, ROT270, "Kaneko (Williams license)", "Roller Aces (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rollace2, fightrol, rollace2, rollrace, rollrace_state, 0, ROT90,  "Kaneko (Williams license)", "Roller Aces (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, fightrol, 0,        rollrace, rollrace, rollrace_state, empty_init, ROT270, "Kaneko (Taito license)",    "Fighting Roller",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rollace,  fightrol, rollrace, rollrace, rollrace_state, empty_init, ROT270, "Kaneko (Williams license)", "Roller Aces (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rollace2, fightrol, rollace2, rollrace, rollrace_state, empty_init, ROT90,  "Kaneko (Williams license)", "Roller Aces (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

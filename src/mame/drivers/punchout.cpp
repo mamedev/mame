@@ -668,7 +668,9 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "mono")
+	// FIXME: this makes no sense - "lspeaker" on left and "mono" on right, with nothing routed to "mono"
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "mono").front_right();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -1336,11 +1338,11 @@ ROM_END
 
 
 
-GAME( 1984, punchout,  0,        punchout, punchout, punchout_state, 0, ROT0, "Nintendo", "Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
-GAME( 1984, punchouta, punchout, punchout, punchout, punchout_state, 0, ROT0, "Nintendo", "Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
-GAME( 1984, punchoutj, punchout, punchout, punchout, punchout_state, 0, ROT0, "Nintendo", "Punch-Out!! (Japan)", 0 )
-GAME( 1984, punchita,  punchout, punchout, punchout, punchout_state, 0, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
-GAME( 1984, spnchout,  0,        spnchout, spnchout, punchout_state, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
-GAME( 1984, spnchouta, spnchout, spnchout, spnchout, punchout_state, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
-GAME( 1984, spnchoutj, spnchout, spnchout, spnchout, punchout_state, 0, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
-GAME( 1985, armwrest,  0,        armwrest, armwrest, punchout_state, 0, ROT0, "Nintendo", "Arm Wrestling", 0 )
+GAME( 1984, punchout,  0,        punchout, punchout, punchout_state, empty_init, ROT0, "Nintendo", "Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
+GAME( 1984, punchouta, punchout, punchout, punchout, punchout_state, empty_init, ROT0, "Nintendo", "Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
+GAME( 1984, punchoutj, punchout, punchout, punchout, punchout_state, empty_init, ROT0, "Nintendo", "Punch-Out!! (Japan)", 0 )
+GAME( 1984, punchita,  punchout, punchout, punchout, punchout_state, empty_init, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
+GAME( 1984, spnchout,  0,        spnchout, spnchout, punchout_state, empty_init, ROT0, "Nintendo", "Super Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
+GAME( 1984, spnchouta, spnchout, spnchout, spnchout, punchout_state, empty_init, ROT0, "Nintendo", "Super Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
+GAME( 1984, spnchoutj, spnchout, spnchout, spnchout, punchout_state, empty_init, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
+GAME( 1985, armwrest,  0,        armwrest, armwrest, punchout_state, empty_init, ROT0, "Nintendo", "Arm Wrestling", 0 )

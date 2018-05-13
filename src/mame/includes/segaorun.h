@@ -69,10 +69,10 @@ public:
 	DECLARE_WRITE16_MEMBER( nop_w );
 
 	// game-specific driver init
-	DECLARE_DRIVER_INIT(generic);
-	DECLARE_DRIVER_INIT(outrun);
-	DECLARE_DRIVER_INIT(outrunb);
-	DECLARE_DRIVER_INIT(shangon);
+	void init_generic();
+	void init_outrun();
+	void init_outrunb();
+	void init_shangon();
 
 	// video updates
 	uint32_t screen_update_outrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

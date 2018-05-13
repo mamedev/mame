@@ -108,7 +108,7 @@ static const discrete_op_amp_filt_info fantasy_filter =
 #define FANTASY_NOISE_STREAM_IN     NODE_02
 #define FANTASY_NOISE_LOGIC         NODE_03
 
-DISCRETE_SOUND_START( fantasy )
+DISCRETE_SOUND_START( fantasy_discrete )
 
 	DISCRETE_INPUT_LOGIC (FANTASY_BOMB_EN)
 	DISCRETE_INPUT_STREAM(FANTASY_NOISE_STREAM_IN, 0)

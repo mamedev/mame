@@ -348,7 +348,7 @@ MACHINE_CONFIG_START(foodf_state::foodf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, foodf_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/2/10)
 	MCFG_POKEY_POT0_R_CB(READ8(*this, foodf_state, pot_r))
@@ -487,7 +487,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, foodf,  0,     foodf, foodf, foodf_state, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, foodf2, foodf, foodf, foodf, foodf_state, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, foodf1, foodf, foodf, foodf, foodf_state, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, foodfc, foodf, foodf, foodf, foodf_state, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (cocktail)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, foodf,  0,     foodf, foodf, foodf_state, empty_init, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, foodf2, foodf, foodf, foodf, foodf_state, empty_init, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, foodf1, foodf, foodf, foodf, foodf_state, empty_init, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, foodfc, foodf, foodf, foodf, foodf_state, empty_init, ROT0, "General Computer Corporation (Atari license)", "Food Fight (cocktail)", MACHINE_SUPPORTS_SAVE )

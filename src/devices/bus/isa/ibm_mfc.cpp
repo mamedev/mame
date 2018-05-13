@@ -403,7 +403,8 @@ MACHINE_CONFIG_START(isa8_ibm_mfc_device::device_add_mconfig)
 	MCFG_PIT8253_CLK2(XTAL(4'000'000) / 2)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("d8253", pit8253_device, write_clk1))
 
-	MCFG_SPEAKER_STANDARD_STEREO("ymleft", "ymright")
+	SPEAKER(config, "ymleft").front_left();
+	SPEAKER(config, "ymright").front_right();
 	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(4'000'000))
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, isa8_ibm_mfc_device, ibm_mfc_ym_irq))
 	MCFG_SOUND_ROUTE(0, "ymleft", 1.00)

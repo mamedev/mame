@@ -28,7 +28,7 @@ public:
 		m_palette(*this, "palette") { }
 
 	void groundfx(machine_config &config);
-	DECLARE_DRIVER_INIT(groundfx);
+	void init_groundfx();
 
 protected:
 	virtual void video_start() override;

@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(yiear_state::yiear)
 	MCFG_PALETTE_INIT_OWNER(yiear_state, yiear)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
@@ -369,5 +369,5 @@ ROM_END
 
 
 
-GAME( 1985, yiear,  0,     yiear, yiear, yiear_state, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code I)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, yiear2, yiear, yiear, yiear, yiear_state, 0, ROT0, "Konami", "Yie Ar Kung-Fu (program code G)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, yiear,  0,     yiear, yiear, yiear_state, empty_init, ROT0, "Konami", "Yie Ar Kung-Fu (program code I)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, yiear2, yiear, yiear, yiear, yiear_state, empty_init, ROT0, "Konami", "Yie Ar Kung-Fu (program code G)", MACHINE_SUPPORTS_SAVE )

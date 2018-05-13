@@ -105,7 +105,7 @@ public:
 	};
 
 	void machine_reset() override;
-	DECLARE_DRIVER_INIT(pcjr);
+	void init_pcjr();
 	void ibmpcjx(machine_config &config);
 	void ibmpcjr(machine_config &config);
 	void ibmpcjr_io(address_map &map);
@@ -123,7 +123,7 @@ static INPUT_PORTS_START( ibmpcjr )
 	PORT_BIT ( 0x07, 0x07,   IPT_UNUSED )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(pcjr_state, pcjr)
+void pcjr_state::init_pcjr()
 {
 	m_pc_int_delay_timer = timer_alloc(TIMER_IRQ_DELAY);
 	m_pcjr_watchdog = timer_alloc(TIMER_WATCHDOG);
@@ -634,7 +634,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_pcjr:palette", pcjr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 	MCFG_DEVICE_ADD("sn76496", SN76496, XTAL(14'318'181)/4)
@@ -730,7 +730,6 @@ ROM_START( ibmpcjx )
 	ROM_LOAD("kanji.rom",     0x00000, 0x38000, BAD_DUMP CRC(eaa6e3c3) SHA1(35554587d02d947fae8446964b1886fff5c9d67f)) // hand-made rom
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT    STATE          INIT        COMPANY                            FULLNAME     FLAGS
-// pcjr
-COMP( 1983, ibmpcjr,    ibm5150,    0,          ibmpcjr,    ibmpcjr, pcjr_state,    pcjr,       "International Business Machines", "IBM PC Jr", MACHINE_IMPERFECT_COLORS )
-COMP( 1985, ibmpcjx,    ibm5150,    0,          ibmpcjx,    ibmpcjr, pcjr_state,    pcjr,       "International Business Machines", "IBM PC JX", MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS       INIT       COMPANY                            FULLNAME     FLAGS
+COMP( 1983, ibmpcjr, ibm5150, 0,      ibmpcjr, ibmpcjr, pcjr_state, init_pcjr, "International Business Machines", "IBM PC Jr", MACHINE_IMPERFECT_COLORS )
+COMP( 1985, ibmpcjx, ibm5150, 0,      ibmpcjx, ibmpcjr, pcjr_state, init_pcjr, "International Business Machines", "IBM PC JX", MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING)

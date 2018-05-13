@@ -108,6 +108,6 @@ private:
 };
 
 /*----------- defined in audio/skydiver.c -----------*/
-DISCRETE_SOUND_EXTERN( skydiver );
+DISCRETE_SOUND_EXTERN( skydiver_discrete );
 
 #endif // MAME_INCLUDES_SKYDIVER_H

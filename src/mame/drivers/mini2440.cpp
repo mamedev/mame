@@ -41,7 +41,7 @@ public:
 	required_ioport m_peny;
 
 	uint32_t m_port[9];
-	DECLARE_DRIVER_INIT(mini2440);
+	void init_mini2440();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(mini2440_input_changed);
@@ -217,7 +217,7 @@ void mini2440_state::mini2440_map(address_map &map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(mini2440_state,mini2440)
+void mini2440_state::init_mini2440()
 {
 	// do nothing
 }
@@ -237,7 +237,8 @@ MACHINE_CONFIG_START(mini2440_state::mini2440)
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2440", s3c2440_device, screen_update)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ldac", UDA1341TS, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // uda1341ts.u12
 	MCFG_DEVICE_ADD("rdac", UDA1341TS, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // uda1341ts.u12
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -285,4 +286,4 @@ ROM_START( mini2440 )
 	ROMX_LOAD( "android.bin", 0, 0x8400000, CRC(4721837d) SHA1(88fcf553b106d9fc624c9615d9c1da9c705ccb46), ROM_BIOS(3) )
 ROM_END
 
-COMP(2009, mini2440, 0, 0, mini2440, mini2440, mini2440_state, mini2440, "FriendlyARM", "Mini2440", 0)
+COMP(2009, mini2440, 0, 0, mini2440, mini2440, mini2440_state, init_mini2440, "FriendlyARM", "Mini2440", 0)

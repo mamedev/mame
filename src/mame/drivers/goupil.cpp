@@ -690,6 +690,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR   NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1979, goupilg1,   0,   0,      goupil_g1,  goupil_g1,goupil_g1_state,   0,     "SMT", "Goupil G1", MACHINE_NO_SOUND )
-COMP( 1981, goupilg2,   0,   0,      goupil_g2,  goupil_g1,goupil_g2_state,   0,     "SMT", "Goupil G2", MACHINE_NO_SOUND )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY  FULLNAME     FLAGS */
+COMP( 1979, goupilg1, 0,      0,      goupil_g1, goupil_g1, goupil_g1_state, empty_init, "SMT",   "Goupil G1", MACHINE_NO_SOUND )
+COMP( 1981, goupilg2, 0,      0,      goupil_g2, goupil_g1, goupil_g2_state, empty_init, "SMT",   "Goupil G2", MACHINE_NO_SOUND )

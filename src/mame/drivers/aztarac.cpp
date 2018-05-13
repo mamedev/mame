@@ -175,7 +175,7 @@ MACHINE_CONFIG_START(aztarac_state::aztarac)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -233,4 +233,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, aztarac, 0, aztarac, aztarac, aztarac_state, 0, ROT0, "Centuri", "Aztarac", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, aztarac, 0, aztarac, aztarac, aztarac_state, empty_init, ROT0, "Centuri", "Aztarac", MACHINE_SUPPORTS_SAVE )

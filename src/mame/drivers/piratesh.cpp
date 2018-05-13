@@ -643,7 +643,8 @@ MACHINE_CONFIG_START(piratesh_state::piratesh)
 	MCFG_VIDEO_START_OVERRIDE(piratesh_state, piratesh)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, piratesh_state, k054539_nmi_gen))
@@ -680,4 +681,4 @@ ROM_START( piratesh )
 ROM_END
 
 //    year  name        parent    machine   input     state           init
-GAME( 1995, piratesh,   0,        piratesh, piratesh, piratesh_state, 0, ROT90,  "Konami", "Pirate Ship (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, piratesh,   0,        piratesh, piratesh, piratesh_state, empty_init, ROT90,  "Konami", "Pirate Ship (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )

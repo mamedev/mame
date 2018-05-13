@@ -230,7 +230,7 @@ MACHINE_CONFIG_START(channelf_state::channelf)
 	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -257,7 +257,7 @@ MACHINE_CONFIG_START(channelf_state::sabavdpl)
 	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(channelf_state::channlf2)
 	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -313,7 +313,7 @@ MACHINE_CONFIG_START(channelf_state::sabavpl2)
 	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -345,12 +345,12 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     STATE            INIT   COMPANY         FULLNAME                                FLAGS */
-CONS( 1976, channelf,  0,        0,      channelf,  channelf, channelf_state,  0,     "Fairchild",    "Channel F",                            0 )
-CONS( 1977, sabavdpl,  channelf, 0,      sabavdpl,  channelf, channelf_state,  0,     "SABA",         "SABA Videoplay",                       0 )
-CONS( 197?, luxorves,  channelf, 0,      sabavdpl,  channelf, channelf_state,  0,     "Luxor",        "Luxor Video Entertainment System",     0 )
-CONS( 1978, channlf2,  0, channelf,      channlf2,  channelf, channelf_state,  0,     "Fairchild",    "Channel F II",                         0 )
-CONS( 1978, sabavpl2,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "SABA",         "SABA Videoplay 2",                     0 )
-CONS( 197?, luxorvec,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "Luxor",        "Luxor Video Entertainment Computer",   0 )
-CONS( 197?, itttelma,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "ITT",          "ITT Tele-Match Processor",             0 )
-CONS( 1978, ingtelma,  channlf2, 0,      sabavpl2,  channelf, channelf_state,  0,     "Ingelen",      "Ingelen Tele-Match Processor",         0 )
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS           INIT        COMPANY         FULLNAME                                FLAGS */
+CONS( 1976, channelf, 0,        0,        channelf, channelf, channelf_state, empty_init, "Fairchild",    "Channel F",                            0 )
+CONS( 1977, sabavdpl, channelf, 0,        sabavdpl, channelf, channelf_state, empty_init, "SABA",         "SABA Videoplay",                       0 )
+CONS( 197?, luxorves, channelf, 0,        sabavdpl, channelf, channelf_state, empty_init, "Luxor",        "Luxor Video Entertainment System",     0 )
+CONS( 1978, channlf2, 0,        channelf, channlf2, channelf, channelf_state, empty_init, "Fairchild",    "Channel F II",                         0 )
+CONS( 1978, sabavpl2, channlf2, 0,        sabavpl2, channelf, channelf_state, empty_init, "SABA",         "SABA Videoplay 2",                     0 )
+CONS( 197?, luxorvec, channlf2, 0,        sabavpl2, channelf, channelf_state, empty_init, "Luxor",        "Luxor Video Entertainment Computer",   0 )
+CONS( 197?, itttelma, channlf2, 0,        sabavpl2, channelf, channelf_state, empty_init, "ITT",          "ITT Tele-Match Processor",             0 )
+CONS( 1978, ingtelma, channlf2, 0,        sabavpl2, channelf, channelf_state, empty_init, "Ingelen",      "Ingelen Tele-Match Processor",         0 )

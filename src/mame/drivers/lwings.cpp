@@ -957,7 +957,7 @@ MACHINE_CONFIG_START(lwings_state::lwings)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -1007,11 +1007,11 @@ MACHINE_CONFIG_START(lwings_state::fball)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, fball_oki_map)
 
@@ -1768,7 +1768,7 @@ ROM_START( buraikenb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(lwings_state, avengersb)
+void lwings_state::init_avengersb()
 {
 	/* set up protection handlers */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf80c, 0xf80c, write8_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch));
@@ -1781,25 +1781,25 @@ DRIVER_INIT_MEMBER(lwings_state, avengersb)
  *
  *************************************/
 
-GAME( 1985, sectionz,  0,        lwings,   sectionz, lwings_state, 0,         ROT0,  "Capcom",            "Section Z (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sectionza, sectionz, lwings,   sectionz, lwings_state, 0,         ROT0,  "Capcom",            "Section Z (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sectionz,  0,        lwings,    sectionz, lwings_state, empty_init,     ROT0,  "Capcom",           "Section Z (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sectionza, sectionz, lwings,    sectionz, lwings_state, empty_init,     ROT0,  "Capcom",           "Section Z (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, lwings,    0,        lwings,   lwings,   lwings_state, 0,         ROT90, "Capcom",            "Legendary Wings (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lwings2,   lwings,   lwings,   lwings,   lwings_state, 0,         ROT90, "Capcom",            "Legendary Wings (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lwingsj,   lwings,   lwings,   lwings,   lwings_state, 0,         ROT90, "Capcom",            "Ares no Tsubasa (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lwingsja,  lwings,   lwings,   lwings,   lwings_state, 0,         ROT90, "Capcom",            "Ares no Tsubasa (Japan, rev. A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lwingsb,   lwings,   lwings,   lwingsb,  lwings_state, 0,         ROT90, "bootleg",           "Legendary Wings (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwings,    0,        lwings,    lwings,   lwings_state, empty_init,     ROT90, "Capcom",           "Legendary Wings (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwings2,   lwings,   lwings,    lwings,   lwings_state, empty_init,     ROT90, "Capcom",           "Legendary Wings (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwingsj,   lwings,   lwings,    lwings,   lwings_state, empty_init,     ROT90, "Capcom",           "Ares no Tsubasa (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwingsja,  lwings,   lwings,    lwings,   lwings_state, empty_init,     ROT90, "Capcom",           "Ares no Tsubasa (Japan, rev. A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lwingsb,   lwings,   lwings,    lwingsb,  lwings_state, empty_init,     ROT90, "bootleg",          "Legendary Wings (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, trojan,    0,        trojan,   trojanls, lwings_state, 0,         ROT0,  "Capcom",            "Trojan (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, trojana,   trojan,   trojan,   trojanls, lwings_state, 0,         ROT0,  "Capcom",            "Trojan (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, trojanr,   trojan,   trojan,   trojan,   lwings_state, 0,         ROT0,  "Capcom (Romstar license)", "Trojan (Romstar)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, trojanj,   trojan,   trojan,   trojan,   lwings_state, 0,         ROT0,  "Capcom",            "Tatakai no Banka (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, trojanb,   trojan,   trojan,   trojanls, lwings_state, 0,         ROT0,  "bootleg",           "Trojan (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojan,    0,        trojan,    trojanls, lwings_state, empty_init,     ROT0,  "Capcom",           "Trojan (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojana,   trojan,   trojan,    trojanls, lwings_state, empty_init,     ROT0,  "Capcom",           "Trojan (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojanr,   trojan,   trojan,    trojan,   lwings_state, empty_init,     ROT0,  "Capcom (Romstar license)", "Trojan (Romstar)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojanj,   trojan,   trojan,    trojan,   lwings_state, empty_init,     ROT0,  "Capcom",           "Tatakai no Banka (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojanb,   trojan,   trojan,    trojanls, lwings_state, empty_init,     ROT0,  "bootleg",          "Trojan (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, avengers,  0,        avengers, avengers, lwings_state, 0,         ROT90, "Capcom",            "Avengers (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, avengers2, avengers, avengers, avengers, lwings_state, 0,         ROT90, "Capcom",            "Avengers (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, buraiken,  avengers, avengers, avengers, lwings_state, 0,         ROT90, "Capcom",            "Hissatsu Buraiken (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, buraikenb, avengers, avengersb,avengers, lwings_state, avengersb, ROT90, "Capcom",            "Hissatsu Buraiken (Japan, bootleg?)", MACHINE_SUPPORTS_SAVE ) // unprotected at least
+GAME( 1987, avengers,  0,        avengers,  avengers, lwings_state, empty_init,     ROT90, "Capcom",           "Avengers (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, avengers2, avengers, avengers,  avengers, lwings_state, empty_init,     ROT90, "Capcom",           "Avengers (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, buraiken,  avengers, avengers,  avengers, lwings_state, empty_init,     ROT90, "Capcom",           "Hissatsu Buraiken (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, buraikenb, avengers, avengersb, avengers, lwings_state, init_avengersb, ROT90, "Capcom",           "Hissatsu Buraiken (Japan, bootleg?)", MACHINE_SUPPORTS_SAVE ) // unprotected at least
 
 // cloned lwings hardware
-GAME( 1992, fball,  0,    fball, fball, lwings_state,  0, ROT0, "FM Work", "Fire Ball (FM Work)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fball,     0,        fball,     fball,    lwings_state, empty_init,     ROT0,  "FM Work",          "Fire Ball (FM Work)", MACHINE_SUPPORTS_SAVE )

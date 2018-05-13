@@ -299,9 +299,9 @@ MACHINE_CONFIG_START(relief_state::relief)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/4/3, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, ATARI_CLOCK_14MHz/4/3, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
@@ -428,7 +428,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(relief_state,relief)
+void relief_state::init_relief()
 {
 	m_okibank->configure_entries(0, 8, memregion("oki")->base(), 0x20000);
 	m_okibank->set_entry(0);
@@ -443,6 +443,6 @@ DRIVER_INIT_MEMBER(relief_state,relief)
  *
  *************************************/
 
-GAME( 1992, relief,  0,      relief, relief, relief_state, relief, ROT0, "Atari Games", "Relief Pitcher (set 1, 07 Jun 1992 / 28 May 1992)", 0 )
-GAME( 1992, relief2, relief, relief, relief, relief_state, relief, ROT0, "Atari Games", "Relief Pitcher (set 2, 26 Apr 1992 / 08 Apr 1992)", 0 )
-GAME( 1992, relief3, relief, relief, relief, relief_state, relief, ROT0, "Atari Games", "Relief Pitcher (set 3, 10 Apr 1992 / 08 Apr 1992)", 0 )
+GAME( 1992, relief,  0,      relief, relief, relief_state, init_relief, ROT0, "Atari Games", "Relief Pitcher (set 1, 07 Jun 1992 / 28 May 1992)", 0 )
+GAME( 1992, relief2, relief, relief, relief, relief_state, init_relief, ROT0, "Atari Games", "Relief Pitcher (set 2, 26 Apr 1992 / 08 Apr 1992)", 0 )
+GAME( 1992, relief3, relief, relief, relief, relief_state, init_relief, ROT0, "Atari Games", "Relief Pitcher (set 3, 10 Apr 1992 / 08 Apr 1992)", 0 )

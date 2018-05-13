@@ -202,5 +202,5 @@ ROM_END
 *           Game Driver(s)            *
 **************************************/
 
-/*    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT   ROT    COMPANY           FULLNAME    FLAGS  */
-GAME( 1998, odyssey,  0,      odyssey, odyssey, odyssey_state, 0,     ROT0, "Silicon Gaming", "Odyssey",   MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT        ROT   COMPANY           FULLNAME    FLAGS  */
+GAME( 1998, odyssey,  0,      odyssey, odyssey, odyssey_state, empty_init, ROT0, "Silicon Gaming", "Odyssey",   MACHINE_IS_SKELETON )

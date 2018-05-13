@@ -451,7 +451,7 @@ MACHINE_CONFIG_START(kangaroo_state::nomcu)
 	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -576,7 +576,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, fnkyfish,  0,        nomcu, fnkyfish, kangaroo_state, 0, ROT90, "Sun Electronics",                 "Funky Fish",         MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kangaroo,  0,        mcu,   kangaroo, kangaroo_state, 0, ROT90, "Sun Electronics",                 "Kangaroo",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kangarooa, kangaroo, mcu,   kangaroo, kangaroo_state, 0, ROT90, "Sun Electronics (Atari license)", "Kangaroo (Atari)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kangaroob, kangaroo, nomcu, kangaroo, kangaroo_state, 0, ROT90, "bootleg",                         "Kangaroo (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fnkyfish,  0,        nomcu, fnkyfish, kangaroo_state, empty_init, ROT90, "Sun Electronics",                 "Funky Fish",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangaroo,  0,        mcu,   kangaroo, kangaroo_state, empty_init, ROT90, "Sun Electronics",                 "Kangaroo",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangarooa, kangaroo, mcu,   kangaroo, kangaroo_state, empty_init, ROT90, "Sun Electronics (Atari license)", "Kangaroo (Atari)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangaroob, kangaroo, nomcu, kangaroo, kangaroo_state, empty_init, ROT90, "bootleg",                         "Kangaroo (bootleg)", MACHINE_SUPPORTS_SAVE )

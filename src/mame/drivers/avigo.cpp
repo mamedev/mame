@@ -785,7 +785,7 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	MCFG_PALETTE_INIT_OWNER(avigo_state, avigo)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -907,9 +907,9 @@ ROM_START(avigo_it)
 	ROMX_LOAD("italian_100.rom",  0x000000, 0x050000, CRC(de359218) SHA1(6185727aba8ffc98723f2df74dda388fd0d70cc9), ROM_BIOS(3))
 ROM_END
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE  INPUT  STATE        INIT    COMPANY              FULLNAME                       FLAGS
-COMP(1997,  avigo,     0,       0,      avigo,   avigo, avigo_state, 0,      "Texas Instruments", "TI Avigo 10 PDA",             MACHINE_SUPPORTS_SAVE)
-COMP(1997,  avigo_de,  avigo,   0,      avigo,   avigo, avigo_state, 0,      "Texas Instruments", "TI Avigo 10 PDA (German)",    MACHINE_SUPPORTS_SAVE)
-COMP(1997,  avigo_fr,  avigo,   0,      avigo,   avigo, avigo_state, 0,      "Texas Instruments", "TI Avigo 10 PDA (French)",    MACHINE_SUPPORTS_SAVE)
-COMP(1997,  avigo_es,  avigo,   0,      avigo,   avigo, avigo_state, 0,      "Texas Instruments", "TI Avigo 10 PDA (Spanish)",   MACHINE_SUPPORTS_SAVE)
-COMP(1997,  avigo_it,  avigo,   0,      avigo,   avigo, avigo_state, 0,      "Texas Instruments", "TI Avigo 10 PDA (Italian)",   MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY              FULLNAME                     FLAGS
+COMP( 1997, avigo,    0,      0,      avigo,   avigo, avigo_state, empty_init, "Texas Instruments", "TI Avigo 10 PDA",           MACHINE_SUPPORTS_SAVE)
+COMP( 1997, avigo_de, avigo,  0,      avigo,   avigo, avigo_state, empty_init, "Texas Instruments", "TI Avigo 10 PDA (German)",  MACHINE_SUPPORTS_SAVE)
+COMP( 1997, avigo_fr, avigo,  0,      avigo,   avigo, avigo_state, empty_init, "Texas Instruments", "TI Avigo 10 PDA (French)",  MACHINE_SUPPORTS_SAVE)
+COMP( 1997, avigo_es, avigo,  0,      avigo,   avigo, avigo_state, empty_init, "Texas Instruments", "TI Avigo 10 PDA (Spanish)", MACHINE_SUPPORTS_SAVE)
+COMP( 1997, avigo_it, avigo,  0,      avigo,   avigo, avigo_state, empty_init, "Texas Instruments", "TI Avigo 10 PDA (Italian)", MACHINE_SUPPORTS_SAVE)

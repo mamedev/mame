@@ -230,7 +230,8 @@ MACHINE_CONFIG_START(toobin_state::toobin)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(*this, toobin_state, sound_int_write_line))
 	MCFG_ATARI_JSA_TEST_PORT("FF9000", 12)
@@ -583,9 +584,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, toobin,   0,      toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobine,  toobin, toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (Europe, rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobing,  toobin, toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (German, rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobin2,  toobin, toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobin2e, toobin, toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (Europe, rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobin1,  toobin, toobin, toobin, toobin_state, 0, ROT270, "Atari Games", "Toobin' (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobin,   0,      toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobine,  toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (Europe, rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobing,  toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (German, rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobin2,  toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobin2e, toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (Europe, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobin1,  toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (rev 1)", MACHINE_SUPPORTS_SAVE )

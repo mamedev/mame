@@ -170,7 +170,7 @@ MACHINE_CONFIG_START(tim100_state::tim100)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(40*12, 16*16)
+	MCFG_SCREEN_SIZE(600, 352)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*12-1, 0, 16*16-1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tim100 )
@@ -233,4 +233,4 @@ ROM_START( tim100 )
 ROM_END
 
 /* Driver */
-COMP( 1985, tim100, 0, 0, tim100, tim100, tim100_state, 0, "Mihajlo Pupin Institute", "TIM-100", MACHINE_IS_SKELETON)
+COMP( 1985, tim100, 0, 0, tim100, tim100, tim100_state, empty_init, "Mihajlo Pupin Institute", "TIM-100", MACHINE_IS_SKELETON)

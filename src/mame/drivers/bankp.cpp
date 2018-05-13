@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(bankp_state::bankp)
 	MCFG_PALETTE_INIT_OWNER(bankp_state, bankp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("sn1", SN76489, MASTER_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -400,5 +400,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, bankp, 0, bankp, bankp, bankp_state, 0, ROT0,   "Sanritsu / Sega", "Bank Panic",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, combh, 0, bankp, combh, bankp_state, 0, ROT270, "Sanritsu / Sega", "Combat Hawk", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bankp, 0, bankp, bankp, bankp_state, empty_init, ROT0,   "Sanritsu / Sega", "Bank Panic",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, combh, 0, bankp, combh, bankp_state, empty_init, ROT270, "Sanritsu / Sega", "Combat Hawk", MACHINE_SUPPORTS_SAVE )

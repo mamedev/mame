@@ -256,7 +256,7 @@ MACHINE_CONFIG_START(pes_state::pes)
 	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, pes_state, data_to_i8031))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("tms5220", TMS5220C, 720000) /* 720Khz clock, 10khz output */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -280,5 +280,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE       INIT  COMPANY                        FULLNAME             FLAGS
-COMP( 1987, pes,    0,      0,      pes,        pes,   pes_state,  0,    "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                        FULLNAME             FLAGS
+COMP( 1987, pes,  0,      0,      pes,     pes,   pes_state, empty_init, "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )

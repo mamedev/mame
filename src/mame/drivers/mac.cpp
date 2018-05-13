@@ -955,7 +955,7 @@ MACHINE_CONFIG_START(mac_state::mac512ke)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mac_state, mac_scanline, "screen", 0, 1)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_PWM, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 2 x ls161
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
@@ -1082,7 +1082,8 @@ MACHINE_CONFIG_START(mac_state::macprtb)
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(*this, mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1130,7 +1131,8 @@ MACHINE_CONFIG_START(mac_state::macii)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(*this, mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1207,7 +1209,8 @@ MACHINE_CONFIG_START(mac_state::maciifx)
 	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(*this, mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1500,7 +1503,8 @@ MACHINE_CONFIG_START(mac_state::macse30)
 	MCFG_VIDEO_START_OVERRIDE(mac_state,mac)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(*this, mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1578,7 +1582,8 @@ MACHINE_CONFIG_START(mac_state::macpb140)
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(*this, mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1668,7 +1673,8 @@ MACHINE_CONFIG_START(mac_state::macpb160)
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_ASC_ADD("asc", C15M, ASC, WRITELINE(*this, mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1878,7 +1884,8 @@ MACHINE_CONFIG_START(mac_state::pwrmac)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_AWACS_ADD("awacs", 44100)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1944,7 +1951,8 @@ MACHINE_CONFIG_START(mac_state::macqd700)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_ASC_ADD("asc", C15M, EASC, WRITELINE(*this, mac_state, mac_asc_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -2096,7 +2104,7 @@ static INPUT_PORTS_START( macadb )
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x44
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)          PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) // 0x45
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x46
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(/*KEYCODE_NUMLOCK*/KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))    // 0x47
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad Clear") PORT_CODE(/*KEYCODE_NUMLOCK*/KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))    // 0x47
 	PORT_BIT(0x0700, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x48, 49, 4a
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH_PAD)         PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) // 0x4b
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)         PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) // 0x4c
@@ -2106,7 +2114,7 @@ static INPUT_PORTS_START( macadb )
 
 	PORT_START("KEY5")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)    // 0x50
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Keypad =") PORT_CODE(/*CODE_OTHER*/KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK)) // 0x51
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(/*CODE_OTHER*/KEYCODE_NUMLOCK) PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD)) // 0x51
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)             PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) // 0x52
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)             PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) // 0x53
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)             PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) // 0x54
@@ -2352,37 +2360,37 @@ ROM_START( maclc520 )
 	ROM_LOAD( "ede66cbd.rom", 0x000000, 0x100000, CRC(a893cb0f) SHA1(c54ee2f45020a4adeb7451adce04cd6e5fb69790) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    STATE       INIT           COMPANY          FULLNAME */
-//COMP( 1983, mactw,    0,        0,      mac128k,  macplus, mac_state,  mac128k512k,  "Apple Computer", "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
-COMP( 1987, macse,    0,        0,      macse,    macadb,  mac_state,  macse,        "Apple Computer", "Macintosh SE",  0 )
-COMP( 1987, macsefd,  0,        0,      macse,    macadb,  mac_state,  macse,        "Apple Computer", "Macintosh SE (FDHD)",  0 )
-COMP( 1987, macii,    0,        0,      macii,    macadb,  mac_state,  macii,        "Apple Computer", "Macintosh II",  0 )
-COMP( 1987, maciihmu, macii,    0,      maciihmu, macadb,  mac_state,  macii,        "Apple Computer", "Macintosh II (w/o 68851 MMU)", 0 )
-COMP( 1988, mac2fdhd, 0,        0,      macii,    macadb,  mac_state,  maciifdhd,    "Apple Computer", "Macintosh II (FDHD)",  0 )
-COMP( 1988, maciix,   mac2fdhd, 0,      maciix,   macadb,  mac_state,  maciix,       "Apple Computer", "Macintosh IIx",  0 )
-COMP( 1989, macprtb,  0,        0,      macprtb,  macadb,  mac_state,  macprtb,      "Apple Computer", "Macintosh Portable", MACHINE_NOT_WORKING )
-COMP( 1989, macse30,  mac2fdhd, 0,      macse30,  macadb,  mac_state,  macse30,      "Apple Computer", "Macintosh SE/30",  0 )
-COMP( 1989, maciicx,  mac2fdhd, 0,      maciicx,  macadb,  mac_state,  maciicx,      "Apple Computer", "Macintosh IIcx",  0 )
-COMP( 1989, maciici,  0,        0,      maciici,  maciici, mac_state,  maciici,      "Apple Computer", "Macintosh IIci", 0 )
-COMP( 1990, maciifx,  0,        0,      maciifx,  macadb,  mac_state,  maciifx,      "Apple Computer", "Macintosh IIfx",  MACHINE_NOT_WORKING )
-COMP( 1990, macclasc, 0,        0,      macclasc, macadb,  mac_state,  macclassic,   "Apple Computer", "Macintosh Classic",  0 )
-COMP( 1990, maclc,    0,        0,      maclc,    maciici, mac_state,  maclc,        "Apple Computer", "Macintosh LC", MACHINE_IMPERFECT_SOUND )
-COMP( 1990, maciisi,  0,        0,      maciisi,  maciici, mac_state,  maciisi,      "Apple Computer", "Macintosh IIsi", 0 )
-COMP( 1991, macpb100, 0,        0,      macprtb,  macadb,  mac_state,  macprtb,      "Apple Computer", "Macintosh PowerBook 100", MACHINE_NOT_WORKING )
-COMP( 1991, macpb140, 0,        0,      macpb140, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 140", MACHINE_NOT_WORKING )
-COMP( 1991, macpb170, macpb140, 0,      macpb170, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 170", MACHINE_NOT_WORKING )
-COMP( 1991, macqd700, macpb140, 0,      macqd700, macadb,  mac_state,  macquadra700, "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING )
-COMP( 1991, macclas2, 0,        0,      macclas2, macadb,  mac_state,  macclassic2,  "Apple Computer", "Macintosh Classic II", MACHINE_IMPERFECT_SOUND )
-COMP( 1991, maclc2,   0,        0,      maclc2,   maciici, mac_state,  maclc2,       "Apple Computer", "Macintosh LC II",  MACHINE_IMPERFECT_SOUND )
-COMP( 1992, macpb145, macpb140, 0,      macpb145, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 145", MACHINE_NOT_WORKING )
-COMP( 1992, macpb160, 0,        0,      macpb160, macadb,  mac_state,  macpb160,     "Apple Computer", "Macintosh PowerBook 160", MACHINE_NOT_WORKING )
-COMP( 1992, macpb180, macpb160, 0,      macpb180, macadb,  mac_state,  macpb160,     "Apple Computer", "Macintosh PowerBook 180", MACHINE_NOT_WORKING )
-COMP( 1992, macpb180c,macpb160, 0,      macpb180c,macadb,  mac_state,  macpb160,     "Apple Computer", "Macintosh PowerBook 180c", MACHINE_NOT_WORKING )
-COMP( 1992, macpd210, 0,        0,      macpd210, macadb,  mac_state,  macpd210,     "Apple Computer", "Macintosh PowerBook Duo 210", MACHINE_NOT_WORKING )
-COMP( 1993, maccclas, 0,        0,      maccclas, macadb,  mac_state,  maclrcclassic,"Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING )
-COMP( 1992, macpb145b,macpb140, 0,      macpb170, macadb,  mac_state,  macpb140,     "Apple Computer", "Macintosh PowerBook 145B", MACHINE_NOT_WORKING )
-COMP( 1993, maclc3,   0,        0,      maclc3,   maciici, mac_state,  maclc3,       "Apple Computer", "Macintosh LC III",  MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maciivx,  0,        0,      maciivx,  maciici, mac_state,  maciivx,      "Apple Computer", "Macintosh IIvx", MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maciivi,  maciivx,  0,      maciivi,  maciici, mac_state,  maciivx,      "Apple Computer", "Macintosh IIvi", MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maclc520, 0,        0,      maclc520, maciici, mac_state,  maclc520,     "Apple Computer", "Macintosh LC 520",  MACHINE_NOT_WORKING )
-COMP( 1994, pmac6100, 0,        0,      pwrmac,   macadb,  mac_state,  macpm6100,    "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS      INIT                COMPANY           FULLNAME */
+//COMP( 1983, mactw,     0,        0,      mac128k,  macplus, mac_state, init_mac128k512k,   "Apple Computer", "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
+COMP( 1987, macse,     0,        0,      macse,    macadb,  mac_state, init_macse,         "Apple Computer", "Macintosh SE",  0 )
+COMP( 1987, macsefd,   0,        0,      macse,    macadb,  mac_state, init_macse,         "Apple Computer", "Macintosh SE (FDHD)",  0 )
+COMP( 1987, macii,     0,        0,      macii,    macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II",  0 )
+COMP( 1987, maciihmu,  macii,    0,      maciihmu, macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II (w/o 68851 MMU)", 0 )
+COMP( 1988, mac2fdhd,  0,        0,      macii,    macadb,  mac_state, init_maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",  0 )
+COMP( 1988, maciix,    mac2fdhd, 0,      maciix,   macadb,  mac_state, init_maciix,        "Apple Computer", "Macintosh IIx",  0 )
+COMP( 1989, macprtb,   0,        0,      macprtb,  macadb,  mac_state, init_macprtb,       "Apple Computer", "Macintosh Portable", MACHINE_NOT_WORKING )
+COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  mac_state, init_macse30,       "Apple Computer", "Macintosh SE/30",  0 )
+COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  mac_state, init_maciicx,       "Apple Computer", "Macintosh IIcx",  0 )
+COMP( 1989, maciici,   0,        0,      maciici,  maciici, mac_state, init_maciici,       "Apple Computer", "Macintosh IIci", 0 )
+COMP( 1990, maciifx,   0,        0,      maciifx,  macadb,  mac_state, init_maciifx,       "Apple Computer", "Macintosh IIfx",  MACHINE_NOT_WORKING )
+COMP( 1990, macclasc,  0,        0,      macclasc, macadb,  mac_state, init_macclassic,    "Apple Computer", "Macintosh Classic",  0 )
+COMP( 1990, maclc,     0,        0,      maclc,    maciici, mac_state, init_maclc,         "Apple Computer", "Macintosh LC", MACHINE_IMPERFECT_SOUND )
+COMP( 1990, maciisi,   0,        0,      maciisi,  maciici, mac_state, init_maciisi,       "Apple Computer", "Macintosh IIsi", 0 )
+COMP( 1991, macpb100,  0,        0,      macprtb,  macadb,  mac_state, init_macprtb,       "Apple Computer", "Macintosh PowerBook 100", MACHINE_NOT_WORKING )
+COMP( 1991, macpb140,  0,        0,      macpb140, macadb,  mac_state, init_macpb140,      "Apple Computer", "Macintosh PowerBook 140", MACHINE_NOT_WORKING )
+COMP( 1991, macpb170,  macpb140, 0,      macpb170, macadb,  mac_state, init_macpb140,      "Apple Computer", "Macintosh PowerBook 170", MACHINE_NOT_WORKING )
+COMP( 1991, macqd700,  macpb140, 0,      macqd700, macadb,  mac_state, init_macquadra700,  "Apple Computer", "Macintosh Quadra 700", MACHINE_NOT_WORKING )
+COMP( 1991, macclas2,  0,        0,      macclas2, macadb,  mac_state, init_macclassic2,   "Apple Computer", "Macintosh Classic II", MACHINE_IMPERFECT_SOUND )
+COMP( 1991, maclc2,    0,        0,      maclc2,   maciici, mac_state, init_maclc2,        "Apple Computer", "Macintosh LC II",  MACHINE_IMPERFECT_SOUND )
+COMP( 1992, macpb145,  macpb140, 0,      macpb145, macadb,  mac_state, init_macpb140,      "Apple Computer", "Macintosh PowerBook 145", MACHINE_NOT_WORKING )
+COMP( 1992, macpb160,  0,        0,      macpb160, macadb,  mac_state, init_macpb160,      "Apple Computer", "Macintosh PowerBook 160", MACHINE_NOT_WORKING )
+COMP( 1992, macpb180,  macpb160, 0,      macpb180, macadb,  mac_state, init_macpb160,      "Apple Computer", "Macintosh PowerBook 180", MACHINE_NOT_WORKING )
+COMP( 1992, macpb180c, macpb160, 0,      macpb180c,macadb,  mac_state, init_macpb160,      "Apple Computer", "Macintosh PowerBook 180c", MACHINE_NOT_WORKING )
+COMP( 1992, macpd210,  0,        0,      macpd210, macadb,  mac_state, init_macpd210,      "Apple Computer", "Macintosh PowerBook Duo 210", MACHINE_NOT_WORKING )
+COMP( 1993, maccclas,  0,        0,      maccclas, macadb,  mac_state, init_maclrcclassic, "Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING )
+COMP( 1992, macpb145b, macpb140, 0,      macpb170, macadb,  mac_state, init_macpb140,      "Apple Computer", "Macintosh PowerBook 145B", MACHINE_NOT_WORKING )
+COMP( 1993, maclc3,    0,        0,      maclc3,   maciici, mac_state, init_maclc3,        "Apple Computer", "Macintosh LC III",  MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maciivx,   0,        0,      maciivx,  maciici, mac_state, init_maciivx,       "Apple Computer", "Macintosh IIvx", MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maciivi,   maciivx,  0,      maciivi,  maciici, mac_state, init_maciivx,       "Apple Computer", "Macintosh IIvi", MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maclc520,  0,        0,      maclc520, maciici, mac_state, init_maclc520,      "Apple Computer", "Macintosh LC 520",  MACHINE_NOT_WORKING )
+COMP( 1994, pmac6100,  0,        0,      pwrmac,   macadb,  mac_state, init_macpm6100,     "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

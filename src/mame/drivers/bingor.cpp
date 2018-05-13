@@ -712,7 +712,7 @@ MACHINE_CONFIG_START(bingor_state::bingor)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBIIII)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_SAA1099_ADD("saa", 6000000 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -804,7 +804,7 @@ MACHINE_CONFIG_START(bingor_state::vip2000)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBIIII)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymz", YMZ284, 1250000) // probably clocked by square wave output of 80186 timer 0
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -926,10 +926,10 @@ ROM_END
 
 
 
-GAME( 2002, bingor1,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>",          "Bingo Roll / Bell Star? (set 1)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor2,    0,      bingor2,  bingor, bingor_state,   0,       ROT0,  "<unknown>",          "Bingo Roll / Bell Star? (set 2)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor3,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>",          "Bingo Roll / Bell Star? (set 3)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor4,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>",          "Bingo Roll / Bell Star? (set 4)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, bingor5,    0,      bingor,   bingor, bingor_state,   0,       ROT0,  "<unknown>",          "Bingo Roll / Bell Star V3? (set 5)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor1, 0, bingor,   bingor, bingor_state, empty_init, ROT0, "<unknown>",          "Bingo Roll / Bell Star? (set 1)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor2, 0, bingor2,  bingor, bingor_state, empty_init, ROT0, "<unknown>",          "Bingo Roll / Bell Star? (set 2)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor3, 0, bingor,   bingor, bingor_state, empty_init, ROT0, "<unknown>",          "Bingo Roll / Bell Star? (set 3)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor4, 0, bingor,   bingor, bingor_state, empty_init, ROT0, "<unknown>",          "Bingo Roll / Bell Star? (set 4)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, bingor5, 0, bingor,   bingor, bingor_state, empty_init, ROT0, "<unknown>",          "Bingo Roll / Bell Star V3? (set 5)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 2001, vip2000,    0,      vip2000,  bingor, bingor_state,   0,       ROT0,  "Paloma-Elektronik?", "unknown 'VIP 2000' game",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, vip2000, 0, vip2000,  bingor, bingor_state, empty_init, ROT0, "Paloma-Elektronik?", "unknown 'VIP 2000' game",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

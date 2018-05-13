@@ -317,7 +317,7 @@ MACHINE_CONFIG_START(barata_state::barata)
 	MCFG_DEFAULT_LAYOUT( layout_barata )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	/* TODO: add sound samples */
 MACHINE_CONFIG_END
@@ -334,4 +334,4 @@ ROM_END
 /*************************
 *      Game Drivers      *
 *************************/
-GAME( 2002, barata,     0,        barata,   barata,    barata_state, 0,        ROT0,  "Eletro Matic Equipamentos Eletromec??nicos", "Dona Barata (early prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, barata, 0, barata, barata, barata_state, empty_init, ROT0, "Eletro Matic Equipamentos Eletromec??nicos", "Dona Barata (early prototype)", MACHINE_IMPERFECT_GRAPHICS )

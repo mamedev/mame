@@ -1249,7 +1249,7 @@ WRITE_LINE_MEMBER(smssdisp_state::sms_store_int_callback)
 	}
 }
 
-DRIVER_INIT_MEMBER(sms_state,sg1000m3)
+void sms_state::init_sg1000m3()
 {
 	m_is_mark_iii = 1;
 	m_has_jpn_sms_cart_slot = 1;
@@ -1258,13 +1258,13 @@ DRIVER_INIT_MEMBER(sms_state,sg1000m3)
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,sms)
+void sms_state::init_sms()
 {
 	m_has_bios_full = 1;
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,sms1)
+void sms_state::init_sms1()
 {
 	m_has_bios_full = 1;
 	// turn on the Power LED
@@ -1272,7 +1272,7 @@ DRIVER_INIT_MEMBER(sms_state,sms1)
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,smsj)
+void sms_state::init_smsj()
 {
 	m_is_smsj = 1;
 	m_has_bios_2000 = 1;
@@ -1283,7 +1283,7 @@ DRIVER_INIT_MEMBER(sms_state,smsj)
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,sms1kr)
+void sms_state::init_sms1kr()
 {
 	m_has_bios_2000 = 1;
 	m_ioctrl_region_is_japan = 1;
@@ -1293,7 +1293,7 @@ DRIVER_INIT_MEMBER(sms_state,sms1kr)
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,smskr)
+void sms_state::init_smskr()
 {
 	m_has_bios_full = 1;
 	// Despite having a Japanese cartridge slot, this version is detected as Export region.
@@ -1301,13 +1301,13 @@ DRIVER_INIT_MEMBER(sms_state,smskr)
 }
 
 
-DRIVER_INIT_MEMBER(smssdisp_state,smssdisp)
+void smssdisp_state::init_smssdisp()
 {
 	m_is_sdisp = 1;
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,gamegear)
+void sms_state::init_gamegear()
 {
 	m_is_gamegear = 1;
 	m_has_bios_0400 = 1;
@@ -1316,7 +1316,7 @@ DRIVER_INIT_MEMBER(sms_state,gamegear)
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,gamegeaj)
+void sms_state::init_gamegeaj()
 {
 	m_is_gamegear = 1;
 	m_has_bios_0400 = 1;

@@ -54,7 +54,7 @@ READ8_MEMBER(pce_common_state::pce_joystick_r)
 	return (ret);
 }
 
-DRIVER_INIT_MEMBER(pce_common_state,pce_common)
+void pce_common_state::init_pce_common()
 {
 	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }

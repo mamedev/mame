@@ -169,5 +169,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY          FULLNAME      FLAGS */
-COMP( 197?, pimps,  0,      0,       pimps,     pimps, pimps_state,  0,    "Henry Colford", "P.I.M.P.S.", MACHINE_NO_SOUND_HW) // terminal beeps
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY          FULLNAME      FLAGS */
+COMP( 197?, pimps, 0,      0,      pimps,   pimps, pimps_state, empty_init, "Henry Colford", "P.I.M.P.S.", MACHINE_NO_SOUND_HW) // terminal beeps

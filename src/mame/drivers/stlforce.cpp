@@ -216,9 +216,9 @@ MACHINE_CONFIG_START(stlforce_state::stlforce)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(32'000'000)/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -374,12 +374,12 @@ ROM_START( twinbratb )
 	ROM_LOAD( "eeprom-twinbrat.bin", 0x0000, 0x0080, CRC(9366263d) SHA1(ff5155498ed0b349ecc1ce98a39566b642201cf2) )
 ROM_END
 
-DRIVER_INIT_MEMBER(stlforce_state, stlforce)
+void stlforce_state::init_stlforce()
 {
 	m_sprxoffs = 0;
 }
 
-DRIVER_INIT_MEMBER(stlforce_state, twinbrat)
+void stlforce_state::init_twinbrat()
 {
 	m_sprxoffs = 9;
 
@@ -388,7 +388,7 @@ DRIVER_INIT_MEMBER(stlforce_state, twinbrat)
 }
 
 
-GAME( 1994, stlforce,  0,        stlforce, stlforce, stlforce_state, stlforce, ROT0, "Electronic Devices Italy / Ecogames S.L. Spain", "Steel Force", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, twinbrat,  0,        twinbrat, stlforce, stlforce_state, twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, twinbrata, twinbrat, twinbrat, stlforce, stlforce_state, twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, twinbratb, twinbrat, twinbrat, stlforce, stlforce_state, twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stlforce,  0,        stlforce, stlforce, stlforce_state, init_stlforce, ROT0, "Electronic Devices Italy / Ecogames S.L. Spain", "Steel Force", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, twinbrat,  0,        twinbrat, stlforce, stlforce_state, init_twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, twinbrata, twinbrat, twinbrat, stlforce, stlforce_state, init_twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, twinbratb, twinbrat, twinbrat, stlforce, stlforce_state, init_twinbrat, ROT0, "Elettronica Video-Games S.R.L.", "Twin Brats (set 3)", MACHINE_SUPPORTS_SAVE )

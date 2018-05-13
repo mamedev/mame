@@ -24,7 +24,7 @@ public:
 		, nvram_bank(*this, "nvram_bank")
 	{ }
 
-	DECLARE_DRIVER_INIT(stratos);
+	void init_stratos();
 	DECLARE_WRITE8_MEMBER(p2000_w);
 	DECLARE_READ8_MEMBER(p2200_r);
 	DECLARE_WRITE8_MEMBER(p2200_w);
@@ -54,7 +54,7 @@ private:
 	required_memory_bank nvram_bank;
 };
 
-DRIVER_INIT_MEMBER( stratos_state, stratos )
+void stratos_state::init_stratos()
 {
 	nvram_data = std::make_unique<uint8_t[]>(0x2000);
 	nvram->set_base(nvram_data.get(), 0x2000);
@@ -371,5 +371,5 @@ ROM_START( stratos )
 	ROM_FILL(0x00000, 0x10000, 0xff)
 ROM_END
 
-/*     YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS          INIT     COMPANY    FULLNAME                           FLAGS */
-CONS(  1986, stratos,  0,       0,      stratos,   stratos,  stratos_state, stratos, "Saitek",  "Kasparov Stratos Chess Computer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME                           FLAGS */
+CONS(  1986, stratos, 0,      0,      stratos, stratos, stratos_state, init_stratos, "Saitek",  "Kasparov Stratos Chess Computer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

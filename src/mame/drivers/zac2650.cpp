@@ -251,7 +251,7 @@ MACHINE_CONFIG_START(zac2650_state::tinvader)
 	MCFG_PALETTE_INIT_OWNER(zac2650_state, zac2650)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("s2636", S2636, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -309,6 +309,6 @@ ROM_START( dodgem )
 ROM_END
 
 
-GAMEL(1979?,tinv2650, 0,        tinvader, tinvader, zac2650_state, 0, ROT270, "Zaccaria / Zelco", "The Invaders", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_tinv2650 )
-GAME( 1979?,sia2650,  tinv2650, tinvader, sinvader, zac2650_state, 0, ROT270, "bootleg (Sidam)",  "Super Invader Attack (bootleg of The Invaders)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 1980?
-GAME( 1979, dodgem,   0,        tinvader, dodgem,   zac2650_state, 0, ROT0,   "Zaccaria",         "Dodgem", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1979?, tinv2650, 0,        tinvader, tinvader, zac2650_state, empty_init, ROT270, "Zaccaria / Zelco", "The Invaders", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_tinv2650 )
+GAME(  1979?, sia2650,  tinv2650, tinvader, sinvader, zac2650_state, empty_init, ROT270, "bootleg (Sidam)",  "Super Invader Attack (bootleg of The Invaders)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 1980?
+GAME(  1979,  dodgem,   0,        tinvader, dodgem,   zac2650_state, empty_init, ROT0,   "Zaccaria",         "Dodgem", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -462,7 +462,7 @@ MACHINE_CONFIG_START(quizdna_state::quizdna)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, MCLK/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
@@ -472,7 +472,7 @@ MACHINE_CONFIG_START(quizdna_state::quizdna)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", (MCLK/1024)*132, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, (MCLK/1024)*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -575,6 +575,6 @@ ROM_START( gekiretu )
 	ROM_LOAD( "quiz3.148",    0x000000,  0x000020, CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
 ROM_END
 
-GAME( 1991, gakupara, 0, gakupara, gakupara, quizdna_state, 0, ROT0, "NMK",  "Quiz Gakuen Paradise (Japan)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1992, quizdna,  0, quizdna,  quizdna,  quizdna_state, 0, ROT0, "Face", "Quiz DNA no Hanran (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gekiretu, 0, gekiretu, gekiretu, quizdna_state, 0, ROT0, "Face", "Quiz Gekiretsu Scramble (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gakupara, 0, gakupara, gakupara, quizdna_state, empty_init, ROT0, "NMK",  "Quiz Gakuen Paradise (Japan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quizdna,  0, quizdna,  quizdna,  quizdna_state, empty_init, ROT0, "Face", "Quiz DNA no Hanran (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gekiretu, 0, gekiretu, gekiretu, quizdna_state, empty_init, ROT0, "Face", "Quiz Gekiretsu Scramble (Japan)", MACHINE_SUPPORTS_SAVE )

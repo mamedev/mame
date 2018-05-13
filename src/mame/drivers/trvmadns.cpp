@@ -405,7 +405,7 @@ MACHINE_CONFIG_START(trvmadns_state::trvmadns)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(10'000'000)/2/4) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -468,5 +468,5 @@ ROM_START( trvmadnsa )
 	// empty space, for 3 roms (each one max 0x8000 bytes long)
 ROM_END
 
-GAME( 1985, trvmadns,         0, trvmadns, trvmadns, trvmadns_state, 0, ROT0, "Thunderhead Inc.", "Trivia Madness - Series A Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
-GAME( 1985, trvmadnsa, trvmadns, trvmadns, trvmadns, trvmadns_state, 0, ROT0, "Thunderhead Inc.", "Trivia Madness - Series B Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 1985, trvmadns,         0, trvmadns, trvmadns, trvmadns_state, empty_init, ROT0, "Thunderhead Inc.", "Trivia Madness - Series A Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 1985, trvmadnsa, trvmadns, trvmadns, trvmadns, trvmadns_state, empty_init, ROT0, "Thunderhead Inc.", "Trivia Madness - Series B Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )

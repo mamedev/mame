@@ -350,7 +350,7 @@ MACHINE_CONFIG_START(beta_state::beta)
 	MCFG_DEFAULT_LAYOUT( layout_beta )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -382,5 +382,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE       INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1984, beta,   0,      0,      beta,   beta, beta_state, 0,    "Pitronics", "Beta",   MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1984, beta, 0,      0,      beta,    beta,  beta_state, empty_init, "Pitronics", "Beta",   MACHINE_SUPPORTS_SAVE )

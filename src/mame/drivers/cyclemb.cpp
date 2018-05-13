@@ -131,8 +131,8 @@ public:
 	DECLARE_WRITE8_MEMBER(skydest_i8741_1_w);
 //  DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
-	DECLARE_DRIVER_INIT(skydest);
-	DECLARE_DRIVER_INIT(cyclemb);
+	void init_skydest();
+	void init_cyclemb();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(cyclemb);
@@ -991,7 +991,7 @@ MACHINE_CONFIG_START(cyclemb_state::cyclemb)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -1091,7 +1091,7 @@ ROM_START( skydest )
 	ROM_LOAD( "blue.4j",      0x000, 0x100, CRC(34579681) SHA1(10e5e137837bdd71959f0c4bf52e0f333630a22f) ) // on daughterboard, _not_ a color prom
 ROM_END
 
-DRIVER_INIT_MEMBER(cyclemb_state,cyclemb)
+void cyclemb_state::init_cyclemb()
 {
 	uint8_t *rom = memregion("audiocpu")->base();
 
@@ -1107,7 +1107,7 @@ DRIVER_INIT_MEMBER(cyclemb_state,cyclemb)
 	rom[0xa38] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(cyclemb_state,skydest)
+void cyclemb_state::init_skydest()
 {
 	uint8_t *rom = memregion("audiocpu")->base();
 
@@ -1123,5 +1123,5 @@ DRIVER_INIT_MEMBER(cyclemb_state,skydest)
 	rom[0xa38] = 0x00;
 }
 
-GAME( 1984, cyclemb,  0,   cyclemb,  cyclemb, cyclemb_state,  cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, skydest,  0,   skydest,  skydest, cyclemb_state,  skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, cyclemb, 0, cyclemb,  cyclemb, cyclemb_state, init_cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, skydest, 0, skydest,  skydest, cyclemb_state, init_skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

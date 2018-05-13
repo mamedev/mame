@@ -223,7 +223,7 @@ public:
 	virtual void machine_reset() override;
 
 public:
-	DECLARE_DRIVER_INIT(mr);
+	void init_mr();
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
 	void mr(machine_config &config);
@@ -257,7 +257,8 @@ MACHINE_CONFIG_START(esqmr_state::mr)
 
 	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ensoniq", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
@@ -317,9 +318,9 @@ ROM_START( mrrack )
 	ROM_REGION(0x200000, "waverom4", ROMREGION_ERASE00)
 ROM_END
 
-DRIVER_INIT_MEMBER(esqmr_state, mr)
+void esqmr_state::init_mr()
 {
 }
 
-CONS( 1996, mr61,   0, 0, mr, mr, esqmr_state, mr, "Ensoniq", "MR-61 Workstation", MACHINE_NOT_WORKING )
-CONS( 1996, mrrack, 0, 0, mr, mr, esqmr_state, mr, "Ensoniq", "MR-Rack", MACHINE_NOT_WORKING )
+CONS( 1996, mr61,   0, 0, mr, mr, esqmr_state, init_mr, "Ensoniq", "MR-61 Workstation", MACHINE_NOT_WORKING )
+CONS( 1996, mrrack, 0, 0, mr, mr, esqmr_state, init_mr, "Ensoniq", "MR-Rack",           MACHINE_NOT_WORKING )

@@ -23,7 +23,8 @@
 ///*************************************************************************
 
 #define MCFG_DAVE_ADD(_tag, _clock, _program_map, _io_map) \
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") \
+	SPEAKER(config, "lspeaker").front_left(); \
+	SPEAKER(config, "rspeaker").front_right(); \
 	MCFG_DEVICE_ADD(_tag, DAVE, _clock) \
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25) \
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25) \

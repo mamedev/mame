@@ -80,7 +80,7 @@ public:
 	DECLARE_WRITE16_MEMBER(apache3_road_z_w);
 	DECLARE_WRITE8_MEMBER(apache3_road_x_w);
 
-	DECLARE_DRIVER_INIT(apache3);
+	void init_apache3();
 	DECLARE_MACHINE_RESET(apache3);
 	DECLARE_VIDEO_START(apache3);
 	uint32_t screen_update_apache3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -133,7 +133,7 @@ public:
 	DECLARE_WRITE16_MEMBER(roundup5_vram_w);
 	DECLARE_WRITE16_MEMBER(roundup5_crt_w);
 
-	DECLARE_DRIVER_INIT(roundup5);
+	void init_roundup5();
 	DECLARE_VIDEO_START(roundup5);
 	uint32_t screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -183,7 +183,7 @@ public:
 	DECLARE_WRITE16_MEMBER(cyclwarr_videoram0_w);
 	DECLARE_WRITE16_MEMBER(cyclwarr_videoram1_w);
 
-	DECLARE_DRIVER_INIT(cyclwarr);
+	void init_cyclwarr();
 	TILE_GET_INFO_MEMBER(get_tile_info_bigfight_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_bigfight_1);
 	DECLARE_VIDEO_START(cyclwarr);

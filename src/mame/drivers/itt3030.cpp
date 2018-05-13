@@ -749,7 +749,7 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
+	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
@@ -772,4 +772,4 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-COMP( 1982, itt3030,  0,   0,  itt3030,  itt3030,  itt3030_state, 0,  "ITT RFA",      "ITT3030", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, itt3030, 0, 0, itt3030, itt3030, itt3030_state, empty_init, "ITT RFA", "ITT3030", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

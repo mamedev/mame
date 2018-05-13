@@ -358,6 +358,7 @@ tia_video_device::tia_video_device(const machine_config &mconfig, device_type ty
 	, m_read_input_port_cb(*this)
 	, m_databus_contents_cb(*this)
 	, m_vsync_cb(*this)
+	, m_maincpu(*this, "^maincpu")
 {
 }
 
@@ -658,13 +659,13 @@ int tia_video_device::collision_check(uint8_t* p1, uint8_t* p2, int x1, int x2)
 
 int tia_video_device::current_x()
 {
-	return 3 * ((machine().device<cpu_device>("maincpu")->total_cycles() - frame_cycles) % 76) - 68;
+	return 3 * ((m_maincpu->total_cycles() - frame_cycles) % 76) - 68;
 }
 
 
 int tia_video_device::current_y()
 {
-	return (machine().device<cpu_device>("maincpu")->total_cycles() - frame_cycles) / 76;
+	return (m_maincpu->total_cycles() - frame_cycles) / 76;
 }
 
 
@@ -1003,11 +1004,11 @@ void tia_video_device::update_bitmap(int next_x, int next_y)
 
 WRITE8_MEMBER( tia_video_device::WSYNC_w )
 {
-	int cycles = machine().device<cpu_device>("maincpu")->total_cycles() - frame_cycles;
+	int cycles = m_maincpu->total_cycles() - frame_cycles;
 
 	if (cycles % 76)
 	{
-		space.device().execute().adjust_icount(cycles % 76 - 76);
+		m_maincpu->adjust_icount(cycles % 76 - 76);
 	}
 }
 
@@ -1044,7 +1045,7 @@ WRITE8_MEMBER( tia_video_device::VBLANK_w )
 {
 	if (data & 0x80)
 	{
-		paddle_start = machine().device<cpu_device>("maincpu")->total_cycles();
+		paddle_start = m_maincpu->total_cycles();
 	}
 	if ( ! ( VBLANK & 0x40 ) ) {
 		INPT4 = 0x80;
@@ -1797,7 +1798,7 @@ WRITE8_MEMBER( tia_video_device::GRP1_w )
 
 READ8_MEMBER( tia_video_device::INPT_r )
 {
-	uint64_t elapsed = machine().device<cpu_device>("maincpu")->total_cycles() - paddle_start;
+	uint64_t elapsed = m_maincpu->total_cycles() - paddle_start;
 	uint16_t input = TIA_INPUT_PORT_ALWAYS_ON;
 	if ( !m_read_input_port_cb.isnull() )
 	{

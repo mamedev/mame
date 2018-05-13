@@ -600,7 +600,7 @@ ROM_END
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
-//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS          INIT     COMPANY    FULLNAME               FLAGS
-COMP( 198?, pg675,      0,        0,      pg675,      pg685,      pg685_state,   0,       "Siemens", "Simatic PG675",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 198?, pg685,      0,        0,      pg685,      pg685,      pg685_state,   0,       "Siemens", "Simatic PG685 OUA11", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 198?, pg685oua12, pg685,    0,      pg685oua12, pg685,      pg685_state,   0,       "Siemens", "Simatic PG685 OUA12", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  CLASS        INIT        COMPANY    FULLNAME               FLAGS
+COMP( 198?, pg675,      0,      0,      pg675,      pg685, pg685_state, empty_init, "Siemens", "Simatic PG675",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 198?, pg685,      0,      0,      pg685,      pg685, pg685_state, empty_init, "Siemens", "Simatic PG685 OUA11", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 198?, pg685oua12, pg685,  0,      pg685oua12, pg685, pg685_state, empty_init, "Siemens", "Simatic PG685 OUA12", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

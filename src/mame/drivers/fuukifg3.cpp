@@ -557,7 +557,8 @@ MACHINE_CONFIG_START(fuuki32_state::fuuki32)
 	MCFG_FUUKI_VIDEO_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	MCFG_DEVICE_ADD("ymf", YMF278B, YMF278B_STD_CLOCK) // 33.8688MHz
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
@@ -705,7 +706,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1998, asurabld,   0,        fuuki32, asurabld, fuuki32_state, 0, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, asurabld,  0,        fuuki32, asurabld, fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, asurabus,   0,        fuuki32, asurabus, fuuki32_state, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, asurabusa,  asurabus, fuuki32, asurabusa,fuuki32_state, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan) (ARCADIA review build)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has pause function on P1 button 4
+GAME( 2000, asurabus,  0,        fuuki32, asurabus, fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, asurabusa, asurabus, fuuki32, asurabusa,fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan) (ARCADIA review build)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has pause function on P1 button 4

@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(nyny_state::nyny)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, nyny_state,main_cpu_irq))
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -746,6 +746,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, nyny,    0,    nyny, nyny, nyny_state, 0, ROT270, "Sigma Enterprises Inc.", "New York! New York!", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, nynyg,   nyny, nyny, nyny, nyny_state, 0, ROT270, "Sigma Enterprises Inc. (Gottlieb license)", "New York! New York! (Gottlieb)", MACHINE_IMPERFECT_SOUND  | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, warcadia,nyny, nyny, nyny, nyny_state, 0, ROT270, "Sigma Enterprises Inc.", "Waga Seishun no Arcadia", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, nyny,    0,    nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc.", "New York! New York!", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, nynyg,   nyny, nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc. (Gottlieb license)", "New York! New York! (Gottlieb)", MACHINE_IMPERFECT_SOUND  | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, warcadia,nyny, nyny, nyny, nyny_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Waga Seishun no Arcadia", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

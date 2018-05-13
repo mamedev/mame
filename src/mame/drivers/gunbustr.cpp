@@ -384,7 +384,7 @@ READ32_MEMBER(gunbustr_state::main_cycle_r)
 	return m_ram[0x3acc/4];
 }
 
-DRIVER_INIT_MEMBER(gunbustr_state,gunbustr)
+void gunbustr_state::init_gunbustr()
 {
 	/* Speedup handler */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x203acc, 0x203acf, read32_delegate(FUNC(gunbustr_state::main_cycle_r),this));
@@ -392,14 +392,14 @@ DRIVER_INIT_MEMBER(gunbustr_state,gunbustr)
 	m_interrupt5_timer = timer_alloc(TIMER_GUNBUSTR_INTERRUPT5);
 }
 
-DRIVER_INIT_MEMBER(gunbustr_state,gunbustrj)
+void gunbustr_state::init_gunbustrj()
 {
-	DRIVER_INIT_CALL(gunbustr);
+	init_gunbustr();
 
 	// no coin lockout, perhaps this was a prototype version without proper coin handling?
 	m_coin_lockout = false;
 }
 
-GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Gunbuster (World)", MACHINE_NODEVICE_LAN )
-GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)",    MACHINE_NODEVICE_LAN )
-GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustr_state, gunbustrj,ORIENTATION_FLIP_X, "Taito Corporation",         "Gunbuster (Japan)", MACHINE_NODEVICE_LAN )
+GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr_state, init_gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Gunbuster (World)", MACHINE_NODEVICE_LAN )
+GAME( 1992, gunbustru, gunbustr, gunbustr, gunbustr, gunbustr_state, init_gunbustr, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)",    MACHINE_NODEVICE_LAN )
+GAME( 1992, gunbustrj, gunbustr, gunbustr, gunbustr, gunbustr_state, init_gunbustrj,ORIENTATION_FLIP_X, "Taito Corporation",         "Gunbuster (Japan)", MACHINE_NODEVICE_LAN )
