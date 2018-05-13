@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "seibucop/seibucop.h"
-
 
 
 class seibu_cop_bootleg_device : public device_t, public device_memory_interface
@@ -14,8 +12,8 @@ class seibu_cop_bootleg_device : public device_t, public device_memory_interface
 public:
 	seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER( copdxbl_0_r );
-	DECLARE_WRITE16_MEMBER( copdxbl_0_w );
+	DECLARE_READ16_MEMBER( read );
+	DECLARE_WRITE16_MEMBER( write );
 
 	DECLARE_READ16_MEMBER( reg_lo_addr_r );
 	DECLARE_READ16_MEMBER( reg_hi_addr_r );
@@ -27,7 +25,10 @@ public:
 	DECLARE_WRITE16_MEMBER( cmd_trigger_w );
 	DECLARE_READ16_MEMBER( d104_move_r );
 	DECLARE_WRITE16_MEMBER( d104_move_w );
-
+	DECLARE_READ16_MEMBER( prng_max_r );
+	DECLARE_WRITE16_MEMBER( prng_max_w );
+	DECLARE_READ16_MEMBER( prng_r );
+	
 	void seibucopbl_map(address_map &map);
 protected:
 	// device-level overrides
@@ -46,6 +47,7 @@ private:
 	uint16_t m_angle,m_dist,m_status;
 	int m_dx,m_dy;
 	uint32_t m_d104_move_offset;
+	uint16_t m_prng_max;
 	//required_device<raiden2cop_device> m_raiden2cop;
 };
 
