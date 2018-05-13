@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "cpu/sharc/sharc.h"
+#include "machine/k033906.h"
 #include "video/voodoo.h"
 
 #define MCFG_KONPPC_CGBOARD_NUMBER(_num) \
@@ -74,7 +76,9 @@ protected:
 	void nwk_fifo_w(int board, uint32_t data);
 private:
 	// device finders
-	required_device_array<voodoo_device, 2> m_voodoo;
+	optional_device_array<adsp21062_device, 2> m_dsp;
+	optional_device_array<k033906_device, 2> m_k033906;
+	optional_device_array<voodoo_device, 2> m_voodoo;
 
 	// internal state
 	uint32_t dsp_comm_ppc[MAX_CG_BOARDS][2];
