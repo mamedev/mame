@@ -485,7 +485,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,bgaregga)
 {
 	uint8_t *Z80 = memregion("audiocpu")->base();
 
-	// seems to only use banks 0x0a to 0x0f
+	m_audiobank->configure_entries(0, 8, Z80, 0x4000); // Test mode only, Mirror of First 128KB Areas?
 	m_audiobank->configure_entries(8, 8, Z80, 0x4000);
 }
 
