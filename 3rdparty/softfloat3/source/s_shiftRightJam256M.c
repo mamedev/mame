@@ -75,7 +75,7 @@ void
 {
     uint64_t wordJam;
     uint_fast32_t wordDist;
-    uint64_t *ptr = nullptr;
+    uint64_t *ptr;
     uint_fast8_t i, innerDist;
 
     wordJam = 0;
