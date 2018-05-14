@@ -9912,6 +9912,21 @@ ROM_START( vliner ) /* MVS ONLY RELEASE */
 	ROM_LOAD16_BYTE( "c-2.c2", 0x000001, 0x80000, CRC(efe9b33e) SHA1(910c651aadce9bf59e51c338ceef62287756d2e8) ) /* Plane 2,3 */
 ROM_END
 
+ROM_START( vliner7e ) /* MVS ONLY RELEASE */
+	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
+	ROM_LOAD16_WORD_SWAP( "epr_7e.p1", 0x000000, 0x080000, CRC(49a94db5) SHA1(5e3066ebe3afde9e59444b8c6e092a3713a173c0) ) /* AM27C400 */
+
+	NEO_SFIX_128K( "s-1.s1", CRC(972d8c31) SHA1(41f09ef28a3791668ea304c74b8b06c117a50e9a) )
+
+	NEO_BIOS_AUDIO_64K( "m-1.m1", CRC(9b92b7d1) SHA1(2c9b777feb9a8e43fa1bd942aba5afe3b5427d94) )
+
+	ROM_REGION( 0x200000, "cslot1:ymsnd", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x400000, "cslot1:sprites", 0 )
+	ROM_LOAD16_BYTE( "c-1.c1", 0x000000, 0x80000, CRC(5118f7c0) SHA1(b6fb6e9cbb660580d98e00780ebf248c0995145a) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "c-2.c2", 0x000001, 0x80000, CRC(efe9b33e) SHA1(910c651aadce9bf59e51c338ceef62287756d2e8) ) /* Plane 2,3 */
+ROM_END
+
 ROM_START( vliner6e ) /* MVS ONLY RELEASE */
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "epr_6e.p1", 0x000000, 0x080000, CRC(72a2c043) SHA1(b34bcc10ff33e4465126a6865fe8bf6b6a3d6cee) ) /* AM27C400 */
@@ -9942,6 +9957,20 @@ ROM_START( vliner54 ) /* MVS ONLY RELEASE */
 	ROM_LOAD16_BYTE( "c-2.c2", 0x000001, 0x80000, CRC(efe9b33e) SHA1(910c651aadce9bf59e51c338ceef62287756d2e8) ) /* Plane 2,3 */
 ROM_END
 
+ROM_START( vliner53 ) /* MVS ONLY RELEASE */
+	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
+	ROM_LOAD16_WORD_SWAP( "epr_53.p1", 0x000000, 0x080000, CRC(e263dce8) SHA1(c95e5b77c99828ee1b849d000a69fdd6bde502f8) )
+
+	NEO_SFIX_128K( "s-1.s1", CRC(972d8c31) SHA1(41f09ef28a3791668ea304c74b8b06c117a50e9a) )
+
+	NEO_BIOS_AUDIO_64K( "m-1.m1", CRC(9b92b7d1) SHA1(2c9b777feb9a8e43fa1bd942aba5afe3b5427d94) )
+
+	ROM_REGION( 0x200000, "cslot1:ymsnd", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x400000, "cslot1:sprites", 0 )
+	ROM_LOAD16_BYTE( "c-1.c1", 0x000000, 0x80000, CRC(5118f7c0) SHA1(b6fb6e9cbb660580d98e00780ebf248c0995145a) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "c-2.c2", 0x000001, 0x80000, CRC(efe9b33e) SHA1(910c651aadce9bf59e51c338ceef62287756d2e8) ) /* Plane 2,3 */
+ROM_END
 
 /*************************************
  *
@@ -11728,10 +11757,12 @@ GAME( 2002, matrimbl,   matrim,   matrimbl,  neogeo,    mvs_led_state, empty_ini
 // BrezzaSoft
 GAME( 2001, jockeygp,   neogeo,   jockeygp,  jockeygp,  mvs_led_state, empty_init, ROT0, "Sun Amusement / BrezzaSoft", "Jockey Grand Prix (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, jockeygpa,  jockeygp, jockeygp,  jockeygp,  mvs_led_state, empty_init, ROT0, "Sun Amusement / BrezzaSoft", "Jockey Grand Prix (set 2)", MACHINE_SUPPORTS_SAVE )
-// ver 0.7e and ver 0.53 are known to exist
+
 GAME( 2001, vliner,     neogeo,   vliner,    vliner,    mvs_led_state, empty_init, ROT0, "Dyna / BrezzaSoft", "V-Liner (v0.7a)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, vliner7e,   vliner,   vliner,    vliner,    mvs_led_state, empty_init, ROT0, "Dyna / BrezzaSoft", "V-Liner (v0.7e)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, vliner6e,   vliner,   vliner,    vliner,    mvs_led_state, empty_init, ROT0, "Dyna / BrezzaSoft", "V-Liner (v0.6e)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, vliner54,   vliner,   vliner,    vliner,    mvs_led_state, empty_init, ROT0, "Dyna / BrezzaSoft", "V-Liner (v0.54)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, vliner53,   vliner,   vliner,    vliner,    mvs_led_state, empty_init, ROT0, "Dyna / BrezzaSoft", "V-Liner (v0.53)", MACHINE_SUPPORTS_SAVE )
 
 // Kyle Hodgetts
 GAME( 2000, diggerma,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Kyle Hodgetts", "Digger Man (prototype)", MACHINE_SUPPORTS_SAVE )
