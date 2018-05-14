@@ -19,8 +19,11 @@ class dms5000_state : public driver_device
 {
 public:
 	dms5000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+	{
+	}
 
 	void dms5000(machine_config &config);
 private:
@@ -29,15 +32,27 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_dms5000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
 	void dms5000_io(address_map &map);
 	void dms5000_mem(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 };
 
 
 READ8_MEMBER(dms5000_state::status_r)
 {
-	return 1;
+	switch (offset)
+	{
+	case 0:
+		return m_screen->vblank();
+
+	case 2:
+		return m_screen->frame_number() & 1;
+
+	default:
+		return 0;
+	}
 }
 
 WRITE8_MEMBER(dms5000_state::brightness_w)
