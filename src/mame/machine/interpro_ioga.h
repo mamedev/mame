@@ -308,20 +308,15 @@ public:
 		MOUSE_MBUTTON = 0x00020000,
 		MOUSE_RBUTTON = 0x00040000,
 
-		MOUSE_COUNTER = 0x0000ffff,
 		MOUSE_BUTTONS = 0x00070000
 	};
 	DECLARE_READ32_MEMBER(mouse_status_r);
 	DECLARE_WRITE32_MEMBER(mouse_status_w);
-	DECLARE_INPUT_CHANGED_MEMBER(mouse_button);
-	DECLARE_INPUT_CHANGED_MEMBER(mouse_x);
-	DECLARE_INPUT_CHANGED_MEMBER(mouse_y);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
 
 	const char *m_memory_tag;
 	int m_memory_spacenum;
