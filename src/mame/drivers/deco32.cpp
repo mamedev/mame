@@ -1820,21 +1820,21 @@ static const gfx_layout spritelayout5 =
 	16*16*8
 };
 
-static GFXDECODE_START( captaven )
+static GFXDECODE_START( gfx_captaven )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 128 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 128 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_8bpp,          0, 128 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,        0, 32 )    /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( fghthist )
+static GFXDECODE_START( gfx_fghthist )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0,  128 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0,  128 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0,  128 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,     1024, 128 )   /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( dragngun )
+static GFXDECODE_START( gfx_dragngun )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 64 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        0, 64 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_8bpp,      0, 8 )   /* Tiles 16x16 */
@@ -1842,7 +1842,7 @@ static GFXDECODE_START( dragngun )
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout5,       0, 32 )    /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( tattass )
+static GFXDECODE_START( gfx_tattass )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,            0, 128 ) /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,            0, 128 ) /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,            0, 128 ) /* Tiles 16x16 */
@@ -1850,7 +1850,7 @@ static GFXDECODE_START( tattass )
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,          1024+256, 32 )   /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( nslasher )
+static GFXDECODE_START( gfx_nslasher )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 128 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 128 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0, 128 )   /* Tiles 16x16 */
@@ -1884,7 +1884,7 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	MCFG_SCREEN_UPDATE_DRIVER(captaven_state, screen_update_captaven)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", captaven)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_captaven)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
@@ -1965,7 +1965,7 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(fghthist_state, screen_update_fghthist)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fghthist)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fghthist)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
@@ -2134,7 +2134,7 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_DEVICE_ADD("spritegen_zoom", DECO_ZOOMSPR, 0)
 	MCFG_DECO_ZOOMSPR_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dragngun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(dragngun_state,dragngun)
@@ -2232,7 +2232,7 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dragngun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(dragngun_state, dragngun)
@@ -2357,7 +2357,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "deco_ace", tattass)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "deco_ace", gfx_tattass)
 
 	MCFG_DECO104_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
@@ -2436,7 +2436,7 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "deco_ace", nslasher)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "deco_ace", gfx_nslasher)
 
 	MCFG_VIDEO_START_OVERRIDE(nslasher_state, nslasher)
 

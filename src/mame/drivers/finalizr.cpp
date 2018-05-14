@@ -238,7 +238,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( finalizr )
+static GFXDECODE_START( gfx_finalizr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  16*16, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    16*16, 16 )  /* to handle 8x8 sprites */
@@ -289,7 +289,7 @@ MACHINE_CONFIG_START(finalizr_state::finalizr)
 	MCFG_SCREEN_UPDATE_DRIVER(finalizr_state, screen_update_finalizr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", finalizr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_finalizr)
 	MCFG_PALETTE_ADD("palette", 2*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(finalizr_state, finalizr)

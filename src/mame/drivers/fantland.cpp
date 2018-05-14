@@ -817,7 +817,7 @@ static const gfx_layout layout16x16x6 =
 	16*16*6
 };
 
-static GFXDECODE_START( fantland )
+static GFXDECODE_START( gfx_fantland )
 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16x6, 0, 4 ) // [0] Sprites
 GFXDECODE_END
 
@@ -875,7 +875,7 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -923,7 +923,7 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1003,7 +1003,7 @@ MACHINE_CONFIG_START(fantland_state::borntofi)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1058,7 +1058,7 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

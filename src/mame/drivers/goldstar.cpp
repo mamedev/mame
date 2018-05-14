@@ -7813,93 +7813,93 @@ static const gfx_layout flam7_tw_tilelayout =  // FIXME
 };
 
 
-static GFXDECODE_START( goldstar )
+static GFXDECODE_START( gfx_goldstar )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( bl )
+static GFXDECODE_START( gfx_bl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayoutbl, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( ml )
+static GFXDECODE_START( gfx_ml )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x18000, tilelayout, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( goldfrui )
+static GFXDECODE_START( gfx_goldfrui )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_goldfrui,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayoutbl, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( chry10 )
+static GFXDECODE_START( gfx_chry10 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_chry10,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_chry10, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( cb3c )
+static GFXDECODE_START( gfx_cb3c )
 	GFXDECODE_ENTRY( "gfx1", 0, cb3c_tiles8x8_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, cb3c_tiles8x32_layout, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( cb3e )
+static GFXDECODE_START( gfx_cb3e )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_cb3e,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_cb3e, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( ncb3 )
+static GFXDECODE_START( gfx_ncb3 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( bingownga )
+static GFXDECODE_START( gfx_bingownga )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x6000, tiles8x32x4_layout, 128, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( magodds )
+static GFXDECODE_START( gfx_magodds )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( cm )
+static GFXDECODE_START( gfx_cm )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 ) // or is there a register for the +64?
 GFXDECODE_END
 
-static GFXDECODE_START( cmbitmap )
+static GFXDECODE_START( gfx_cmbitmap )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 ) // or is there a register for the +64?
 	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout, 128, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( cmasterc )
+static GFXDECODE_START( gfx_cmasterc )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "reels", 0, tiles8x32x4alt_layout, 128+64, 4 )
 	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout, 128, 4 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( cmast91 )
+static GFXDECODE_START( gfx_cmast91 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 ) // or is there a register for the +64?
 	GFXDECODE_ENTRY( "user1", 0, tiles256x128x4_layout, 128, 4 ) // wrong... FIXME.
 GFXDECODE_END
 
 #if 0 // decodes an extra plane for cmv4 / cmasterb, not sure if we need to
-static GFXDECODE_START( cmasterb )
+static GFXDECODE_START( gfx_cmasterb )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x5_layout, 0, 4 )
 GFXDECODE_END
 #endif
 
-static GFXDECODE_START( megaline )
+static GFXDECODE_START( gfx_megaline )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( sangho )
+static GFXDECODE_START( gfx_sangho )
 	GFXDECODE_ENTRY( "gfx1", 0, sangho_charlayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sangho_tilelayout, 128, 8 )
 /* 7*16,16 title girl in 1st color
@@ -7911,17 +7911,17 @@ static GFXDECODE_START( sangho )
 */
 GFXDECODE_END
 
-static GFXDECODE_START( super9 )
+static GFXDECODE_START( gfx_super9 )
 	GFXDECODE_ENTRY( "gfx1", 0, super9_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, super9_tilelayout, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( flaming7 )  // gfx 2 still wrong...
+static GFXDECODE_START( gfx_flaming7 )  // gfx 2 still wrong...
 	GFXDECODE_ENTRY( "gfx1", 0, flaming7_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, flaming7_tilelayout, 104,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( flam7_tw )  // gfx 2 still wrong...
+static GFXDECODE_START( gfx_flam7_tw )  // gfx 2 still wrong...
 	GFXDECODE_ENTRY( "gfx1", 0, flam7_tw_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, flam7_tw_tilelayout, 104,  8 )
 GFXDECODE_END
@@ -7951,7 +7951,7 @@ static const gfx_layout tiles8x8_3bpp_layout =
 	8*8
 };
 
-static GFXDECODE_START( nfm )
+static GFXDECODE_START( gfx_nfm )
 	GFXDECODE_ENTRY( "tilegfx", 0, tiles8x8_3bpp_layout, 0, 16 )
 	GFXDECODE_ENTRY( "reelgfx", 0, tiles8x32_4bpp_layout, 0, 16 )
 GFXDECODE_END
@@ -7991,7 +7991,7 @@ static const gfx_layout tiles8x32x4alt2_layout =
 };
 
 
-static GFXDECODE_START( unkch )
+static GFXDECODE_START( gfx_unkch )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4alt_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4alt2_layout, 0, 16 )
 GFXDECODE_END
@@ -8007,7 +8007,7 @@ static const gfx_layout tilescherrys_layout =
 	32*32
 };
 
-static GFXDECODE_START(cherrys )
+static GFXDECODE_START( gfx_cherrys )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_miss1bpp_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilescherrys_layout, 128,  8 )
 GFXDECODE_END
@@ -8027,7 +8027,7 @@ static const gfx_layout tiles8x32x4pkr_layout =
 	8*32*4          /* every char takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( pkrmast )
+static GFXDECODE_START( gfx_pkrmast )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4pkr_layout, 128+64, 16 )
 GFXDECODE_END
@@ -8057,7 +8057,7 @@ static const gfx_layout cm97_layout32 =
 	32*32
 };
 
-static GFXDECODE_START( cm97 )
+static GFXDECODE_START( gfx_cm97 )
 	GFXDECODE_ENTRY( "gfx", 0, cm97_layout,   0x0, 32 )
 	GFXDECODE_ENTRY( "gfx", 0, cm97_layout32, 0x0, 32 )
 GFXDECODE_END
@@ -8113,7 +8113,7 @@ MACHINE_CONFIG_START(goldstar_state::goldstar)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldstar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldstar)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -8150,7 +8150,7 @@ MACHINE_CONFIG_START(goldstar_state::goldstbl)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bl)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -8170,12 +8170,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(goldstar_state::moonlght)
 	goldstbl(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", ml)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ml)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(goldstar_state::goldfrui)
 	goldstbl(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", goldfrui)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_goldfrui)
 MACHINE_CONFIG_END
 
 
@@ -8199,7 +8199,7 @@ MACHINE_CONFIG_START(sanghopm_state::star100)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sangho)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sangho)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -8237,7 +8237,7 @@ MACHINE_CONFIG_START(goldstar_state::super9)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super9)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_super9)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -8345,7 +8345,7 @@ MACHINE_CONFIG_START(cb3_state::ncb3)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
 
@@ -8367,27 +8367,27 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cb3_state::cb3c)
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cb3c)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cb3c)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cb3_state::cb3e)
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cb3e)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cb3e)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cb3_state::chrygld)
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", chry10)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_chry10)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cb3_state::cherrys)
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cherrys)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cherrys)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cb3_state::cm97)
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cm97)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cm97)
 MACHINE_CONFIG_END
 
 
@@ -8420,7 +8420,7 @@ MACHINE_CONFIG_START(goldstar_state::wcherry)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cb3e)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cb3e)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -8467,7 +8467,7 @@ MACHINE_CONFIG_START(cmaster_state::cm)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cmbitmap)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cmbitmap)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -8484,7 +8484,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cmaster_state::cmasterc)
 	cm(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cmasterc)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cmasterc)
 MACHINE_CONFIG_END
 
 
@@ -8515,7 +8515,7 @@ MACHINE_CONFIG_START(goldstar_state::cmast91)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cmast91)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cmast91)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, cmast91)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -8571,7 +8571,7 @@ MACHINE_CONFIG_START(wingco_state::lucky8)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wingco_state, masked_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
@@ -8626,7 +8626,7 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wingco_state, masked_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -8649,7 +8649,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wingco_state::bingownga)
 	bingowng(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", bingownga)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bingownga)
 MACHINE_CONFIG_END
 
 
@@ -8671,7 +8671,7 @@ MACHINE_CONFIG_START(wingco_state::flaming7)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(flaming7_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", flaming7)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_flaming7)
 
 	// to do serial protection.
 	MCFG_DEVICE_MODIFY("ppi8255_0")
@@ -8686,7 +8686,7 @@ MACHINE_CONFIG_START(wingco_state::flam7_tw)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(flaming7_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", flam7_tw)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_flam7_tw)
 
 	// to do serial protection.
 	MCFG_DEVICE_MODIFY("ppi8255_0")
@@ -8753,7 +8753,7 @@ MACHINE_CONFIG_START(wingco_state::magodds)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wingco_state, masked_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magodds)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magodds)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(wingco_state, magodds)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -8804,7 +8804,7 @@ MACHINE_CONFIG_START(goldstar_state::kkotnoli)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 
@@ -8844,7 +8844,7 @@ MACHINE_CONFIG_START(goldstar_state::ladylinr)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -8895,7 +8895,7 @@ MACHINE_CONFIG_START(wingco_state::wcat3)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -8946,7 +8946,7 @@ MACHINE_CONFIG_START(cmaster_state::amcoe1)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cm)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -9003,7 +9003,7 @@ MACHINE_CONFIG_START(cmaster_state::amcoe2)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cm)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -9025,7 +9025,7 @@ MACHINE_CONFIG_START(cmaster_state::nfm)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(nfm_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", nfm)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_nfm)
 MACHINE_CONFIG_END
 
 
@@ -9054,7 +9054,7 @@ MACHINE_CONFIG_START(unkch_state::unkch)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, unkch_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unkch)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unkch)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -9091,7 +9091,7 @@ MACHINE_CONFIG_START(goldstar_state::pkrmast)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkrmast)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkrmast)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -9128,7 +9128,7 @@ MACHINE_CONFIG_START(unkch_state::megaline)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megaline)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_megaline)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 //  MCFG_NVRAM_ADD_1FILL("nvram")
@@ -9176,7 +9176,7 @@ MACHINE_CONFIG_START(unkch_state::bonusch)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megaline)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_megaline)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 

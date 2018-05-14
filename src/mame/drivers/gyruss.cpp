@@ -360,7 +360,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( gyruss )
+static GFXDECODE_START( gfx_gyruss )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0, 16 )  /* upper half */
 	GFXDECODE_ENTRY( "gfx1", 0x0010, spritelayout, 0, 16 )  /* lower half */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout,   16*16, 16 )
@@ -508,7 +508,7 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gyruss_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gyruss)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gyruss)
 	MCFG_PALETTE_ADD("palette", 16*4+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gyruss_state, gyruss)

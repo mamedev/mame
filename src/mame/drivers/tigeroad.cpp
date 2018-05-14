@@ -642,7 +642,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( tigeroad )
+static GFXDECODE_START( gfx_tigeroad )
 	GFXDECODE_ENTRY( "text", 0, text_layout,      0x300, 16 )
 	GFXDECODE_ENTRY( "tiles", 0, tile_layout,     0x100, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )
@@ -673,7 +673,7 @@ MACHINE_CONFIG_START(tigeroad_state::tigeroad)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tigeroad)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tigeroad)
 
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 
@@ -751,7 +751,7 @@ MACHINE_CONFIG_START(tigeroad_state::f1dream_comad)
 
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tigeroad)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tigeroad)
 
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 

@@ -263,11 +263,11 @@ void mz80_state::mz80k_io(address_map &map)
 	map.unmap_value_high();
 }
 
-static GFXDECODE_START( mz80k )
+static GFXDECODE_START( gfx_mz80k )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mz80k_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( mz80kj )
+static GFXDECODE_START( gfx_mz80kj )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mz80kj_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80k)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz80k)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz80k)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Audio */
@@ -326,7 +326,7 @@ MACHINE_CONFIG_START(mz80_state::mz80kj)
 	mz80k(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80kj)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", mz80kj)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mz80kj)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mz80_state::mz80a)

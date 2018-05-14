@@ -293,7 +293,7 @@ static const gfx_layout CGA_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( photoply )
+static GFXDECODE_START( gfx_photoply )
 	GFXDECODE_ENTRY( "video_bios", 0x6000+0xa5*8+7, CGA_charlayout,              0, 256 )
 	//there's also a 8x16 entry (just after the 8x8)
 GFXDECODE_END
@@ -307,7 +307,7 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 
 	pcat_common(config);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vga", photoply )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vga", gfx_photoply)
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))

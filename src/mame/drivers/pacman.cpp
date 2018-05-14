@@ -3489,25 +3489,25 @@ static const gfx_layout crush4_spritelayout =
 };
 
 
-static GFXDECODE_START( pacman )
+static GFXDECODE_START( gfx_pacman )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, spritelayout, 0, 128 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( s2650games )
+static GFXDECODE_START( gfx_s2650games )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0x4000, spritelayout, 0, 128 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( superabc )
+static GFXDECODE_START( gfx_superabc )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0x8000, spritelayout, 0, 128 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( crush4 )
+static GFXDECODE_START( gfx_crush4 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, crush4_tilelayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, crush4_spritelayout, 0, 128 )
 GFXDECODE_END
@@ -3541,7 +3541,7 @@ MACHINE_CONFIG_START(pacman_state::pacman)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pacman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pacman)
 	MCFG_PALETTE_ADD("palette", 128*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pacman_state,pacman)
@@ -3796,7 +3796,7 @@ MACHINE_CONFIG_START(pacman_state::s2650games)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pacman_state, coin_counter_w))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", s2650games)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_s2650games)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*8, 32*8)
@@ -3878,7 +3878,7 @@ MACHINE_CONFIG_START(pacman_state::superabc)
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,superabc)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", superabc)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_superabc)
 MACHINE_CONFIG_END
 
 
@@ -3886,7 +3886,7 @@ MACHINE_CONFIG_START(pacman_state::crush4)
 	mschamp(config);
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", crush4)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_crush4)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pacman_state::crushs)

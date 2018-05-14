@@ -84,7 +84,7 @@ const gfx_layout sagitta180_charlayout =
 	8*16                /* space between characters */
 };
 
-static GFXDECODE_START( sagitta180 )
+static GFXDECODE_START( gfx_sagitta180 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sagitta180_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -209,7 +209,7 @@ MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(80*5, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*5-1, 0, 25*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sagitta180 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sagitta180 )
 
 	MCFG_DEVICE_ADD("crtc", I8275, 12480000 / 8) /* guessed xtal */
 	MCFG_I8275_CHARACTER_WIDTH(8)

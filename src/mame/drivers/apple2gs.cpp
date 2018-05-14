@@ -103,7 +103,7 @@ static const gfx_layout apple2gs_dbltext_layout =
 	8*8         /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( apple2gs )
+static GFXDECODE_START( gfx_apple2gs )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, apple2gs_text_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, apple2gs_dbltext_layout, 0, 2 )
 GFXDECODE_END
@@ -340,7 +340,7 @@ MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(apple2gs_state, apple2gs)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apple2gs )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apple2gs )
 
 	MCFG_MACHINE_START_OVERRIDE(apple2gs_state, apple2gs )
 	MCFG_MACHINE_RESET_OVERRIDE(apple2gs_state, apple2gs )

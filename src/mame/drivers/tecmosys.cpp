@@ -435,7 +435,7 @@ static const gfx_layout gfxlayout2 =
 	16*16*4
 };
 
-static GFXDECODE_START( tecmosys )
+static GFXDECODE_START( gfx_tecmosys )
 	GFXDECODE_ENTRY( "layer0", 0, gfxlayout,   0x4400, 0x40 )
 	GFXDECODE_ENTRY( "layer1", 0, gfxlayout2,  0x4000, 0x40 )
 	GFXDECODE_ENTRY( "layer2", 0, gfxlayout2,  0x4000, 0x40 )
@@ -466,7 +466,7 @@ MACHINE_CONFIG_START(tecmosys_state::tecmosys)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tecmosys)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tecmosys)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()

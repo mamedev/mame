@@ -478,8 +478,6 @@ void megaduck_state::megaduck_map(address_map &map)
 	map(0xffff, 0xffff).rw(this, FUNC(megaduck_state::gb_ie_r), FUNC(megaduck_state::gb_ie_w));                                  /* interrupt enable register */
 }
 
-static GFXDECODE_START( gb )
-GFXDECODE_END
 
 static INPUT_PORTS_START( gameboy )
 	PORT_START("INPUTS")
@@ -630,7 +628,7 @@ MACHINE_CONFIG_START(gb_state::gameboy)
 	MCFG_SCREEN_SIZE( 458, 154 )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gb)
 
@@ -672,7 +670,7 @@ MACHINE_CONFIG_START(gb_state::supergb)
 	MCFG_SCREEN_SIZE(32*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
 
@@ -751,7 +749,7 @@ MACHINE_CONFIG_START(gb_state::gbcolor)
 	MCFG_SCREEN_SIZE( 458, 154 )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbc)
@@ -798,7 +796,7 @@ MACHINE_CONFIG_START(megaduck_state::megaduck)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(megaduck_state,megaduck)

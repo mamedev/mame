@@ -504,7 +504,7 @@ static const gfx_layout bglayout =
 	128*8
 };
 
-static GFXDECODE_START( plygonet )
+static GFXDECODE_START( gfx_plygonet )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout, 0x0000, 64 )
 GFXDECODE_END
 
@@ -571,7 +571,7 @@ MACHINE_CONFIG_START(polygonet_state::plygonet)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", plygonet)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_plygonet)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

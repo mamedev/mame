@@ -423,7 +423,7 @@ static const gfx_layout slapshot_charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( slapshot )
+static GFXDECODE_START( gfx_slapshot )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tilelayout,  0, 256 ) /* sprite parts */
 	GFXDECODE_ENTRY( "gfx1", 0x0, slapshot_charlayout, 4096, 256 )    /* sprites & playfield */
 GFXDECODE_END
@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(slapshot_state::slapshot)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, slapshot_state, screen_vblank_taito_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapshot)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -539,7 +539,7 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, slapshot_state, screen_vblank_taito_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapshot)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(XRGB)
 

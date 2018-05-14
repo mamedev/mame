@@ -574,7 +574,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( galpani2 )
+static GFXDECODE_START( gfx_galpani2 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0,  0x40    ) // [0] Sprites
 GFXDECODE_END
 
@@ -643,7 +643,7 @@ MACHINE_CONFIG_START(galpani2_state::galpani2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(galpani2_state, screen_update_galpani2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galpani2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galpani2)
 	MCFG_PALETTE_ADD("palette", 0x4000)    // sprites
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 

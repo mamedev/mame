@@ -677,7 +677,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( freekick )
+static GFXDECODE_START( gfx_freekick )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x100, 32 )
 GFXDECODE_END
@@ -752,7 +752,7 @@ MACHINE_CONFIG_START(freekick_state::omega)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, freekick_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", freekick)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_freekick)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x200)
 
 	// sound hardware
@@ -790,7 +790,7 @@ MACHINE_CONFIG_START(freekick_state::base)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, freekick_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", freekick)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_freekick)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x200)
 
 	/* sound hardware */

@@ -426,7 +426,7 @@ static const gfx_layout tilelayout =
 	8*8
 };
 
-static GFXDECODE_START( flipjack )
+static GFXDECODE_START( gfx_flipjack )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 64 )
 GFXDECODE_END
 
@@ -472,7 +472,7 @@ MACHINE_CONFIG_START(flipjack_state::flipjack)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flipjack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flipjack)
 
 	MCFG_PALETTE_ADD("palette", 128+8)
 	MCFG_PALETTE_INIT_OWNER(flipjack_state, flipjack)

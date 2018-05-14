@@ -535,11 +535,11 @@ static const gfx_layout layout_8x16 =
 	8*8
 };
 
-static GFXDECODE_START( ssingles )
+static GFXDECODE_START( gfx_ssingles )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( atamanot )
+static GFXDECODE_START( gfx_atamanot )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8, 0, 8 )
 	GFXDECODE_ENTRY( "kanji", 0, layout_16x16,     0, 8 )
 	GFXDECODE_ENTRY( "kanji_uc", 0, layout_8x16,     0, 8 )
@@ -558,7 +558,7 @@ MACHINE_CONFIG_START(ssingles_state::ssingles)
 
 	MCFG_PALETTE_ADD("palette", 4) //guess
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssingles)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ssingles)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1000000 /* ? MHz */)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -596,7 +596,7 @@ MACHINE_CONFIG_START(ssingles_state::atamanot)
 	MCFG_MC6845_UPDATE_ROW_CB(ssingles_state, atamanot_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, ssingles_state, atamanot_irq))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", atamanot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_atamanot)
 MACHINE_CONFIG_END
 
 ROM_START( ssingles )

@@ -436,14 +436,14 @@ static const gfx_layout madgear_tile2 =
 	64*16
 };
 
-static GFXDECODE_START( lastduel )
+static GFXDECODE_START( gfx_lastduel )
 	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )  /* colors 0x200-0x2ff */
 	GFXDECODE_ENTRY( "gfx2", 0, text_layout,   0x300, 16 )  /* colors 0x300-0x33f */
 	GFXDECODE_ENTRY( "gfx3", 0, madgear_tile,  0x000, 16 )  /* colors 0x000-0x0ff */
 	GFXDECODE_ENTRY( "gfx4", 0, madgear_tile,  0x100, 16 )  /* colors 0x100-0x1ff */
 GFXDECODE_END
 
-static GFXDECODE_START( madgear )
+static GFXDECODE_START( gfx_madgear )
 	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )  /* colors 0x200-0x2ff */
 	GFXDECODE_ENTRY( "gfx2", 0, text_layout,   0x300, 16 )  /* colors 0x300-0x33f */
 	GFXDECODE_ENTRY( "gfx3", 0, madgear_tile,  0x000, 16 )  /* colors 0x000-0x0ff */
@@ -513,7 +513,7 @@ MACHINE_CONFIG_START(lastduel_state::lastduel)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastduel)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastduel)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,lastduel)
@@ -558,7 +558,7 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", madgear)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_madgear)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,madgear)

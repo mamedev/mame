@@ -3220,19 +3220,19 @@ static const gfx_layout fixeightblayout =
 	8*8*4
 };
 
-static GFXDECODE_START( truxton2 )
+static GFXDECODE_START( gfx_truxton2 )
 	GFXDECODE_ENTRY( nullptr,   0, truxton2_tx_tilelayout, 64*16, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( raizing )
+static GFXDECODE_START( gfx_raizing )
 	GFXDECODE_ENTRY( "text", 0, raizing_textlayout, 64*16, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( batrider )
+static GFXDECODE_START( gfx_batrider )
 	GFXDECODE_ENTRY( nullptr,   0, batrider_tx_tilelayout, 64*16, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( fixeightbl )
+static GFXDECODE_START( gfx_fixeightbl )
 	GFXDECODE_ENTRY( "text", 0, fixeightblayout, 64*16, 64 )
 GFXDECODE_END
 
@@ -3513,7 +3513,7 @@ MACHINE_CONFIG_START(toaplan2_state::truxton2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan2_state, screen_vblank_toaplan2))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", truxton2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_truxton2)
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3692,7 +3692,7 @@ MACHINE_CONFIG_START(toaplan2_state::fixeight)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan2_state, screen_vblank_toaplan2))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", truxton2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_truxton2)
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3731,7 +3731,7 @@ MACHINE_CONFIG_START(toaplan2_state::fixeightbl)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan2_state, screen_vblank_toaplan2))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fixeightbl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fixeightbl)
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3999,7 +3999,7 @@ MACHINE_CONFIG_START(toaplan2_state::mahoudai)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan2_state, screen_vblank_toaplan2))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raizing)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raizing)
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -4044,7 +4044,7 @@ MACHINE_CONFIG_START(toaplan2_state::shippumd)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan2_state, screen_vblank_toaplan2))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raizing)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raizing)
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -4088,7 +4088,7 @@ MACHINE_CONFIG_START(toaplan2_state::bgaregga)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan2_state, screen_vblank_toaplan2))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raizing)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raizing)
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -4149,7 +4149,7 @@ MACHINE_CONFIG_START(toaplan2_state::batrider)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan2_state, screen_vblank_toaplan2))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", batrider)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_batrider)
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -4210,7 +4210,7 @@ MACHINE_CONFIG_START(toaplan2_state::bbakraid)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan2_state, screen_vblank_toaplan2))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", batrider)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_batrider)
 	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

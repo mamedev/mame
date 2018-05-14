@@ -323,7 +323,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( offtwall )
+static GFXDECODE_START( gfx_offtwall )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 32 )      /* sprites & playfield */
 GFXDECODE_END
 
@@ -347,7 +347,7 @@ MACHINE_CONFIG_START(offtwall_state::offtwall)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", offtwall)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_offtwall)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 

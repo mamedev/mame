@@ -219,7 +219,7 @@ layout16x16(tilelayout,  0x20000)
 layout8x8  (txtlayout,   0x04000)
 layout16x16(spritelayout,0x50000)
 
-static GFXDECODE_START( ginganin )
+static GFXDECODE_START( gfx_ginganin )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  256*3, 16 ) /* [0] bg */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  256*2, 16 ) /* [1] fg */
 	GFXDECODE_ENTRY( "gfx3", 0, txtlayout,   256*0, 16 ) /* [2] txt */
@@ -269,7 +269,7 @@ MACHINE_CONFIG_START(ginganin_state::ginganin)
 	MCFG_SCREEN_UPDATE_DRIVER(ginganin_state, screen_update_ginganin)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ginganin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ginganin)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 

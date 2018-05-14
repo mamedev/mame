@@ -272,7 +272,7 @@ _32x32_START
 	_32x32_SEQUENCE_1_FLIP
 _32x32_END
 
-static GFXDECODE_START( segacd )
+static GFXDECODE_START( gfx_segacd )
 	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r00_f0_layout, 0, 0 )
 	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r01_f0_layout, 0, 0 )
 	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r10_f0_layout, 0, 0 )
@@ -324,7 +324,7 @@ MACHINE_CONFIG_END
 
 sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, GFXDECODE_NAME( segacd )),
+		device_gfx_interface(mconfig, *this, gfx_segacd),
 		m_scdcpu(*this, "segacd_68k"),
 		m_rfsnd(*this, "rfsnd"),
 		m_lc89510_temp(*this, "tempcdc"),

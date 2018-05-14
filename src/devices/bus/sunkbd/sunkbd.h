@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "diserial.h"
 
 
 #define MCFG_SUNKBD_RXD_HANDLER(cb) \

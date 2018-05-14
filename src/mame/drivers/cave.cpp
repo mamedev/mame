@@ -1910,7 +1910,7 @@ static const gfx_layout layout_sprites =
                                 Dangun Feveron
 ***************************************************************************/
 
-static GFXDECODE_START( dfeveron )
+static GFXDECODE_START( gfx_dfeveron )
 	/* There are only $800 colors here, the first half for sprites
 	   the second half for tiles. We use $8000 virtual colors instead
 	   for consistency with games having $8000 real colors.
@@ -1925,7 +1925,7 @@ GFXDECODE_END
                                 Dodonpachi
 ***************************************************************************/
 
-static GFXDECODE_START( ddonpach )
+static GFXDECODE_START( gfx_ddonpach )
 	/* Layers 01 are 4 bit deep and use the first 16 of every 256
 	   colors for any given color code (a palette_init function
 	   is provided for these layers, filling the 8000-83ff entries
@@ -1942,7 +1942,7 @@ GFXDECODE_END
                                 Donpachi
 ***************************************************************************/
 
-static GFXDECODE_START( donpachi )
+static GFXDECODE_START( gfx_donpachi )
 	/* There are only $800 colors here, the first half for sprites
 	   the second half for tiles. We use $8000 virtual colors instead
 	   for consistency with games having $8000 real colors.
@@ -1958,7 +1958,7 @@ GFXDECODE_END
                                 Esprade
 ***************************************************************************/
 
-static GFXDECODE_START( esprade )
+static GFXDECODE_START( gfx_esprade )
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x8, 0x4000, 0x40 ) // [0] Layer 0
 	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x8, 0x4000, 0x40 ) // [1] Layer 1
@@ -1969,7 +1969,7 @@ GFXDECODE_END
                                 Hotdog Storm
 ***************************************************************************/
 
-static GFXDECODE_START( hotdogst )
+static GFXDECODE_START( gfx_hotdogst )
 	/* There are only $800 colors here, the first half for sprites
 	   the second half for tiles. We use $8000 virtual colors instead
 	   for consistency with games having $8000 real colors.
@@ -1985,7 +1985,7 @@ GFXDECODE_END
                                 Koro Koro Quest
 ***************************************************************************/
 
-static GFXDECODE_START( korokoro )
+static GFXDECODE_START( gfx_korokoro )
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x4400, 0x40 ) // [0] Layer 0
 GFXDECODE_END
@@ -1994,7 +1994,7 @@ GFXDECODE_END
                                 Mazinger Z
 ***************************************************************************/
 
-static GFXDECODE_START( mazinger )
+static GFXDECODE_START( gfx_mazinger )
 	/*  Sprites are 4 bit deep.
 	    Layer 0 is 4 bit deep.
 	    Layer 1 uses 64 color palettes, but the game only fills the
@@ -2012,7 +2012,7 @@ GFXDECODE_END
                                Poka Poka Satan
 ***************************************************************************/
 
-static GFXDECODE_START( ppsatan )
+static GFXDECODE_START( gfx_ppsatan )
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x4000, 0x40 ) // [0] Layer 0
 	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4, 0x4000, 0x40 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x4, 0x4000, 0x40 ) // [2] Layer 2
@@ -2022,7 +2022,7 @@ GFXDECODE_END
                                 Power Instinct 2
 ***************************************************************************/
 
-static GFXDECODE_START( pwrinst2 )
+static GFXDECODE_START( gfx_pwrinst2 )
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x0800+0x8000, 0x40 ) // [0] Layer 0
 	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4, 0x1000+0x8000, 0x40 ) // [1] Layer 1
@@ -2035,7 +2035,7 @@ GFXDECODE_END
                                 Sailor Moon
 ***************************************************************************/
 
-static GFXDECODE_START( sailormn )
+static GFXDECODE_START( gfx_sailormn )
 	/* 4 bit sprites ? */
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4,   0x4400, 0x40 ) // [0] Layer 0
@@ -2048,7 +2048,7 @@ GFXDECODE_END
                                 Uo Poko
 ***************************************************************************/
 
-static GFXDECODE_START( uopoko )
+static GFXDECODE_START( gfx_uopoko )
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x8, 0x4000, 0x40 ) // [0] Layer 0
 GFXDECODE_END
@@ -2115,7 +2115,7 @@ MACHINE_CONFIG_START(cave_state::dfeveron)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dfeveron)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dfeveron)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
 
@@ -2156,7 +2156,7 @@ MACHINE_CONFIG_START(cave_state::ddonpach)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddonpach)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddonpach)
 	MCFG_PALETTE_ADD("palette", 0x8000 + 0x40*16)   // $400 extra entries for layers 1&2
 	MCFG_PALETTE_INIT_OWNER(cave_state,ddonpach)
 
@@ -2196,7 +2196,7 @@ MACHINE_CONFIG_START(cave_state::donpachi)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", donpachi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_donpachi)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
 
@@ -2243,7 +2243,7 @@ MACHINE_CONFIG_START(cave_state::esprade)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esprade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprade)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
@@ -2284,7 +2284,7 @@ MACHINE_CONFIG_START(cave_state::gaia)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esprade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprade)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
@@ -2324,7 +2324,7 @@ MACHINE_CONFIG_START(cave_state::guwange)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esprade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprade)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
@@ -2367,7 +2367,7 @@ MACHINE_CONFIG_START(cave_state::hotdogst)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hotdogst)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hotdogst)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
 
@@ -2417,7 +2417,7 @@ MACHINE_CONFIG_START(cave_state::korokoro)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1-2, 0, 240-1-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", korokoro)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_korokoro)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,korokoro)
 
@@ -2470,7 +2470,7 @@ MACHINE_CONFIG_START(cave_state::mazinger)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mazinger)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mazinger)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,mazinger)
 
@@ -2527,7 +2527,7 @@ MACHINE_CONFIG_START(cave_state::metmqstr)
 	MCFG_SCREEN_VISIBLE_AREA(0x7d, 0x7d + 0x180-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", donpachi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_donpachi)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
 
@@ -2585,7 +2585,7 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", uopoko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
@@ -2660,7 +2660,7 @@ MACHINE_CONFIG_START(cave_state::ppsatan)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_ppsatan_right)
 	MCFG_TIMER_DRIVER_ADD("int_timer_right", cave_state, cave_vblank_start_right)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ppsatan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppsatan)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,ppsatan)
 	MCFG_DEFAULT_LAYOUT(layout_ppsatan)
@@ -2708,7 +2708,7 @@ MACHINE_CONFIG_START(cave_state::pwrinst2)
 	MCFG_SCREEN_VISIBLE_AREA(0x70, 0x70 + 0x140-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pwrinst2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pwrinst2)
 	MCFG_PALETTE_ADD("palette", 0x8000+0x2800)
 	MCFG_PALETTE_INIT_OWNER(cave_state,pwrinst2)
 
@@ -2785,7 +2785,7 @@ MACHINE_CONFIG_START(cave_state::sailormn)
 	MCFG_SCREEN_VISIBLE_AREA(0+1, 320+1-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sailormn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sailormn)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,sailormn) // 4 bit sprites, 6 bit tiles
 
@@ -2845,7 +2845,7 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", uopoko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
@@ -2901,7 +2901,7 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", uopoko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
@@ -2943,7 +2943,7 @@ MACHINE_CONFIG_START(cave_state::uopoko)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", uopoko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)

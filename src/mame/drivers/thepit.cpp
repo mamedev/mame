@@ -692,19 +692,19 @@ static const gfx_layout suprmous_spritelayout =
 };
 
 
-static GFXDECODE_START( thepit )
+static GFXDECODE_START( gfx_thepit )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( intrepid )
+static GFXDECODE_START( gfx_intrepid )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( suprmous )
+static GFXDECODE_START( gfx_suprmous )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, suprmous_charlayout,   0, 4 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, suprmous_spritelayout, 0, 4 )
 GFXDECODE_END
@@ -738,7 +738,7 @@ MACHINE_CONFIG_START(thepit_state::thepit)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thepit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thepit)
 	MCFG_PALETTE_ADD("palette", 32+8)
 	MCFG_PALETTE_INIT_OWNER(thepit_state, thepit)
 
@@ -777,7 +777,7 @@ MACHINE_CONFIG_START(thepit_state::desertdn)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update_desertdan)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", intrepid)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(thepit_state::intrepid)
@@ -791,7 +791,7 @@ MACHINE_CONFIG_START(thepit_state::intrepid)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, thepit_state, intrepid_graphics_bank_w))
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", intrepid)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
 MACHINE_CONFIG_END
 
 
@@ -803,7 +803,7 @@ MACHINE_CONFIG_START(thepit_state::suprmous)
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(thepit_state,suprmous)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", suprmous)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_suprmous)
 MACHINE_CONFIG_END
 
 

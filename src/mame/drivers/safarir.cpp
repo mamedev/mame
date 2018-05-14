@@ -147,7 +147,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( safarir )
+static GFXDECODE_START( gfx_safarir )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 8 )
 GFXDECODE_END
@@ -413,7 +413,7 @@ MACHINE_CONFIG_START(safarir_state::safarir)
 	MCFG_PALETTE_ADD("palette", 2*8)
 	MCFG_PALETTE_INIT_OWNER(safarir_state, safarir)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", safarir)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_safarir)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(32*8, 32*8)

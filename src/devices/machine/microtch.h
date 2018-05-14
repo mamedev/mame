@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "diserial.h"
 
 class microtouch_device :
 		public device_t,

@@ -220,7 +220,7 @@ static const gfx_layout alphalayout =
 	8*8
 };
 
-static GFXDECODE_START( carpolo )
+static GFXDECODE_START( gfx_carpolo )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0,         12 )
 	GFXDECODE_ENTRY( "gfx2", 0, goallayout,   12*2,      2 )
 	GFXDECODE_ENTRY( "gfx3", 0, alphalayout,  12*2+2*16, 4 )
@@ -292,7 +292,7 @@ MACHINE_CONFIG_START(carpolo_state::carpolo)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, carpolo_state, screen_vblank_carpolo))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carpolo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_carpolo)
 	MCFG_PALETTE_ADD("palette", 12*2+2*16+4*2)
 	MCFG_PALETTE_INIT_OWNER(carpolo_state,carpolo)
 

@@ -1099,7 +1099,7 @@ static const gfx_layout charlayout =
 	8*16
 };
 
-static GFXDECODE_START( pinkiri8 )
+static GFXDECODE_START( gfx_pinkiri8 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x100 )
 GFXDECODE_END
 
@@ -1117,7 +1117,7 @@ MACHINE_CONFIG_START(pinkiri8_state::pinkiri8)
 	MCFG_SCREEN_UPDATE_DRIVER(pinkiri8_state, screen_update_pinkiri8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pinkiri8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pinkiri8)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 
 

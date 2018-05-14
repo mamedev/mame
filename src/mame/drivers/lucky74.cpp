@@ -1390,7 +1390,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( lucky74 )
+static GFXDECODE_START( gfx_lucky74 )
 	GFXDECODE_ENTRY( "fgtiles", 0, tilelayout, 0, 16 )      /* text, frames & cards */
 	GFXDECODE_ENTRY( "bgtiles", 0, tilelayout, 256, 16 )    /* title & whores */
 GFXDECODE_END
@@ -1503,7 +1503,7 @@ MACHINE_CONFIG_START(lucky74_state::lucky74)
 	MCFG_SCREEN_UPDATE_DRIVER(lucky74_state, screen_update_lucky74)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lucky74)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lucky74)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(lucky74_state, lucky74)

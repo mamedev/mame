@@ -858,14 +858,14 @@ static const gfx_layout tilelayout =
 	8*16
 };
 
-static GFXDECODE_START( cntsteer )
+static GFXDECODE_START( gfx_cntsteer )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, cntsteer_charlayout, 0, 256 ) /* Only 1 used so far :/ */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,            0, 256 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,         0, 256 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( zerotrgt )
+static GFXDECODE_START( gfx_zerotrgt )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, zerotrgt_charlayout, 0, 256 ) /* Only 1 used so far :/ */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,            0, 256 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,         0, 256 )
@@ -949,7 +949,7 @@ MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_QUANTUM_PERFECT_CPU("subcpu")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cntsteer)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cntsteer)
 	MCFG_PALETTE_ADD("palette", 256)
 //  MCFG_PALETTE_INIT_OWNER(cntsteer_state,zerotrgt)
 
@@ -1001,7 +1001,7 @@ MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 	MCFG_SCREEN_UPDATE_DRIVER(cntsteer_state, screen_update_zerotrgt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zerotrgt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zerotrgt)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(cntsteer_state,zerotrgt)

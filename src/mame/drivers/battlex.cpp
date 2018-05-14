@@ -262,7 +262,7 @@ static const gfx_layout battlex_spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( battlex )
+static GFXDECODE_START( gfx_battlex )
 	GFXDECODE_ENTRY( "gfx1", 0, battlex_charlayout,   64, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, battlex_spritelayout, 0, 8 )
 GFXDECODE_END
@@ -309,7 +309,7 @@ MACHINE_CONFIG_START(battlex_state::battlex)
 	MCFG_SCREEN_UPDATE_DRIVER(battlex_state, screen_update_battlex)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", battlex)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_battlex)
 	MCFG_PALETTE_ADD("palette", 64 + 128)
 
 	/* sound hardware */

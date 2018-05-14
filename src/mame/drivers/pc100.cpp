@@ -378,7 +378,7 @@ static const gfx_layout kanji_layout =
 	16*16
 };
 
-static GFXDECODE_START( pc100 )
+static GFXDECODE_START( gfx_pc100 )
 	GFXDECODE_ENTRY( "kanji", 0x0000, kanji_layout, 8, 1 )
 GFXDECODE_END
 
@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	MCFG_SCREEN_UPDATE_DRIVER(pc100_state, screen_update_pc100)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc100)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_FORMAT(xxxxxxxBBBGGGRRR)
 

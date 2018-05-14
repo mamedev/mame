@@ -2960,11 +2960,11 @@ static const gfx_layout charlayout =
    in the first and second half of the bipolar PROM.
 */
 
-static GFXDECODE_START( fw1stpal )  /* Adressing the first half of the palette */
+static GFXDECODE_START( gfx_fw1stpal )  /* Adressing the first half of the palette */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( fw2ndpal )  /* Adressing the second half of the palette */
+static GFXDECODE_START( gfx_fw2ndpal )  /* Adressing the second half of the palette */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x100, 16 )
 GFXDECODE_END
 
@@ -3090,7 +3090,7 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 	MCFG_SCREEN_UPDATE_DRIVER(funworld_state, screen_update_funworld)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fw1stpal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fw1stpal)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(funworld_state, funworld)
@@ -3115,7 +3115,7 @@ MACHINE_CONFIG_START(funworld_state::fw2ndpal)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(funworld_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
 MACHINE_CONFIG_END
 
 
@@ -3217,7 +3217,7 @@ MACHINE_CONFIG_START(funworld_state::intrgmes)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(intergames_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
 MACHINE_CONFIG_END
 
 
@@ -3225,7 +3225,7 @@ MACHINE_CONFIG_START(funworld_state::fw_a7_11)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(fw_a7_11_map)
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
+//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
 MACHINE_CONFIG_END
 
 

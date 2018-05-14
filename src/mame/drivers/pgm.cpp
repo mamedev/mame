@@ -477,7 +477,7 @@ static const gfx_layout pgm32_charlayout =
 		32*160
 };
 
-GFXDECODE_START( pgm )
+GFXDECODE_START( gfx_pgm )
 	GFXDECODE_REVERSEBITS( "tiles", 0, pgm8_charlayout,    0x800, 32  ) /* 8x8x4 Tiles */
 	GFXDECODE_REVERSEBITS( "tiles", 0, pgm32_charlayout,   0x400, 32  ) /* 32x32x5 Tiles */
 GFXDECODE_END
@@ -535,7 +535,7 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pgm_state, screen_vblank_pgm))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pgm)
 	MCFG_PALETTE_ADD("palette", 0x1200/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

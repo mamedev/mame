@@ -242,7 +242,7 @@ static const gfx_layout cdc721_charlayout =
 	8                   /* every char takes 16 x 1 bytes */
 };
 
-static GFXDECODE_START( cdc721 )
+static GFXDECODE_START( gfx_cdc721 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, cdc721_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(cdc721_state, cdc721)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cdc721)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cdc721)
 
 	MCFG_DEVICE_ADD("crtc", CRT5037, 12.936_MHz_XTAL / 8)
 	MCFG_TMS9927_CHAR_WIDTH(8)

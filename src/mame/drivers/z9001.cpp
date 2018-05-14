@@ -198,7 +198,7 @@ void z9001_state::kbd_put(u8 data)
 	m_maincpu->space(AS_PROGRAM).write_byte(0x0025, data);
 }
 
-static GFXDECODE_START( z9001 )
+static GFXDECODE_START( gfx_z9001 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, z9001_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -219,7 +219,7 @@ MACHINE_CONFIG_START(z9001_state::z9001)
 	MCFG_SCREEN_UPDATE_DRIVER(z9001_state, screen_update_z9001)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", z9001)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_z9001)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	/* Sound */

@@ -968,7 +968,7 @@ static const gfx_layout charlayout =
 //  GFXDECODE( portfolio )
 //-------------------------------------------------
 
-static GFXDECODE_START( portfolio )
+static GFXDECODE_START( gfx_portfolio )
 	GFXDECODE_ENTRY( HD61830_TAG, 0, charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -1036,7 +1036,7 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(portfolio_state, portfolio)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", portfolio)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_portfolio)
 
 	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL(4'915'200)/2/2)
 	MCFG_DEVICE_ADDRESS_MAP(0, portfolio_lcdc)

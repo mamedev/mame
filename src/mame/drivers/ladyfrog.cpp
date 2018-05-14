@@ -262,7 +262,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( ladyfrog )
+static GFXDECODE_START( gfx_ladyfrog )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )
 GFXDECODE_END
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
 	MCFG_SCREEN_UPDATE_DRIVER(ladyfrog_state, screen_update_ladyfrog)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ladyfrog)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ladyfrog)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

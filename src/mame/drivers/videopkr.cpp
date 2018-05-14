@@ -1228,12 +1228,12 @@ static const gfx_layout tilelayout_8 =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( videopkr )
+static GFXDECODE_START( gfx_videopkr )
 	GFXDECODE_ENTRY( "tiles", 0, tilelayout_8, 0, 64 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( videodad )
+static GFXDECODE_START( gfx_videodad )
 	GFXDECODE_ENTRY( "tiles", 0, tilelayout_16, 0, 64 )
 GFXDECODE_END
 
@@ -1296,7 +1296,7 @@ MACHINE_CONFIG_START(videopkr_state::videopkr)
 	MCFG_SCREEN_UPDATE_DRIVER(videopkr_state, screen_update_videopkr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", videopkr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_videopkr)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(videopkr_state, videopkr)
 
@@ -1332,7 +1332,7 @@ MACHINE_CONFIG_START(videopkr_state::videodad)
 	MCFG_SCREEN_SIZE(32*16, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*16, 31*16-1, 2*8, 30*8-1)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", videodad)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_videodad)
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 MACHINE_CONFIG_END
 
@@ -1363,7 +1363,7 @@ MACHINE_CONFIG_START(videopkr_state::babypkr)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(videopkr_state,babypkr)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", videodad)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_videodad)
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, CPU_CLOCK / 6) /* no ports used */

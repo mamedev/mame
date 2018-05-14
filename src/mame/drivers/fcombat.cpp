@@ -250,7 +250,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( fcombat )
+static GFXDECODE_START( gfx_fcombat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     256, 64 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,     512, 64 )
@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(fcombat_state::fcombat)
 	MCFG_SCREEN_UPDATE_DRIVER(fcombat_state, screen_update_fcombat)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fcombat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fcombat)
 	MCFG_PALETTE_ADD("palette", 256*3)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(fcombat_state, fcombat)

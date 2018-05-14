@@ -1290,7 +1290,7 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("scn2674_vid", scn2674_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_DEVICE_ADD("scn2674_vid", SCN2674, 0)
 	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("video", M68K_IRQ_3))

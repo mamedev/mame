@@ -589,7 +589,7 @@ static const gfx_layout spritelayout =
 	32*16
 };
 
-static GFXDECODE_START( panicr )
+static GFXDECODE_START( gfx_panicr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0x000,  8 )
 	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout,   0x200, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0x100, 16 )
@@ -626,7 +626,7 @@ MACHINE_CONFIG_START(panicr_state::panicr)
 	MCFG_SCREEN_UPDATE_DRIVER(panicr_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panicr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_panicr)
 	MCFG_PALETTE_ADD("palette", 256*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(panicr_state, panicr)

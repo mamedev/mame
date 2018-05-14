@@ -33,7 +33,7 @@ Paste facility was tested but doesn't work, so all code remnants removed.
 #include "speaker.h"
 
 
-static GFXDECODE_START( ut88 )
+static GFXDECODE_START( gfx_ut88 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ut88_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -205,7 +205,7 @@ MACHINE_CONFIG_START(ut88_state::ut88)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ut88 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ut88)
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();

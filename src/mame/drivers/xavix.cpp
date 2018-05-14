@@ -619,7 +619,7 @@ static const gfx_layout char16layout8bpp =
 	16*16*8
 };
 
-static GFXDECODE_START( xavix )
+static GFXDECODE_START( gfx_xavix )
 	GFXDECODE_ENTRY( "bios", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "bios", 0, char16layout, 0, 16 )
 	GFXDECODE_ENTRY( "bios", 0, charlayout8bpp, 0, 1 )
@@ -655,7 +655,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xavix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xavix)
 
 	MCFG_PALETTE_ADD("palette", 256)
 

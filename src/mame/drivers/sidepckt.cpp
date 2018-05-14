@@ -353,7 +353,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( sidepckt )
+static GFXDECODE_START( gfx_sidepckt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   128,  4 ) /* colors 128-159 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 ) /* colors   0-127 */
 GFXDECODE_END
@@ -388,7 +388,7 @@ MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sidepckt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sidepckt)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(sidepckt_state, sidepckt)
 

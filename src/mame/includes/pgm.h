@@ -129,6 +129,6 @@ public:
 
 INPUT_PORTS_EXTERN( pgm );
 
-GFXDECODE_EXTERN( pgm );
+extern gfx_decode_entry const gfx_pgm[];
 
 #endif // MAME_INCLUDES_PGM_H

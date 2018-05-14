@@ -348,7 +348,7 @@ static const gfx_layout hp9k_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( hp9k )
+static GFXDECODE_START( gfx_hp9k )
 	GFXDECODE_ENTRY( "bootrom", 0x2000, hp9k_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -410,7 +410,7 @@ MACHINE_CONFIG_START(hp9k_state::hp9k)
 	MCFG_SCREEN_UPDATE_DRIVER(hp9k_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hp9k)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hp9k)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL(16'000'000) / 16)

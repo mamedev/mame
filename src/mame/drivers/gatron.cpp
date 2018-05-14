@@ -556,7 +556,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( gat )
+static GFXDECODE_START( gfx_gat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -589,7 +589,7 @@ MACHINE_CONFIG_START(gatron_state::gat)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gat)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(gatron_state, gatron)
 

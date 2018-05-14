@@ -305,7 +305,7 @@ static const gfx_layout charlayout_3_bit =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( polyplay )
+static GFXDECODE_START( gfx_polyplay )
 	GFXDECODE_ENTRY( "gfx1",  0x0000, charlayout_1_bit, 0, 1 )
 	GFXDECODE_ENTRY( nullptr, 0xec00, charlayout_3_bit, 2, 1 )
 GFXDECODE_END
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	MCFG_SCREEN_UPDATE_DRIVER(polyplay_state, screen_update_polyplay)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", polyplay)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_polyplay)
 	MCFG_PALETTE_ADD("palette", 10)
 	MCFG_PALETTE_INIT_OWNER(polyplay_state, polyplay)
 

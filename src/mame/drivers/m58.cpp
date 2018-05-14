@@ -179,7 +179,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( yard )
+static GFXDECODE_START( gfx_yard )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     512, 32 )
 GFXDECODE_END
@@ -200,7 +200,7 @@ MACHINE_CONFIG_START(m58_state::yard)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m58_state,  irq0_line_hold)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yard)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yard)
 	MCFG_PALETTE_ADD("palette", 256+256+256)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+256+16)
 	MCFG_PALETTE_INIT_OWNER(m58_state, m58)

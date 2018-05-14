@@ -381,7 +381,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( jokrwild )
+static GFXDECODE_START( gfx_jokrwild )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 	MCFG_SCREEN_UPDATE_DRIVER(jokrwild_state, screen_update_jokrwild)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jokrwild)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jokrwild)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(jokrwild_state, jokrwild)
 

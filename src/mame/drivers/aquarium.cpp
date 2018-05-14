@@ -280,7 +280,7 @@ void aquarium_state::init_aquarium()
 }
 
 
-static GFXDECODE_START( aquarium )
+static GFXDECODE_START( gfx_aquarium )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,       0x300, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, char5bpplayout,   0x400, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, char_8x8_layout,  0x200, 32 )
@@ -310,7 +310,7 @@ MACHINE_CONFIG_START(aquarium_state::aquarium)
 	MCFG_SCREEN_UPDATE_DRIVER(aquarium_state, screen_update_aquarium)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aquarium)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aquarium)
 	MCFG_PALETTE_ADD("palette", 0x1000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 

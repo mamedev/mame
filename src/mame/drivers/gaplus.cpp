@@ -466,7 +466,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( gaplus )
+static GFXDECODE_START( gfx_gaplus )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,      0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout, 64*4, 64 )
 GFXDECODE_END
@@ -570,7 +570,7 @@ MACHINE_CONFIG_START(gaplus_state::gaplus)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, gaplus_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gaplus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaplus)
 	MCFG_PALETTE_ADD("palette", 64*4+64*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(gaplus_state, gaplus)

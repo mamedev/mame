@@ -466,7 +466,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( seabattl )
+static GFXDECODE_START( gfx_seabattl )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles32x16x3_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 8, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 24, 1 )
@@ -508,7 +508,7 @@ MACHINE_CONFIG_START(seabattl_state::seabattl)
 	MCFG_SCREEN_UPDATE_DRIVER(seabattl_state, screen_update_seabattl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seabattl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seabattl)
 	MCFG_PALETTE_ADD("palette", 26)
 	MCFG_PALETTE_INIT_OWNER(seabattl_state, seabattl)
 

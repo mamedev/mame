@@ -557,7 +557,7 @@ static const gfx_layout tile_16x16x8_layout =
 };
 #endif
 
-static GFXDECODE_START( srmp5 )
+static GFXDECODE_START( gfx_srmp5 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x8x8_layout,  0x0, 0x800  )
 	//GFXDECODE_ENTRY( "gfx1", 0, tile_16x16x8_layout, 0x0, 0x800  )
 GFXDECODE_END
@@ -589,7 +589,7 @@ MACHINE_CONFIG_START(srmp5_state::srmp5)
 	MCFG_PALETTE_MEMBITS(16)
 
 #ifdef DEBUG_CHAR
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srmp5 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srmp5)
 #endif
 
 MACHINE_CONFIG_END

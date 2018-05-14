@@ -692,7 +692,7 @@ static const gfx_layout tile_layout =
 	8*8*8,
 };
 
-static GFXDECODE_START( limenko )
+static GFXDECODE_START( gfx_limenko )
 	GFXDECODE_ENTRY( "gfx", 0, tile_layout, 0, 16 ) /* tiles */
 GFXDECODE_END
 
@@ -719,7 +719,7 @@ MACHINE_CONFIG_START(limenko_state::limenko)
 	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", limenko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_limenko)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -764,7 +764,7 @@ MACHINE_CONFIG_START(limenko_state::spotty)
 	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", limenko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_limenko)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

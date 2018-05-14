@@ -155,7 +155,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every char takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( gotya )
+static GFXDECODE_START( gfx_gotya )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 16 )
 GFXDECODE_END
@@ -227,7 +227,7 @@ MACHINE_CONFIG_START(gotya_state::gotya)
 	MCFG_SCREEN_UPDATE_DRIVER(gotya_state, screen_update_gotya)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gotya)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gotya)
 	MCFG_PALETTE_ADD("palette", 16*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gotya_state, gotya)

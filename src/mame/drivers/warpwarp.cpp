@@ -699,15 +699,15 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( 1k )
+static GFXDECODE_START( gfx_1k )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( 2k )
+static GFXDECODE_START( gfx_2k )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 2 )
 GFXDECODE_END
 
-static GFXDECODE_START( color )
+static GFXDECODE_START( gfx_color )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -737,7 +737,7 @@ MACHINE_CONFIG_START(warpwarp_state::geebee)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, warpwarp_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1k)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1k)
 	MCFG_PALETTE_ADD("palette", 4*2)
 
 	MCFG_PALETTE_INIT_OWNER(warpwarp_state,geebee)
@@ -760,7 +760,7 @@ MACHINE_CONFIG_START(warpwarp_state::navarone)
 	geebee(config);
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", 2k)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_2k)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(2*2)
 
@@ -772,7 +772,7 @@ MACHINE_CONFIG_START(warpwarp_state::kaitei)
 	geebee(config);
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", 1k)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_1k)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4*2+1)
 
@@ -805,7 +805,7 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, warpwarp_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", color)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_color)
 
 	MCFG_PALETTE_ADD("palette", 2*256+1)
 	MCFG_PALETTE_INIT_OWNER(warpwarp_state,warpwarp)

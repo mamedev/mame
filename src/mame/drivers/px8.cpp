@@ -712,7 +712,7 @@ static const gfx_layout px8_charlayout =
     GFXDECODE( px8 )
 -------------------------------------------------*/
 
-static GFXDECODE_START( px8 )
+static GFXDECODE_START( gfx_px8 )
 	GFXDECODE_ENTRY( SED1320_TAG, 0x0000, px8_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -774,7 +774,7 @@ MACHINE_CONFIG_START(px8_state::px8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 63)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", px8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_px8)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(px8_state, px8)
 

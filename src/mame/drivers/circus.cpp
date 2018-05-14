@@ -253,12 +253,12 @@ static const gfx_layout robotlayout =
 	8
 };
 
-static GFXDECODE_START( circus )
+static GFXDECODE_START( gfx_circus )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, clownlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( robotbwl )
+static GFXDECODE_START( gfx_robotbwl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, robotlayout, 0, 1 )
 GFXDECODE_END
@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(circus_state::circus)
 	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_circus)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", circus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_circus)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -334,7 +334,7 @@ MACHINE_CONFIG_START(circus_state::robotbwl)
 	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_robotbwl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", robotbwl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_robotbwl)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(circus_state::crash)
 	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_crash)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", circus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_circus)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -408,7 +408,7 @@ MACHINE_CONFIG_START(circus_state::ripcord)
 	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_ripcord)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", circus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_circus)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 

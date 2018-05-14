@@ -199,12 +199,12 @@ static const gfx_layout bootleg_spritelayout =
 	32*8    /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( pcktgal )
+static GFXDECODE_START( gfx_pcktgal )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   256, 16 ) /* chars */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout,   0,  8 ) /* sprites */
 GFXDECODE_END
 
-static GFXDECODE_START( bootleg )
+static GFXDECODE_START( gfx_bootleg )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, bootleg_charlayout,   256, 16 ) /* chars */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, bootleg_spritelayout,   0,  8 ) /* sprites */
 GFXDECODE_END
@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcktgal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcktgal)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(pcktgal_state, pcktgal)
 
@@ -273,7 +273,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcktgal_state::bootleg)
 	pcktgal(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", bootleg)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bootleg)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pcktgal_state, screen_update_pcktgalb)
 MACHINE_CONFIG_END

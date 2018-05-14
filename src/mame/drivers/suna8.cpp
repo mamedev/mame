@@ -1847,11 +1847,11 @@ static const gfx_layout layout_8x8x4 =
 	8*8*2
 };
 
-static GFXDECODE_START( suna8 )
+static GFXDECODE_START( gfx_suna8 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4, 0, 16*2 ) // [0] Sprites (brickzn has 2 palette RAMs)
 GFXDECODE_END
 
-static GFXDECODE_START( suna8_x2 )
+static GFXDECODE_START( gfx_suna8_x2 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4, 0, 16*2 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4, 0, 16*2 ) // [1] Sprites (sparkman has 2 sprite "chips")
 GFXDECODE_END
@@ -1899,7 +1899,7 @@ MACHINE_CONFIG_START(suna8_state::hardhead)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna8)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -1958,7 +1958,7 @@ MACHINE_CONFIG_START(suna8_state::rranger)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna8)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -2027,7 +2027,7 @@ MACHINE_CONFIG_START(suna8_state::brickzn11)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna8)
 	MCFG_PALETTE_ADD("palette", 256 * 2)    // 2 x Palette RAM
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -2141,7 +2141,7 @@ MACHINE_CONFIG_START(suna8_state::starfigh)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna8)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -2195,7 +2195,7 @@ MACHINE_CONFIG_START(suna8_state::sparkman)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna8_x2)    // 2 sprite "chips"
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna8_x2)    // 2 sprite "chips"
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)

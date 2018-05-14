@@ -1015,7 +1015,7 @@ static const gfx_layout spritelayout =
 	32*32*4
 };
 
-static GFXDECODE_START( namcos1 )
+static GFXDECODE_START( gfx_namcos1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0x0800,   8 )  /* characters */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x0000, 128 )  /* sprites 32/16/8/4 dots */
 GFXDECODE_END
@@ -1067,7 +1067,7 @@ MACHINE_CONFIG_START(namcos1_state::ns1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos1_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos1)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()

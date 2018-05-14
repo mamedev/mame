@@ -393,7 +393,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static GFXDECODE_START( cloud9 )
+static GFXDECODE_START( gfx_cloud9 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_16x16x4_planar, 0, 4 )
 GFXDECODE_END
 
@@ -422,7 +422,7 @@ MACHINE_CONFIG_START(cloud9_state::cloud9)
 	MCFG_X2212_ADD_AUTOSAVE("nvram")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cloud9)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cloud9)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

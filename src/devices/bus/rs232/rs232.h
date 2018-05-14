@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "diserial.h"
+
 
 #define MCFG_RS232_RXD_HANDLER(_devcb) \
 	devcb = &downcast<rs232_port_device &>(*device).set_rxd_handler(DEVCB_##_devcb);

@@ -525,7 +525,7 @@ static const gfx_layout charlayout =
 	8*16                    /* size of one char */
 };
 
-static GFXDECODE_START( itt3030 )
+static GFXDECODE_START( gfx_itt3030 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
@@ -739,7 +739,7 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itt3030)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_itt3030)
 
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(itt3030_state, itt3030)

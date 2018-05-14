@@ -335,7 +335,7 @@ static const gfx_layout oneshot8x8_layout =
 };
 
 
-static GFXDECODE_START( oneshot )
+static GFXDECODE_START( gfx_oneshot )
 	GFXDECODE_ENTRY( "gfx1", 0, oneshot16x16_layout,   0x00, 4  ) /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, oneshot8x8_layout,     0x00, 4  ) /* sprites */
 GFXDECODE_END
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(oneshot_state::oneshot)
 	MCFG_SCREEN_UPDATE_DRIVER(oneshot_state, screen_update_oneshot)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", oneshot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_oneshot)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

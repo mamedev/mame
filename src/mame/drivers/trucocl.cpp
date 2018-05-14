@@ -131,7 +131,7 @@ static const gfx_layout tilelayout =
 
 
 
-static GFXDECODE_START( trucocl )
+static GFXDECODE_START( gfx_trucocl )
 	GFXDECODE_ENTRY( "gfx1", 0,         tilelayout,      0, 2 )
 	GFXDECODE_ENTRY( "gfx1", 0x10000, tilelayout,      0, 2 )
 GFXDECODE_END
@@ -160,7 +160,7 @@ MACHINE_CONFIG_START(trucocl_state::trucocl)
 	MCFG_SCREEN_UPDATE_DRIVER(trucocl_state, screen_update_trucocl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trucocl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trucocl)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(trucocl_state, trucocl)
 

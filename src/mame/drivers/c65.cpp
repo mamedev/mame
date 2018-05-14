@@ -648,7 +648,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( c65 )
+static GFXDECODE_START( gfx_c65 )
 	GFXDECODE_ENTRY( "maincpu", 0xd000, charlayout,     0, 16 ) // another identical copy is at 0x9000
 GFXDECODE_END
 
@@ -715,7 +715,7 @@ MACHINE_CONFIG_START(c65_state::c65)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK*4, 910, 0, 640, 262, 0, 200) // mods needed
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c65)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c65)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(c65_state, c65)

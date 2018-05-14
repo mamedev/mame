@@ -186,7 +186,7 @@ static const gfx_layout stlforce_splayout =
 	32*8
 };
 
-static GFXDECODE_START( stlforce )
+static GFXDECODE_START( gfx_stlforce )
 	GFXDECODE_ENTRY( "gfx1", 0, stlforce_bglayout, 0, 256  )
 	GFXDECODE_ENTRY( "gfx1", 0, stlforce_txlayout, 0, 256  )
 	GFXDECODE_ENTRY( "gfx2", 0, stlforce_splayout, 0, 256  )
@@ -211,7 +211,7 @@ MACHINE_CONFIG_START(stlforce_state::stlforce)
 	MCFG_SCREEN_UPDATE_DRIVER(stlforce_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stlforce)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stlforce)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

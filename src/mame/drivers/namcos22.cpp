@@ -3721,12 +3721,12 @@ static const gfx_layout namcos22_cg_layout =
 
 #undef XOR
 
-static GFXDECODE_START( namcos22 )
+static GFXDECODE_START( gfx_namcos22 )
 	GFXDECODE_ENTRY( nullptr,      0, namcos22_cg_layout,   0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, texture_tile_layout,  0, 0x80 )
 GFXDECODE_END
 
-static GFXDECODE_START( super )
+static GFXDECODE_START( gfx_super )
 	GFXDECODE_ENTRY( nullptr,      0, namcos22_cg_layout,   0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, texture_tile_layout,  0, 0x80 )
 	GFXDECODE_ENTRY( "sprite",  0, sprite_layout,        0, 0x80 )
@@ -3796,7 +3796,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos22)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos22)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3864,7 +3864,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22s)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_super)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

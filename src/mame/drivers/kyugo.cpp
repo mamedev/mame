@@ -481,7 +481,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( kyugo )
+static GFXDECODE_START( gfx_kyugo )
 	GFXDECODE_ENTRY( "gfx1", 0, fg_tilelayout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, bg_tilelayout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  0, 32 )
@@ -548,7 +548,7 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 	MCFG_SCREEN_UPDATE_DRIVER(kyugo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kyugo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kyugo)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */

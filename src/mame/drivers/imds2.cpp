@@ -749,7 +749,7 @@ INPUT_PORTS_END
 
 static GFXLAYOUT_RAW(imds2_charlayout , 8 , 8 , 8 , 64)
 
-static GFXDECODE_START(imds2)
+static GFXDECODE_START(gfx_imds2)
 	GFXDECODE_ENTRY("gfx1" , 0x0000 , imds2_charlayout , 0 , 1)
 GFXDECODE_END
 
@@ -841,7 +841,7 @@ MACHINE_CONFIG_START(imds2_state::imds2)
 		MCFG_SCREEN_ADD("screen" , RASTER)
 		MCFG_SCREEN_UPDATE_DEVICE("ioccrtc" , i8275_device , screen_update)
 		MCFG_SCREEN_REFRESH_RATE(50)
-		MCFG_GFXDECODE_ADD("gfxdecode" , "palette" , imds2)
+		MCFG_DEVICE_ADD("gfxdecode" , GFXDECODE, "palette" , gfx_imds2)
 		MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 		SPEAKER(config, "mono").front_center();

@@ -373,7 +373,7 @@ static const gfx_layout tiles16x16_layout =
 };
 
 
-static GFXDECODE_START( divebomb )
+static GFXDECODE_START( gfx_divebomb )
 	GFXDECODE_ENTRY( "fgrom", 0, tiles8x8_layout, 0x400+0x400, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, tiles16x16_layout, 0x400+0x400+0x400, 16 )
 GFXDECODE_END
@@ -448,7 +448,7 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("spritecpu", INPUT_LINE_NMI))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("rozcpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", divebomb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_divebomb)
 	MCFG_PALETTE_ADD("palette", 0x400+0x400+0x400+0x100)
 
 	MCFG_PALETTE_INIT_OWNER(divebomb_state, divebomb)

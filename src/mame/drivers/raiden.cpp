@@ -315,7 +315,7 @@ static const gfx_layout raiden_spritelayout =
 	1024
 };
 
-static GFXDECODE_START( raiden )
+static GFXDECODE_START( gfx_raiden )
 	GFXDECODE_ENTRY( "gfx1", 0, raiden_charlayout,   768, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, raiden_spritelayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, raiden_spritelayout, 256, 16 )
@@ -361,7 +361,7 @@ MACHINE_CONFIG_START(raiden_state::raiden)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, raiden_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

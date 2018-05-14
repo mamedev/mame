@@ -438,7 +438,7 @@ static const gfx_layout tiles32x32_layout =
 	128*8
 };
 
-static GFXDECODE_START( calorie )
+static GFXDECODE_START( gfx_calorie )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 16 )
@@ -486,7 +486,7 @@ MACHINE_CONFIG_START(calorie_state::calorie)
 	MCFG_SCREEN_UPDATE_DRIVER(calorie_state, screen_update_calorie)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", calorie)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_calorie)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

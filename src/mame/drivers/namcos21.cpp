@@ -1871,7 +1871,7 @@ static const gfx_layout tile_layout =
 	8*64 /* sprite offset */
 };
 
-static GFXDECODE_START( namcos21 )
+static GFXDECODE_START( gfx_namcos21 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tile_layout,  0x1000, 0x10 )
 GFXDECODE_END
 
@@ -1960,7 +1960,7 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	configure_c148_standard(config);
 	MCFG_NAMCO_C139_ADD("sci")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos21)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 	MCFG_PALETTE_FORMAT(XBRG)
 
@@ -2022,7 +2022,7 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_driveyes)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos21)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 	MCFG_PALETTE_FORMAT(XBRG)
 
@@ -2085,7 +2085,7 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_winrun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 	MCFG_PALETTE_FORMAT(XBRG)

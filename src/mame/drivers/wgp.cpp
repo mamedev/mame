@@ -857,7 +857,7 @@ static const gfx_layout charlayout =
 };
 
 /* taitoic.c TC0100SCN routines expect scr stuff to be in second gfx slot */
-static GFXDECODE_START( wgp )
+static GFXDECODE_START( gfx_wgp )
 	GFXDECODE_ENTRY( "gfx3", 0x0, wgp_tilelayout,  0, 256 )     /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 256 )     /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0x0, wgp_tile2layout,  0, 256 )    /* piv */
@@ -939,7 +939,7 @@ MACHINE_CONFIG_START(wgp_state::wgp)
 	MCFG_SCREEN_UPDATE_DRIVER(wgp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wgp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wgp)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 

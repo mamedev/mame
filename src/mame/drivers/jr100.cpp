@@ -262,7 +262,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( jr100 )
+static GFXDECODE_START( gfx_jr100 )
 	GFXDECODE_ENTRY( "maincpu", 0xe000, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(jr100_state::jr100)
 	MCFG_SCREEN_UPDATE_DRIVER(jr100_state, screen_update_jr100)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jr100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jr100)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(14'318'181) / 16)

@@ -626,15 +626,15 @@ static const gfx_layout mbee_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( mono )
+static GFXDECODE_START( gfx_mono )
 	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 96, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( standard )
+static GFXDECODE_START( gfx_standard )
 	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 48 )
 GFXDECODE_END
 
-static GFXDECODE_START( premium )
+static GFXDECODE_START( gfx_premium )
 	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -668,7 +668,7 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 19*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mono)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mono)
 
 	MCFG_PALETTE_ADD("palette", 100)
 	MCFG_PALETTE_INIT_OWNER(mbee_state, standard)
@@ -725,7 +725,7 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 19*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", standard)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_standard)
 
 	MCFG_PALETTE_ADD("palette", 100)
 	MCFG_PALETTE_INIT_OWNER(mbee_state, standard)
@@ -771,7 +771,7 @@ MACHINE_CONFIG_START(mbee_state::mbeeppc)
 	MCFG_DEVICE_PROGRAM_MAP(mbeeppc_mem)
 	MCFG_DEVICE_IO_MAP(mbeeppc_io)
 	MCFG_VIDEO_START_OVERRIDE(mbee_state, premium)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", premium)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_premium)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(mbee_state, premium)
 	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )

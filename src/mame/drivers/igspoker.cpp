@@ -1879,7 +1879,7 @@ static const gfx_layout charlayout2 =
 };
 
 
-static GFXDECODE_START( igspoker )
+static GFXDECODE_START( gfx_igspoker )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, charlayout2,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, charlayout2,  0, 16 )
@@ -1898,7 +1898,7 @@ static const gfx_layout charlayoutcpk =
 	64*8
 };
 
-static GFXDECODE_START( cpokerpk )
+static GFXDECODE_START( gfx_cpokerpk )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayoutcpk,   0, 16 )
 	/* these not used? */
 	GFXDECODE_ENTRY( "gfx2", 0x04000, charlayout2,  0, 1 )
@@ -1929,7 +1929,7 @@ MACHINE_CONFIG_START(igspoker_state::igspoker)
 	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_igs_video)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igspoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igspoker)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1974,7 +1974,7 @@ MACHINE_CONFIG_START(igspoker_state::cpokerpk)
 	number10(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(cpokerpk_io_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cpokerpk)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cpokerpk)
 MACHINE_CONFIG_END
 
 

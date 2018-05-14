@@ -117,6 +117,8 @@ reelquak:
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
+
+#include "diserial.h"
 #include "speaker.h"
 
 
@@ -2376,7 +2378,7 @@ static const gfx_layout layout_2bpp_hi =
 
 /*  Tiles are 8bpp, but the hardware is additionally able to discard
     some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static GFXDECODE_START( seta2 )
+static GFXDECODE_START( gfx_seta2 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_4bpp_lo, 0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_4bpp_hi, 0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_6bpp,    0, 0x8000/16 )   // 6bpp, but 4bpp color granularity
@@ -2458,7 +2460,7 @@ static const gfx_layout funcube_layout_2bpp_hi =
 
 /*  Tiles are 8bpp, but the hardware is additionally able to discard
     some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static GFXDECODE_START( funcube )
+static GFXDECODE_START( gfx_funcube )
 	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_4bpp_lo, 0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_4bpp_hi, 0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_6bpp,    0, 0x8000/16 )   // 6bpp, but 4bpp color granularity
@@ -2495,7 +2497,7 @@ static const gfx_layout staraudi_layout_6bpp =
 
 /*  Tiles are 8bpp, but the hardware is additionally able to discard
     some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static GFXDECODE_START( staraudi )
+static GFXDECODE_START( gfx_staraudi )
 	GFXDECODE_ENTRY( "sprites", 0, staraudi_layout_4bpp_lo, 0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_4bpp_hi,  0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, staraudi_layout_6bpp,    0, 0x8000/16 )   // 6bpp, but 4bpp color granularity
@@ -2543,7 +2545,7 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seta2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seta2)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2695,7 +2697,7 @@ MACHINE_CONFIG_START(staraudi_state::staraudi)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
 	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x150-1, 0x100, 0x1f0-1)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", staraudi)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_staraudi)
 MACHINE_CONFIG_END
 
 
@@ -2778,7 +2780,7 @@ MACHINE_CONFIG_START(seta2_state::funcube)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funcube)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funcube)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2833,7 +2835,7 @@ MACHINE_CONFIG_START(seta2_state::namcostr)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funcube)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funcube)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

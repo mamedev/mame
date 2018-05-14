@@ -3092,7 +3092,7 @@ static const gfx_layout dblaxle_charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( taitoz )
+static GFXDECODE_START( gfx_taitoz )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x8_layout,  0, 256 )    /* sprite parts */
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 256 )     /* sprites & playfield */
 GFXDECODE_END
@@ -3100,13 +3100,13 @@ GFXDECODE_END
 /* taitoic.c TC0100SCN routines expect scr stuff to be in second gfx
    slot, so 2nd batch of obj must be placed third */
 
-static GFXDECODE_START( chasehq )
+static GFXDECODE_START( gfx_chasehq )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 256 )   /* sprite parts */
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 256 )     /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx4", 0x0, tile16x16_layout,  0, 256 )   /* sprite parts */
 GFXDECODE_END
 
-static GFXDECODE_START( dblaxle )
+static GFXDECODE_START( gfx_dblaxle )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x8_layout,  0, 256 )    /* sprite parts */
 	GFXDECODE_ENTRY( "gfx1", 0x0, dblaxle_charlayout,  0, 256 ) /* sprites & playfield */
 GFXDECODE_END
@@ -3209,7 +3209,7 @@ MACHINE_CONFIG_START(taitoz_state::contcirc)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_contcirc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3284,7 +3284,7 @@ MACHINE_CONFIG_START(taitoz_state::chasehq)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_chasehq)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chasehq)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chasehq)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3361,7 +3361,7 @@ MACHINE_CONFIG_START(taitoz_state::enforce)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_contcirc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3442,7 +3442,7 @@ MACHINE_CONFIG_START(taitoz_state::bshark)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_bshark)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3523,7 +3523,7 @@ MACHINE_CONFIG_START(taitoz_state::sci)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_sci)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3604,7 +3604,7 @@ MACHINE_CONFIG_START(taitoz_state::nightstr)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_chasehq)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chasehq)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chasehq)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3681,7 +3681,7 @@ MACHINE_CONFIG_START(taitoz_state::aquajack)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_aquajack)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3764,7 +3764,7 @@ MACHINE_CONFIG_START(taitoz_state::spacegun)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_spacegun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3835,7 +3835,7 @@ MACHINE_CONFIG_START(taitoz_state::dblaxle)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_dblaxle)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dblaxle)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dblaxle)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3909,7 +3909,7 @@ MACHINE_CONFIG_START(taitoz_state::racingb)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_racingb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dblaxle)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dblaxle)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)

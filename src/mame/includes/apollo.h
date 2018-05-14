@@ -32,8 +32,9 @@
 #include "bus/isa/isa_cards.h"
 #include "bus/isa/3c505.h"
 
-
 #include "bus/rs232/rs232.h"
+
+#include "diserial.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0

@@ -719,25 +719,25 @@ static const gfx_layout layout8x32x8_bdream97 =  /* for bdream97 */
 *           Graphics Decode           *
 **************************************/
 
-static GFXDECODE_START( skylncr )
+static GFXDECODE_START( gfx_skylncr )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8,        0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8,       0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_rot,   0, 2 )
 GFXDECODE_END
 
-static GFXDECODE_START( neraidou )
+static GFXDECODE_START( gfx_neraidou )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_alt,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt2,  0, 2 )
 //  GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( sstar97 )
+static GFXDECODE_START( gfx_sstar97 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_alt,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( bdream97 )
+static GFXDECODE_START( gfx_bdream97 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_bdream97,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_bdream97,   0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_bdream97,   0x100, 1 )
@@ -1666,7 +1666,7 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 	MCFG_SCREEN_UPDATE_DRIVER(skylncr_state, screen_update_skylncr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skylncr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skylncr)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -1697,7 +1697,7 @@ MACHINE_CONFIG_START(skylncr_state::neraidou)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_GFXDECODE_MODIFY("gfxdecode", neraidou)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_neraidou)
 MACHINE_CONFIG_END
 
 
@@ -1706,7 +1706,7 @@ MACHINE_CONFIG_START(skylncr_state::sstar97)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_GFXDECODE_MODIFY("gfxdecode", sstar97)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sstar97)
 MACHINE_CONFIG_END
 
 
@@ -1717,7 +1717,7 @@ MACHINE_CONFIG_START(skylncr_state::bdream97)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_OPCODES_MAP(bdream97_opcode_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", bdream97)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bdream97)
 MACHINE_CONFIG_END
 
 

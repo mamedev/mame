@@ -624,12 +624,12 @@ static const gfx_layout sprite_layout =
 	8*8*4
 };
 
-static GFXDECODE_START( combatsc )
+static GFXDECODE_START( gfx_combatsc )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, gfxlayout, 0, 8*16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, gfxlayout, 0, 8*16 )
 GFXDECODE_END
 
-static GFXDECODE_START( combatscb )
+static GFXDECODE_START( gfx_combatscb )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tile_layout,   0, 8*16 )
 	GFXDECODE_ENTRY( "gfx1", 0x40000, tile_layout,   0, 8*16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, sprite_layout, 0, 8*16 )
@@ -722,7 +722,7 @@ MACHINE_CONFIG_START(combatsc_state::combatsc)
 	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatsc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", combatsc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_combatsc)
 	MCFG_PALETTE_ADD("palette", 8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -773,7 +773,7 @@ MACHINE_CONFIG_START(combatsc_state::combatscb)
 	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatscb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", combatscb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_combatscb)
 	MCFG_PALETTE_ADD("palette", 8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

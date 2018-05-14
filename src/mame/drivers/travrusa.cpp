@@ -288,12 +288,12 @@ static const gfx_layout shtrider_spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( travrusa )
+static GFXDECODE_START( gfx_travrusa )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*8, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( shtrider )
+static GFXDECODE_START( gfx_shtrider )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,               0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, shtrider_spritelayout, 16*8, 16 )
 GFXDECODE_END
@@ -323,7 +323,7 @@ MACHINE_CONFIG_START(travrusa_state::travrusa)
 	MCFG_SCREEN_UPDATE_DRIVER(travrusa_state, screen_update_travrusa)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", travrusa)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_travrusa)
 
 	MCFG_PALETTE_ADD("palette", 16*8+16*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128+16)
@@ -339,7 +339,7 @@ MACHINE_CONFIG_START(travrusa_state::shtrider)
 	travrusa(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shtrider)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(travrusa_state,shtrider)
 MACHINE_CONFIG_END
@@ -348,7 +348,7 @@ MACHINE_CONFIG_START(travrusa_state::shtriderb)
 	travrusa(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shtrider)
 MACHINE_CONFIG_END
 
 /***************************************************************************

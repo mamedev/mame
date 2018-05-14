@@ -386,7 +386,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( cmmb )
+static GFXDECODE_START( gfx_cmmb )
 	GFXDECODE_ENTRY( "gfx", 0, charlayout,     0x00, 4 )
 	GFXDECODE_ENTRY( "gfx", 0, spritelayout,   0x10, 4 )
 GFXDECODE_END
@@ -422,7 +422,7 @@ MACHINE_CONFIG_START(cmmb_state::cmmb)
 	MCFG_SCREEN_UPDATE_DRIVER(cmmb_state, screen_update_cmmb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cmmb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cmmb)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRGGGBB_inverted)

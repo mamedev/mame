@@ -591,7 +591,7 @@ static const gfx_layout charlayout =
 	10*8                    /* every char takes 10 bytes */
 };
 
-static GFXDECODE_START( lazercmd )
+static GFXDECODE_START( gfx_lazercmd )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -647,7 +647,7 @@ MACHINE_CONFIG_START(lazercmd_state::lazercmd)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lazercmd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lazercmd)
 	MCFG_PALETTE_ADD("palette", 5)
 	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
@@ -686,7 +686,7 @@ MACHINE_CONFIG_START(lazercmd_state::medlanes)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lazercmd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lazercmd)
 	MCFG_PALETTE_ADD("palette", 5)
 	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
@@ -721,7 +721,7 @@ MACHINE_CONFIG_START(lazercmd_state::bbonk)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lazercmd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lazercmd)
 	MCFG_PALETTE_ADD("palette", 5)
 	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 

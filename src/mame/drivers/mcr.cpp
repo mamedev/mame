@@ -1714,7 +1714,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static GFXDECODE_START( mcr )
+static GFXDECODE_START( gfx_mcr )
 	GFXDECODE_SCALE( "gfx1", 0, mcr_bg_layout,     0, 4, 2, 2 ) /* colors 0-15, 2x2 */
 	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout, 0, 4 )       /* colors 16-31 */
 GFXDECODE_END
@@ -1777,7 +1777,7 @@ MACHINE_CONFIG_START(mcr_state::mcr_90009)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr_state, screen_update_mcr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcr)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
 

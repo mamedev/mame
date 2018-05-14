@@ -555,7 +555,7 @@ static const gfx_layout layout3s8_8x8x6 =
 	16*8
 };
 
-static GFXDECODE_START( spoker )
+static GFXDECODE_START( gfx_spoker )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, layout_8x8x6,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, layout_8x32x6, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, layout_8x32x6, 0, 16 )
@@ -563,7 +563,7 @@ static GFXDECODE_START( spoker )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, layout_8x32x6, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( 3super8 )
+static GFXDECODE_START( gfx_3super8 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, layout3s8_8x8x6, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, layout_8x32x6,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, layout_8x32x6,   0, 16 )
@@ -626,7 +626,7 @@ MACHINE_CONFIG_START(spoker_state::spoker)
 	MCFG_SCREEN_UPDATE_DRIVER(spoker_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spoker)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -653,7 +653,7 @@ MACHINE_CONFIG_START(spoker_state::_3super8)
 	MCFG_DEVICE_REMOVE("ppi8255_0")
 	MCFG_DEVICE_REMOVE("ppi8255_1")
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", 3super8)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_3super8)
 
 	MCFG_DEVICE_REMOVE("ymsnd")
 MACHINE_CONFIG_END

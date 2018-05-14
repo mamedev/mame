@@ -495,7 +495,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( 1942 )
+static GFXDECODE_START( gfx_1942 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,             0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          64*4, 4*32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 64*4+4*32*8, 16 )
@@ -538,7 +538,7 @@ static const gfx_layout spritelayout_p =
 	32*8
 };
 
-static GFXDECODE_START( 1942p )
+static GFXDECODE_START( gfx_1942p )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_p,             0x000, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_p,          0x300, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_p, 0x400, 16 )
@@ -572,7 +572,7 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1942)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1942)
 
 	MCFG_PALETTE_ADD("palette", 64*4+4*32*8+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
@@ -641,7 +641,7 @@ MACHINE_CONFIG_START(_1942_state::_1942p)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1942p)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1942p)
 	MCFG_PALETTE_ADD("palette", 0x500)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
 	MCFG_PALETTE_INIT_OWNER(_1942_state, 1942p)

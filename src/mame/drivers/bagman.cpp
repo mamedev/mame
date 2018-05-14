@@ -385,13 +385,13 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( bagman )
+static GFXDECODE_START( gfx_bagman )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* char set #1 */
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0, 16 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0, 16 ) /* char set #2 */
 GFXDECODE_END
 
-static GFXDECODE_START( pickin )
+static GFXDECODE_START( gfx_pickin )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* char set #1 */
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0, 16 ) /* sprites */
 	/* no gfx2 */
@@ -448,7 +448,7 @@ MACHINE_CONFIG_START(bagman_state::bagman)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bagman_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bagman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bagman)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
@@ -528,7 +528,7 @@ MACHINE_CONFIG_START(bagman_state::pickin)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bagman_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pickin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pickin)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
@@ -588,7 +588,7 @@ MACHINE_CONFIG_START(bagman_state::botanic)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bagman_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bagman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bagman)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)

@@ -2726,7 +2726,7 @@ MACHINE_CONFIG_START(subsino_state::victor21)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subsino_depth3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", subsino_depth3)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(subsino_state, _2proms)
@@ -2770,7 +2770,7 @@ MACHINE_CONFIG_START(subsino_state::crsbingo)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subsino_depth4)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", subsino_depth4)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(subsino_state, _2proms)
@@ -2812,7 +2812,7 @@ MACHINE_CONFIG_START(subsino_state::srider)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subsino_depth4)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", subsino_depth4)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(subsino_state, _3proms)
@@ -2865,7 +2865,7 @@ MACHINE_CONFIG_START(subsino_state::tisub)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_reels)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subsino_depth4_reels)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", subsino_depth4_reels)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(subsino_state, _3proms)
@@ -2906,7 +2906,7 @@ MACHINE_CONFIG_START(subsino_state::stbsub)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_stbsub_reels)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subsino_stbsub)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", subsino_stbsub)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	//MCFG_PALETTE_INIT_OWNER(subsino_state, _3proms)

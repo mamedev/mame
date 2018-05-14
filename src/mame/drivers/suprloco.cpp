@@ -164,7 +164,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( suprloco )
+static GFXDECODE_START( gfx_suprloco )
 	/* sprites use colors 256-511 + 512-767 */
 	GFXDECODE_ENTRY( "gfx1", 0x6000, charlayout, 0, 16 )
 GFXDECODE_END
@@ -198,7 +198,7 @@ MACHINE_CONFIG_START(suprloco_state::suprloco)
 	MCFG_SCREEN_UPDATE_DRIVER(suprloco_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprloco)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprloco)
 	MCFG_PALETTE_ADD("palette", 512+256)
 	MCFG_PALETTE_INIT_OWNER(suprloco_state, suprloco)
 

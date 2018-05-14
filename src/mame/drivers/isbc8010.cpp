@@ -137,7 +137,7 @@ const gfx_layout sdk80_charlayout =
 	8 * 8               /* 8 8-bit pixel rows per character */
 };
 
-static GFXDECODE_START( isbc8010 )
+static GFXDECODE_START( gfx_isbc8010 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sdk80_charlayout, 0, 1 )
 GFXDECODE_END
 #endif
@@ -211,7 +211,7 @@ MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 //  MCFG_SCREEN_UPDATE_DRIVER(sdk80_state, screen_update)
 //  MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", sdk80)
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sdk80)
 
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 

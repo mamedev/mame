@@ -3608,7 +3608,7 @@ static const gfx_layout bigspritelayout_4bpp =
 
 /*********************************************************************/
 
-static GFXDECODE_START( marvins )
+static GFXDECODE_START( gfx_marvins )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,   0x180, 0x080>>4 )
 	GFXDECODE_ENTRY( "fg_tiles",   0, charlayout_4bpp,   0x080, 0x080>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, charlayout_4bpp,   0x100, 0x080>>4 )
@@ -3616,14 +3616,14 @@ static GFXDECODE_START( marvins )
 	/* colors 0x200-0x3ff contain shadows */
 GFXDECODE_END
 
-static GFXDECODE_START( tnk3 )
+static GFXDECODE_START( gfx_tnk3 )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,   0x180, 0x080>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, charlayout_4bpp,   0x080, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp, 0x000, 0x080>>3 )
 	/* colors 0x200-0x3ff contain shadows */
 GFXDECODE_END
 
-static GFXDECODE_START( ikari )
+static GFXDECODE_START( gfx_ikari )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x180, 0x080>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x100, 0x080>>4 )
 	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp,    0x000, 0x080>>3 )
@@ -3631,14 +3631,14 @@ static GFXDECODE_START( ikari )
 	/* colors 0x200-0x3ff contain shadows */
 GFXDECODE_END
 
-static GFXDECODE_START( gwar )
+static GFXDECODE_START( gfx_gwar )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x000, 0x100>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x300, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_4bpp,    0x100, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp32_tiles", 0, bigspritelayout_4bpp, 0x200, 0x100>>4 )
 GFXDECODE_END
 
-static GFXDECODE_START( tdfever )
+static GFXDECODE_START( gfx_tdfever )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x000, 0x100>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x200, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp32_tiles", 0, bigspritelayout_4bpp, 0x100, 0x100>>4 )
@@ -3673,7 +3673,7 @@ MACHINE_CONFIG_START(snk_state::marvins)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_marvins)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", marvins)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marvins)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -3747,7 +3747,7 @@ MACHINE_CONFIG_START(snk_state::jcross)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tnk3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tnk3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tnk3)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -3830,7 +3830,7 @@ MACHINE_CONFIG_START(snk_state::tnk3)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tnk3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tnk3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tnk3)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -3926,7 +3926,7 @@ MACHINE_CONFIG_START(snk_state::ikari)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_ikari)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ikari)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ikari)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -3987,7 +3987,7 @@ MACHINE_CONFIG_START(snk_state::bermudat)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_gwar)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gwar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gwar)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,gwar)
 
@@ -4089,7 +4089,7 @@ MACHINE_CONFIG_START(snk_state::tdfever)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tdfever)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tdfever)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tdfever)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()

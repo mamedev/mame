@@ -728,7 +728,7 @@ static const gfx_layout tiles =
 	16*16
 };
 
-static GFXDECODE_START( karnov )
+static GFXDECODE_START( gfx_karnov )
 	GFXDECODE_ENTRY( "gfx1", 0, chars,     0,  4 )  /* colors 0-31 */
 	GFXDECODE_ENTRY( "gfx2", 0, tiles,   512, 16 )  /* colors 512-767 */
 	GFXDECODE_ENTRY( "gfx3", 0, sprites, 256, 16 )  /* colors 256-511 */
@@ -831,7 +831,7 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, karnov_state, vbint_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", karnov)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
@@ -909,7 +909,7 @@ MACHINE_CONFIG_START(karnov_state::wndrplnt)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, karnov_state, vbint_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", karnov)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)

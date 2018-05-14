@@ -260,7 +260,7 @@ static const gfx_layout diverboy_spritelayout =
 	16*64
 };
 
-static GFXDECODE_START( diverboy )
+static GFXDECODE_START( gfx_diverboy )
 	GFXDECODE_ENTRY( "gfx1", 0, diverboy_spritelayout, 0, 4*16 )
 	GFXDECODE_ENTRY( "gfx2", 0, diverboy_spritelayout, 0, 4*16 )
 GFXDECODE_END
@@ -280,7 +280,7 @@ MACHINE_CONFIG_START(diverboy_state::diverboy)
 	MCFG_DEVICE_PROGRAM_MAP(snd_map)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", diverboy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_diverboy)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

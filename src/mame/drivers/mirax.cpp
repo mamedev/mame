@@ -466,7 +466,7 @@ static const gfx_layout layout8 =
 	8*8
 };
 
-static GFXDECODE_START( mirax )
+static GFXDECODE_START( gfx_mirax )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8,     0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout16,    0, 8 )
 GFXDECODE_END
@@ -507,7 +507,7 @@ MACHINE_CONFIG_START(mirax_state::mirax)
 
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(mirax_state, mirax)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirax)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mirax)
 
 	SPEAKER(config, "mono").front_center();
 

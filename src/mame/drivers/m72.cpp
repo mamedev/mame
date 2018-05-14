@@ -1836,18 +1836,18 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( m72 )
+static GFXDECODE_START( gfx_m72 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,    0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,    256, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( rtype2 )
+static GFXDECODE_START( gfx_rtype2 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     256, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( majtitle )
+static GFXDECODE_START( gfx_majtitle )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     256, 16 )
 	GFXDECODE_ENTRY( "sprites2", 0, spritelayout,     0, 16 )
@@ -1894,7 +1894,7 @@ MACHINE_CONFIG_START(m72_state::m72_base)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m72)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m72)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2019,7 +2019,7 @@ MACHINE_CONFIG_START(m72_state::rtype2)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rtype2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2064,7 +2064,7 @@ MACHINE_CONFIG_START(m72_state::cosmccop)
 	// upd71059c isn't needed beacuse the V35 has its own IRQ controller
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rtype2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2109,7 +2109,7 @@ MACHINE_CONFIG_START(m72_state::m82)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", majtitle)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_majtitle)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2152,7 +2152,7 @@ MACHINE_CONFIG_START(m72_state::poundfor)
 	MCFG_UPD4701_PORTY("TRACK1_Y")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rtype2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

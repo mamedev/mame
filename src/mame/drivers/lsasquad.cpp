@@ -533,7 +533,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( lsasquad )
+static GFXDECODE_START( gfx_lsasquad )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256, 16 )
 GFXDECODE_END
@@ -592,7 +592,7 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 	MCFG_SCREEN_UPDATE_DRIVER(lsasquad_state, screen_update_lsasquad)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lsasquad)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lsasquad)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
@@ -658,7 +658,7 @@ MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 	MCFG_SCREEN_UPDATE_DRIVER(lsasquad_state, screen_update_daikaiju)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lsasquad)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lsasquad)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */

@@ -4156,13 +4156,13 @@ static const gfx_layout layout_16x16x1 =
 	16*16*1
 };
 
-static GFXDECODE_START( igs011 )
+static GFXDECODE_START( gfx_igs011 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x4,   0, 0x80 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4, 0, 0x80 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,   0, 0x08 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8, 0, 0x08 )
 GFXDECODE_END
-static GFXDECODE_START( igs011_hi )
+static GFXDECODE_START( gfx_igs011_hi )
 	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x4,   0, 0x80 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4, 0, 0x80 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,   0, 0x08 )
@@ -4186,7 +4186,7 @@ MACHINE_CONFIG_START(igs011_state::igs011_base)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x800)
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011)
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs011)
 
 
 	/* sound hardware */
@@ -4280,7 +4280,7 @@ MACHINE_CONFIG_START(igs011_state::lhb2)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev5_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs011_hi)
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
@@ -4297,7 +4297,7 @@ MACHINE_CONFIG_START(igs011_state::nkishusp)
 
 	// VSync 60.0052Hz, HSync 15.620kHz
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs011_hi)
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
@@ -4321,7 +4321,7 @@ MACHINE_CONFIG_START(igs011_state::vbowl)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs011_state, screen_vblank_vbowl))
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs011_hi)
 
 	MCFG_DEVICE_REMOVE("oki")
 	MCFG_ICS2115_ADD("ics", 0)

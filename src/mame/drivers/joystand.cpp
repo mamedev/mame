@@ -551,7 +551,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( joystand )
+static GFXDECODE_START( gfx_joystand )
 	GFXDECODE_ENTRY( "tiles",    0, layout_8x8x4,   0, 0x100 )
 	GFXDECODE_ENTRY( "cart.u5",  0, layout_16x16x8, 0,  0x10 )
 	GFXDECODE_ENTRY( "cart.u6",  0, layout_16x16x8, 0,  0x10 )
@@ -604,7 +604,7 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", joystand)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_joystand)
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("bg15_palette")
 

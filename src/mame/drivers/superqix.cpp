@@ -1325,12 +1325,12 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( pbillian )
+static GFXDECODE_START( gfx_pbillian )
 	GFXDECODE_ENTRY( "gfx1", 0, pbillian_charlayout, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,            0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( sqix )
+static GFXDECODE_START( gfx_sqix )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, sqix_charlayout,   0, 16 )    /* Chars */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, sqix_charlayout,   0, 16 )    /* Background tiles */
 	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout,      0, 16 )    /* Sprites */
@@ -1374,7 +1374,7 @@ MACHINE_CONFIG_START(hotsmash_state::pbillian)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hotsmash_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbillian)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pbillian)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
@@ -1419,7 +1419,7 @@ MACHINE_CONFIG_START(superqix_state::sqix)
 	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_superqix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sqix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sqix)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
@@ -1472,7 +1472,7 @@ MACHINE_CONFIG_START(superqix_state::sqix_nomcu)
 	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_superqix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sqix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sqix)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 

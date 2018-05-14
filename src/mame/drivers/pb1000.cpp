@@ -324,7 +324,7 @@ static const gfx_layout pb1000_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( pb1000 )
+static GFXDECODE_START( gfx_pb1000 )
 	GFXDECODE_ENTRY( "hd44352", 0x0000, pb1000_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -504,7 +504,7 @@ MACHINE_CONFIG_START(pb1000_state::pb1000)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pb1000_state, pb1000)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pb1000 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pb1000)
 
 	MCFG_DEVICE_ADD("hd44352", HD44352, 910000)
 	MCFG_HD44352_ON_CB(INPUTLINE("maincpu", HD61700_ON_INT))

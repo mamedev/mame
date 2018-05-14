@@ -252,7 +252,7 @@ static const gfx_layout spritelayout =
 	32*16
 };
 
-static GFXDECODE_START( blktiger )
+static GFXDECODE_START( gfx_blktiger )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x300, 32 )   /* colors 0x300-0x37f */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x000, 16 )   /* colors 0x000-0x0ff */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x200,  8 )   /* colors 0x200-0x27f */
@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(blktiger_state::blktiger)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blktiger)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blktiger)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)

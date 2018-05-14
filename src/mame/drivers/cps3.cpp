@@ -2554,7 +2554,7 @@ MACHINE_CONFIG_START(cps3_state::cps3)
 	MCFG_NVRAM_ADD_0FILL("eeprom")
 	MCFG_PALETTE_ADD("palette", 0x10000) // actually 0x20000 ...
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

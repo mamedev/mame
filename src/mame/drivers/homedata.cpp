@@ -1067,7 +1067,7 @@ static const gfx_layout char_layout =
 	32*8
 };
 
-static GFXDECODE_START( mrokumei )
+static GFXDECODE_START( gfx_mrokumei )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0x6000, 0x100 )
 	GFXDECODE_ENTRY( "gfx2", 0, char_layout, 0x7000, 0x100 )
 GFXDECODE_END
@@ -1083,14 +1083,14 @@ static const gfx_layout tile_layout =
 	64*8
 };
 
-static GFXDECODE_START( reikaids )
+static GFXDECODE_START( gfx_reikaids )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0x6000, 0x20 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 0x4000, 0x20 )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 0x2000, 0x20 )
 	GFXDECODE_ENTRY( "gfx4", 0, tile_layout, 0x0000, 0x20 )
 GFXDECODE_END
 
-static GFXDECODE_START( pteacher )
+static GFXDECODE_START( gfx_pteacher )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0x0000, 0x40 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 0x4000, 0x40 )
 GFXDECODE_END
@@ -1117,7 +1117,7 @@ static const gfx_layout tile_layout_4bpp_lo =
 	64*8
 };
 
-static GFXDECODE_START( lemnangl )
+static GFXDECODE_START( gfx_lemnangl )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_4bpp_hi, 0x0000, 0x200 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_4bpp_lo, 0x2000, 0x200 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout_4bpp_lo, 0x4000, 0x200 )
@@ -1243,7 +1243,7 @@ MACHINE_CONFIG_START(homedata_state::mrokumei)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, homedata_state, screen_vblank_homedata))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrokumei)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrokumei)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,mrokumei)
@@ -1296,7 +1296,7 @@ MACHINE_CONFIG_START(homedata_state::reikaids)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, homedata_state, screen_vblank_homedata))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", reikaids)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_reikaids)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,reikaids)
@@ -1354,7 +1354,7 @@ MACHINE_CONFIG_START(homedata_state::pteacher)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, homedata_state, screen_vblank_homedata))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pteacher)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pteacher)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,pteacher)
@@ -1382,7 +1382,7 @@ MACHINE_CONFIG_START(homedata_state::lemnangl)
 	pteacher(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", lemnangl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lemnangl)
 
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,lemnangl)
 MACHINE_CONFIG_END
@@ -1446,7 +1446,7 @@ static const gfx_layout mirderbychar_layout =
 	32*8
 };
 
-static GFXDECODE_START( mirderby )
+static GFXDECODE_START( gfx_mirderby )
 	GFXDECODE_ENTRY( "gfx1", 0, mirderbychar_layout, 0x0000, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, mirderbychar_layout, 0x0000, 0x10 )
 GFXDECODE_END
@@ -1523,7 +1523,7 @@ MACHINE_CONFIG_START(homedata_state::mirderby)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_mirderby)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirderby)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mirderby)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,mirderby)

@@ -527,7 +527,7 @@ static const gfx_layout bg16x16x6_layout =
 	2*16*16
 };
 
-static GFXDECODE_START( shadfrce )
+static GFXDECODE_START( gfx_shadfrce )
 	GFXDECODE_ENTRY( "chars",   0, fg8x8x4_layout,   0x0000, 256 )
 	GFXDECODE_ENTRY( "sprites", 0, sp16x16x5_layout, 0x1000, 128 )
 	GFXDECODE_ENTRY( "tiles",   0, bg16x16x6_layout, 0x2000, 128 )
@@ -552,7 +552,7 @@ MACHINE_CONFIG_START(shadfrce_state::shadfrce)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, shadfrce_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shadfrce)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shadfrce)
 	MCFG_PALETTE_ADD("palette", 0x4000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

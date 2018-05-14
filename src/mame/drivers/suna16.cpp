@@ -776,12 +776,12 @@ static const gfx_layout layout_8x8x4 =
 	8*8*4
 };
 
-static GFXDECODE_START( suna16 )
+static GFXDECODE_START( gfx_suna16 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4, 0, 16*2 ) // [0] Sprites
 GFXDECODE_END
 
 // Two sprites chips
-static GFXDECODE_START( bestbest )
+static GFXDECODE_START( gfx_bestbest )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4, 0, 256*8/16 ) // [0] Sprites (Chip 1)
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4, 0, 256*8/16 ) // [1] Sprites (Chip 2)
 GFXDECODE_END
@@ -843,7 +843,7 @@ MACHINE_CONFIG_START(suna16_state::bssoccer)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
@@ -906,7 +906,7 @@ MACHINE_CONFIG_START(suna16_state::uballoon)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
@@ -963,7 +963,7 @@ MACHINE_CONFIG_START(suna16_state::sunaq)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
@@ -1023,7 +1023,7 @@ MACHINE_CONFIG_START(suna16_state::bestbest)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_bestbest)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bestbest)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bestbest)
 	MCFG_PALETTE_ADD("palette", 256*8)
 
 

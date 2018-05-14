@@ -214,7 +214,7 @@ static const gfx_layout bg_layout =
 	8*8
 };
 
-static GFXDECODE_START( kopunch )
+static GFXDECODE_START( gfx_kopunch )
 	GFXDECODE_ENTRY( "gfx1", 0, fg_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, bg_layout, 0, 1 )
 GFXDECODE_END
@@ -273,7 +273,7 @@ MACHINE_CONFIG_START(kopunch_state::kopunch)
 	MCFG_SCREEN_UPDATE_DRIVER(kopunch_state, screen_update_kopunch)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kopunch)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kopunch)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(kopunch_state, kopunch)
 

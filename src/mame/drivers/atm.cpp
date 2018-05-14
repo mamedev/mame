@@ -177,11 +177,11 @@ static const gfx_layout spectrum_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( atm )
+static GFXDECODE_START( gfx_atm )
 	GFXDECODE_ENTRY( "maincpu", 0x1fd00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( atmtb2 )
+static GFXDECODE_START( gfx_atmtb2 )
 	GFXDECODE_ENTRY( "maincpu", 0x13d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -196,14 +196,14 @@ MACHINE_CONFIG_START(atm_state::atm)
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", atm)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_atm)
 
 	MCFG_DEVICE_REMOVE("exp")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atm_state::atmtb2)
 	atm(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", atmtb2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_atmtb2)
 MACHINE_CONFIG_END
 
 

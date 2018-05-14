@@ -81,7 +81,7 @@ static INPUT_PORTS_START( wswan )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Y2 - Right") PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
-static GFXDECODE_START( wswan )
+static GFXDECODE_START( gfx_wswan )
 GFXDECODE_END
 
 /* WonderSwan can display 16 shades of grey */
@@ -138,7 +138,7 @@ MACHINE_CONFIG_START(wswan_state::wswan)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wswan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wswan)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(wswan_state, wswan)
 

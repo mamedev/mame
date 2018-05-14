@@ -2347,12 +2347,12 @@ static const gfx_layout tilelayout =
 *          Graphics Decode Information           *
 *************************************************/
 
-static GFXDECODE_START( calomega )
+static GFXDECODE_START( gfx_calomega )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( sys906 )
+static GFXDECODE_START( gfx_sys906 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, tilelayout, 0, 32 )
 GFXDECODE_END
@@ -2597,7 +2597,7 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 	MCFG_SCREEN_UPDATE_DRIVER(calomega_state, screen_update_calomega)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", calomega)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_calomega)
 	MCFG_PALETTE_ADD("palette", 256) /* or 128? is the upper half of the PROMs really valid colors? */
 	MCFG_PALETTE_INIT_OWNER(calomega_state, calomega)
 
@@ -2684,7 +2684,7 @@ MACHINE_CONFIG_START(calomega_state::sys906)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, calomega_state, pia1_aout_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, calomega_state, pia1_bout_w))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", sys906)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sys906)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("ay8912")

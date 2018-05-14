@@ -1210,7 +1210,7 @@ static const gfx_layout sprite_layout =
 	64*8
 };
 
-static GFXDECODE_START( armedf )
+static GFXDECODE_START( gfx_armedf )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout,         0*16,  32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,        64*16,  32 )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,        96*16,  32 )
@@ -1294,7 +1294,7 @@ MACHINE_CONFIG_START(armedf_state::terraf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", armedf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1336,7 +1336,7 @@ MACHINE_CONFIG_START(armedf_state::terrafjb)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", armedf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -1386,7 +1386,7 @@ MACHINE_CONFIG_START(armedf_state::kozure)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", armedf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -1423,7 +1423,7 @@ MACHINE_CONFIG_START(armedf_state::armedf)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", armedf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -1473,7 +1473,7 @@ MACHINE_CONFIG_START(armedf_state::cclimbr2)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", armedf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -1523,7 +1523,7 @@ MACHINE_CONFIG_START(armedf_state::legion)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", armedf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -1571,7 +1571,7 @@ MACHINE_CONFIG_START(armedf_state::legionjb)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", armedf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -1615,7 +1615,7 @@ MACHINE_CONFIG_START(bigfghtr_state::bigfghtr)
 	MCFG_SCREEN_UPDATE_DRIVER(armedf_state, screen_update_armedf)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", armedf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_armedf)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 

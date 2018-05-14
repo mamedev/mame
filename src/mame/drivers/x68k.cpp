@@ -1682,7 +1682,7 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_SCREEN_VISIBLE_AREA(0, 767, 0, 511)
 	MCFG_SCREEN_UPDATE_DRIVER(x68k_state, screen_update_x68000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "pcgpalette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcgpalette", gfxdecode_device::empty)
 
 	MCFG_PALETTE_ADD("gfxpalette", 256)
 	MCFG_PALETTE_FORMAT_CLASS(2, x68k_state, GGGGGRRRRRBBBBBI)

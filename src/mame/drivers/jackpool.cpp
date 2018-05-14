@@ -214,7 +214,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( jackpool )
+static GFXDECODE_START( gfx_jackpool )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x000, 0x20  ) /* sprites */
 GFXDECODE_END
 
@@ -231,7 +231,7 @@ MACHINE_CONFIG_START(jackpool_state::jackpool)
 	MCFG_DEVICE_PROGRAM_MAP(jackpool_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jackpool_state, jackpool_interrupt)  // ?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jackpool)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jackpool)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

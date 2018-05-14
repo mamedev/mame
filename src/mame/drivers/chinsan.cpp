@@ -378,7 +378,7 @@ uint32_t chinsan_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 //  DRAWGFX LAYOUTS
 //**************************************************************************
 
-static GFXDECODE_START( chinsan )
+static GFXDECODE_START( gfx_chinsan )
 	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x3_planar, 0, 32)
 GFXDECODE_END
 
@@ -528,7 +528,7 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	MCFG_SCREEN_UPDATE_DRIVER(chinsan_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinsan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinsan)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	// sound hardware

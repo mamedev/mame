@@ -2566,13 +2566,13 @@ static const gfx_layout sigmab98_16x16x8_layout =
 	16*16*8
 };
 
-static GFXDECODE_START( sigmab98 )
+static GFXDECODE_START( gfx_sigmab98 )
 	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x4_layout, 0, 0x100/16  )
 	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x8_layout, 0, 0x100/256 )
 GFXDECODE_END
 
 // Larger palette
-static GFXDECODE_START( lufykzku )
+static GFXDECODE_START( gfx_lufykzku )
 	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x4_layout, 0, 0x1000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x8_layout, 0, 0x1000/16 )
 GFXDECODE_END
@@ -2855,7 +2855,7 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sigmab98)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sigmab98)
 	MCFG_PALETTE_ADD("palette", 0x1000 + 1)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -2949,7 +2949,7 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lufykzku)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lufykzku)
 	MCFG_PALETTE_ADD("palette", 0x1000 + 1)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -3013,7 +3013,7 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sigmab98_state, screen_vblank_sammymdl))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sigmab98)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sigmab98)
 	MCFG_PALETTE_ADD("palette", 0x1000 + 1)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)

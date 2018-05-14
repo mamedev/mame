@@ -369,7 +369,7 @@ static const gfx_layout tlayout =
 };
 
 
-static GFXDECODE_START( silvmil )
+static GFXDECODE_START( gfx_silvmil )
 	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 64 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx1", 0, tlayout,       0, 64 )  /* Sprites 16x16 */
 GFXDECODE_END
@@ -424,7 +424,7 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", silvmil)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_silvmil)
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)

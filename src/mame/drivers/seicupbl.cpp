@@ -30,19 +30,19 @@ class seicupbl_state : public driver_device
 {
 public:
 	seicupbl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_back_data(*this, "back_data"),
-			m_fore_data(*this, "fore_data"),
-			m_mid_data(*this, "mid_data"),
-			m_textram(*this, "textram"),
-			m_spriteram(*this, "spriteram"),
-			m_vregs(*this, "vregs"),
-			m_oki(*this, "oki"),
-			m_soundlatch(*this, "soundlatch"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_back_data(*this, "back_data")
+		, m_fore_data(*this, "fore_data")
+		, m_mid_data(*this, "mid_data")
+		, m_textram(*this, "textram")
+		, m_spriteram(*this, "spriteram")
+		, m_vregs(*this, "vregs")
+		, m_oki(*this, "oki")
+		, m_soundlatch(*this, "soundlatch")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
 	{ }
 
 	// devices
@@ -539,7 +539,7 @@ static const gfx_layout cupsocsb_tilelayout =
 };
 
 
-static GFXDECODE_START( seicupbl_csb )
+static GFXDECODE_START( gfx_seicupbl_csb )
 	GFXDECODE_ENTRY( "char", 0, cupsocsb_8x8_tilelayout,    48*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, cupsocsb_tilelayout,        0*16, 32 )
 	GFXDECODE_ENTRY( "gfx4", 0, cupsocsb_tilelayout,        32*16, 16 ) /* unused */
@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
 	//MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, seicupbl_state, tile_scroll_w))
 	//MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, seicupbl_state, tile_vreg_1a_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seicupbl_csb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seicupbl_csb)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

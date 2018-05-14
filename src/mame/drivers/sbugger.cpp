@@ -143,7 +143,7 @@ static const gfx_layout char16layout =
 	16*8
 };
 
-static GFXDECODE_START( sbugger )
+static GFXDECODE_START( gfx_sbugger )
 	GFXDECODE_ENTRY( "gfx1", 0, char16layout,   0, 256  )
 GFXDECODE_END
 
@@ -226,7 +226,7 @@ MACHINE_CONFIG_START(sbugger_state::sbugger)
 	MCFG_I8155_IN_PORTC_CB(IOPORT("DSW2"))
 	MCFG_I8155_OUT_TIMEROUT_CB(INPUTLINE("maincpu", I8085_RST75_LINE))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbugger)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbugger)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

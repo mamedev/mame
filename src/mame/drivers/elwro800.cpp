@@ -561,7 +561,7 @@ static const gfx_layout elwro800_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( elwro800 )
+static GFXDECODE_START( gfx_elwro800 )
 	GFXDECODE_ENTRY( "maincpu", 0x3c00, elwro800_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -589,7 +589,7 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(elwro800_state, spectrum )
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", elwro800)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_elwro800)
 
 	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum )
 

@@ -282,7 +282,7 @@ static const gfx_layout spritelayout2 =
 
 
 
-static GFXDECODE_START( pbaction )
+static GFXDECODE_START( gfx_pbaction )
 	GFXDECODE_ENTRY( "fgchars", 0x00000, charlayout1,    0, 16 )    /*   0-127 characters */
 	GFXDECODE_ENTRY( "bgchars", 0x00000, charlayout2,  128,  8 )    /* 128-255 background */
 	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout1,  0, 16 )    /*   0-127 normal sprites */
@@ -345,7 +345,7 @@ MACHINE_CONFIG_START(pbaction_state::pbaction)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pbaction_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbaction)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pbaction)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

@@ -620,7 +620,7 @@ static const gfx_layout spritelayout =
 	32*32 /* every sprite takes 128 bytes */
 };
 
-static GFXDECODE_START( acefruit )
+static GFXDECODE_START( gfx_acefruit )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x1800, charlayout, 8, 4 )
 GFXDECODE_END
@@ -635,7 +635,7 @@ MACHINE_CONFIG_START(acefruit_state::acefruit)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", acefruit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_acefruit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

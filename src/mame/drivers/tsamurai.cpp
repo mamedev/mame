@@ -707,7 +707,7 @@ static const gfx_layout tile_layout =
 	8*8
 };
 
-static GFXDECODE_START( tsamurai )
+static GFXDECODE_START( gfx_tsamurai )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, char_layout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 0, 32 )
@@ -748,7 +748,7 @@ MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,tsamurai)
 
@@ -796,7 +796,7 @@ MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,vsgongf)
 
@@ -852,7 +852,7 @@ MACHINE_CONFIG_START(tsamurai_state::m660)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tsamurai_state, vblank_irq))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audio3", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,m660)
 

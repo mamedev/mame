@@ -396,7 +396,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( nsmpoker )
+static GFXDECODE_START( gfx_nsmpoker )
 	GFXDECODE_ENTRY( "maincpu", 0, charlayout, 0, 16 )
 	GFXDECODE_ENTRY( "maincpu", 0, tilelayout, 0, 16 )
 GFXDECODE_END
@@ -429,7 +429,7 @@ MACHINE_CONFIG_START(nsmpoker_state::nsmpoker)
 	MCFG_SCREEN_UPDATE_DRIVER(nsmpoker_state, screen_update_nsmpoker)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nsmpoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nsmpoker)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(nsmpoker_state, nsmpoker)

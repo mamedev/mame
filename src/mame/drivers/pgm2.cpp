@@ -791,9 +791,9 @@ MACHINE_CONFIG_START(pgm2_state::pgm2)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm2_state, screen_update_pgm2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pgm2_state, screen_vblank_pgm2))
 
-	MCFG_GFXDECODE_ADD("gfxdecode2", "tx_palette", pgm2_tx)
+	MCFG_DEVICE_ADD("gfxdecode2", GFXDECODE, "tx_palette", pgm2_tx)
 
-	MCFG_GFXDECODE_ADD("gfxdecode3", "bg_palette", pgm2_bg)
+	MCFG_DEVICE_ADD("gfxdecode3", GFXDECODE, "bg_palette", pgm2_bg)
 
 	MCFG_PALETTE_ADD("sp_palette", 0x4000/4) // sprites
 	MCFG_PALETTE_FORMAT(XRGB)

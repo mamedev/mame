@@ -294,7 +294,7 @@ static const gfx_layout bglayout =
 	128*8
 };
 
-static GFXDECODE_START( dbz )
+static GFXDECODE_START( gfx_dbz )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout, 0, 512 )
 	GFXDECODE_ENTRY( "gfx4", 0, bglayout, 0, 512 )
 GFXDECODE_END
@@ -348,7 +348,7 @@ MACHINE_CONFIG_START(dbz_state::dbz)
 	MCFG_SCREEN_UPDATE_DRIVER(dbz_state, screen_update_dbz)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dbz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dbz)
 
 	MCFG_PALETTE_ADD("palette", 0x4000/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)

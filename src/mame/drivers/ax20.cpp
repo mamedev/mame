@@ -118,7 +118,7 @@ static const gfx_layout ax20_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( ax20 )
+static GFXDECODE_START( gfx_ax20 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ax20_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -142,7 +142,7 @@ MACHINE_CONFIG_START(ax20_state::ax20)
 	MCFG_SCREEN_SIZE(80*8, 24*12)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*12-1)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ax20)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ax20)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_I8272A_ADD("fdc", true)

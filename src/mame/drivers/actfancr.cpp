@@ -260,13 +260,13 @@ static const gfx_layout sprites =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( actfan )
+static GFXDECODE_START( gfx_actfan )
 	GFXDECODE_ENTRY( "chars",   0, chars,       0, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, sprites,   512, 16 )
 	GFXDECODE_ENTRY( "tiles",   0, tiles,     256, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( triothep )
+static GFXDECODE_START( gfx_triothep )
 	GFXDECODE_ENTRY( "chars",   0, chars,       0, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, sprites,   256, 16 )
 	GFXDECODE_ENTRY( "tiles",   0, tiles,     512, 16 )
@@ -305,7 +305,7 @@ MACHINE_CONFIG_START(actfancr_state::actfancr)
 	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update_actfancr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", actfan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_actfan)
 
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
@@ -363,7 +363,7 @@ MACHINE_CONFIG_START(actfancr_state::triothep)
 	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update_actfancr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", triothep)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triothep)
 
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)

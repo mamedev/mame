@@ -201,7 +201,7 @@ static const gfx_layout tail2nos_spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( tail2nos )
+static GFXDECODE_START( gfx_tail2nos )
 	GFXDECODE_ENTRY( "gfx1", 0, tail2nos_charlayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, tail2nos_spritelayout, 0, 128 )
 GFXDECODE_END
@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(tail2nos_state::tail2nos)
 	MCFG_SCREEN_UPDATE_DRIVER(tail2nos_state, screen_update_tail2nos)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tail2nos)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tail2nos)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

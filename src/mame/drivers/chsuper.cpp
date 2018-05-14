@@ -344,7 +344,7 @@ static const gfx_layout charlayout =
 	8*32
 };
 
-static GFXDECODE_START( chsuper )
+static GFXDECODE_START( gfx_chsuper )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 1 )
 GFXDECODE_END
 
@@ -377,7 +377,7 @@ MACHINE_CONFIG_START(chsuper_state::chsuper)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chsuper)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chsuper)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")

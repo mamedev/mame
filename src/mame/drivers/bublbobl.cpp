@@ -803,7 +803,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( bublbobl )
+static GFXDECODE_START( gfx_bublbobl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -874,7 +874,7 @@ MACHINE_CONFIG_START(bublbobl_state::tokio)
 	MCFG_SCREEN_UPDATE_DRIVER(bublbobl_state, screen_update_bublbobl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bublbobl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bublbobl)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -987,7 +987,7 @@ MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
 	MCFG_SCREEN_UPDATE_DRIVER(bublbobl_state, screen_update_bublbobl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bublbobl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bublbobl)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)

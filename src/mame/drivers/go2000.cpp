@@ -192,7 +192,7 @@ static const gfx_layout go2000_layout =
 	8*32
 };
 
-static GFXDECODE_START( go2000 )
+static GFXDECODE_START( gfx_go2000 )
 	GFXDECODE_ENTRY( "gfx1", 0, go2000_layout,   0x0, 0x80  ) /* tiles */
 GFXDECODE_END
 
@@ -351,7 +351,7 @@ MACHINE_CONFIG_START(go2000_state::go2000)
 	MCFG_DEVICE_IO_MAP(go2000_sound_io)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", go2000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_go2000)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

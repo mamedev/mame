@@ -1475,7 +1475,7 @@ MACHINE_CONFIG_START(taitol_state::l_system_video)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitol_state, screen_vblank_taitol))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_l)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", taito_l)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

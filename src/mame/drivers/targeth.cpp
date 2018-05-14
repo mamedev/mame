@@ -85,7 +85,7 @@ static const gfx_layout tilelayout16_0x080000 =
 	32*8
 };
 
-static GFXDECODE_START( 0x080000 )
+static GFXDECODE_START( gfx_0x080000 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout16_0x080000, 0, 64 )
 GFXDECODE_END
 
@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(targeth_state::targeth)
 	MCFG_SCREEN_UPDATE_DRIVER(targeth_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x080000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x080000)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

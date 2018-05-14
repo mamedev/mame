@@ -318,7 +318,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( atetris )
+static GFXDECODE_START( gfx_atetris )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(atetris_state::atetris)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atetris)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atetris)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRGGGBB)
@@ -381,7 +381,7 @@ MACHINE_CONFIG_START(atetris_state::atetrisb2)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atetris)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atetris)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRGGGBB)

@@ -647,7 +647,7 @@ static const gfx_layout spyhuntertec_charlayout =
 };
 
 
-static GFXDECODE_START( spyhuntertec )
+static GFXDECODE_START( gfx_spyhuntertec )
 	GFXDECODE_ENTRY( "gfx1", 0, spyhuntertec_charlayout,  3*16, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spyhuntertec_sprite_layout,   0*16, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spyhuntertec_alphalayout, 4*16, 1 )
@@ -689,7 +689,7 @@ MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 	MCFG_SCREEN_UPDATE_DRIVER(spyhuntertec_state, screen_update_spyhuntertec)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spyhuntertec)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spyhuntertec)
 	MCFG_PALETTE_ADD("palette", 64+4)
 
 //  MCFG_PALETTE_INIT_OWNER(spyhuntertec_state,spyhunt)

@@ -1347,7 +1347,7 @@ static const gfx_layout sfbonus32_layout =
 
 
 
-static GFXDECODE_START( sfbonus )
+static GFXDECODE_START( gfx_sfbonus )
 	GFXDECODE_ENTRY( "gfx1", 0, sfbonus_layout,   0x0, 2  )
 	GFXDECODE_ENTRY( "gfx2", 0, sfbonus32_layout,   0x0, 2  )
 GFXDECODE_END
@@ -1377,7 +1377,7 @@ MACHINE_CONFIG_START(sfbonus_state::sfbonus)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sfbonus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sfbonus)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -564,7 +564,7 @@ static const gfx_layout layout_8x32x6 =
 	8*32*2
 };
 
-static GFXDECODE_START( jackie )
+static GFXDECODE_START( gfx_jackie )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x6,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x32x6, 0, 16 )
 GFXDECODE_END
@@ -626,7 +626,7 @@ MACHINE_CONFIG_START(jackie_state::jackie)
 	MCFG_SCREEN_UPDATE_DRIVER(jackie_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jackie)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jackie)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

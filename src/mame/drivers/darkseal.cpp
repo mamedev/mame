@@ -194,7 +194,7 @@ static const gfx_layout seallayout2 =
 	64*8
 };
 
-static GFXDECODE_START( darkseal )
+static GFXDECODE_START( gfx_darkseal )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 16 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, seallayout,  768, 16 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, seallayout, 1024, 16 )  /* Tiles 16x16 */
@@ -206,11 +206,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(darkseal_state::darkseal)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* Custom chip 59 */
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(24'000'000)/2) /* Custom chip 59 */
 	MCFG_DEVICE_PROGRAM_MAP(darkseal_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", darkseal_state,  irq6_line_assert)/* VBL */
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
+	MCFG_DEVICE_ADD(m_audiocpu, H6280, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
@@ -220,13 +220,12 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darkseal_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE("colors")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darkseal)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_darkseal)
+	MCFG_PALETTE_ADD(m_palette, 2048)
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -256,7 +255,7 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	MCFG_DEVICE_ADD(m_sprgen, DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
@@ -264,8 +263,8 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, 0))
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)

@@ -496,7 +496,7 @@ static const gfx_layout layout_planes_2roms =
 	16*16*2
 };
 
-static GFXDECODE_START( thedealr )
+static GFXDECODE_START( gfx_thedealr )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms, 0, 32 )
 GFXDECODE_END
 
@@ -560,7 +560,7 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("subcpu", INPUT_LINE_NMI))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thedealr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thedealr)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(thedealr_state,thedealr)
 

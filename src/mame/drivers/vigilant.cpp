@@ -458,7 +458,7 @@ static const gfx_layout buccaneer_back_layout =
 	16*8
 };
 
-static GFXDECODE_START( vigilant )
+static GFXDECODE_START( gfx_vigilant )
 	GFXDECODE_ENTRY( "gfx1", 0, text_layout,   256, 16 )    /* colors 256-511 */
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout,   0, 16 )    /* colors   0-255 */
 	GFXDECODE_ENTRY( "gfx3", 0, back_layout,   512,  2 )    /* actually the background uses colors */
@@ -466,7 +466,7 @@ static GFXDECODE_START( vigilant )
 													/* pens we can handle it more easily. */
 GFXDECODE_END
 
-static GFXDECODE_START( buccanrs )
+static GFXDECODE_START( gfx_buccanrs )
 	GFXDECODE_ENTRY( "gfx1", 0, text_layout,   256, 16 )    /* colors 256-511 */
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout_buccanrs,   0, 16 )   /* colors   0-255 */
 	GFXDECODE_ENTRY( "gfx3", 0, buccaneer_back_layout,   512,  2 )  /* actually the background uses colors */
@@ -474,7 +474,7 @@ static GFXDECODE_START( buccanrs )
 													/* pens we can handle it more easily. */
 GFXDECODE_END
 
-static GFXDECODE_START( kikcubic )
+static GFXDECODE_START( gfx_kikcubic )
 	GFXDECODE_ENTRY( "gfx1", 0, text_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 0, 16 )
 GFXDECODE_END
@@ -504,7 +504,7 @@ MACHINE_CONFIG_START(vigilant_state::vigilant)
 	MCFG_SCREEN_UPDATE_DRIVER(vigilant_state, screen_update_vigilant)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vigilant)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vigilant)
 	MCFG_PALETTE_ADD("palette", 512+32) /* 512 real palette, 32 virtual palette */
 
 
@@ -555,7 +555,7 @@ MACHINE_CONFIG_START(vigilant_state::buccanrs)
 	MCFG_SCREEN_UPDATE_DRIVER(vigilant_state, screen_update_vigilant)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", buccanrs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_buccanrs)
 	MCFG_PALETTE_ADD("palette", 512+32) /* 512 real palette, 32 virtual palette */
 
 
@@ -622,7 +622,7 @@ MACHINE_CONFIG_START(vigilant_state::kikcubic)
 	MCFG_SCREEN_UPDATE_DRIVER(vigilant_state, screen_update_kikcubic)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kikcubic)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kikcubic)
 	MCFG_PALETTE_ADD("palette", 256)
 
 

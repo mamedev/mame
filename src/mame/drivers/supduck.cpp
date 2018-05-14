@@ -420,7 +420,7 @@ static const gfx_layout tile_layout =
 
 
 
-static GFXDECODE_START( supduck )
+static GFXDECODE_START( gfx_supduck )
 	GFXDECODE_ENTRY( "gfx1", 0, vramlayout_bionicc,    768, 64 )    /* colors 768-1023 */
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   0,  16 )    /* colors   0-  63 */
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 256,  16 )    /* colors 256- 319 */
@@ -462,7 +462,7 @@ MACHINE_CONFIG_START(supduck_state::supduck)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supduck)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supduck)
 
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 

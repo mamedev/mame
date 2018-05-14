@@ -1044,12 +1044,12 @@ static const gfx_layout roz_layout =
 	16*128
 }; /* roz_layout */
 
-static GFXDECODE_START( namconb1 )
+static GFXDECODE_START( gfx_namconb1 )
 	GFXDECODE_ENTRY( NAMCONB1_TILEGFXREGION,    0, tile_layout, 0x1000, 0x10 )
 	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,  0, obj_layout,  0x0000, 0x10 )
 GFXDECODE_END /* gfxdecodeinfo */
 
-static GFXDECODE_START( 2 )
+static GFXDECODE_START( gfx_2 )
 	GFXDECODE_ENTRY( NAMCONB1_TILEGFXREGION,    0, tile_layout, 0x1000, 0x08 )
 	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,  0, obj_layout,  0x0000, 0x10 )
 	GFXDECODE_ENTRY( NAMCONB1_ROTGFXREGION, 0, roz_layout,      0x1800, 0x08 )
@@ -1093,7 +1093,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 	MCFG_SCREEN_UPDATE_DRIVER(namconb1_state, screen_update_namconb1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namconb1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namconb1)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
@@ -1134,7 +1134,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb2)
 	MCFG_SCREEN_UPDATE_DRIVER(namconb1_state, screen_update_namconb2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_2)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 

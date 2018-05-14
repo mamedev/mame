@@ -227,7 +227,7 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( galpanic )
+static GFXDECODE_START( gfx_galpanic )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  256, 16 )
 GFXDECODE_END
 
@@ -251,7 +251,7 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galpanic_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galpanic)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galpanic)
 	MCFG_PALETTE_ADD("palette", 1024 + 32768)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx) // fg palette ram, bit 0 seems to be a transparency flag for the front bitmap
 	MCFG_PALETTE_INIT_OWNER(galpanic_state, galpanic)

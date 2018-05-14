@@ -713,7 +713,7 @@ static const gfx_layout layout_16x16x4 =
 	16*16*4
 };
 
-static GFXDECODE_START( dreamwld )
+static GFXDECODE_START( gfx_dreamwld )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x000, 0x40 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x800, 0x48 ) // [1] Layer 0 + 1
 GFXDECODE_END
@@ -766,7 +766,7 @@ MACHINE_CONFIG_START(dreamwld_state::baryon)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dreamwld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dreamwld)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

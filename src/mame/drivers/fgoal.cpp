@@ -332,7 +332,7 @@ static const gfx_layout gfxlayout =
 };
 
 
-static GFXDECODE_START( fgoal )
+static GFXDECODE_START( gfx_fgoal )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0x00, 8 ) /* foreground */
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0x80, 1 ) /* background */
 GFXDECODE_END
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(fgoal_state::fgoal)
 	MCFG_SCREEN_UPDATE_DRIVER(fgoal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fgoal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fgoal)
 	MCFG_PALETTE_ADD("palette", 128 + 16 + 1)
 	MCFG_PALETTE_INIT_OWNER(fgoal_state, fgoal)
 

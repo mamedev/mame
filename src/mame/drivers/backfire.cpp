@@ -372,7 +372,7 @@ static const gfx_layout tilelayout =
 };
 
 
-static GFXDECODE_START( backfire )
+static GFXDECODE_START( gfx_backfire )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 128 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,      0, 128 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,      0, 128 )   /* Characters 8x8 */
@@ -435,7 +435,7 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", backfire)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_backfire)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)

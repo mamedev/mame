@@ -558,7 +558,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( pow )
+static GFXDECODE_START( gfx_pow )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0,  0x80>>4 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 0x800>>4 )
 GFXDECODE_END
@@ -612,7 +612,7 @@ MACHINE_CONFIG_START(snk68_state::pow)
 	MCFG_SCREEN_UPDATE_DRIVER(snk68_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pow)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pow)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
 

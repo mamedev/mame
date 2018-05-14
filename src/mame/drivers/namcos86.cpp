@@ -1052,7 +1052,7 @@ static const gfx_layout spritelayout =
 	64*64
 };
 
-static GFXDECODE_START( namcos86 )
+static GFXDECODE_START( gfx_namcos86 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   2048*0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   2048*0, 256 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 2048*1, 128 )
@@ -1087,7 +1087,7 @@ MACHINE_CONFIG_START(namcos86_state::hopmappy)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos86_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos86)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos86)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(namcos86_state, namcos86)
 

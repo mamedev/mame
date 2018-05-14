@@ -209,7 +209,7 @@ static const gfx_layout charlayout2 =
 };
 
 
-static GFXDECODE_START( dynadice )
+static GFXDECODE_START( gfx_dynadice )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 1 ) /* 1bpp */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,  0, 1 ) /* 3bpp */
 GFXDECODE_END
@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(dynadice_state::dynadice)
 	MCFG_SCREEN_UPDATE_DRIVER(dynadice_state, screen_update_dynadice)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dynadice)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dynadice)
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
 	SPEAKER(config, "mono").front_center();

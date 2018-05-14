@@ -282,11 +282,11 @@ static const gfx_layout tiles8x8x2_layout =
 	8*8
 };
 
-static GFXDECODE_START( galaxia )
+static GFXDECODE_START( gfx_galaxia )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x2_layout, 0, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( astrowar )
+static GFXDECODE_START( gfx_astrowar )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x1_layout, 0, 8 )
 GFXDECODE_END
 
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(galaxia_state::galaxia)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxia_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxia)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxia)
 	MCFG_PALETTE_ADD("palette", 0x18+2)
 
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,galaxia)
@@ -356,7 +356,7 @@ MACHINE_CONFIG_START(galaxia_state::astrowar)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxia_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrowar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_astrowar)
 	MCFG_PALETTE_ADD("palette", 0x18+2)
 
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,astrowar)

@@ -1450,7 +1450,7 @@ static const gfx_layout williams2_layout =
 };
 
 
-static GFXDECODE_START( williams2 )
+static GFXDECODE_START( gfx_williams2 )
 	GFXDECODE_ENTRY( "gfx1", 0, williams2_layout, 0, 8 )
 GFXDECODE_END
 
@@ -1744,7 +1744,7 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", williams2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_williams2)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)

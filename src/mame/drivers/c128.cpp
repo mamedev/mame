@@ -1109,7 +1109,7 @@ READ_LINE_MEMBER( c128_state::mmu_sense40_r )
 //  mc6845
 //-------------------------------------------------
 
-static GFXDECODE_START( c128 )
+static GFXDECODE_START( gfx_c128 )
 	GFXDECODE_ENTRY( "charom", 0x0000, gfx_8x8x1, 0, 1 )
 GFXDECODE_END
 
@@ -1730,7 +1730,7 @@ MACHINE_CONFIG_START(c128_state::ntsc)
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS8564_TAG, mos8564_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", MOS8563_TAG":palette", c128)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, MOS8563_TAG":palette", gfx_c128)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -1904,7 +1904,7 @@ MACHINE_CONFIG_START(c128_state::pal)
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MOS8566_TAG, mos8566_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", MOS8563_TAG":palette", c128)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, MOS8563_TAG":palette", gfx_c128)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();

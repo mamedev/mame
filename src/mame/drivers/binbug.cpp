@@ -222,7 +222,7 @@ static const gfx_layout dg640_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( dg640 )
+static GFXDECODE_START( gfx_dg640 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, dg640_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(binbug_state::binbug)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dg640)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dg640)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Keyboard */
@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(dg680_state::dg680)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dg640)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dg640)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Keyboard */

@@ -382,7 +382,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( drw80pkr )
+static GFXDECODE_START( gfx_drw80pkr )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	MCFG_SCREEN_UPDATE_DRIVER(drw80pkr_state, screen_update_drw80pkr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drw80pkr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drw80pkr)
 	MCFG_PALETTE_ADD("palette", 16*16)
 	MCFG_PALETTE_INIT_OWNER(drw80pkr_state, drw80pkr)
 

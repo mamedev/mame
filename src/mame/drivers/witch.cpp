@@ -932,12 +932,12 @@ static const gfx_layout tiles8x8_layout =
 	16*8
 };
 
-static GFXDECODE_START( witch )
+static GFXDECODE_START( gfx_witch )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( keirinou )
+static GFXDECODE_START( gfx_keirinou )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0x200, 8 )
@@ -986,7 +986,7 @@ MACHINE_CONFIG_START(witch_state::witch)
 	MCFG_SCREEN_UPDATE_DRIVER(witch_state, screen_update_witch)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", witch)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_witch)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1024,7 +1024,7 @@ MACHINE_CONFIG_START(keirinou_state::keirinou)
 
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 0x200+0x80)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", keirinou)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_keirinou)
 
 //	MCFG_PALETTE_FORMAT(IIBBGGRR)
 

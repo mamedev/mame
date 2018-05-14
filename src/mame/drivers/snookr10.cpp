@@ -1031,7 +1031,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( snookr10 )
+static GFXDECODE_START( gfx_snookr10 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -1059,7 +1059,7 @@ MACHINE_CONFIG_START(snookr10_state::snookr10)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", snookr10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_snookr10)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(snookr10_state, snookr10)
 

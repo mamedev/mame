@@ -527,7 +527,7 @@ static const gfx_layout charlayout =
 	8*8*4    // every sprite takes 32 consecutive bytes
 };
 
-static GFXDECODE_START( topspeed )
+static GFXDECODE_START( gfx_topspeed )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x8_layout,  0, 256 )    // Sprite parts
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 512 )         // Sprites & playfield
 	// Road Lines gfxdecodable ?
@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(topspeed_state::topspeed)
 	MCFG_SCREEN_UPDATE_DRIVER(topspeed_state, screen_update_topspeed)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", topspeed)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_topspeed)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

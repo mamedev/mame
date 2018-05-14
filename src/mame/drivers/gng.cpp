@@ -343,7 +343,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( gng )
+static GFXDECODE_START( gfx_gng )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0x80, 16 ) /* colors 0x80-0xbf */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0x00,  8 ) /* colors 0x00-0x3f */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x40, 4 ) /* colors 0x40-0x7f */
@@ -418,7 +418,7 @@ MACHINE_CONFIG_START(gng_state::gng)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gng)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gng)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)

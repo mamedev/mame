@@ -397,7 +397,7 @@ static const gfx_layout layout_spr =
 	16*16*4
 };
 
-static GFXDECODE_START( himesiki )
+static GFXDECODE_START( gfx_himesiki )
 	GFXDECODE_ENTRY( "bgtiles",   0, layout_bg, 0x000, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_spr, 0x200, 16 )
 	GFXDECODE_ENTRY( "spr_p103a", 0, layout_p103a, 0x200, 16 )
@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(himesiki_state::himesiki)
 	MCFG_SCREEN_UPDATE_DRIVER(himesiki_state, screen_update_himesiki)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", himesiki)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_himesiki)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

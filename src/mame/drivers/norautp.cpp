@@ -1230,7 +1230,7 @@ static const gfx_layout charlayout32x32 =
 ******************************/
 
 /* GFX are stored in the 2nd half... Maybe the HW could handle 2 bitplanes? */
-static GFXDECODE_START( norautp )
+static GFXDECODE_START( gfx_norautp )
 	GFXDECODE_ENTRY( "gfx", 0x800, charlayout,      0, 4 )
 	GFXDECODE_ENTRY( "gfx", 0x800, charlayout32x32, 0, 4 )
 GFXDECODE_END
@@ -1279,7 +1279,7 @@ MACHINE_CONFIG_START(norautp_state::noraut_base)
 	MCFG_SCREEN_UPDATE_DRIVER(norautp_state, screen_update_norautp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", norautp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_norautp)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(norautp_state, norautp)

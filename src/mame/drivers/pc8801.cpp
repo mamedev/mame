@@ -2239,7 +2239,7 @@ static const gfx_layout kanji_layout =
 };
 
 /* debugging only */
-static GFXDECODE_START( pc8801 )
+static GFXDECODE_START( gfx_pc8801 )
 	GFXDECODE_ENTRY( "cgrom", 0, char_layout,  0, 8 )
 	GFXDECODE_ENTRY( "kanji", 0, kanji_layout, 0, 8 )
 GFXDECODE_END
@@ -2635,7 +2635,7 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	MCFG_SCREEN_UPDATE_DRIVER(pc8801_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc8801 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc8801)
 	MCFG_PALETTE_ADD("palette", 0x10)
 	MCFG_PALETTE_INIT_OWNER(pc8801_state, pc8801)
 

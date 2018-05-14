@@ -405,7 +405,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( m14 )
+static GFXDECODE_START( gfx_m14 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
 GFXDECODE_END
 
@@ -446,7 +446,7 @@ MACHINE_CONFIG_START(m14_state::m14)
 	MCFG_SCREEN_UPDATE_DRIVER(m14_state, screen_update_m14)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m14)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m14)
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(m14_state, m14)
 

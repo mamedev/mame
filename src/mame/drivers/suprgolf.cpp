@@ -480,7 +480,7 @@ static const gfx_layout gfxlayout =
 	8*8*4
 };
 
-static GFXDECODE_START( suprgolf )
+static GFXDECODE_START( gfx_suprgolf )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 0x80 )
 GFXDECODE_END
 
@@ -520,7 +520,7 @@ MACHINE_CONFIG_START(suprgolf_state::suprgolf)
 	MCFG_SCREEN_UPDATE_DRIVER(suprgolf_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprgolf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprgolf)
 	MCFG_PALETTE_ADD("palette", 0x800)
 
 	/* sound hardware */

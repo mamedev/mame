@@ -204,7 +204,7 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( galspnbl )
+static GFXDECODE_START( gfx_galspnbl )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   512, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 )
 GFXDECODE_END
@@ -237,7 +237,7 @@ MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 
 	MCFG_VIDEO_START_OVERRIDE(galspnbl_state,galspnbl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galspnbl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galspnbl)
 
 	MCFG_PALETTE_ADD("palette", 1024 + 32768)
 	MCFG_PALETTE_INIT_OWNER(galspnbl_state, galspnbl)

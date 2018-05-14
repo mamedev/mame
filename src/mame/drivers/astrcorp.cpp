@@ -483,7 +483,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( astrocorp )
+static GFXDECODE_START( gfx_astrocorp )
 	GFXDECODE_ENTRY("sprites", 0, layout_16x16x8, 0, 1)
 GFXDECODE_END
 
@@ -528,7 +528,7 @@ MACHINE_CONFIG_START(astrocorp_state::showhand)
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrocorp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_astrocorp)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 
@@ -583,7 +583,7 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrocorp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_astrocorp)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 

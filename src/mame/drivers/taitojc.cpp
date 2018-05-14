@@ -1105,7 +1105,7 @@ MACHINE_CONFIG_START(taitojc_state::taitojc)
 	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(*this, taitojc_state, coin_control_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("BUTTONS"))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -334,7 +334,7 @@ static const gfx_layout layout_8x32x6i =
 	8*32*2
 };
 
-static GFXDECODE_START( cabaret )
+static GFXDECODE_START( gfx_cabaret )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, layout_8x8x6,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, layout_8x32x6i, 0, 16 )
 GFXDECODE_END
@@ -389,7 +389,7 @@ MACHINE_CONFIG_START(cabaret_state::cabaret)
 	MCFG_SCREEN_UPDATE_DRIVER(cabaret_state, screen_update_cabaret)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cabaret)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cabaret)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

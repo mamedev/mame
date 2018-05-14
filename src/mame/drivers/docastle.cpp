@@ -553,7 +553,7 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( docastle )
+static GFXDECODE_START( gfx_docastle )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     0, 32*2 )
 GFXDECODE_END
@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	MCFG_SCREEN_UPDATE_DRIVER(docastle_state, screen_update_docastle)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", docastle)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_docastle)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(docastle_state, docastle)
 

@@ -211,7 +211,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( skullxbo )
+static GFXDECODE_START( gfx_skullxbo )
 	GFXDECODE_ENTRY( "gfx1", 0, molayout, 0x000, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, pflayout, 0x200, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, anlayout, 0x300, 16 )
@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(skullxbo_state::skullxbo)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skullxbo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skullxbo)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 

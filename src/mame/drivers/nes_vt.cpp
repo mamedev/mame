@@ -1335,7 +1335,7 @@ static const gfx_layout helper2_layout =
 
 
 
-static GFXDECODE_START( vt03_helper )
+static GFXDECODE_START( vt03_gfx_helper )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_layout,  0x0, 2  )
 	GFXDECODE_ENTRY( "mainrom", 0, helper2_layout,  0x0, 2  )
 GFXDECODE_END
@@ -1361,7 +1361,7 @@ MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DEVICE("ppu", ppu2c0x_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "ppu", vt03_helper)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "ppu", vt03_gfx_helper)
 
 	MCFG_PPU_VT03_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")

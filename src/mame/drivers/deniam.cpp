@@ -215,7 +215,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( deniam )
+static GFXDECODE_START( gfx_deniam )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 128 )    /* colors 0-1023 */
 												/* sprites use colors 1024-2047 */
 GFXDECODE_END
@@ -272,7 +272,7 @@ MACHINE_CONFIG_START(deniam_state::deniam16b)
 	MCFG_SCREEN_UPDATE_DRIVER(deniam_state, screen_update_deniam)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deniam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deniam)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -308,7 +308,7 @@ MACHINE_CONFIG_START(deniam_state::deniam16c)
 	MCFG_SCREEN_UPDATE_DRIVER(deniam_state, screen_update_deniam)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deniam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deniam)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 

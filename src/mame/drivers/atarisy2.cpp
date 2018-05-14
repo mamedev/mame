@@ -1167,7 +1167,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( atarisy2 )
+static GFXDECODE_START( gfx_atarisy2 )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 128, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, molayout,   0, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, anlayout,  64, 8 )
@@ -1209,7 +1209,7 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarisy2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarisy2)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT_CLASS(2, atarisy2_state, RRRRGGGGBBBBIIII)
 

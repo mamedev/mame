@@ -1274,27 +1274,27 @@ static const gfx_layout ad2083_spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( scramble )
+static GFXDECODE_START( gfx_scramble )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, scramble_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, scramble_spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( devilfsh )
+static GFXDECODE_START( gfx_devilfsh )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, devilfsh_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, devilfsh_spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( newsin7 )
+static GFXDECODE_START( gfx_newsin7 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, newsin7_charlayout,   0, 4 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, newsin7_spritelayout, 0, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( mrkougar )
+static GFXDECODE_START( gfx_mrkougar )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mrkougar_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mrkougar_spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( ad2083 )
+static GFXDECODE_START( gfx_ad2083 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ad2083_charlayout,    0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ad2083_spritelayout,  0, 8 )
 GFXDECODE_END
@@ -1346,7 +1346,7 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scramble)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scramble)
 	MCFG_PALETTE_ADD("palette", 32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scramble_state,scrambold)
@@ -1393,7 +1393,7 @@ MACHINE_CONFIG_START(scramble_state::devilfsh)
 	MCFG_DEVICE_PROGRAM_MAP(mars_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", devilfsh)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_devilfsh)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
@@ -1408,7 +1408,7 @@ MACHINE_CONFIG_START(scramble_state::newsin7)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scramble_state,  irq0_line_hold) // newsin7a has a corrupt opcode at 0x67, the irq routine instead of NMI avoids it by jumping to 0x68 after doing some other things, probably intentional. newsin7 has this fixed, maybe a bootleg?
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", newsin7)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_newsin7)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
@@ -1437,7 +1437,7 @@ MACHINE_CONFIG_START(scramble_state::mrkougar)
 	mrkougb(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", mrkougar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mrkougar)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::ckongs)
@@ -1611,7 +1611,7 @@ MACHINE_CONFIG_START(scramble_state::ad2083)
 	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ad2083)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ad2083)
 	MCFG_PALETTE_ADD("palette", 32+64+2+8)  /* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scramble_state,turtles)

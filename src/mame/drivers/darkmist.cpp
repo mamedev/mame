@@ -219,7 +219,7 @@ static const gfx_layout tilelayout =
 };
 
 
-static GFXDECODE_START( darkmist )
+static GFXDECODE_START( gfx_darkmist )
 	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout,  0x300, 16 )
 	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout,  0x000, 16 )
 	GFXDECODE_ENTRY( "fg_gfx", 0, tilelayout,  0x100, 16 )
@@ -257,7 +257,7 @@ MACHINE_CONFIG_START(darkmist_state::darkmist)
 	MCFG_SCREEN_UPDATE_DRIVER(darkmist_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darkmist)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darkmist)
 	MCFG_PALETTE_ADD("palette", 0x100*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+1)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)

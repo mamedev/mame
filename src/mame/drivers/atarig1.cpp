@@ -347,7 +347,7 @@ static const gfx_layout anlayout =
 };
 
 
-static GFXDECODE_START( atarig1 )
+static GFXDECODE_START( gfx_atarig1 )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 0x300, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, anlayout, 0x100, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x300, 8 )
@@ -415,7 +415,7 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarig1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarig1)
 	MCFG_PALETTE_ADD("palette", 1280)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 

@@ -657,7 +657,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( 40love )
+static GFXDECODE_START( gfx_40love )
 	GFXDECODE_ENTRY( "gfx2", 0, char_layout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout, 0, 64 )
 GFXDECODE_END
@@ -736,7 +736,7 @@ MACHINE_CONFIG_START(fortyl_state::_40love)
 	MCFG_SCREEN_UPDATE_DRIVER(fortyl_state, screen_update_fortyl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 40love)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_40love)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
 
 	/* sound hardware */
@@ -802,7 +802,7 @@ MACHINE_CONFIG_START(fortyl_state::undoukai)
 	MCFG_SCREEN_UPDATE_DRIVER(fortyl_state, screen_update_fortyl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 40love)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_40love)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
 
 	/* sound hardware */

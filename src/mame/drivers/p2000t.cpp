@@ -91,7 +91,7 @@ PALETTE_INIT_MEMBER(p2000m_state,p2000m)
 	palette.set_pen_color(3,rgb_t::white()); /* white */
 }
 
-static GFXDECODE_START( p2000m )
+static GFXDECODE_START( gfx_p2000m )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, p2000m_charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(p2000m_state::p2000m)
 	MCFG_SCREEN_UPDATE_DRIVER(p2000m_state, screen_update_p2000m)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", p2000m)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_p2000m)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(p2000m_state,p2000m)
 

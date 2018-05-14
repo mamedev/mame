@@ -557,7 +557,7 @@ static const gfx_layout chars_8x8 =
 	8*8
 };
 
-static GFXDECODE_START( fp1100 )
+static GFXDECODE_START( gfx_fp1100 )
 	GFXDECODE_ENTRY( "sub_ipl", 0x2400, chars_8x8, 0, 1 )
 GFXDECODE_END
 
@@ -658,7 +658,7 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fp1100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fp1100)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

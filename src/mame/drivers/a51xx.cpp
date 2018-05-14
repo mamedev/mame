@@ -118,7 +118,7 @@ static const gfx_layout a51xx_charlayout =
 	8*8                 /* every char takes 2 x 8 bytes */
 };
 
-static GFXDECODE_START( a51xx )
+static GFXDECODE_START( gfx_a51xx )
 	GFXDECODE_ENTRY( "chargen", 0x0000, a51xx_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -138,7 +138,7 @@ MACHINE_CONFIG_START(a51xx_state::a5120)
 	MCFG_SCREEN_UPDATE_DRIVER(a51xx_state, screen_update_a5120)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", a51xx)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_a51xx)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 

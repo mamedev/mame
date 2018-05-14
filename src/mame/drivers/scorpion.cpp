@@ -275,17 +275,17 @@ static const gfx_layout profi_8_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( scorpion )
+static GFXDECODE_START( gfx_scorpion )
 	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( profi )
+static GFXDECODE_START( gfx_profi )
 	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
 	GFXDECODE_ENTRY( "maincpu", 0x1abfc, profi_8_charlayout, 0, 8 )
 	/* There are more characters after this, that haven't been decoded */
 GFXDECODE_END
 
-static GFXDECODE_START( quorum )
+static GFXDECODE_START( gfx_quorum )
 	GFXDECODE_ENTRY( "maincpu", 0x1fb00, quorum_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(scorpion_state::scorpion)
 
 	MCFG_MACHINE_START_OVERRIDE(scorpion_state, scorpion )
 	MCFG_MACHINE_RESET_OVERRIDE(scorpion_state, scorpion )
-	MCFG_GFXDECODE_MODIFY("gfxdecode", scorpion)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_scorpion)
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 
@@ -313,12 +313,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scorpion_state::profi)
 	scorpion(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", profi)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_profi)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scorpion_state::quorum)
 	scorpion(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", quorum)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_quorum)
 MACHINE_CONFIG_END
 
 

@@ -467,7 +467,7 @@ public:
 
 /*----------- defined in drivers/cps1.c -----------*/
 
-GFXDECODE_EXTERN( cps1 );
+extern gfx_decode_entry const gfx_cps1[];
 
 INPUT_PORTS_EXTERN( dino );
 INPUT_PORTS_EXTERN( knights );
@@ -477,4 +477,4 @@ INPUT_PORTS_EXTERN( slammast );
 INPUT_PORTS_EXTERN( varth );
 
 
-#endif
+#endif // MAME_INCLUDES_CPS1_H

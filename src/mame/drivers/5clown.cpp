@@ -1010,7 +1010,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( fclown )
+static GFXDECODE_START( gfx_fclown )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 16 )
 GFXDECODE_END
@@ -1050,7 +1050,7 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 	MCFG_SCREEN_UPDATE_DRIVER(_5clown_state, screen_update_fclown)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fclown)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fclown)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(_5clown_state, _5clown)
 

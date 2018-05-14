@@ -229,7 +229,7 @@ static const gfx_layout tilelayout =
 	8*32
 };
 
-static GFXDECODE_START( koftball )
+static GFXDECODE_START( gfx_koftball )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 1 )
 GFXDECODE_END
 
@@ -250,7 +250,7 @@ MACHINE_CONFIG_START(koftball_state::koftball)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", koftball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_koftball)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

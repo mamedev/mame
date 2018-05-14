@@ -187,7 +187,7 @@ static const gfx_layout gfxlayout =
 	32*8
 };
 
-static GFXDECODE_START( contra )
+static GFXDECODE_START( gfx_contra )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,       0, 8*16 )
 	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout, 8*16*16, 8*16 )
 GFXDECODE_END
@@ -228,7 +228,7 @@ MACHINE_CONFIG_START(contra_state::contra)
 	MCFG_SCREEN_UPDATE_DRIVER(contra_state, screen_update_contra)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", contra)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_contra)
 
 	MCFG_PALETTE_ADD("palette", 2*8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)

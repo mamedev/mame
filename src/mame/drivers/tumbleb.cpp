@@ -1976,21 +1976,21 @@ static const gfx_layout suprtrio_tlayout =
 };
 
 
-static GFXDECODE_START( tumbleb )
+static GFXDECODE_START( gfx_tumbleb )
 	GFXDECODE_ENTRY( "tilegfx", 0, tcharlayout, 256, 16 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "tilegfx", 0, tlayout,     512, 16 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "tilegfx", 0, tlayout,     256, 16 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "sprgfx", 0, tlayout,       0, 16 )  /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( suprtrio )
+static GFXDECODE_START( gfx_suprtrio )
 	GFXDECODE_ENTRY( "tilegfx", 0, tcharlayout,        256, 16 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "tilegfx", 0, suprtrio_tlayout,   512, 16 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "tilegfx", 0, suprtrio_tlayout,   256, 16 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "sprgfx", 0, tlayout,              0, 16 )   /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( fncywld )
+static GFXDECODE_START( gfx_fncywld )
 	GFXDECODE_ENTRY( "tilegfx", 0, tcharlayout, 0x400, 0x40 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "tilegfx", 0, tlayout,     0x400, 0x40 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "tilegfx", 0, tlayout,     0x200, 0x40 )  /* Tiles 16x16 */
@@ -2043,7 +2043,7 @@ MACHINE_CONFIG_START(tumbleb_state::tumblepb)
 	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2081,7 +2081,7 @@ MACHINE_CONFIG_START(tumbleb_state::tumbleb2)
 	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2122,7 +2122,7 @@ MACHINE_CONFIG_START(tumbleb_state::jumpkids)
 	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2162,7 +2162,7 @@ MACHINE_CONFIG_START(tumbleb_state::fncywld)
 	MCFG_DECO_SPRITE_TRANSPEN(15)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fncywld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fncywld)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -2222,7 +2222,7 @@ MACHINE_CONFIG_START(tumbleb_state::htchctch)
 	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2336,7 +2336,7 @@ MACHINE_CONFIG_START(tumbleb_state::suprtrio)
 	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprtrio)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprtrio)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2375,7 +2375,7 @@ MACHINE_CONFIG_START(tumbleb_state::pangpang)
 	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

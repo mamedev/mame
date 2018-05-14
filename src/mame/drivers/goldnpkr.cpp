@@ -4110,12 +4110,12 @@ static const gfx_layout tilelayout =
 *           Graphics Decode Information           *
 **************************************************/
 
-static GFXDECODE_START( goldnpkr )
+static GFXDECODE_START( gfx_goldnpkr )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( wcrdxtnd )
+static GFXDECODE_START( gfx_wcrdxtnd )
 	GFXDECODE_ENTRY( "gfx0", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 16 )
@@ -4323,7 +4323,7 @@ MACHINE_CONFIG_START(goldnpkr_state::goldnpkr_base)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldnpkr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldnpkr)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, goldnpkr)
 MACHINE_CONFIG_END
@@ -4415,7 +4415,7 @@ MACHINE_CONFIG_START(goldnpkr_state::wildcard)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, mux_port_w))
 
 	/* video hardware */
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", wildcard)
+//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wildcard)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
@@ -4439,7 +4439,7 @@ MACHINE_CONFIG_START(goldnpkr_state::wcrdxtnd)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, mux_port_w))
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", wcrdxtnd)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wcrdxtnd)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, wcrdxtnd)
 	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, wcrdxtnd)
@@ -4469,7 +4469,7 @@ MACHINE_CONFIG_START(goldnpkr_state::wildcrdb)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, wcfalcon_snd_w))
 
 	/* video hardware */
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", wildcard)
+//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wildcard)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
@@ -4731,7 +4731,7 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldnpkr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldnpkr)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
 

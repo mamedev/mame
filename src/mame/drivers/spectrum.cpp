@@ -639,7 +639,7 @@ static const gfx_layout spectrum_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( spectrum )
+static GFXDECODE_START( gfx_spectrum )
 	GFXDECODE_ENTRY( "maincpu", 0x3d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -688,7 +688,7 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(spectrum_state, spectrum )
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spectrum)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spectrum)
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum )
 
 	/* sound hardware */

@@ -729,14 +729,14 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( realbrk )
+static GFXDECODE_START( gfx_realbrk )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,     0, 0x80     )   // [0] Backgrounds
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,       0, 0x800    )   // [1] Text
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,     0, 0x80     )   // [2] Sprites (256 colors)
 	GFXDECODE_ENTRY( "gfx4", 0, layout_16x16x4,     0, 0x800    )   // [3] Sprites (16 colors)
 GFXDECODE_END
 
-static GFXDECODE_START( dai2kaku )
+static GFXDECODE_START( gfx_dai2kaku )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,     0, 0x80     )   // [0] Backgrounds
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,       0, 0x800    )   // [1] Text
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,     0, 0x80     )   // [2] Sprites (256 colors)
@@ -781,7 +781,7 @@ MACHINE_CONFIG_START(realbrk_state::realbrk)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, realbrk_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", realbrk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_realbrk)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -818,7 +818,7 @@ MACHINE_CONFIG_START(realbrk_state::dai2kaku)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(dai2kaku_mem)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", dai2kaku)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_dai2kaku)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(realbrk_state, screen_update_dai2kaku)
 MACHINE_CONFIG_END

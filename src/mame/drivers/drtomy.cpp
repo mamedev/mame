@@ -212,7 +212,7 @@ static const gfx_layout tilelayout16 =
 	32*8
 };
 
-static GFXDECODE_START( drtomy )
+static GFXDECODE_START( gfx_drtomy )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout8,  0x100, 16 ) /* Sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout16, 0x000, 16 ) /* BG */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout16, 0x200, 16 ) /* FG */
@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(drtomy_state::drtomy)
 	MCFG_SCREEN_UPDATE_DRIVER(drtomy_state, screen_update_drtomy)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drtomy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drtomy)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

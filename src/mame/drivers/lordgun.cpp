@@ -431,7 +431,7 @@ static const gfx_layout lordgun_32x32x6_layout =
 	32*32*2
 };
 
-static GFXDECODE_START( lordgun )
+static GFXDECODE_START( gfx_lordgun )
 	GFXDECODE_ENTRY( "tiles0",  0, lordgun_8x8x6_layout,    0x000, 0x800/0x40*8  )  // [0] Tilemap 0
 	GFXDECODE_ENTRY( "tiles1",  0, lordgun_16x16x6_layout,  0x000, 0x800/0x40*8  )  // [1] Tilemap 1
 	GFXDECODE_ENTRY( "tiles1",  0, lordgun_32x32x6_layout,  0x000, 0x800/0x40*8  )  // [2] Tilemap 2
@@ -672,7 +672,7 @@ MACHINE_CONFIG_START(lordgun_state::lordgun)
 	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update_lordgun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lordgun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lordgun)
 	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
 
 	// sound hardware
@@ -724,7 +724,7 @@ MACHINE_CONFIG_START(lordgun_state::aliencha)
 	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update_lordgun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lordgun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lordgun)
 	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
 
 	// sound hardware

@@ -595,7 +595,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( ddealer )
+static GFXDECODE_START( gfx_ddealer )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x100, 16 )
 GFXDECODE_END
@@ -629,7 +629,7 @@ MACHINE_CONFIG_START(ddealer_state::ddealer)
 	// M50747 or NMK-110 8131 MCU
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddealer)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddealer)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

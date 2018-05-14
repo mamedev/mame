@@ -325,7 +325,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( crbaloon )
+static GFXDECODE_START( gfx_crbaloon )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -371,7 +371,7 @@ MACHINE_CONFIG_START(crbaloon_state::crbaloon)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crbaloon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crbaloon)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(crbaloon_state, crbaloon)
 

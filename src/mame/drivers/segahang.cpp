@@ -747,7 +747,7 @@ INPUT_PORTS_END
 //  GRAPHICS DECODING
 //**************************************************************************
 
-static GFXDECODE_START( segahang )
+static GFXDECODE_START( gfx_segahang )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1024 )
 GFXDECODE_END
 
@@ -783,7 +783,7 @@ MACHINE_CONFIG_START(segahang_state::shared_base)
 	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segahang)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segahang)
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

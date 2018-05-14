@@ -220,7 +220,7 @@ static const gfx_layout trucklayout =
 };
 
 
-static GFXDECODE_START( copsnrob )
+static GFXDECODE_START( gfx_copsnrob )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, carlayout,   0, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, trucklayout, 0, 1 )
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(copsnrob_state::copsnrob)
 	MCFG_SCREEN_UPDATE_DRIVER(copsnrob_state, screen_update_copsnrob)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", copsnrob)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_copsnrob)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	copsnrob_audio(config);

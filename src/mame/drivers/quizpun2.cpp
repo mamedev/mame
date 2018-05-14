@@ -560,7 +560,7 @@ static const gfx_layout layout_16x16x1 =
 	16*16*1
 };
 
-static GFXDECODE_START( quizpun2 )
+static GFXDECODE_START( gfx_quizpun2 )
 	GFXDECODE_ENTRY( "bg",  0, layout_16x16x4,     0, 256/16 )
 	GFXDECODE_ENTRY( "fg",  0, layout_16x16x1, 0x100, 256/2  )
 	GFXDECODE_ENTRY( "fg2", 0, layout_16x16x1, 0x100, 256/2  )
@@ -606,7 +606,7 @@ MACHINE_CONFIG_START(quizpun2_state::quizpun2)
 	MCFG_SCREEN_UPDATE_DRIVER(quizpun2_state, screen_update_quizpun2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizpun2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quizpun2)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

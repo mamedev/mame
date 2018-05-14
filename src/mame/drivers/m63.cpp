@@ -692,13 +692,13 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( m63 )
+static GFXDECODE_START( gfx_m63 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   256, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( fghtbskt )
+static GFXDECODE_START( gfx_fghtbskt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   16, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  0, 32 )
@@ -786,7 +786,7 @@ MACHINE_CONFIG_START(m63_state::m63)
 	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m63)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m63)
 	MCFG_PALETTE_ADD("palette", 256+4)
 
 	MCFG_PALETTE_INIT_OWNER(m63_state,m63)
@@ -839,7 +839,7 @@ MACHINE_CONFIG_START(m63_state::fghtbskt)
 	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fghtbskt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fghtbskt)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 

@@ -187,7 +187,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( rocnrope )
+static GFXDECODE_START( gfx_rocnrope )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
 GFXDECODE_END
@@ -232,7 +232,7 @@ MACHINE_CONFIG_START(rocnrope_state::rocnrope)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rocnrope_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rocnrope)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rocnrope)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(rocnrope_state, rocnrope)

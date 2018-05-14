@@ -1743,7 +1743,7 @@ static const gfx_layout charset_16x16 =
 	16*16
 };
 
-static GFXDECODE_START( pc9801 )
+static GFXDECODE_START( gfx_pc9801 )
 	GFXDECODE_ENTRY( "chargen", 0x00000, charset_8x8,     0x000, 0x01 )
 	GFXDECODE_ENTRY( "chargen", 0x00800, charset_8x16,    0x000, 0x01 )
 	GFXDECODE_ENTRY( "kanji",   0x00000, charset_16x16,   0x000, 0x01 )
@@ -2380,7 +2380,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 
 	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc9801)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc9801)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc9801_state::pc9801)

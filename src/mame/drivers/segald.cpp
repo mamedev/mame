@@ -29,16 +29,17 @@ Todo:
 class segald_state : public driver_device
 {
 public:
-	segald_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc") ,
+	segald_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_laserdisc(*this, "laserdisc"),
 		m_obj_ram(*this, "obj_ram"),
 		m_out_ram(*this, "out_ram"),
 		m_color_ram(*this, "color_ram"),
 		m_fix_ram(*this, "fix_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	uint8_t m_nmi_enable;
 
@@ -360,7 +361,7 @@ static INPUT_PORTS_START( astron )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                                          /* SW15 = nonJAMMA pin W  = unused? */
 INPUT_PORTS_END
 
-static GFXDECODE_START( segald )
+static GFXDECODE_START( gfx_segald )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,  0, 1 )      /* CHARACTERS */
 	/* SPRITES are apparently non-uniform in width - not straightforward to decode */
 GFXDECODE_END
@@ -388,7 +389,7 @@ MACHINE_CONFIG_START(segald_state::astron)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segald)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segald)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardare */

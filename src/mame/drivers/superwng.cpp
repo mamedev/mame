@@ -456,7 +456,7 @@ static const gfx_layout spritelayout =
 	16*8*4
 };
 
-static GFXDECODE_START( superwng )
+static GFXDECODE_START( gfx_superwng )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout,     0, 16 )
 GFXDECODE_END
@@ -496,7 +496,7 @@ MACHINE_CONFIG_START(superwng_state::superwng)
 	MCFG_SCREEN_UPDATE_DRIVER(superwng_state, screen_update_superwng)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superwng)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superwng)
 
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(superwng_state, superwng)

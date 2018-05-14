@@ -409,7 +409,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( pacland )
+static GFXDECODE_START( gfx_pacland )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,              0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,          256*4, 256 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  256*4+256*4, 64 )
@@ -446,7 +446,7 @@ MACHINE_CONFIG_START(pacland_state::pacland)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacland_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pacland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pacland)
 	MCFG_PALETTE_ADD("palette", 256*4+256*4+64*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(pacland_state, pacland)

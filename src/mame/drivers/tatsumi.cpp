@@ -821,17 +821,17 @@ static const gfx_layout roundup5_vramlayout =
 	8*16
 };
 
-static GFXDECODE_START( apache3 )
+static GFXDECODE_START( gfx_apache3 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,    1024, 128)
 	GFXDECODE_ENTRY( "text",    0, gfx_8x8x3_planar, 768,  16)
 GFXDECODE_END
 
-static GFXDECODE_START( roundup5 )
+static GFXDECODE_START( gfx_roundup5 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,     1024, 256)
 	GFXDECODE_ENTRY(  nullptr,  0, roundup5_vramlayout, 0,  16)
 GFXDECODE_END
 
-static GFXDECODE_START( cyclwarr )
+static GFXDECODE_START( gfx_cyclwarr )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,  8192, 512)
 	GFXDECODE_ENTRY( "tilerom", 0, gfx_8x8x3_planar, 0,  16)
 GFXDECODE_END
@@ -895,7 +895,7 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 280, 0, 240) // TODO: Hook up CRTC
 	MCFG_SCREEN_UPDATE_DRIVER(apache3_state, screen_update_apache3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apache3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apache3)
 	MCFG_PALETTE_ADD("palette", 1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -950,7 +950,7 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(roundup5_state, screen_update_roundup5)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", roundup5)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_roundup5)
 	MCFG_PALETTE_ADD("palette", 1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)
@@ -1009,7 +1009,7 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_cyclwarr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cyclwarr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyclwarr)
 	MCFG_PALETTE_ADD("palette", 8192 + 8192)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1069,7 +1069,7 @@ MACHINE_CONFIG_START(cyclwarr_state::bigfight)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cyclwarr_state, screen_update_bigfight)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cyclwarr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyclwarr)
 	MCFG_PALETTE_ADD("palette", 8192 + 8192)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

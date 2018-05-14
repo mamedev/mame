@@ -511,7 +511,7 @@ static const gfx_layout sprite_gfxlayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( airbustr )
+static GFXDECODE_START( gfx_airbustr )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_gfxlayout,   0, 32 ) // tiles
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_gfxlayout, 512, 16 ) // sprites
 GFXDECODE_END
@@ -596,7 +596,7 @@ MACHINE_CONFIG_START(airbustr_state::airbustr)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, airbustr_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", airbustr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_airbustr)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 

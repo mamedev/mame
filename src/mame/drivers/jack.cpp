@@ -845,7 +845,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( jack )
+static GFXDECODE_START( gfx_jack )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -861,7 +861,7 @@ static const gfx_layout joinem_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( joinem )
+static GFXDECODE_START( gfx_joinem )
 	GFXDECODE_ENTRY( "gfx1", 0, joinem_charlayout, 0, 32 )
 GFXDECODE_END
 
@@ -931,7 +931,7 @@ MACHINE_CONFIG_START(jack_state::jack)
 	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_jack)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jack)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
@@ -995,7 +995,7 @@ MACHINE_CONFIG_START(jack_state::joinem)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_joinem)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", joinem)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_joinem)
 
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 64)

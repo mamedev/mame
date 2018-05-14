@@ -256,7 +256,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( relief )
+static GFXDECODE_START( gfx_relief )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout,   0, 64 )     /* alpha & playfield */
 	GFXDECODE_ENTRY( "gfx1", 1, molayout, 256, 16 )     /* sprites */
 GFXDECODE_END
@@ -281,7 +281,7 @@ MACHINE_CONFIG_START(relief_state::relief)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", relief)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_relief)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 

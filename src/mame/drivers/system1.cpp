@@ -2143,7 +2143,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( system1 )
+static GFXDECODE_START( gfx_system1 )
 	GFXDECODE_ENTRY( "tiles", 0, charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -2181,7 +2181,7 @@ MACHINE_CONFIG_START(system1_state::sys1ppi)
 	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", system1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_system1)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 

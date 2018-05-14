@@ -453,7 +453,7 @@ static const gfx_layout hitpoker_layout_8bpp =
 	8*32
 };
 
-static GFXDECODE_START( hitpoker )
+static GFXDECODE_START( gfx_hitpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout_4bpp,   0, 0x100  )
 	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout_8bpp,   0, 8  )
 GFXDECODE_END
@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(hitpoker_state::hitpoker)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hitpoker_state, hitpoker_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hitpoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hitpoker)
 	MCFG_PALETTE_ADD("palette", 0x800)
 
 	SPEAKER(config, "mono").front_center();

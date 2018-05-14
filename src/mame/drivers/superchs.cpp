@@ -213,7 +213,7 @@ static const gfx_layout charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( superchs )
+static GFXDECODE_START( gfx_superchs )
 	GFXDECODE_ENTRY( "gfx2", 0x0, tile16x16_layout,  0, 512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,        0, 512 )
 GFXDECODE_END
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(superchs_state::superchs)
 	MCFG_SCREEN_UPDATE_DRIVER(superchs_state, screen_update_superchs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superchs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superchs)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(XRGB)
 

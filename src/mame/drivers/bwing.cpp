@@ -325,7 +325,7 @@ static const gfx_layout ram_tilelayout =
 	32*8
 };
 
-static GFXDECODE_START( bwing )
+static GFXDECODE_START( gfx_bwing )
 	GFXDECODE_ENTRY( "gfx1",      0, charlayout,     0x00, 1 ) // chars
 	GFXDECODE_ENTRY( "gfx2",      0, spritelayout,   0x20, 2 ) // sprites
 	GFXDECODE_RAM( "gfxram",      0, ram_tilelayout, 0x10, 2 ) // foreground tiles
@@ -396,7 +396,7 @@ MACHINE_CONFIG_START(bwing_state::bwing)
 	MCFG_SCREEN_UPDATE_DRIVER(bwing_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bwing)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bwing)
 	MCFG_PALETTE_ADD("palette", 64)
 
 

@@ -518,7 +518,7 @@ static const gfx_layout a5105_chars_8x8 =
 	8*8
 };
 
-static GFXDECODE_START( a5105 )
+static GFXDECODE_START( gfx_a5105 )
 	GFXDECODE_ENTRY( "pcg", 0x0000, a5105_chars_8x8, 0, 8 )
 GFXDECODE_END
 
@@ -580,7 +580,7 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", a5105)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_a5105)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(a5105_state, a5105)
 

@@ -468,7 +468,7 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( wallc )
+static GFXDECODE_START( gfx_wallc )
 	GFXDECODE_ENTRY( "gfx1", 0     , charlayout, 0, 4 )
 GFXDECODE_END
 
@@ -523,7 +523,7 @@ MACHINE_CONFIG_START(wallc_state::wallc)
 	MCFG_SCREEN_UPDATE_DRIVER(wallc_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wallc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wallc)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(wallc_state, wallc)
 

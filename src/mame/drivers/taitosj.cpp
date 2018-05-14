@@ -1728,7 +1728,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( taitosj )
+static GFXDECODE_START( gfx_taitosj )
 	GFXDECODE_ENTRY( nullptr, 0x9000, charlayout,   0, 8 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( nullptr, 0x9000, spritelayout, 0, 8 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( nullptr, 0xa800, charlayout,   0, 8 )    /* the game dynamically modifies this */
@@ -1781,7 +1781,7 @@ MACHINE_CONFIG_START(taitosj_state::nomcu)
 	MCFG_SCREEN_UPDATE_DRIVER(taitosj_state, screen_update_taitosj)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitosj)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitosj)
 	MCFG_PALETTE_ADD("palette", 64)
 
 

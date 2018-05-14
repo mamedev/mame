@@ -241,7 +241,7 @@ static const gfx_layout charlayout =
 	8*8*4
 };
 
-static GFXDECODE_START( konblands )
+static GFXDECODE_START( gfx_konblands )
 	GFXDECODE_ENTRY( "gfx", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(konblands_state::konblands)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", konblands)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_konblands)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(konblands_state, konblands)

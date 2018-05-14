@@ -462,7 +462,7 @@ static const gfx_layout tilelayout =
 	16*16*2
 };
 
-static GFXDECODE_START( flower )
+static GFXDECODE_START( gfx_flower )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0,  64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0,  16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0,  16 )
@@ -511,7 +511,7 @@ MACHINE_CONFIG_START(flower_state::flower)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3,384,0,288,264,16,240) // derived from Galaxian HW, 60.606060
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flower)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flower)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")

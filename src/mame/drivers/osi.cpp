@@ -705,7 +705,7 @@ static const gfx_layout osi_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( osi )
+static GFXDECODE_START( gfx_osi )
 	GFXDECODE_ENTRY( "chargen", 0x0000, osi_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -718,7 +718,7 @@ MACHINE_CONFIG_START(sb2m600_state::osi600)
 
 	/* video hardware */
 	osi600_video(config);
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -749,7 +749,7 @@ MACHINE_CONFIG_START(uk101_state::uk101)
 
 	/* video hardware */
 	uk101_video(config);
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* cassette ACIA */
 	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
@@ -774,7 +774,7 @@ MACHINE_CONFIG_START(c1p_state::c1p)
 
 	/* video hardware */
 	osi630_video(config);
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -633,7 +633,7 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-static GFXDECODE_START( bbusters )
+static GFXDECODE_START( gfx_bbusters )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 512, 16 )
@@ -641,7 +641,7 @@ static GFXDECODE_START( bbusters )
 	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,  1024+256, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( mechatt )
+static GFXDECODE_START( gfx_mechatt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 512, 16 )
@@ -675,7 +675,7 @@ MACHINE_CONFIG_START(bbusters_state::bbusters)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bbusters)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bbusters)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -718,7 +718,7 @@ MACHINE_CONFIG_START(bbusters_state::mechatt)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mechatt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mechatt)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 

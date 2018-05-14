@@ -295,7 +295,7 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static GFXDECODE_START( hvysmsh )
+static GFXDECODE_START( gfx_hvysmsh )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 32 )    /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 32 )    /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 32 )    /* Sprites 16x16 */
@@ -343,7 +343,7 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(XBGR)
 
@@ -397,7 +397,7 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

@@ -607,7 +607,7 @@ static const gfx_layout tilelayout =
 
 
 
-static GFXDECODE_START( powerbal )
+static GFXDECODE_START( gfx_powerbal )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0x100, 16 )    /* colors 0x100-0x1ff */
 	GFXDECODE_ENTRY( "gfx1", 0, magicstk_charlayout, 0x000, 16 )    /* colors 0x000-0x0ff */
 GFXDECODE_END
@@ -644,7 +644,7 @@ MACHINE_CONFIG_START(powerbal_state::powerbal)
 	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerbal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerbal)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -680,7 +680,7 @@ MACHINE_CONFIG_START(powerbal_state::magicstk)
 	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerbal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerbal)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 

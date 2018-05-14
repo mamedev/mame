@@ -455,7 +455,7 @@ static const gfx_layout tile2 =
 };
 
 
-static GFXDECODE_START( exprraid )
+static GFXDECODE_START( gfx_exprraid )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   128, 2 ) /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout,  64, 8 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tile1,          0, 4 ) /* background tiles */
@@ -513,7 +513,7 @@ MACHINE_CONFIG_START(exprraid_state::exprraid)
 	MCFG_SCREEN_UPDATE_DRIVER(exprraid_state, screen_update_exprraid)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exprraid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exprraid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */

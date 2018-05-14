@@ -1518,24 +1518,24 @@ static const gfx_layout dotlayout =
 	16*8
 };
 
-static GFXDECODE_START( bosco )
+static GFXDECODE_START( gfx_bosco )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_2bpp,       0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_bosco, 64*4, 64 )
 	GFXDECODE_ENTRY( "gfx3", 0, dotlayout,     64*4+64*4,  1 )
 GFXDECODE_END
 
-static GFXDECODE_START( galaga )
+static GFXDECODE_START( gfx_galaga )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_2bpp,        0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_galaga, 64*4, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( xevious )
+static GFXDECODE_START( gfx_xevious )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_xevious, 128*4+64*8,  64 )
 	GFXDECODE_ENTRY( "gfx2", 0, bgcharlayout,                0, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_xevious,    128*4,  64 )
 GFXDECODE_END
 
-static GFXDECODE_START( digdug )
+static GFXDECODE_START( gfx_digdug )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_digdug,         0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_galaga,    16*2, 64 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout_2bpp, 64*4 + 16*2, 64 )
@@ -1642,7 +1642,7 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, galaga_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bosco)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bosco)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4+4+64)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+64)
 	MCFG_PALETTE_INIT_OWNER(bosco_state,bosco)
@@ -1717,7 +1717,7 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, galaga_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaga)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaga)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4+64)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+64)
 	MCFG_PALETTE_INIT_OWNER(galaga_state,galaga)
@@ -1822,7 +1822,7 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaga_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xevious)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xevious)
 	MCFG_PALETTE_ADD("palette", 128*4+64*8+64*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128+1)
 	MCFG_PALETTE_INIT_OWNER(xevious_state,xevious)
@@ -1943,7 +1943,7 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaga_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", digdug)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_digdug)
 	MCFG_PALETTE_ADD("palette", 16*2+64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(digdug_state,digdug)

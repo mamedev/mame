@@ -304,7 +304,7 @@ static const gfx_layout layout16x16 =
 	32*32
 };
 
-static GFXDECODE_START( pzletime )
+static GFXDECODE_START( gfx_pzletime )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x100, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout16x16, 0x200, 0x10 )
 	GFXDECODE_ENTRY( "gfx3", 0, layout16x16, 0x000, 0x10 )
@@ -348,7 +348,7 @@ MACHINE_CONFIG_START(pzletime_state::pzletime)
 	MCFG_SCREEN_UPDATE_DRIVER(pzletime_state, screen_update_pzletime)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pzletime)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pzletime)
 	MCFG_PALETTE_ADD("palette", 0x300 + 32768)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_INIT_OWNER(pzletime_state, pzletime)

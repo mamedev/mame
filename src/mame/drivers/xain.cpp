@@ -434,7 +434,7 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static GFXDECODE_START( xain )
+static GFXDECODE_START( gfx_xain )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )    /* 8x8 text */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 256, 8 )    /* 16x16 Background */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 384, 8 )    /* 16x16 Background */
@@ -475,7 +475,7 @@ MACHINE_CONFIG_START(xain_state::xsleena)
 	MCFG_SCREEN_UPDATE_DRIVER(xain_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xain)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xain)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

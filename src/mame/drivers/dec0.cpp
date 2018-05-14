@@ -1564,14 +1564,14 @@ static const gfx_layout automat_tilelayout2 =
 };
 
 
-static GFXDECODE_START( dec0 )
+static GFXDECODE_START( gfx_dec0 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 512, 16 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 768, 16 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 256, 16 )   /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( midres )
+static GFXDECODE_START( gfx_midres )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 256, 16 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 512, 16 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 768, 16 )   /* Tiles 16x16 */
@@ -1582,14 +1582,14 @@ GFXDECODE_END
 
 
 
-static GFXDECODE_START( automat )
+static GFXDECODE_START( gfx_automat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, automat_tilelayout3, 512, 16 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, automat_tilelayout2, 768, 16 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx4", 0, automat_spritelayout, 256, 16 ) /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( secretab )
+static GFXDECODE_START( gfx_secretab )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0x000, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, automat_tilelayout2,     0x200, 0x10 )
 	GFXDECODE_ENTRY( "gfx3", 0, automat_tilelayout2,     0x300, 0x10 )
@@ -1618,7 +1618,7 @@ MACHINE_CONFIG_START(dec0_state::dec0_base)
 	//MCFG_SCREEN_UPDATE_DRIVER differs per game
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dec0)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dec0)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
@@ -1768,7 +1768,7 @@ MACHINE_CONFIG_START(dec0_automat_state::automat)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", automat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_automat)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1843,7 +1843,7 @@ MACHINE_CONFIG_START(dec0_automat_state::secretab)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", secretab)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_secretab)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2029,7 +2029,7 @@ MACHINE_CONFIG_START(dec0_state::midres)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_midres)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", midres)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_midres)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dec0_state::midresb)

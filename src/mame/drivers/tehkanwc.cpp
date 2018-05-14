@@ -658,7 +658,7 @@ static const gfx_layout tilelayout =
 	64*8    /* every char takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( tehkanwc )
+static GFXDECODE_START( gfx_tehkanwc )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* Colors 0 - 255 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256,  8 ) /* Colors 256 - 383 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   512, 16 ) /* Colors 512 - 767 */
@@ -694,7 +694,7 @@ MACHINE_CONFIG_START(tehkanwc_state::tehkanwc)
 	MCFG_SCREEN_UPDATE_DRIVER(tehkanwc_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tehkanwc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tehkanwc)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)

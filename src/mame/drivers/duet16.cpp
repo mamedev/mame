@@ -328,7 +328,7 @@ static const gfx_layout duet16_charlayout =
 	8*16                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START(duet16)
+static GFXDECODE_START(gfx_duet16)
 	GFXDECODE_ENTRY( "char", 0x0000, duet16_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -421,7 +421,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_ADD_3BIT_BRG("chrpal")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "chrpal", duet16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "chrpal", gfx_duet16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

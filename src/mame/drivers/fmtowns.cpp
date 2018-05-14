@@ -2755,7 +2755,7 @@ static const gfx_layout text_chars =
 	8*16
 };
 
-static GFXDECODE_START( towns )
+static GFXDECODE_START( gfx_towns )
 	GFXDECODE_ENTRY( "user",   0x180000 + 0x3d800, text_chars,  0, 16 )
 	GFXDECODE_ENTRY( "user",   0x180000, fnt_chars_16x16,  0, 16 )
 GFXDECODE_END
@@ -2777,7 +2777,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
 	MCFG_SCREEN_UPDATE_DRIVER(towns_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette16_0", towns)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette16_0", gfx_towns)
 	MCFG_PALETTE_ADD("palette256", 256)
 	MCFG_PALETTE_ADD("palette16_0", 16)
 	MCFG_PALETTE_ADD("palette16_1", 16)

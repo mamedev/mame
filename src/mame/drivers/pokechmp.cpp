@@ -201,7 +201,7 @@ static const gfx_layout pokechmp_spritelayout =
 };
 
 
-static GFXDECODE_START( pokechmp )
+static GFXDECODE_START( gfx_pokechmp )
 	GFXDECODE_ENTRY( "bgs", 0x00000, pokechmp_charlayout,   0x100, 4 ) /* chars */
 	GFXDECODE_ENTRY( "sprites", 0x00000, pokechmp_spritelayout,   0,  32 ) /* sprites */
 GFXDECODE_END
@@ -246,7 +246,7 @@ MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, pokechmp_state, sound_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pokechmp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pokechmp)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

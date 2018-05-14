@@ -357,7 +357,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( pengo )
+static GFXDECODE_START( gfx_pengo )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0x2000, spritelayout, 0, 128 )
 GFXDECODE_END
@@ -396,7 +396,7 @@ MACHINE_CONFIG_START(pengo_state::pengo)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pengo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pengo)
 	MCFG_PALETTE_ADD("palette", 128*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pengo_state,pacman)

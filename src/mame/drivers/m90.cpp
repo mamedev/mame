@@ -693,7 +693,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( m90 )
+static GFXDECODE_START( gfx_m90 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )
 GFXDECODE_END
@@ -753,7 +753,7 @@ MACHINE_CONFIG_START(m90_state::m90)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", NEC_INPUT_LINE_INTP0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m90)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m90)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

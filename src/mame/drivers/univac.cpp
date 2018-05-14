@@ -300,7 +300,7 @@ static const gfx_layout c10_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( c10 )
+static GFXDECODE_START( gfx_c10 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, c10_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -327,7 +327,7 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c10)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

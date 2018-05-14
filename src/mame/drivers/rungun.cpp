@@ -358,7 +358,7 @@ static const gfx_layout bglayout =
 	128*8
 };
 
-static GFXDECODE_START( rungun )
+static GFXDECODE_START( gfx_rungun )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout, 0x0000, 64 )
 GFXDECODE_END
 
@@ -404,7 +404,7 @@ MACHINE_CONFIG_START(rungun_state::rng)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // higher if sound stutters
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rungun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rungun)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 

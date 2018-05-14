@@ -1004,7 +1004,7 @@ static const gfx_layout tiles16x16_layout =
 };
 
 
-static GFXDECODE_START( igrosoft_gamble )
+static GFXDECODE_START( gfx_igrosoft_gamble )
 	GFXDECODE_ENTRY( "gfx", 0, tiles16x16_layout, 0, 16 )
 GFXDECODE_END
 
@@ -1041,7 +1041,7 @@ MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 	MCFG_SCREEN_UPDATE_DRIVER(igrosoft_gamble_state, screen_update_igrosoft_gamble)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igrosoft_gamble)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igrosoft_gamble)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 

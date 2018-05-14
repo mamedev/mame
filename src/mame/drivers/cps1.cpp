@@ -3319,7 +3319,7 @@ static const gfx_layout cps1_layout32x32 =
 	4*32*32
 };
 
-GFXDECODE_START( cps1 )
+GFXDECODE_START( gfx_cps1 )
 	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8,   0, 0x100 )
 	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8_2, 0, 0x100 )
 	GFXDECODE_ENTRY( "gfx", 0, cps1_layout16x16, 0, 0x100 )
@@ -3373,7 +3373,7 @@ MACHINE_CONFIG_START(cps_state::cps1_10MHz)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cps_state, screen_vblank_cps1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cps1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state, cps1)

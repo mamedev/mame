@@ -106,7 +106,7 @@ static const gfx_layout esprit_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( esprit )
+static GFXDECODE_START( gfx_esprit )
 	GFXDECODE_ENTRY( "chargen", 0x0000, esprit_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -129,7 +129,7 @@ MACHINE_CONFIG_START(esprit_state::esprit)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esprit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprit)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */

@@ -402,9 +402,9 @@ static const gfx_layout sprites_layout =
 	32*32*2
 };
 
-static GFXDECODE_START( laserbat )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,       0, 256 ) /* Rom chars */
-	GFXDECODE_ENTRY( "gfx2", 0x0000, sprites_layout,   0,   8 ) /* Sprites   */
+static GFXDECODE_START( gfx_laserbat )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,       0, 256 ) // ROM chars
+	GFXDECODE_ENTRY( "gfx2", 0x0000, sprites_layout,   0,   8 ) // sprites
 GFXDECODE_END
 
 
@@ -492,7 +492,7 @@ MACHINE_CONFIG_START(laserbat_state_base::laserbat_base)
 	MCFG_S2636_OFFSETS(-8, -16)
 	MCFG_S2636_DIVIDER(3)
 
-	MCFG_GFXDECODE_ADD(m_gfxdecode, "palette", laserbat)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_laserbat)
 
 MACHINE_CONFIG_END
 

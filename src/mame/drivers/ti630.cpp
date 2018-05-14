@@ -130,7 +130,7 @@ static const gfx_layout ti630_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( ti630 )
+static GFXDECODE_START( gfx_ti630 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, ti630_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -155,7 +155,7 @@ MACHINE_CONFIG_START(ti630_state::ti630)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(ti630_state, ti630)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ti630)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ti630)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)

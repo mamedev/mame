@@ -494,11 +494,11 @@ static const gfx_layout okean240_charlayout =
 	8*7                 /* every char takes 7 bytes */
 };
 
-static GFXDECODE_START( okean240 )
+static GFXDECODE_START( gfx_okean240 )
 	GFXDECODE_ENTRY( "maincpu", 0xec08, okean240_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( okean240a )
+static GFXDECODE_START( gfx_okean240a )
 	GFXDECODE_ENTRY( "maincpu", 0xef63, okean240_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -552,7 +552,7 @@ MACHINE_CONFIG_START(okean240_state::okean240a)
 	okean240t(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(okean240a_io)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240a)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_okean240a)
 	MCFG_DEVICE_REMOVE("rs232")
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
@@ -572,7 +572,7 @@ MACHINE_CONFIG_START(okean240_state::okean240)
 	okean240t(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(okean240_io)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_okean240)
 	MCFG_DEVICE_REMOVE("uart")
 	MCFG_DEVICE_REMOVE("rs232")
 	MCFG_DEVICE_MODIFY("pit")

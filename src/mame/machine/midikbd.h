@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "diserial.h"
+
 
 #define MCFG_MIDI_KBD_ADD(_tag, _devcb, _clock) \
 	MCFG_DEVICE_ADD(_tag, MIDI_KBD, _clock) \

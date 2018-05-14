@@ -111,7 +111,7 @@ static const gfx_layout jungleyo16_layout =
 };
 
 
-static GFXDECODE_START( jungleyo )
+static GFXDECODE_START( gfx_jungleyo )
 	GFXDECODE_ENTRY( "reelgfx", 0, jungleyo16_layout,   0x0, 2  )
 	GFXDECODE_ENTRY( "gfx2", 0, jungleyo_layout,   0x0, 2  )
 	GFXDECODE_ENTRY( "gfx3", 0, jungleyo_layout,   0x0, 2  )
@@ -124,7 +124,7 @@ MACHINE_CONFIG_START(jungleyo_state::jungleyo)
 	MCFG_DEVICE_PROGRAM_MAP(jungleyo_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jungleyo_state,  irq1_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jungleyo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jungleyo)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

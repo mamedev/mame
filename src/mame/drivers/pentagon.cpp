@@ -267,7 +267,7 @@ static const gfx_layout spectrum_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( pentagon )
+static GFXDECODE_START( gfx_pentagon )
 	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -289,7 +289,7 @@ MACHINE_CONFIG_START(pentagon_state::pentagon)
 	MCFG_VIDEO_START_OVERRIDE(pentagon_state, pentagon )
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pentagon)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pentagon)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -319,7 +319,7 @@ static const gfx_layout tiles16x16x8_layout =
 
 
 
-GFXDECODE_START( stv )
+GFXDECODE_START( gfx_stv )
 	GFXDECODE_ENTRY( nullptr, 0, tiles8x8x4_layout,   0x00, (0x80*(2+1))  )
 	GFXDECODE_ENTRY( nullptr, 0, tiles16x16x4_layout, 0x00, (0x80*(2+1))  )
 	GFXDECODE_ENTRY( nullptr, 0, tiles8x8x8_layout,   0x00, (0x08*(2+1))  )

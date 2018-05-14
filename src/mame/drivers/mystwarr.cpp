@@ -851,11 +851,11 @@ static const gfx_layout bglayout_8bpp =
 	16*128
 };
 
-static GFXDECODE_START( gaiapols )
+static GFXDECODE_START( gfx_gaiapols )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_4bpp, 0x0000, 128 )
 GFXDECODE_END
 
-static GFXDECODE_START( dadandrn )
+static GFXDECODE_START( gfx_dadandrn )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x0000, 8 )
 GFXDECODE_END
 
@@ -1091,7 +1091,7 @@ MACHINE_CONFIG_START(mystwarr_state::dadandrn)
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(24, 16+1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dadandrn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dadandrn)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, dadandrn)
@@ -1127,7 +1127,7 @@ MACHINE_CONFIG_START(mystwarr_state::gaiapols)
 
 	MCFG_K054000_ADD("k054000")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gaiapols)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaiapols)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, gaiapols)

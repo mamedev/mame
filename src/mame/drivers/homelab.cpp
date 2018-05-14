@@ -654,7 +654,7 @@ static const gfx_layout homelab_charlayout =
 	8                   /* every char takes 8 x 1 bytes */
 };
 
-static GFXDECODE_START( homelab )
+static GFXDECODE_START( gfx_homelab )
 	GFXDECODE_ENTRY( "chargen", 0x0000, homelab_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -761,7 +761,7 @@ MACHINE_CONFIG_START(homelab_state::homelab)
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homelab)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -793,7 +793,7 @@ MACHINE_CONFIG_START(homelab_state::homelab3)
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homelab)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -825,7 +825,7 @@ MACHINE_CONFIG_START(homelab_state::brailab4)
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homelab)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */

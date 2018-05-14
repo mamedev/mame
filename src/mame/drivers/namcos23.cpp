@@ -3556,7 +3556,7 @@ static const gfx_layout namcos23_cg_layout =
 	64*16
 }; /* cg_layout */
 
-static GFXDECODE_START( namcos23 )
+static GFXDECODE_START( gfx_namcos23 )
 	GFXDECODE_ENTRY( nullptr, 0, namcos23_cg_layout, 0, 0x800 )
 GFXDECODE_END
 
@@ -3612,7 +3612,7 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos23)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos23)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
@@ -3679,7 +3679,7 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos23)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos23)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
@@ -3759,7 +3759,7 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos23)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos23)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 

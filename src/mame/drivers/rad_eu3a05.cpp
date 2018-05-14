@@ -1125,7 +1125,7 @@ static const gfx_layout texture_helper_4bpp_layout =
 	texlayout_yoffset_4bpp
 };
 
-static GFXDECODE_START( radicasi_fake )
+static GFXDECODE_START( gfx_radicasi_fake )
 	GFXDECODE_ENTRY( "maincpu", 0, helper_4bpp_8_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "maincpu", 0, texture_helper_4bpp_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper_8bpp_8_layout,  0x0, 1  )
@@ -1171,7 +1171,7 @@ MACHINE_CONFIG_START(radica_eu3a05_state::radicasi)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", radicasi_fake)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_radicasi_fake)
 
 	MCFG_DEVICE_ADD("gpio", RADICA6502_GPIO, 0)
 	MCFG_RADICA6502_GPIO_READ_PORT0_CB(IOPORT("IN0"))

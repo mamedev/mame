@@ -755,17 +755,17 @@ static const gfx_layout charlayout_memory =
 };
 
 
-static GFXDECODE_START( sasuke )
+static GFXDECODE_START( gfx_sasuke )
 	GFXDECODE_ENTRY( nullptr,           0x1000, swapcharlayout,      0, 4 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, swapcharlayout,    4*4, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( satansat )
+static GFXDECODE_START( gfx_satansat )
 	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 4 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        4*4, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( vanguard )
+static GFXDECODE_START( gfx_vanguard )
 	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 8 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        8*4, 8 )
 GFXDECODE_END
@@ -852,7 +852,7 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sasuke)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sasuke)
 	MCFG_PALETTE_ADD("palette", 32)
 
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,satansat)
@@ -937,7 +937,7 @@ MACHINE_CONFIG_START(snk6502_state::satansat)
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,satansat)
 
 	// video hardware
-	MCFG_GFXDECODE_MODIFY("gfxdecode", satansat)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_satansat)
 
 	// sound hardware
 	MCFG_DEVICE_MODIFY("samples")
@@ -986,7 +986,7 @@ MACHINE_CONFIG_START(snk6502_state::vanguard)
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vanguard)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vanguard)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,snk6502)

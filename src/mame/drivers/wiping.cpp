@@ -266,7 +266,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( wiping )
+static GFXDECODE_START( gfx_wiping )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4, 64 )
 GFXDECODE_END
@@ -313,7 +313,7 @@ MACHINE_CONFIG_START(wiping_state::wiping)
 	MCFG_SCREEN_UPDATE_DRIVER(wiping_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wiping)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wiping)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(wiping_state, wiping)
