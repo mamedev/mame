@@ -233,7 +233,7 @@ MACHINE_CONFIG_START(vaportra_state::vaportra)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vaportra)
 	MCFG_PALETTE_ADD("palette", 1280)
-
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
