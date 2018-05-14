@@ -63,7 +63,7 @@ float64_t
     struct uint128 sig128Z;
     uint_fast64_t sigZ;
     int_fast16_t expDiff;
-    struct uint128 sig128C;
+	struct uint128 sig128C = {};
     int_fast8_t shiftDist;
     union ui64_f64 uZ;
 

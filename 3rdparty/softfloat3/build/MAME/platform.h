@@ -64,13 +64,6 @@ Softfloat 3 MAME modifications
 // MSVC has __lzcnt16 as well, but opts-GCC.h expects __lzcnt for uint16_t and uint32_t
 #define __builtin_clz __lzcnt
 #define __builtin_clzll __lzcnt64
-
-// prevent potentially uninitialized local variable 'sig128C' warning at s_muladdf64.c:161
-// prevent potentially uninitialized local variable 'ptr' warning at s_shiftrightjam256m.c:117
-#pragma warning(disable: 4701)
-
-// prevent potentially uninitialized local pointer variable 'ptr' at s_shiftrightjam256m.c:117
-#pragma warning(disable: 4703)
 #else
 #if defined(PTR64)
 #define SOFTFLOAT_INTRINSIC_INT128 1
