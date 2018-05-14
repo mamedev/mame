@@ -634,7 +634,7 @@ MACHINE_CONFIG_START(gb_state::gameboy)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gb)
 
-	MCFG_DMG_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", DMG_PPU, "maincpu")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -676,7 +676,7 @@ MACHINE_CONFIG_START(gb_state::supergb)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
 
-	MCFG_SGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", SGB_PPU, "maincpu")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -714,7 +714,7 @@ MACHINE_CONFIG_START(gb_state::supergb2)
 	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
 
 	MCFG_DEVICE_REMOVE("ppu")
-	MCFG_SGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", SGB_PPU, "maincpu")
 MACHINE_CONFIG_END
 
 
@@ -726,7 +726,7 @@ MACHINE_CONFIG_START(gb_state::gbpocket)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbp)
 
 	MCFG_DEVICE_REMOVE("ppu")
-	MCFG_MGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", MGB_PPU, "maincpu")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gb_state::gbcolor)
@@ -756,7 +756,7 @@ MACHINE_CONFIG_START(gb_state::gbcolor)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbc)
 
-	MCFG_CGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", CGB_PPU, "maincpu")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -803,7 +803,7 @@ MACHINE_CONFIG_START(megaduck_state::megaduck)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(megaduck_state,megaduck)
 
-	MCFG_DMG_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", DMG_PPU, "maincpu")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

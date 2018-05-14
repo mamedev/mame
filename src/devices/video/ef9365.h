@@ -49,7 +49,7 @@ public:
 	ef9365_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	void set_nb_bitplanes(int nb_bitplanes );
 	void set_display_mode(int display_mode );
 	template<class Object> devcb_base &set_irq_handler(Object object) { return m_irq_handler.set_callback(std::forward<Object>(object)); }
