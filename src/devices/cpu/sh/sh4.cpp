@@ -3515,27 +3515,53 @@ bool sh34_base_device::generate_group_15_FDIV(drcuml_block &block, compiler_stat
 	return true;
 }
 
-void sh34_base_device::func_FCMP_EQ() { FCMP_EQ(m_sh2_state->arg0); }
-static void cfunc_FCMP_EQ(void *param) { ((sh34_base_device *)param)->func_FCMP_EQ(); };
-
 bool sh34_base_device::generate_group_15_FCMP_EQ(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_FCMP_EQ, this);
-	load_fast_iregs(block);
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_JMPc(block, COND_Z, compiler.labelnum);
+
+	UML_MOV(block, I0, uml::mem(&m_sh2_state->sr));
+	UML_AND(block, I0, I0, ~SH_T);
+	UML_FDCMP(block, FPD32(Rm & 14), FPD32(Rn & 14));
+	UML_MOVc(block, COND_Z, I0, SH_T);
+	UML_MOV(block, uml::mem(&m_sh2_state->sr), I0);
+
+	UML_JMP(block, compiler.labelnum+1);
+
+	UML_LABEL(block, compiler.labelnum++);  // labelnum:
+
+	UML_MOV(block, I0, uml::mem(&m_sh2_state->sr));
+	UML_AND(block, I0, I0, ~SH_T);
+	UML_FSCMP(block, FPS32(Rm), FPS32(Rn));
+	UML_MOVc(block, COND_Z, I0, SH_T);
+	UML_MOV(block, uml::mem(&m_sh2_state->sr), I0);
+
+	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:
 	return true;
 }
 
-void sh34_base_device::func_FCMP_GT() { FCMP_GT(m_sh2_state->arg0); }
-static void cfunc_FCMP_GT(void *param) { ((sh34_base_device *)param)->func_FCMP_GT(); };
-
 bool sh34_base_device::generate_group_15_FCMP_GT(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_FCMP_GT, this);
-	load_fast_iregs(block);
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_JMPc(block, COND_Z, compiler.labelnum);
+
+	UML_MOV(block, I0, uml::mem(&m_sh2_state->sr));
+	UML_AND(block, I0, I0, ~SH_T);
+	UML_FDCMP(block, FPD32(Rm & 14), FPD32(Rn & 14));
+	UML_MOVc(block, COND_C, I0, SH_T);
+	UML_MOV(block, uml::mem(&m_sh2_state->sr), I0);
+
+	UML_JMP(block, compiler.labelnum+1);
+
+	UML_LABEL(block, compiler.labelnum++);  // labelnum:
+
+	UML_MOV(block, I0, uml::mem(&m_sh2_state->sr));
+	UML_AND(block, I0, I0, ~SH_T);
+	UML_FSCMP(block, FPS32(Rm), FPS32(Rn));
+	UML_MOVc(block, COND_C, I0, SH_T);
+	UML_MOV(block, uml::mem(&m_sh2_state->sr), I0);
+
+	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:
 	return true;
 }
 
@@ -3755,27 +3781,27 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FSRRA(drcuml_block &block, 
 	return true;
 }
 
-void sh34_base_device::func_FLDI0() { FLDI0(m_sh2_state->arg0); }
-static void cfunc_FLDI0(void *param) { ((sh34_base_device *)param)->func_FLDI0(); };
-
 bool sh34_base_device::generate_group_15_op1111_0x13_FLDI0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_FLDI0, this);
-	load_fast_iregs(block);
+#ifdef LSB_FIRST
+	UML_MOV(block, I0, Rn);
+	UML_XOR(block, I0, I0, uml::mem(&m_sh2_state->m_fpu_pr));
+	UML_STORE(block, m_sh2_state->m_fr, I0, 0, SIZE_DWORD, SCALE_x4);
+#else
+	UML_MOV(block, FP_RFS(Rn), 0);
+#endif
 	return true;
 }
 
-void sh34_base_device::func_FLDI1() { FLDI1(m_sh2_state->arg0); }
-static void cfunc_FLDI1(void *param) { ((sh34_base_device *)param)->func_FLDI1(); };
-
 bool sh34_base_device::generate_group_15_op1111_0x13_FLDI1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_FLDI1, this);
-	load_fast_iregs(block);
+#ifdef LSB_FIRST
+	UML_MOV(block, I0, Rn);
+	UML_XOR(block, I0, I0, uml::mem(&m_sh2_state->m_fpu_pr));
+	UML_STORE(block, m_sh2_state->m_fr, I0, 0x3F800000, SIZE_DWORD, SCALE_x4);
+#else
+	UML_MOV(block, FP_RFS(Rn), 0x3F800000);
+#endif
 	return true;
 }
 
