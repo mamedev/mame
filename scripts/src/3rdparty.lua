@@ -196,6 +196,12 @@ includedirs {
 	MAME_DIR .. "3rdparty/softfloat3/source/8086",
 }
 
+configuration { "vs*" }
+buildoptions {
+	"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
+	"/wd4703", -- warning C4703: potentially uninitialized local pointer variable 'xxx' used
+}
+
 configuration { }
 defines {
 	"SOFTFLOAT_ROUND_ODD",

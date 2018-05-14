@@ -54,11 +54,20 @@ Softfloat 3 MAME modifications
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
 
-// may not be true for MSVC?  true for GCC and Clang on Intel and ARM at least.
+// true for GCC and Clang on Intel and ARM, and MSVC on Intel.
 #define SOFTFLOAT_BUILTIN_CLZ 1
 
+#ifdef _MSC_VER
+#define _INC_MALLOC 0
+#include <intrin.h>
+
+// MSVC has __lzcnt16 as well, but opts-GCC.h expects __lzcnt for uint16_t and uint32_t
+#define __builtin_clz __lzcnt
+#define __builtin_clzll __lzcnt64
+#else
 #if defined(PTR64)
 #define SOFTFLOAT_INTRINSIC_INT128 1
+#endif
 #endif
 
 #include "opts-GCC.h"
