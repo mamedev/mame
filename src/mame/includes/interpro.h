@@ -31,6 +31,7 @@
 #include "bus/interpro/sr/sr.h"
 #include "bus/interpro/sr/sr_cards.h"
 #include "bus/interpro/keyboard/keyboard.h"
+#include "bus/interpro/mouse/mouse.h"
 
 #include "formats/pc_dsk.h"
 #include "softlist.h"
@@ -47,6 +48,7 @@
 #define INTERPRO_SERIAL_PORT1_TAG  "serial1"
 #define INTERPRO_SERIAL_PORT2_TAG  "serial2"
 #define INTERPRO_KEYBOARD_PORT_TAG "kbd"
+#define INTERPRO_MOUSE_PORT_TAG    "mse"
 #define INTERPRO_RTC_TAG           "rtc"
 #define INTERPRO_SCSI_TAG          "scsi"
 #define INTERPRO_SCSI_ADAPTER_TAG  "host"
