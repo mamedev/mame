@@ -3685,15 +3685,15 @@ bool sh34_base_device::generate_group_15_op1111_0x13(drcuml_block &block, compil
 	return false;
 }
 
-void sh34_base_device::func_FSTS() { FSTS(m_sh2_state->arg0); }
-static void cfunc_FSTS(void *param) { ((sh34_base_device *)param)->func_FSTS(); };
-
 bool sh34_base_device::generate_group_15_op1111_0x13_FSTS(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_FSTS, this);
-	load_fast_iregs(block);
+#ifdef LSB_FIRST
+	UML_MOV(block, I0, Rn);
+	UML_XOR(block, I0, I0, uml::mem(&m_sh2_state->m_fpu_pr));
+	UML_STORE(block, m_sh2_state->m_fr, I0, uml::mem(&m_sh2_state->m_fpul), SIZE_DWORD, SCALE_x4);
+#else
+	UML_MOV(block, FPS32(Rn), uml::mem(&m_sh2_state->m_fpul));
+#endif
 	return true;
 }
 
@@ -3709,51 +3709,84 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FLDS(drcuml_block &block, c
 	return true;
 }
 
-void sh34_base_device::func_FLOAT() { FLOAT(m_sh2_state->arg0); }
-static void cfunc_FLOAT(void *param) { ((sh34_base_device *)param)->func_FLOAT(); };
-
 bool sh34_base_device::generate_group_15_op1111_0x13_FLOAT(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_FLOAT, this);
-	load_fast_iregs(block);
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_JMPc(block, COND_Z, compiler.labelnum);
+
+	UML_FDFRINT(block, FPD32(Rn & 14), uml::mem(&m_sh2_state->m_fpul), SIZE_DWORD);
+	UML_JMP(block, compiler.labelnum+1);
+
+	UML_LABEL(block, compiler.labelnum++);  // labelnum:
+
+	UML_FSFRINT(block, FPS32(Rn), uml::mem(&m_sh2_state->m_fpul), SIZE_DWORD);
+
+	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:
+
 	return true;
 }
-
-void sh34_base_device::func_FTRC() { FTRC(m_sh2_state->arg0); }
-static void cfunc_FTRC(void *param) { ((sh34_base_device *)param)->func_FTRC(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FTRC(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_FTRC, this);
-	load_fast_iregs(block);
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_JMPc(block, COND_Z, compiler.labelnum);
+
+	UML_FDTOINT(block, uml::mem(&m_sh2_state->m_fpul), FPD32(Rn & 14), SIZE_DWORD, ROUND_TRUNC);
+	UML_JMP(block, compiler.labelnum+1);
+
+	UML_LABEL(block, compiler.labelnum++);  // labelnum:
+
+	UML_FSTOINT(block, uml::mem(&m_sh2_state->m_fpul), FPS32(Rn), SIZE_DWORD, ROUND_TRUNC);
+
+	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:
 	return true;
 }
-
-void sh34_base_device::func_FNEG() { FNEG(m_sh2_state->arg0); }
-static void cfunc_FNEG(void *param) { ((sh34_base_device *)param)->func_FNEG(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FNEG(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_FNEG, this);
-	load_fast_iregs(block);
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_JMPc(block, COND_Z, compiler.labelnum);
+
+	UML_XOR(block, I0, I0, I0);
+	UML_FDFRINT(block, F1, I0, SIZE_DWORD);
+	UML_FDSUB(block, FPD32(Rn), F1, FPD32(Rn));
+
+	UML_JMP(block, compiler.labelnum+1);
+
+	UML_LABEL(block, compiler.labelnum++);  // labelnum:
+
+	UML_XOR(block, I0, I0, I0);
+	UML_FSFRINT(block, F1, I0, SIZE_DWORD);
+	UML_FSSUB(block, FPS32(Rn), F1, FPS32(Rn));
+
+	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:
 	return true;
 }
 
-void sh34_base_device::func_FABS() { FABS(m_sh2_state->arg0); }
-static void cfunc_FABS(void *param) { ((sh34_base_device *)param)->func_FABS(); };
-
 bool sh34_base_device::generate_group_15_op1111_0x13_FABS(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_FABS, this);
-	load_fast_iregs(block);
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_JMPc(block, COND_Z, compiler.labelnum);
+
+#ifdef LSB_FIRST
+	UML_LOAD(block, I0, m_sh2_state->m_fr, ((Rn & 14) | 1), SIZE_DWORD, SCALE_x4);
+	UML_AND(block, I0, I0, 0x7fffffff);
+	UML_STORE(block, m_sh2_state->m_fr, ((Rn & 14) | 1), 0, SIZE_DWORD, SCALE_x4);
+#else
+	UML_LOAD(block, I0, m_sh2_state->m_fr, (Rn & 14), SIZE_DWORD, SCALE_x4);
+	UML_AND(block, I0, I0, 0x7fffffff);
+	UML_STORE(block, m_sh2_state->m_fr, (Rn & 14), 0, SIZE_DWORD, SCALE_x4);
+#endif
+
+	UML_JMP(block, compiler.labelnum+1);
+
+	UML_LABEL(block, compiler.labelnum++);  // labelnum:
+
+	UML_LOAD(block, I0, m_sh2_state->m_fr, Rn, SIZE_DWORD, SCALE_x4);
+	UML_AND(block, I0, I0, 0x7fffffff);
+	UML_STORE(block, m_sh2_state->m_fr, Rn, 0, SIZE_DWORD, SCALE_x4);
+
+	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:
 	return true;
 }
 
@@ -3868,27 +3901,24 @@ bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13(drcuml_block &
 	return false;
 }
 
-void sh34_base_device::func_FSCHG() { FSCHG(); }
-static void cfunc_FSCHG(void *param) { ((sh34_base_device *)param)->func_FSCHG(); };
-
 bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FSCHG(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	//UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_FSCHG, this);
-	load_fast_iregs(block);
+	UML_MOV(block, I0, uml::mem(&m_sh2_state->m_fpscr));
+	UML_XOR(block, I0, I0, SZ);
+	UML_MOV(block, uml::mem(&m_sh2_state->m_fpscr), I0);
+	UML_TEST(block, I0, SZ);
+	UML_SETc(block, COND_NZ, uml::mem(&m_sh2_state->m_fpu_sz));
 	return true;
 }
 
-void sh34_base_device::func_FRCHG() { FRCHG(); }
+void sh34_base_device::func_FRCHG() { sh4_swap_fp_registers(); }
 static void cfunc_FRCHG(void *param) { ((sh34_base_device *)param)->func_FRCHG(); };
 
 bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FRCHG(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	//UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+	UML_XOR(block, uml::mem(&m_sh2_state->m_fpscr), uml::mem(&m_sh2_state->m_fpscr), FR);
+	// no iregs are operated on by what this calls, so no need to save/restore
 	UML_CALLC(block, cfunc_FRCHG, this);
-	load_fast_iregs(block);
 	return true;
 }
 
