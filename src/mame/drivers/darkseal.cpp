@@ -224,6 +224,7 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darkseal)
 	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
