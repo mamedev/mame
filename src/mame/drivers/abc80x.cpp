@@ -142,7 +142,6 @@ Notes:
     TODO:
 
 	- abc802 video is all black
-    - abc806 disks except ufd631 won't boot
     - cassette
 
 */
