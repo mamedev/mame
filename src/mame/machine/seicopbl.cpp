@@ -223,11 +223,31 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 		}
 
 		// shoot/pass is done with this
-		// TODO: wrong
+		/*
+			0x5105
+			sub32 (r0)
+			write16h 8(r0)
+			addmem32 4(r0)
+			outputs to 0x446/0x447 (d104_move_offset ?)
+		*/
 		case 0x5105:
+		{
+			int val = m_host_space->read_dword(m_reg[0]);
+			val += m_host_space->read_word(m_reg[0] + 8);
+			m_host_space->write_dword(m_reg[0] + 4,val);
+			break;
+		}
+		/*
+			0x5905
+			write16h 10(r2)
+			sub32 8(r0)
+			addmem32 4(r1)
+		*/
 		case 0x5905:
 		{
-			m_host_space->write_dword(m_reg[1], m_host_space->read_dword(m_reg[0]));
+			int val = m_host_space->read_word(m_reg[2] + 0x10 + offs);
+			val -= m_host_space->read_dword(m_reg[0] + 8 + offs);
+			m_host_space->write_dword(m_reg[1] + 4 + offs,val);
 			break;
 		}
 		
