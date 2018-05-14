@@ -9560,6 +9560,7 @@ cedmag
 mag_time
 mag_exzi
 mag_xain
+mag_war
 
 @source:centiped.cpp
 bullsdrt                        // (c) 1985 Shinkai
