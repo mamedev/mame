@@ -46,6 +46,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+
 	DECLARE_READ16_MEMBER( port9a_r );
 	DECLARE_READ16_MEMBER( port9c_r );
 	void kbd_put(u8 data);
@@ -58,6 +60,12 @@ private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
+
+
+WRITE_LINE_MEMBER(dms86_state::nmi_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
+}
 
 
 READ16_MEMBER( dms86_state::port9a_r )
@@ -94,6 +102,8 @@ void dms86_state::io_map(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( dms86 )
+	PORT_START("FRONT")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Interrupt") PORT_CODE(KEYCODE_F2) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, dms86_state, nmi_w)
 INPUT_PORTS_END
 
 
