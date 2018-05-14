@@ -142,7 +142,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			int sx = (m_host_space->read_dword(m_reg[0]+8) >> 16);
 			int dy = (m_host_space->read_dword(m_reg[target_reg]+4) >> 16);
 			int dx = (m_host_space->read_dword(m_reg[target_reg]+8) >> 16);
-
+			
 			#if 0
 			if(data == 0xe30e)
 			{
@@ -152,7 +152,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			#endif
 			dy -= sy;
 			dx -= sx;
-	
+		
 			#if 0
 			if(data == 0xe30e)
 			{
@@ -160,7 +160,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 					printf("%08x %08x\n",dx,dy);
 			}
 			#endif
-			
+
 			//m_status = 7;
 			if(!dx) 
 			{
@@ -170,19 +170,23 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			else
 			{
 				m_status = 0;
-				m_angle =  atan(double(dy)/double(dx)) * 128.0 / M_PI;
 
+				m_angle =  atan(double(dy)/double(dx)) * 128.0 / M_PI;
+				
+				//printf("%f\n",atan(double(dy)/double(dx)));
+				
 				if(dx<0)
 				{
 					m_angle += 0x80;
 				}
 			}
-
+			
 			m_dy = dy;
 			m_dx = dx;
 
-			// TODO: for some reason tackling go in inverted direction with this on
-			if(data == 0x118e)
+			// TODO: for some reason with 0x118e tackling go in inverted direction with this on
+			// TODO: even worse, calculating 0xe18e makes the game pretty slow
+			if(data == 0x118e || data == 0xe18e)
 			{
 				return;
 			}
@@ -212,13 +216,14 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			
 			if (!div)
 			{
-				//m_status |= 0x8000;
-				m_host_space->write_dword(m_reg[0] + (0x38), 0);
+				m_status |= 0x8000;
+				m_host_space->write_word(m_reg[0] + (0x38), 0);
 				break;
 			}
-
 			// TODO: scaling is wrong
-			m_host_space->write_dword(m_reg[0] + (0x38), m_dist / (div << 10));
+			m_host_space->write_word(m_reg[0] + (0x38), (m_dist << (5 - m_scale)) / div);
+
+			//m_host_space->write_dword(m_reg[0] + (0x38), m_dist / (div << 10));
 			break;
 		}
 
@@ -277,7 +282,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			if(raw_angle == 0xc0)
 				amp*=2;
 
-			res = int(amp*sin(angle)) << 1;//m_raiden2cop->cop_scale;
+			res = int(amp*sin(angle)) << m_scale;
 
 			m_host_space->write_dword(m_reg[0] + 0x10, res);
 
@@ -295,16 +300,24 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			if(raw_angle == 0x80)
 				amp*=2;
 
-			res = int(amp*cos(angle)) << 1;//m_raiden2cop->cop_scale;
+			res = int(amp*cos(angle)) << m_scale;
 
 			m_host_space->write_dword(m_reg[0] + 20, res);
 
 			break;
 		}
 
+		/*
+			sub32 4(r2)
+			write16h (r3)
+			addmem32 4(r1)
+			outputs to 0x046/0x047 (d104_move_offset ?)
+		*/
 		case 0xd104:
 		{
-			//m_host_space->write_dword(m_reg[0] + 4 + offs, 0x04000000);
+			int val = m_host_space->read_dword(m_reg[2]);
+			val += m_host_space->read_word(m_reg[3] + 8);
+			m_host_space->write_dword(m_reg[1] + 4,val);
 			break;
 		}
 	}
@@ -354,6 +367,17 @@ READ16_MEMBER(seibu_cop_bootleg_device::prng_r)
 	return m_host_cpu->total_cycles() % (m_prng_max + 1);
 }
 
+READ16_MEMBER(seibu_cop_bootleg_device::scale_r)
+{
+	return m_scale;
+}
+
+WRITE16_MEMBER(seibu_cop_bootleg_device::scale_w)
+{
+	COMBINE_DATA(&m_scale);
+	m_scale &= 3;
+}
+
 
 // anything that is read thru ROM range 0xc**** is replacement code, therefore on this HW they are latches.
 void seibu_cop_bootleg_device::seibucopbl_map(address_map &map)
@@ -361,7 +385,8 @@ void seibu_cop_bootleg_device::seibucopbl_map(address_map &map)
 	map(0x01e, 0x01f).ram(); // angle step, PC=0xc0186
 	map(0x028, 0x02b).ram(); // DMA fill latches
 	map(0x02c, 0x02d).rw(this, FUNC(seibu_cop_bootleg_device::prng_max_r), FUNC(seibu_cop_bootleg_device::prng_max_w));
-	map(0x040, 0x045).ram(); // n/a
+	map(0x040, 0x043).ram(); // n/a
+	map(0x044, 0x045).rw(this, FUNC(seibu_cop_bootleg_device::scale_r), FUNC(seibu_cop_bootleg_device::scale_w));
 	map(0x046, 0x049).rw(this, FUNC(seibu_cop_bootleg_device::d104_move_r), FUNC(seibu_cop_bootleg_device::d104_move_w));
 	map(0x04a, 0x04f).ram(); // n/a
 	map(0x050, 0x05f).ram(); // n/a

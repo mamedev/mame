@@ -28,6 +28,8 @@ public:
 	DECLARE_READ16_MEMBER( prng_max_r );
 	DECLARE_WRITE16_MEMBER( prng_max_w );
 	DECLARE_READ16_MEMBER( prng_r );
+	DECLARE_READ16_MEMBER( scale_r );
+	DECLARE_WRITE16_MEMBER( scale_w );
 	
 	void seibucopbl_map(address_map &map);
 protected:
@@ -48,6 +50,7 @@ private:
 	int m_dx,m_dy;
 	uint32_t m_d104_move_offset;
 	uint16_t m_prng_max;
+	uint16_t m_scale;
 	//required_device<raiden2cop_device> m_raiden2cop;
 };
 
