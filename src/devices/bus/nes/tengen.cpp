@@ -21,7 +21,6 @@
 #include "emu.h"
 #include "tengen.h"
 
-#include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 
 
@@ -176,7 +175,7 @@ inline void nes_tengen032_device::irq_clock(int blanked)
 
 	m_irq_count--;
 	if (m_irq_enable && !blanked && !m_irq_count)
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		set_irq_line(ASSERT_LINE);
 }
 
 // we use the HBLANK IRQ latch from PPU for the scanline based IRQ mode
@@ -305,7 +304,7 @@ WRITE8_MEMBER(nes_tengen032_device::tengen032_write)
 
 		case 0x6000:
 			m_irq_enable = 0;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 
 		case 0x6001:

@@ -86,6 +86,8 @@
 #include "hashfile.h"
 #include "nes_slot.h"
 
+#include "cpu/m6502/m6502.h"
+
 #define NES_BATTERY_SIZE 0x2000
 
 
@@ -564,6 +566,30 @@ void device_nes_cart_interface::set_nt_mirroring(int mirroring)
 			set_nt_page(3, CIRAM, 1, 1);
 			break;
 	}
+}
+
+//-------------------------------------------------
+//  Interrupt helpers
+//-------------------------------------------------
+
+DECLARE_WRITE_LINE_MEMBER(device_nes_cart_interface::set_irq_line)
+{
+	// use hold_irq_line for HOLD_LINE semantics (not recommended)
+	assert(state == ASSERT_LINE || state == CLEAR_LINE);
+
+	m_maincpu->set_input_line(m6502_device::IRQ_LINE, state);
+}
+
+void device_nes_cart_interface::hold_irq_line()
+{
+	// hack which requires the CPU object
+	m_maincpu->set_input_line(m6502_device::IRQ_LINE, HOLD_LINE);
+}
+
+void device_nes_cart_interface::reset_cpu()
+{
+	// another hack
+	m_maincpu->set_pc(0xfffc);
 }
 
 //-------------------------------------------------

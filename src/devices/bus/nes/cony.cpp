@@ -19,8 +19,6 @@
 #include "emu.h"
 #include "cony.h"
 
-#include "cpu/m6502/m6502.h"
-
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -166,7 +164,7 @@ void nes_cony_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		{
 			if (!m_irq_count)
 			{
-				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				hold_irq_line();
 				m_irq_enable = 0;
 				m_irq_count = 0xffff;
 			}

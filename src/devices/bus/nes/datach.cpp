@@ -16,7 +16,6 @@
 
 #include "emu.h"
 #include "datach.h"
-#include "cpu/m6502/m6502.h"
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -396,7 +395,7 @@ void nes_datach_device::device_timer(emu_timer &timer, device_timer_id id, int p
 
 			if (!m_irq_count)
 			{
-				m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+				set_irq_line(ASSERT_LINE);
 				m_irq_enable = 0;
 			}
 		}

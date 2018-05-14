@@ -16,8 +16,6 @@
 #include "emu.h"
 #include "event.h"
 
-#include "cpu/m6502/m6502.h"
-
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -154,7 +152,7 @@ void nes_event_device::set_prg()
 	if (m_reg[1] & 0x10)
 	{
 		m_timer_enabled = 1;
-		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+		set_irq_line(CLEAR_LINE);
 	}
 	else
 	{
@@ -237,7 +235,7 @@ void nes_event_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		m_timer_count--;
 		if (!m_timer_count)
 		{
-			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			hold_irq_line();
 			event_timer->reset();
 		}
 	}
