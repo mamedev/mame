@@ -11,8 +11,11 @@
 #define MCFG_TOPCAT_FB_HEIGHT(_pixels) \
 	downcast<topcat_device &>(*device).set_fb_height(_pixels);
 
-#define MCFG_TOPCAT_PLANE(_plane) \
-	downcast<topcat_device &>(*device).set_plane(_plane);
+#define MCFG_TOPCAT_PLANEMASK(_mask) \
+	downcast<topcat_device &>(*device).set_planemask(_mask);
+
+#define MCFG_TOPCAT_VRAM(_vram) \
+	downcast<topcat_device &>(*device).set_vram(_vram);
 
 class topcat_device : public device_t
 {
@@ -21,7 +24,8 @@ public:
 
 	void set_fb_width(int _pixels) { m_fb_width = _pixels; }
 	void set_fb_height(int _pixels) { m_fb_height = _pixels; }
-	void set_plane(int _plane) { m_plane = _plane; }
+	void set_planemask(int _mask) { m_plane_mask = _mask; }
+	void set_vram(std::vector<uint8_t> *vram) { m_vram = vram; }
 
 	TIMER_CALLBACK_MEMBER(cursor_callback);
 
@@ -30,9 +34,9 @@ public:
 	DECLARE_READ16_MEMBER(ctrl_r);
 	DECLARE_WRITE16_MEMBER(ctrl_w);
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
 	topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -87,17 +91,35 @@ private:
 	void execute_rule(bool src, replacement_rule_t rule, bool *dst);
 
 	void update_cursor(int x, int y, uint8_t ctrl, uint8_t width);
-	std::vector<bool> m_vram;
-	uint32_t m_palette[2];
+
+	void modify_vram(int x, int y, bool state) {
+		if (state)
+			(*m_vram)[y * m_fb_width + x] |= m_plane_mask;
+		else
+			(*m_vram)[y * m_fb_width + x] &= ~m_plane_mask;
+	}
+
+	void modify_vram_offset(int offset, bool state) {
+		if (state)
+			(*m_vram)[offset] |= m_plane_mask;
+		else
+			(*m_vram)[offset] &= ~m_plane_mask;
+	}
+
+	bool get_vram_pixel(int x, int y) {
+		return (*m_vram)[y * m_fb_width + x] & m_plane_mask;
+	}
+
+	std::vector<uint8_t> *m_vram;
 
 	uint8_t m_vblank;
 	uint8_t m_wmove_active;
 	uint8_t m_vert_retrace_intrq;
 	uint8_t m_wmove_intrq;
 	uint8_t m_display_enable_planes;
-	uint8_t m_write_enable_plane;
-	uint8_t m_read_enable_plane;
-	uint8_t m_fb_write_enable;
+	bool m_write_enable_plane;
+	bool m_read_enable_plane;
+	bool m_fb_write_enable;
 	uint8_t m_enable_blink_planes;
 	uint8_t m_enable_alt_frame;
 	uint8_t m_cursor_ctrl;
@@ -118,7 +140,7 @@ private:
 
 	int m_fb_width;
 	int m_fb_height;
-	int m_plane;
+	uint8_t m_plane_mask;
 
 	bool m_read_enable;
 	bool m_write_enable;
