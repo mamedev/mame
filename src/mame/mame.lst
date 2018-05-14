@@ -14882,6 +14882,7 @@ tnmarebc                        // Tiger
 trobhood                        // Tiger
 trobocop2                       // Tiger
 trobocop3                       // Tiger
+trockteer                       // Tiger
 tsddragon                       // Tiger
 tsf2010                         // Tiger
 tsfight2                        // Tiger
@@ -14896,6 +14897,8 @@ tstrider                        // Tiger
 tswampt                         // Tiger
 ttransf2                        // Tiger
 tvindictr                       // Tiger
+twworld                         // Tiger
+txmen                           // Tiger
 txmenpx                         // Tiger
 
 @source:hh_tms1k.cpp
