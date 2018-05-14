@@ -36,9 +36,9 @@ public:
 	// construction/destruction
 	huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_vdc1_tag(const char *tag) { m_huc6270_a.set_tag(tag); }
-	void set_vdc2_tag(const char *tag) { m_huc6270_b.set_tag(tag); }
-	void set_king_tag(const char *tag) { m_huc6272.set_tag(tag); }
+	template <typename T> void set_vdc1_tag(T &&tag) { m_huc6270_a.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_vdc2_tag(T &&tag) { m_huc6270_b.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_king_tag(T &&tag) { m_huc6272.set_tag(std::forward<T>(tag)); }
 
 	void video_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ16_MEMBER( read );

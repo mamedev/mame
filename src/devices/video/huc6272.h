@@ -41,7 +41,7 @@ public:
 	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_irq_changed_callback(Object &&cb) { return m_irq_changed_cb.set_callback(std::forward<Object>(cb)); }
-	void set_rainbow_tag(const char *tag) { m_huc6271.set_tag(tag); }
+	template <typename T> void set_rainbow_tag(const char *tag) { m_huc6271.set_tag(std::forward<T>(tag)); }
 
 	// I/O operations
 	DECLARE_WRITE32_MEMBER( write );
