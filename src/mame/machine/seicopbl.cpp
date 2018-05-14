@@ -228,7 +228,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			sub32 (r0)
 			write16h 8(r0)
 			addmem32 4(r0)
-			outputs to 0x446/0x447 (d104_move_offset ?)
+			outputs to 0x046/0x047 (d104_move_offset ?)
 		*/
 		case 0x5105:
 		{

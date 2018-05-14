@@ -162,13 +162,19 @@ void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 		switch (cur_pri)
 		{
-			case 0: pri_mask = -256; break; // gumdam swamp monster l2
-			case 1: pri_mask = 0xfffc; break; // cupsoc (players and football goal)
-			case 2: pri_mask = -4; break; // masking effect for gundam l2 monster
-			case 3: pri_mask = 0x0000; break; // cupsoc (radar dots)
-			case 4: pri_mask = -32; break; // gundam level 2/3 player
+			// gumdam swamp monster l2
+			case 0: pri_mask = -256; break; 
+			// (players and football goal, should go above sidelines but behind portraits when there's a goal)
+			case 1: pri_mask = 0xfff0; break;
+			// masking effect for gundam l2 monster
+			case 2: pri_mask = -4; break; 
+			// cupsoc (radar dots)
+			case 3: pri_mask = 0x0000; break; 
+			// gundam level 2/3 player
+			case 4: pri_mask = -32; break;
 			//case 5: pri_mask = 0; break;
-			case 6: pri_mask = 0; break; // insert coin in gundam
+			// insert coin in gundam
+			case 6: pri_mask = 0; break; 
 			//case 7: pri_mask = 0; break;
 
 			default: printf("unhandled pri %d\n",cur_pri); pri_mask=0;
