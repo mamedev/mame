@@ -177,15 +177,6 @@ WRITE_LINE_MEMBER( abc802_state::vs_w )
 }
 
 
-void abc802_state::video_start()
-{
-	// register for state saving
-	save_item(NAME(m_flshclk_ctr));
-	save_item(NAME(m_flshclk));
-	save_item(NAME(m_80_40_mux));
-}
-
-
 //-------------------------------------------------
 //  MACHINE_CONFIG_START( abc802_video )
 //-------------------------------------------------

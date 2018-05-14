@@ -428,21 +428,6 @@ void abc806_state::video_start()
 	// allocate memory
 	m_char_ram.allocate(ABC806_CHAR_RAM_SIZE);
 	m_attr_ram.allocate(ABC806_ATTR_RAM_SIZE);
-
-	// register for state saving
-	save_item(NAME(m_txoff));
-	save_item(NAME(m_40));
-	save_item(NAME(m_flshclk_ctr));
-	save_item(NAME(m_flshclk));
-	save_item(NAME(m_attr_data));
-	save_item(NAME(m_hrs));
-	save_item(NAME(m_hrc));
-	save_item(NAME(m_sync));
-	save_item(NAME(m_v50_addr));
-	save_item(NAME(m_hru2_a8));
-	save_item(NAME(m_vsync_shift));
-	save_item(NAME(m_vsync));
-	save_item(NAME(m_d_vsync));
 }
 
 
@@ -474,7 +459,7 @@ uint32_t abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 PALETTE_INIT_MEMBER( abc806_state, abc806 )
 {
-	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // black
+	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
 	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // green
 	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0x00)); // yellow
