@@ -2112,10 +2112,10 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
 	MCFG_DEVICE_PROGRAM_MAP(alpha68k_II_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state,  irq3_line_hold)/* VBL */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545*2) /* Unlikely but needed to stop nested NMI's */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 6000000)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi,  7500)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi, 7614)
 
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_II)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_II)
@@ -2145,7 +2145,7 @@ MACHINE_CONFIG_START(alpha68k_state::alpha68k_II)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, alpha68k_state, porta_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
 
-	MCFG_DEVICE_ADD("ym2", YM2413, 3579545)
+	MCFG_DEVICE_ADD("ym2", YM2413, 3.579545_MHz_XTAL)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
@@ -2161,52 +2161,10 @@ MACHINE_CONFIG_START(alpha68k_state::btlfieldb)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alpha68k_state::alpha68k_II_gm)
-
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(alpha68k_II_map)
+	alpha68k_II(config);
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60*3) // MCU irq
-
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000*2) // TODO: fix this
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(alpha68k_state, alpha68k_sound_nmi,  7500)
-
-	MCFG_MACHINE_START_OVERRIDE(alpha68k_state,alpha68k_II)
-	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_state,alpha68k_II)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(ALPHA68K_PIXEL_CLOCK,ALPHA68K_HTOTAL,ALPHA68K_HBEND,ALPHA68K_HBSTART,ALPHA68K_VTOTAL,ALPHA68K_VBEND,ALPHA68K_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_II)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alpha68k_II)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
-
-	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
-	MCFG_DEVICE_ADD("ym1", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, alpha68k_state, porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
-
-	MCFG_DEVICE_ADD("ym2", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(alpha68k_state::alpha68k_V)
