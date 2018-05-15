@@ -3520,8 +3520,7 @@ bool sh34_base_device::generate_group_15_FCMP_EQ(drcuml_block &block, compiler_s
 	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 0);
 	UML_JMPc(block, COND_Z, compiler.labelnum);
 
-	UML_MOV(block, I0, uml::mem(&m_sh2_state->sr));
-	UML_AND(block, I0, I0, ~SH_T);
+	UML_AND(block, I0, uml::mem(&m_sh2_state->sr), ~SH_T);
 	UML_FDCMP(block, FPD32(Rm & 14), FPD32(Rn & 14));
 	UML_MOVc(block, COND_Z, I0, SH_T);
 	UML_MOV(block, uml::mem(&m_sh2_state->sr), I0);
@@ -3530,8 +3529,7 @@ bool sh34_base_device::generate_group_15_FCMP_EQ(drcuml_block &block, compiler_s
 
 	UML_LABEL(block, compiler.labelnum++);  // labelnum:
 
-	UML_MOV(block, I0, uml::mem(&m_sh2_state->sr));
-	UML_AND(block, I0, I0, ~SH_T);
+	UML_AND(block, I0, uml::mem(&m_sh2_state->sr), ~SH_T);
 	UML_FSCMP(block, FPS32(Rm), FPS32(Rn));
 	UML_MOVc(block, COND_Z, I0, SH_T);
 	UML_MOV(block, uml::mem(&m_sh2_state->sr), I0);
@@ -3545,8 +3543,7 @@ bool sh34_base_device::generate_group_15_FCMP_GT(drcuml_block &block, compiler_s
 	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 0);
 	UML_JMPc(block, COND_Z, compiler.labelnum);
 
-	UML_MOV(block, I0, uml::mem(&m_sh2_state->sr));
-	UML_AND(block, I0, I0, ~SH_T);
+	UML_AND(block, I0, uml::mem(&m_sh2_state->sr), ~SH_T);
 	UML_FDCMP(block, FPD32(Rm & 14), FPD32(Rn & 14));
 	UML_MOVc(block, COND_C, I0, SH_T);
 	UML_MOV(block, uml::mem(&m_sh2_state->sr), I0);
@@ -3555,8 +3552,7 @@ bool sh34_base_device::generate_group_15_FCMP_GT(drcuml_block &block, compiler_s
 
 	UML_LABEL(block, compiler.labelnum++);  // labelnum:
 
-	UML_MOV(block, I0, uml::mem(&m_sh2_state->sr));
-	UML_AND(block, I0, I0, ~SH_T);
+	UML_AND(block, I0, uml::mem(&m_sh2_state->sr), ~SH_T);
 	UML_FSCMP(block, FPS32(Rm), FPS32(Rn));
 	UML_MOVc(block, COND_C, I0, SH_T);
 	UML_MOV(block, uml::mem(&m_sh2_state->sr), I0);
@@ -3688,8 +3684,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13(drcuml_block &block, compil
 bool sh34_base_device::generate_group_15_op1111_0x13_FSTS(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 #ifdef LSB_FIRST
-	UML_MOV(block, I0, Rn);
-	UML_XOR(block, I0, I0, uml::mem(&m_sh2_state->m_fpu_pr));
+	UML_XOR(block, I0, Rn, uml::mem(&m_sh2_state->m_fpu_pr));
 	UML_STORE(block, m_sh2_state->m_fr, I0, uml::mem(&m_sh2_state->m_fpul), SIZE_DWORD, SCALE_x4);
 #else
 	UML_MOV(block, FPS32(Rn), uml::mem(&m_sh2_state->m_fpul));
@@ -3744,10 +3739,11 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FTRC(drcuml_block &block, c
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FNEG(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
+	UML_MOV(block, I0, 0);
+
 	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 0);
 	UML_JMPc(block, COND_Z, compiler.labelnum);
 
-	UML_XOR(block, I0, I0, I0);
 	UML_FDFRINT(block, F1, I0, SIZE_DWORD);
 	UML_FDSUB(block, FPD32(Rn), F1, FPD32(Rn));
 
@@ -3755,7 +3751,6 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FNEG(drcuml_block &block, c
 
 	UML_LABEL(block, compiler.labelnum++);  // labelnum:
 
-	UML_XOR(block, I0, I0, I0);
 	UML_FSFRINT(block, F1, I0, SIZE_DWORD);
 	UML_FSSUB(block, FPS32(Rn), F1, FPS32(Rn));
 
@@ -3769,22 +3764,16 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FABS(drcuml_block &block, c
 	UML_JMPc(block, COND_Z, compiler.labelnum);
 
 #ifdef LSB_FIRST
-	UML_LOAD(block, I0, m_sh2_state->m_fr, ((Rn & 14) | 1), SIZE_DWORD, SCALE_x4);
-	UML_AND(block, I0, I0, 0x7fffffff);
-	UML_STORE(block, m_sh2_state->m_fr, ((Rn & 14) | 1), 0, SIZE_DWORD, SCALE_x4);
+	UML_AND(block, FPS32(((Rn&14)|1)), FPS32(((Rn&14)|1)), 0x7fffffff);
 #else
-	UML_LOAD(block, I0, m_sh2_state->m_fr, (Rn & 14), SIZE_DWORD, SCALE_x4);
-	UML_AND(block, I0, I0, 0x7fffffff);
-	UML_STORE(block, m_sh2_state->m_fr, (Rn & 14), 0, SIZE_DWORD, SCALE_x4);
+	UML_AND(block, FPS32(Rn&14), FPS32(Rn&14), 0x7fffffff);
 #endif
 
 	UML_JMP(block, compiler.labelnum+1);
 
 	UML_LABEL(block, compiler.labelnum++);  // labelnum:
 
-	UML_LOAD(block, I0, m_sh2_state->m_fr, Rn, SIZE_DWORD, SCALE_x4);
-	UML_AND(block, I0, I0, 0x7fffffff);
-	UML_STORE(block, m_sh2_state->m_fr, Rn, 0, SIZE_DWORD, SCALE_x4);
+	UML_AND(block, FPS32(Rn), FPS32(Rn), 0x7fffffff);
 
 	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:
 	return true;
@@ -3903,8 +3892,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13(drcuml_block &
 
 bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FSCHG(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	UML_MOV(block, I0, uml::mem(&m_sh2_state->m_fpscr));
-	UML_XOR(block, I0, I0, SZ);
+	UML_XOR(block, I0, uml::mem(&m_sh2_state->m_fpscr), SZ);
 	UML_MOV(block, uml::mem(&m_sh2_state->m_fpscr), I0);
 	UML_TEST(block, I0, SZ);
 	UML_SETc(block, COND_NZ, uml::mem(&m_sh2_state->m_fpu_sz));
