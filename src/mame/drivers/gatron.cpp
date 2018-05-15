@@ -570,7 +570,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gatron_state::gat)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/24)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(gat_map)
 	MCFG_DEVICE_IO_MAP(gat_portmap)
 
