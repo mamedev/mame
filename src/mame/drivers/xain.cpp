@@ -275,9 +275,11 @@ CUSTOM_INPUT_MEMBER(xain_state::mcu_status_r)
 
 READ8_MEMBER(xain_state::mcu_comm_reset_r)
 {
-	if (m_mcu)
-		m_mcu->reset_w(PULSE_LINE);
-
+	if (m_mcu.found() && !machine().side_effects_disabled())
+	{
+		m_mcu->reset_w(ASSERT_LINE);
+		m_mcu->reset_w(CLEAR_LINE);
+	}
 	return 0xff;
 }
 
