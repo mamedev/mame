@@ -3899,14 +3899,22 @@ bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FSCHG(drcuml_b
 	return true;
 }
 
-void sh34_base_device::func_FRCHG() { sh4_swap_fp_registers(); }
-static void cfunc_FRCHG(void *param) { ((sh34_base_device *)param)->func_FRCHG(); };
-
 bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FRCHG(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
 	UML_XOR(block, uml::mem(&m_sh2_state->m_fpscr), uml::mem(&m_sh2_state->m_fpscr), FR);
-	// no iregs are operated on by what this calls, so no need to save/restore
-	UML_CALLC(block, cfunc_FRCHG, this);
+
+	UML_MOV(block, I0, 0);
+	UML_LABEL(block, compiler.labelnum);  // labelnum:
+
+	UML_LOAD(block, I1, m_sh2_state->m_fr, I0, SIZE_DWORD, SCALE_x4);
+	UML_LOAD(block, I2, m_sh2_state->m_xf, I0, SIZE_DWORD, SCALE_x4);
+	UML_STORE(block, m_sh2_state->m_xf, I0, I1, SIZE_DWORD, SCALE_x4);
+	UML_STORE(block, m_sh2_state->m_fr, I0, I2, SIZE_DWORD, SCALE_x4);
+	UML_ADD(block, I0, I0, 1);
+	UML_CMP(block, I0, 16);
+	UML_JMPc(block, COND_NZ, compiler.labelnum);
+
+	compiler.labelnum++;
 	return true;
 }
 
