@@ -38,7 +38,7 @@ To Do:
 #include "cpu/z8000/z8000.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
-//#include "cpu/z80/z80daisy.h"
+//#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"

@@ -69,7 +69,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"

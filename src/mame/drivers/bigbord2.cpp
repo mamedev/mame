@@ -72,7 +72,7 @@ X - change banks
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/74259.h"
 #include "machine/clock.h"
 #include "machine/keyboard.h"

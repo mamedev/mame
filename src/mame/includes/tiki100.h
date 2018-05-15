@@ -9,7 +9,7 @@
 #include "bus/rs232/rs232.h"
 #include "bus/tiki100/exp.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "formats/tiki100_dsk.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
