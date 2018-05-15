@@ -69,7 +69,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
 	DECLARE_READ32_MEMBER(test_r);
 	// DECLARE_READ32_MEMBER(rng_r);
-	DECLARE_DRIVER_INIT(kingtut);
+	void init_kingtut();
 	DECLARE_VIDEO_START(kongambl);
 	uint8_t m_irq_mask;
 
@@ -605,7 +605,7 @@ static const gfx_layout charlayout8_tasman =
 	8*64
 };
 
-static GFXDECODE_START( tasman )
+static GFXDECODE_START( gfx_tasman )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout8_tasman, 0, 0x8000/(1 << 8) )
 GFXDECODE_END
 
@@ -674,7 +674,7 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_K055673_PALETTE("palette")
 
 #if CUSTOM_DRAW
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tasman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tasman)
 #endif
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
@@ -813,7 +813,7 @@ ROM_START( vikingt )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(kongambl_state,kingtut)
+void kongambl_state::init_kingtut()
 {
 	//uint32_t *rom = (uint32_t*)memregion("maincpu")->base();
 
@@ -823,8 +823,8 @@ DRIVER_INIT_MEMBER(kongambl_state,kingtut)
 	//rom[0x55e40/4] = (rom[0x55e40/4] & 0xffff0000) | 0x4e71; // goes away from the POST
 }
 
-GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state,  kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, moneybnk,   0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Money In The Bank (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, dragsphr,   0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Dragon Sphere", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Ivory Tusk", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, vikingt,    0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Viking Treasure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state, init_kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, moneybnk,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Money In The Bank (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, dragsphr,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Dragon Sphere", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Ivory Tusk", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, vikingt,    0,        kongambl,    kongambl, kongambl_state, empty_init,   ROT0,  "Konami", "Viking Treasure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

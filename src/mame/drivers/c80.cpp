@@ -296,5 +296,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  CLASS       INIT  COMPANY           FULLNAME  FLAGS */
-COMP( 1986, c80,    0,      0,      c80,    c80,   c80_state,  0,    "Joachim Czepa", "C-80",    MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY          FULLNAME  FLAGS */
+COMP( 1986, c80,  0,      0,      c80,     c80,   c80_state, empty_init, "Joachim Czepa", "C-80",   MACHINE_SUPPORTS_SAVE )

@@ -243,7 +243,7 @@ static const gfx_layout spritelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( jailbrek )
+static GFXDECODE_START( gfx_jailbrek )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 ) /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 ) /* sprites */
 GFXDECODE_END
@@ -271,7 +271,7 @@ MACHINE_CONFIG_START(jailbrek_state::jailbrek)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jailbrek)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jailbrek)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(jailbrek_state, jailbrek)
@@ -423,6 +423,6 @@ ROM_START( jailbrekb )
 	ROM_LOAD( "k8.bin",  0x0000, 0x0001, NO_DUMP ) /* PAL16L8 */
 ROM_END
 
-GAME( 1986, jailbrek,  0,        jailbrek, jailbrek, jailbrek_state, 0, ROT0, "Konami",  "Jail Break",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, jailbrekb, jailbrek, jailbrek, jailbrek, jailbrek_state, 0, ROT0, "bootleg", "Jail Break (bootleg)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, manhatan,  jailbrek, jailbrek, jailbrek, jailbrek_state, 0, ROT0, "Konami",  "Manhattan 24 Bunsyo (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jailbrek,  0,        jailbrek, jailbrek, jailbrek_state, empty_init, ROT0, "Konami",  "Jail Break",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jailbrekb, jailbrek, jailbrek, jailbrek, jailbrek_state, empty_init, ROT0, "bootleg", "Jail Break (bootleg)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, manhatan,  jailbrek, jailbrek, jailbrek, jailbrek_state, empty_init, ROT0, "Konami",  "Manhattan 24 Bunsyo (Japan)", MACHINE_SUPPORTS_SAVE )

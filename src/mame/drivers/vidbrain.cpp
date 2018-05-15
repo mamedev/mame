@@ -565,5 +565,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     STATE           INIT    COMPANY                         FULLNAME                        FLAGS
-COMP( 1977, vidbrain,   0,      0,      vidbrain,   vidbrain, vidbrain_state, 0,      "VideoBrain Computer Company",  "VideoBrain FamilyComputer",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                        FULLNAME                     FLAGS
+COMP( 1977, vidbrain, 0,      0,      vidbrain, vidbrain, vidbrain_state, empty_init, "VideoBrain Computer Company", "VideoBrain FamilyComputer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

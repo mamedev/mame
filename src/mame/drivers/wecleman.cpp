@@ -967,7 +967,7 @@ static const gfx_layout wecleman_road_layout =
 	nullptr
 };
 
-static GFXDECODE_START( wecleman )
+static GFXDECODE_START( gfx_wecleman )
 	// "sprites" holds sprite, which are not decoded here
 	GFXDECODE_ENTRY( "layers", 0, wecleman_bg_layout,   0, 2048/8 )   // [0] bg + fg + txt
 	GFXDECODE_ENTRY( "road",   0, wecleman_road_layout, 0, 2048/8 )   // [1] road
@@ -1001,7 +1001,7 @@ static const gfx_layout hotchase_road_layout =
 	nullptr
 };
 
-static GFXDECODE_START( hotchase )
+static GFXDECODE_START( gfx_hotchase )
 	// "sprites" holds sprite, which are not decoded here
 	GFXDECODE_ENTRY( "road", 0, hotchase_road_layout, 0x70*16, 16 ) // road
 GFXDECODE_END
@@ -1067,7 +1067,7 @@ MACHINE_CONFIG_START(wecleman_state::wecleman)
 	MCFG_SCREEN_VISIBLE_AREA(0 +8, 320-1 +8, 0 +8, 224-1 +8)
 	MCFG_SCREEN_UPDATE_DRIVER(wecleman_state, screen_update_wecleman)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wecleman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wecleman)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 
@@ -1146,7 +1146,7 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 	MCFG_SCREEN_UPDATE_DRIVER(wecleman_state, screen_update_hotchase)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hotchase)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hotchase)
 	MCFG_PALETTE_ADD("palette", 2048*2)
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state, hotchase)
@@ -1369,10 +1369,8 @@ void wecleman_state::bitswap(uint8_t *src,size_t len,int _14,int _13,int _12,int
 }
 
 /* Unpack sprites data and do some patching */
-DRIVER_INIT_MEMBER(wecleman_state,wecleman)
+void wecleman_state::init_wecleman()
 {
-	int i, len;
-	uint8_t *RAM;
 //  uint16_t *RAM1 = (uint16_t *) memregion("maincpu")->base();   /* Main CPU patches */
 //  RAM1[0x08c2/2] = 0x601e;    // faster self test
 
@@ -1383,9 +1381,9 @@ DRIVER_INIT_MEMBER(wecleman_state,wecleman)
 	    I hope you'll appreciate this effort!  */
 
 	/* let's swap even and odd *pixels* of the sprites */
-	RAM = m_sprite_region;
-	len = m_sprite_region.length();
-	for (i = 0; i < len; i ++)
+	uint8_t *RAM = m_sprite_region;
+	int len = m_sprite_region.length();
+	for (int i = 0; i < len; i ++)
 	{
 		/* TODO: could be wrong, colors have to be fixed.       */
 		/* The only certain thing is that 87 must convert to f0 */
@@ -1677,7 +1675,7 @@ void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 }
 
 /* Unpack sprites data and do some patching */
-DRIVER_INIT_MEMBER(wecleman_state,hotchase)
+void wecleman_state::init_hotchase()
 {
 //  uint16_t *RAM1 = (uint16_t) memregion("maincpu")->base(); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test
@@ -1694,10 +1692,10 @@ DRIVER_INIT_MEMBER(wecleman_state,hotchase)
                                 Game driver(s)
 ***************************************************************************/
 
-GAMEL( 1986, wecleman,  0,        wecleman, wecleman, wecleman_state, wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00, set 1)", 0, layout_wecleman )
-GAMEL( 1986, weclemana, wecleman, wecleman, wecleman, wecleman_state, wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00, set 2)", 0, layout_wecleman ) // 1988 release (maybe date hacked?)
-GAMEL( 1986, weclemanb, wecleman, wecleman, wecleman, wecleman_state, wecleman, ROT0, "Konami", "WEC Le Mans 24 (v1.26)", 0, layout_wecleman )
+GAMEL( 1986, wecleman,  0,        wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00, set 1)", 0, layout_wecleman )
+GAMEL( 1986, weclemana, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v2.00, set 2)", 0, layout_wecleman ) // 1988 release (maybe date hacked?)
+GAMEL( 1986, weclemanb, wecleman, wecleman, wecleman, wecleman_state, init_wecleman, ROT0, "Konami", "WEC Le Mans 24 (v1.26)", 0, layout_wecleman )
 // a version 1.21 is known to exist too, see https://www.youtube.com/watch?v=4l8vYJi1OeU
 
-GAMEL( 1988, hotchase,  0,        hotchase, hotchase, wecleman_state, hotchase, ROT0, "Konami", "Hot Chase (set 1)", 0, layout_wecleman )
-GAMEL( 1988, hotchasea, hotchase, hotchase, hotchase, wecleman_state, hotchase, ROT0, "Konami", "Hot Chase (set 2)", 0, layout_wecleman )
+GAMEL( 1988, hotchase,  0,        hotchase, hotchase, wecleman_state, init_hotchase, ROT0, "Konami", "Hot Chase (set 1)", 0, layout_wecleman )
+GAMEL( 1988, hotchasea, hotchase, hotchase, hotchase, wecleman_state, init_hotchase, ROT0, "Konami", "Hot Chase (set 2)", 0, layout_wecleman )

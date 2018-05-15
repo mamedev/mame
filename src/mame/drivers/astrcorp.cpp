@@ -86,9 +86,9 @@ public:
 	DECLARE_READ16_MEMBER(astrocorp_unk_r);
 	DECLARE_WRITE16_MEMBER(astrocorp_sound_bank_w);
 	DECLARE_WRITE16_MEMBER(skilldrp_sound_bank_w);
-	DECLARE_DRIVER_INIT(astoneag);
-	DECLARE_DRIVER_INIT(showhanc);
-	DECLARE_DRIVER_INIT(showhand);
+	void init_astoneag();
+	void init_showhanc();
+	void init_showhand();
 	DECLARE_VIDEO_START(astrocorp);
 	uint32_t screen_update_astrocorp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline);
@@ -483,7 +483,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( astrocorp )
+static GFXDECODE_START( gfx_astrocorp )
 	GFXDECODE_ENTRY("sprites", 0, layout_16x16x8, 0, 1)
 GFXDECODE_END
 
@@ -528,7 +528,7 @@ MACHINE_CONFIG_START(astrocorp_state::showhand)
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrocorp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_astrocorp)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 
@@ -583,7 +583,7 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrocorp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_astrocorp)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 
@@ -1197,7 +1197,7 @@ ROM_START( dinodino )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(astrocorp_state,showhand)
+void astrocorp_state::init_showhand()
 {
 #if 0
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
@@ -1213,7 +1213,7 @@ DRIVER_INIT_MEMBER(astrocorp_state,showhand)
 #endif
 }
 
-DRIVER_INIT_MEMBER(astrocorp_state,showhanc)
+void astrocorp_state::init_showhanc()
 {
 #if 0
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
@@ -1226,7 +1226,7 @@ DRIVER_INIT_MEMBER(astrocorp_state,showhanc)
 #endif
 }
 
-DRIVER_INIT_MEMBER(astrocorp_state,astoneag)
+void astrocorp_state::init_astoneag()
 {
 #if 0
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
@@ -1377,16 +1377,16 @@ DRIVER_INIT_MEMBER(astrocorp_state,astoneag)
 #endif
 }
 
-GAME( 2000,  showhand,  0,        showhand, showhand, astrocorp_state, showhand, ROT0, "Astro Corp.",        "Show Hand (Italy)",                MACHINE_SUPPORTS_SAVE )
-GAME( 2000,  showhanc,  showhand, showhanc, showhanc, astrocorp_state, showhanc, ROT0, "Astro Corp.",        "Wang Pai Dui Jue (China)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, astrocorp_state, 0,        ROT0, "Astro Corp.",        "Skill Drop Georgia (Ver. G1.0S)",  MACHINE_SUPPORTS_SAVE )
-GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, astrocorp_state, 0,        ROT0, "Astro Corp.",        "Speed Drop (Ver. 1.06)",           MACHINE_SUPPORTS_SAVE )
+GAME( 2000,  showhand,  0,        showhand, showhand, astrocorp_state, init_showhand, ROT0, "Astro Corp.",        "Show Hand (Italy)",                MACHINE_SUPPORTS_SAVE )
+GAME( 2000,  showhanc,  showhand, showhanc, showhanc, astrocorp_state, init_showhanc, ROT0, "Astro Corp.",        "Wang Pai Dui Jue (China)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Skill Drop Georgia (Ver. G1.0S)",  MACHINE_SUPPORTS_SAVE )
+GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Speed Drop (Ver. 1.06)",           MACHINE_SUPPORTS_SAVE )
 
 // Encrypted games (not working):
-GAME( 2003?, dinodino,  0,        skilldrp, skilldrp, astrocorp_state, 0,        ROT0, "Astro Corp.",        "Dino Dino",                        MACHINE_NOT_WORKING )
-GAME( 2004?, astoneag,  0,        skilldrp, skilldrp, astrocorp_state, astoneag, ROT0, "Astro Corp.",        "Stone Age (Astro, Ver. ENG.03.A)", MACHINE_NOT_WORKING )
-GAME( 2005?, winbingo,  0,        skilldrp, skilldrp, astrocorp_state, 0,        ROT0, "Astro Corp.",        "Win Win Bingo (set 1)",            MACHINE_NOT_WORKING )
-GAME( 2005?, winbingoa, winbingo, skilldrp, skilldrp, astrocorp_state, 0,        ROT0, "Astro Corp.",        "Win Win Bingo (set 2)",            MACHINE_NOT_WORKING )
-GAME( 2005?, hacher,    winbingo, skilldrp, skilldrp, astrocorp_state, 0,        ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo)",   MACHINE_NOT_WORKING )
-GAME( 2005?, zoo,       0,        showhand, showhand, astrocorp_state, 0,        ROT0, "Astro Corp.",        "Zoo (Ver. ZO.02.D)",               MACHINE_NOT_WORKING )
-GAME( 2007?, westvent,  0,        skilldrp, skilldrp, astrocorp_state, 0,        ROT0, "Astro Corp.",        "Western Venture (Ver. AA.02.D)",   MACHINE_NOT_WORKING )
+GAME( 2003?, dinodino,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Dino Dino",                        MACHINE_NOT_WORKING )
+GAME( 2004?, astoneag,  0,        skilldrp, skilldrp, astrocorp_state, init_astoneag, ROT0, "Astro Corp.",        "Stone Age (Astro, Ver. ENG.03.A)", MACHINE_NOT_WORKING )
+GAME( 2005?, winbingo,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Win Win Bingo (set 1)",            MACHINE_NOT_WORKING )
+GAME( 2005?, winbingoa, winbingo, skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Win Win Bingo (set 2)",            MACHINE_NOT_WORKING )
+GAME( 2005?, hacher,    winbingo, skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo)",   MACHINE_NOT_WORKING )
+GAME( 2005?, zoo,       0,        showhand, showhand, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Zoo (Ver. ZO.02.D)",               MACHINE_NOT_WORKING )
+GAME( 2007?, westvent,  0,        skilldrp, skilldrp, astrocorp_state, empty_init,    ROT0, "Astro Corp.",        "Western Venture (Ver. AA.02.D)",   MACHINE_NOT_WORKING )

@@ -77,7 +77,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(xtheball_state::scanline_update)
 {
 	uint16_t *srcbg = &m_vram_bg[(params->rowaddr << 8) & 0xff00];
 	uint32_t *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = m_tlc34076->get_pens();
+	const pen_t *pens = m_tlc34076->pens();
 	int coladdr = params->coladdr;
 	int x;
 
@@ -365,4 +365,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, xtheball, 0, xtheball, xtheball, xtheball_state, 0,  ROT0, "Rare", "X the Ball", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, xtheball, 0, xtheball, xtheball, xtheball_state, empty_init, ROT0, "Rare", "X the Ball", MACHINE_SUPPORTS_SAVE )

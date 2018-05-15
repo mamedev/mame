@@ -54,7 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ninjemak_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(galivan_scrollx_w);
 	DECLARE_WRITE8_MEMBER(galivan_scrolly_w);
-	DECLARE_DRIVER_INIT(youmab);
+	void init_youmab();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(ninjemak_get_bg_tile_info);

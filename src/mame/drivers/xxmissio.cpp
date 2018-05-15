@@ -257,7 +257,7 @@ static const gfx_layout bglayout =
 	64*8
 };
 
-static GFXDECODE_START( xxmissio )
+static GFXDECODE_START( gfx_xxmissio )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   256,  8 ) /* FG */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout,   0,  8 ) /* sprite */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, bglayout,     512, 16 ) /* BG */
@@ -287,7 +287,7 @@ MACHINE_CONFIG_START(xxmissio_state::xxmissio)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xxmissio_state, interrupt_m))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xxmissio)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xxmissio)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT_CLASS(1, xxmissio_state, BBGGRRII)
 
@@ -336,4 +336,4 @@ ROM_START( xxmissio )
 	ROM_LOAD16_BYTE( "xx11.4b", 0x0001,  0x8000, CRC(d9dd827c) SHA1(aea3a5abd871adf7f75ad4d6cc57eff0833135c7) )
 ROM_END
 
-GAME( 1986, xxmissio, 0, xxmissio, xxmissio, xxmissio_state, 0, ROT90, "UPL", "XX Mission", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, xxmissio, 0, xxmissio, xxmissio, xxmissio_state, empty_init, ROT90, "UPL", "XX Mission", MACHINE_SUPPORTS_SAVE )

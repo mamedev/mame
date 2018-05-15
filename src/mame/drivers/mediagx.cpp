@@ -102,7 +102,7 @@ public:
 		m_ports(*this, "IN%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(a51site4);
+	void init_a51site4();
 	void mediagx(machine_config &config);
 
 protected:
@@ -791,7 +791,7 @@ static const gfx_layout CGA_charlayout =
 	8*8                     /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( CGA )
+static GFXDECODE_START( gfx_cga )
 /* Support up to four CGA fonts */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, CGA_charlayout, 0, 256 )   /* Font 0 */
 	GFXDECODE_ENTRY( "gfx1", 0x0800, CGA_charlayout, 0, 256 )   /* Font 1 */
@@ -907,7 +907,7 @@ MACHINE_CONFIG_START(mediagx_state::mediagx)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(mediagx_state, screen_update_mediagx)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", CGA)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cga)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
@@ -1006,7 +1006,7 @@ static const speedup_entry a51site4_speedups[] =
 
 #endif
 
-DRIVER_INIT_MEMBER(mediagx_state,a51site4)
+void mediagx_state::init_a51site4()
 {
 	init_mediagx();
 
@@ -1052,5 +1052,5 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1998, a51site4, 0       , mediagx, mediagx, mediagx_state, a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.01, September 7, 1998)", MACHINE_NOT_WORKING )
-GAME( 1998, a51site4a,a51site4, mediagx, mediagx, mediagx_state, a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.0, September 11, 1998)", MACHINE_NOT_WORKING )
+GAME( 1998, a51site4, 0       , mediagx, mediagx, mediagx_state, init_a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.01, September 7, 1998)", MACHINE_NOT_WORKING )
+GAME( 1998, a51site4a,a51site4, mediagx, mediagx, mediagx_state, init_a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.0, September 11, 1998)", MACHINE_NOT_WORKING )

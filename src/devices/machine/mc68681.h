@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "diserial.h"
 
 #define MCFG_MC68681_IRQ_CALLBACK(_cb) \
 	devcb = &downcast<duart_base_device &>(*device).set_irq_cb(DEVCB_##_cb);

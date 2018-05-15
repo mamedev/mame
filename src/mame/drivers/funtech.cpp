@@ -471,7 +471,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static GFXDECODE_START( funtech )
+static GFXDECODE_START( gfx_funtech )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32_layout, 0x100, 1 )
 GFXDECODE_END
@@ -502,7 +502,7 @@ MACHINE_CONFIG_START(fun_tech_corp_state::funtech)
 	MCFG_SCREEN_UPDATE_DRIVER(fun_tech_corp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funtech)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funtech)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -531,4 +531,4 @@ ROM_START( fts2in1 )
 	ROM_LOAD16_BYTE( "u30.bin", 0x00001, 0x20000, CRC(d572bddc) SHA1(06499aeb47085a02af9eb4987ed987f9a3a397f7) )
 ROM_END
 
-GAMEL( 1993, fts2in1,  0,    funtech, funtech, fun_tech_corp_state,  0, ROT0, "Fun Tech Corporation", "Super Two In One", 0, layout_fts2in1 )
+GAMEL( 1993, fts2in1, 0, funtech, funtech, fun_tech_corp_state, empty_init, ROT0, "Fun Tech Corporation", "Super Two In One", 0, layout_fts2in1 )

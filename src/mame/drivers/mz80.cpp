@@ -263,11 +263,11 @@ void mz80_state::mz80k_io(address_map &map)
 	map.unmap_value_high();
 }
 
-static GFXDECODE_START( mz80k )
+static GFXDECODE_START( gfx_mz80k )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mz80k_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( mz80kj )
+static GFXDECODE_START( gfx_mz80kj )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mz80kj_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80k)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz80k)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz80k)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Audio */
@@ -326,7 +326,7 @@ MACHINE_CONFIG_START(mz80_state::mz80kj)
 	mz80k(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80kj)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", mz80kj)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mz80kj)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mz80_state::mz80a)
@@ -373,7 +373,7 @@ ROM_START( mz80a )
 	ROM_LOAD( "mz80acg.rom", 0x0000, 0x0800, CRC(a87c2e2b) SHA1(e8aefbdb48a63e5f96692af868c353ca7e1bfcd2) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY    FULLNAME             FLAGS
-COMP( 1979, mz80kj,   0,        0,      mz80kj,  mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80K (Japanese)", 0 )
-COMP( 1979, mz80k,    mz80kj,   0,      mz80k,   mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80K",            0 )
-COMP( 1982, mz80a,    0,        0,      mz80a,   mz80a, mz80_state,  mz80k, "Sharp",   "MZ-80A",            0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME             FLAGS
+COMP( 1979, mz80kj, 0,      0,      mz80kj,  mz80k, mz80_state, init_mz80k, "Sharp", "MZ-80K (Japanese)", 0 )
+COMP( 1979, mz80k,  mz80kj, 0,      mz80k,   mz80k, mz80_state, init_mz80k, "Sharp", "MZ-80K",            0 )
+COMP( 1982, mz80a,  0,      0,      mz80a,   mz80a, mz80_state, init_mz80k, "Sharp", "MZ-80A",            0 )

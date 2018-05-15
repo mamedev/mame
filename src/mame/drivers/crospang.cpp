@@ -321,7 +321,7 @@ static const gfx_layout tlayout =
 };
 
 
-static GFXDECODE_START( crospang )
+static GFXDECODE_START( gfx_crospang )
 	//GFXDECODE_ENTRY( "gfx1", 0, tcharlayout, 256, 16 )    /* Characters 8x8 */
 	//GFXDECODE_ENTRY( "gfx1", 0, tlayout,     512, 16 )    /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 64 )  /* Tiles 16x16 */
@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(crospang_state::crospang)
 
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crospang)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crospang)
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
@@ -625,12 +625,12 @@ void crospang_state::tumblepb_gfx1_rearrange()
 	}
 }
 
-DRIVER_INIT_MEMBER(crospang_state,crospang)
+void crospang_state::init_crospang()
 {
 	tumblepb_gfx1_rearrange();
 }
 
-GAME( 1998, crospang,        0, crospang, crospang, crospang_state, crospang, ROT0, "F2 System",         "Cross Pang", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, heuksun,         0, crospang,  heuksun, crospang_state, crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bestri,          0,   bestri,   bestri, crospang_state, crospang, ROT0, "F2 System",         "Bestri (Korea, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bestria,    bestri,  bestria,   bestri, crospang_state, crospang, ROT0, "F2 System",         "Bestri (Korea, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, crospang, 0,      crospang, crospang, crospang_state, init_crospang, ROT0, "F2 System",         "Cross Pang", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, heuksun,  0,      crospang, heuksun,  crospang_state, init_crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bestri,   0,      bestri,   bestri,   crospang_state, init_crospang, ROT0, "F2 System",         "Bestri (Korea, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bestria,  bestri, bestria,  bestri,   crospang_state, init_crospang, ROT0, "F2 System",         "Bestri (Korea, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -379,7 +379,7 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( crshrace )
+static GFXDECODE_START( gfx_crshrace )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 512, 32 )
@@ -424,7 +424,7 @@ MACHINE_CONFIG_START(crshrace_state::crshrace)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crshrace)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crshrace)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
 
@@ -538,14 +538,14 @@ void crshrace_state::crshrace_patch_code( uint16_t offset )
 #endif
 
 
-DRIVER_INIT_MEMBER(crshrace_state,crshrace)
+void crshrace_state::init_crshrace()
 {
 	#if CRSHRACE_3P_HACK
 	crshrace_patch_code(0x003778);
 	#endif
 }
 
-DRIVER_INIT_MEMBER(crshrace_state,crshrace2)
+void crshrace_state::init_crshrace2()
 {
 	#if CRSHRACE_3P_HACK
 	crshrace_patch_code(0x003796);
@@ -553,5 +553,5 @@ DRIVER_INIT_MEMBER(crshrace_state,crshrace2)
 }
 
 
-GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace_state, crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, crshrace2, ROT270, "Video System Co.", "Lethal Crash Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace_state, init_crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, init_crshrace2, ROT270, "Video System Co.", "Lethal Crash Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

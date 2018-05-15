@@ -350,14 +350,14 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( f1gp )
+static GFXDECODE_START( gfx_f1gp )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x100, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x200, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout2,  0x300, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( f1gp2 )
+static GFXDECODE_START( gfx_f1gp2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x200, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0x100, 16 )
@@ -427,7 +427,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", f1gp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_f1gp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -501,7 +501,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gpb)
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gpb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", f1gp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_f1gp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -527,7 +527,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gp2)
 	MCFG_DEVICE_PROGRAM_MAP(f1gp2_cpu1_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", f1gp2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1gp2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gp2)
@@ -693,7 +693,7 @@ ROM_START( f1gp2 )
 ROM_END
 
 
-GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix",                    MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  f1gp_state, 0, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
+GAME( 1991, f1gp,  0,    f1gp,  f1gp,  f1gp_state, empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix",                    MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, f1gpb, f1gp, f1gpb, f1gp,  f1gp_state, empty_init, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
 
-GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, f1gp_state, 0, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, f1gp_state, empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )

@@ -88,15 +88,15 @@ public:
 	DECLARE_WRITE32_MEMBER(encryption_do_w);
 	DECLARE_WRITE32_MEMBER(sprite_encryption_w);
 
-	DECLARE_DRIVER_INIT(kov2nl);
-	DECLARE_DRIVER_INIT(orleg2);
-	DECLARE_DRIVER_INIT(ddpdojt);
-	DECLARE_DRIVER_INIT(kov3);
-	DECLARE_DRIVER_INIT(kov3_104);
-	DECLARE_DRIVER_INIT(kov3_102);
-	DECLARE_DRIVER_INIT(kov3_101);
-	DECLARE_DRIVER_INIT(kov3_100);
-	DECLARE_DRIVER_INIT(kof98umh);
+	void init_kov2nl();
+	void init_orleg2();
+	void init_ddpdojt();
+	void init_kov3();
+	void init_kov3_104();
+	void init_kov3_102();
+	void init_kov3_101();
+	void init_kov3_100();
+	void init_kof98umh();
 
 	uint32_t screen_update_pgm2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm2);

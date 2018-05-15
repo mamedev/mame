@@ -427,7 +427,7 @@ MACHINE_CONFIG_START(quickpick5_state::quickpick5)
 	MCFG_K05324X_OFFSETS(-(44+80), 20)
 	MCFG_K05324X_CB(quickpick5_state, sprite_callback)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -463,5 +463,5 @@ ROM_START( quickp5 )
 
 ROM_END
 
-GAME( 1995, quickp5, 0, quickpick5, quickpick5,  quickpick5_state, 0, ROT0, "Konami", "Quick Pick 5", MACHINE_NOT_WORKING)
+GAME( 1995, quickp5, 0, quickpick5, quickpick5,  quickpick5_state, empty_init, ROT0, "Konami", "Quick Pick 5", MACHINE_NOT_WORKING)
 

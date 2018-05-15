@@ -390,7 +390,7 @@ static const gfx_layout sprite8layout =
 	8*32    /* offset to next tile */
 };
 
-static GFXDECODE_START( tbowl )
+static GFXDECODE_START( gfx_tbowl )
 	GFXDECODE_ENTRY( "characters", 0, charlayout,   256, 16 )
 	GFXDECODE_ENTRY( "bg_tiles", 0, bgtilelayout, 768, 16 )
 	GFXDECODE_ENTRY( "bg_tiles", 0, bgtilelayout, 512, 16 )
@@ -449,7 +449,7 @@ MACHINE_CONFIG_START(tbowl_state::tbowl)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tbowl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tbowl)
 	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -745,7 +745,7 @@ ROM_START( tbowlj )
 	ROM_LOAD( "6206a-2.l16",    0x10000, 0x10000, CRC(1e9e5936) SHA1(60370d1de28b1c5ffeff7843702aaddb19ff1f58) )
 ROM_END
 
-GAME( 1987, tbowl,    0,        tbowl,    tbowl,  tbowl_state,   0, ROT0,  "Tecmo", "Tecmo Bowl (World, set 1)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1987, tbowla,   tbowl,    tbowl,    tbowl,  tbowl_state,   0, ROT0,  "Tecmo", "Tecmo Bowl (World, set 2)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1987, tbowlp,   tbowl,    tbowl,    tbowl,  tbowl_state,   0, ROT0,  "Tecmo", "Tecmo Bowl (World, prototype?)", MACHINE_SUPPORTS_SAVE ) // or early version, handwritten labels
-GAME( 1987, tbowlj,   tbowl,    tbowl,    tbowlj, tbowl_state,   0, ROT0,  "Tecmo", "Tecmo Bowl (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tbowl,    0,        tbowl,    tbowl,  tbowl_state, empty_init, ROT0, "Tecmo", "Tecmo Bowl (World, set 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tbowla,   tbowl,    tbowl,    tbowl,  tbowl_state, empty_init, ROT0, "Tecmo", "Tecmo Bowl (World, set 2)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tbowlp,   tbowl,    tbowl,    tbowl,  tbowl_state, empty_init, ROT0, "Tecmo", "Tecmo Bowl (World, prototype?)", MACHINE_SUPPORTS_SAVE ) // or early version, handwritten labels
+GAME( 1987, tbowlj,   tbowl,    tbowl,    tbowlj, tbowl_state, empty_init, ROT0, "Tecmo", "Tecmo Bowl (Japan)",             MACHINE_SUPPORTS_SAVE )

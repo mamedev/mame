@@ -110,7 +110,7 @@ static const gfx_layout c900_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( c900 )
+static GFXDECODE_START( gfx_c900 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, c900_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -123,7 +123,7 @@ MACHINE_CONFIG_START(c900_state::c900)
 
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(c900_state, kbd_put))
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c900)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c900)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("cio", Z8036, 6'000'000)
@@ -152,5 +152,5 @@ ROM_START( c900 )
 	ROM_LOAD( "380217-01.u2", 0x0000, 0x1000, CRC(64cb4171) SHA1(e60d796170addfd27e2c33090f9c512c7e3f99f5) )
 ROM_END
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   STATE       INIT  COMPANY      FULLNAME         FLAGS */
-COMP( 1985, c900,  0,      0,      c900,    c900,   c900_state, 0,    "Commodore", "Commodore 900", MACHINE_IS_SKELETON )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY      FULLNAME         FLAGS */
+COMP( 1985, c900, 0,      0,      c900,    c900,  c900_state, empty_init, "Commodore", "Commodore 900", MACHINE_IS_SKELETON )

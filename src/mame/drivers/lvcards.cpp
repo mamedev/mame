@@ -449,7 +449,7 @@ static const gfx_layout charlayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( lvcards )
+static GFXDECODE_START( gfx_lvcards )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -471,7 +471,7 @@ MACHINE_CONFIG_START(lvcards_state::lvcards)
 	MCFG_SCREEN_UPDATE_DRIVER(lvcards_state, screen_update_lvcards)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lvcards)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lvcards)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(lvcards_state, lvcards)
 
@@ -570,6 +570,6 @@ ROM_START( ponttehk )
 	ROM_LOAD( "pon24s10.001", 0x0200, 0x0100, CRC(c64ecee8) SHA1(80c9ec21e135235f7f2d41ce7900cf3904123823) )  /* blue component */
 ROM_END
 
-GAME( 1985, lvcards,        0, lvcards,  lvcards,  lvcards_state, 0, ROT0, "Tehkan", "Lovely Cards",       0 )
-GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvcards_state, 0, ROT0, "Tehkan", "Lovely Poker [BET]", 0 )
-GAME( 1985, ponttehk,       0, ponttehk, ponttehk, lvcards_state, 0, ROT0, "Tehkan", "Pontoon (Tehkan)",   0 )
+GAME( 1985, lvcards,  0,       lvcards,  lvcards,  lvcards_state, empty_init, ROT0, "Tehkan", "Lovely Cards",       0 )
+GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvcards_state, empty_init, ROT0, "Tehkan", "Lovely Poker [BET]", 0 )
+GAME( 1985, ponttehk, 0,       ponttehk, ponttehk, lvcards_state, empty_init, ROT0, "Tehkan", "Pontoon (Tehkan)",   0 )

@@ -455,7 +455,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( boxer )
+static GFXDECODE_START( gfx_boxer )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 2, 1 )
@@ -502,7 +502,7 @@ MACHINE_CONFIG_START(boxer_state::boxer)
 	MCFG_SCREEN_UPDATE_DRIVER(boxer_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", boxer)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_boxer)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(boxer_state, boxer)
 
@@ -551,4 +551,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1978, boxer, 0, boxer, boxer, boxer_state, 0, 0, "Atari", "Boxer (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, boxer, 0, boxer, boxer, boxer_state, empty_init, 0, "Atari", "Boxer (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

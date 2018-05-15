@@ -651,7 +651,7 @@ static const gfx_layout ojankohs_bglayout =
 	16*8
 };
 
-static GFXDECODE_START( ojankohs )
+static GFXDECODE_START( gfx_ojankohs )
 	GFXDECODE_ENTRY( "gfx1", 0, ojankohs_bglayout,   0, 64 )
 GFXDECODE_END
 
@@ -732,7 +732,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankohs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ojankohs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(13'333'000)/2) // divider not verified
@@ -773,7 +773,7 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankohs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ojankohs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(ojankohs_state,ojankoy)
 
@@ -813,7 +813,7 @@ MACHINE_CONFIG_START(ojankohs_state::ccasino)
 	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankohs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ojankohs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ojankohs)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(13'333'000)/2) // divider not verified
@@ -982,9 +982,9 @@ ROM_START( ojankoca )
 ROM_END
 
 
-GAME( 1986, ojankoc,  0,       ojankoc,  ojankoc,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ojankoca, ojankoc, ojankoc,  ojankoc,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ojankoy,  0,       ojankoy,  ojankoy,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Yakata (Japan)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ojanko2,  0,       ojankoy,  ojankoy,  ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko Yakata 2bankan (Japan)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ccasino,  0,       ccasino,  ccasino,  ojankohs_state, 0, ROT0, "V-System Co.", "Chinese Casino [BET] (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ojankohs, 0,       ojankohs, ojankohs, ojankohs_state, 0, ROT0, "V-System Co.", "Ojanko High School (Japan)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoc,  0,       ojankoc,  ojankoc,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoca, ojankoc, ojankoc,  ojankoc,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ojankoy,  0,       ojankoy,  ojankoy,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Yakata (Japan)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ojanko2,  0,       ojankoy,  ojankoy,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko Yakata 2bankan (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ccasino,  0,       ccasino,  ccasino,  ojankohs_state, empty_init, ROT0, "V-System Co.", "Chinese Casino [BET] (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ojankohs, 0,       ojankohs, ojankohs, ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko High School (Japan)",            MACHINE_SUPPORTS_SAVE )

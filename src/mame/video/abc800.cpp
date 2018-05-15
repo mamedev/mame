@@ -49,24 +49,6 @@ WRITE8_MEMBER( abc800_state::hrc_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  translate_trom_offset -
-//-------------------------------------------------
-
-offs_t abc800c_state::translate_trom_offset(offs_t offset)
-{
-	int row = offset / 40;
-	int col = offset % 40;
-
-	offset = ((row & 0x07) * 0x80) + col;
-
-	if (row & 0x08) offset += 0x28;
-	if (row & 0x10) offset += 0x50;
-
-	return offset;
-}
-
-
-//-------------------------------------------------
 //  hr_update - high resolution screen update
 //-------------------------------------------------
 
@@ -113,14 +95,6 @@ void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 }
 
 
-void abc800_state::video_start()
-{
-	// register for state saving
-	save_item(NAME(m_hrs));
-	save_item(NAME(m_fgctl));
-}
-
-
 //-------------------------------------------------
 //  SCREEN_UPDATE( abc800c )
 //-------------------------------------------------
@@ -149,7 +123,15 @@ uint32_t abc800c_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 READ8_MEMBER( abc800c_state::char_ram_r )
 {
-	return m_char_ram[translate_trom_offset(offset)];
+	int row = offset / 40;
+	int col = offset % 40;
+
+	offset = ((row & 0x07) * 0x80) + col;
+
+	if (row & 0x08) offset += 0x28;
+	if (row & 0x10) offset += 0x50;
+
+	return m_char_ram[offset];
 }
 
 
@@ -159,7 +141,7 @@ READ8_MEMBER( abc800c_state::char_ram_r )
 
 PALETTE_INIT_MEMBER( abc800c_state, abc800c )
 {
-	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // black
+	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
 	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // green
 	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0x00)); // yellow

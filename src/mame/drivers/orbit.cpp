@@ -232,7 +232,7 @@ static const gfx_layout orbit_tile_layout =
 };
 
 
-static GFXDECODE_START( orbit )
+static GFXDECODE_START( gfx_orbit )
 	GFXDECODE_ENTRY( "gfx1", 0, orbit_full_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, orbit_upper_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, orbit_lower_sprite_layout, 0, 1 )
@@ -295,7 +295,7 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 	MCFG_SCREEN_UPDATE_DRIVER(orbit_state, screen_update_orbit)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", orbit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_orbit)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -352,4 +352,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1978, orbit, 0, orbit, orbit, orbit_state, 0, 0, "Atari", "Orbit", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, orbit, 0, orbit, orbit, orbit_state, empty_init, 0, "Atari", "Orbit", MACHINE_SUPPORTS_SAVE )

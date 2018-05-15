@@ -37,7 +37,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
@@ -300,7 +300,7 @@ static const gfx_layout c10_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( c10 )
+static GFXDECODE_START( gfx_c10 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, c10_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -327,7 +327,7 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c10)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -407,5 +407,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY            FULLNAME  FLAGS
-COMP( 1980, uts20,  0,      0,       uts20,     uts20, univac_state,   0,      "Sperry Univac",   "UTS-20", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY          FULLNAME  FLAGS
+COMP( 1980, uts20, 0,      0,      uts20,   uts20, univac_state, empty_init, "Sperry Univac", "UTS-20", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

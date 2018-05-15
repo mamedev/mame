@@ -346,7 +346,7 @@ static const gfx_layout spritelayout =
 	16*8    /* ofset to next tile */
 };
 
-static GFXDECODE_START( kchamp )
+static GFXDECODE_START( gfx_kchamp )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,   32*4, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, spritelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, spritelayout, 0, 16 )
@@ -433,7 +433,7 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, kchamp_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kchamp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kchamp)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
 
@@ -493,7 +493,7 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, kchamp_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kchamp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kchamp)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
 
@@ -738,12 +738,11 @@ void kchamp_state::decrypt_code()
 }
 
 
-DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
+void kchamp_state::init_kchampvs()
 {
 	decrypt_code();
 
 	uint8_t *rom = memregion("maincpu")->base();
-	int A;
 
 	/*
 	    Note that the first 4 opcodes that the program
@@ -755,7 +754,7 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 	    encrypted address for the jump.
 	 */
 	m_decrypted_opcodes[0] = rom[0];  /* this is a jump */
-	A = rom[1] + 256 * rom[2];
+	int A = rom[1] + 256 * rom[2];
 	m_decrypted_opcodes[A] = rom[A];  /* fix opcode on first jump address (again, a jump) */
 	rom[A+1] ^= 0xee;       /* fix address of the second jump */
 	A = rom[A+1] + 256 * rom[A+2];
@@ -768,7 +767,7 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 }
 
 
-DRIVER_INIT_MEMBER(kchamp_state,kchampvs2)
+void kchamp_state::init_kchampvs2()
 {
 	decrypt_code();
 	m_msm_play_lo_nibble = true;
@@ -776,8 +775,8 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs2)
 
 
 
-GAME( 1984, kchamp,    0,      kchamp,   kchamp,   kchamp_state,  0,         ROT90, "Data East USA",         "Karate Champ (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, karatedo,  kchamp, kchamp,   kchamp,   kchamp_state,  0,         ROT90, "Data East Corporation", "Karate Dou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs,  kchamp, kchampvs, kchampvs, kchamp_state,  kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs2, kchamp, kchampvs, kchampvs, kchamp_state,  kchampvs2, ROT90, "Data East USA",         "Karate Champ (US VS version, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, karatevs,  kchamp, kchampvs, kchampvs, kchamp_state,  kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchamp,    0,      kchamp,   kchamp,   kchamp_state,  empty_init,     ROT90, "Data East USA",         "Karate Champ (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, karatedo,  kchamp, kchamp,   kchamp,   kchamp_state,  empty_init,     ROT90, "Data East Corporation", "Karate Dou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs,  kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs2, kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs2, ROT90, "Data East USA",         "Karate Champ (US VS version, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, karatevs,  kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", MACHINE_SUPPORTS_SAVE )

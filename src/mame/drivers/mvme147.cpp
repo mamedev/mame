@@ -715,5 +715,5 @@ ROM_START (mvme147)
 ROM_END
 
 /* Driver */
-//    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT    CLASS          INIT COMPANY       FULLNAME    FLAGS
-COMP (1989, mvme147,      0,      0,       mvme147,        mvme147, mvme147_state, 0,   "Motorola",   "MVME-147", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME    FLAGS
+COMP( 1989, mvme147, 0,      0,      mvme147, mvme147, mvme147_state, empty_init, "Motorola", "MVME-147", MACHINE_NO_SOUND_HW )

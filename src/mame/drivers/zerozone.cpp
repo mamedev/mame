@@ -155,7 +155,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( zerozone )
+static GFXDECODE_START( gfx_zerozone )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 256 )         /* sprites & playfield */
 GFXDECODE_END
 
@@ -191,7 +191,7 @@ MACHINE_CONFIG_START(zerozone_state::zerozone)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 47*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zerozone)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zerozone)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -247,5 +247,5 @@ ROM_START( lvgirl94 )
 ROM_END
 
 
-GAME( 1993, zerozone, 0, zerozone, zerozone, zerozone_state, 0, ROT0, "Comad", "Zero Zone", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lvgirl94, 0, zerozone, zerozone, zerozone_state, 0, ROT0, "Comad", "Las Vegas Girl (Girl '94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, zerozone, 0, zerozone, zerozone, zerozone_state, empty_init, ROT0, "Comad", "Zero Zone", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lvgirl94, 0, zerozone, zerozone, zerozone_state, empty_init, ROT0, "Comad", "Las Vegas Girl (Girl '94)", MACHINE_SUPPORTS_SAVE )

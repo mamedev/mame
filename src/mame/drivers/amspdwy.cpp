@@ -216,7 +216,7 @@ static const gfx_layout layout_8x8x2 =
 	8*8
 };
 
-static GFXDECODE_START( amspdwy )
+static GFXDECODE_START( gfx_amspdwy )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x2, 0, 8 )
 GFXDECODE_END
 
@@ -269,7 +269,7 @@ MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 	MCFG_SCREEN_UPDATE_DRIVER(amspdwy_state, screen_update_amspdwy)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amspdwy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amspdwy)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
@@ -382,5 +382,5 @@ ROM_END
 
 /* (C) 1987 ETI 8402 MAGNOLIA ST. #C SANTEE, CA 92071 */
 
-GAME( 1987, amspdwy,  0,       amspdwy, amspdwy,  amspdwy_state, 0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, amspdwy_state, 0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, amspdwy,  0,       amspdwy, amspdwy,  amspdwy_state, empty_init, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, amspdwy_state, empty_init, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 2)", MACHINE_SUPPORTS_SAVE )

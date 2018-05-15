@@ -315,7 +315,7 @@ static const gfx_layout tiles8x8_layout =
 	8*4
 };
 
-static GFXDECODE_START( buster )
+static GFXDECODE_START( gfx_buster )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -339,7 +339,7 @@ MACHINE_CONFIG_START(buster_state::buster)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", buster)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_buster)
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
@@ -364,4 +364,4 @@ ROM_START( buster )
 ROM_END
 
 
-GAME( 1982, buster,  0,    buster, buster, buster_state,  0, ROT0, "Marian Electronics Ltd.", "Buster", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1982, buster, 0, buster, buster, buster_state, empty_init, ROT0, "Marian Electronics Ltd.", "Buster", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

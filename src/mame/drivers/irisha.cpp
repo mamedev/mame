@@ -239,7 +239,7 @@ static const gfx_layout irisha_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( irisha )
+static GFXDECODE_START( gfx_irisha )
 	GFXDECODE_ENTRY( "maincpu", 0x3800, irisha_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -377,7 +377,7 @@ MACHINE_CONFIG_START(irisha_state::irisha)
 	MCFG_SCREEN_UPDATE_DRIVER(irisha_state, screen_update_irisha)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", irisha)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_irisha)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -417,5 +417,5 @@ ROM_START( irisha )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS          INIT    COMPANY  FULLNAME   FLAGS
-COMP( 1983, irisha,      0,      0, irisha,     irisha, irisha_state,  0,      "MGU",   "Irisha",  MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME  FLAGS
+COMP( 1983, irisha,      0,      0, irisha,  irisha, irisha_state, empty_init, "MGU",   "Irisha", MACHINE_NOT_WORKING)

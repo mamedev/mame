@@ -86,7 +86,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	DECLARE_DRIVER_INIT(fp1100);
+	void init_fp1100();
 	DECLARE_MACHINE_RESET(fp1100);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
@@ -557,7 +557,7 @@ static const gfx_layout chars_8x8 =
 	8*8
 };
 
-static GFXDECODE_START( fp1100 )
+static GFXDECODE_START( gfx_fp1100 )
 	GFXDECODE_ENTRY( "sub_ipl", 0x2400, chars_8x8, 0, 1 )
 GFXDECODE_END
 
@@ -622,7 +622,7 @@ MACHINE_RESET_MEMBER( fp1100_state, fp1100 )
 	m_upd7801.portc = 0;
 }
 
-DRIVER_INIT_MEMBER( fp1100_state, fp1100 )
+void fp1100_state::init_fp1100()
 {
 	uint8_t *main = memregion("ipl")->base();
 	uint8_t *wram = memregion("wram")->base();
@@ -658,7 +658,7 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fp1100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fp1100)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -697,5 +697,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS          INIT      COMPANY    FULLNAME   FLAGS */
-COMP( 1983, fp1100,  0,      0,       fp1100,     fp1100, fp1100_state,  fp1100,   "Casio",   "FP-1100", MACHINE_NOT_WORKING)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY  FULLNAME   FLAGS */
+COMP( 1983, fp1100, 0,      0,      fp1100,  fp1100, fp1100_state, init_fp1100, "Casio", "FP-1100", MACHINE_NOT_WORKING)

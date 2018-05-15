@@ -299,4 +299,4 @@ ROM_START( fiveside )
 ROM_END
 
 // Undumped: Ultra Hockey
-GAME(1995, fiveside, 0, ultrsprt, ultrsprt, ultrsprt_state, 0, ROT90, "Konami", "Five a Side Soccer (ver UAA)", 0)
+GAME(1995, fiveside, 0, ultrsprt, ultrsprt, ultrsprt_state, empty_init, ROT90, "Konami", "Five a Side Soccer (ver UAA)", 0)

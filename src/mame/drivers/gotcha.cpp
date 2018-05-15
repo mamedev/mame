@@ -227,7 +227,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( gotcha )
+static GFXDECODE_START( gfx_gotcha )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0x100, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x000, 16 )
 GFXDECODE_END
@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(gotcha_state::gotcha)
 	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI)) // ?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gotcha)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gotcha)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -384,5 +384,5 @@ ROM_START( ppchamp )
 	ROM_LOAD( "uz11", 0x00000, 0x80000, CRC(3d96274c) SHA1(c7a670af86194c370bf8fb30afbe027ab78a0227) )
 ROM_END
 
-GAMEL( 1997, gotcha,  0,      gotcha, gotcha, gotcha_state, 0, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival",                   MACHINE_SUPPORTS_SAVE, layout_gotcha )
-GAMEL( 1997, ppchamp, gotcha, gotcha, gotcha, gotcha_state, 0, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea)", MACHINE_SUPPORTS_SAVE, layout_gotcha )
+GAMEL( 1997, gotcha,  0,      gotcha, gotcha, gotcha_state, empty_init, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival",                   MACHINE_SUPPORTS_SAVE, layout_gotcha )
+GAMEL( 1997, ppchamp, gotcha, gotcha, gotcha, gotcha_state, empty_init, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea)", MACHINE_SUPPORTS_SAVE, layout_gotcha )

@@ -164,7 +164,7 @@ public:
 	DECLARE_WRITE16_MEMBER(mcu_shared_w);
 	DECLARE_READ16_MEMBER(mcu_r);
 
-	DECLARE_DRIVER_INIT(ddealer);
+	void init_ddealer();
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -595,7 +595,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( ddealer )
+static GFXDECODE_START( gfx_ddealer )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x100, 16 )
 GFXDECODE_END
@@ -629,7 +629,7 @@ MACHINE_CONFIG_START(ddealer_state::ddealer)
 	// M50747 or NMK-110 8131 MCU
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddealer)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddealer)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -672,7 +672,7 @@ READ16_MEMBER(ddealer_state::mcu_r)
 	return res;
 }
 
-DRIVER_INIT_MEMBER(ddealer_state,ddealer)
+void ddealer_state::init_ddealer()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfe01c, 0xfe01d, read16_delegate(FUNC(ddealer_state::mcu_r), this));
 }
@@ -696,4 +696,4 @@ ROM_START( ddealer )
 	ROM_LOAD( "6.ic86", 0x100, 0x100, NO_DUMP )
 ROM_END
 
-GAME( 1991, ddealer,  0, ddealer, ddealer, ddealer_state, ddealer,  ROT0, "NMK", "Double Dealer", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1991, ddealer, 0, ddealer, ddealer, ddealer_state, init_ddealer, ROT0, "NMK", "Double Dealer", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )

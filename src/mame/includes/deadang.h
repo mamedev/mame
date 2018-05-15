@@ -48,8 +48,8 @@ public:
 	DECLARE_READ16_MEMBER(ghunter_trackball_low_r);
 	DECLARE_READ16_MEMBER(ghunter_trackball_high_r);
 
-	DECLARE_DRIVER_INIT(deadang);
-	DECLARE_DRIVER_INIT(ghunter);
+	void init_deadang();
+	void init_ghunter();
 
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	TILE_GET_INFO_MEMBER(get_pf3_tile_info);
@@ -77,8 +77,9 @@ public:
 	popnrun_state(const machine_config &mconfig, device_type type, const char *tag)
 	: deadang_state(mconfig, type, tag)
 	{}
-	
-	DECLARE_DRIVER_INIT(popnrun);
+
+	void init_popnrun();
+
 	TILE_GET_INFO_MEMBER(get_popnrun_text_tile_info);
 	DECLARE_WRITE16_MEMBER(popnrun_text_w);
 	void popnrun_main_map(address_map &map);

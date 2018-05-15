@@ -266,7 +266,7 @@ static const gfx_layout charlayout =
 
 /* S2636 Mappings */
 
-static GFXDECODE_START( quasar )
+static GFXDECODE_START( gfx_quasar )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 64+1 )  /* ROM chars */
 GFXDECODE_END
 
@@ -328,7 +328,7 @@ MACHINE_CONFIG_START(quasar_state::quasar)
 	MCFG_SCREEN_UPDATE_DRIVER(quasar_state, screen_update_quasar)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quasar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quasar)
 	MCFG_PALETTE_ADD("palette", (64+1)*8+(4*256))
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x500)
 	MCFG_PALETTE_INIT_OWNER(quasar_state,quasar)
@@ -414,5 +414,5 @@ ROM_START( quasara )
 ROM_END
 
 
-GAME( 1980, quasar,   0,      quasar,   quasar, quasar_state,   0, ROT90, "Zaccaria / Zelco", "Quasar (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, quasara,  quasar, quasar,   quasar, quasar_state,   0, ROT90, "Zaccaria / Zelco", "Quasar (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, quasar,   0,      quasar,   quasar, quasar_state, empty_init, ROT90, "Zaccaria / Zelco", "Quasar (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, quasara,  quasar, quasar,   quasar, quasar_state, empty_init, ROT90, "Zaccaria / Zelco", "Quasar (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

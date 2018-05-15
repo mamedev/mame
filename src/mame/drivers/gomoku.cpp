@@ -117,7 +117,7 @@ static const gfx_layout charlayout =
 	16*8        /* every char takes 16 consecutive bytes */
 };
 
-static GFXDECODE_START( gomoku )
+static GFXDECODE_START( gfx_gomoku )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
@@ -142,7 +142,7 @@ MACHINE_CONFIG_START(gomoku_state::gomoku)
 	MCFG_SCREEN_UPDATE_DRIVER(gomoku_state, screen_update_gomoku)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gomoku)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gomoku)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(gomoku_state, gomoku)
 
@@ -186,5 +186,5 @@ ROM_START( gomoku )
 ROM_END
 
 
-//    YEAR,   NAME,   PARENT,  MACHINE,  INPUT,  STATE         INIT,   MONITOR, COMPANY,      FULLNAME,              FLAGS
-GAME( 1981,   gomoku, 0,       gomoku,   gomoku, gomoku_state, 0,      ROT90,   "Nichibutsu", "Gomoku Narabe Renju", 0 )
+//    YEAR,   NAME,   PARENT,  MACHINE,  INPUT,  STATE         INIT,       MONITOR, COMPANY,      FULLNAME,              FLAGS
+GAME( 1981,   gomoku, 0,       gomoku,   gomoku, gomoku_state, empty_init, ROT90,   "Nichibutsu", "Gomoku Narabe Renju", 0 )

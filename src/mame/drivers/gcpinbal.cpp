@@ -325,10 +325,10 @@ static const gfx_layout tilelayout =
 	16*16*4   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( gcpinbal )
-	GFXDECODE_ENTRY( "sprite", 0, tilelayout,       0, 256 )  /* sprites & playfield */
-	GFXDECODE_ENTRY( "bg0", 0, charlayout,       0, 256 )  /* sprites & playfield */
-	GFXDECODE_ENTRY( "fg0", 0, char_8x8_layout,  0, 256 )  /* sprites & playfield */
+static GFXDECODE_START( gfx_gcpinbal )
+	GFXDECODE_ENTRY( "sprite", 0, tilelayout,       0, 256 )  // sprites & playfield
+	GFXDECODE_ENTRY( "bg0",    0, charlayout,       0, 256 )  // sprites & playfield
+	GFXDECODE_ENTRY( "fg0",    0, char_8x8_layout,  0, 256 )  // sprites & playfield
 GFXDECODE_END
 
 
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	MCFG_SCREEN_UPDATE_DRIVER(gcpinbal_state, screen_update_gcpinbal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gcpinbal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gcpinbal)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -468,5 +468,5 @@ ROM_START( gcpinbal )
 ROM_END
 
 
-GAME( 1994, pwrflip,  0, gcpinbal, gcpinbal, gcpinbal_state, 0, ROT270, "Excellent System", "Power Flipper Pinball Shooting v1.33", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gcpinbal, 0, gcpinbal, gcpinbal, gcpinbal_state, 0, ROT270, "Excellent System", "Grand Cross v1.02F",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pwrflip,  0, gcpinbal, gcpinbal, gcpinbal_state, empty_init, ROT270, "Excellent System", "Power Flipper Pinball Shooting v1.33", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gcpinbal, 0, gcpinbal, gcpinbal, gcpinbal_state, empty_init, ROT270, "Excellent System", "Grand Cross v1.02F",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

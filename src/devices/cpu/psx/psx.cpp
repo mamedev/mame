@@ -1448,7 +1448,7 @@ void psxcpu_device::update_cop0( int reg )
 		( m_cp0r[ CP0_SR ] & SR_IEC ) != 0 &&
 		( m_cp0r[ CP0_SR ] & m_cp0r[ CP0_CAUSE ] & CAUSE_IP ) != 0 )
 	{
-		m_op = m_direct->read_dword( m_pc );
+		m_op = m_cache->read_dword( m_pc );
 		execute_unstoppable_instructions( 1 );
 		exception( EXC_INT );
 	}
@@ -1475,11 +1475,11 @@ void psxcpu_device::fetch_next_op()
 	{
 		uint32_t safepc = m_delayv & ~m_bad_word_address_mask;
 
-		m_op = m_direct->read_dword( safepc );
+		m_op = m_cache->read_dword( safepc );
 	}
 	else
 	{
-		m_op = m_direct->read_dword( m_pc + 4 );
+		m_op = m_cache->read_dword( m_pc + 4 );
 	}
 }
 
@@ -1819,7 +1819,7 @@ void psxcpu_device::device_start()
 {
 	// get our address spaces
 	m_program = &space( AS_PROGRAM );
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
 
 	save_item( NAME( m_op ) );
 	save_item( NAME( m_pc ) );
@@ -2331,7 +2331,7 @@ void psxcpu_device::execute_run()
 		}
 		else
 		{
-			m_op = m_direct->read_dword(m_pc);
+			m_op = m_cache->read_dword(m_pc);
 
 			if( m_berr )
 			{

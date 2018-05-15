@@ -141,7 +141,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( rcorsair )
+static GFXDECODE_START( gfx_rcorsair )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -175,7 +175,7 @@ MACHINE_CONFIG_START(rcorsair_state::rcorsair)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rcorsair)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rcorsair)
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 
@@ -199,4 +199,4 @@ ROM_START( rcorsair )
 ROM_END
 
 
-GAME( 1984, rcorsair,  0,    rcorsair, inports, rcorsair_state, 0, ROT90, "Nakasawa", "Red Corsair", MACHINE_IS_SKELETON )
+GAME( 1984, rcorsair,  0,    rcorsair, inports, rcorsair_state, empty_init, ROT90, "Nakasawa", "Red Corsair", MACHINE_IS_SKELETON )

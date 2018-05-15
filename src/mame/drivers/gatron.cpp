@@ -337,6 +337,8 @@
 
 
 #define MASTER_CLOCK    XTAL(16'000'000)
+#define CPU_CLOCK       MASTER_CLOCK / 24    // 666.66 kHz, guess...
+
 
 /****************************
 *    Read/Write Handlers    *
@@ -453,7 +455,7 @@ void gatron_state::gat_map(address_map &map)
 	map(0x6000, 0x63ff).ram().w(this, FUNC(gatron_state::gat_videoram_w)).share("videoram");
 	map(0x8000, 0x87ff).ram().share("nvram");                          /* battery backed RAM */
 	map(0xa000, 0xa000).w("snsnd", FUNC(sn76489_device::write));       /* PSG */
-	map(0xe000, 0xe000).w(this, FUNC(gatron_state::output_port_0_w));                         /* lamps */
+	map(0xe000, 0xe000).w(this, FUNC(gatron_state::output_port_0_w));  /* lamps */
 }
 
 void gatron_state::gat_portmap(address_map &map)
@@ -556,7 +558,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( gat )
+static GFXDECODE_START( gfx_gat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -568,7 +570,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gatron_state::gat)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/24)   /* 666.66 kHz, guess */
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(gat_map)
 	MCFG_DEVICE_IO_MAP(gat_portmap)
 
@@ -589,7 +591,7 @@ MACHINE_CONFIG_START(gatron_state::gat)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gat)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(gatron_state, gatron)
 
@@ -640,7 +642,7 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE  INPUT      STATE          INIT  ROT   COMPANY         FULLNAME              FLAGS  LAYOUT   */
-GAMEL( 1983, poker41,  0,      gat,     poker41,   gatron_state,  0,    ROT0, "Game-A-Tron",  "Four In One Poker",  0,     layout_poker41  )
-GAMEL( 1983, pulltabs, 0,      gat,     pulltabs,  gatron_state,  0,    ROT0, "Game-A-Tron",  "Pull Tabs",          0,     layout_pulltabs )
-GAMEL( 1983, bingo,    0,      gat,     bingo,     gatron_state,  0,    ROT0, "Game-A-Tron",  "Bingo",              0,     layout_bingo  )
+/*     YEAR  NAME      PARENT  MACHINE  INPUT     CLASS         INIT        ROT   COMPANY         FULLNAME              FLAGS  LAYOUT   */
+GAMEL( 1983, poker41,  0,      gat,     poker41,  gatron_state, empty_init, ROT0, "Game-A-Tron",  "Four In One Poker",  0,     layout_poker41  )
+GAMEL( 1983, pulltabs, 0,      gat,     pulltabs, gatron_state, empty_init, ROT0, "Game-A-Tron",  "Pull Tabs",          0,     layout_pulltabs )
+GAMEL( 1983, bingo,    0,      gat,     bingo,    gatron_state, empty_init, ROT0, "Game-A-Tron",  "Bingo",              0,     layout_bingo  )

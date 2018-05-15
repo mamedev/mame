@@ -508,7 +508,7 @@ static const gfx_layout roz_layout =
 	16*128
 };
 
-static GFXDECODE_START( 2 )
+static GFXDECODE_START( gfx_2 )
 	GFXDECODE_ENTRY( NAMCOFL_TILEGFXREGION, 0, tile_layout, 0x1000, 0x08 )
 	GFXDECODE_ENTRY( NAMCOFL_SPRITEGFXREGION,   0, obj_layout,      0x0000, 0x10 )
 	GFXDECODE_ENTRY( NAMCOFL_ROTGFXREGION,      0, roz_layout,      0x1800, 0x08 )
@@ -605,7 +605,7 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 
 	MCFG_PALETTE_ADD("palette", 8192)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_2)
 
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
@@ -801,19 +801,19 @@ void namcofl_state::common_init()
 	save_item(NAME(m_sprbank));
 }
 
-DRIVER_INIT_MEMBER(namcofl_state,speedrcr)
+void namcofl_state::init_speedrcr()
 {
 	common_init();
 	m_gametype = NAMCOFL_SPEED_RACER;
 }
 
-DRIVER_INIT_MEMBER(namcofl_state,finalapr)
+void namcofl_state::init_finalapr()
 {
 	common_init();
 	m_gametype = NAMCOFL_FINAL_LAP_R;
 }
 
-GAME ( 1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
-GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
-GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAME(  1995, speedrcr,         0, namcofl, speedrcr, namcofl_state, init_speedrcr, ROT0, "Namco", "Speed Racer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1995, finalapr,         0, namcofl, finalapr, namcofl_state, init_finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAMEL( 1995, finalapro, finalapr, namcofl, finalapr, namcofl_state, init_finalapr, ROT0, "Namco", "Final Lap R", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAMEL( 1995, finalaprj, finalapr, namcofl, finalapr, namcofl_state, init_finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )

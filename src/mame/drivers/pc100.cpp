@@ -378,7 +378,7 @@ static const gfx_layout kanji_layout =
 	16*16
 };
 
-static GFXDECODE_START( pc100 )
+static GFXDECODE_START( gfx_pc100 )
 	GFXDECODE_ENTRY( "kanji", 0x0000, kanji_layout, 8, 1 )
 GFXDECODE_END
 
@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	MCFG_SCREEN_UPDATE_DRIVER(pc100_state, screen_update_pc100)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc100)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_FORMAT(xxxxxxxBBBGGGRRR)
 
@@ -573,5 +573,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE          INIT    COMPANY  FULLNAME  FLAGS
-COMP( 198?, pc100,  0,      0,       pc100,     pc100, pc100_state,   0,      "NEC",   "PC-100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
+COMP( 198?, pc100, 0,      0,      pc100,   pc100, pc100_state, empty_init, "NEC",   "PC-100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

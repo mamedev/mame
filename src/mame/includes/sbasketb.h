@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sbasketb_colorram_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(spriteram_select_w);
-	DECLARE_DRIVER_INIT(sbasketb);
+	void init_sbasketb();
 
 	uint8_t m_SN76496_latch;
 	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };

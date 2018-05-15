@@ -306,6 +306,6 @@ ROM_END
 
 
 
-GAME( 1983, kingpin,  0, kingpin,  kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "Kingpin",     0 )
-GAME( 1983, maxideal, 0, kingpin,  kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "Maxi-Dealer", 0 )
-GAME( 1981, dealracl, 0, dealracl, kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "The Dealer (ACL)",  MACHINE_NOT_WORKING )
+GAME( 1983, kingpin,  0, kingpin,  kingpin, kingpin_state, empty_init, 0, "ACL Manufacturing", "Kingpin",     0 )
+GAME( 1983, maxideal, 0, kingpin,  kingpin, kingpin_state, empty_init, 0, "ACL Manufacturing", "Maxi-Dealer", 0 )
+GAME( 1981, dealracl, 0, dealracl, kingpin, kingpin_state, empty_init, 0, "ACL Manufacturing", "The Dealer (ACL)",  MACHINE_NOT_WORKING )

@@ -216,7 +216,7 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( aeroboto )
+static GFXDECODE_START( gfx_aeroboto )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0,  64 )     /* chars */
 //  GFXDECODE_ENTRY( "gfx2", 0, starlayout,     0, 128 )     /* sky */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0,   8 )
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(aeroboto_state::formatz)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, aeroboto_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aeroboto)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aeroboto)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
@@ -344,5 +344,5 @@ ROM_END
 
 
 
-GAME( 1984, formatz,  0,       formatz, formatz, aeroboto_state, 0, ROT0, "Jaleco",                    "Formation Z", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, aeroboto, formatz, formatz, formatz, aeroboto_state, 0, ROT0, "Jaleco (Williams license)", "Aeroboto",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, formatz,  0,       formatz, formatz, aeroboto_state, empty_init, ROT0, "Jaleco",                    "Formation Z", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, aeroboto, formatz, formatz, formatz, aeroboto_state, empty_init, ROT0, "Jaleco (Williams license)", "Aeroboto",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

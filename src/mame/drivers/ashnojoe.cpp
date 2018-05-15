@@ -254,7 +254,7 @@ static const gfx_layout tiles16x16_layout =
 	16*64
 };
 
-static GFXDECODE_START( ashnojoe )
+static GFXDECODE_START( gfx_ashnojoe )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x100 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 0x100 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 0, 0x100 )
@@ -325,7 +325,7 @@ MACHINE_CONFIG_START(ashnojoe_state::ashnojoe)
 	MCFG_SCREEN_UPDATE_DRIVER(ashnojoe_state, screen_update_ashnojoe)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ashnojoe)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ashnojoe)
 	MCFG_PALETTE_ADD("palette", 0x1000/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -420,7 +420,7 @@ ROM_START( ashnojoe )
 	ROM_LOAD( "sj401-nw.10r", 0x00000, 0x80000, CRC(25dfab59) SHA1(7d50159204ba05323a2442778f35192e66117dda) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ashnojoe_state,ashnojoe)
+void ashnojoe_state::init_ashnojoe()
 {
 	uint8_t *ROM = memregion("adpcm")->base();
 	membank("bank4")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
@@ -428,5 +428,5 @@ DRIVER_INIT_MEMBER(ashnojoe_state,ashnojoe)
 	membank("bank4")->set_entry(0);
 }
 
-GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe_state, ashnojoe, ROT0, "Taito Corporation / Wave", "Success Joe (World)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe_state, ashnojoe, ROT0, "Taito Corporation / Wave", "Ashita no Joe (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe_state, init_ashnojoe, ROT0, "Taito Corporation / Wave", "Success Joe (World)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe_state, init_ashnojoe, ROT0, "Taito Corporation / Wave", "Ashita no Joe (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -209,7 +209,7 @@ static const gfx_layout apogee_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( apogee )
+static GFXDECODE_START( gfx_apogee )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, apogee_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -249,7 +249,7 @@ MACHINE_CONFIG_START(apogee_state::apogee)
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apogee)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apogee)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(apogee_state,radio86)
 
@@ -284,5 +284,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT   COMPAT  MACHINE    INPUT   STATE         INIT     COMPANY      FULLNAME        FLAGS
-COMP( 1989, apogee, radio86, 0,      apogee,    apogee, apogee_state, radio86, "Zavod BRA", "Apogee BK-01", 0 )
+//    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT          COMPANY      FULLNAME        FLAGS
+COMP( 1989, apogee, radio86, 0,      apogee,  apogee, apogee_state, init_radio86, "Zavod BRA", "Apogee BK-01", 0 )

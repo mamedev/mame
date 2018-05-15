@@ -325,7 +325,7 @@ static const gfx_layout layout_16x16x4 =
 };
 
 /* Layers both use the first $20 color codes. Sprites the next $10 */
-static GFXDECODE_START( blmbycar )
+static GFXDECODE_START( gfx_blmbycar )
 	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 0x0, 0x30 ) // [0] Layers + Sprites
 GFXDECODE_END
 
@@ -373,7 +373,7 @@ MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 	MCFG_SCREEN_UPDATE_DRIVER(blmbycar_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blmbycar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blmbycar)
 
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
@@ -504,13 +504,11 @@ ROM_START( watrball )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(blmbycar_state,blmbycar)
+void blmbycar_state::init_blmbycar()
 {
 	uint16_t *RAM  = (uint16_t *) memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes() / 2;
-	int i;
-
-	for (i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
 		uint16_t x = RAM[i];
 		x = (x & ~0x0606) | ((x & 0x0202) << 1) | ((x & 0x0404) >> 1);
@@ -526,6 +524,6 @@ DRIVER_INIT_MEMBER(blmbycar_state,blmbycar)
 
 ***************************************************************************/
 
-GAME( 1994, blmbycar,  0,        blmbycar, blmbycar, blmbycar_state, blmbycar, ROT0, "ABM & Gecas", "Blomby Car", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, blmbycaru, blmbycar, blmbycar, blmbycar, blmbycar_state, 0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, watrball,  0,        watrball, watrball, blmbycar_state, 0,        ROT0, "ABM",         "Water Balls", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, blmbycar,  0,        blmbycar, blmbycar, blmbycar_state, init_blmbycar, ROT0, "ABM & Gecas", "Blomby Car", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, blmbycaru, blmbycar, blmbycar, blmbycar, blmbycar_state, empty_init,    ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, watrball,  0,        watrball, watrball, blmbycar_state, empty_init,    ROT0, "ABM",         "Water Balls", MACHINE_SUPPORTS_SAVE )

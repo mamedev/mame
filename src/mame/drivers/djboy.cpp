@@ -429,7 +429,7 @@ static const gfx_layout tile_layout =
 	16*16*4
 };
 
-static GFXDECODE_START( djboy )
+static GFXDECODE_START( gfx_djboy )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0x100, 16 ) /* sprite bank */
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 0x000, 16 ) /* background tiles */
 GFXDECODE_END
@@ -523,7 +523,7 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, djboy_state, screen_vblank_djboy))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", djboy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_djboy)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
@@ -640,17 +640,17 @@ ROM_START( djboyj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(djboy_state,djboy)
+void djboy_state::init_djboy()
 {
 	m_bankxor = 0x00;
 }
 
-DRIVER_INIT_MEMBER(djboy_state,djboyj)
+void djboy_state::init_djboyj()
 {
 	m_bankxor = 0x1f;
 }
 
-/*     YEAR, NAME,  PARENT, MACHINE, INPUT, INIT, MNTR,  COMPANY, FULLNAME, FLAGS */
-GAME( 1989, djboy,  0,      djboy,   djboy, djboy_state, djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 1)", MACHINE_SUPPORTS_SAVE) // Sammy & Williams logos in FG ROM
-GAME( 1989, djboya, djboy,  djboy,   djboy, djboy_state, djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 2)", MACHINE_SUPPORTS_SAVE) // Sammy & Williams logos in FG ROM
-GAME( 1989, djboyj, djboy,  djboy,   djboy, djboy_state, djboyj,   ROT0, "Kaneko (Sega license)", "DJ Boy (Japan)", MACHINE_SUPPORTS_SAVE ) // Sega logo in FG ROM
+/*     YEAR, NAME,  PARENT, MACHINE, INPUT, STATE,       INIT,          MNTR, COMPANY,                           FULLNAME,         FLAGS */
+GAME( 1989, djboy,  0,      djboy,   djboy, djboy_state, init_djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 1)", MACHINE_SUPPORTS_SAVE) // Sammy & Williams logos in FG ROM
+GAME( 1989, djboya, djboy,  djboy,   djboy, djboy_state, init_djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 2)", MACHINE_SUPPORTS_SAVE) // Sammy & Williams logos in FG ROM
+GAME( 1989, djboyj, djboy,  djboy,   djboy, djboy_state, init_djboyj,   ROT0, "Kaneko (Sega license)",           "DJ Boy (Japan)", MACHINE_SUPPORTS_SAVE ) // Sega logo in FG ROM

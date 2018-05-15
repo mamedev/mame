@@ -828,15 +828,15 @@ ROM_END
 ***************************************************************************/
 
 
-GAME( 1991, vendetta,    0,        vendetta, vendet4p, vendetta_state, 0, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, vendetta_state, 0, ROT0, "Konami", "Vendetta (US, 4 Players, ver. R)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettaz,   vendetta, vendetta, vendet4p, vendetta_state, 0, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pw, vendetta, vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2peba,vendetta,vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pun,vendetta, vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)", MACHINE_SUPPORTS_SAVE ) /* program rom labeled as 1 */
-GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendettan,   vendetta, vendetta, vendet4p, vendetta_state, 0, ROT0, "Konami", "Crime Fighters 2 (Japan, 4 Players, ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, vendetta2pp, vendetta, vendetta, vendetta, vendetta_state, 0, ROT0, "Konami", "Crime Fighters 2 (Japan, 2 Players, ver. P)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, esckids,     0,        esckids,  esckids,  vendetta_state, 0, ROT0, "Konami", "Escape Kids (Asia, 4 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, esckidsj,    esckids,  esckids,  esckidsj, vendetta_state, 0, ROT0, "Konami", "Escape Kids (Japan, 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta,    0,        vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 4 Players, ver. T)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (US, 4 Players, ver. R)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettaz,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pw, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2peba,vendetta,vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pun,vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)", MACHINE_SUPPORTS_SAVE ) /* program rom labeled as 1 */
+GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendettan,   vendetta, vendetta, vendet4p, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 4 Players, ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pp, vendetta, vendetta, vendetta, vendetta_state, empty_init, ROT0, "Konami", "Crime Fighters 2 (Japan, 2 Players, ver. P)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, esckids,     0,        esckids,  esckids,  vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Asia, 4 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, esckidsj,    esckids,  esckids,  esckidsj, vendetta_state, empty_init, ROT0, "Konami", "Escape Kids (Japan, 2 Players)", MACHINE_SUPPORTS_SAVE )

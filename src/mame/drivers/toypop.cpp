@@ -624,7 +624,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( toypop )
+static GFXDECODE_START( gfx_toypop )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 128*4,  64 )
 GFXDECODE_END
@@ -701,7 +701,7 @@ MACHINE_CONFIG_START(namcos16_state::liblrabl)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos16_state, slave_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toypop)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toypop)
 	MCFG_PALETTE_ADD("palette", 128*4+64*4+16*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(namcos16_state, toypop)
@@ -778,5 +778,5 @@ ROM_START( toypop )
 	ROM_LOAD( "tp1-6.3d", 0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
 ROM_END
 
-GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, namcos16_state, 0,   ROT0,   "Namco", "Libble Rabble", MACHINE_NO_COCKTAIL )
-GAME( 1986, toypop,   0,     toypop,   toypop,   namcos16_state, 0,   ROT0,   "Namco", "Toypop",        MACHINE_NO_COCKTAIL )
+GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, namcos16_state, empty_init, ROT0, "Namco", "Libble Rabble", MACHINE_NO_COCKTAIL )
+GAME( 1986, toypop,   0,     toypop,   toypop,   namcos16_state, empty_init, ROT0, "Namco", "Toypop",        MACHINE_NO_COCKTAIL )

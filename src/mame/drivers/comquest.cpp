@@ -201,7 +201,7 @@ static const gfx_layout comquest_charlayout =
 		8*8
 };
 
-static GFXDECODE_START( comquest )
+static GFXDECODE_START( gfx_comquest )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, comquest_charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -255,7 +255,7 @@ MACHINE_CONFIG_START(comquest_state::comquest)
 	MCFG_SCREEN_UPDATE_DRIVER(comquest_state, screen_update_comquest)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", comquest )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_comquest )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
@@ -305,5 +305,5 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY          FULLNAME                  FLAGS
-CONS( 1995, comquest, 0,        0,      comquest, comquest, comquest_state, 0,    "Data Concepts", "ComQuest Plus (German)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY          FULLNAME                  FLAGS
+CONS( 1995, comquest, 0,      0,      comquest, comquest, comquest_state, empty_init, "Data Concepts", "ComQuest Plus (German)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

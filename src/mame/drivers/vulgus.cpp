@@ -207,7 +207,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( vulgus )
+static GFXDECODE_START( gfx_vulgus )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  64*4+16*16, 32*4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,      64*4, 16 )
@@ -236,7 +236,7 @@ MACHINE_CONFIG_START(vulgus_state::vulgus)
 	MCFG_SCREEN_UPDATE_DRIVER(vulgus_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vulgus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vulgus)
 
 	MCFG_PALETTE_ADD("palette", 64*4+16*16+4*32*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
@@ -418,7 +418,7 @@ ROM_START( mach9 )
 	ROM_LOAD( "82s129_8n.bin",    0x0700, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
-GAME( 1984, vulgus,  0,      vulgus, vulgus, vulgus_state, 0, ROT270, "Capcom", "Vulgus (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vulgusa, vulgus, vulgus, vulgus, vulgus_state, 0, ROT90,  "Capcom", "Vulgus (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vulgusj, vulgus, vulgus, vulgus, vulgus_state, 0, ROT270, "Capcom", "Vulgus (Japan?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mach9,   vulgus, vulgus, vulgus, vulgus_state, 0, ROT270,  "bootleg (ITISA)", "Mach-9 (bootleg of Vulgus)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vulgus,  0,      vulgus, vulgus, vulgus_state, empty_init, ROT270, "Capcom", "Vulgus (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vulgusa, vulgus, vulgus, vulgus, vulgus_state, empty_init, ROT90,  "Capcom", "Vulgus (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vulgusj, vulgus, vulgus, vulgus, vulgus_state, empty_init, ROT270, "Capcom", "Vulgus (Japan?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mach9,   vulgus, vulgus, vulgus, vulgus_state, empty_init, ROT270,  "bootleg (ITISA)", "Mach-9 (bootleg of Vulgus)", MACHINE_SUPPORTS_SAVE )

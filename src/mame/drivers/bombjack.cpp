@@ -313,7 +313,7 @@ static const gfx_layout spritelayout2 =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( bombjack )
+static GFXDECODE_START( gfx_bombjack )
 	GFXDECODE_ENTRY( "chars",   0x0000, charlayout1,      0, 16 )   /* characters */
 	GFXDECODE_ENTRY( "tiles",   0x0000, charlayout2,      0, 16 )   /* background tiles */
 	GFXDECODE_ENTRY( "sprites", 0x0000, spritelayout1,    0, 16 )   /* normal sprites */
@@ -372,7 +372,7 @@ MACHINE_CONFIG_START(bombjack_state::bombjack)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bombjack_state, vblank_irq))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bombjack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bombjack)
 	MCFG_PALETTE_ADD("palette", 128)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -503,6 +503,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, bombjack,  0,        bombjack, bombjack, bombjack_state, 0, ROT90, "Tehkan", "Bomb Jack (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bombjack2, bombjack, bombjack, bombjack, bombjack_state, 0, ROT90, "Tehkan", "Bomb Jack (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bombjackt, bombjack, bombjack, bombjack, bombjack_state, 0, ROT90, "Tehkan (Tecfri licence)", "Bomb Jack (Tecfri, Spain)", MACHINE_SUPPORTS_SAVE ) // official licence
+GAME( 1984, bombjack,  0,        bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan", "Bomb Jack (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bombjack2, bombjack, bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan", "Bomb Jack (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bombjackt, bombjack, bombjack, bombjack, bombjack_state, empty_init, ROT90, "Tehkan (Tecfri licence)", "Bomb Jack (Tecfri, Spain)", MACHINE_SUPPORTS_SAVE ) // official licence

@@ -1151,5 +1151,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       STATE        INIT    COMPANY         FULLNAME            FLAGS
-COMP( 1982, adam,       0,          coleco, adam,       adam,       adam_state,  0,      "Coleco",       "Adam",             MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY   FULLNAME  FLAGS
+COMP( 1982, adam, 0,      coleco, adam,    adam,  adam_state, empty_init, "Coleco", "Adam",   MACHINE_SUPPORTS_SAVE )

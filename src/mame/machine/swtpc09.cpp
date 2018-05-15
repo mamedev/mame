@@ -686,22 +686,22 @@ void swtpc09_state::machine_start()
 	m_brg->rsb_w(1);
 }
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09 )
+void swtpc09_state::init_swtpc09()
 {
 	m_system_type = FLEX_DMF2;
 }
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09i )
+void swtpc09_state::init_swtpc09i()
 {
 	m_system_type = FLEX_DC4_PIAIDE;
 }
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09u )
+void swtpc09_state::init_swtpc09u()
 {
 	m_system_type = UNIFLEX_DMF2;
 }
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09d3 )
+void swtpc09_state::init_swtpc09d3()
 {
 	m_via_ca1_input = 0;
 	m_system_type = UNIFLEX_DMF3;

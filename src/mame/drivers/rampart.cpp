@@ -325,7 +325,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( rampart )
+static GFXDECODE_START( gfx_rampart )
 	GFXDECODE_ENTRY( "gfx1", 0, molayout,  256, 16 )
 GFXDECODE_END
 
@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rampart)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rampart)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)
@@ -479,7 +479,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(rampart_state,rampart)
+void rampart_state::init_rampart()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -495,6 +495,6 @@ DRIVER_INIT_MEMBER(rampart_state,rampart)
  *
  *************************************/
 
-GAME( 1990, rampart,  0,       rampart, rampart,  rampart_state, rampart, ROT0, "Atari Games", "Rampart (Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rampart2p,rampart, rampart, ramprt2p, rampart_state, rampart, ROT0, "Atari Games", "Rampart (Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rampartj, rampart, rampart, rampartj, rampart_state, rampart, ROT0, "Atari Games", "Rampart (Japan, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampart,  0,       rampart, rampart,  rampart_state, init_rampart, ROT0, "Atari Games", "Rampart (Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampart2p,rampart, rampart, ramprt2p, rampart_state, init_rampart, ROT0, "Atari Games", "Rampart (Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampartj, rampart, rampart, rampartj, rampart_state, init_rampart, ROT0, "Atari Games", "Rampart (Japan, Joystick)", MACHINE_SUPPORTS_SAVE )

@@ -616,24 +616,24 @@ static const gfx_layout layout16x16 =
 	128*8
 };
 
-static GFXDECODE_START( nova2001 )
+static GFXDECODE_START( gfx_nova2001 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, layout16x16,    0x000, 16 )    // sprites
 	GFXDECODE_ENTRY( "gfx1", 0x0000, layout8x8_part, 0x000, 16 )    // fg tiles (using only 1/4th of the ROM space)
 	GFXDECODE_ENTRY( "gfx1", 0x4000, layout8x8_part, 0x100, 16 )    // bg tiles (using only 1/4th of the ROM space)
 GFXDECODE_END
 
-static GFXDECODE_START( ninjakun )
+static GFXDECODE_START( gfx_ninjakun )
 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0x200, 16 )    // sprites
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x000, 16 )    // fg tiles
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x8,   0x100, 16 )    // bg tiles
 GFXDECODE_END
 
-static GFXDECODE_START( pkunwar )
+static GFXDECODE_START( gfx_pkunwar )
 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0x000, 16 )    // sprites
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,   0x100, 16 )    // bg tiles
 GFXDECODE_END
 
-static GFXDECODE_START( raiders5 )
+static GFXDECODE_START( gfx_raiders5 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16,    0x200, 16 ) // sprites
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8_part, 0x000, 16 ) // fg tiles (using only 1/4th of the ROM space)
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x8,      0x100, 16 ) // bg tiles
@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(nova2001_state::nova2001)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_nova2001)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nova2001)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nova2001)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
@@ -708,7 +708,7 @@ MACHINE_CONFIG_START(nova2001_state::ninjakun)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_ninjakun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ninjakun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ninjakun)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
@@ -744,7 +744,7 @@ MACHINE_CONFIG_START(nova2001_state::pkunwar)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_pkunwar)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkunwar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkunwar)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
@@ -787,7 +787,7 @@ MACHINE_CONFIG_START(nova2001_state::raiders5)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_raiders5)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiders5)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiders5)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
@@ -1013,12 +1013,12 @@ void nova2001_state::lineswap_gfx_roms(const char *region, const int bit)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(nova2001_state,pkunwar)
+void nova2001_state::init_pkunwar()
 {
 	lineswap_gfx_roms("gfx1", 13);
 }
 
-DRIVER_INIT_MEMBER(nova2001_state,raiders5)
+void nova2001_state::init_raiders5()
 {
 	lineswap_gfx_roms("gfx1", 13);
 	lineswap_gfx_roms("gfx2", 13);
@@ -1035,11 +1035,11 @@ DRIVER_INIT_MEMBER(nova2001_state,raiders5)
 // many of these don't explicitly state Japan, eg. Nova 2001 could easily be used anywhere.
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1983, nova2001,  0,        nova2001, nova2001, nova2001_state, 0,        ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nova2001h, nova2001, nova2001, nova2001, nova2001_state, 0,        ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nova2001u, nova2001, nova2001, nova2001, nova2001_state, 0,        ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ninjakun,  0,        ninjakun, ninjakun, nova2001_state, 0,        ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar,  nova2001_state, pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar,  nova2001_state, pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, raiders5,  0,        raiders5, raiders5, nova2001_state, raiders5, ROT0,   "UPL", "Raiders5", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, raiders5t, raiders5, raiders5, raiders5, nova2001_state, raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001,  0,        nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001h, nova2001, nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001u, nova2001, nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ninjakun,  0,        ninjakun, ninjakun, nova2001_state, empty_init,    ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar,  nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar,  nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5,  0,        raiders5, raiders5, nova2001_state, init_raiders5, ROT0,   "UPL", "Raiders5", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5t, raiders5, raiders5, raiders5, nova2001_state, init_raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan)", MACHINE_SUPPORTS_SAVE )

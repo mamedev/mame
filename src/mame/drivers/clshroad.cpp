@@ -246,13 +246,13 @@ static const gfx_layout layout_16x16x4 =
 	16*16*2
 };
 
-static GFXDECODE_START( firebatl )
+static GFXDECODE_START( gfx_firebatl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,   0, 16 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,  16,  1 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x2,   512, 64 ) // [2] Layer 1
 GFXDECODE_END
 
-static GFXDECODE_START( clshroad )
+static GFXDECODE_START( gfx_clshroad )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,    0, 16 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x90,  1 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x4,      0, 16 ) // [2] Layer 1
@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(clshroad_state::firebatl)
 	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firebatl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firebatl)
 	MCFG_PALETTE_ADD("palette", 512+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(clshroad_state,firebatl)
@@ -339,7 +339,7 @@ MACHINE_CONFIG_START(clshroad_state::clshroad)
 	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", clshroad)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_clshroad)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(clshroad_state,clshroad)
@@ -560,7 +560,7 @@ ROM_START( clshroadd )
 	ROM_LOAD( "clashrd.g7",  0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) ) /* high 4 bits */
 ROM_END
 
-DRIVER_INIT_MEMBER(clshroad_state,firebatl)
+void clshroad_state::init_firebatl()
 {
 	// applying HACK to fix the game
 	// without this the death sequence never ends so the game is unplayable after you
@@ -572,7 +572,7 @@ DRIVER_INIT_MEMBER(clshroad_state,firebatl)
 	ROM[0x05C8] = 0x23;
 }
 
-GAME( 1984, firebatl, 0,        firebatl, firebatl, clshroad_state, firebatl, ROT90, "Wood Place Inc. (Taito license)",             "Fire Battle",                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, clshroad, 0,        clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc.",                             "Clash-Road",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, clshroads,clshroad, clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1986, clshroadd,clshroad, clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc. (Data East license)",         "Clash-Road (Data East license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, firebatl,  0,        firebatl, firebatl, clshroad_state, init_firebatl, ROT90, "Wood Place Inc. (Taito license)",             "Fire Battle",                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, clshroad,  0,        clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Wood Place Inc.",                             "Clash-Road",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, clshroads, clshroad, clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, clshroadd, clshroad, clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Wood Place Inc. (Data East license)",         "Clash-Road (Data East license)", MACHINE_SUPPORTS_SAVE )

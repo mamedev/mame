@@ -405,7 +405,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( m14 )
+static GFXDECODE_START( gfx_m14 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
 GFXDECODE_END
 
@@ -446,7 +446,7 @@ MACHINE_CONFIG_START(m14_state::m14)
 	MCFG_SCREEN_UPDATE_DRIVER(m14_state, screen_update_m14)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m14)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m14)
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(m14_state, m14)
 
@@ -487,4 +487,4 @@ ROM_START( ptrmj )
 	ROM_LOAD( "mgpa10.bin",  0x0400, 0x0400, CRC(e1a4ebdc) SHA1(d9df42424ede17f0634d8d0a56c0374a33c55333) )
 ROM_END
 
-GAME( 1979, ptrmj,  0,       m14,  m14, m14_state,  0, ROT0, "Irem", "PT Reach Mahjong (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // was already Irem according to the official flyer
+GAME( 1979, ptrmj, 0, m14, m14, m14_state, empty_init, ROT0, "Irem", "PT Reach Mahjong (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // was already Irem according to the official flyer

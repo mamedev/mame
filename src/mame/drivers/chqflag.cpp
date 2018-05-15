@@ -453,6 +453,6 @@ ROM_START( chqflagj )
 ROM_END
 
 
-//     YEAR, NAME,     PARENT,  MACHINE, INPUT,    STATE,         INIT, MONITOR, COMPANY,  FULLNAME,                 FLAGS,                                                                                                      LAYOUT
-GAMEL( 1988, chqflag,  0,       chqflag, chqflag,  chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
-GAMEL( 1988, chqflagj, chqflag, chqflag, chqflagj, chqflag_state, 0,    ROT90,   "Konami", "Chequered Flag (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
+//     YEAR  NAME      PARENT   MACHINE  INPUT     CLASS          INIT        MONITOR  COMPANY   FULLNAME                  FLAGS                                                                                                       LAYOUT
+GAMEL( 1988, chqflag,  0,       chqflag, chqflag,  chqflag_state, empty_init, ROT90,   "Konami", "Chequered Flag",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )
+GAMEL( 1988, chqflagj, chqflag, chqflag, chqflagj, chqflag_state, empty_init, ROT90,   "Konami", "Chequered Flag (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_chqflag )

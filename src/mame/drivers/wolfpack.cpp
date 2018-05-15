@@ -297,7 +297,7 @@ static const gfx_layout torpedo_layout =
 };
 
 
-static GFXDECODE_START( wolfpack )
+static GFXDECODE_START( gfx_wolfpack )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, ship_layout, 6, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, pt_layout, 0, 1 )
@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(wolfpack_state::wolfpack)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wolfpack_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wolfpack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wolfpack)
 	MCFG_PALETTE_ADD("palette", 12)
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(wolfpack_state, wolfpack)
@@ -364,4 +364,4 @@ ROM_START( wolfpack )
 ROM_END
 
 
-GAME( 1978, wolfpack, 0, wolfpack, wolfpack, wolfpack_state, 0, ORIENTATION_FLIP_Y, "Atari", "Wolf Pack (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, wolfpack, 0, wolfpack, wolfpack, wolfpack_state, empty_init, ORIENTATION_FLIP_Y, "Atari", "Wolf Pack (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

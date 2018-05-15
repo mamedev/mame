@@ -366,7 +366,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static GFXDECODE_START( _3x3puzzle )
+static GFXDECODE_START( gfx_3x3puzzle )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x8_layout,     0, 3 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout,     0, 3 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout,     0, 3 )
@@ -400,7 +400,7 @@ MACHINE_CONFIG_START(_3x3puzzle_state::_3x3puzzle)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", _3x3puzzle)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_3x3puzzle)
 
 	MCFG_PALETTE_ADD("palette", 0x600/2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -506,6 +506,6 @@ ROM_END
 
 
 
-GAME( 1998, 3x3puzzl,  0,          _3x3puzzle,  _3x3puzzle,  _3x3puzzle_state, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Enterprise)", MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
-GAME( 1998, 3x3puzzla, 3x3puzzl,   _3x3puzzle,  _3x3puzzle,  _3x3puzzle_state, 0,       ROT0, "Ace Enterprise",      "3X3 Puzzle (Normal)",     MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
-GAME( 199?, casanova,  0,          _3x3puzzle,  casanova,    _3x3puzzle_state, 0,       ROT0, "Promat",              "Casanova",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, 3x3puzzl,  0,        _3x3puzzle, _3x3puzzle, _3x3puzzle_state, empty_init, ROT0, "Ace Enterprise", "3X3 Puzzle (Enterprise)", MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
+GAME( 1998, 3x3puzzla, 3x3puzzl, _3x3puzzle, _3x3puzzle, _3x3puzzle_state, empty_init, ROT0, "Ace Enterprise", "3X3 Puzzle (Normal)",     MACHINE_SUPPORTS_SAVE ) // 1998. 5. 28
+GAME( 199?, casanova,  0,        _3x3puzzle, casanova,   _3x3puzzle_state, empty_init, ROT0, "Promat",         "Casanova",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

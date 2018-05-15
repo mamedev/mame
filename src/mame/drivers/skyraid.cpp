@@ -215,7 +215,7 @@ static const gfx_layout skyraid_missile_layout =
 };
 
 
-static GFXDECODE_START( skyraid )
+static GFXDECODE_START( gfx_skyraid )
 	GFXDECODE_ENTRY( "gfx1", 0, skyraid_text_layout, 18, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, skyraid_sprite_layout, 8, 2 )
 	GFXDECODE_ENTRY( "gfx3", 0, skyraid_missile_layout, 16, 1 )
@@ -241,7 +241,7 @@ MACHINE_CONFIG_START(skyraid_state::skyraid)
 	MCFG_SCREEN_UPDATE_DRIVER(skyraid_state, screen_update_skyraid)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skyraid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skyraid)
 
 	MCFG_PALETTE_ADD("palette", 20)
 	MCFG_PALETTE_INIT_OWNER(skyraid_state, skyraid)
@@ -284,4 +284,4 @@ ROM_START( skyraid )
 ROM_END
 
 
-GAME( 1978, skyraid, 0, skyraid, skyraid, skyraid_state, 0, ORIENTATION_FLIP_Y, "Atari", "Sky Raider", MACHINE_IMPERFECT_COLORS )
+GAME( 1978, skyraid, 0, skyraid, skyraid, skyraid_state, empty_init, ORIENTATION_FLIP_Y, "Atari", "Sky Raider", MACHINE_IMPERFECT_COLORS )

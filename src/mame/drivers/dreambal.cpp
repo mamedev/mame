@@ -48,7 +48,7 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	DECLARE_DRIVER_INIT(dreambal);
+	void init_dreambal();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -164,7 +164,7 @@ static const gfx_layout tile_16x16_layout =
 };
 
 
-static GFXDECODE_START( dreambal )
+static GFXDECODE_START( gfx_dreambal )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0x000, 32 )    /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0x000, 32 )    /* Tiles (16x16) */
 GFXDECODE_END
@@ -325,7 +325,7 @@ MACHINE_CONFIG_START(dreambal_state::dreambal)
 
 	MCFG_PALETTE_ADD("palette", 0x400/2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dreambal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dreambal)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93lc46b
 
@@ -371,10 +371,10 @@ ROM_START( dreambal )
 	ROM_LOAD( "mm_01-1.12f",    0x00000, 0x20000, CRC(4f134be7) SHA1(b83230cc62bde55be736fd604af23f927706a770) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dreambal_state,dreambal)
+void dreambal_state::init_dreambal()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 }
 
 // Ver 2.4 JPN 93.12.02
-GAME( 1993, dreambal, 0,     dreambal, dreambal, dreambal_state,  dreambal,  ROT0, "NDK / Data East", "Dream Ball (Japan V2.4)", MACHINE_SUPPORTS_SAVE ) // copyright shows NDK, board is Data East, code seems Data East-like too
+GAME( 1993, dreambal, 0, dreambal, dreambal, dreambal_state, init_dreambal, ROT0, "NDK / Data East", "Dream Ball (Japan V2.4)", MACHINE_SUPPORTS_SAVE ) // copyright shows NDK, board is Data East, code seems Data East-like too

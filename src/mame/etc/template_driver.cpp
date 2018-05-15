@@ -129,7 +129,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( xxx )
+static GFXDECODE_START( gfx_xxx )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -165,7 +165,7 @@ MACHINE_CONFIG_START(xxx_state::xxx)
 	//MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 0, 256, 264, 16, 240)  /* generic NTSC video timing at 256x224 */
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xxx)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xxx)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(xxx_state, xxx)
@@ -190,15 +190,15 @@ ROM_END
 
 // See src/emu/gamedrv.h for details
 // For a game:
-// GAME(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)
+// GAME(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,DRIVER_INIT,MONITOR,COMPANY,FULLNAME,FLAGS)
 
 // For a console:
-// CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
+// CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,DRIVER_INIT,COMPANY,FULLNAME,FLAGS)
 
 // For a computer:
-// COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
+// COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,DRIVER_INIT,COMPANY,FULLNAME,FLAGS)
 
 // For a generic system:
-// SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
+// SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,DRIVER_INIT,COMPANY,FULLNAME,FLAGS)
 
-GAME( 198?, xxx,  0,   xxx,  xxx, xxx_state,  0,       ROT0, "<template_manufacturer>",      "<template_machinename>", MACHINE_IS_SKELETON )
+GAME( 198?, xxx,  0,   xxx,  xxx, xxx_state, empty_init, ROT0, "<template_manufacturer>",      "<template_machinename>", MACHINE_IS_SKELETON )

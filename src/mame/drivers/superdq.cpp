@@ -314,7 +314,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( superdq )
+static GFXDECODE_START( gfx_superdq )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -346,7 +346,7 @@ MACHINE_CONFIG_START(superdq_state::superdq)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superdq)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superdq)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(superdq_state, superdq)
 
@@ -420,6 +420,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, superdq,  0,        superdq, superdq, superdq_state, 0, ROT0, "Universal", "Super Don Quix-ote (Long Scenes)",       MACHINE_NOT_WORKING )
-GAME( 1984, superdqs, superdq,  superdq, superdq, superdq_state, 0, ROT0, "Universal", "Super Don Quix-ote (Short Scenes)",      MACHINE_NOT_WORKING )
-GAME( 1984, superdqa, superdq,  superdq, superdq, superdq_state, 0, ROT0, "Universal", "Super Don Quix-ote (Short Scenes, Alt)", MACHINE_NOT_WORKING )
+GAME( 1984, superdq,  0,        superdq, superdq, superdq_state, empty_init, ROT0, "Universal", "Super Don Quix-ote (Long Scenes)",       MACHINE_NOT_WORKING )
+GAME( 1984, superdqs, superdq,  superdq, superdq, superdq_state, empty_init, ROT0, "Universal", "Super Don Quix-ote (Short Scenes)",      MACHINE_NOT_WORKING )
+GAME( 1984, superdqa, superdq,  superdq, superdq, superdq_state, empty_init, ROT0, "Universal", "Super Don Quix-ote (Short Scenes, Alt)", MACHINE_NOT_WORKING )

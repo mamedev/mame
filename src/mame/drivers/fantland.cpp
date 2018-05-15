@@ -817,7 +817,7 @@ static const gfx_layout layout16x16x6 =
 	16*16*6
 };
 
-static GFXDECODE_START( fantland )
+static GFXDECODE_START( gfx_fantland )
 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16x6, 0, 4 ) // [0] Sprites
 GFXDECODE_END
 
@@ -875,7 +875,7 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -923,7 +923,7 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1003,7 +1003,7 @@ MACHINE_CONFIG_START(fantland_state::borntofi)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1058,7 +1058,7 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fantland_state, fantland_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1425,8 +1425,8 @@ ROM_START( wheelrun )
 ROM_END
 
 
-GAME( 19??, borntofi,  0,        borntofi, borntofi, fantland_state, 0, ROT0,  "International Games",       "Born To Fight",        MACHINE_SUPPORTS_SAVE )
-GAME( 19??, fantland,  0,        fantland, fantland, fantland_state, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, fantlanda, fantland, fantland, fantland, fantland_state, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, fantland_state, 0, ROT0,  "International Games",       "Wheels Runner",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, galaxygn,  0,        galaxygn, galaxygn, fantland_state, 0, ROT90, "Electronic Devices Italy",  "Galaxy Gunners",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, borntofi,  0,        borntofi, borntofi, fantland_state, empty_init, ROT0,  "International Games",       "Born To Fight",        MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantland,  0,        fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantlanda, fantland, fantland, fantland, fantland_state, empty_init, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, fantland_state, empty_init, ROT0,  "International Games",       "Wheels Runner",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, galaxygn,  0,        galaxygn, galaxygn, fantland_state, empty_init, ROT90, "Electronic Devices Italy",  "Galaxy Gunners",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

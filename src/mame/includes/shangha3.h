@@ -55,8 +55,8 @@ public:
 	// blocken specific
 	DECLARE_WRITE16_MEMBER(blocken_coinctrl_w);
 
-	DECLARE_DRIVER_INIT(shangha3);
-	DECLARE_DRIVER_INIT(heberpop);
+	void init_shangha3();
+	void init_heberpop();
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

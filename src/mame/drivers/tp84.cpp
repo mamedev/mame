@@ -324,7 +324,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( tp84 )
+static GFXDECODE_START( gfx_tp84 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 64*8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4*8, 16*8 )
 GFXDECODE_END
@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tp84_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tp84)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tp84)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(tp84_state, tp84)
@@ -493,6 +493,6 @@ ROM_START( tp84b )
 ROM_END
 
 
-GAME( 1984, tp84,  0,    tp84,  tp84,  tp84_state, 0, ROT90, "Konami", "Time Pilot '84 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, tp84a, tp84, tp84,  tp84a, tp84_state, 0, ROT90, "Konami", "Time Pilot '84 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, tp84b, tp84, tp84b, tp84,  tp84_state, 0, ROT90, "Konami", "Time Pilot '84 (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tp84,  0,    tp84,  tp84,  tp84_state, empty_init, ROT90, "Konami", "Time Pilot '84 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tp84a, tp84, tp84,  tp84a, tp84_state, empty_init, ROT90, "Konami", "Time Pilot '84 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tp84b, tp84, tp84b, tp84,  tp84_state, empty_init, ROT90, "Konami", "Time Pilot '84 (set 3)", MACHINE_SUPPORTS_SAVE )

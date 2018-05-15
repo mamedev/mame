@@ -491,14 +491,14 @@ static const gfx_layout weststry_spritelayout =
 
 /* Graphics Decode Info */
 
-static GFXDECODE_START( bloodbro )
+static GFXDECODE_START( gfx_bloodbro )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, textlayout,   0x70*16,  0x10 ) /* Text */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout, 0x40*16,  0x10 ) /* Background */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout, 0x50*16,  0x10 ) /* Foreground */
 	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout, 0x00*16,  0x10 ) /* Sprites */
 GFXDECODE_END
 
-static GFXDECODE_START( weststry )
+static GFXDECODE_START( gfx_weststry )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, weststry_textlayout,     0x10*16,  0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, weststry_spritelayout,   0x30*16,  0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, weststry_spritelayout,   0x20*16,  0x10 )
@@ -546,7 +546,7 @@ MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, bloodbro_state, layer_scroll_w))
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bloodbro)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bloodbro)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -578,7 +578,7 @@ MACHINE_CONFIG_START(bloodbro_state::weststry)
 	MCFG_DEVICE_CLOCK(XTAL(20'000'000)/4) /* 5MHz - verified on PCB */
 	MCFG_DEVICE_PROGRAM_MAP(weststry_sound_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", weststry)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_weststry)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
@@ -853,16 +853,14 @@ ROM_START( skysmash )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(bloodbro_state,weststry)
+void bloodbro_state::init_weststry()
 {
 	// Patch out jp nz,$3000; no code known to exist at that address
 	memory_region *z80_rom = memregion("audiocpu");
 	z80_rom->as_u8(0x160e) = 0x00;
 	z80_rom->as_u8(0x1610) = 0x00;
 
-
 	uint8_t *sprites = memregion("gfx3")->base();
-
 	for (int i = 0; i < 0x40000; i++)
 	{
 		/* sprite roms ws25 and ws26 have 2 bits swapped
@@ -880,10 +878,10 @@ DRIVER_INIT_MEMBER(bloodbro_state,weststry)
 
 /* Game Drivers */
 
-GAME( 1990, bloodbro,   0,        bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation", "Blood Bros. (World?)",                       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, bloodbroj,  bloodbro, bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation", "Blood Bros. (Japan, rev A)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, bloodbroja, bloodbro, bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation", "Blood Bros. (Japan)",                        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, bloodbrou,  bloodbro, bloodbro, bloodbro, bloodbro_state, 0,        ROT0,   "TAD Corporation (Fabtek license)", "Blood Bros. (US)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, weststry,   bloodbro, weststry, weststry, bloodbro_state, weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros., set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, weststrya,  bloodbro, weststry, weststry, bloodbro_state, weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros., set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, skysmash,   0,        skysmash, skysmash, bloodbro_state, 0,        ROT270, "Nihon System",    "Sky Smasher",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bloodbro,   0,        bloodbro, bloodbro, bloodbro_state, empty_init,    ROT0,   "TAD Corporation", "Blood Bros. (World?)",                       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bloodbroj,  bloodbro, bloodbro, bloodbro, bloodbro_state, empty_init,    ROT0,   "TAD Corporation", "Blood Bros. (Japan, rev A)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bloodbroja, bloodbro, bloodbro, bloodbro, bloodbro_state, empty_init,    ROT0,   "TAD Corporation", "Blood Bros. (Japan)",                        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, bloodbrou,  bloodbro, bloodbro, bloodbro, bloodbro_state, empty_init,    ROT0,   "TAD Corporation (Fabtek license)", "Blood Bros. (US)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, weststry,   bloodbro, weststry, weststry, bloodbro_state, init_weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros., set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, weststrya,  bloodbro, weststry, weststry, bloodbro_state, init_weststry, ROT0,   "bootleg (Datsu)", "West Story (bootleg of Blood Bros., set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, skysmash,   0,        skysmash, skysmash, bloodbro_state, empty_init,    ROT270, "Nihon System",    "Sky Smasher",                                MACHINE_SUPPORTS_SAVE )

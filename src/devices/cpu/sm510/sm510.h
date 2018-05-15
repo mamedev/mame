@@ -235,8 +235,8 @@ protected:
 	virtual void get_opcode_param() { }
 	virtual void update_w_latch() { }
 
-	u8 ram_r();
-	void ram_w(u8 data);
+	virtual u8 ram_r();
+	virtual void ram_w(u8 data);
 	void pop_stack();
 	void push_stack();
 	virtual void do_branch(u8 pu, u8 pm, u8 pl);

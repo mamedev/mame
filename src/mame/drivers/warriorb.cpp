@@ -412,7 +412,7 @@ static const gfx_layout charlayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( warriorb )
+static GFXDECODE_START( gfx_warriorb )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* scr tiles (screen 1) */
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,  0, 256 )   /* scr tiles (screen 2) */
@@ -454,7 +454,7 @@ MACHINE_CONFIG_START(warriorb_state::darius2d)
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", warriorb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_warriorb)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_ADD("palette2", 4096)
 
@@ -540,7 +540,7 @@ MACHINE_CONFIG_START(warriorb_state::warriorb)
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", warriorb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_warriorb)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_ADD("palette2", 4096)
 
@@ -787,8 +787,8 @@ ROM_END
 
 /* Working Games */
 
-//    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    STATE,          INIT,MONITOR,COMPANY,FULLNAME,          FLAGS
-GAME( 1989, sagaia,    darius2, darius2d, sagaia,   warriorb_state, 0,   ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, darius2d,  darius2, darius2d, darius2d, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, darius2do, darius2, darius2d, darius2d, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1991, warriorb,  0,       warriorb, warriorb, warriorb_state, 0,   ROT0,   "Taito Corporation",       "Warrior Blade - Rastan Saga Episode III (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    STATE,          INIT,       MONITOR,COMPANY,FULLNAME,          FLAGS
+GAME( 1989, sagaia,    darius2, darius2d, sagaia,   warriorb_state, empty_init, ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, darius2d,  darius2, darius2d, darius2d, warriorb_state, empty_init, ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, darius2do, darius2, darius2d, darius2d, warriorb_state, empty_init, ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1991, warriorb,  0,       warriorb, warriorb, warriorb_state, empty_init, ROT0,   "Taito Corporation",       "Warrior Blade - Rastan Saga Episode III (Japan)", MACHINE_SUPPORTS_SAVE )

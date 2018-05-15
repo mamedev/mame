@@ -200,8 +200,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mbutrfly_prot_w);
 	READ_LINE_MEMBER(mbutrfly_prot_r);
 	DECLARE_READ8_MEMBER(bdream97_opcode_r);
-	DECLARE_DRIVER_INIT(miaction);
-	DECLARE_DRIVER_INIT(sonikfig);
+	void init_miaction();
+	void init_sonikfig();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
@@ -719,25 +719,25 @@ static const gfx_layout layout8x32x8_bdream97 =  /* for bdream97 */
 *           Graphics Decode           *
 **************************************/
 
-static GFXDECODE_START( skylncr )
+static GFXDECODE_START( gfx_skylncr )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8,        0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8,       0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_rot,   0, 2 )
 GFXDECODE_END
 
-static GFXDECODE_START( neraidou )
+static GFXDECODE_START( gfx_neraidou )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_alt,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt2,  0, 2 )
 //  GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( sstar97 )
+static GFXDECODE_START( gfx_sstar97 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_alt,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( bdream97 )
+static GFXDECODE_START( gfx_bdream97 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_bdream97,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_bdream97,   0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_bdream97,   0x100, 1 )
@@ -1666,7 +1666,7 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 	MCFG_SCREEN_UPDATE_DRIVER(skylncr_state, screen_update_skylncr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skylncr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skylncr)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -1697,7 +1697,7 @@ MACHINE_CONFIG_START(skylncr_state::neraidou)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_GFXDECODE_MODIFY("gfxdecode", neraidou)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_neraidou)
 MACHINE_CONFIG_END
 
 
@@ -1706,7 +1706,7 @@ MACHINE_CONFIG_START(skylncr_state::sstar97)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_GFXDECODE_MODIFY("gfxdecode", sstar97)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sstar97)
 MACHINE_CONFIG_END
 
 
@@ -1717,7 +1717,7 @@ MACHINE_CONFIG_START(skylncr_state::bdream97)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_OPCODES_MAP(bdream97_opcode_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", bdream97)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bdream97)
 MACHINE_CONFIG_END
 
 
@@ -2054,7 +2054,7 @@ ROM_END
 *           Driver Init           *
 **********************************/
 
-DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
+void skylncr_state::init_sonikfig()
 /*
   Encryption: For each 8 bytes group,
   swap byte #1 with #4 and #3 with #6.
@@ -2086,7 +2086,7 @@ DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
 	}
 }
 
-DRIVER_INIT_MEMBER(skylncr_state, miaction)
+void skylncr_state::init_miaction()
 /*
   Encryption:
 
@@ -2101,24 +2101,23 @@ DRIVER_INIT_MEMBER(skylncr_state, miaction)
 */
 {
 	uint8_t *const ROM = memregion("maincpu")->base();
-	int x;
 
-	for (x = 0x0007; x < 0x4485; x++)
+	for (int x = 0x0007; x < 0x4485; x++)
 	{
 		ROM[x] = ROM[x] ^ 0x19;
 	}
 
-	for (x = 0x4486; x < 0x7fff; x++)
+	for (int x = 0x4486; x < 0x7fff; x++)
 	{
 		ROM[x] = ROM[x] ^ 0x44;
 	}
 
-	for (x = 0xc000; x < 0xd25f; x++)
+	for (int x = 0xc000; x < 0xd25f; x++)
 	{
 		ROM[x] = ROM[x] ^ 0x44;
 	}
 
-	for (x = 0xe000; x < 0xffff; x++)
+	for (int x = 0xe000; x < 0xffff; x++)
 	{
 		ROM[x] = ROM[x] ^ 0x19;
 	}
@@ -2129,16 +2128,16 @@ DRIVER_INIT_MEMBER(skylncr_state, miaction)
 *                  Game Drivers                     *
 ****************************************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT   COMPANY                 FULLNAME                                          FLAGS
-GAME( 1995, skylncr,   0,        skylncr,  skylncr,  skylncr_state,  0,        ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
-GAME( 1995, butrfly,   0,        skylncr,  skylncr,  skylncr_state,  0,        ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
-GAME( 1999, mbutrfly,  0,        mbutrfly, mbutrfly, skylncr_state,  0,        ROT0, "Bordun International", "Magical Butterfly (version U350C, protected)",   0 )
-GAME( 1995, madzoo,    0,        skylncr,  skylncr,  skylncr_state,  0,        ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
-GAME( 1995, leader,    0,        skylncr,  leader,   skylncr_state,  0,        ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
-GAME( 199?, gallag50,  0,        skylncr,  gallag50, skylncr_state,  0,        ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
-GAME( 199?, neraidou,  0,        neraidou, neraidou, skylncr_state,  0,        ROT0, "bootleg",              "Neraidoula",                                     0 )
-GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  miaction, ROT0, "Vegas",                "Missing In Action",                              MACHINE_NOT_WORKING )
-GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  miaction, ROT0, "bootleg",              "Tiger (slot)",                                   MACHINE_NOT_WORKING )
-GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  0,        ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
-GAME( 1995, bdream97,  0,        bdream97, skylncr,  skylncr_state,  0,        ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 2000, sonikfig,  0,        skylncr,  sonikfig, skylncr_state,  sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT   COMPANY                 FULLNAME                                          FLAGS
+GAME( 1995, skylncr,   0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Sky Lancer (Bordun, version U450C)",             0 )
+GAME( 1995, butrfly,   0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Butterfly Video Game (version U350C)",           0 )
+GAME( 1999, mbutrfly,  0,        mbutrfly, mbutrfly, skylncr_state,  empty_init,    ROT0, "Bordun International", "Magical Butterfly (version U350C, protected)",   0 )
+GAME( 1995, madzoo,    0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
+GAME( 1995, leader,    0,        skylncr,  leader,   skylncr_state,  empty_init,    ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
+GAME( 199?, gallag50,  0,        skylncr,  gallag50, skylncr_state,  empty_init,    ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
+GAME( 199?, neraidou,  0,        neraidou, neraidou, skylncr_state,  empty_init,    ROT0, "bootleg",              "Neraidoula",                                     0 )
+GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction, ROT0, "Vegas",                "Missing In Action",                              MACHINE_NOT_WORKING )
+GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  init_miaction, ROT0, "bootleg",              "Tiger (slot)",                                   MACHINE_NOT_WORKING )
+GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
+GAME( 1995, bdream97,  0,        bdream97, skylncr,  skylncr_state,  empty_init,    ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2000, sonikfig,  0,        skylncr,  sonikfig, skylncr_state,  init_sonikfig, ROT0, "Z Games",              "Sonik Fighter (version 02, encrypted)",          MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )

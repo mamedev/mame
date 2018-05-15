@@ -59,7 +59,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	DECLARE_DRIVER_INIT(wink);
+	void init_wink();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -351,7 +351,7 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( wink )
+static GFXDECODE_START( gfx_wink )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 4 )
 GFXDECODE_END
 
@@ -411,7 +411,7 @@ MACHINE_CONFIG_START(wink_state::wink)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wink_state, nmi_clock_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wink)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wink)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
@@ -460,9 +460,8 @@ ROM_START( winka )
 	ROM_LOAD( "wink4.bin",    0x4000, 0x2000, CRC(06dd229b) SHA1(9057cf10e9ec4119297c2d40b26f0ce0c1d7b86a) )
 ROM_END
 
-DRIVER_INIT_MEMBER(wink_state,wink)
+void wink_state::init_wink()
 {
-	uint32_t i;
 	uint8_t *ROM = memregion("maincpu")->base();
 	std::vector<uint8_t> buffer(0x8000);
 
@@ -470,21 +469,21 @@ DRIVER_INIT_MEMBER(wink_state,wink)
 
 	memcpy(&buffer[0],ROM,0x8000);
 
-	for (i = 0x0000; i <= 0x1fff; i++)
+	for (uint32_t i = 0x0000; i <= 0x1fff; i++)
 		ROM[i] = buffer[bitswap<16>(i,15,14,13, 11,12, 7, 9, 8,10, 6, 4, 5, 1, 2, 3, 0)];
 
-	for (i = 0x2000; i <= 0x3fff; i++)
+	for (uint32_t i = 0x2000; i <= 0x3fff; i++)
 		ROM[i] = buffer[bitswap<16>(i,15,14,13, 10, 7,12, 9, 8,11, 6, 3, 1, 5, 2, 4, 0)];
 
-	for (i = 0x4000; i <= 0x5fff; i++)
+	for (uint32_t i = 0x4000; i <= 0x5fff; i++)
 		ROM[i] = buffer[bitswap<16>(i,15,14,13,  7,10,11, 9, 8,12, 6, 1, 3, 4, 2, 5, 0)];
 
-	for (i = 0x6000; i <= 0x7fff; i++)
+	for (uint32_t i = 0x6000; i <= 0x7fff; i++)
 		ROM[i] = buffer[bitswap<16>(i,15,14,13, 11,12, 7, 9, 8,10, 6, 4, 5, 1, 2, 3, 0)];
 
-	for (i = 0; i < 0x8000; i++)
+	for (uint32_t i = 0; i < 0x8000; i++)
 		ROM[i] += bitswap<8>(i & 0xff, 7,5,3,1,6,4,2,0);
 }
 
-GAME( 1985, wink,  0,    wink, wink, wink_state, wink, ROT0, "Midcoin", "Wink (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, winka, wink, wink, wink, wink_state, wink, ROT0, "Midcoin", "Wink (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wink,  0,    wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, winka, wink, wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

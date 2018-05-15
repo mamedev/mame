@@ -182,7 +182,7 @@ static const gfx_layout dai_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( dai )
+static GFXDECODE_START( gfx_dai )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dai_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -214,7 +214,7 @@ MACHINE_CONFIG_START(dai_state::dai)
 	MCFG_SCREEN_UPDATE_DRIVER(dai_state, screen_update_dai)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dai)
 	MCFG_PALETTE_ADD("palette", sizeof (dai_palette) / 3)
 	MCFG_PALETTE_INIT_OWNER(dai_state, dai)
 
@@ -257,5 +257,5 @@ ROM_START(dai)
 	ROM_LOAD ("nch.bin", 0x0000, 0x1000, CRC(a9f5b30b) SHA1(24119b2984ab4e50dc0dabae1065ff6d6c1f237d))
 ROM_END
 
-/*    YEAR  NAME PARENT  COMPAT MACHINE INPUT  STATE      INIT  COMPANY                            FULLNAME */
-COMP( 1978, dai, 0,      0,     dai,    dai,   dai_state, 0,    "Data Applications International", "DAI Personal Computer", 0)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY                            FULLNAME */
+COMP( 1978, dai,  0,      0,      dai,     dai,   dai_state, empty_init, "Data Applications International", "DAI Personal Computer", 0)

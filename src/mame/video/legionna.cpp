@@ -425,7 +425,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 			if(machine().input().code_pressed_once(KEYCODE_A))
 				pri_test++;
 
-			if(machine().input().code_pressed_once(KEYCODE_A))
+			if(machine().input().code_pressed_once(KEYCODE_S))
 				pri_test--;
 
 			pri_test&=3;

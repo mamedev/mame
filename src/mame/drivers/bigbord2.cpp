@@ -72,7 +72,7 @@ X - change banks
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/74259.h"
 #include "machine/clock.h"
 #include "machine/keyboard.h"
@@ -125,7 +125,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sio_wrdya_w);
 	DECLARE_WRITE_LINE_MEMBER(sio_wrdyb_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_DRIVER_INIT(bigbord2);
+	void init_bigbord2();
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
@@ -429,7 +429,7 @@ void bigbord2_state::machine_reset()
 	m_banka->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(bigbord2_state,bigbord2)
+void bigbord2_state::init_bigbord2()
 {
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 	m_io = &m_maincpu->space(AS_IO);
@@ -455,7 +455,7 @@ static const gfx_layout crt8002_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( crt8002 )
+static GFXDECODE_START( gfx_crt8002 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, crt8002_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -557,7 +557,7 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(10'694'250), 700, 0, 560, 260, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crt8002)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crt8002)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("ctc_clock", CLOCK, MAIN_CLOCK)
@@ -640,5 +640,5 @@ ROM_START( bigbord2 )
 ROM_END
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY                       FULLNAME        FLAGS
-COMP( 1982, bigbord2, 0,        0,      bigbord2, bigbord2, bigbord2_state, bigbord2, "Digital Research Computers", "Big Board II", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY                       FULLNAME        FLAGS
+COMP( 1982, bigbord2, 0,      0,      bigbord2, bigbord2, bigbord2_state, init_bigbord2, "Digital Research Computers", "Big Board II", MACHINE_NOT_WORKING )

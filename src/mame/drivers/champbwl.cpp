@@ -446,7 +446,7 @@ static const gfx_layout charlayout =
 	32*8
 };
 
-static GFXDECODE_START( champbwl )
+static GFXDECODE_START( gfx_champbwl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
@@ -512,7 +512,7 @@ MACHINE_CONFIG_START(champbwl_state::champbwl)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, champbwl_state, screen_vblank_champbwl))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_champbwl)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_PALETTE_INIT_OWNER(champbwl_state,champbwl)
@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(champbwl_state::doraemon)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, champbwl_state, screen_vblank_doraemon))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_champbwl)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_PALETTE_INIT_OWNER(champbwl_state,champbwl)
@@ -710,5 +710,5 @@ ROM_START( doraemon )
 	ROM_LOAD( "u27-01.bin", 0x00200, 0x200, CRC(66245fc7) SHA1(c94d9dce7b557c21a3dc1f3f8a1b29594715c994) )
 ROM_END
 
-GAME( 1993?,doraemon, 0, doraemon, doraemon, champbwl_state, 0, ROT0,   "Sunsoft / Epoch",     "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
-GAME( 1989, champbwl, 0, champbwl, champbwl, champbwl_state, 0, ROT270, "Seta / Romstar Inc.", "Championship Bowling",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1993?,doraemon, 0, doraemon, doraemon, champbwl_state, empty_init, ROT0,   "Sunsoft / Epoch",     "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
+GAME( 1989, champbwl, 0, champbwl, champbwl, champbwl_state, empty_init, ROT270, "Seta / Romstar Inc.", "Championship Bowling",                   MACHINE_SUPPORTS_SAVE )

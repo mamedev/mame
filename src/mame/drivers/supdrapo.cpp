@@ -428,7 +428,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( supdrapo )
+static GFXDECODE_START( gfx_supdrapo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 GFXDECODE_END
 
@@ -471,7 +471,7 @@ MACHINE_CONFIG_START(supdrapo_state::supdrapo)
 	MCFG_SCREEN_UPDATE_DRIVER(supdrapo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supdrapo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supdrapo)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(supdrapo_state, supdrapo)
 
@@ -613,7 +613,7 @@ ROM_END
                            Games Drivers
 **********************************************************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT  ROT    COMPANY                                           FULLNAME                      FLAGS
-GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, supdrapo_state, 0,    ROT90, "Valadon Automation (Stern Electronics license)", "Super Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, supdrapo_state, 0,    ROT90, "Valadon Automation / Jeutel",                    "Super Draw Poker (set 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, supdrapob, supdrapo, supdrapo, supdrapo, supdrapo_state, 0,    ROT90, "bootleg",                                        "Super Draw Poker (bootleg)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        ROT    COMPANY                                           FULLNAME                      FLAGS
+GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, supdrapo_state, empty_init, ROT90, "Valadon Automation (Stern Electronics license)", "Super Draw Poker (set 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, supdrapo_state, empty_init, ROT90, "Valadon Automation / Jeutel",                    "Super Draw Poker (set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, supdrapob, supdrapo, supdrapo, supdrapo, supdrapo_state, empty_init, ROT90, "bootleg",                                        "Super Draw Poker (bootleg)", MACHINE_SUPPORTS_SAVE )

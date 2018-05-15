@@ -826,15 +826,15 @@ ROM_END
 
 /* Second "version" letter denotes players, A=2 players, B=4 players, C=6 players ??? - For the Asia versions both D & E are 4 players */
 
-GAME( 1992, xmen,    0,    xmen,   xmen,   xmen_state,  0,   ROT0, "Konami", "X-Men (4 Players ver UBB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmenj,   xmen, xmen,   xmen,   xmen_state,  0,   ROT0, "Konami", "X-Men (4 Players ver JBA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmene,   xmen, xmen,   xmen,   xmen_state,  0,   ROT0, "Konami", "X-Men (4 Players ver EBA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmena,   xmen, xmen,   xmen,   xmen_state,  0,   ROT0, "Konami", "X-Men (4 Players ver AEA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmenaa,  xmen, xmen,   xmen,   xmen_state,  0,   ROT0, "Konami", "X-Men (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen2pe, xmen, xmen,   xmen2p, xmen_state,  0,   ROT0, "Konami", "X-Men (2 Players ver EAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen2pu, xmen, xmen,   xmen2p, xmen_state,  0,   ROT0, "Konami", "X-Men (2 Players ver UAB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen2pa, xmen, xmen,   xmen2p, xmen_state,  0,   ROT0, "Konami", "X-Men (2 Players ver AAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen2pj, xmen, xmen,   xmen2p, xmen_state,  0,   ROT0, "Konami", "X-Men (2 Players ver JAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen,    0,    xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver UBB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmenj,   xmen, xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver JBA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmene,   xmen, xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver EBA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmena,   xmen, xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver AEA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmenaa,  xmen, xmen,   xmen,   xmen_state,  empty_init, ROT0, "Konami", "X-Men (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen2pe, xmen, xmen,   xmen2p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (2 Players ver EAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen2pu, xmen, xmen,   xmen2p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (2 Players ver UAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen2pa, xmen, xmen,   xmen2p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (2 Players ver AAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen2pj, xmen, xmen,   xmen2p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (2 Players ver JAA)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, xmen6p,  xmen, xmen6p, xmen6p, xmen_state,  0,   ROT0, "Konami", "X-Men (6 Players ver ECB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmen6pu, xmen, xmen6p, xmen6p, xmen_state,  0,   ROT0, "Konami", "X-Men (6 Players ver UCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen6p,  xmen, xmen6p, xmen6p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (6 Players ver ECB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, xmen6pu, xmen, xmen6p, xmen6p, xmen_state,  empty_init, ROT0, "Konami", "X-Men (6 Players ver UCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

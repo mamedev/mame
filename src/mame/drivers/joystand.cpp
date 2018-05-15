@@ -551,7 +551,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( joystand )
+static GFXDECODE_START( gfx_joystand )
 	GFXDECODE_ENTRY( "tiles",    0, layout_8x8x4,   0, 0x100 )
 	GFXDECODE_ENTRY( "cart.u5",  0, layout_16x16x8, 0,  0x10 )
 	GFXDECODE_ENTRY( "cart.u6",  0, layout_16x16x8, 0,  0x10 )
@@ -604,7 +604,7 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", joystand)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_joystand)
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("bg15_palette")
 
@@ -690,4 +690,4 @@ ROM_START( joystand )
 	ROM_LOAD( "jsp-xct.ic5",   0x000, 0x117, NO_DUMP )
 ROM_END
 
-GAME( 1997, joystand, 0, joystand, joystand, joystand_state, 0, ROT0, "Yuvo", "Joy Stand Private", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, joystand, 0, joystand, joystand, joystand_state, empty_init, ROT0, "Yuvo", "Joy Stand Private", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

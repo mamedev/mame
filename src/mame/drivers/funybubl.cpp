@@ -198,7 +198,7 @@ static const gfx_layout tiles16x16x8_2_layout =
 };
 
 
-static GFXDECODE_START( funybubl )
+static GFXDECODE_START( gfx_funybubl )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x8_1_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x8_2_layout, 0, 16 )
 GFXDECODE_END
@@ -241,7 +241,7 @@ MACHINE_CONFIG_START(funybubl_state::funybubl)
 	MCFG_SCREEN_UPDATE_DRIVER(funybubl_state, screen_update_funybubl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funybubl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funybubl)
 	MCFG_PALETTE_ADD("palette", 0x400)
 
 
@@ -317,5 +317,5 @@ ROM_START( funybublc )
 ROM_END
 
 
-GAME( 1999, funybubl, 0,        funybubl, funybubl, funybubl_state, 0, ROT0, "In Chang Electronic Co", "Funny Bubble", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, funybublc,funybubl, funybubl, funybubl, funybubl_state, 0, ROT0, "Comad", "Funny Bubble (Comad version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, funybubl, 0,        funybubl, funybubl, funybubl_state, empty_init, ROT0, "In Chang Electronic Co", "Funny Bubble", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, funybublc,funybubl, funybubl, funybubl, funybubl_state, empty_init, ROT0, "Comad", "Funny Bubble (Comad version)", MACHINE_SUPPORTS_SAVE )

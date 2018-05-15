@@ -438,5 +438,5 @@ ROM_START(lwriter)
 
 ROM_END
 
-/*    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      STATE          INIT  COMPANY            FULLNAME                    FLAGS */
-CONS( 1988, lwriter,    0,        0,      lwriter,   lwriter,   lwriter_state, 0,    "Apple Computer",  "Apple Laser Writer II NT", MACHINE_IS_SKELETON)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT        COMPANY            FULLNAME                    FLAGS */
+CONS( 1988, lwriter, 0,      0,      lwriter, lwriter, lwriter_state, empty_init, "Apple Computer",  "Apple Laser Writer II NT", MACHINE_IS_SKELETON)

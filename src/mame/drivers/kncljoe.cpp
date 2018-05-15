@@ -225,7 +225,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( kncljoe )
+static GFXDECODE_START( gfx_kncljoe )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 16 )    /* colors 0x00-0x7f direct mapped */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x80, 16 )    /* colors 0x80-0x8f with lookup table */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x80, 16 )
@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(kncljoe_state::kncljoe)
 	MCFG_SCREEN_UPDATE_DRIVER(kncljoe_state, screen_update_kncljoe)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kncljoe)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kncljoe)
 	MCFG_PALETTE_ADD("palette", 16*8+16*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128+16)
 	MCFG_PALETTE_INIT_OWNER(kncljoe_state, kncljoe)
@@ -400,6 +400,6 @@ ROM_END
 
 
 
-GAME( 1985, kncljoe,  0,       kncljoe, kncljoe, kncljoe_state, 0, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, kncljoea, kncljoe, kncljoe, kncljoe, kncljoe_state, 0, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, bcrusher, kncljoe, kncljoe, kncljoe, kncljoe_state, 0, ROT0, "bootleg",                        "Bone Crusher", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kncljoe,  0,       kncljoe, kncljoe, kncljoe_state, empty_init, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kncljoea, kncljoe, kncljoe, kncljoe, kncljoe_state, empty_init, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bcrusher, kncljoe, kncljoe, kncljoe, kncljoe_state, empty_init, ROT0, "bootleg",                        "Bone Crusher", MACHINE_SUPPORTS_SAVE )

@@ -130,7 +130,7 @@ playing the automaton. Bits 0-2 of PORTB control the organ.
 #include "includes/polyplay.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -305,7 +305,7 @@ static const gfx_layout charlayout_3_bit =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( polyplay )
+static GFXDECODE_START( gfx_polyplay )
 	GFXDECODE_ENTRY( "gfx1",  0x0000, charlayout_1_bit, 0, 1 )
 	GFXDECODE_ENTRY( nullptr, 0xec00, charlayout_3_bit, 2, 1 )
 GFXDECODE_END
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	MCFG_SCREEN_UPDATE_DRIVER(polyplay_state, screen_update_polyplay)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", polyplay)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_polyplay)
 	MCFG_PALETTE_ADD("palette", 10)
 	MCFG_PALETTE_INIT_OWNER(polyplay_state, polyplay)
 
@@ -438,6 +438,6 @@ ROM_START( polyplay2c )
 ROM_END
 
 /* game driver */
-GAMEL( 1986, polyplay,   0,         polyplay_zre,   polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE)",            0, layout_polyplay )
-GAMEL( 1989, polyplay2,  0,         polyplay_zrepp, polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP)",         0, layout_polyplay )
-GAMEL( 1989, polyplay2c, polyplay2, polyplay_zrepp, polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP - Czech)", 0, layout_polyplay )
+GAMEL( 1986, polyplay,   0,         polyplay_zre,   polyplay, polyplay_state, empty_init, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE)",            0, layout_polyplay )
+GAMEL( 1989, polyplay2,  0,         polyplay_zrepp, polyplay, polyplay_state, empty_init, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP)",         0, layout_polyplay )
+GAMEL( 1989, polyplay2c, polyplay2, polyplay_zrepp, polyplay, polyplay_state, empty_init, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP - Czech)", 0, layout_polyplay )

@@ -41,7 +41,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(hideseek);
+	void init_hideseek();
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(hideseek);
 	uint32_t screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -84,7 +84,7 @@ INPUT_PORTS_END
 
 static GFXLAYOUT_RAW( hideseek, 2048, 1, 2048*8, 2048*8 )
 
-static GFXDECODE_START( hideseek )
+static GFXDECODE_START( gfx_hideseek )
 	GFXDECODE_ENTRY( "blit_data", 0, hideseek,     0x0000, 0x1 )
 GFXDECODE_END
 
@@ -117,7 +117,7 @@ MACHINE_CONFIG_START(hideseek_state::hideseek)
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_INIT_OWNER(hideseek_state, hideseek)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hideseek)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hideseek)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -155,9 +155,9 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(hideseek_state,hideseek)
+void hideseek_state::init_hideseek()
 {
 }
 
 
-GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, hideseek,    ROT0, "<unknown>", "Hide & Seek",MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, init_hideseek, ROT0, "<unknown>", "Hide & Seek",MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

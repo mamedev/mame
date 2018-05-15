@@ -190,7 +190,7 @@ READ8_MEMBER(aquarius_state::cartridge_r)
     DRIVER INIT
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(aquarius_state,aquarius)
+void aquarius_state::init_aquarius()
 {
 	/* install expansion memory if available */
 	if (m_ram->size() > 0x1000)
@@ -340,7 +340,7 @@ static const gfx_layout aquarius_charlayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( aquarius )
+static GFXDECODE_START( gfx_aquarius )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, aquarius_charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -365,7 +365,7 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	MCFG_SCREEN_UPDATE_DRIVER(aquarius_state, screen_update_aquarius)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aquarius )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aquarius)
 	MCFG_TEA1002_ADD("encoder", XTAL(8'867'238))
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
@@ -422,6 +422,6 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME         PARENT    COMPAT  MACHINE      INPUT     STATE           INIT      COMPANY   FULLNAME               FLAGS
-COMP( 1983, aquarius,    0,        0,      aquarius,    aquarius, aquarius_state, aquarius, "Mattel", "Aquarius (NTSC)",     0 )
-//COMP( 1984, aquariu2,    aquarius, 0,      aquarius,    aquarius, aquarius_state, 0,        "Mattel", "Aquarius II",         MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY   FULLNAME           FLAGS
+COMP( 1983, aquarius, 0,        0,      aquarius, aquarius, aquarius_state, init_aquarius, "Mattel", "Aquarius (NTSC)", 0 )
+//COMP( 1984, aquariu2, aquarius, 0,      aquarius, aquarius, aquarius_state, empty_init,    "Mattel", "Aquarius II",     MACHINE_NOT_WORKING )

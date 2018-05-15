@@ -392,7 +392,7 @@ static const gfx_layout x1_chars_16x16 =
 };
 
 /* decoded for debugging purpose, this will be nuked in the end... */
-static GFXDECODE_START( x1 )
+static GFXDECODE_START( gfx_x1 )
 	GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0, 1 )
 	GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0, 1 )
 	GFXDECODE_ENTRY( "font",    0x00000, x1_chars_8x16,   0, 1 )
@@ -473,7 +473,7 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
 	MCFG_PALETTE_INIT_OWNER(x1twin_state,x1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x1)
 
 	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 
@@ -558,4 +558,4 @@ ROM_START( x1twin )
 	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, BAD_DUMP CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
 ROM_END
 
-COMP( 1986, x1twin,    x1,     0,       x1twin,      x1twin, x1twin_state, x1_kanji,"Sharp",  "X1 Twin (CZ-830C)",    MACHINE_NOT_WORKING )
+COMP( 1986, x1twin, x1, 0, x1twin, x1twin, x1twin_state, init_x1_kanji, "Sharp", "X1 Twin (CZ-830C)", MACHINE_NOT_WORKING )

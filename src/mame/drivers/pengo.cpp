@@ -81,7 +81,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_DRIVER_INIT(penta);
+	void init_penta();
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
@@ -357,7 +357,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( pengo )
+static GFXDECODE_START( gfx_pengo )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0x2000, spritelayout, 0, 128 )
 GFXDECODE_END
@@ -396,7 +396,7 @@ MACHINE_CONFIG_START(pengo_state::pengo)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pengo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pengo)
 	MCFG_PALETTE_ADD("palette", 128*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pengo_state,pacman)
@@ -703,7 +703,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(pengo_state,penta)
+void pengo_state::init_penta()
 {
 /*
     the values vary, but the translation mask is always laid out like this:
@@ -750,17 +750,13 @@ DRIVER_INIT_MEMBER(pengo_state,penta)
 
 	for (int A = 0x0000;A < 0x8000;A++)
 	{
-		int i,j;
-		uint8_t src;
-
-
-		src = rom[A];
+		uint8_t src = rom[A];
 
 		/* pick the translation table from bit 0 of the address */
-		i = A & 1;
+		int i = A & 1;
 
 		/* pick the offset in the table from bits 1, 3 and 5 of the source data */
-		j = ((src >> 1) & 1) + (((src >> 3) & 1) << 1) + (((src >> 5) & 1) << 2);
+		int j = ((src >> 1) & 1) + (((src >> 3) & 1) << 1) + (((src >> 5) & 1) << 2);
 		/* the bottom half of the translation table is the mirror image of the top */
 		if (src & 0x80) j = 7 - j;
 
@@ -781,12 +777,12 @@ DRIVER_INIT_MEMBER(pengo_state,penta)
  *
  *************************************/
 
-GAME( 1982, pengo,    0,        pengoe,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 1 rev c)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo2,   pengo,    pengoe,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 2)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo2u,  pengo,    pengou,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 2 not encrypted)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo3u,  pengo,    pengou,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 3 not encrypted)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo4,   pengo,    pengoe,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 4)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo5,   pengo,    pengoe,   pengo,    pengo_state, 0,     ROT90, "Sega",                     "Pengo (set 5)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengob,   pengo,    pengo,    pengo,    pengo_state, penta, ROT90, "bootleg",                  "Pengo (bootleg)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1982, penta,    pengo,    pengo,    pengo,    pengo_state, penta, ROT90, "bootleg (Grinbee Shouji)", "Penta",                        MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
-GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, 0,     ROT90, "bootleg",                  "Jr. Pac-Man (Pengo hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo,    0,        pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 1 rev c)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo2,   pengo,    pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 2)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo2u,  pengo,    pengou,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 2 not encrypted)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo3u,  pengo,    pengou,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 3 not encrypted)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo4,   pengo,    pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 4)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengo5,   pengo,    pengoe,   pengo,    pengo_state, empty_init, ROT90, "Sega",                     "Pengo (set 5)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengob,   pengo,    pengo,    pengo,    pengo_state, init_penta, ROT90, "bootleg",                  "Pengo (bootleg)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, penta,    pengo,    pengo,    pengo,    pengo_state, init_penta, ROT90, "bootleg (Grinbee Shouji)", "Penta",                        MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
+GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, empty_init, ROT90, "bootleg",                  "Jr. Pac-Man (Pengo hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

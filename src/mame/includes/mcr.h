@@ -7,7 +7,7 @@
 **************************************************************************/
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
@@ -63,16 +63,16 @@ public:
 	DECLARE_READ8_MEMBER(demoderb_ip2_r);
 	DECLARE_WRITE8_MEMBER(demoderb_op4_w);
 
-	DECLARE_DRIVER_INIT(mcr_91490);
-	DECLARE_DRIVER_INIT(kroozr);
-	DECLARE_DRIVER_INIT(solarfox);
-	DECLARE_DRIVER_INIT(kick);
-	DECLARE_DRIVER_INIT(twotiger);
-	DECLARE_DRIVER_INIT(demoderb);
-	DECLARE_DRIVER_INIT(wacko);
-	DECLARE_DRIVER_INIT(mcr_90010);
-	DECLARE_DRIVER_INIT(dotrone);
-	DECLARE_DRIVER_INIT(journey);
+	void init_mcr_91490();
+	void init_kroozr();
+	void init_solarfox();
+	void init_kick();
+	void init_twotiger();
+	void init_demoderb();
+	void init_wacko();
+	void init_mcr_90010();
+	void init_dotrone();
+	void init_journey();
 
 	uint32_t screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcr_interrupt);
@@ -152,7 +152,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(hopper_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(coin_in_callback);
 
-	DECLARE_DRIVER_INIT(dpoker);
+	void init_dpoker();
 
 	void mcr_90009_dp(machine_config &config);
 private:
@@ -185,7 +185,7 @@ public:
 	TIMER_CALLBACK_MEMBER(ipu_watchdog_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(ipu_interrupt);
 
-	DECLARE_DRIVER_INIT(nflfoot);
+	void init_nflfoot();
 
 	void mcr_91490_ipu(machine_config &config);
 	void ipu_91695_map(address_map &map);

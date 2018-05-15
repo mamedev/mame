@@ -201,7 +201,7 @@ static const gfx_layout sprite_layout =
 	16*16*4
 };
 
-static GFXDECODE_START( lemmings )
+static GFXDECODE_START( gfx_lemmings )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,  512, 16 ) /* Sprites 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout,  768, 16 ) /* Sprites 16x16 */
 	GFXDECODE_ENTRY( nullptr,0, charlayout,     0,   16 ) /* Dynamically modified */
@@ -235,7 +235,7 @@ MACHINE_CONFIG_START(lemmings_state::lemmings)
 	MCFG_SCREEN_UPDATE_DRIVER(lemmings_state, screen_update_lemmings)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lemmings_state, screen_vblank_lemmings))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lemmings)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lemmings)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(XBGR)
 
@@ -302,4 +302,4 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1991, lemmings, 0, lemmings, lemmings, lemmings_state, 0, ROT0, "Data East USA", "Lemmings (US prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, lemmings, 0, lemmings, lemmings, lemmings_state, empty_init, ROT0, "Data East USA", "Lemmings (US prototype)", MACHINE_SUPPORTS_SAVE )

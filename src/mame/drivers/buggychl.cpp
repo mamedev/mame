@@ -391,7 +391,7 @@ static const gfx_layout spritelayout =
 	8
 };
 
-static GFXDECODE_START( buggychl )
+static GFXDECODE_START( gfx_buggychl )
 	GFXDECODE_ENTRY( nullptr,           0, charlayout,   0, 8 ) /* decoded at runtime */
 	/* sprites are drawn pixel by pixel by draw_sprites() */
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 8 )
@@ -483,7 +483,7 @@ MACHINE_CONFIG_START(buggychl_state::buggychl)
 	MCFG_SCREEN_UPDATE_DRIVER(buggychl_state, screen_update_buggychl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", buggychl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_buggychl)
 	MCFG_PALETTE_ADD("palette", 128+128)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -594,5 +594,5 @@ ROM_START( buggychlt )
 ROM_END
 
 
-GAMEL( 1984, buggychl, 0,        buggychl, buggychl, buggychl_state, 0, ROT270, "Taito Corporation",                  "Buggy Challenge",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )
-GAMEL( 1984, buggychlt,buggychl, buggychl, buggychl, buggychl_state, 0, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )
+GAMEL( 1984, buggychl,  0,        buggychl, buggychl, buggychl_state, empty_init, ROT270, "Taito Corporation",                  "Buggy Challenge",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )
+GAMEL( 1984, buggychlt, buggychl, buggychl, buggychl, buggychl_state, empty_init, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )

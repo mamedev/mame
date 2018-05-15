@@ -83,7 +83,7 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	}
 
 	// fetch the opcode
-	op = desc.opptr.l[0] = m_ppc.m_direct->read_dword(desc.physpc, m_ppc.m_codexor);
+	op = desc.opptr.l[0] = m_ppc.m_pr32(desc.physpc);
 
 	// all instructions are 4 bytes and default to a single cycle each
 	desc.length = 4;

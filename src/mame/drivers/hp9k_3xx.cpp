@@ -717,12 +717,12 @@ ROM_START( hp9k382 )
 	ROM_LOAD( "1818-5282_8ce61e951207_28c64.bin", 0x000000, 0x002000, CRC(740442f3) SHA1(ab65bd4eec1024afb97fc2dd3bd3f017e90f49ae) )
 ROM_END
 
-/*    YEAR  NAME    PARENT   COMPAT  MACHINE   INPUT    STATE       INIT  COMPANY            FULLNAME      FLAGS */
-COMP( 1985, hp9k310, 0,      0,      hp9k310,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/310", MACHINE_NOT_WORKING)
-COMP( 1985, hp9k320, 0,      0,      hp9k320,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/320", MACHINE_NOT_WORKING)
-COMP( 1987, hp9k330, 0,      0,      hp9k330,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/330", MACHINE_NOT_WORKING)
-COMP( 1987, hp9k332, 0,      0,      hp9k332,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/332", MACHINE_NOT_WORKING)
-COMP( 1989, hp9k340, hp9k330,0,      hp9k340,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/340", MACHINE_NOT_WORKING)
-COMP( 1988, hp9k370, hp9k330,0,      hp9k370,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/370", MACHINE_NOT_WORKING)
-COMP( 1991, hp9k380, 0,      0,      hp9k380,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/380", MACHINE_NOT_WORKING)
-COMP( 1991, hp9k382, 0,      0,      hp9k382,  hp9k330, hp9k3xx_state, 0, "Hewlett-Packard", "HP9000/382", MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY            FULLNAME      FLAGS */
+COMP( 1985, hp9k310, 0,       0,      hp9k310, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/310", MACHINE_NOT_WORKING)
+COMP( 1985, hp9k320, 0,       0,      hp9k320, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/320", MACHINE_NOT_WORKING)
+COMP( 1987, hp9k330, 0,       0,      hp9k330, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/330", MACHINE_NOT_WORKING)
+COMP( 1987, hp9k332, 0,       0,      hp9k332, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/332", MACHINE_NOT_WORKING)
+COMP( 1989, hp9k340, hp9k330, 0,      hp9k340, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/340", MACHINE_NOT_WORKING)
+COMP( 1988, hp9k370, hp9k330, 0,      hp9k370, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/370", MACHINE_NOT_WORKING)
+COMP( 1991, hp9k380, 0,       0,      hp9k380, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/380", MACHINE_NOT_WORKING)
+COMP( 1991, hp9k382, 0,       0,      hp9k382, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/382", MACHINE_NOT_WORKING)

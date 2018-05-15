@@ -753,13 +753,13 @@ static const gfx_layout wwf_sprite_layout = {
  *
  *************************************/
 
-static GFXDECODE_START( ddragon3 )
+static GFXDECODE_START( gfx_ddragon3 )
 	GFXDECODE_ENTRY( "gfx1", 0, wwf_tile_layout,   512, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, wwf_tile_layout,   256, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, wwf_sprite_layout,  0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( wwfwfest )
+static GFXDECODE_START( gfx_wwfwfest )
 	GFXDECODE_ENTRY( "gfx3", 0, wwf_tile_layout,     0x0c00, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, wwf_tile_layout,     0x1000, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, wwf_sprite_layout,   0x0400, 16 )
@@ -837,7 +837,7 @@ MACHINE_CONFIG_START(ddragon3_state::ddragon3)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddragon3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon3)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -917,7 +917,7 @@ MACHINE_CONFIG_START(wwfwfest_state::wwfwfest)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wwfwfest)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wwfwfest)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -1481,20 +1481,20 @@ ROM_END
  *
  *************************************/
 
-GAME( 1990, ddragon3,  0,        ddragon3,  ddragon3,  ddragon3_state, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3j, ddragon3, ddragon3,  ddragon3,  ddragon3_state, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3p, ddragon3, ddragon3,  ddragon3,  ddragon3_state, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3b, ddragon3, ddragon3b, ddragon3b, ddragon3_state, 0, ROT0, "bootleg",       "Double Dragon 3 - The Rosetta Stone (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3,  0,        ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3j, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3p, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3b, ddragon3, ddragon3b, ddragon3b, ddragon3_state, empty_init, ROT0, "bootleg",       "Double Dragon 3 - The Rosetta Stone (bootleg)",   MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, ctribe,    0,        ctribe,    ctribe,    ddragon3_state, 0, ROT0, "Technos Japan", "The Combatribes (US)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribe1,   ctribe,   ctribe,    ctribe,    ddragon3_state, 0, ROT0, "Technos Japan", "The Combatribes (US set 1?)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeo,   ctribe,   ctribe,    ctribe,    ddragon3_state, 0, ROT0, "Technos Japan", "The Combatribes (US, older)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribej,   ctribe,   ctribe,    ctribe,    ddragon3_state, 0, ROT0, "Technos Japan", "The Combatribes (Japan)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeb,   ctribe,   ctribe,    ctribeb,   ddragon3_state, 0, ROT0, "bootleg",       "The Combatribes (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeb2,  ctribe,   ctribe,    ctribeb,   ddragon3_state, 0, ROT0, "bootleg",       "The Combatribes (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribe,    0,        ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribe1,   ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US set 1?)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeo,   ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, older)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribej,   ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeb,   ctribe,   ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeb2,  ctribe,   ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, wwfwfest,  0,        wwfwfest,  wwfwfest,  wwfwfest_state, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (World)",      MACHINE_SUPPORTS_SAVE ) // Euro label but shows FBI "Winners Don't Do drugs" logo
-GAME( 1991, wwfwfestu, wwfwfest, wwfwfest,  wwfwfest,  wwfwfest_state, 0, ROT0, "Technos Japan",                 "WWF WrestleFest (US)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wwfwfestb, wwfwfest, wwfwfstb,  wwfwfest,  wwfwfest_state, 0, ROT0, "bootleg",                       "WWF WrestleFest (US bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wwfwfestj, wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wwfwfestk, wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Korea)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfest,  0,        wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (World)",      MACHINE_SUPPORTS_SAVE ) // Euro label but shows FBI "Winners Don't Do drugs" logo
+GAME( 1991, wwfwfestu, wwfwfest, wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan",                 "WWF WrestleFest (US)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestb, wwfwfest, wwfwfstb,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "bootleg",                       "WWF WrestleFest (US bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestj, wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestk, wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Korea)",      MACHINE_SUPPORTS_SAVE )

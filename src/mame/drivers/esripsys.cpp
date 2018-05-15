@@ -620,7 +620,7 @@ void esripsys_state::video_cpu_map(address_map &map)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(esripsys_state,esripsys)
+void esripsys_state::init_esripsys()
 {
 	uint8_t *rom = memregion("sound_data")->base();
 
@@ -1067,6 +1067,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, turbosub,  0,        esripsys, turbosub, esripsys_state, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, turbosub7, turbosub, esripsys, turbosub, esripsys_state, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC7)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, turbosub6, turbosub, esripsys, turbosub, esripsys_state, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosub,  0,        esripsys, turbosub, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosub7, turbosub, esripsys, turbosub, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, turbosub6, turbosub, esripsys, turbosub, esripsys_state, init_esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", MACHINE_SUPPORTS_SAVE )

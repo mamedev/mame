@@ -147,7 +147,7 @@ static const gfx_layout gfxlayout =
 	32*8
 };
 
-static GFXDECODE_START( labyrunr )
+static GFXDECODE_START( gfx_labyrunr )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 8*16 )
 GFXDECODE_END
 
@@ -183,7 +183,7 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, labyrunr_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", labyrunr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_labyrunr)
 	MCFG_PALETTE_ADD("palette", 2*8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -268,6 +268,6 @@ ROM_START( labyrunrk )
 ROM_END
 
 
-GAME( 1987, tricktrp, 0,        labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Trick Trap (World?)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1987, labyrunr, tricktrp, labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Labyrinth Runner (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, labyrunrk,tricktrp, labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tricktrp,  0,        labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Trick Trap (World?)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, labyrunr,  tricktrp, labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Labyrinth Runner (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, labyrunrk, tricktrp, labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", MACHINE_SUPPORTS_SAVE )

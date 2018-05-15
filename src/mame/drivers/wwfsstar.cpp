@@ -402,7 +402,7 @@ static const gfx_layout tiles16x16_layout =
 	64*8
 };
 
-static GFXDECODE_START( wwfsstar )
+static GFXDECODE_START( gfx_wwfsstar )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,     0, 16 )    /* colors   0-255 */
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 128, 16 )    /* colors   128-383 */
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16_layout, 256,  8 )    /* colors   256-383 */
@@ -429,7 +429,7 @@ MACHINE_CONFIG_START(wwfsstar_state::wwfsstar)
 	MCFG_SCREEN_UPDATE_DRIVER(wwfsstar_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wwfsstar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wwfsstar)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -662,9 +662,9 @@ ROM_END
 // There is only 1 ROM difference between US revision 6 & 7.  Rev 7 has a patch to the way the 2nd coin slot works
 
 
-GAME( 1989, wwfsstar,   0,        wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (Europe)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstaru7, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (US revision 7)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstaru6, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (US revision 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstaru4, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (US revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstarj,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstarb,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "bootleg",       "WWF Superstars (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstar,   0,        wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (Europe)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstaru7, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (US revision 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstaru6, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (US revision 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstaru4, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstarj,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstarb,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "bootleg",       "WWF Superstars (bootleg)",   MACHINE_SUPPORTS_SAVE )

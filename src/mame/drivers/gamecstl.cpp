@@ -92,7 +92,7 @@ public:
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	DECLARE_DRIVER_INIT(gamecstl);
+	void init_gamecstl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -389,7 +389,7 @@ static const gfx_layout CGA_charlayout =
 	8*8                     /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( CGA )
+static GFXDECODE_START( gfx_cga )
 /* Support up to four CGA fonts */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, CGA_charlayout,              0, 256 )   /* Font 0 */
 	GFXDECODE_ENTRY( "gfx1", 0x0800, CGA_charlayout,              0, 256 )   /* Font 1 */
@@ -465,13 +465,13 @@ MACHINE_CONFIG_START(gamecstl_state::gamecstl)
 	MCFG_SCREEN_UPDATE_DRIVER(gamecstl_state, screen_update_gamecstl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", CGA)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cga)
 	MCFG_PALETTE_ADD("palette", 16)
 
 
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(gamecstl_state,gamecstl)
+void gamecstl_state::init_gamecstl()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
 
@@ -505,5 +505,5 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(2002, gamecstl, 0,        gamecstl, gamecstl, gamecstl_state, gamecstl, ROT0, "Cristaltec", "GameCristal",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(2002, gamecst2, gamecstl, gamecstl, gamecstl, gamecstl_state, gamecstl, ROT0, "Cristaltec", "GameCristal (version 2.613)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(2002, gamecstl, 0,        gamecstl, gamecstl, gamecstl_state, init_gamecstl, ROT0, "Cristaltec", "GameCristal",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(2002, gamecst2, gamecstl, gamecstl, gamecstl, gamecstl_state, init_gamecstl, ROT0, "Cristaltec", "GameCristal (version 2.613)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -196,7 +196,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( tagteam )
+static GFXDECODE_START( gfx_tagteam )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 4 ) /* chars */
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 4 ) /* sprites */
 GFXDECODE_END
@@ -229,7 +229,7 @@ MACHINE_CONFIG_START(tagteam_state::tagteam)
 	MCFG_SCREEN_UPDATE_DRIVER(tagteam_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tagteam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tagteam)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(tagteam_state, tagteam)
 
@@ -316,5 +316,5 @@ ROM_END
 
 
 
-GAME( 1983, bigprowr, 0,        tagteam, bigprowr, tagteam_state, 0, ROT270, "Technos Japan",                     "The Big Pro Wrestling!", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tagteam,  bigprowr, tagteam, tagteam,  tagteam_state, 0, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling",     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bigprowr, 0,        tagteam, bigprowr, tagteam_state, empty_init, ROT270, "Technos Japan",                     "The Big Pro Wrestling!", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tagteam,  bigprowr, tagteam, tagteam,  tagteam_state, empty_init, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling",     MACHINE_SUPPORTS_SAVE )

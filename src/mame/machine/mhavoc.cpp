@@ -324,7 +324,7 @@ WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_strobe_w)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(mhavoc_state,mhavocrv)
+void mhavoc_state::init_mhavocrv()
 {
 	/* install the speech support that was only optionally stuffed for use */
 	/* in the Return to Vax hack */

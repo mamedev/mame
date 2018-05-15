@@ -15,6 +15,9 @@
 
 #include "sound/beep.h"
 
+#include "diserial.h"
+
+
 // BSD-derived systems get very sad when you party with system reserved names.
 #ifdef getchar
 #undef getchar

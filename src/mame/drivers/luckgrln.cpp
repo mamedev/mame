@@ -152,7 +152,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_b_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
 	DECLARE_READ8_MEMBER(test_r);
-	DECLARE_DRIVER_INIT(luckgrln);
+	void init_luckgrln();
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel3_tile_info);
@@ -963,7 +963,7 @@ static const gfx_layout tiles8x32_layout =
 	32*8
 };
 
-static GFXDECODE_START( luckgrln )
+static GFXDECODE_START( gfx_luckgrln )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0x400, 64 )
 	GFXDECODE_ENTRY( "reels", 0, tiles8x32_layout, 0, 64 )
 GFXDECODE_END
@@ -994,7 +994,7 @@ MACHINE_CONFIG_START(luckgrln_state::luckgrln)
 	MCFG_SCREEN_UPDATE_DRIVER(luckgrln_state, screen_update_luckgrln)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", luckgrln)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_luckgrln)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	SPEAKER(config, "mono").front_center();
@@ -1010,16 +1010,14 @@ MACHINE_CONFIG_START(luckgrln_state::_7smash)
 	MCFG_DEVICE_REMOVE("rtc")
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(luckgrln_state,luckgrln)
+void luckgrln_state::init_luckgrln()
 {
-	int i;
-	uint8_t x,v;
-	uint8_t* rom = memregion("rom_data")->base();
+	uint8_t *rom = memregion("rom_data")->base();
 
-	for (i=0;i<0x20000;i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
-		x = rom[i];
-		v = 0xfe + (i & 0xf)*0x3b + ((i >> 4) & 0xf)*0x9c + ((i >> 8) & 0xf)*0xe1 + ((i >> 12) & 0x7)*0x10;
+		uint8_t x = rom[i];
+		uint8_t v = 0xfe + (i & 0xf)*0x3b + ((i >> 4) & 0xf)*0x9c + ((i >> 8) & 0xf)*0xe1 + ((i >> 12) & 0x7)*0x10;
 		v += ((((i >> 4) & 0xf) + ((i >> 2) & 3)) >> 2) * 0x50;
 		x ^= ~v;
 		x = (x << (i & 7)) | (x >> (8-(i & 7)));
@@ -1028,10 +1026,9 @@ DRIVER_INIT_MEMBER(luckgrln_state,luckgrln)
 
 	#if 0
 	{
-		FILE *fp;
 		char filename[256];
 		sprintf(filename,"decrypted_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
+		FILE *fp = fopen(filename, "w+b");
 		if (fp)
 		{
 			fwrite(rom, 0x20000, 1, fp);
@@ -1087,6 +1084,6 @@ ROM_END
 *                Game Drivers                *
 **********************************************/
 
-//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY           FULL NAME                                 FLAGS             LAYOUT
-GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", MACHINE_NO_SOUND, layout_luckgrln )
-GAMEL( 1993, 7smash,   0,      _7smash,  _7smash,  luckgrln_state, 0,        ROT0, "Sovic",          "7 Smash",                                MACHINE_NO_SOUND, layout_7smash )
+//     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT           ROT   COMPANY           FULL NAME                                 FLAGS             LAYOUT
+GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", MACHINE_NO_SOUND, layout_luckgrln )
+GAMEL( 1993, 7smash,   0,      _7smash,  _7smash,  luckgrln_state, empty_init,    ROT0, "Sovic",          "7 Smash",                                MACHINE_NO_SOUND, layout_7smash )

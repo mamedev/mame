@@ -265,5 +265,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY       FULLNAME       FLAGS */
-COMP( 1976, et3400,  0,     0,       et3400,    et3400, et3400_state,  0,    "Heath Company", "Heathkit Model ET-3400 Microprocessor Trainer", 0 )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY          FULLNAME                                         FLAGS */
+COMP( 1976, et3400, 0,      0,      et3400,  et3400, et3400_state, empty_init, "Heath Company", "Heathkit Model ET-3400 Microprocessor Trainer", 0 )

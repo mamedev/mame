@@ -204,7 +204,7 @@ static const gfx_layout chunky_layout =
 	8 * 16      /* code takes 8 times 16 bits */
 };
 
-static GFXDECODE_START( microtan )
+static GFXDECODE_START( gfx_microtan )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, chunky_layout, 0, 1 )
 GFXDECODE_END
@@ -226,7 +226,7 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	MCFG_SCREEN_UPDATE_DRIVER(microtan_state, screen_update_microtan)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", microtan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_microtan)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -284,5 +284,5 @@ ROM_START( microtan )
 ROM_END
 
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY      FULLNAME        FLAGS
-COMP( 1979, microtan, 0,        0,      microtan, microtan, microtan_state, microtan, "Tangerine", "Microtan 65" , 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY      FULLNAME        FLAGS
+COMP( 1979, microtan, 0,      0,      microtan, microtan, microtan_state, init_microtan, "Tangerine", "Microtan 65" , 0 )

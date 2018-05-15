@@ -316,7 +316,7 @@ static const gfx_layout charlayout2 =
 	8*8     /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( tankbust )
+static GFXDECODE_START( gfx_tankbust )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0x00, 2 )   /* sprites 32x32  (2 * 16 colors) */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0x20, 8 )   /* bg tilemap characters */
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout2,        0x60, 16  ) /* txt tilemap characters*/
@@ -358,7 +358,7 @@ MACHINE_CONFIG_START(tankbust_state::tankbust)
 	MCFG_SCREEN_UPDATE_DRIVER(tankbust_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tankbust )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tankbust)
 
 	MCFG_PALETTE_ADD( "palette", 128 )
 	MCFG_PALETTE_INIT_OWNER(tankbust_state, tankbust)
@@ -423,4 +423,4 @@ ROM_START( tankbust )
 ROM_END
 
 
-GAME( 1985, tankbust,    0,       tankbust, tankbust, tankbust_state,  0, ROT90, "Valadon Automation", "Tank Busters", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tankbust,    0,       tankbust, tankbust, tankbust_state, empty_init, ROT90, "Valadon Automation", "Tank Busters", MACHINE_SUPPORTS_SAVE )

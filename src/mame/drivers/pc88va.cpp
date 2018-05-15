@@ -1581,7 +1581,7 @@ static const gfx_layout pc88va_chars_16x16 =
 };
 
 /* decoded for debugging purpose, this will be nuked in the end... */
-static GFXDECODE_START( pc88va )
+static GFXDECODE_START( gfx_pc88va )
 	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_8x8,    0, 1 )
 	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_16x16,  0, 1 )
 GFXDECODE_END
@@ -1815,7 +1815,7 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 
 	MCFG_PALETTE_ADD("palette", 32)
 //  MCFG_PALETTE_INIT_OWNER(pc88va_state, pc8801 )
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc88va )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc88va)
 
 	MCFG_DEVICE_ADD("d8255_2", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8("d8255_2s", i8255_device, pb_r))
@@ -1935,6 +1935,6 @@ ROM_END
 
 
 
-COMP( 1987, pc88va,         0,      0,     pc88va,   pc88va, pc88va_state,  0,    "NEC",  "PC-88VA",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1988, pc88va2,        pc88va, 0,     pc88va,   pc88va, pc88va_state,  0,    "NEC",  "PC-88VA2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88va, pc88va_state,  0,    "NEC",  "PC-88VA3", MACHINE_NOT_WORKING )
+COMP( 1987, pc88va,  0,      0, pc88va, pc88va, pc88va_state, empty_init, "NEC", "PC-88VA",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1988, pc88va2, pc88va, 0, pc88va, pc88va, pc88va_state, empty_init, "NEC", "PC-88VA2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//COMP( 1988, pc88va3, pc88va, 0, pc88va, pc88va, pc88va_state, empty_init, "NEC", "PC-88VA3", MACHINE_NOT_WORKING )

@@ -65,7 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(brailab4_port7f_w);
 	DECLARE_WRITE8_MEMBER(brailab4_portff_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(cass3_r);
-	DECLARE_DRIVER_INIT(brailab4);
+	void init_brailab4();
 	DECLARE_VIDEO_START(homelab2);
 	DECLARE_MACHINE_RESET(homelab3);
 	DECLARE_VIDEO_START(homelab3);
@@ -654,7 +654,7 @@ static const gfx_layout homelab_charlayout =
 	8                   /* every char takes 8 x 1 bytes */
 };
 
-static GFXDECODE_START( homelab )
+static GFXDECODE_START( gfx_homelab )
 	GFXDECODE_ENTRY( "chargen", 0x0000, homelab_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -761,7 +761,7 @@ MACHINE_CONFIG_START(homelab_state::homelab)
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homelab)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -793,7 +793,7 @@ MACHINE_CONFIG_START(homelab_state::homelab3)
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homelab)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -825,7 +825,7 @@ MACHINE_CONFIG_START(homelab_state::brailab4)
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homelab)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -843,7 +843,7 @@ MACHINE_CONFIG_START(homelab_state::brailab4)
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 18)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(homelab_state,brailab4)
+void homelab_state::init_brailab4()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &RAM[0xf800], 0x8000);
@@ -920,9 +920,9 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME        PARENT     COMPAT  MACHINE      INPUT     STATE           INIT      COMPANY                    FULLNAME                  FLAGS */
-COMP( 1982, homelab2,   0,         0,      homelab,     homelab,  homelab_state,  0,        "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1983, homelab3,   homelab2,  0,      homelab3,    homelab3, homelab_state,  0,        "Jozsef and Endre Lukacs", "Homelab 3",              MACHINE_NOT_WORKING )
-COMP( 1984, homelab4,   homelab2,  0,      homelab3,    homelab3, homelab_state,  0,        "Jozsef and Endre Lukacs", "Homelab 4",              MACHINE_NOT_WORKING )
-COMP( 1984, brailab4,   homelab2,  0,      brailab4,    brailab4, homelab_state,  brailab4, "Jozsef and Endre Lukacs", "Brailab 4",              MACHINE_NOT_WORKING )
-COMP( 1988, braiplus,   homelab2,  0,      brailab4,    brailab4, homelab_state,  brailab4, "Jozsef and Endre Lukacs", "Brailab Plus",           MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY                    FULLNAME                  FLAGS */
+COMP( 1982, homelab2, 0,        0,      homelab,  homelab,  homelab_state,  empty_init,    "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1983, homelab3, homelab2, 0,      homelab3, homelab3, homelab_state,  empty_init,    "Jozsef and Endre Lukacs", "Homelab 3",              MACHINE_NOT_WORKING )
+COMP( 1984, homelab4, homelab2, 0,      homelab3, homelab3, homelab_state,  empty_init,    "Jozsef and Endre Lukacs", "Homelab 4",              MACHINE_NOT_WORKING )
+COMP( 1984, brailab4, homelab2, 0,      brailab4, brailab4, homelab_state,  init_brailab4, "Jozsef and Endre Lukacs", "Brailab 4",              MACHINE_NOT_WORKING )
+COMP( 1988, braiplus, homelab2, 0,      brailab4, brailab4, homelab_state,  init_brailab4, "Jozsef and Endre Lukacs", "Brailab Plus",           MACHINE_IS_SKELETON )

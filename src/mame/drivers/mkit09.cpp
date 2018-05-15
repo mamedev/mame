@@ -256,6 +256,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS          INIT  COMPANY       FULLNAME                    FLAGS
-COMP( 1983, mkit09,  0,      0,       mkit09,     mkit09, mkit09_state,  0,    "Multitech",  "Microkit09",               MACHINE_NO_SOUND_HW )
-COMP( 1983, mkit09a, mkit09, 0,       mkit09a,    mkit09, mkit09_state,  0,    "Multitech",  "Microkit09 (Alt version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME                    FLAGS
+COMP( 1983, mkit09,  0,      0,      mkit09,  mkit09, mkit09_state, empty_init, "Multitech", "Microkit09",               MACHINE_NO_SOUND_HW )
+COMP( 1983, mkit09a, mkit09, 0,      mkit09a, mkit09, mkit09_state, empty_init, "Multitech", "Microkit09 (Alt version)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -38,8 +38,8 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	DECLARE_DRIVER_INIT(hvysmsh);
-	DECLARE_DRIVER_INIT(wcvol95);
+	void init_hvysmsh();
+	void init_wcvol95();
 
 	void hvysmsh(machine_config &config);
 	void wcvol95(machine_config &config);
@@ -295,7 +295,7 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static GFXDECODE_START( hvysmsh )
+static GFXDECODE_START( gfx_hvysmsh )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 32 )    /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 32 )    /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 32 )    /* Sprites 16x16 */
@@ -343,7 +343,7 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(XBGR)
 
@@ -397,7 +397,7 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -674,14 +674,14 @@ void deco156_state::descramble_sound( const char *tag )
 	memcpy(rom,&buf1[0],length);
 }
 
-DRIVER_INIT_MEMBER(deco156_state,hvysmsh)
+void deco156_state::init_hvysmsh()
 {
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco156_decrypt(machine());
 	descramble_sound("oki2");
 }
 
-DRIVER_INIT_MEMBER(deco156_state,wcvol95)
+void deco156_state::init_wcvol95()
 {
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco156_decrypt(machine());
@@ -691,8 +691,8 @@ DRIVER_INIT_MEMBER(deco156_state,wcvol95)
 
 /**********************************************************************************/
 
-GAME( 1993, hvysmsh,  0,       hvysmsh, hvysmsh, deco156_state, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Europe version -2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hvysmsha, hvysmsh, hvysmsh, hvysmsh, deco156_state, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Asia version -4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hvysmshj, hvysmsh, hvysmsh, hvysmsh, deco156_state, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Japan version -2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wcvol95,  0,       wcvol95, wcvol95, deco156_state, wcvol95,  ROT0, "Data East Corporation", "World Cup Volley '95 (Japan v1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wcvol95x, wcvol95, wcvol95, wcvol95, deco156_state, wcvol95,  ROT0, "Data East Corporation", "World Cup Volley '95 Extra Version (Asia v2.0B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hvysmsh,  0,       hvysmsh, hvysmsh, deco156_state, init_hvysmsh, ROT0, "Data East Corporation", "Heavy Smash (Europe version -2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hvysmsha, hvysmsh, hvysmsh, hvysmsh, deco156_state, init_hvysmsh, ROT0, "Data East Corporation", "Heavy Smash (Asia version -4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hvysmshj, hvysmsh, hvysmsh, hvysmsh, deco156_state, init_hvysmsh, ROT0, "Data East Corporation", "Heavy Smash (Japan version -2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wcvol95,  0,       wcvol95, wcvol95, deco156_state, init_wcvol95, ROT0, "Data East Corporation", "World Cup Volley '95 (Japan v1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wcvol95x, wcvol95, wcvol95, wcvol95, deco156_state, init_wcvol95, ROT0, "Data East Corporation", "World Cup Volley '95 Extra Version (Asia v2.0B)", MACHINE_SUPPORTS_SAVE )

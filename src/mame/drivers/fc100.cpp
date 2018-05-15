@@ -75,7 +75,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port60_w);
 	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	DECLARE_DRIVER_INIT(fc100);
+	void init_fc100();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
@@ -393,7 +393,7 @@ static const gfx_layout u53_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( fc100 )
+static GFXDECODE_START( gfx_fc100 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, u53_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -501,7 +501,7 @@ WRITE8_MEMBER( fc100_state::port70_w )
 	m_banksw_unlocked = (bool)offset;
 }
 
-DRIVER_INIT_MEMBER( fc100_state, fc100 )
+void fc100_state::init_fc100()
 {
 	uint8_t *ram = memregion("ram")->base();
 	uint8_t *cgen = memregion("chargen")->base()+0x800;
@@ -525,7 +525,7 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	// other lines not connected
 
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "vdg")
-	MCFG_GFXDECODE_ADD("gfxdecode", "f4palette", fc100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "f4palette", gfx_fc100)
 	MCFG_PALETTE_ADD_MONOCHROME("f4palette")
 
 	/* sound hardware */
@@ -577,5 +577,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS        INIT    COMPANY     FULLNAME  FLAGS
-CONS( 1982, fc100,  0,      0,       fc100,   fc100,  fc100_state, fc100,  "Goldstar", "FC-100", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
+CONS( 1982, fc100, 0,      0,      fc100,   fc100, fc100_state, init_fc100, "Goldstar", "FC-100", MACHINE_NOT_WORKING )

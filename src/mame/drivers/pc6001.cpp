@@ -1477,7 +1477,7 @@ static const gfx_layout kanji_layout =
 	8*16
 };
 
-static GFXDECODE_START( pc6001m2 )
+static GFXDECODE_START( gfx_pc6001m2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, char_layout, 2, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, kanji_layout, 2, 1 )
 GFXDECODE_END
@@ -1494,7 +1494,7 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 
 //  MCFG_DEVICE_ADD("subcpu", I8049, 7987200)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc6001m2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc6001m2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1554,7 +1554,7 @@ MACHINE_CONFIG_START(pc6001mk2_state::pc6001mk2)
 	MCFG_PALETTE_ENTRIES(16+16)
 	MCFG_PALETTE_INIT_OWNER(pc6001mk2_state,pc6001mk2)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pc6001m2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pc6001m2)
 
 	MCFG_DEVICE_ADD("upd7752", UPD7752, PC6001_MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1679,9 +1679,9 @@ ROM_START( pc6001sr )
 	ROM_COPY( "maincpu", 0x28000, 0x00000, 0x8000 )
 ROM_END
 
-//    YEAR  NAME      PARENT   COMPAT MACHINE    INPUT   STATE            INIT    COMPANY  FULLNAME                 FLAGS
-COMP( 1981, pc6001,   0,       0,     pc6001,    pc6001, pc6001_state,    0,      "NEC",   "PC-6001 (Japan)",       MACHINE_NOT_WORKING )
-COMP( 1981, pc6001a,  pc6001,  0,     pc6001,    pc6001, pc6001_state,    0,      "NEC",   "PC-6001A (US)",         MACHINE_NOT_WORKING ) // This version is also known as the NEC Trek
-COMP( 1983, pc6001mk2,pc6001,  0,     pc6001mk2, pc6001, pc6001mk2_state, 0,      "NEC",   "PC-6001mkII (Japan)",   MACHINE_NOT_WORKING )
-COMP( 1983, pc6601,   pc6001,  0,     pc6601,    pc6001, pc6601_state,    0,      "NEC",   "PC-6601 (Japan)",       MACHINE_NOT_WORKING )
-COMP( 1984, pc6001sr, pc6001,  0,     pc6001sr,  pc6001, pc6001sr_state,  0,      "NEC",   "PC-6001mkIISR (Japan)", MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT  COMPAT MACHINE    INPUT   STATE            INIT        COMPANY  FULLNAME                 FLAGS
+COMP( 1981, pc6001,    0,      0,     pc6001,    pc6001, pc6001_state,    empty_init, "NEC",   "PC-6001 (Japan)",       MACHINE_NOT_WORKING )
+COMP( 1981, pc6001a,   pc6001, 0,     pc6001,    pc6001, pc6001_state,    empty_init, "NEC",   "PC-6001A (US)",         MACHINE_NOT_WORKING ) // This version is also known as the NEC Trek
+COMP( 1983, pc6001mk2, pc6001, 0,     pc6001mk2, pc6001, pc6001mk2_state, empty_init, "NEC",   "PC-6001mkII (Japan)",   MACHINE_NOT_WORKING )
+COMP( 1983, pc6601,    pc6001, 0,     pc6601,    pc6001, pc6601_state,    empty_init, "NEC",   "PC-6601 (Japan)",       MACHINE_NOT_WORKING )
+COMP( 1984, pc6001sr,  pc6001, 0,     pc6001sr,  pc6001, pc6001sr_state,  empty_init, "NEC",   "PC-6001mkIISR (Japan)", MACHINE_NOT_WORKING )

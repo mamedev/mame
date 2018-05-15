@@ -213,7 +213,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( usgames )
+static GFXDECODE_START( gfx_usgames )
 	GFXDECODE_ENTRY( nullptr, 0x2800, charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -236,7 +236,7 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	MCFG_SCREEN_UPDATE_DRIVER(usgames_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", usgames)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_usgames)
 	MCFG_PALETTE_ADD("palette", 2*256)
 	MCFG_PALETTE_INIT_OWNER(usgames_state, usgames)
 
@@ -407,11 +407,11 @@ ROM_START( usg182 ) /* Version 18.2 */
 ROM_END
 
 
-GAME( 1987, usg32,    0,        usg32,  usg32, usgames_state, 0, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, superten, 0,        usg32,  usg83, usgames_state, 0, ROT0, "U.S. Games", "Super Ten V8.3",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, usg83x,   superten, usg32,  usg83, usgames_state, 0, ROT0, "U.S. Games", "Super Ten V8.3X",                      MACHINE_SUPPORTS_SAVE ) /* "Experimental" version?? */
-GAME( 1988, usg82,    superten, usg32,  usg83, usgames_state, 0, ROT0, "U.S. Games", "Super Ten V8.2" ,                      MACHINE_SUPPORTS_SAVE )
-GAME( 1992, usgames,  0,        usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V25.4X",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, usg187c,  usgames,  usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V18.7C",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1990, usg185,   usgames,  usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V18.5",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, usg182,   usgames,  usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V18.2",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, usg32,    0,        usg32,  usg32, usgames_state, empty_init, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, superten, 0,        usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Super Ten V8.3",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, usg83x,   superten, usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Super Ten V8.3X",                      MACHINE_SUPPORTS_SAVE ) /* "Experimental" version?? */
+GAME( 1988, usg82,    superten, usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Super Ten V8.2" ,                      MACHINE_SUPPORTS_SAVE )
+GAME( 1992, usgames,  0,        usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V25.4X",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, usg187c,  usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V18.7C",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, usg185,   usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V18.5",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, usg182,   usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V18.2",                          MACHINE_SUPPORTS_SAVE )

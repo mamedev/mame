@@ -80,7 +80,7 @@ public:
 	tilemap_t *m_alpha_tilemap;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(spyhuntertec_paletteram_w);
-	DECLARE_DRIVER_INIT(spyhuntertec);
+	void init_spyhuntertec();
 //  DECLARE_VIDEO_START(spyhuntertec);
 //  uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_port04_w);
@@ -647,7 +647,7 @@ static const gfx_layout spyhuntertec_charlayout =
 };
 
 
-static GFXDECODE_START( spyhuntertec )
+static GFXDECODE_START( gfx_spyhuntertec )
 	GFXDECODE_ENTRY( "gfx1", 0, spyhuntertec_charlayout,  3*16, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spyhuntertec_sprite_layout,   0*16, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spyhuntertec_alphalayout, 4*16, 1 )
@@ -689,7 +689,7 @@ MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 	MCFG_SCREEN_UPDATE_DRIVER(spyhuntertec_state, screen_update_spyhuntertec)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spyhuntertec)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spyhuntertec)
 	MCFG_PALETTE_ADD("palette", 64+4)
 
 //  MCFG_PALETTE_INIT_OWNER(spyhuntertec_state,spyhunt)
@@ -811,11 +811,11 @@ ROM_START( spyhuntpr )
 	ROM_LOAD( "14.bin",  0x00000, 0x1000, CRC(87a4c130) SHA1(7792afdc36b0f3bd51c387d04d38f60c85fd2e93) )
 ROM_END
 
-DRIVER_INIT_MEMBER(spyhuntertec_state,spyhuntertec)
+void spyhuntertec_state::init_spyhuntertec()
 {
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 16;
 }
 
 
-GAMEL(1983, spyhuntpr,spyhunt,  spyhuntertec, spyhuntertec,spyhuntertec_state,  spyhuntertec,ROT90, "bootleg (Recreativos Franco S.A. license, Tecfri)", "Spy Hunter (Spain, Recreativos Franco S.A., Tecfri PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_spyhunttec )
+GAMEL(1983, spyhuntpr, spyhunt, spyhuntertec, spyhuntertec, spyhuntertec_state, init_spyhuntertec, ROT90, "bootleg (Recreativos Franco S.A. license, Tecfri)", "Spy Hunter (Spain, Recreativos Franco S.A., Tecfri PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_spyhunttec )

@@ -484,8 +484,8 @@ ROM_START( gijoea )
 ROM_END
 
 
-GAME( 1992, gijoe,   0,     gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (World, EAB, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoeea, gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (World, EB8, prototype?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoeu,  gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (US, UAB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoej,  gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (Japan, JAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoea,  gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (Asia, AA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoe,   0,     gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (World, EAB, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoeea, gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (World, EB8, prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoeu,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (US, UAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoej,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (Japan, JAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoea,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (Asia, AA)", MACHINE_SUPPORTS_SAVE )

@@ -266,5 +266,5 @@ ROM_START( tonton )
 ROM_END
 
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT  ROT    COMPANY                   FULLNAME                                 FLAGS
-GAME( 1987, tonton,  0,      tonton,  tonton, tonton_state, 0,    ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )
+//    YEAR  NAME     PARENT  MACHINE  INPUT   STATE         INIT        ROT   COMPANY                   FULLNAME                                 FLAGS
+GAME( 1987, tonton,  0,      tonton,  tonton, tonton_state, empty_init, ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )

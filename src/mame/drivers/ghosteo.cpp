@@ -116,8 +116,8 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
 	int m_rom_pagesize;
-	DECLARE_DRIVER_INIT(touryuu);
-	DECLARE_DRIVER_INIT(bballoon);
+	void init_touryuu();
+	void init_bballoon();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
@@ -756,16 +756,16 @@ ROM_START( touryuu )
 	ROM_LOAD( "qs1001a.u17",  0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) /* QDSP wavetable rom */
 ROM_END
 
-DRIVER_INIT_MEMBER(ghosteo_state,bballoon)
+void ghosteo_state::init_bballoon()
 {
 	m_rom_pagesize = 0x200; // extra data is missing from the FLASH dumps and needs to be simulated
 }
 
-DRIVER_INIT_MEMBER(ghosteo_state,touryuu)
+void ghosteo_state::init_touryuu()
 {
 	m_rom_pagesize = 0x210;
 }
 
-GAME( 2003, bballoon, 0, bballoon, bballoon, ghosteo_state, bballoon, ROT0, "Eolith",          "BnB Arcade",         MACHINE_IMPERFECT_SOUND )
-GAME( 2005, hapytour, 0, bballoon, bballoon, ghosteo_state, bballoon, ROT0, "GAV Company",     "Happy Tour",         MACHINE_IMPERFECT_SOUND )
-GAME( 2005, touryuu,  0, touryuu,  touryuu,  ghosteo_state, touryuu,  ROT0, "Yuki Enterprise", "Touryuumon (V1.1)?", MACHINE_IMPERFECT_SOUND ) // On first boot inputs won't work, TODO: hook-up default eeprom
+GAME( 2003, bballoon, 0, bballoon, bballoon, ghosteo_state, init_bballoon, ROT0, "Eolith",          "BnB Arcade",         MACHINE_IMPERFECT_SOUND )
+GAME( 2005, hapytour, 0, bballoon, bballoon, ghosteo_state, init_bballoon, ROT0, "GAV Company",     "Happy Tour",         MACHINE_IMPERFECT_SOUND )
+GAME( 2005, touryuu,  0, touryuu,  touryuu,  ghosteo_state, init_touryuu,  ROT0, "Yuki Enterprise", "Touryuumon (V1.1)?", MACHINE_IMPERFECT_SOUND ) // On first boot inputs won't work, TODO: hook-up default eeprom

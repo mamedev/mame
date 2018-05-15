@@ -268,7 +268,7 @@ static const gfx_layout zrt80_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( zrt80 )
+static GFXDECODE_START( gfx_zrt80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, zrt80_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(zrt80_state::zrt80)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zrt80)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zrt80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -317,5 +317,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT  COMPANY                       FULLNAME   FLAGS */
-COMP( 1982, zrt80,  0,       0,      zrt80,     zrt80, zrt80_state, 0,    "Digital Research Computers", "ZRT-80",  0)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                       FULLNAME   FLAGS */
+COMP( 1982, zrt80, 0,      0,      zrt80,   zrt80, zrt80_state, empty_init, "Digital Research Computers", "ZRT-80",  0)

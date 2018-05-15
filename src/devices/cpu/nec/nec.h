@@ -25,7 +25,7 @@ class nec_common_device : public cpu_device
 {
 protected:
 	// construction/destruction
-	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
+	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -62,7 +62,6 @@ private:
 	};
 
 	necbasicregs m_regs;
-	offs_t  m_fetch_xor;
 	uint16_t  m_sregs[4];
 
 	uint16_t  m_ip;
@@ -88,7 +87,7 @@ private:
 	uint8_t   m_halted;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	std::function<u8 (offs_t address)> m_dr8;
 	address_space *m_io;
 	int     m_icount;
 

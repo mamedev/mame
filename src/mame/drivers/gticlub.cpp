@@ -314,9 +314,9 @@ public:
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
 
 	void init_hangplt_common();
-	DECLARE_DRIVER_INIT(hangplt);
-	DECLARE_DRIVER_INIT(hangpltu);
-	DECLARE_DRIVER_INIT(gticlub);
+	void init_hangplt();
+	void init_hangpltu();
+	void init_gticlub();
 	DECLARE_MACHINE_START(gticlub);
 	DECLARE_MACHINE_RESET(gticlub);
 	DECLARE_MACHINE_RESET(hangplt);
@@ -1479,7 +1479,7 @@ ROM_START( hangpltu ) /* USA version UAA */
 ROM_END
 
 
-DRIVER_INIT_MEMBER(gticlub_state,gticlub)
+void gticlub_state::init_gticlub()
 {
 	m_sharc_dataram_0 = std::make_unique<uint32_t[]>(0x100000/4);
 
@@ -1494,7 +1494,7 @@ void gticlub_state::init_hangplt_common()
 	m_sharc_dataram_1 = std::make_unique<uint32_t[]>(0x100000/4);
 }
 
-DRIVER_INIT_MEMBER(gticlub_state,hangplt)
+void gticlub_state::init_hangplt()
 {
 	init_hangplt_common();
 
@@ -1504,7 +1504,7 @@ DRIVER_INIT_MEMBER(gticlub_state,hangplt)
 	rom[(0x15428^4) / 4] = 0x4e800020;
 }
 
-DRIVER_INIT_MEMBER(gticlub_state,hangpltu)
+void gticlub_state::init_hangpltu()
 {
 	init_hangplt_common();
 
@@ -1516,14 +1516,14 @@ DRIVER_INIT_MEMBER(gticlub_state,hangpltu)
 
 /*************************************************************************/
 
-GAME( 1996, gticlub,    0,        gticlub,  gticlub,  gticlub_state, gticlub,  ROT0, "Konami", "GTI Club (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, gticlubu,   gticlub,  gticlub,  gticlub,  gticlub_state, gticlub,  ROT0, "Konami", "GTI Club (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, gticluba,   gticlub,  gticlub,  gticlub,  gticlub_state, gticlub,  ROT0, "Konami", "GTI Club (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, gticlubj,   gticlub,  gticlub,  gticlub,  gticlub_state, gticlub,  ROT0, "Konami", "GTI Club (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, thunderh,   0,        thunderh, thunderh, gticlub_state, gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, thunderhu,  thunderh, thunderh, thunderh, gticlub_state, gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, slrasslt,   0,        slrasslt, slrasslt, gticlub_state, gticlub,  ROT0, "Konami", "Solar Assault (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Based on Revised code
-GAME( 1997, slrassltj,  slrasslt, slrasslt, slrasslt, gticlub_state, gticlub,  ROT0, "Konami", "Solar Assault Revised (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, slrassltj1, slrasslt, slrasslt, slrasslt, gticlub_state, gticlub,  ROT0, "Konami", "Solar Assault (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAMEL(1997, hangplt,    0,        hangplt,  hangplt,  gticlub_state, hangplt,  ROT0, "Konami", "Hang Pilot (ver JAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND, layout_dualhovu )
-GAMEL(1997, hangpltu,   hangplt,  hangplt,  hangplt,  gticlub_state, hangpltu, ROT0, "Konami", "Hang Pilot (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND, layout_dualhovu )
+GAME( 1996, gticlub,    0,        gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, gticlubu,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, gticluba,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, gticlubj,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, thunderh,   0,        thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, thunderhu,  thunderh, thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, slrasslt,   0,        slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Based on Revised code
+GAME( 1997, slrassltj,  slrasslt, slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault Revised (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, slrassltj1, slrasslt, slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAMEL(1997, hangplt,    0,        hangplt,  hangplt,  gticlub_state, init_hangplt,  ROT0, "Konami", "Hang Pilot (ver JAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND, layout_dualhovu )
+GAMEL(1997, hangpltu,   hangplt,  hangplt,  hangplt,  gticlub_state, init_hangpltu, ROT0, "Konami", "Hang Pilot (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND, layout_dualhovu )

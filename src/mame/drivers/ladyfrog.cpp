@@ -262,7 +262,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( ladyfrog )
+static GFXDECODE_START( gfx_ladyfrog )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )
 GFXDECODE_END
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
 	MCFG_SCREEN_UPDATE_DRIVER(ladyfrog_state, screen_update_ladyfrog)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ladyfrog)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ladyfrog)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -399,8 +399,8 @@ ROM_START( touchemea )
 	ROM_LOAD( "8.ic10",   0x20000, 0x10000, CRC(fc6808bf) SHA1(f1f1b75a79dfdb500012f9b52c6364f0a13dce2d) )
 ROM_END
 
-GAME( 1990, ladyfrog, 0, ladyfrog, ladyfrog, ladyfrog_state, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ladyfrog,  0,        ladyfrog, ladyfrog, ladyfrog_state, empty_init, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", MACHINE_SUPPORTS_SAVE )
 
 // toucheme art style is similar to ladyfrog, so it's probably the same manufacturer
-GAME( 19??, toucheme,  0,        toucheme, toucheme, ladyfrog_state, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 19??, touchemea, toucheme, toucheme, toucheme, ladyfrog_state, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 2, harder)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, toucheme,  0,        toucheme, toucheme, ladyfrog_state, empty_init, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 19??, touchemea, toucheme, toucheme, toucheme, ladyfrog_state, empty_init, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 2, harder)", MACHINE_SUPPORTS_SAVE )

@@ -125,7 +125,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
 
-	DECLARE_DRIVER_INIT(jackie);
+	void init_jackie();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -564,17 +564,16 @@ static const gfx_layout layout_8x32x6 =
 	8*32*2
 };
 
-static GFXDECODE_START( jackie )
+static GFXDECODE_START( gfx_jackie )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x6,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x32x6, 0, 16 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER(jackie_state,jackie)
+void jackie_state::init_jackie()
 {
-	int A;
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (A = 0;A < 0xf000;A++)
+	for (int A = 0; A < 0xf000; A++)
 	{
 		rom[A] = rom[A] ^ 0x21;
 
@@ -582,7 +581,7 @@ DRIVER_INIT_MEMBER(jackie_state,jackie)
 		if ((A & 0x0282) == 0x0282) rom[A] ^= 0x01;
 		if ((A & 0x0940) == 0x0940) rom[A] ^= 0x02;
 	}
-	memset( &rom[0xf000], 0, 0x1000);
+	memset(&rom[0xf000], 0, 0x1000);
 
 	// Patch trap
 	rom[0x7e86] = 0xc3;
@@ -627,7 +626,7 @@ MACHINE_CONFIG_START(jackie_state::jackie)
 	MCFG_SCREEN_UPDATE_DRIVER(jackie_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jackie)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jackie)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -664,4 +663,4 @@ ROM_START( jackie )
 ROM_END
 
 
-GAME( 1993,  jackie,   0,        jackie,   jackie, jackie_state, jackie,  ROT0, "IGS",    "Happy Jackie (v110U)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, jackie, 0, jackie, jackie, jackie_state, init_jackie, ROT0, "IGS", "Happy Jackie (v110U)", MACHINE_SUPPORTS_SAVE )

@@ -2315,7 +2315,7 @@ MACHINE_CONFIG_START(p500_state::p500_ntsc)
 
 	// basic hardware
 	MCFG_DEVICE_ADD(M6509_TAG, M6509, XTAL(14'318'181)/14)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_DEVICE_PROGRAM_MAP(p500_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 
@@ -2431,7 +2431,7 @@ MACHINE_CONFIG_START(p500_state::p500_pal)
 
 	// basic hardware
 	MCFG_DEVICE_ADD(M6509_TAG, M6509, XTAL(17'734'472)/18)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_DEVICE_PROGRAM_MAP(p500_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 
@@ -2544,7 +2544,7 @@ MACHINE_CONFIG_START(cbm2_state::cbm2lp_ntsc)
 
 	// basic hardware
 	MCFG_DEVICE_ADD(M6509_TAG, M6509, XTAL(18'000'000)/9)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_DEVICE_PROGRAM_MAP(cbm2_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 
@@ -3086,20 +3086,20 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       STATE            INIT    COMPANY                         FULLNAME                    FLAGS
-COMP( 1983, p500,       0,      0,      p500_ntsc,  cbm2,       p500_state,      0,      "Commodore Business Machines",  "P500 (NTSC)",              MACHINE_SUPPORTS_SAVE )
-COMP( 1983, p500p,      p500,   0,      p500_pal,   cbm2,       p500_state,      0,      "Commodore Business Machines",  "P500 (PAL)",               MACHINE_SUPPORTS_SAVE )
-COMP( 1983, b500,       0,      0,      b128,       cbm2,       cbm2_state,      0,      "Commodore Business Machines",  "B500",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1983, b128,       b500,   0,      b128,       cbm2,       cbm2_state,      0,      "Commodore Business Machines",  "B128",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1983, b256,       b500,   0,      b256,       cbm2,       cbm2_state,      0,      "Commodore Business Machines",  "B256",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm610,     b500,   0,      cbm610,     cbm2,       cbm2_state,      0,      "Commodore Business Machines",  "CBM 610",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm620,     b500,   0,      cbm620,     cbm2,       cbm2_state,      0,      "Commodore Business Machines",  "CBM 620",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm620_hu,  b500,   0,      cbm620,     cbm2_hu,    cbm2_state,      0,      "Commodore Business Machines",  "CBM 620 (Hungary)",        MACHINE_SUPPORTS_SAVE )
-COMP( 1983, b128hp,     0,      0,      b128hp,     cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "B128-80HP",                MACHINE_SUPPORTS_SAVE )
-COMP( 1983, b256hp,     b128hp, 0,      b256hp,     cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "B256-80HP",                MACHINE_SUPPORTS_SAVE )
-COMP( 1983, bx256hp,    b128hp, 0,      bx256hp,    cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "BX256-80HP",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing
-COMP( 1983, cbm710,     b128hp, 0,      cbm710,     cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "CBM 710",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm720,     b128hp, 0,      cbm720,     cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "CBM 720",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm720_de,  b128hp, 0,      cbm720,     cbm2_de,    cbm2hp_state,    0,      "Commodore Business Machines",  "CBM 720 (Germany)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm720_se,  b128hp, 0,      cbm720,     cbm2_se,    cbm2hp_state,    0,      "Commodore Business Machines",  "CBM 720 (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm730,     b128hp, 0,      cbm730,     cbm2,       cbm2hp_state,    0,      "Commodore Business Machines",  "CBM 730",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT    CLASS         INIT    COMPANY                         FULLNAME                    FLAGS
+COMP( 1983, p500,      0,      0,      p500_ntsc, cbm2,    p500_state,   empty_init, "Commodore Business Machines",  "P500 (NTSC)",              MACHINE_SUPPORTS_SAVE )
+COMP( 1983, p500p,     p500,   0,      p500_pal,  cbm2,    p500_state,   empty_init, "Commodore Business Machines",  "P500 (PAL)",               MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b500,      0,      0,      b128,      cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "B500",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b128,      b500,   0,      b128,      cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "B128",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b256,      b500,   0,      b256,      cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "B256",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm610,    b500,   0,      cbm610,    cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "CBM 610",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm620,    b500,   0,      cbm620,    cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "CBM 620",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm620_hu, b500,   0,      cbm620,    cbm2_hu, cbm2_state,   empty_init, "Commodore Business Machines",  "CBM 620 (Hungary)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b128hp,    0,      0,      b128hp,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "B128-80HP",                MACHINE_SUPPORTS_SAVE )
+COMP( 1983, b256hp,    b128hp, 0,      b256hp,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "B256-80HP",                MACHINE_SUPPORTS_SAVE )
+COMP( 1983, bx256hp,   b128hp, 0,      bx256hp,   cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "BX256-80HP",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing
+COMP( 1983, cbm710,    b128hp, 0,      cbm710,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 710",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm720,    b128hp, 0,      cbm720,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 720",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm720_de, b128hp, 0,      cbm720,    cbm2_de, cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 720 (Germany)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm720_se, b128hp, 0,      cbm720,    cbm2_se, cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 720 (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm730,    b128hp, 0,      cbm730,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 730",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing

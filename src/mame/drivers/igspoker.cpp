@@ -119,17 +119,17 @@ public:
 	DECLARE_READ8_MEMBER(exp_rom_r);
 	void show_out();
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
-	DECLARE_DRIVER_INIT(igs_ncs);
-	DECLARE_DRIVER_INIT(number10);
-	DECLARE_DRIVER_INIT(pktet346);
-	DECLARE_DRIVER_INIT(tet341);
-	DECLARE_DRIVER_INIT(cpokert);
-	DECLARE_DRIVER_INIT(chleague);
-	DECLARE_DRIVER_INIT(cska);
-	DECLARE_DRIVER_INIT(cpoker);
-	DECLARE_DRIVER_INIT(igs_ncs2);
-	DECLARE_DRIVER_INIT(cpokerpk);
-	DECLARE_DRIVER_INIT(kungfu);
+	void init_igs_ncs();
+	void init_number10();
+	void init_pktet346();
+	void init_tet341();
+	void init_cpokert();
+	void init_chleague();
+	void init_cska();
+	void init_cpoker();
+	void init_igs_ncs2();
+	void init_cpokerpk();
+	void init_kungfu();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_reset() override;
@@ -1879,7 +1879,7 @@ static const gfx_layout charlayout2 =
 };
 
 
-static GFXDECODE_START( igspoker )
+static GFXDECODE_START( gfx_igspoker )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, charlayout2,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, charlayout2,  0, 16 )
@@ -1898,7 +1898,7 @@ static const gfx_layout charlayoutcpk =
 	64*8
 };
 
-static GFXDECODE_START( cpokerpk )
+static GFXDECODE_START( gfx_cpokerpk )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayoutcpk,   0, 16 )
 	/* these not used? */
 	GFXDECODE_ENTRY( "gfx2", 0x04000, charlayout2,  0, 1 )
@@ -1929,7 +1929,7 @@ MACHINE_CONFIG_START(igspoker_state::igspoker)
 	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_igs_video)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igspoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igspoker)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1974,7 +1974,7 @@ MACHINE_CONFIG_START(igspoker_state::cpokerpk)
 	number10(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(cpokerpk_io_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cpokerpk)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cpokerpk)
 MACHINE_CONFIG_END
 
 
@@ -2078,13 +2078,10 @@ ROM_END
 /*  Decode a simple PAL encryption
  */
 
-DRIVER_INIT_MEMBER(igspoker_state,cpoker)
+void igspoker_state::init_cpoker()
 {
-	int A;
 	uint8_t *rom = memregion("maincpu")->base();
-
-
-	for (A = 0; A < 0x10000; A++)
+	for (int A = 0; A < 0x10000; A++)
 	{
 		rom[A] ^= 0x21;
 		if ((A & 0x0030) == 0x0010) rom[A] ^= 0x20;
@@ -2093,13 +2090,11 @@ DRIVER_INIT_MEMBER(igspoker_state,cpoker)
 	}
 }
 
-DRIVER_INIT_MEMBER(igspoker_state,cpokert)
+void igspoker_state::init_cpokert()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
-
 	/* decrypt the program ROM */
-	for (i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		if((i & 0x200) && (i & 0x80))
 		{
@@ -2122,13 +2117,10 @@ DRIVER_INIT_MEMBER(igspoker_state,cpokert)
 	}
 }
 
-DRIVER_INIT_MEMBER(igspoker_state,cska)
+void igspoker_state::init_cska()
 {
-	int A;
 	uint8_t *rom = memregion("maincpu")->base();
-
-
-	for (A = 0; A < 0x10000; A++)
+	for (int A = 0; A < 0x10000; A++)
 	{
 		if ((A & 0x0020) == 0x0000) rom[A] ^= 0x01;
 		if ((A & 0x0020) == 0x0020) rom[A] ^= 0x21;
@@ -2139,13 +2131,10 @@ DRIVER_INIT_MEMBER(igspoker_state,cska)
 }
 
 
-DRIVER_INIT_MEMBER(igspoker_state,igs_ncs)
+void igspoker_state::init_igs_ncs()
 {
-	int A;
 	uint8_t *rom = memregion("maincpu")->base();
-
-
-	for (A = 0; A < 0x10000; A++)
+	for (int A = 0; A < 0x10000; A++)
 	{
 		rom[A] ^= 0x21;
 		if ((A & 0x0282) == 0x0282) rom[A] ^= 0x01;
@@ -2301,12 +2290,10 @@ Clocks
 
 */
 
-DRIVER_INIT_MEMBER(igspoker_state,igs_ncs2)
+void igspoker_state::init_igs_ncs2()
 {
 	uint8_t *src = (uint8_t *) (memregion("maincpu")->base());
-	int i;
-
-	for(i = 0; i < 0x10000; i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		/* bit 0 xor layer */
 		if(i & 0x200)
@@ -2374,15 +2361,11 @@ ROM_START( igs_ncs2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(igspoker_state,chleague)
+void igspoker_state::init_chleague()
 {
-	int A;
-	int length;
-	uint8_t *rom;
-
-	rom = memregion("maincpu")->base();
-	length = memregion("maincpu")->bytes();
-	for (A = 0; A < length; A++)
+	uint8_t *rom = memregion("maincpu")->base();
+	int length = memregion("maincpu")->bytes();
+	for (int A = 0; A < length; A++)
 	{
 		if ((A & 0x09C0) == 0x0880) rom[A] ^= 0x20;
 		if ((A & 0x0B40) == 0x0140) rom[A] ^= 0x20;
@@ -2584,15 +2567,11 @@ ROM_START( chleagxb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(igspoker_state,number10)
+void igspoker_state::init_number10()
 {
-	int A;
-	int length;
-	uint8_t *rom;
-
-	rom = memregion("maincpu")->base();
-	length = memregion("maincpu")->bytes();
-	for (A = 0; A < length; A++)
+	uint8_t *rom = memregion("maincpu")->base();
+	int length = memregion("maincpu")->bytes();
+	for (int A = 0; A < length; A++)
 	{
 		if ((A & 0x09C0) == 0x0880) rom[A] ^= 0x20;
 		if ((A & 0x0B40) == 0x0140) rom[A] ^= 0x20;
@@ -2624,7 +2603,7 @@ DRIVER_INIT_MEMBER(igspoker_state,number10)
 	length = memregion("gfx1")->bytes();
 	std::vector<uint8_t> tmp(length);
 	memcpy(&tmp[0],rom,length);
-	for (A = 0; A < length; A++)
+	for (int A = 0; A < length; A++)
 	{
 		int addr = (A & ~0xffff) | bitswap<16>(A,15,14,13,12,11,10,9,8,7,6,5,4,3,0,1,2);
 		rom[A] = tmp[addr];
@@ -2664,12 +2643,10 @@ ROM_START( numbr10l )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(igspoker_state,cpokerpk)
+void igspoker_state::init_cpokerpk()
 {
-	int A;
 	uint8_t *rom = memregion("maincpu")->base();
-
-	for (A = 0x0714; A < 0xF000; A += 0x1000)
+	for (int A = 0x0714; A < 0xF000; A += 0x1000)
 		rom[A] ^= 0x20;
 }
 
@@ -2747,12 +2724,10 @@ ROM_START( igstet341 )
 
 ROM_END
 
-DRIVER_INIT_MEMBER(igspoker_state, tet341)
+void igspoker_state::init_tet341()
 {
-	int A;
 	uint8_t *rom = memregion("maincpu")->base();
-
-	for (A = 0; A < 0x10000; A++)
+	for (int A = 0; A < 0x10000; A++)
 	{
 		rom[A] ^= 0x01;
 		if ((A & 0x0060) == 0x0020) rom[A] ^= 0x20;
@@ -2778,13 +2753,10 @@ ROM_START( pktet346 )
 
 ROM_END
 
-DRIVER_INIT_MEMBER(igspoker_state,pktet346)
+void igspoker_state::init_pktet346()
 {
-	int A;
 	uint8_t *rom = memregion("maincpu")->base();
-
-
-	for (A = 0;A < 0x10000; A++)
+	for (int A = 0; A < 0x10000; A++)
 	{
 		rom[A] ^= 0x21;
 		if ((A & 0x0008) == 0x0008) rom[A] ^= 0x20;
@@ -2857,12 +2829,11 @@ ROM_START( kungfu )
 	ROM_LOAD( "kungfu.u48", 0x000, 0xde1, CRC(5d4aacaf) SHA1(733546ce0585c40833e1c34504c33219a2bea0a9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(igspoker_state, kungfu)
+void igspoker_state::init_kungfu()
 {
-	int A;
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (A = 0x4000;A < 0x10000; A++)
+	for (int A = 0x4000; A < 0x10000; A++)
 	{
 		rom[A] = rom[A] ^ 0x01;
 	}
@@ -2870,27 +2841,27 @@ DRIVER_INIT_MEMBER(igspoker_state, kungfu)
 }
 
 
-GAMEL( 1993?,cpoker,    0,        igspoker, cpoker,   igspoker_state, cpoker,   ROT0, "IGS",                  "Champion Poker (v220I)",                       0, layout_igspoker )
-GAMEL( 1993?,cpokert,   cpoker,   igspoker, cpoker,   igspoker_state, cpokert,  ROT0, "IGS (Tuning license)", "Champion Poker (v200G)",                       0, layout_igspoker )
-GAMEL( 1993, cpokerx,   cpoker,   igspoker, cpokerx,  igspoker_state, cpokert,  ROT0, "IGS",                  "Champion Poker (v100)",                        0, layout_igspoker )
-GAMEL( 2000, chleague,  0,        igspoker, chleague, igspoker_state, chleague, ROT0, "IGS",                  "Champion League (v220I, Poker)",               0, layout_igspoker )
-GAMEL( 2000, chleagul,  chleague, igspoker, chleague, igspoker_state, chleague, ROT0, "IGS",                  "Champion League (v220I, Lattine)",             0, layout_igspoker )
-GAMEL( 1998, chleagxa,  chleague, igspoker, chleague, igspoker_state, chleague, ROT0, "PlayMark SRL",         "Champion League (v220I, dual program, set 1)", 0, layout_igspoker )
-GAMEL( 1998, chleagxb,  chleague, igspoker, chleague, igspoker_state, chleague, ROT0, "PlayMark SRL",         "Champion League (v220I, dual program, set 2)", 0, layout_igspoker )
-GAMEL( 198?, csk227it,  0,        csk227it, csk227,   igspoker_state, cska,     ROT0, "IGS",                  "Champion Skill (with Ability)",                0, layout_igspoker ) /* SU 062 */
-GAMEL( 198?, csk234it,  csk227it, csk234it, csk234,   igspoker_state, cska,     ROT0, "IGS",                  "Champion Skill (Ability, Poker & Symbols)",    0, layout_igspoker ) /* SU 062 */
-GAMEL( 2000, number10,  0,        number10, number10, igspoker_state, number10, ROT0, "PlayMark SRL",         "Number Dieci (Poker)",                         0, layout_igspoker )
-GAMEL( 2000, numbr10l,  number10, number10, number10, igspoker_state, number10, ROT0, "PlayMark SRL",         "Number Dieci (Lattine)",                       0, layout_igspoker )
-GAMEL( 198?, igs_ncs,   0,        igs_ncs,  igs_ncs,  igspoker_state, igs_ncs,  ROT0, "IGS",                  "New Champion Skill (v100n)",                   0, layout_igspoker ) /* SU 062 */
-GAMEL( 199?, cpokerpk,  0,        cpokerpk, cpokerpk, igspoker_state, cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian PK (bootleg, blue board)",    0, layout_igspoker )
-GAMEL( 199?, cpokerpkg, cpokerpk, cpokerpk, cpokerpk, igspoker_state, cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian PK (bootleg, green board)",   0, layout_igspoker )
-GAMEL( 199?, citalcup,  cpokerpk, cpokerpk, cpokerpk, igspoker_state, cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian Cup (bootleg V220IT)",        0, layout_igspoker )
+GAMEL( 1993?,cpoker,    0,        igspoker, cpoker,   igspoker_state, init_cpoker,   ROT0, "IGS",                  "Champion Poker (v220I)",                       0, layout_igspoker )
+GAMEL( 1993?,cpokert,   cpoker,   igspoker, cpoker,   igspoker_state, init_cpokert,  ROT0, "IGS (Tuning license)", "Champion Poker (v200G)",                       0, layout_igspoker )
+GAMEL( 1993, cpokerx,   cpoker,   igspoker, cpokerx,  igspoker_state, init_cpokert,  ROT0, "IGS",                  "Champion Poker (v100)",                        0, layout_igspoker )
+GAMEL( 2000, chleague,  0,        igspoker, chleague, igspoker_state, init_chleague, ROT0, "IGS",                  "Champion League (v220I, Poker)",               0, layout_igspoker )
+GAMEL( 2000, chleagul,  chleague, igspoker, chleague, igspoker_state, init_chleague, ROT0, "IGS",                  "Champion League (v220I, Lattine)",             0, layout_igspoker )
+GAMEL( 1998, chleagxa,  chleague, igspoker, chleague, igspoker_state, init_chleague, ROT0, "PlayMark SRL",         "Champion League (v220I, dual program, set 1)", 0, layout_igspoker )
+GAMEL( 1998, chleagxb,  chleague, igspoker, chleague, igspoker_state, init_chleague, ROT0, "PlayMark SRL",         "Champion League (v220I, dual program, set 2)", 0, layout_igspoker )
+GAMEL( 198?, csk227it,  0,        csk227it, csk227,   igspoker_state, init_cska,     ROT0, "IGS",                  "Champion Skill (with Ability)",                0, layout_igspoker ) /* SU 062 */
+GAMEL( 198?, csk234it,  csk227it, csk234it, csk234,   igspoker_state, init_cska,     ROT0, "IGS",                  "Champion Skill (Ability, Poker & Symbols)",    0, layout_igspoker ) /* SU 062 */
+GAMEL( 2000, number10,  0,        number10, number10, igspoker_state, init_number10, ROT0, "PlayMark SRL",         "Number Dieci (Poker)",                         0, layout_igspoker )
+GAMEL( 2000, numbr10l,  number10, number10, number10, igspoker_state, init_number10, ROT0, "PlayMark SRL",         "Number Dieci (Lattine)",                       0, layout_igspoker )
+GAMEL( 198?, igs_ncs,   0,        igs_ncs,  igs_ncs,  igspoker_state, init_igs_ncs,  ROT0, "IGS",                  "New Champion Skill (v100n)",                   0, layout_igspoker ) /* SU 062 */
+GAMEL( 199?, cpokerpk,  0,        cpokerpk, cpokerpk, igspoker_state, init_cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian PK (bootleg, blue board)",    0, layout_igspoker )
+GAMEL( 199?, cpokerpkg, cpokerpk, cpokerpk, cpokerpk, igspoker_state, init_cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian PK (bootleg, green board)",   0, layout_igspoker )
+GAMEL( 199?, citalcup,  cpokerpk, cpokerpk, cpokerpk, igspoker_state, init_cpokerpk, ROT0, "bootleg (SGS)",        "Champion Italian Cup (bootleg V220IT)",        0, layout_igspoker )
 
-GAMEL( 2000, igs_ncs2,  0,        igs_ncs,  igs_ncs,  igspoker_state, igs_ncs2, ROT0, "IGS",                  "New Champion Skill (v100n 2000)",              MACHINE_IMPERFECT_GRAPHICS, layout_igspoker )
+GAMEL( 2000, igs_ncs2,  0,        igs_ncs,  igs_ncs,  igspoker_state, init_igs_ncs2, ROT0, "IGS",                  "New Champion Skill (v100n 2000)",              MACHINE_IMPERFECT_GRAPHICS, layout_igspoker )
 
-GAMEL( 1998, stellecu,  0,        number10, number10, igspoker_state, 0,        ROT0, "Sure",                 "Stelle e Cubi (Italy)",                        MACHINE_NOT_WORKING, layout_igspoker )
+GAMEL( 1998, stellecu,  0,        number10, number10, igspoker_state, empty_init,    ROT0, "Sure",                 "Stelle e Cubi (Italy)",                        MACHINE_NOT_WORKING, layout_igspoker )
 
-GAMEL( 1993?,pktet346,  0,        pktetris, pktet346, igspoker_state, pktet346, ROT0, "IGS",                  "PK Tetris (v346I)",                            0, layout_igspoker )
-GAMEL( 199?, igstet341, pktet346, pktetris, igstet341,igspoker_state, tet341,   ROT0, "IGS",                  "Tetris (v341R)",                               0, layout_igspoker )
+GAMEL( 1993?,pktet346,  0,        pktetris, pktet346, igspoker_state, init_pktet346, ROT0, "IGS",                  "PK Tetris (v346I)",                            0, layout_igspoker )
+GAMEL( 199?, igstet341, pktet346, pktetris, igstet341,igspoker_state, init_tet341,   ROT0, "IGS",                  "Tetris (v341R)",                               0, layout_igspoker )
 
-GAMEL( 1992, kungfu,    0,        igspoker, cpoker,   igspoker_state, kungfu,   ROT0, "IGS",                  "Kung Fu (IGS, v100)",                          MACHINE_NOT_WORKING, layout_igspoker )
+GAMEL( 1992, kungfu,    0,        igspoker, cpoker,   igspoker_state, init_kungfu,   ROT0, "IGS",                  "Kung Fu (IGS, v100)",                          MACHINE_NOT_WORKING, layout_igspoker )

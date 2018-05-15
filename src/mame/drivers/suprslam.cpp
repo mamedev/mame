@@ -244,7 +244,7 @@ static const gfx_layout suprslam_16x16x4_layout =
 	16*64
 };
 
-static GFXDECODE_START( suprslam )
+static GFXDECODE_START( gfx_suprslam )
 	GFXDECODE_ENTRY( "gfx1", 0, suprslam_8x8x4_layout,   0x000, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, suprslam_16x16x4_layout, 0x200, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, suprslam_16x16x4_layout, 0x100, 16 )
@@ -286,7 +286,7 @@ MACHINE_CONFIG_START(suprslam_state::suprslam)
 	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
 	MCFG_VS9209_OUT_PORTG_CB(WRITE8(*this, suprslam_state, spr_ctrl_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprslam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprslam)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -357,4 +357,4 @@ ROM_END
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1995, suprslam, 0, suprslam, suprslam, suprslam_state, 0, ROT0, "Banpresto / Toei Animation / Video System Co.", "From TV Animation Slam Dunk - Super Slams", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Video System credited in ending screen
+GAME( 1995, suprslam, 0, suprslam, suprslam, suprslam_state, empty_init, ROT0, "Banpresto / Toei Animation / Video System Co.", "From TV Animation Slam Dunk - Super Slams", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Video System credited in ending screen

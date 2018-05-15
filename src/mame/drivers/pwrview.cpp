@@ -447,4 +447,4 @@ ROM_START(pwrview)
 	ROMX_LOAD("215856-004.bin", 0x0001, 0x4000, CRC(4fd01e0a) SHA1(c4d1d40d4e8e529c03857f4a3c8428ccf6b8ff99), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
-COMP(1984, pwrview, 0, 0, pwrview, 0, pwrview_state, 0, "Compugraphic", "MCS PowerView 10", MACHINE_NOT_WORKING)
+COMP(1984, pwrview, 0, 0, pwrview, 0, pwrview_state, empty_init, "Compugraphic", "MCS PowerView 10", MACHINE_NOT_WORKING)

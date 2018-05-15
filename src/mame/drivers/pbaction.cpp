@@ -282,7 +282,7 @@ static const gfx_layout spritelayout2 =
 
 
 
-static GFXDECODE_START( pbaction )
+static GFXDECODE_START( gfx_pbaction )
 	GFXDECODE_ENTRY( "fgchars", 0x00000, charlayout1,    0, 16 )    /*   0-127 characters */
 	GFXDECODE_ENTRY( "bgchars", 0x00000, charlayout2,  128,  8 )    /* 128-255 background */
 	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout1,  0, 16 )    /*   0-127 normal sprites */
@@ -345,7 +345,7 @@ MACHINE_CONFIG_START(pbaction_state::pbaction)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pbaction_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbaction)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pbaction)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -535,13 +535,12 @@ READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
 	return m_work_ram[0];
 }
 
-DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
+void pbaction_state::init_pbactio3()
 {
-	int i;
 	uint8_t *rom = memregion("maincpu")->base();
 
 	/* first of all, do a simple bitswap */
-	for (i = 0; i < 0xc000; i++)
+	for (int i = 0; i < 0xc000; i++)
 	{
 		rom[i] = bitswap<8>(rom[i], 7,6,5,4,1,2,3,0);
 	}
@@ -553,8 +552,8 @@ DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
 
 
 
-GAME( 1985, pbaction,  0,        pbaction,  pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction2, pbaction, pbaction2, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction,  0,        pbaction,  pbaction, pbaction_state, empty_init,    ROT90, "Tehkan", "Pinball Action (set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction2, pbaction, pbaction2, pbaction, pbaction_state, empty_init,    ROT90, "Tehkan", "Pinball Action (set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, init_pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, empty_init,    ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, pbaction_state, empty_init,    ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", MACHINE_SUPPORTS_SAVE )

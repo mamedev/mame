@@ -197,7 +197,7 @@ static const gfx_layout name =                      \
 GFX( charlayout_1bpp, 0x2000*8+4, 0x2000*8+4, 0x2000*8+4 )
 GFX( charlayout_3bpp, 0x2000*8,   0,          4          )
 
-static GFXDECODE_START( hanaawas )
+static GFXDECODE_START( gfx_hanaawas )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_1bpp, 0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_3bpp, 0, 32 )
 GFXDECODE_END
@@ -233,7 +233,7 @@ MACHINE_CONFIG_START(hanaawas_state::hanaawas)
 	MCFG_SCREEN_UPDATE_DRIVER(hanaawas_state, screen_update_hanaawas)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hanaawas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hanaawas)
 	MCFG_PALETTE_ADD("palette", 32*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(hanaawas_state, hanaawas)
@@ -274,4 +274,4 @@ ROM_START( hanaawas )
 ROM_END
 
 
-GAME( 1982, hanaawas, 0, hanaawas, hanaawas, hanaawas_state, 0, ROT0, "Seta Kikaku, Ltd.", "Hana Awase", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hanaawas, 0, hanaawas, hanaawas, hanaawas_state, empty_init, ROT0, "Seta Kikaku, Ltd.", "Hana Awase", MACHINE_SUPPORTS_SAVE )

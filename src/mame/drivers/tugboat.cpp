@@ -353,7 +353,7 @@ static const gfx_layout tilelayout =
 	8*8
 };
 
-static GFXDECODE_START( tugboat )
+static GFXDECODE_START( gfx_tugboat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x80, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x80, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout, 0x00, 16 )
@@ -380,7 +380,7 @@ MACHINE_CONFIG_START(tugboat_state::tugboat)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tugboat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tugboat)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tugboat_state, tugboat)
 
@@ -475,6 +475,6 @@ ROM_START( berenstn )
 ROM_END
 
 
-GAME( 1982, tugboat,  0, tugboat, tugboat,  tugboat_state,  0, ROT90, "Enter-Tech, Ltd.", "Tugboat",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, noahsark, 0, tugboat, noahsark, tugboat_state,  0, ROT90, "Enter-Tech, Ltd.", "Noah's Ark",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, berenstn, 0, tugboat, noahsark, tugboat_state,  0, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, tugboat,  0, tugboat, tugboat,  tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Tugboat",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, noahsark, 0, tugboat, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Noah's Ark",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, berenstn, 0, tugboat, noahsark, tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

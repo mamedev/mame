@@ -285,7 +285,7 @@ static const gfx_layout charlayout =
 	8*8*8
 };
 
-static GFXDECODE_START( cardline )
+static GFXDECODE_START( gfx_cardline )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 2 )
 GFXDECODE_END
 
@@ -337,7 +337,7 @@ MACHINE_CONFIG_START(cardline_state::cardline)
 	//MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cardline)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cardline)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(cardline_state, cardline)
 
@@ -383,4 +383,4 @@ ROM_START( cardline )
 
 ROM_END
 
-GAME( 199?, cardline,  0,       cardline,  cardline, cardline_state,  0, ROT0, "Veltmeijer", "Card Line" , MACHINE_SUPPORTS_SAVE)
+GAME( 199?, cardline, 0, cardline, cardline, cardline_state, empty_init, ROT0, "Veltmeijer", "Card Line" , MACHINE_SUPPORTS_SAVE)

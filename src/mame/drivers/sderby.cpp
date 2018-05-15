@@ -589,7 +589,7 @@ static const gfx_layout tiles16x16_layout =
 *      Graphics Decode      *
 ****************************/
 
-static GFXDECODE_START( sderby )
+static GFXDECODE_START( gfx_sderby )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x000, 256  ) /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0x000, 256  ) /* sprites */
 GFXDECODE_END
@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(sderby_state::sderby)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sderby)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
@@ -640,7 +640,7 @@ MACHINE_CONFIG_START(sderby_state::sderbya)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sderby)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
@@ -665,7 +665,7 @@ MACHINE_CONFIG_START(sderby_state::luckboom)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sderby)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
@@ -690,7 +690,7 @@ MACHINE_CONFIG_START(sderby_state::spacewin)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_pmroulet)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sderby)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
@@ -715,7 +715,7 @@ MACHINE_CONFIG_START(sderby_state::shinygld)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sderby)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
@@ -740,7 +740,7 @@ MACHINE_CONFIG_START(sderby_state::pmroulet)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_pmroulet)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sderby)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
@@ -1041,11 +1041,11 @@ ROM_END
 *        Game Drivers         *
 ******************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE         INIT   ROT   COMPANY     FULLNAME                                FLAGS                                                LAYOUT
-GAMEL( 1996, sderby,    0,        sderby,   sderby,   sderby_state, 0,     ROT0, "Playmark", "Super Derby (v.07.03)",                0,                                                   layout_sderby   )
-GAMEL( 1996, sderbya,   sderby,   sderbya,  sderbya,  sderby_state, 0,     ROT0, "Playmark", "Super Derby (v.10.04)",                0,                                                   layout_sderby   )
-GAMEL( 1996, spacewin,  0,        spacewin, spacewin, sderby_state, 0,     ROT0, "Playmark", "Scacco Matto / Space Win",             0,                                                   layout_spacewin )
-GAME ( 1996, shinygld,  0,        shinygld, shinygld, sderby_state, 0,     ROT0, "Playmark", "Shiny Golds",                          0                                                                    )
-GAMEL( 1997, croupier,  0,        pmroulet, pmroulet, sderby_state, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
-GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet, sderby_state, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
-GAME ( 1996, luckboom,  0,        luckboom, luckboom, sderby_state, 0,     ROT0, "Playmark", "Lucky Boom",                           0                                                                    )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS         INIT        ROT   COMPANY     FULLNAME                                FLAGS                                                LAYOUT
+GAMEL( 1996, sderby,    0,        sderby,   sderby,   sderby_state, empty_init, ROT0, "Playmark", "Super Derby (v.07.03)",                0,                                                   layout_sderby   )
+GAMEL( 1996, sderbya,   sderby,   sderbya,  sderbya,  sderby_state, empty_init, ROT0, "Playmark", "Super Derby (v.10.04)",                0,                                                   layout_sderby   )
+GAMEL( 1996, spacewin,  0,        spacewin, spacewin, sderby_state, empty_init, ROT0, "Playmark", "Scacco Matto / Space Win",             0,                                                   layout_spacewin )
+GAME(  1996, shinygld,  0,        shinygld, shinygld, sderby_state, empty_init, ROT0, "Playmark", "Shiny Golds",                          0                                                                    )
+GAMEL( 1997, croupier,  0,        pmroulet, pmroulet, sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
+GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet, sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
+GAME(  1996, luckboom,  0,        luckboom, luckboom, sderby_state, empty_init, ROT0, "Playmark", "Lucky Boom",                           0                                                                    )

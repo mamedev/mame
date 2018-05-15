@@ -418,7 +418,7 @@ static const gfx_layout layout_16x16x4 =
 	16*16*4
 };
 
-static GFXDECODE_START( mcatadv )
+static GFXDECODE_START( gfx_mcatadv )
 	GFXDECODE_ENTRY( "bg0", 0, layout_16x16x4, 0, 0x200 )
 	GFXDECODE_ENTRY( "bg1", 0, layout_16x16x4, 0, 0x200 )
 GFXDECODE_END
@@ -456,7 +456,7 @@ MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mcatadv_state, screen_vblank_mcatadv))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcatadv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcatadv)
 	MCFG_PALETTE_ADD("palette", 0x2000/2)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
@@ -667,9 +667,9 @@ ROM_START( nostk )
 ROM_END
 
 
-GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Magical Cat Adventure",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, mcatadv_state, 0, ROT0,   "Wintechno", "Catt (Japan)",                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, nost,     0,       nost,    nost,    mcatadv_state, 0, ROT270, "Face",      "Nostradamus",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, nostj,    nost,    nost,    nost,    mcatadv_state, 0, ROT270, "Face",      "Nostradamus (Japan)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, nostk,    nost,    nost,    nost,    mcatadv_state, 0, ROT270, "Face",      "Nostradamus (Korea)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mcatadv,  0,       mcatadv, mcatadv, mcatadv_state, empty_init, ROT0,   "Wintechno", "Magical Cat Adventure",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mcatadvj, mcatadv, mcatadv, mcatadv, mcatadv_state, empty_init, ROT0,   "Wintechno", "Magical Cat Adventure (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, mcatadv_state, empty_init, ROT0,   "Wintechno", "Catt (Japan)",                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nost,     0,       nost,    nost,    mcatadv_state, empty_init, ROT270, "Face",      "Nostradamus",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nostj,    nost,    nost,    nost,    mcatadv_state, empty_init, ROT270, "Face",      "Nostradamus (Japan)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, nostk,    nost,    nost,    nost,    mcatadv_state, empty_init, ROT270, "Face",      "Nostradamus (Korea)",           MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

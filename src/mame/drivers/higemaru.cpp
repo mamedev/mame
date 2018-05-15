@@ -157,7 +157,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( higemaru )
+static GFXDECODE_START( gfx_higemaru )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  32*4, 16 )
 GFXDECODE_END
@@ -179,7 +179,7 @@ MACHINE_CONFIG_START(higemaru_state::higemaru)
 	MCFG_SCREEN_UPDATE_DRIVER(higemaru_state, screen_update_higemaru)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", higemaru)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_higemaru)
 
 	MCFG_PALETTE_ADD("palette", 32*4+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
@@ -224,4 +224,4 @@ ROM_START( higemaru )
 ROM_END
 
 
-GAME( 1984, higemaru, 0, higemaru, higemaru, higemaru_state, 0, ROT0, "Capcom", "Pirate Ship Higemaru", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, higemaru, 0, higemaru, higemaru, higemaru_state, empty_init, ROT0, "Capcom", "Pirate Ship Higemaru", MACHINE_SUPPORTS_SAVE )

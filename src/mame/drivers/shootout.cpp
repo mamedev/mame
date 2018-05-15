@@ -265,7 +265,7 @@ static const gfx_layout tile_layout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( shootout )
+static GFXDECODE_START( gfx_shootout )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout,   16*4+8*8, 16 ) /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 16*4,     8  ) /* sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,   0,        16 ) /* tiles */
@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(shootout_state::shootout)
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootout)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shootout)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shootout)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
 
@@ -324,7 +324,7 @@ MACHINE_CONFIG_START(shootout_state::shootouj)
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootouj)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shootout)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shootout)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
 
@@ -433,12 +433,12 @@ ROM_START( shootoutb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(shootout_state,shootout)
+void shootout_state::init_shootout()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x8000, 0x4000);
 }
 
 
-GAME( 1985, shootout,  0,        shootout, shootout, shootout_state, shootout, ROT0, "Data East USA",         "Shoot Out (US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shootoutj, shootout, shootouj, shootouj, shootout_state, shootout, ROT0, "Data East Corporation", "Shoot Out (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shootoutb, shootout, shootouk, shootout, shootout_state, shootout, ROT0, "bootleg",               "Shoot Out (Korean Bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shootout,  0,        shootout, shootout, shootout_state, init_shootout, ROT0, "Data East USA",         "Shoot Out (US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shootoutj, shootout, shootouj, shootouj, shootout_state, init_shootout, ROT0, "Data East Corporation", "Shoot Out (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shootoutb, shootout, shootouk, shootout, shootout_state, init_shootout, ROT0, "bootleg",               "Shoot Out (Korean Bootleg)", MACHINE_SUPPORTS_SAVE )

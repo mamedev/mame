@@ -763,13 +763,13 @@ static const gfx_layout dotlayout =
 	16*8
 };
 
-static GFXDECODE_START( rallyx )
+static GFXDECODE_START( gfx_rallyx )
 	GFXDECODE_ENTRY( "gfx1", 0, rallyx_charlayout,     0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0, rallyx_spritelayout,   0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, dotlayout,         64*4,  1 )
 GFXDECODE_END
 
-static GFXDECODE_START( jungler )
+static GFXDECODE_START( gfx_jungler )
 	GFXDECODE_ENTRY( "gfx1", 0, jungler_charlayout,    0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0, jungler_spritelayout,  0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, dotlayout,          64*4,  1 )
@@ -845,7 +845,7 @@ MACHINE_CONFIG_START(rallyx_state::rallyx)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rallyx_state, rallyx_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rallyx)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rallyx)
 
 	MCFG_PALETTE_ADD("palette", 64*4+4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
@@ -897,7 +897,7 @@ MACHINE_CONFIG_START(rallyx_state::jungler)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rallyx_state, jungler_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jungler)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jungler)
 
 	MCFG_PALETTE_ADD("palette", 64*4+4+64)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+64)
@@ -1430,21 +1430,21 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, rallyx,   0,        rallyx,   rallyx,   rallyx_state, 0, ROT0,  "Namco", "Rally X (32k Ver.?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallyxa,  rallyx,   rallyx,   rallyx,   rallyx_state, 0, ROT0,  "Namco", "Rally X", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallyxm,  rallyx,   rallyx,   rallyx,   rallyx_state, 0, ROT0,  "Namco (Midway license)", "Rally X (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallyxmr, rallyx,   rallyx,   rallyx,   rallyx_state, 0, ROT0,  "bootleg (Model Racing)", "Rally X (Model Racing bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, dngrtrck, rallyx,   rallyx,   dngrtrck, rallyx_state, 0, ROT0,  "bootleg (Petaco)", "Danger Track (Rally X bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, nrallyx,  0,        rallyx,   nrallyx,  rallyx_state, 0, ROT0,  "Namco", "New Rally X", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, nrallyxb, nrallyx,  rallyx,   nrallyx,  rallyx_state, 0, ROT0,  "Namco", "New Rally X (bootleg?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, jungler,  0,        jungler,  jungler,  rallyx_state, 0, ROT90, "Konami", "Jungler", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, junglers, jungler,  jungler,  jungler,  rallyx_state, 0, ROT90, "Konami (Stern Electronics license)", "Jungler (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jackler,  jungler,  jungler,  jungler,  rallyx_state, 0, ROT90, "bootleg", "Jackler (Jungler bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, savanna,  jungler,  jungler,  jungler,  rallyx_state, 0, ROT90, "bootleg (Olympia)", "Savanna (Jungler bootleg)", MACHINE_SUPPORTS_SAVE ) // or licensed from Konami?
-GAME( 1982, tactcian, 0,        tactcian, tactcian, rallyx_state, 0, ROT90, "Konami (Sega license)", "Tactician (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tactcian2,tactcian, tactcian, tactcian, rallyx_state, 0, ROT90, "Konami (Sega license)", "Tactician (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, locomotn, 0,        locomotn, locomotn, rallyx_state, 0, ROT90, "Konami (Centuri license)", "Loco-Motion", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, gutangtn, locomotn, locomotn, locomotn, rallyx_state, 0, ROT90, "Konami (Sega license)", "Guttang Gottong", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, cottong,  locomotn, locomotn, locomotn, rallyx_state, 0, ROT90, "bootleg", "Cotocoto Cottong", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, locoboot, locomotn, locomotn, locomotn, rallyx_state, 0, ROT90, "bootleg", "Loco-Motion (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, commsega, 0,        commsega, commsega, rallyx_state, 0, ROT90, "Sega", "Commando (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyx,   0,        rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "Namco", "Rally X (32k Ver.?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyxa,  rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "Namco", "Rally X", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyxm,  rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "Namco (Midway license)", "Rally X (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyxmr, rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "bootleg (Model Racing)", "Rally X (Model Racing bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, dngrtrck, rallyx,   rallyx,   dngrtrck, rallyx_state, empty_init, ROT0,  "bootleg (Petaco)", "Danger Track (Rally X bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, nrallyx,  0,        rallyx,   nrallyx,  rallyx_state, empty_init, ROT0,  "Namco", "New Rally X", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, nrallyxb, nrallyx,  rallyx,   nrallyx,  rallyx_state, empty_init, ROT0,  "Namco", "New Rally X (bootleg?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, jungler,  0,        jungler,  jungler,  rallyx_state, empty_init, ROT90, "Konami", "Jungler", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, junglers, jungler,  jungler,  jungler,  rallyx_state, empty_init, ROT90, "Konami (Stern Electronics license)", "Jungler (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jackler,  jungler,  jungler,  jungler,  rallyx_state, empty_init, ROT90, "bootleg", "Jackler (Jungler bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, savanna,  jungler,  jungler,  jungler,  rallyx_state, empty_init, ROT90, "bootleg (Olympia)", "Savanna (Jungler bootleg)", MACHINE_SUPPORTS_SAVE ) // or licensed from Konami?
+GAME( 1982, tactcian, 0,        tactcian, tactcian, rallyx_state, empty_init, ROT90, "Konami (Sega license)", "Tactician (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tactcian2,tactcian, tactcian, tactcian, rallyx_state, empty_init, ROT90, "Konami (Sega license)", "Tactician (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, locomotn, 0,        locomotn, locomotn, rallyx_state, empty_init, ROT90, "Konami (Centuri license)", "Loco-Motion", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, gutangtn, locomotn, locomotn, locomotn, rallyx_state, empty_init, ROT90, "Konami (Sega license)", "Guttang Gottong", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, cottong,  locomotn, locomotn, locomotn, rallyx_state, empty_init, ROT90, "bootleg", "Cotocoto Cottong", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, locoboot, locomotn, locomotn, locomotn, rallyx_state, empty_init, ROT90, "bootleg", "Loco-Motion (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, commsega, 0,        commsega, commsega, rallyx_state, empty_init, ROT90, "Sega", "Commando (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

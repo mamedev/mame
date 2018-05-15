@@ -234,7 +234,7 @@ static const gfx_layout sprite_layout = {
 	16*16
 };
 
-static GFXDECODE_START( mrflea )
+static GFXDECODE_START( gfx_mrflea )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,  0x10, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,    0x00, 1 )
 GFXDECODE_END
@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(mrflea_state::mrflea)
 	MCFG_SCREEN_UPDATE_DRIVER(mrflea_state, screen_update_mrflea)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrflea)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrflea)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -367,4 +367,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, mrflea,   0,        mrflea,   mrflea, mrflea_state,   0,        ROT270, "Pacific Novelty", "The Amazing Adventures of Mr. F. Lea" , MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrflea,   0,        mrflea,   mrflea, mrflea_state, empty_init, ROT270, "Pacific Novelty", "The Amazing Adventures of Mr. F. Lea" , MACHINE_SUPPORTS_SAVE )

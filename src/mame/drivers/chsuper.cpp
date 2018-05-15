@@ -66,9 +66,9 @@ protected:
 
 	virtual void video_start() override;
 public:
-	DECLARE_DRIVER_INIT(chsuper3);
-	DECLARE_DRIVER_INIT(chmpnum);
-	DECLARE_DRIVER_INIT(chsuper2);
+	void init_chsuper3();
+	void init_chmpnum();
+	void init_chsuper2();
 };
 
 
@@ -344,7 +344,7 @@ static const gfx_layout charlayout =
 	8*32
 };
 
-static GFXDECODE_START( chsuper )
+static GFXDECODE_START( gfx_chsuper )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 1 )
 GFXDECODE_END
 
@@ -377,7 +377,7 @@ MACHINE_CONFIG_START(chsuper_state::chsuper)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chsuper)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chsuper)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -475,21 +475,18 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
+void chsuper_state::init_chsuper2()
 {
 	std::unique_ptr<uint8_t[]> buffer;
 	uint8_t *rom = memregion("gfx1")->base();
-	int i;
 
 	m_tilexor = 0x7f00;
 
 	buffer = std::make_unique<uint8_t[]>(0x100000);
 
-	for (i=0;i<0x100000;i++)
+	for (int i = 0; i < 0x100000; i++)
 	{
-		int j;
-
-		j = i ^ (m_tilexor << 5);
+		int j = i ^ (m_tilexor << 5);
 
 		buffer[j] = rom[i];
 	}
@@ -497,17 +494,16 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
 	memcpy(rom,buffer.get(),0x100000);
 }
 
-DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
+void chsuper_state::init_chsuper3()
 {
 	std::unique_ptr<uint8_t[]> buffer;
 	uint8_t *rom = memregion("gfx1")->base();
-	int i;
 
 	m_tilexor = 0x0e00;
 
 	buffer = std::make_unique<uint8_t[]>(0x100000);
 
-	for (i=0;i<0x100000;i++)
+	for (int i = 0; i < 0x100000; i++)
 	{
 		int j;
 
@@ -519,21 +515,18 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
 	memcpy(rom,buffer.get(),0x100000);
 }
 
-DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
+void chsuper_state::init_chmpnum()
 {
 	std::unique_ptr<uint8_t[]> buffer;
 	uint8_t *rom = memregion("gfx1")->base();
-	int i;
 
 	m_tilexor = 0x1800;
 
 	buffer = std::make_unique<uint8_t[]>(0x100000);
 
-	for (i=0;i<0x100000;i++)
+	for (int i = 0; i < 0x100000; i++)
 	{
-		int j;
-
-		j = i ^ (m_tilexor << 5);
+		int j = i ^ (m_tilexor << 5);
 
 		j = bitswap<24>(j,23,22,21,20,19,18,17,13, 15,14,16,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
 		j = bitswap<24>(j,23,22,21,20,19,18,17,14, 15,16,13,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
@@ -550,8 +543,8 @@ DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT    MACHINE  INPUT    STATE           INIT      ROT    COMPANY         FULLNAME                   FLAGS                 LAYOUT */
-GAMEL( 1999, chsuper3, 0,        chsuper, chsuper, chsuper_state,  chsuper3, ROT0, "<unknown>",    "Champion Super 3 (V0.35)", MACHINE_IMPERFECT_SOUND, layout_chsuper ) //24/02/99
-GAMEL( 1999, chsuper2, chsuper3, chsuper, chsuper, chsuper_state,  chsuper2, ROT0, "<unknown>",    "Champion Super 2 (V0.13)", MACHINE_IMPERFECT_SOUND, layout_chsuper ) //26/01/99
-GAME(  1999, chmpnum,  chsuper3, chsuper, chsuper, chsuper_state,  chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.74)",  MACHINE_IMPERFECT_SOUND )                 //10/11/99
-GAME(  1999, chmpnuma, chsuper3, chsuper, chsuper, chsuper_state,  chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.67)",  MACHINE_IMPERFECT_SOUND )                 //21/10/99
+/*     YEAR  NAME      PARENT    MACHINE  INPUT    CLASS          INIT           ROT   COMPANY         FULLNAME                    FLAGS                    LAYOUT */
+GAMEL( 1999, chsuper3, 0,        chsuper, chsuper, chsuper_state, init_chsuper3, ROT0, "<unknown>",    "Champion Super 3 (V0.35)", MACHINE_IMPERFECT_SOUND, layout_chsuper ) //24/02/99
+GAMEL( 1999, chsuper2, chsuper3, chsuper, chsuper, chsuper_state, init_chsuper2, ROT0, "<unknown>",    "Champion Super 2 (V0.13)", MACHINE_IMPERFECT_SOUND, layout_chsuper ) //26/01/99
+GAME(  1999, chmpnum,  chsuper3, chsuper, chsuper, chsuper_state, init_chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.74)",  MACHINE_IMPERFECT_SOUND )                 //10/11/99
+GAME(  1999, chmpnuma, chsuper3, chsuper, chsuper, chsuper_state, init_chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.67)",  MACHINE_IMPERFECT_SOUND )                 //21/10/99

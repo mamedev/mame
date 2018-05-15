@@ -262,7 +262,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( jr100 )
+static GFXDECODE_START( gfx_jr100 )
 	GFXDECODE_ENTRY( "maincpu", 0xe000, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(jr100_state::jr100)
 	MCFG_SCREEN_UPDATE_DRIVER(jr100_state, screen_update_jr100)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jr100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jr100)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(14'318'181) / 16)
@@ -422,6 +422,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT    COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY      FULLNAME   FLAGS
-COMP( 1981, jr100,  0,        0,      jr100,   jr100, jr100_state, 0,     "National",  "JR-100",  0 )
-COMP( 1981, jr100u, jr100,    0,      jr100,   jr100, jr100_state, 0,     "Panasonic", "JR-100U", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME   FLAGS
+COMP( 1981, jr100,  0,      0,      jr100,   jr100, jr100_state, empty_init, "National",  "JR-100",  0 )
+COMP( 1981, jr100u, jr100,  0,      jr100,   jr100, jr100_state, empty_init, "Panasonic", "JR-100U", 0 )

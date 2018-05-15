@@ -349,7 +349,7 @@ static const gfx_layout carjmbre_spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( carjmbre )
+static GFXDECODE_START( gfx_carjmbre )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, carjmbre_spritelayout, 0, 16 )
 GFXDECODE_END
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(carjmbre_state::carjmbre)
 	MCFG_SCREEN_UPDATE_DRIVER(carjmbre_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carjmbre)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_carjmbre)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(carjmbre_state, carjmbre)
 
@@ -429,4 +429,4 @@ ROM_START( carjmbre )
 ROM_END
 
 
-GAME( 1983, carjmbre, 0, carjmbre, carjmbre, carjmbre_state, 0, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, carjmbre, 0, carjmbre, carjmbre, carjmbre_state, empty_init, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )

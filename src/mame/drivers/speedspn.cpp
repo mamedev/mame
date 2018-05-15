@@ -254,7 +254,7 @@ static const gfx_layout speedspn_spritelayout =
 };
 
 
-static GFXDECODE_START( speedspn )
+static GFXDECODE_START( gfx_speedspn )
 	GFXDECODE_ENTRY( "gfx1", 0, speedspn_charlayout,   0x000, 0x40 )
 	GFXDECODE_ENTRY( "gfx2", 0, speedspn_spritelayout, 0x000, 0x40 )
 GFXDECODE_END
@@ -301,7 +301,7 @@ MACHINE_CONFIG_START(speedspn_state::speedspn)
 	MCFG_SCREEN_UPDATE_DRIVER(speedspn_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speedspn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speedspn)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -343,4 +343,4 @@ ROM_END
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1994, speedspn, 0, speedspn, speedspn, speedspn_state, 0, ROT180, "TCH", "Speed Spin", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, speedspn, 0, speedspn, speedspn, speedspn_state, empty_init, ROT180, "TCH", "Speed Spin", MACHINE_SUPPORTS_SAVE )

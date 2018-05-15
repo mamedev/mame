@@ -404,7 +404,7 @@ static const gfx_layout tiles16x16_layout =
 	16*16
 };
 
-static GFXDECODE_START( egghunt )
+static GFXDECODE_START( gfx_egghunt )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0, 64 )
 GFXDECODE_END
@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(egghunt_state::egghunt)
 	MCFG_SCREEN_UPDATE_DRIVER(egghunt_state, screen_update_egghunt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", egghunt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_egghunt)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
@@ -482,4 +482,4 @@ ROM_START( egghunt )
 	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(f03589bc) SHA1(4d9c8422ac3c4c3ecba3bcf0ed47b8c7d5903f8c) )
 ROM_END
 
-GAME( 1995, egghunt, 0, egghunt, egghunt, egghunt_state, 0, ROT0, "Invi Image", "Egg Hunt", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, egghunt, 0, egghunt, egghunt, egghunt_state, empty_init, ROT0, "Invi Image", "Egg Hunt", MACHINE_SUPPORTS_SAVE )

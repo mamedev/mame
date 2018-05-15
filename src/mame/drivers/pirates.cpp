@@ -242,7 +242,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( pirates )
+static GFXDECODE_START( gfx_pirates )
 
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x0000, 3*128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x1800,   128 )
@@ -259,7 +259,7 @@ MACHINE_CONFIG_START(pirates_state::pirates)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pirates)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pirates)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -444,7 +444,7 @@ void pirates_state::decrypt_oki()
 }
 
 
-DRIVER_INIT_MEMBER(pirates_state,pirates)
+void pirates_state::init_pirates()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -459,7 +459,7 @@ DRIVER_INIT_MEMBER(pirates_state,pirates)
 
 READ16_MEMBER(pirates_state::genix_prot_r){ if(!offset) return 0x0004; else return 0x0000; }
 
-DRIVER_INIT_MEMBER(pirates_state,genix)
+void pirates_state::init_genix()
 {
 	decrypt_68k();
 	decrypt_p();
@@ -473,7 +473,7 @@ DRIVER_INIT_MEMBER(pirates_state,genix)
 
 /* GAME */
 
-GAME( 1994, pirates,  0,       pirates, pirates, pirates_state, pirates,  0, "NIX", "Pirates (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, piratesb, pirates, pirates, pirates, pirates_state, pirates,  0, "NIX", "Pirates (set 2)", MACHINE_SUPPORTS_SAVE ) // shows 'Copyright 1995' instead of (c)1994 Nix, but isn't unprotected, various changes to the names in the credis + a few other minor alterations
+GAME( 1994, pirates,  0,       pirates, pirates, pirates_state, init_pirates, 0, "NIX", "Pirates (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, piratesb, pirates, pirates, pirates, pirates_state, init_pirates, 0, "NIX", "Pirates (set 2)", MACHINE_SUPPORTS_SAVE ) // shows 'Copyright 1995' instead of (c)1994 Nix, but isn't unprotected, various changes to the names in the credis + a few other minor alterations
 
-GAME( 1994, genix,    0,       pirates, pirates, pirates_state, genix,    0, "NIX", "Genix Family",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, genix,    0,       pirates, pirates, pirates_state, init_genix,   0, "NIX", "Genix Family",    MACHINE_SUPPORTS_SAVE )

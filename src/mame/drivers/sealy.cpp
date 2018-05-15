@@ -92,7 +92,7 @@ static const gfx_layout gfxlayout_8x8x16 =
 };
 
 
-static GFXDECODE_START( sealy )
+static GFXDECODE_START( gfx_sealy )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x16, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_8x8x16, 0, 1 )
 GFXDECODE_END
@@ -112,7 +112,7 @@ MACHINE_CONFIG_START(sealy_state::sealy)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sealy_state, screen_update_sealy)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sealy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sealy)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(sealy_state, sealy)
 
@@ -139,4 +139,4 @@ ROM_START( crzyddz )
 ROM_END
 
 
-GAME( 2004?, crzyddz,  0, sealy, sealy, sealy_state, 0, ROT0, "Sealy", "Crazy Dou Di Zhu", MACHINE_IS_SKELETON )
+GAME( 2004?, crzyddz,  0, sealy, sealy, sealy_state, empty_init, ROT0, "Sealy", "Crazy Dou Di Zhu", MACHINE_IS_SKELETON )

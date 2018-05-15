@@ -86,7 +86,7 @@ public:
 	DECLARE_READ16_MEMBER(mjmux_r);
 	DECLARE_WRITE16_MEMBER(okim1_rombank_w);
 	DECLARE_WRITE16_MEMBER(okim0_rombank_w);
-	DECLARE_DRIVER_INIT(mirage);
+	void init_mirage();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -266,7 +266,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( mirage )
+static GFXDECODE_START( gfx_mirage )
 	GFXDECODE_ENTRY("gfx1", 0, tile_8x8_layout,     0x000, 32)  /* Tiles (8x8) */
 	GFXDECODE_ENTRY("gfx1", 0, tile_16x16_layout,   0x000, 32)  /* Tiles (16x16) */
 	GFXDECODE_ENTRY("gfx2", 0, spritelayout,        0x200, 32)  /* Sprites (16x16) */
@@ -309,7 +309,7 @@ MACHINE_CONFIG_START(miragemj_state::mirage)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirage)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mirage)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -369,9 +369,9 @@ ROM_START( mirage )
 	ROM_LOAD( "mbl-04.12k", 0x000000, 0x100000, CRC(b533123d) SHA1(2cb2f11331d00c2d282113932ed2836805f4fc6e) )
 ROM_END
 
-DRIVER_INIT_MEMBER(miragemj_state,mirage)
+void miragemj_state::init_mirage()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 }
 
-GAME( 1994, mirage, 0,     mirage, mirage, miragemj_state, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mirage, 0,     mirage, mirage, miragemj_state, init_mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", MACHINE_SUPPORTS_SAVE )

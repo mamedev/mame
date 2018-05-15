@@ -263,12 +263,12 @@ static const gfx_layout crzrally_spritelayout =
 	8*16
 };
 
-static GFXDECODE_START( holeland )
+static GFXDECODE_START( gfx_holeland )
 	GFXDECODE_ENTRY( "gfx1", 0, holeland_charlayout,   0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, holeland_spritelayout, 0, 256 )
 GFXDECODE_END
 
-static GFXDECODE_START( crzrally )
+static GFXDECODE_START( gfx_crzrally )
 	GFXDECODE_ENTRY( "gfx1", 0, crzrally_charlayout,   0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, crzrally_spritelayout, 0, 256 )
 GFXDECODE_END
@@ -299,7 +299,7 @@ MACHINE_CONFIG_START(holeland_state::holeland)
 	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_holeland)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", holeland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_holeland)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,holeland)
 
@@ -380,7 +380,7 @@ MACHINE_CONFIG_START(holeland_state::crzrally)
 	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_crzrally)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crzrally)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crzrally)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,crzrally)
 
@@ -555,8 +555,8 @@ ROM_START( crzrallyg )
 ROM_END
 
 
-GAME( 1984, holeland,  0,        holeland, holeland,  holeland_state, 0, ROT0,   "Tecfri",                 "Hole Land (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, holeland2, holeland, holeland, holeland2, holeland_state, 0, ROT0,   "Tecfri",                 "Hole Land (Spain)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //attract is different
-GAME( 1985, crzrally,  0,        crzrally, crzrally,  holeland_state, 0, ROT270, "Tecfri",                 "Crazy Rally (set 1)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, crzrallya, crzrally, crzrally, crzrally,  holeland_state, 0, ROT270, "Tecfri",                 "Crazy Rally (set 2)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, crzrallyg, crzrally, crzrally, crzrally,  holeland_state, 0, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, holeland,  0,        holeland, holeland,  holeland_state, empty_init, ROT0,   "Tecfri",                 "Hole Land (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, holeland2, holeland, holeland, holeland2, holeland_state, empty_init, ROT0,   "Tecfri",                 "Hole Land (Spain)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //attract is different
+GAME( 1985, crzrally,  0,        crzrally, crzrally,  holeland_state, empty_init, ROT270, "Tecfri",                 "Crazy Rally (set 1)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, crzrallya, crzrally, crzrally, crzrally,  holeland_state, empty_init, ROT270, "Tecfri",                 "Crazy Rally (set 2)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, crzrallyg, crzrally, crzrally, crzrally,  holeland_state, empty_init, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

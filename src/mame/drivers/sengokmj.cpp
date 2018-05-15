@@ -547,7 +547,7 @@ static const gfx_layout charlayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( sengokmj )
+static GFXDECODE_START( gfx_sengokmj )
 	GFXDECODE_ENTRY( "spr_gfx",0, tilelayout, 0x000, 0x40 ) /* Sprites */
 	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout, 0x400, 0x10 ) /* Tiles */
 	GFXDECODE_ENTRY( "md_gfx", 0, tilelayout, 0x500, 0x10 ) /* Tiles */
@@ -598,7 +598,7 @@ MACHINE_CONFIG_START(sengokmj_state::sengokmj)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, sengokmj_state, layer_en_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, sengokmj_state, layer_scroll_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sengokmj)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sengokmj)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -656,5 +656,5 @@ ROM_START( sengokmj )
 	ROM_LOAD( "rs006.89", 0x000, 0x200, CRC(96f7646e) SHA1(400a831b83d6ac4d2a46ef95b97b1ee237099e44) ) /* Priority */
 ROM_END
 
-GAME( 1991, sengokmj, 0, sengokmj, sengokmj, sengokmj_state, 0, ROT0, "Sigma", "Sengoku Mahjong [BET] (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, sengokmj, 0, sengokmj, sengokmj, sengokmj_state, empty_init, ROT0, "Sigma", "Sengoku Mahjong [BET] (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /*Non-Bet Version?*/

@@ -154,4 +154,4 @@ ROM_START( instantm )
 ROM_END
 
 
-GAME( 199?, instantm,  0,    instantm, instantm, instantm_state,  0, ROT0, "Capcom / Polaroid", "Polaroid Instant Memories", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, instantm, 0, instantm, instantm, instantm_state, empty_init, ROT0, "Capcom / Polaroid", "Polaroid Instant Memories", MACHINE_IS_SKELETON_MECHANICAL )

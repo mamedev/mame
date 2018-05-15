@@ -330,7 +330,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( brkthru )
+static GFXDECODE_START( gfx_brkthru )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0x00,  1 )  /* use colors 0x00-0x07 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout1,  0x80, 16 )  /* use colors 0x80-0xff */
 	GFXDECODE_ENTRY( "gfx2", 0x01000, tilelayout2,  0x80, 16 )
@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(brkthru_state::brkthru)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", brkthru)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_brkthru)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)
@@ -425,7 +425,7 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", brkthru)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_brkthru)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)
@@ -641,7 +641,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(brkthru_state,brkthru)
+void brkthru_state::init_brkthru()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
@@ -653,7 +653,7 @@ DRIVER_INIT_MEMBER(brkthru_state,brkthru)
  *
  *************************************/
 
-GAME( 1986, brkthru,  0,       brkthru, brkthru,  brkthru_state, brkthru, ROT0,   "Data East USA",         "Break Thru (US)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthruj, brkthru, brkthru, brkthruj, brkthru_state, brkthru, ROT0,   "Data East Corporation", "Kyohkoh-Toppa (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, forcebrk, brkthru, brkthru, brkthruj, brkthru_state, brkthru, ROT0,   "bootleg",               "Force Break (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, darwin,   0,       darwin,  darwin,   brkthru_state, brkthru, ROT270, "Data East Corporation", "Darwin 4078 (Japan)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthru,  0,       brkthru, brkthru,  brkthru_state, init_brkthru, ROT0,   "Data East USA",         "Break Thru (US)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthruj, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "Data East Corporation", "Kyohkoh-Toppa (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, forcebrk, brkthru, brkthru, brkthruj, brkthru_state, init_brkthru, ROT0,   "bootleg",               "Force Break (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darwin,   0,       darwin,  darwin,   brkthru_state, init_brkthru, ROT270, "Data East Corporation", "Darwin 4078 (Japan)",   MACHINE_SUPPORTS_SAVE )

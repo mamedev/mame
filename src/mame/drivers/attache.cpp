@@ -67,7 +67,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "bus/rs232/rs232.h"
 #include "machine/am9517a.h"
 #include "machine/clock.h"
@@ -1334,6 +1334,6 @@ ROM_START( attache816 )
 
 ROM_END
 
-//    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY     FULLNAME             FLAGS
-COMP( 1982, attache, 0,      0,         attache,    attache, attache_state,    0,      "Otrona",   "Attach\xC3\xA9",    MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1983, attache816, attache,0,      attache816, attache, attache816_state,    0,      "Otrona",   "Attach\xC3\xA9 8:16",    MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    CLASS             INIT        COMPANY   FULLNAME               FLAGS
+COMP( 1982, attache,    0,       0,      attache,    attache, attache_state,    empty_init, "Otrona", "Attach\xC3\xA9",      MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, attache816, attache, 0,      attache816, attache, attache816_state, empty_init, "Otrona", "Attach\xC3\xA9 8:16", MACHINE_IMPERFECT_GRAPHICS )

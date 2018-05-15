@@ -379,9 +379,9 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS       INIT  COMPANY      FULLNAME              FLAGS
-COMP( 1976, tk80,     0,      0,      tk80,     tk80,     tk80_state, 0,    "NEC",       "TK-80",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, nectk85,  tk80,   0,      tk85,     tk80,     tk80_state, 0,    "NEC",       "TK-85",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 19??, nd80z,    tk80,   0,      nd80z,    tk80,     tk80_state, 0,    "Chunichi",  "ND-80Z",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 19??, mikrolab, tk80,   0,      mikrolab, mikrolab, tk80_state, 0,    "<unknown>", "Mikrolab KR580IK80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 19??, ics8080,  tk80,   0,      ics8080,  ics8080,  tk80_state, 0,    "<unknown>", "ICS8080",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS       INIT        COMPANY      FULLNAME              FLAGS
+COMP( 1976, tk80,     0,      0,      tk80,     tk80,     tk80_state, empty_init, "NEC",       "TK-80",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, nectk85,  tk80,   0,      tk85,     tk80,     tk80_state, empty_init, "NEC",       "TK-85",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 19??, nd80z,    tk80,   0,      nd80z,    tk80,     tk80_state, empty_init, "Chunichi",  "ND-80Z",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 19??, mikrolab, tk80,   0,      mikrolab, mikrolab, tk80_state, empty_init, "<unknown>", "Mikrolab KR580IK80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 19??, ics8080,  tk80,   0,      ics8080,  ics8080,  tk80_state, empty_init, "<unknown>", "ICS8080",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

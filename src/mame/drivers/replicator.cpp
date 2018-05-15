@@ -183,7 +183,7 @@ public:
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_DRIVER_INIT(replicator);
+	void init_replicator();
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(replicator);
 	void replicator(machine_config &config);
@@ -564,7 +564,7 @@ INPUT_PORTS_END
 * Machine definition                                 *
 \****************************************************/
 
-DRIVER_INIT_MEMBER(replicator_state, replicator)
+void replicator_state::init_replicator()
 {
 }
 
@@ -602,7 +602,7 @@ static const gfx_layout hd44780_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( replicator )
+static GFXDECODE_START( gfx_replicator )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, hd44780_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -632,7 +632,7 @@ MACHINE_CONFIG_START(replicator_state::replicator)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(replicator_state, replicator)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", replicator)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_replicator)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_HD44780_ADD("hd44780")
@@ -727,5 +727,5 @@ ROM_START( replica1 )
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )
 ROM_END
 
-/*   YEAR  NAME        PARENT    COMPAT    MACHINE        INPUT       STATE                INIT           COMPANY     FULLNAME */
-COMP(2012, replica1,   0,        0,        replicator,    replicator, replicator_state,    replicator,    "Makerbot", "Replicator 1 desktop 3d printer", MACHINE_NOT_WORKING)
+/*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT             COMPANY     FULLNAME */
+COMP(2012, replica1, 0,      0,      replicator, replicator, replicator_state, init_replicator, "Makerbot", "Replicator 1 desktop 3d printer", MACHINE_NOT_WORKING)

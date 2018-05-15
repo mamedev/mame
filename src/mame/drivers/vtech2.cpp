@@ -353,7 +353,7 @@ static const gfx_layout gfxlayout_4bpp_dh =
 	2*4                     /* one byte per code */
 };
 
-static GFXDECODE_START( vtech2 )
+static GFXDECODE_START( gfx_vtech2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_80, 0, 256 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_40, 0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_1bpp, 0, 256 )
@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(vtech2_state::laser350)
 	MCFG_SCREEN_UPDATE_DRIVER(vtech2_state, screen_update_laser)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vtech2 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vtech2)
 	MCFG_PALETTE_ADD("palette", 512+16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(vtech2_state, vtech2)
@@ -506,7 +506,7 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     STATE         INIT   COMPANY             FULLNAME      FLAGS
-COMP( 1984?, laser350, 0,        0,      laser350, laser350, vtech2_state, laser, "Video Technology", "Laser 350" , 0)
-COMP( 1984?, laser500, laser350, 0,      laser500, laser500, vtech2_state, laser, "Video Technology", "Laser 500" , 0)
-COMP( 1984?, laser700, laser350, 0,      laser700, laser500, vtech2_state, laser, "Video Technology", "Laser 700" , 0)
+//    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS         INIT        COMPANY             FULLNAME      FLAGS
+COMP( 1984?, laser350, 0,        0,      laser350, laser350, vtech2_state, init_laser, "Video Technology", "Laser 350" , 0)
+COMP( 1984?, laser500, laser350, 0,      laser500, laser500, vtech2_state, init_laser, "Video Technology", "Laser 500" , 0)
+COMP( 1984?, laser700, laser350, 0,      laser700, laser500, vtech2_state, init_laser, "Video Technology", "Laser 700" , 0)

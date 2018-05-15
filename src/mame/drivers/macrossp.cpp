@@ -510,7 +510,7 @@ static const gfx_layout macrossp_char16x16x8layout =
 	16*128
 };
 
-static GFXDECODE_START( macrossp )
+static GFXDECODE_START( gfx_macrossp )
 	GFXDECODE_ENTRY( "gfx1", 0, macrossp_char16x16x8layout,   0x000, 0x20 ) /* 8bpp but 6bpp granularity */
 	GFXDECODE_ENTRY( "gfx2", 0, macrossp_char16x16x8layout,   0x800, 0x20 ) /* 8bpp but 6bpp granularity */
 	GFXDECODE_ENTRY( "gfx3", 0, macrossp_char16x16x8layout,   0x800, 0x20 ) /* 8bpp but 6bpp granularity */
@@ -561,7 +561,7 @@ MACHINE_CONFIG_START(macrossp_state::macrossp)
 	MCFG_SCREEN_UPDATE_DRIVER(macrossp_state, screen_update_macrossp)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, macrossp_state, screen_vblank_macrossp))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macrossp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macrossp)
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RGBX)
@@ -714,17 +714,17 @@ WRITE32_MEMBER(macrossp_state::quizmoon_speedup_w)
 }
 #endif
 
-DRIVER_INIT_MEMBER(macrossp_state,macrossp)
+void macrossp_state::init_macrossp()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf10158, 0xf1015b, write32_delegate(FUNC(macrossp_state::macrossp_speedup_w),this));
 }
 
-DRIVER_INIT_MEMBER(macrossp_state,quizmoon)
+void macrossp_state::init_quizmoon()
 {
 #ifdef UNUSED_FUNCTION
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf00020, 0xf00023, write32_delegate(FUNC(macrossp_state::quizmoon_speedup_w),this));
 #endif
 }
 
-GAME( 1996, macrossp, 0, macrossp, macrossp, macrossp_state, macrossp, ROT270, "MOSS / Banpresto", "Macross Plus", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, quizmoon, 0, quizmoon, quizmoon, macrossp_state, quizmoon, ROT0,   "Banpresto", "Quiz Bisyoujo Senshi Sailor Moon - Chiryoku Tairyoku Toki no Un", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, macrossp, 0, macrossp, macrossp, macrossp_state, init_macrossp, ROT270, "MOSS / Banpresto", "Macross Plus", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, quizmoon, 0, quizmoon, quizmoon, macrossp_state, init_quizmoon, ROT0,   "Banpresto", "Quiz Bisyoujo Senshi Sailor Moon - Chiryoku Tairyoku Toki no Un", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -113,7 +113,7 @@ static const gfx_layout spritelayout2 =
 	1 /* every sprite takes 1 consecutive bytes */
 };
 
-static GFXDECODE_START( starcrus )
+static GFXDECODE_START( gfx_starcrus )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout1, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0040, spritelayout1, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0080, spritelayout1, 0, 1 )
@@ -157,7 +157,7 @@ MACHINE_CONFIG_START(starcrus_state::starcrus)
 	MCFG_SCREEN_UPDATE_DRIVER(starcrus_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", starcrus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_starcrus)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -199,4 +199,4 @@ ROM_START( starcrus )
 ROM_END
 
 
-GAME( 1977, starcrus, 0, starcrus, starcrus, starcrus_state, 0, ROT0, "Ramtek", "Star Cruiser", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, starcrus, 0, starcrus, starcrus, starcrus_state, empty_init, ROT0, "Ramtek", "Star Cruiser", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

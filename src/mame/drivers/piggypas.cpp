@@ -322,16 +322,16 @@ ROM_END
 
 
 // COPYRIGHT (c) 1990, 1991, 1992, DOYLE & ASSOC., INC.   VERSION 04.40
-GAME( 1992, piggypas,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "Piggy Pass (version 04.40)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, piggypas,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Piggy Pass (version 04.40)", MACHINE_IS_SKELETON_MECHANICAL )
 // COPYRIGHT (c) 1990, 1991, 1992, DOYLE & ASSOC., INC.   VERSION 05.22
-GAME( 1992, hoopshot,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "Hoop Shot (version 05.22)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, hoopshot,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Hoop Shot (version 05.22)", MACHINE_IS_SKELETON_MECHANICAL )
 // Quick $ilver   Development Co.    10/08/96      ROUND  REV 6
-GAME( 1996, rndrndqs,  0,    fidlstix, piggypas, piggypas_state,  0, ROT0, "Quick $ilver Development Co.", "Round and Round (Rev 6) (Quick $ilver)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1996, rndrndqs,  0,    fidlstix, piggypas, piggypas_state,  empty_init, ROT0, "Quick $ilver Development Co.", "Round and Round (Rev 6) (Quick $ilver)", MACHINE_IS_SKELETON_MECHANICAL )
 //  Quick$ilver   Development Co.    10/02/95      -FIDDLESTIX-       REV 15T
-GAME( 1995, fidlstix,  0,    fidlstix, piggypas, piggypas_state,  0, ROT0, "Quick $ilver Development Co.", "Fiddle Stix (1st Rev)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1995, fidlstix,  0,    fidlstix, piggypas, piggypas_state,  empty_init, ROT0, "Quick $ilver Development Co.", "Fiddle Stix (1st Rev)", MACHINE_IS_SKELETON_MECHANICAL )
 // bad dump, so version unknown
-GAME( 199?, jackbean,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "Jack & The Beanstalk (Doyle & Assoc.?)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, jackbean,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Jack & The Beanstalk (Doyle & Assoc.?)", MACHINE_IS_SKELETON_MECHANICAL )
 // bad dump, so version unknown
-GAME( 199?, dumpump,   0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "Dump The Ump", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, dumpump,   0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Dump The Ump", MACHINE_IS_SKELETON_MECHANICAL )
 // bad dump, so version unknown
-GAME( 199?, 3lilpigs,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "3 Lil' Pigs", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, 3lilpigs,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "3 Lil' Pigs", MACHINE_IS_SKELETON_MECHANICAL )

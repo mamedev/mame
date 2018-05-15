@@ -94,7 +94,7 @@ public:
 	DECLARE_READ8_MEMBER(mycom_05_r);
 	DECLARE_READ8_MEMBER(mycom_06_r);
 	DECLARE_READ8_MEMBER(mycom_08_r);
-	DECLARE_DRIVER_INIT(mycom);
+	void init_mycom();
 	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
 	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -336,7 +336,7 @@ static const gfx_layout mycom_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( mycom )
+static GFXDECODE_START( gfx_mycom )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mycom_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -497,7 +497,7 @@ void mycom_state::machine_reset()
 	m_0a = 0;
 }
 
-DRIVER_INIT_MEMBER(mycom_state,mycom)
+void mycom_state::init_mycom()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
@@ -532,7 +532,7 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mycom)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mycom)
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
 	The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
@@ -582,5 +582,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY                      FULLNAME      FLAGS
-COMP( 1981, mycom,  0,      0,       mycom,     mycom, mycom_state, mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                      FULLNAME      FLAGS
+COMP( 1981, mycom, 0,      0,      mycom,   mycom, mycom_state, init_mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -447,7 +447,7 @@ static const gfx_layout excali64_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( excali64 )
+static GFXDECODE_START( gfx_excali64 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, excali64_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -588,7 +588,7 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 40)
 	MCFG_PALETTE_INIT_OWNER(excali64_state, excali64)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", excali64)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_excali64)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(16'000'000) / 16) // 1MHz for lowres; 2MHz for highres
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
@@ -650,5 +650,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     CLASS           INIT  COMPANY          FULLNAME        FLAGS
-COMP( 1984, excali64, 0,      0,       excali64,  excali64, excali64_state, 0,    "BGR Computers", "Excalibur 64", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY          FULLNAME        FLAGS
+COMP( 1984, excali64, 0,      0,      excali64, excali64, excali64_state, empty_init, "BGR Computers", "Excalibur 64", 0 )

@@ -600,7 +600,7 @@ INPUT_PORTS_END
 }
 
 #define GFXDECODEINFO(NUM,ENTRIES) \
-static GFXDECODE_START( NUM )\
+static GFXDECODE_START( gfx_##NUM )\
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout8_##NUM,0, ENTRIES )                           \
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout16_##NUM,0,    ENTRIES )                           \
 GFXDECODE_END
@@ -651,7 +651,7 @@ MACHINE_CONFIG_START(gaelco_state::bigkarnk)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_bigkarnk)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x100000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x100000)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -686,7 +686,7 @@ MACHINE_CONFIG_START(gaelco_state::maniacsq)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_maniacsq)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x100000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x100000)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -725,7 +725,7 @@ MACHINE_CONFIG_START(gaelco_state::squash)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_maniacsq)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x100000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x100000)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -764,7 +764,7 @@ MACHINE_CONFIG_START(gaelco_state::thoop)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_maniacsq)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x100000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x100000)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1121,12 +1121,12 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, bigkarnk, 0,        bigkarnk, bigkarnk, gaelco_state, 0, ROT0, "Gaelco", "Big Karnak", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  gaelco_state, 0, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1885)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, biomtoya, biomtoy,  maniacsq, biomtoy,  gaelco_state, 0, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1884)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, biomtoyb, biomtoy,  maniacsq, biomtoy,  gaelco_state, 0, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1878)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, bioplayc, biomtoy,  maniacsq, bioplayc, gaelco_state, 0, ROT0, "Gaelco", "Bioplaything Cop (Ver. 1.0.1823, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, maniacsp, maniacsq, maniacsq, maniacsq, gaelco_state, 0, ROT0, "Gaelco", "Maniac Square (prototype)", MACHINE_SUPPORTS_SAVE ) // sometimes listed as a 1992 proto?
-GAME( 1995, lastkm,   0,        maniacsq, lastkm,   gaelco_state, 0, ROT0, "Gaelco", "Last KM (Ver 1.0.0275)", MACHINE_SUPPORTS_SAVE ) // used on 'Salter' exercise bikes
-GAME( 1992, squash,   0,        squash,   squash,   gaelco_state, 0, ROT0, "Gaelco", "Squash (Ver. 1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, 0, ROT0, "Gaelco", "Thunder Hoop (Ver. 1, Checksum 02A09F7D)", MACHINE_SUPPORTS_SAVE ) // could be other versions, still Ver. 1 but different checksum listed on boot
+GAME( 1991, bigkarnk, 0,        bigkarnk, bigkarnk, gaelco_state, empty_init, ROT0, "Gaelco", "Big Karnak", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1885)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, biomtoya, biomtoy,  maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1884)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, biomtoyb, biomtoy,  maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1878)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, bioplayc, biomtoy,  maniacsq, bioplayc, gaelco_state, empty_init, ROT0, "Gaelco", "Bioplaything Cop (Ver. 1.0.1823, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, maniacsp, maniacsq, maniacsq, maniacsq, gaelco_state, empty_init, ROT0, "Gaelco", "Maniac Square (prototype)", MACHINE_SUPPORTS_SAVE ) // sometimes listed as a 1992 proto?
+GAME( 1995, lastkm,   0,        maniacsq, lastkm,   gaelco_state, empty_init, ROT0, "Gaelco", "Last KM (Ver 1.0.0275)", MACHINE_SUPPORTS_SAVE ) // used on 'Salter' exercise bikes
+GAME( 1992, squash,   0,        squash,   squash,   gaelco_state, empty_init, ROT0, "Gaelco", "Squash (Ver. 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, empty_init, ROT0, "Gaelco", "Thunder Hoop (Ver. 1, Checksum 02A09F7D)", MACHINE_SUPPORTS_SAVE ) // could be other versions, still Ver. 1 but different checksum listed on boot

@@ -276,6 +276,8 @@ device_univ_card_interface::device_univ_card_interface(const machine_config &mco
 
 void device_univ_card_interface::interface_pre_start()
 {
+	device_slot_card_interface::interface_pre_start();
+
 	if (!m_bus)
 		throw device_missing_dependencies();
 }

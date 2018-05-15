@@ -705,7 +705,7 @@ static const gfx_layout osi_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( osi )
+static GFXDECODE_START( gfx_osi )
 	GFXDECODE_ENTRY( "chargen", 0x0000, osi_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -718,7 +718,7 @@ MACHINE_CONFIG_START(sb2m600_state::osi600)
 
 	/* video hardware */
 	osi600_video(config);
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -749,7 +749,7 @@ MACHINE_CONFIG_START(uk101_state::uk101)
 
 	/* video hardware */
 	uk101_video(config);
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* cassette ACIA */
 	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
@@ -774,7 +774,7 @@ MACHINE_CONFIG_START(c1p_state::c1p)
 
 	/* video hardware */
 	osi630_video(config);
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", osi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -889,7 +889,7 @@ void c1p_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-DRIVER_INIT_MEMBER(c1p_state,c1p)
+void c1p_state::init_c1p()
 {
 	timer_set(attotime::zero, TIMER_SETUP_BEEP);
 }
@@ -897,9 +897,9 @@ DRIVER_INIT_MEMBER(c1p_state,c1p)
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT   STATE          INIT  COMPANY            FULLNAME                            FLAGS
-COMP( 1978, sb2m600b, 0,        0,        osi600,   osi600, sb2m600_state, 0,    "Ohio Scientific", "Superboard II Model 600 (Rev. B)", MACHINE_NOT_WORKING)
-//COMP( 1980, sb2m600c, 0,        0,        osi600c,  osi600, sb2m600_state, 0,    "Ohio Scientific", "Superboard II Model 600 (Rev. C)", MACHINE_NOT_WORKING)
-COMP( 1980, c1p,      sb2m600b, 0,        c1p,      osi600, c1p_state,     c1p,  "Ohio Scientific", "Challenger 1P Series 2",           MACHINE_NOT_WORKING)
-COMP( 1980, c1pmf,    sb2m600b, 0,        c1pmf,    osi600, c1pmf_state,   c1p,  "Ohio Scientific", "Challenger 1P MF Series 2",        MACHINE_NOT_WORKING)
-COMP( 1979, uk101,    sb2m600b, 0,        uk101,    uk101,  uk101_state,   0,    "Compukit",        "UK101",                            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT   CLASS          INIT        COMPANY            FULLNAME                            FLAGS
+COMP( 1978, sb2m600b, 0,        0,      osi600,  osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. B)", MACHINE_NOT_WORKING)
+//COMP( 1980, sb2m600c, 0,        0,      osi600c, osi600, sb2m600_state, empty_init, "Ohio Scientific", "Superboard II Model 600 (Rev. C)", MACHINE_NOT_WORKING)
+COMP( 1980, c1p,      sb2m600b, 0,      c1p,     osi600, c1p_state,     init_c1p,   "Ohio Scientific", "Challenger 1P Series 2",           MACHINE_NOT_WORKING)
+COMP( 1980, c1pmf,    sb2m600b, 0,      c1pmf,   osi600, c1pmf_state,   init_c1p,   "Ohio Scientific", "Challenger 1P MF Series 2",        MACHINE_NOT_WORKING)
+COMP( 1979, uk101,    sb2m600b, 0,      uk101,   uk101,  uk101_state,   empty_init, "Compukit",        "UK101",                            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

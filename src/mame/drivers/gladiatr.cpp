@@ -924,13 +924,13 @@ static const gfx_layout spritelayout  =
 	64*8
 };
 
-static GFXDECODE_START( ppking )
+static GFXDECODE_START( gfx_ppking )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x100, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( gladiatr )
+static GFXDECODE_START( gfx_gladiatr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x200, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0x000, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x100, 32 )
@@ -978,7 +978,7 @@ MACHINE_CONFIG_START(ppking_state::ppking)
 	MCFG_SCREEN_UPDATE_DRIVER(ppking_state, screen_update_ppking)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ppking)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppking)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(ppking_state, ppking)
@@ -1070,7 +1070,7 @@ MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 	MCFG_SCREEN_UPDATE_DRIVER(gladiatr_state, screen_update_gladiatr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gladiatr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gladiatr)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(gladiatr_state,gladiatr)
@@ -1378,16 +1378,13 @@ void gladiatr_state::swap_block(uint8_t *src1,uint8_t *src2,int len)
 	}
 }
 
-DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
+void gladiatr_state::init_gladiatr()
 {
-	uint8_t *rom;
-	int i,j;
-
-	rom = memregion("gfx2")->base();
+	uint8_t *rom = memregion("gfx2")->base();
 	// unpack 3bpp graphics
-	for (j = 3; j >= 0; j--)
+	for (int j = 3; j >= 0; j--)
 	{
-		for (i = 0; i < 0x2000; i++)
+		for (int i = 0; i < 0x2000; i++)
 		{
 			rom[i+(2*j+1)*0x2000] = rom[i+j*0x2000] >> 4;
 			rom[i+2*j*0x2000] = rom[i+j*0x2000];
@@ -1399,9 +1396,9 @@ DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 
 	rom = memregion("gfx3")->base();
 	// unpack 3bpp graphics
-	for (j = 5; j >= 0; j--)
+	for (int j = 5; j >= 0; j--)
 	{
-		for (i = 0; i < 0x2000; i++)
+		for (int i = 0; i < 0x2000; i++)
 		{
 			rom[i+(2*j+1)*0x2000] = rom[i+j*0x2000] >> 4;
 			rom[i+2*j*0x2000] = rom[i+j*0x2000];
@@ -1433,23 +1430,20 @@ DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 }
 
 
-DRIVER_INIT_MEMBER(ppking_state, ppking)
+void ppking_state::init_ppking()
 {
-	uint8_t *rom;
-	int i,j;
-
-	rom = memregion("gfx2")->base();
+	uint8_t *rom = memregion("gfx2")->base();
 	// unpack 3bpp graphics
-	for (i = 0; i < 0x2000; i++)
+	for (int i = 0; i < 0x2000; i++)
 	{
 		rom[i+0x2000] = rom[i] >> 4;
 	}
 
 	rom = memregion("gfx3")->base();
 	// unpack 3bpp graphics
-	for (j = 1; j >= 0; j--)
+	for (int j = 1; j >= 0; j--)
 	{
-		for (i = 0; i < 0x2000; i++)
+		for (int i = 0; i < 0x2000; i++)
 		{
 			rom[i+(2*j+1)*0x2000] = rom[i+j*0x2000] >> 4;
 			rom[i+2*j*0x2000] = rom[i+j*0x2000];
@@ -1472,8 +1466,8 @@ DRIVER_INIT_MEMBER(ppking_state, ppking)
 
 
 
-GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
-GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Golden Castle (prototype?)", MACHINE_SUPPORTS_SAVE ) // incomplete dump
+GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   init_ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
+GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation", "Golden Castle (prototype?)", MACHINE_SUPPORTS_SAVE ) // incomplete dump

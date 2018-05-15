@@ -177,28 +177,6 @@ WRITE_LINE_MEMBER( abc802_state::vs_w )
 }
 
 
-void abc802_state::video_start()
-{
-	// register for state saving
-	save_item(NAME(m_flshclk_ctr));
-	save_item(NAME(m_flshclk));
-	save_item(NAME(m_80_40_mux));
-}
-
-
-//-------------------------------------------------
-//  SCREEN_UPDATE( abc802 )
-//-------------------------------------------------
-
-uint32_t abc802_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	// draw text
-	m_crtc->screen_update(screen, bitmap, cliprect);
-
-	return 0;
-}
-
-
 //-------------------------------------------------
 //  MACHINE_CONFIG_START( abc802_video )
 //-------------------------------------------------
@@ -211,7 +189,7 @@ MACHINE_CONFIG_START(abc802_state::abc802_video)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, abc802_state, vs_w))
 
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber())
-	MCFG_SCREEN_UPDATE_DRIVER(abc802_state, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xf0)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")

@@ -120,7 +120,7 @@ public:
 		m_watchdog(*this, "watchdog")
 	{ }
 
-	DECLARE_DRIVER_INIT(looping);
+	void init_looping();
 	void looping(machine_config &config);
 
 protected:
@@ -613,7 +613,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( looping )
+static GFXDECODE_START( gfx_looping )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar, 0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,    0, 8 )
 GFXDECODE_END
@@ -660,7 +660,7 @@ MACHINE_CONFIG_START(looping_state::looping)
 	MCFG_SCREEN_UPDATE_DRIVER(looping_state, screen_update_looping)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", looping)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_looping)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(looping_state, looping)
@@ -920,16 +920,15 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(looping_state,looping)
+void looping_state::init_looping()
 {
 	int length = memregion("maincpu")->bytes();
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
 
 	m_cop_port_l = 0;
 
 	/* bitswap the TMS9995 ROMs */
-	for (i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 		rom[i] = bitswap<8>(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
@@ -944,7 +943,7 @@ DRIVER_INIT_MEMBER(looping_state,looping)
  *
  *************************************/
 
-GAME( 1982, looping,   0,        looping, looping, looping_state, looping, ROT90, "Video Games GmbH", "Looping", MACHINE_IMPERFECT_SOUND /*| MACHINE_SUPPORTS_SAVE */)
-GAME( 1982, loopingv,  looping,  looping, looping, looping_state, looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 1)", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE */)
-GAME( 1982, loopingva, looping,  looping, looping, looping_state, looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 2)", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE */ )
-GAME( 1982, skybump,   0,        looping, skybump, looping_state, looping, ROT90, "Venture Line", "Sky Bumper", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE  */)
+GAME( 1982, looping,   0,        looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH", "Looping", MACHINE_IMPERFECT_SOUND /*| MACHINE_SUPPORTS_SAVE */)
+GAME( 1982, loopingv,  looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 1)", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE */)
+GAME( 1982, loopingva, looping,  looping, looping, looping_state, init_looping, ROT90, "Video Games GmbH (Venture Line license)", "Looping (Venture Line license, set 2)", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE */ )
+GAME( 1982, skybump,   0,        looping, skybump, looping_state, init_looping, ROT90, "Venture Line", "Sky Bumper", MACHINE_IMPERFECT_SOUND /* | MACHINE_SUPPORTS_SAVE  */)

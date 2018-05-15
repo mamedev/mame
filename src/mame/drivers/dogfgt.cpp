@@ -204,7 +204,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( dogfgt )
+static GFXDECODE_START( gfx_dogfgt )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   16, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  0, 2 )
 GFXDECODE_END
@@ -260,7 +260,7 @@ MACHINE_CONFIG_START(dogfgt_state::dogfgt)
 	MCFG_SCREEN_UPDATE_DRIVER(dogfgt_state, screen_update_dogfgt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dogfgt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dogfgt)
 	MCFG_PALETTE_ADD("palette", 16+64)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_PALETTE_INIT_OWNER(dogfgt_state, dogfgt)
@@ -381,6 +381,6 @@ ROM_END
 
 
 
-GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, dogfgt_state, 0, ROT0, "Technos Japan",                               "Acrobatic Dog-Fight",       MACHINE_SUPPORTS_SAVE )
-GAME( 1985, dogfgtu, dogfgt, dogfgt, dogfgt, dogfgt_state, 0, ROT0, "Technos Japan (Data East USA, Inc. license)", "Acrobatic Dog-Fight (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, dogfgt_state, 0, ROT0, "Technos Japan",                               "Dog-Fight (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan",                               "Acrobatic Dog-Fight",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, dogfgtu, dogfgt, dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan (Data East USA, Inc. license)", "Acrobatic Dog-Fight (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan",                               "Dog-Fight (Japan)",         MACHINE_SUPPORTS_SAVE )

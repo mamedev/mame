@@ -642,7 +642,7 @@ void tandy1000_state::cfg_fdc_525(device_t *device)
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
-static GFXDECODE_START( t1000 )
+static GFXDECODE_START( gfx_t1000 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, t1000_charlayout, 3, 1 )
 GFXDECODE_END
 
@@ -653,7 +653,7 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
 	MCFG_VIDEO_SET_SCREEN("pcvideo_t1000:screen")
-	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_t1000:palette", t1000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_t1000:palette", gfx_t1000)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("sn76496", NCR7496, XTAL(14'318'181)/4)
@@ -939,11 +939,11 @@ ROM_START( t1000tl2 )
 ROM_END
 
 
-//    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT         STATE               INIT  COMPANY               FULLNAME          FLAGS
 // tandy 1000
-COMP( 1987, t1000hx,    ibm5150,    0,          t1000hx,    t1000_90key,  tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 HX",   0 )
-COMP( 1987, t1000sx,    ibm5150,    0,          t1000sx,    t1000_90key,  tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 SX",   0 )
-COMP( 1987, t1000tx,    ibm5150,    0,          t1000tx,    t1000_90key,  tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 TX",   0 )
-COMP( 1989, t1000rl,    ibm5150,    0,          t1000rl,    t1000_101key, tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 RL",   0 )
-COMP( 1989, t1000tl2,   ibm5150,    0,          t1000tl,    t1000_101key, tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 TL/2", 0 )
-COMP( 1988, t1000sl2,   ibm5150,    0,          t1000sl2,   t1000_101key, tandy1000_state,    0,    "Tandy Radio Shack", "Tandy 1000 SL/2", 0 )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT         CLASS            INIT        COMPANY              FULLNAME           FLAGS
+COMP( 1987, t1000hx,  ibm5150, 0,      t1000hx,  t1000_90key,  tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 HX",   0 )
+COMP( 1987, t1000sx,  ibm5150, 0,      t1000sx,  t1000_90key,  tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SX",   0 )
+COMP( 1987, t1000tx,  ibm5150, 0,      t1000tx,  t1000_90key,  tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TX",   0 )
+COMP( 1989, t1000rl,  ibm5150, 0,      t1000rl,  t1000_101key, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 RL",   0 )
+COMP( 1989, t1000tl2, ibm5150, 0,      t1000tl,  t1000_101key, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TL/2", 0 )
+COMP( 1988, t1000sl2, ibm5150, 0,      t1000sl2, t1000_101key, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SL/2", 0 )

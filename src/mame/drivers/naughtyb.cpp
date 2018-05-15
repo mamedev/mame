@@ -402,7 +402,7 @@ static const gfx_layout charlayout =
 
 
 
-static GFXDECODE_START( naughtyb )
+static GFXDECODE_START( gfx_naughtyb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 32*4, 32 )
 GFXDECODE_END
@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(naughtyb_state::naughtyb)
 	MCFG_SCREEN_UPDATE_DRIVER(naughtyb_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", naughtyb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_naughtyb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(naughtyb_state, naughtyb)
 
@@ -460,7 +460,7 @@ MACHINE_CONFIG_START(naughtyb_state::popflame)
 	MCFG_SCREEN_UPDATE_DRIVER(naughtyb_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", naughtyb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_naughtyb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(naughtyb_state, naughtyb)
 
@@ -857,7 +857,7 @@ ROM_START( trvgns )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(naughtyb_state,popflame)
+void naughtyb_state::init_popflame()
 {
 	/* install a handler to catch protection checks */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9000, 0x9000, read8_delegate(FUNC(naughtyb_state::popflame_protection_r),this));
@@ -892,7 +892,7 @@ WRITE8_MEMBER(naughtyb_state::trvmstr_questions_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(naughtyb_state,trvmstr)
+void naughtyb_state::init_trvmstr()
 {
 	/* install questions' handlers  */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xc002, read8_delegate(FUNC(naughtyb_state::trvmstr_questions_r),this), write8_delegate(FUNC(naughtyb_state::trvmstr_questions_w),this));
@@ -901,16 +901,16 @@ DRIVER_INIT_MEMBER(naughtyb_state,trvmstr)
 }
 
 
-GAME( 1982, naughtyb,  0,        naughtyb, naughtyb, naughtyb_state, 0,        ROT90, "Jaleco", "Naughty Boy", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, naughtyba, naughtyb, naughtyb, naughtyb, naughtyb_state, 0,        ROT90, "bootleg", "Naughty Boy (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, naughtybb, naughtyb, naughtyb, naughtyb, naughtyb_state, 0,        ROT90, "bootleg", "Naughty Boy (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, naughtybc, naughtyb, naughtyb, naughtyb, naughtyb_state, 0,        ROT90, "Jaleco (Cinematronics license)", "Naughty Boy (Cinematronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popflame,  0,        popflame, naughtyb, naughtyb_state, popflame, ROT90, "Jaleco", "Pop Flamer (protected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popflamea, popflame, popflame, naughtyb, naughtyb_state, 0,        ROT90, "Jaleco", "Pop Flamer (not protected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popflameb, popflame, popflame, naughtyb, naughtyb_state, 0,        ROT90, "Jaleco", "Pop Flamer (hack?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popflamen, popflame, naughtyb, naughtyb, naughtyb_state, 0,        ROT90, "Jaleco", "Pop Flamer (bootleg on Naughty Boy PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvmstr,   0,        naughtyb, trvmstr,  naughtyb_state, trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvmstra,  trvmstr,  naughtyb, trvmstr,  naughtyb_state, trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvmstrb,  trvmstr,  naughtyb, trvmstr,  naughtyb_state, trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvmstrc,  trvmstr,  naughtyb, trvmstr,  naughtyb_state, trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvgns,    trvmstr,  naughtyb, trvmstr,  naughtyb_state, trvmstr,  ROT90, "bootleg", "Trivia Genius", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, naughtyb,  0,        naughtyb, naughtyb, naughtyb_state, empty_init,    ROT90, "Jaleco", "Naughty Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, naughtyba, naughtyb, naughtyb, naughtyb, naughtyb_state, empty_init,    ROT90, "bootleg", "Naughty Boy (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, naughtybb, naughtyb, naughtyb, naughtyb, naughtyb_state, empty_init,    ROT90, "bootleg", "Naughty Boy (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, naughtybc, naughtyb, naughtyb, naughtyb, naughtyb_state, empty_init,    ROT90, "Jaleco (Cinematronics license)", "Naughty Boy (Cinematronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popflame,  0,        popflame, naughtyb, naughtyb_state, init_popflame, ROT90, "Jaleco", "Pop Flamer (protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popflamea, popflame, popflame, naughtyb, naughtyb_state, empty_init,    ROT90, "Jaleco", "Pop Flamer (not protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popflameb, popflame, popflame, naughtyb, naughtyb_state, empty_init,    ROT90, "Jaleco", "Pop Flamer (hack?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popflamen, popflame, naughtyb, naughtyb, naughtyb_state, empty_init,    ROT90, "Jaleco", "Pop Flamer (bootleg on Naughty Boy PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmstr,   0,        naughtyb, trvmstr,  naughtyb_state, init_trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmstra,  trvmstr,  naughtyb, trvmstr,  naughtyb_state, init_trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmstrb,  trvmstr,  naughtyb, trvmstr,  naughtyb_state, init_trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmstrc,  trvmstr,  naughtyb, trvmstr,  naughtyb_state, init_trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvgns,    trvmstr,  naughtyb, trvmstr,  naughtyb_state, init_trvmstr,  ROT90, "bootleg", "Trivia Genius", MACHINE_SUPPORTS_SAVE )

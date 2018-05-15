@@ -214,7 +214,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( murogem )
+static GFXDECODE_START( gfx_murogem )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(murogem_state::murogem)
 	MCFG_SCREEN_UPDATE_DRIVER(murogem_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", murogem)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_murogem)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(murogem_state, murogem)
 
@@ -335,7 +335,7 @@ ROM_START( lasvegas )
 	ROM_LOAD( "a3.1b", 0x0000, 0x0020, CRC(abddfb6b) SHA1(ed78b93701b5a3bf2053d2584e9a354fb6cec203) )   /* 74s288 at 1B */
 ROM_END
 
-GAME( 198?, murogem,  0,       murogem, murogem, murogem_state, 0, ROT0, "<unknown>", "Muroge Monaco (set 1)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, murogema, murogem, murogem, murogem, murogem_state, 0, ROT0, "<unknown>", "Muroge Monaco (set 2)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, murogemb, murogem, murogem, murogem, murogem_state, 0, ROT0, "<unknown>", "Muroge Monaco (set 3)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, lasvegas, murogem, murogem, murogem, murogem_state, 0, ROT0, "hack",      "Las Vegas, Nevada",     MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, murogem,  0,       murogem, murogem, murogem_state, empty_init, ROT0, "<unknown>", "Muroge Monaco (set 1)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, murogema, murogem, murogem, murogem, murogem_state, empty_init, ROT0, "<unknown>", "Muroge Monaco (set 2)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, murogemb, murogem, murogem, murogem, murogem_state, empty_init, ROT0, "<unknown>", "Muroge Monaco (set 3)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, lasvegas, murogem, murogem, murogem, murogem_state, empty_init, ROT0, "hack",      "Las Vegas, Nevada",     MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

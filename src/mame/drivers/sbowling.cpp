@@ -363,7 +363,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( sbowling )
+static GFXDECODE_START( gfx_sbowling )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x18, 1 )
 GFXDECODE_END
 
@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(sbowling_state::sbowling)
 	MCFG_SCREEN_UPDATE_DRIVER(sbowling_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbowling)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbowling)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_INIT_OWNER(sbowling_state, sbowling)
@@ -454,4 +454,4 @@ ROM_START( sbowling )
 	ROM_LOAD( "kb09.6m",        0x0400, 0x0400, CRC(e29191a6) SHA1(9a2c78a96ef6d118f4dacbea0b7d454b66a452ae))
 ROM_END
 
-GAME( 1982, sbowling, 0, sbowling, sbowling, sbowling_state, 0, ROT90, "Taito Corporation", "Strike Bowling", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sbowling, 0, sbowling, sbowling, sbowling_state, empty_init, ROT90, "Taito Corporation", "Strike Bowling", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

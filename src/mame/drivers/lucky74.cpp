@@ -1390,7 +1390,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( lucky74 )
+static GFXDECODE_START( gfx_lucky74 )
 	GFXDECODE_ENTRY( "fgtiles", 0, tilelayout, 0, 16 )      /* text, frames & cards */
 	GFXDECODE_ENTRY( "bgtiles", 0, tilelayout, 256, 16 )    /* title & whores */
 GFXDECODE_END
@@ -1503,7 +1503,7 @@ MACHINE_CONFIG_START(lucky74_state::lucky74)
 	MCFG_SCREEN_UPDATE_DRIVER(lucky74_state, screen_update_lucky74)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lucky74)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lucky74)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(lucky74_state, lucky74)
@@ -1747,8 +1747,8 @@ ROM_END
 *                Game Drivers                *
 **********************************************/
 
-//     YEAR  NAME      PARENT   MACHINE  INPUT     STATS           INIT  ROT   COMPANY            FULLNAME                    FLAGS                LAYOUT
-GAMEL( 1988, lucky74,  0,       lucky74, lucky74,  lucky74_state,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 1)", 0,                   layout_lucky74 )
-GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74a, lucky74_state,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 3)", 0,                   layout_lucky74 )
-GAMEL( 1988, lucky74b, lucky74, lucky74, lucky74,  lucky74_state,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", MACHINE_NOT_WORKING, layout_lucky74 )
-GAME(  1989, excitbj,  0,       lucky74, excitbj,  lucky74_state,  0,    ROT0, "Sega",           "Exciting Black Jack",       MACHINE_NOT_WORKING )
+//     YEAR  NAME      PARENT   MACHINE  INPUT     STATS          INIT        ROT   COMPANY            FULLNAME                    FLAGS                LAYOUT
+GAMEL( 1988, lucky74,  0,       lucky74, lucky74,  lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 1)", 0,                   layout_lucky74 )
+GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74a, lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 3)", 0,                   layout_lucky74 )
+GAMEL( 1988, lucky74b, lucky74, lucky74, lucky74,  lucky74_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", MACHINE_NOT_WORKING, layout_lucky74 )
+GAME(  1989, excitbj,  0,       lucky74, excitbj,  lucky74_state, empty_init, ROT0, "Sega",           "Exciting Black Jack",       MACHINE_NOT_WORKING )

@@ -245,7 +245,7 @@ void tsispch_state::machine_reset()
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
 }
 
-DRIVER_INIT_MEMBER(tsispch_state,prose2k)
+void tsispch_state::init_prose2k()
 {
 	uint8_t *dspsrc = (uint8_t *)(memregion("dspprgload")->base());
 	uint32_t *dspprg = (uint32_t *)(memregion("dspprg")->base());
@@ -266,28 +266,27 @@ DRIVER_INIT_MEMBER(tsispch_state,prose2k)
 	// b1  15 16 17 18 19 20 21 22 ->      22 21 20 19 18 17 16 15
 	// b2  L  8  9  10 11 12 13 14 ->      14 13 12 11 10 9  8  7
 	// b3  0  1  2  3  4  5  6  7  ->      6  5  X  X  3  2  1  0
-	uint8_t byte1t;
-	uint16_t byte23t;
-		for (int i = 0; i < 0x600; i+= 3)
+	for (int i = 0; i < 0x600; i+= 3)
+	{
+		uint8_t byte1t = bitswap<8>(dspsrc[0+i], 0, 1, 2, 3, 4, 5, 6, 7);
+		uint16_t byte23t;
+		// here's where things get disgusting: if the first byte was an OP or RT, do the following:
+		if ((byte1t&0x80) == 0x00) // op or rt instruction
 		{
-			byte1t = bitswap<8>(dspsrc[0+i], 0, 1, 2, 3, 4, 5, 6, 7);
-			// here's where things get disgusting: if the first byte was an OP or RT, do the following:
-			if ((byte1t&0x80) == 0x00) // op or rt instruction
-			{
-				byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 15, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5, 6, 7);
-			}
-			else if ((byte1t&0xC0) == 0x80) // jp instruction
-			{
-				byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 15, 15, 15, 10, 11, 12, 13, 14, 0, 1, 2, 3, 6, 7);
-			}
-			else // ld instruction
-			{
-				byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 3, 4, 5, 6, 7);
-			}
-
-			*dspprg = byte1t<<24 | byte23t<<8;
-			dspprg++;
+			byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 15, 11, 12, 13, 14, 0, 1, 2, 3, 4, 5, 6, 7);
 		}
+		else if ((byte1t&0xC0) == 0x80) // jp instruction
+		{
+			byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 15, 15, 15, 10, 11, 12, 13, 14, 0, 1, 2, 3, 6, 7);
+		}
+		else // ld instruction
+		{
+			byte23t = bitswap<16>( (((uint16_t)dspsrc[1+i]<<8)|dspsrc[2+i]), 8, 9, 10, 11, 12, 13, 14, 0, 1, 2, 3, 3, 4, 5, 6, 7);
+		}
+
+		*dspprg = byte1t<<24 | byte23t<<8;
+		dspprg++;
+	}
 	m_paramReg = 0x00; // on power up, all leds on, reset to upd7720 is high
 }
 
@@ -546,6 +545,6 @@ ROM_START( prose2ko )
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    STATE          INIT     COMPANY                                FULLNAME                  FLAGS
-COMP( 1987, prose2k,  0,       0,      prose2k, prose2k, tsispch_state, prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v3.4.1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1982, prose2ko, prose2k, 0,      prose2k, prose2k, tsispch_state, prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v1.1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                                FULLNAME                  FLAGS
+COMP( 1987, prose2k,  0,       0,      prose2k, prose2k, tsispch_state, init_prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v3.4.1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, prose2ko, prose2k, 0,      prose2k, prose2k, tsispch_state, init_prose2k, "Telesensory Systems Inc/Speech Plus", "Prose 2000/2020 v1.1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

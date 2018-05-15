@@ -135,7 +135,7 @@ static const gfx_layout pgc_charlayout =
 	8*16                    /* every char takes 10 bytes */
 };
 
-static GFXDECODE_START( pgc )
+static GFXDECODE_START( gfx_pgc )
 	GFXDECODE_REVERSEBITS("chargen", 0, pgc_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -172,7 +172,7 @@ MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, isa8_pgc_device, vblank_irq))
 #endif
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pgc)
 	MCFG_PALETTE_ADD( "palette", 256 )
 MACHINE_CONFIG_END
 
@@ -378,13 +378,13 @@ WRITE8_MEMBER(isa8_pgc_device::lut_w)
 
 	if (offset & 1)
 	{
-		m_lut[o + 2] = (data & 15) << 4;
+		m_lut[o + 2] = (data & 15) * 17;
 		m_palette->set_pen_color( offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] );
 		LOG("lut W @ %02X <- %d %d %d\n",
 			offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] );
 	} else {
-		m_lut[o    ] = data & 0xf0;
-		m_lut[o + 1] = (data & 15) << 4;
+		m_lut[o    ] = (data >> 4) * 17;
+		m_lut[o + 1] = (data & 15) * 17;
 	}
 }
 

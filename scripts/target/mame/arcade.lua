@@ -621,6 +621,7 @@ MACHINES["INPUT_MERGER"] = true
 MACHINES["K054321"] = true
 MACHINES["ADC0844"] = true
 MACHINES["GEN_FIFO"] = true
+MACHINES["Z80DAISY"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -3474,8 +3475,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/wiz.cpp",
 	MAME_DIR .. "src/mame/includes/wiz.h",
 	MAME_DIR .. "src/mame/video/wiz.cpp",
-	MAME_DIR .. "src/mame/machine/seicop.cpp",
-	MAME_DIR .. "src/mame/machine/seicop.h",
+	MAME_DIR .. "src/mame/machine/seicopbl.cpp",
+	MAME_DIR .. "src/mame/machine/seicopbl.h",
 	MAME_DIR .. "src/mame/machine/seibuspi.cpp",
 	MAME_DIR .. "src/mame/machine/seibuspi.h",
 	MAME_DIR .. "src/mame/audio/seibu.cpp",

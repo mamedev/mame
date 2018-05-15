@@ -435,13 +435,13 @@ static const gfx_layout sauro_spritelayout =
 	16*16     /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( sauro )
+static GFXDECODE_START( gfx_sauro )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx3", 0, sauro_spritelayout, 0, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( trckydoc )
+static GFXDECODE_START( gfx_trckydoc )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, trckydoc_spritelayout, 0, 64 )
 GFXDECODE_END
@@ -489,7 +489,7 @@ MACHINE_CONFIG_START(sauro_state::trckydoc)
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, sauro_state, coin1_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, sauro_state, coin2_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trckydoc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trckydoc)
 
 	MCFG_VIDEO_START_OVERRIDE(sauro_state,trckydoc)
 	MCFG_SCREEN_MODIFY("screen")
@@ -516,7 +516,7 @@ MACHINE_CONFIG_START(sauro_state::sauro)
 	MCFG_DEVICE_PROGRAM_MAP(sauro_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(sauro_state, irq0_line_hold,  8*60) // ?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sauro)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sauro)
 
 	MCFG_VIDEO_START_OVERRIDE(sauro_state,sauro)
 	MCFG_SCREEN_MODIFY("screen")
@@ -741,7 +741,7 @@ ROM_START( trckydoca )
 	ROM_LOAD( "tdprm.prm",    0x0000, 0x0200,  CRC(5261bc11) SHA1(1cc7a9a7376e65f4587b75ef9382049458656372) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sauro_state,tecfri)
+void sauro_state::init_tecfri()
 {
 	/* This game doesn't like all memory to be initialized to zero, it won't
 	   initialize the high scores */
@@ -752,10 +752,10 @@ DRIVER_INIT_MEMBER(sauro_state,tecfri)
 	RAM[0xe000] = 1;
 }
 
-GAME( 1987, sauro,    0,        sauro,    tecfri,    sauro_state, tecfri, ROT0, "Tecfri",                                "Sauro", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, saurop,   sauro,    sauro,    tecfri,    sauro_state, tecfri, ROT0, "Tecfri (Philko license)",               "Sauro (Philko license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, saurorr,  sauro,    sauro,    tecfri,    sauro_state, tecfri, ROT0, "Tecfri (Recreativos Real S.A. license)","Sauro (Recreativos Real S.A. license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, saurob,   sauro,    saurob,   saurob,    sauro_state, tecfri, ROT0, "bootleg",                               "Sauro (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sauro,    0,        sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri",                                "Sauro", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, saurop,   sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri (Philko license)",               "Sauro (Philko license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, saurorr,  sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri (Recreativos Real S.A. license)","Sauro (Recreativos Real S.A. license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, saurob,   sauro,    saurob,   saurob,    sauro_state, init_tecfri, ROT0, "bootleg",                               "Sauro (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, trckydoc, 0,        trckydoc, tecfri,    sauro_state, tecfri, ROT0, "Tecfri", "Tricky Doc (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, trckydoca,trckydoc, trckydoc, trckydoca, sauro_state, tecfri, ROT0, "Tecfri", "Tricky Doc (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, trckydoc, 0,        trckydoc, tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri", "Tricky Doc (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, trckydoca,trckydoc, trckydoc, trckydoca, sauro_state, init_tecfri, ROT0, "Tecfri", "Tricky Doc (set 2)", MACHINE_SUPPORTS_SAVE )

@@ -364,7 +364,7 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( baraduke )
+static GFXDECODE_START( gfx_baraduke )
 	GFXDECODE_ENTRY( "gfx1", 0,      text_layout,  0, 512 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, tile_layout,  0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0x4000, tile_layout,  0, 256 )
@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(baraduke_state::baraduke)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, baraduke_state, screen_vblank_baraduke))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", baraduke)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_baraduke)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_INIT_OWNER(baraduke_state, baraduke)
 
@@ -525,19 +525,16 @@ ROM_START( metrocrsa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(baraduke_state,baraduke)
+void baraduke_state::init_baraduke()
 {
-	uint8_t *rom;
-	int i;
-
 	/* unpack the third tile ROM */
-	rom = memregion("gfx2")->base() + 0x8000;
-	for (i = 0x2000;i < 0x4000;i++)
+	uint8_t *rom = memregion("gfx2")->base() + 0x8000;
+	for (int i = 0x2000; i < 0x4000; i++)
 	{
 		rom[i + 0x2000] = rom[i];
 		rom[i + 0x4000] = rom[i] << 4;
 	}
-	for (i = 0;i < 0x2000;i++)
+	for (int i = 0; i < 0x2000; i++)
 	{
 		rom[i + 0x2000] = rom[i] << 4;
 	}
@@ -545,7 +542,7 @@ DRIVER_INIT_MEMBER(baraduke_state,baraduke)
 
 
 
-GAME( 1985, metrocrs, 0,        baraduke, metrocrs, baraduke_state, baraduke, ROT0, "Namco", "Metro-Cross (set 1)", 0 )
-GAME( 1985, metrocrsa,metrocrs, baraduke, metrocrs, baraduke_state, baraduke, ROT0, "Namco", "Metro-Cross (set 2)", 0 )
-GAME( 1985, aliensec, 0,        baraduke, baraduke, baraduke_state, baraduke, ROT0, "Namco", "Alien Sector", 0 )
-GAME( 1985, baraduke, aliensec, baraduke, baraduke, baraduke_state, baraduke, ROT0, "Namco", "Baraduke", 0 )
+GAME( 1985, metrocrs,  0,        baraduke, metrocrs, baraduke_state, init_baraduke, ROT0, "Namco", "Metro-Cross (set 1)", 0 )
+GAME( 1985, metrocrsa, metrocrs, baraduke, metrocrs, baraduke_state, init_baraduke, ROT0, "Namco", "Metro-Cross (set 2)", 0 )
+GAME( 1985, aliensec,  0,        baraduke, baraduke, baraduke_state, init_baraduke, ROT0, "Namco", "Alien Sector", 0 )
+GAME( 1985, baraduke,  aliensec, baraduke, baraduke, baraduke_state, init_baraduke, ROT0, "Namco", "Baraduke", 0 )

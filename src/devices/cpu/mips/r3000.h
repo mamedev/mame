@@ -194,7 +194,8 @@ protected:
 	const address_space_config m_program_config_be;
 	const address_space_config m_program_config_le;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	std::function<u32 (offs_t)> m_pr32;
+	std::function<const void * (offs_t)> m_prptr;
 
 	// configuration
 	chip_type       m_chip_type;

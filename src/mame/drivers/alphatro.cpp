@@ -580,7 +580,7 @@ static const gfx_layout charlayout =
 	8*16
 };
 
-static GFXDECODE_START( alphatro )
+static GFXDECODE_START( gfx_alphatro )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 4 )
 GFXDECODE_END
 
@@ -711,7 +711,7 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", alphatro)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatro)
 	MCFG_PALETTE_ADD("palette", 9) // 8 colours + amber
 	MCFG_PALETTE_INIT_OWNER(alphatro_state, alphatro)
 
@@ -816,4 +816,4 @@ ROM_START( alphatro )
 	ROMX_LOAD( "b40r_ic1067.bin",   0x0000, 0x1000, CRC(543e3ee8) SHA1(3e6c6f8c85d3a5d0735edfec52709c5670ff1646), ROM_BIOS(3) )
 ROM_END
 
-COMP( 1983, alphatro,   0,        0,    alphatro,   alphatro, alphatro_state,  0,  "Triumph-Adler", "Alphatronic PC", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, alphatro, 0, 0, alphatro, alphatro, alphatro_state, empty_init, "Triumph-Adler", "Alphatronic PC", MACHINE_SUPPORTS_SAVE )

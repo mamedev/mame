@@ -81,7 +81,7 @@ WRITE8_MEMBER(exzisus_state::cpub_reset_w)
 #if 0
 // without cpub_reset_w, the following patch would be needed for
 // the RAM check to work
-DRIVER_INIT_MEMBER(exzisus_state,exzisus)
+void exzisus_state::init_exzisus()
 {
 	uint8_t *RAM = memregion("cpua")->base();
 
@@ -221,7 +221,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( exzisus )
+static GFXDECODE_START( gfx_exzisus )
 	GFXDECODE_ENTRY( "bg0", 0, charlayout,   0, 256 )
 	GFXDECODE_ENTRY( "bg1", 0, charlayout, 256, 256 )
 GFXDECODE_END
@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(exzisus_state::exzisus)
 	MCFG_SCREEN_UPDATE_DRIVER(exzisus_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exzisus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exzisus)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
 
 	/* sound hardware */
@@ -394,6 +394,6 @@ ROM_START( exzisust )
 	ROM_LOAD( "b23-05.16l", 0x00800, 0x00400, CRC(87f0f69a) SHA1(37df6fd56245fab9beaabfd86fd8f95d7c42c2a5) )
 ROM_END
 
-GAME( 1987, exzisus,  0,       exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation",               "Exzisus (Japan, dedicated)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exzisusa, exzisus, exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation",               "Exzisus (Japan, conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exzisust, exzisus, exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisus,  0,       exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito Corporation",               "Exzisus (Japan, dedicated)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisusa, exzisus, exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito Corporation",               "Exzisus (Japan, conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisust, exzisus, exzisus, exzisus, exzisus_state, empty_init, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)",       MACHINE_SUPPORTS_SAVE )

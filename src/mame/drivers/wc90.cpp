@@ -331,7 +331,7 @@ static const gfx_layout spritelayout8 =
 };
 
 
-static GFXDECODE_START( wc90 )
+static GFXDECODE_START( gfx_wc90 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,       1*16*16, 16*16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,       2*16*16, 16*16 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,       3*16*16, 16*16 )
@@ -372,7 +372,7 @@ MACHINE_CONFIG_START(wc90_state::wc90)
 	MCFG_SCREEN_UPDATE_DRIVER(wc90_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wc90)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wc90)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -568,9 +568,9 @@ ROM_START( pac90 )
 ROM_END
 
 
-GAME( 1989, twcup90,  0,       wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (World)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90a, twcup90, wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90b, twcup90, wc90,  wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twcup90t, twcup90, wc90t, wc90,  wc90_state, 0, ROT0,  "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90,  0,       wc90,  wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (World)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90a, twcup90, wc90,  wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90b, twcup90, wc90,  wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (Euro set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90t, twcup90, wc90t, wc90,  wc90_state, empty_init, ROT0,  "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, pac90, puckman, pac90, pac90, wc90_state, 0, ROT90, "bootleg (Macro)", "Pac-Man (bootleg on World Cup '90 hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // made by Mike Coates etc.
+GAME( 199?, pac90, puckman, pac90, pac90, wc90_state, empty_init, ROT90, "bootleg (Macro)", "Pac-Man (bootleg on World Cup '90 hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // made by Mike Coates etc.

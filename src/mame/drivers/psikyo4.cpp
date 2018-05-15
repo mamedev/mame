@@ -138,7 +138,7 @@ ROMs -
 
 static GFXLAYOUT_RAW( layout_16x16x8, 16, 16, 16*8, 16*16*8 )
 
-static GFXDECODE_START( ps4 )
+static GFXDECODE_START( gfx_ps4 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x40 ) // 8bpp tiles
 GFXDECODE_END
 
@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(psikyo4_state::ps4big)
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", ps4)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_ps4)
 	MCFG_PALETTE_ADD("lpalette", (0x2000/4) + 1) /* palette + clear colour */
 	MCFG_PALETTE_ADD("rpalette", (0x2000/4) + 1)
 
@@ -914,12 +914,12 @@ ROM_START( hotdebut )
 ROM_END
 
 
-//    YEAR  NAME      PARENT    MACHINE    INPUT     INIT              MONITOR COMPANY          FULLNAME                                        FLAGS
-GAME( 1997, hotgmck,  0,        ps4big,    hotgmck,  psikyo4_state, 0, ROT0,   "Psikyo",        "Taisen Hot Gimmick (Japan)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1998, hgkairak, 0,        ps4big,    hotgmck,  psikyo4_state, 0, ROT0,   "Psikyo",        "Taisen Hot Gimmick Kairakuten (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1999, hotgmck3, 0,        ps4big,    hotgmck,  psikyo4_state, 0, ROT0,   "Psikyo",        "Taisen Hot Gimmick 3 Digital Surfing (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hotgm4ev, 0,        ps4big,    hotgmck,  psikyo4_state, 0, ROT0,   "Psikyo",        "Taisen Hot Gimmick 4 Ever (Japan)",            MACHINE_SUPPORTS_SAVE )
-GAME( 2001, hotgmcki, 0,        ps4big,    hotgmck,  psikyo4_state, 0, ROT0,   "Psikyo",        "Mahjong Hot Gimmick Integral (Japan)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2000, loderndf, 0,        ps4small,  loderndf, psikyo4_state, 0, ROT0,   "Psikyo",        "Lode Runner - The Dig Fight (ver. B)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2000, loderndfa,loderndf, ps4small,  loderndf, psikyo4_state, 0, ROT0,   "Psikyo",        "Lode Runner - The Dig Fight (ver. A)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hotdebut, 0,        ps4small,  hotdebut, psikyo4_state, 0, ROT0,   "MOSS / Psikyo", "Quiz de Idol! Hot Debut (Japan)",              MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    MACHINE    INPUT     STATE          INIT        MONITOR COMPANY          FULLNAME                                        FLAGS
+GAME( 1997, hotgmck,  0,        ps4big,    hotgmck,  psikyo4_state, empty_init, ROT0,   "Psikyo",        "Taisen Hot Gimmick (Japan)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1998, hgkairak, 0,        ps4big,    hotgmck,  psikyo4_state, empty_init, ROT0,   "Psikyo",        "Taisen Hot Gimmick Kairakuten (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hotgmck3, 0,        ps4big,    hotgmck,  psikyo4_state, empty_init, ROT0,   "Psikyo",        "Taisen Hot Gimmick 3 Digital Surfing (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hotgm4ev, 0,        ps4big,    hotgmck,  psikyo4_state, empty_init, ROT0,   "Psikyo",        "Taisen Hot Gimmick 4 Ever (Japan)",            MACHINE_SUPPORTS_SAVE )
+GAME( 2001, hotgmcki, 0,        ps4big,    hotgmck,  psikyo4_state, empty_init, ROT0,   "Psikyo",        "Mahjong Hot Gimmick Integral (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, loderndf, 0,        ps4small,  loderndf, psikyo4_state, empty_init, ROT0,   "Psikyo",        "Lode Runner - The Dig Fight (ver. B)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, loderndfa,loderndf, ps4small,  loderndf, psikyo4_state, empty_init, ROT0,   "Psikyo",        "Lode Runner - The Dig Fight (ver. A)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hotdebut, 0,        ps4small,  hotdebut, psikyo4_state, empty_init, ROT0,   "MOSS / Psikyo", "Quiz de Idol! Hot Debut (Japan)",              MACHINE_SUPPORTS_SAVE )

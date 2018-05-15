@@ -786,7 +786,7 @@ static const gfx_layout cb2001_layout32 =
 	32*32
 };
 
-static GFXDECODE_START( cb2001 )
+static GFXDECODE_START( gfx_cb2001 )
 	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout,   0x0, 32 )
 	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout32, 0x0, 32 )
 GFXDECODE_END
@@ -837,7 +837,7 @@ MACHINE_CONFIG_START(cb2001_state::cb2001)
 	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cb2001)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cb2001)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -882,5 +882,5 @@ ROM_START( scherrym )
 	ROM_LOAD( "n82s135-2.bin", 0x200, 0x100, CRC(a19821db) SHA1(62dda90dd67dfbc0b96f161f1f2b7a46a5805eae) )
 ROM_END
 
-GAME( 2001, cb2001,    0,      cb2001,      cb2001, cb2001_state,   0, ROT0,  "Dyna", "Cherry Bonus 2001",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 2001, scherrym,  0,      cb2001,      cb2001, cb2001_state,   0, ROT0,  "Dyna", "Super Cherry Master", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
+GAME( 2001, cb2001,   0, cb2001, cb2001, cb2001_state, empty_init, ROT0, "Dyna", "Cherry Bonus 2001",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2001, scherrym, 0, cb2001, cb2001, cb2001_state, empty_init, ROT0, "Dyna", "Super Cherry Master", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)

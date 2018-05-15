@@ -29,7 +29,7 @@
 #include "speaker.h"
 
 
-static GFXDECODE_START( ac1 )
+static GFXDECODE_START( gfx_ac1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ac1_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -150,7 +150,7 @@ MACHINE_CONFIG_START(ac1_state::ac1)
 	MCFG_SCREEN_UPDATE_DRIVER(ac1_state, screen_update_ac1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ac1 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ac1 )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -219,7 +219,7 @@ ROM_START( ac1scch )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY         FULLNAME   FLAGS */
-COMP( 1984, ac1,     0,      0,      ac1,     ac1,   ac1_state, ac1,  "Frank Heyder", "Amateurcomputer AC1 Berlin", 0 )
-COMP( 1984, ac1_32,  ac1,    0,      ac1_32,  ac1,   ac1_state, ac1,  "Frank Heyder", "Amateurcomputer AC1 Berlin (32 lines)", 0 )
-COMP( 1984, ac1scch, ac1,    0,      ac1_32,  ac1,   ac1_state, ac1,  "Frank Heyder", "Amateurcomputer AC1 SCCH", 0 )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT      COMPANY         FULLNAME                                 FLAGS */
+COMP( 1984, ac1,     0,      0,      ac1,     ac1,   ac1_state, init_ac1, "Frank Heyder", "Amateurcomputer AC1 Berlin",            0 )
+COMP( 1984, ac1_32,  ac1,    0,      ac1_32,  ac1,   ac1_state, init_ac1, "Frank Heyder", "Amateurcomputer AC1 Berlin (32 lines)", 0 )
+COMP( 1984, ac1scch, ac1,    0,      ac1_32,  ac1,   ac1_state, init_ac1, "Frank Heyder", "Amateurcomputer AC1 SCCH",              0 )

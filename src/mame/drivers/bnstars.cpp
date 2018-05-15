@@ -148,7 +148,7 @@ public:
 	DECLARE_WRITE32_MEMBER(ms32_roz1_ram_w);
 	DECLARE_WRITE32_MEMBER(bnstars1_mahjong_select_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
-	DECLARE_DRIVER_INIT(bnstars);
+	void init_bnstars();
 	TILE_GET_INFO_MEMBER(get_ms32_tx0_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_tx1_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_bg0_tile_info);
@@ -700,7 +700,7 @@ static GFXLAYOUT_RAW( spritelayout, 256, 256, 256*8, 256*256*8 )
 static GFXLAYOUT_RAW( bglayout, 16, 16, 16*8, 16*16*8 )
 static GFXLAYOUT_RAW( txlayout, 8, 8, 8*8, 8*8*8 )
 
-static GFXDECODE_START( bnstars )
+static GFXDECODE_START( gfx_bnstars )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x0000, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x5000, 0x10 ) /* Roz scr1 */
 	GFXDECODE_ENTRY( "gfx4", 0, bglayout,     0x1000, 0x10 ) /* Bg scr1 */
@@ -817,7 +817,7 @@ MACHINE_CONFIG_START(bnstars_state::bnstars)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bnstars)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bnstars)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_FORMAT(XBRG)
@@ -925,7 +925,7 @@ ROM_END
 
 
 /* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi1 */
-DRIVER_INIT_MEMBER(bnstars_state,bnstars)
+void bnstars_state::init_bnstars()
 {
 	ms32_rearrange_sprites(machine(), "gfx1");
 
@@ -937,4 +937,4 @@ DRIVER_INIT_MEMBER(bnstars_state,bnstars)
 	configure_banks();
 }
 
-GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars_state, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, bnstars1, 0, bnstars, bnstars, bnstars_state, init_bnstars, ROT0, "Jaleco", "Vs. Janshi Brandnew Stars", MACHINE_IMPERFECT_GRAPHICS )

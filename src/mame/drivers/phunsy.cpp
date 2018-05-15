@@ -52,7 +52,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(phunsy);
+	void init_phunsy();
 	DECLARE_READ8_MEMBER(phunsy_data_r);
 	DECLARE_WRITE8_MEMBER(phunsy_ctrl_w);
 	DECLARE_WRITE8_MEMBER(phunsy_data_w);
@@ -277,7 +277,7 @@ static const gfx_layout phunsy_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( phunsy )
+static GFXDECODE_START( gfx_phunsy )
 	GFXDECODE_ENTRY( "chargen", 0x0000, phunsy_charlayout, 1, 3 )
 GFXDECODE_END
 
@@ -321,7 +321,7 @@ QUICKLOAD_LOAD_MEMBER( phunsy_state, phunsy )
 	return result;
 }
 
-DRIVER_INIT_MEMBER( phunsy_state, phunsy )
+void phunsy_state::init_phunsy()
 {
 	uint8_t *main = memregion("maincpu")->base();
 	uint8_t *roms = memregion("roms")->base();
@@ -358,7 +358,7 @@ MACHINE_CONFIG_START(phunsy_state::phunsy)
 	MCFG_SCREEN_UPDATE_DRIVER(phunsy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phunsy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phunsy)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(phunsy_state, phunsy)
 
@@ -399,5 +399,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY            FULLNAME  FLAGS */
-COMP( 1980, phunsy, 0,      0,       phunsy,    phunsy, phunsy_state,  phunsy, "J.F.P. Philipse", "PHUNSY", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY            FULLNAME  FLAGS */
+COMP( 1980, phunsy, 0,      0,      phunsy,  phunsy, phunsy_state, init_phunsy, "J.F.P. Philipse", "PHUNSY", MACHINE_NOT_WORKING )

@@ -32,7 +32,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(gts80a);
+	void init_gts80a();
 	DECLARE_READ8_MEMBER(port1a_r);
 	DECLARE_READ8_MEMBER(port2a_r);
 	DECLARE_WRITE8_MEMBER(port1b_w);
@@ -338,7 +338,7 @@ void gts80a_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER( gts80a_state, gts80a )
+void gts80a_state::init_gts80a()
 {
 }
 
@@ -820,29 +820,29 @@ ROM_START(touchdn)
 ROM_END
 
 
-/* cust  */GAME(1981,   dvlsdre,    0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Devil's Dare",                MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME(1981,   dvlsdre2,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Devil's Dare (Sound Only)",   MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME(1982,   rocky,      0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Rocky",                       MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME(1982,   rockyf,     rocky,   gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Rocky (French speech)",       MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME(1982,   spirit,     0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Spirit",                      MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1982,   punk,       0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Punk!",                       MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME(1982,   striker,    0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Striker",                     MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME(1983,   krullp,     0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Krull (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1983,   qbquest,    0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Q*Bert's Quest",              MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1983,   sorbit,     0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Super Orbit",                 MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1983,   rflshdlx,   0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Royal Flush Deluxe",          MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME(1983,   goinnuts,   0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Goin' Nuts",                  MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1983,   amazonh,    0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Amazon Hunt",                 MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1983,   amazonha,   amazonh, gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Amazon Hunt (alternate set)", MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1983,   rackempp,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Rack 'em Up! (Pinball)",      MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1983,   raimfire,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Ready...Aim...Fire!",         MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1984,   jack2opn,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Jacks to Open",               MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1984,   touchdn,    0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Touchdown",                   MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1984,   alienstr,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Alien Star",                  MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1984,   thegames,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "The Games",                   MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1984,   eldorado,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "El Dorado City of Gold",      MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1985,   icefever,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Ice Fever",                   MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1981, dvlsdre,  0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Devil's Dare",                MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1981, dvlsdre2, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Devil's Dare (Sound Only)",   MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1982, rocky,    0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Rocky",                       MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1982, rockyf,   rocky,   gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Rocky (French speech)",       MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1982, spirit,   0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Spirit",                      MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1982, punk,     0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Punk!",                       MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1982, striker,  0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Striker",                     MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1983, krullp,   0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Krull (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1983, qbquest,  0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Q*Bert's Quest",              MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1983, sorbit,   0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Super Orbit",                 MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1983, rflshdlx, 0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Royal Flush Deluxe",          MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1983, goinnuts, 0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Goin' Nuts",                  MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1983, amazonh,  0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Amazon Hunt",                 MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1983, amazonha, amazonh, gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Amazon Hunt (alternate set)", MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1983, rackempp, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Rack 'em Up! (Pinball)",      MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1983, raimfire, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Ready...Aim...Fire!",         MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1984, jack2opn, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Jacks to Open",               MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1984, touchdn,  0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Touchdown",                   MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1984, alienstr, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Alien Star",                  MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1984, thegames, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "The Games",                   MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1984, eldorado, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "El Dorado City of Gold",      MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1985, icefever, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Ice Fever",                   MACHINE_IS_SKELETON_MECHANICAL)
 
 /* custom (+video) */
-GAME(1981,  caveman,    0,          caveman, caveman, caveman_state,  gts80a, ROT0,   "Gottlieb",     "Caveman (Pinball/Video Combo, set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  cavemana,   caveman,    caveman, caveman, caveman_state,  gts80a, ROT0,   "Gottlieb",     "Caveman (Pinball/Video Combo, set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, caveman,  0,       caveman, caveman, caveman_state, init_gts80a, ROT0, "Gottlieb", "Caveman (Pinball/Video Combo, set 1)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, cavemana, caveman, caveman, caveman, caveman_state, init_gts80a, ROT0, "Gottlieb", "Caveman (Pinball/Video Combo, set 2)", MACHINE_IS_SKELETON_MECHANICAL)

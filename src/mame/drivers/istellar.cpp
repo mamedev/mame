@@ -43,7 +43,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	DECLARE_DRIVER_INIT(istellar);
+	void init_istellar();
 	void istellar(machine_config &config);
 private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
@@ -254,7 +254,7 @@ static const gfx_layout istellar_gfx_layout =
 	8*8
 };
 
-static GFXDECODE_START( istellar )
+static GFXDECODE_START( gfx_istellar )
 	GFXDECODE_ENTRY( "gfx1", 0, istellar_gfx_layout, 0x0, 0x20 )
 GFXDECODE_END
 
@@ -305,7 +305,7 @@ MACHINE_CONFIG_START(istellar_state::istellar)
 	// Daphne says "TODO: get the real interstellar resistor values"
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", istellar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_istellar)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -352,7 +352,7 @@ ROM_START( istellar )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(istellar_state,istellar)
+void istellar_state::init_istellar()
 {
 	//m_z80_2_nmi_enable = 0;
 
@@ -373,5 +373,5 @@ DRIVER_INIT_MEMBER(istellar_state,istellar)
 	#endif
 }
 
-//    YEAR  NAME      PARENT   MACHINE    INPUT     STATE            INIT      MONITOR  COMPANY          FULLNAME                       FLAGS)
-GAME( 1983, istellar, 0,       istellar,  istellar, istellar_state,  istellar, ROT0,    "Funai/Gakken",  "Interstellar Laser Fantasy",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT   MACHINE    INPUT     STATE            INIT           MONITOR  COMPANY          FULLNAME                       FLAGS)
+GAME( 1983, istellar, 0,       istellar,  istellar, istellar_state,  init_istellar, ROT0,    "Funai/Gakken",  "Interstellar Laser Fantasy",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

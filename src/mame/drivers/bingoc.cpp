@@ -242,4 +242,4 @@ ROM_START( bingoc )
 	ROM_COPY( "upd",       0x20000, 0x00000, 0x20000 )
 ROM_END
 
-GAME( 1989, bingoc,  0,    bingoc, bingoc, bingoc_state,  0, ROT0, "Sega", "Bingo Circus (Rev. A 891001)", MACHINE_NOT_WORKING )
+GAME( 1989, bingoc, 0, bingoc, bingoc, bingoc_state, empty_init, ROT0, "Sega", "Bingo Circus (Rev. A 891001)", MACHINE_NOT_WORKING )

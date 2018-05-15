@@ -372,7 +372,7 @@ static const gfx_layout k3_layout =
 };
 
 
-static GFXDECODE_START( 1945kiii )
+static GFXDECODE_START( gfx_1945kiii )
 	GFXDECODE_ENTRY( "gfx1", 0, k3_layout,   0x0, 2  ) /* bg tiles */
 	GFXDECODE_ENTRY( "gfx2", 0, k3_layout,   0x0, 2  ) /* bg tiles */
 GFXDECODE_END
@@ -388,7 +388,7 @@ MACHINE_CONFIG_START(k3_state::flagrall)
 	MCFG_DEVICE_PROGRAM_MAP(flagrall_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", k3_state,  irq4_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1945kiii)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1945kiii)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -528,8 +528,8 @@ ROM_START( flagrall )
 ROM_END
 
 
-GAME( 2000, 1945kiii,  0,        k3,       k3,       k3_state, 0, ROT270, "Oriental Soft", "1945k III (newer, OPCX2 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, 1945kiiin, 1945kiii, k3,       k3,       k3_state, 0, ROT270, "Oriental Soft", "1945k III (newer, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, 1945kiiio, 1945kiii, k3,       k3,       k3_state, 0, ROT270, "Oriental Soft", "1945k III (older, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, 1945kiii,  0,        k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (newer, OPCX2 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, 1945kiiin, 1945kiii, k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (newer, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, 1945kiiio, 1945kiii, k3,       k3,       k3_state, empty_init, ROT270, "Oriental Soft", "1945k III (older, OPCX1 PCB)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, flagrall,  0,        flagrall, flagrall, k3_state, 0, ROT0,   "Promat?",       "'96 Flag Rally",               MACHINE_SUPPORTS_SAVE )
+GAME( 1996, flagrall,  0,        flagrall, flagrall, k3_state, empty_init, ROT0,   "Promat?",       "'96 Flag Rally",               MACHINE_SUPPORTS_SAVE )

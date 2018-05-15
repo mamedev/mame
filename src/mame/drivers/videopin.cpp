@@ -346,7 +346,7 @@ static const gfx_layout ball_layout =
 };
 
 
-static GFXDECODE_START( videopin )
+static GFXDECODE_START( gfx_videopin )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tile_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, ball_layout, 0, 1 )
 GFXDECODE_END
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(videopin_state::videopin)
 	MCFG_SCREEN_UPDATE_DRIVER(videopin_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", videopin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_videopin)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -465,5 +465,5 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1979, videopin, 0, videopin, videopin, videopin_state, 0, ROT270, "Atari", "Video Pinball", MACHINE_SUPPORTS_SAVE, layout_videopin )
-GAMEL( 1979, solarwar, 0, videopin, solarwar, videopin_state, 0, ROT270, "Atari", "Solar War", MACHINE_SUPPORTS_SAVE, layout_videopin )
+GAMEL( 1979, videopin, 0, videopin, videopin, videopin_state, empty_init, ROT270, "Atari", "Video Pinball", MACHINE_SUPPORTS_SAVE, layout_videopin )
+GAMEL( 1979, solarwar, 0, videopin, solarwar, videopin_state, empty_init, ROT270, "Atari", "Solar War", MACHINE_SUPPORTS_SAVE, layout_videopin )

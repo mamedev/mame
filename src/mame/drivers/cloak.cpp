@@ -301,7 +301,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( cloak )
+static GFXDECODE_START( gfx_cloak )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  32,  1 )
 GFXDECODE_END
@@ -347,7 +347,7 @@ MACHINE_CONFIG_START(cloak_state::cloak)
 	MCFG_SCREEN_UPDATE_DRIVER(cloak_state, screen_update_cloak)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cloak)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cloak)
 	MCFG_PALETTE_ADD("palette", 64)
 
 
@@ -613,11 +613,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cloak,   0,     cloak, cloak, cloak_state, 0, ROT0, "Atari", "Cloak & Dagger (rev 5)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, cloaksp, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Cloak & Dagger (Spanish)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, cloakfr, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Cloak & Dagger (French)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, cloakgr, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Cloak & Dagger (German)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, agentx4, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Agent X (prototype, rev 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, agentx3, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Agent X (prototype, rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, agentx2, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Agent X (prototype, rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, agentx1, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Agent X (prototype, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloak,   0,     cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Cloak & Dagger (rev 5)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloaksp, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Cloak & Dagger (Spanish)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloakfr, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Cloak & Dagger (French)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloakgr, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Cloak & Dagger (German)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx4, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Agent X (prototype, rev 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx3, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Agent X (prototype, rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx2, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Agent X (prototype, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx1, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Agent X (prototype, rev 1)", MACHINE_SUPPORTS_SAVE )

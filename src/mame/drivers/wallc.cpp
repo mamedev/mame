@@ -71,10 +71,10 @@ public:
 	void wallc(machine_config &config);
 	void wallca(machine_config &config);
 
-	DECLARE_DRIVER_INIT(wallc);
-	DECLARE_DRIVER_INIT(wallca);
-	DECLARE_DRIVER_INIT(sidam);
-	DECLARE_DRIVER_INIT(unkitpkr);
+	void init_wallc();
+	void init_wallca();
+	void init_sidam();
+	void init_unkitpkr();
 
 protected:
 	virtual void video_start() override;
@@ -468,43 +468,38 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( wallc )
+static GFXDECODE_START( gfx_wallc )
 	GFXDECODE_ENTRY( "gfx1", 0     , charlayout, 0, 4 )
 GFXDECODE_END
 
 
-DRIVER_INIT_MEMBER(wallc_state, wallc)
+void wallc_state::init_wallc()
 {
-	uint8_t c;
-	uint32_t i;
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	for (i=0; i<0x2000*2; i++)
+	for (uint32_t i = 0; i < 0x2000 * 2; i++)
 	{
-		c = ROM[ i ] ^ 0x55 ^ 0xff; /* NOTE: this can be shortened but now it fully reflects what the bigger module really does */
+		uint8_t c = ROM[ i ] ^ 0x55 ^ 0xff; /* NOTE: this can be shortened but now it fully reflects what the bigger module really does */
 		c = bitswap<8>(c, 4,2,6,0,7,1,3,5); /* also swapped inside of the bigger module */
 		ROM[ i ] = c;
 	}
 }
 
-DRIVER_INIT_MEMBER(wallc_state, wallca)
+void wallc_state::init_wallca()
 {
-	uint8_t c;
-	uint32_t i;
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	for (i=0; i<0x4000; i++)
+	for (uint32_t i = 0; i < 0x4000; i++)
 	{
-		if(i & 0x100)
+		uint8_t c;
+		if (i & 0x100)
 		{
-			c = ROM[ i ] ^ 0x4a;
+			c = ROM[i] ^ 0x4a;
 			c = bitswap<8>(c, 4,7,1,3,2,0,5,6);
 		}
 		else
 		{
-			c = ROM[ i ] ^ 0xa5;
+			c = ROM[i] ^ 0xa5;
 			c = bitswap<8>(c, 0,2,3,6,1,5,7,4);
 		}
 
@@ -528,7 +523,7 @@ MACHINE_CONFIG_START(wallc_state::wallc)
 	MCFG_SCREEN_UPDATE_DRIVER(wallc_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wallc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wallc)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(wallc_state, wallc)
 
@@ -677,7 +672,7 @@ ROM_START( sidampkr )
 	ROM_LOAD( "11607-74.288",  0x0000, 0x0020, CRC(e14bf545) SHA1(5e8c5a9ea6e4842f27a47c1d7224ed294bbaa40b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(wallc_state, sidam)
+void wallc_state::init_sidam()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -755,7 +750,7 @@ ROM_START( unkitpkr )
 	ROM_LOAD( "74s288.c2",  0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) ) // dumped; matches the wallc bp
 ROM_END
 
-DRIVER_INIT_MEMBER(wallc_state, unkitpkr)
+void wallc_state::init_unkitpkr()
 {
 	// line swapping is too annoying to handle with ROM_LOAD macros
 	uint8_t buffer[0x400];
@@ -773,9 +768,9 @@ DRIVER_INIT_MEMBER(wallc_state, unkitpkr)
 
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     STATE        INIT      ROT      COMPANY             FULLNAME                              FLAGS
-GAME( 1984, wallc,    0,      wallc,    wallc,    wallc_state, wallc,    ROT0,   "Midcoin",          "Wall Crash (set 1)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wallca,   wallc,  wallca,   wallc,    wallc_state, wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1984, brkblast, wallc,  wallc,    wallc,    wallc_state, wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
+GAME( 1984, wallc,    0,      wallc,    wallc,    wallc_state, init_wallc,    ROT0,   "Midcoin",          "Wall Crash (set 1)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wallca,   wallc,  wallca,   wallc,    wallc_state, init_wallca,   ROT0,   "Midcoin",          "Wall Crash (set 2)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1984, brkblast, wallc,  wallc,    wallc,    wallc_state, init_wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
-GAME( 1984, sidampkr, 0,      sidampkr, sidampkr, wallc_state, sidam,    ROT270, "Sidam",            "unknown Sidam Poker",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs correct decoding of the color PROM. Using the unkitpkr one gives correct colors and makes the game playable.
-GAME( 198?, unkitpkr, 0,      unkitpkr, unkitpkr, wallc_state, unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sidampkr, 0,      sidampkr, sidampkr, wallc_state, init_sidam,    ROT270, "Sidam",            "unknown Sidam Poker",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs correct decoding of the color PROM. Using the unkitpkr one gives correct colors and makes the game playable.
+GAME( 198?, unkitpkr, 0,      unkitpkr, unkitpkr, wallc_state, init_unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_SUPPORTS_SAVE )

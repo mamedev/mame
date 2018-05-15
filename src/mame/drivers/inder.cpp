@@ -81,8 +81,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(qc7a_w);
 	DECLARE_WRITE_LINE_MEMBER(q9a_w);
 	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
-	DECLARE_DRIVER_INIT(inder);
-	DECLARE_DRIVER_INIT(inder1);
+	void init_inder();
+	void init_inder1();
 	void inder(machine_config &config);
 	void brvteam(machine_config &config);
 	void canasta(machine_config &config);
@@ -1330,7 +1330,7 @@ void inder_state::machine_reset()
 	}
 }
 
-DRIVER_INIT_MEMBER( inder_state, inder )
+void inder_state::init_inder()
 {
 	m_p_speech = memregion("speech")->base();
 	if (m_7a.found())
@@ -1342,7 +1342,7 @@ DRIVER_INIT_MEMBER( inder_state, inder )
 	m_game = 0;
 }
 
-DRIVER_INIT_MEMBER( inder_state, inder1 )
+void inder_state::init_inder1()
 {
 	m_p_speech = memregion("speech")->base();
 	if (m_7a.found())
@@ -1650,21 +1650,21 @@ ROM_END
 
 
 // old cpu board, 6 digits, sn76489
-GAME(1985,  brvteam,    0,    brvteam,  brvteam,  inder_state, 0,      ROT0, "Inder", "Brave Team",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1985,  brvteam,  0, brvteam,  brvteam,  inder_state, empty_init,  ROT0, "Inder", "Brave Team",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // old cpu board, 7 digits, ay8910
-GAME(1986,  canasta,    0,    canasta,  canasta,  inder_state, 0,      ROT0, "Inder", "Canasta '86'",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  canasta,  0, canasta,  canasta,  inder_state, empty_init,  ROT0, "Inder", "Canasta '86'",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // old cpu board, 7 digits, sound cpu with 2x ay8910
-GAME(1986,  lapbylap,   0,    lapbylap, lapbylap, inder_state, 0,      ROT0, "Inder", "Lap By Lap",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  lapbylap, 0, lapbylap, lapbylap, inder_state, empty_init,  ROT0, "Inder", "Lap By Lap",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // new cpu board, sound board with msm5205
-GAME(1987,  pinmoonl,   0,    inder,    pinmoonl, inder_state, inder,  ROT0, "Inder", "Moon Light (Inder)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1988,  pinclown,   0,    inder,    pinclown, inder_state, inder1, ROT0, "Inder", "Clown (Inder)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1989,  corsario,   0,    inder,    corsario, inder_state, inder1, ROT0, "Inder", "Corsario",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1990,  mundial,    0,    inder,    mundial,  inder_state, inder1, ROT0, "Inder", "Mundial 90",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1991,  atleta,     0,    inder,    atleta,   inder_state, inder1, ROT0, "Inder", "Atleta",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1992,  ind250cc,   0,    inder,    ind250cc, inder_state, inder1, ROT0, "Inder", "250 CC",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1987,  pinmoonl, 0, inder,    pinmoonl, inder_state, init_inder,  ROT0, "Inder", "Moon Light (Inder)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1988,  pinclown, 0, inder,    pinclown, inder_state, init_inder1, ROT0, "Inder", "Clown (Inder)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1989,  corsario, 0, inder,    corsario, inder_state, init_inder1, ROT0, "Inder", "Corsario",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1990,  mundial,  0, inder,    mundial,  inder_state, init_inder1, ROT0, "Inder", "Mundial 90",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1991,  atleta,   0, inder,    atleta,   inder_state, init_inder1, ROT0, "Inder", "Atleta",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1992,  ind250cc, 0, inder,    ind250cc, inder_state, init_inder1, ROT0, "Inder", "250 CC",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // new cpu board, later revision of msm5205 sound board
-GAME(1992,  metalman,   0,    inder,    metalman, inder_state, inder,  ROT0, "Inder", "Metal Man",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  metalman, 0, inder,    metalman, inder_state, init_inder,  ROT0, "Inder", "Metal Man",          MACHINE_IS_SKELETON_MECHANICAL)

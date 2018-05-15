@@ -368,7 +368,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( mainsnk )
+static GFXDECODE_START( gfx_mainsnk )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,   0x100, 0x080>>4 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 0x000, 0x080>>3 )
 GFXDECODE_END
@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(mainsnk_state::mainsnk)
 	MCFG_SCREEN_UPDATE_DRIVER(mainsnk_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mainsnk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mainsnk)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_INIT_OWNER(mainsnk_state, mainsnk)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -479,5 +479,5 @@ ROM_START( canvas )
 ROM_END
 
 
-GAME( 1984, mainsnk,   0,   mainsnk, mainsnk, mainsnk_state, 0,   ROT0, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, canvas,    0,   mainsnk, canvas,  mainsnk_state, 0,   ROT0, "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mainsnk, 0, mainsnk, mainsnk, mainsnk_state, empty_init, ROT0, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, canvas,  0, mainsnk, canvas,  mainsnk_state, empty_init, ROT0, "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )

@@ -248,7 +248,7 @@ public:
 	DECLARE_READ8_MEMBER(omegrace_spinner1_r);
 	DECLARE_WRITE8_MEMBER(omegrace_leds_w);
 	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
-	DECLARE_DRIVER_INIT(omegrace);
+	void init_omegrace();
 	virtual void machine_reset() override;
 	void omegrace(machine_config &config);
 	void main_map(address_map &map);
@@ -618,9 +618,9 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(omegrace_state,omegrace)
+void omegrace_state::init_omegrace()
 {
-	int i, len = memregion("user1")->bytes();
+	int len = memregion("user1")->bytes();
 	uint8_t *prom = memregion("user1")->base();
 
 	/* Omega Race has two pairs of the state PROM output
@@ -628,7 +628,7 @@ DRIVER_INIT_MEMBER(omegrace_state,omegrace)
 	 * Since all other avg/dvg games connect the PROM
 	 * in a consistent way to the decoder, we swap the bits
 	 * here. */
-	for (i=0; i<len; i++)
+	for (int i = 0; i < len; i++)
 		prom[i] = bitswap<8>(prom[i],7,6,5,4,1,0,3,2);
 }
 
@@ -639,6 +639,6 @@ DRIVER_INIT_MEMBER(omegrace_state,omegrace)
  *
  *************************************/
 
-GAMEL(1981, omegrace,  0,        omegrace, omegrace, omegrace_state, omegrace, ROT0, "Midway", "Omega Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )
-GAMEL(1981, omegrace2, omegrace, omegrace, omegrace, omegrace_state, omegrace, ROT0, "Midway", "Omega Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )
-GAMEL(1981, deltrace,  omegrace, omegrace, omegrace, omegrace_state, omegrace, ROT0, "bootleg (Allied Leisure)", "Delta Race", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )
+GAMEL(1981, omegrace,  0,        omegrace, omegrace, omegrace_state, init_omegrace, ROT0, "Midway", "Omega Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )
+GAMEL(1981, omegrace2, omegrace, omegrace, omegrace, omegrace_state, init_omegrace, ROT0, "Midway", "Omega Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )
+GAMEL(1981, deltrace,  omegrace, omegrace, omegrace, omegrace_state, init_omegrace, ROT0, "bootleg (Allied Leisure)", "Delta Race", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )

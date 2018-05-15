@@ -177,7 +177,7 @@ public:
 	DECLARE_WRITE8_MEMBER( sol20_fd_w );
 	DECLARE_WRITE8_MEMBER( sol20_fe_w );
 	void kbd_put(u8 data);
-	DECLARE_DRIVER_INIT(sol20);
+	void init_sol20();
 	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
 	TIMER_CALLBACK_MEMBER(sol20_boot);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -607,7 +607,7 @@ void sol20_state::machine_reset()
 	m_rs232->write_rts(1);
 }
 
-DRIVER_INIT_MEMBER(sol20_state,sol20)
+void sol20_state::init_sol20()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
@@ -699,7 +699,7 @@ static const gfx_layout sol20_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( sol20 )
+static GFXDECODE_START( gfx_sol20 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sol20_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -728,7 +728,7 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 207)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sol20)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sol20)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -791,5 +791,5 @@ ROM_START( sol20 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT   COMPANY                             FULLNAME  FLAGS
-COMP( 1976, sol20,  0,      0,      sol20,   sol20, sol20_state, sol20, "Processor Technology Corporation", "SOL-20", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                             FULLNAME  FLAGS
+COMP( 1976, sol20, 0,      0,      sol20,   sol20, sol20_state, init_sol20, "Processor Technology Corporation", "SOL-20", 0 )

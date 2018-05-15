@@ -30,7 +30,7 @@ std::unique_ptr<util::disasm_interface> deco16_device::create_disassembler()
 
 void deco16_device::device_start()
 {
-	if(direct_disabled)
+	if(cache_disabled)
 		mintf = std::make_unique<mi_default_nd>();
 	else
 		mintf = std::make_unique<mi_default_normal>();

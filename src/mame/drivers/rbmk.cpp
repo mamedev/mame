@@ -520,7 +520,7 @@ static const gfx_layout rbmk8_layout =
 };
 
 
-static GFXDECODE_START( rbmk )
+static GFXDECODE_START( gfx_rbmk )
 	GFXDECODE_ENTRY( "gfx1", 0, rbmk32_layout,   0x0, 16  )
 	GFXDECODE_ENTRY( "gfx2", 0, rbmk8_layout,   0x100, 16  )
 GFXDECODE_END
@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, rbmk_state, mcu_io_mux_w))
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbmk_state,  mcu_irq)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rbmk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rbmk)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -674,5 +674,5 @@ ROM_START( rbspm )
 	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, NO_DUMP )
 ROM_END
 
-GAME( 1998, rbmk,  0, rbmk,  rbmk,  rbmk_state, 0, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",     MACHINE_NOT_WORKING )
-GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, 0, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)", MACHINE_NOT_WORKING )
+GAME( 1998, rbmk,  0, rbmk,  rbmk,  rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",     MACHINE_NOT_WORKING )
+GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, empty_init, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)", MACHINE_NOT_WORKING )

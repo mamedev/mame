@@ -451,7 +451,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( rblaster )
+static GFXDECODE_START( gfx_rblaster )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 8 )
 GFXDECODE_END
@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rblaster)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rblaster)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
@@ -664,9 +664,9 @@ ROM_END
 
 
 
-GAME( 1983, begas,  0,       rblaster,  begas,    deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )
-GAME( 1983, begas1, begas,   rblaster,  begas,    deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 1)", MACHINE_NOT_WORKING )
-GAME( 1984, cobra,  0,       rblaster,  cobra,    deco_ld_state,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", MACHINE_NOT_WORKING )
-GAME( 1984, cobraa, cobra,   rblaster,  cobra,    deco_ld_state,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
+GAME( 1983, begas,    0,     rblaster, begas,    deco_ld_state, empty_init, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )
+GAME( 1983, begas1,   begas, rblaster, begas,    deco_ld_state, empty_init, ROT0, "Data East", "Bega's Battle (Revision 1)", MACHINE_NOT_WORKING )
+GAME( 1984, cobra,    0,     rblaster, cobra,    deco_ld_state, empty_init, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", MACHINE_NOT_WORKING )
+GAME( 1984, cobraa,   cobra, rblaster, cobra,    deco_ld_state, empty_init, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
 // Thunder Storm (Cobra Command Japanese version)
-GAME( 1985, rblaster,  0,    rblaster,  rblaster, deco_ld_state,  0, ROT0, "Data East", "Road Blaster (Data East LD)", MACHINE_NOT_WORKING )
+GAME( 1985, rblaster, 0,     rblaster, rblaster, deco_ld_state, empty_init, ROT0, "Data East", "Road Blaster (Data East LD)", MACHINE_NOT_WORKING )

@@ -32,8 +32,8 @@ public:
 		: playmark_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_DRIVER_INIT(powerbal);
-	DECLARE_DRIVER_INIT(magicstk);
+	void init_powerbal();
+	void init_magicstk();
 
 	void magicstk(machine_config &config);
 	void powerbal(machine_config &config);
@@ -607,7 +607,7 @@ static const gfx_layout tilelayout =
 
 
 
-static GFXDECODE_START( powerbal )
+static GFXDECODE_START( gfx_powerbal )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0x100, 16 )    /* colors 0x100-0x1ff */
 	GFXDECODE_ENTRY( "gfx1", 0, magicstk_charlayout, 0x000, 16 )    /* colors 0x000-0x0ff */
 GFXDECODE_END
@@ -644,7 +644,7 @@ MACHINE_CONFIG_START(powerbal_state::powerbal)
 	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerbal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerbal)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -680,7 +680,7 @@ MACHINE_CONFIG_START(powerbal_state::magicstk)
 	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerbal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerbal)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -858,13 +858,13 @@ ROM_START( atombjt ) // based off bjtwina set
 ROM_END
 
 
-DRIVER_INIT_MEMBER(powerbal_state,powerbal)
+void powerbal_state::init_powerbal()
 {
 	m_bg_yoffset = 16;
 	m_yoffset = -8;
 }
 
-DRIVER_INIT_MEMBER(powerbal_state,magicstk)
+void powerbal_state::init_magicstk()
 {
 	m_bg_yoffset = 0;
 	m_yoffset = -5;
@@ -874,8 +874,8 @@ DRIVER_INIT_MEMBER(powerbal_state,magicstk)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT      ROT      COMPANY             FULLNAME                           FLAGS
-GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal_state, powerbal, ROT0,   "Playmark",          "Power Balls",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, magicstk, 0,       magicstk, magicstk, powerbal_state, magicstk, ROT0,   "Playmark",          "Magic Sticks",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1995, hotminda, hotmind, magicstk, hotminda, powerbal_state, magicstk, ROT0,   "Playmark",          "Hot Mind (adjustable prize)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993, atombjt,  bjtwin,  atombjt,  atombjt,  powerbal_state, 0,        ROT270, "bootleg (Kyon K.)", "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // some non-trivial mods to the gfx and sound hw wrt nmk16 hw original
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT           ROT      COMPANY             FULLNAME                           FLAGS
+GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal_state, init_powerbal, ROT0,   "Playmark",          "Power Balls",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magicstk, 0,       magicstk, magicstk, powerbal_state, init_magicstk, ROT0,   "Playmark",          "Magic Sticks",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotminda, hotmind, magicstk, hotminda, powerbal_state, init_magicstk, ROT0,   "Playmark",          "Hot Mind (adjustable prize)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993, atombjt,  bjtwin,  atombjt,  atombjt,  powerbal_state, empty_init,    ROT270, "bootleg (Kyon K.)", "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // some non-trivial mods to the gfx and sound hw wrt nmk16 hw original

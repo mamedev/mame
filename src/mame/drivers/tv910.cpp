@@ -570,5 +570,5 @@ ROM_START( tv910 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY              FULLNAME               FLAGS
-COMP( 1981, tv910,  0,      0,       tv910,     tv910, tv910_state,  0,    "TeleVideo Systems", "TeleVideo Model 910", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY              FULLNAME               FLAGS
+COMP( 1981, tv910, 0,      0,      tv910,   tv910, tv910_state, empty_init, "TeleVideo Systems", "TeleVideo Model 910", 0 )

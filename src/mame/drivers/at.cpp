@@ -111,9 +111,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
-	DECLARE_DRIVER_INIT(at);
-	DECLARE_DRIVER_INIT(atpci);
-	DECLARE_DRIVER_INIT(megapcpla);
+	void init_at();
+	void init_atpci();
+	void init_megapcpla();
 	DECLARE_READ16_MEMBER(ps1_unk_r);
 	DECLARE_WRITE16_MEMBER(ps1_unk_w);
 	DECLARE_READ8_MEMBER(ps1_portb_r);
@@ -175,8 +175,8 @@ public:
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 
-	DECLARE_DRIVER_INIT(megapc);
-	DECLARE_DRIVER_INIT(megapcpl);
+	void init_megapc();
+	void init_megapcpl();
 
 	DECLARE_READ16_MEMBER( wd7600_ior );
 	DECLARE_WRITE16_MEMBER( wd7600_iow );
@@ -295,21 +295,21 @@ void at_state::ficpio_io(address_map &map)
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 }
 
-DRIVER_INIT_MEMBER(megapc_state, megapc)
+void megapc_state::init_megapc()
 {
 	uint8_t* ROM = memregion("bios")->base();
 	ROM[0x19145] = 0x45;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
 	ROM[0x1fea0] = 0x20;  // to correct checksum
 }
 
-DRIVER_INIT_MEMBER(megapc_state, megapcpl)
+void megapc_state::init_megapcpl()
 {
 	uint8_t* ROM = memregion("bios")->base();
 	ROM[0x187b1] = 0x55;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
 	ROM[0x1fea0] = 0x20;  // to correct checksum
 }
 
-DRIVER_INIT_MEMBER(at_state, megapcpla)
+void at_state::init_megapcpla()
 {
 	uint8_t* ROM = memregion("bios")->base();
 
@@ -387,12 +387,12 @@ void at_state::init_at_common(int xmsbase)
 	}
 }
 
-DRIVER_INIT_MEMBER(at_state,at)
+void at_state::init_at()
 {
 	init_at_common(0xa0000);
 }
 
-DRIVER_INIT_MEMBER(at_state,atpci)
+void at_state::init_atpci()
 {
 	init_at_common(0x100000);
 }
@@ -1422,53 +1422,53 @@ ROM_END
 
 ***************************************************************************/
 
-//     YEAR  NAME       PARENT   COMPAT   MACHINE    INIT  INPUT          STATE    COMPANY                              FULLNAME                FLAGS
-COMP ( 1984, ibm5170,   0,       ibm5150, ibm5170,   0,    at_state,      at,      "International Business Machines",  "IBM PC/AT 5170", MACHINE_NOT_WORKING )
-COMP ( 1985, ibm5170a,  ibm5170, 0,       ibm5170a,  0,    at_state,      at,      "International Business Machines",  "IBM PC/AT 5170 8MHz", MACHINE_NOT_WORKING )
-COMP ( 1985, ibm5162,   ibm5170, 0,       ibm5162,   0,    at_state,      at,      "International Business Machines",  "IBM PC/XT-286 5162", MACHINE_NOT_WORKING )
-COMP ( 1989, ibmps1es,  ibm5170, 0,       ibmps1,    0,    at_state,      at,      "International Business Machines",  "IBM PS/1 (Spanish)", MACHINE_NOT_WORKING )
-COMP ( 1987, at,        ibm5170, 0,       ibm5162,   0,    at_state,      at,      "<generic>",  "PC/AT (CGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1987, atvga,     ibm5170, 0,       atvga,     0,    at_state,      at,      "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , MACHINE_NOT_WORKING )
-COMP ( 1988, at386,     ibm5170, 0,       at386,     0,    at_state,      at,      "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1988, ct386sx,   ibm5170, 0,       ct386sx,   0,    at_state,      at,      "<generic>",  "NEAT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1988, at386sx,   ibm5170, 0,       at386sx,   0,    at_state,      at,      "<generic>",  "PC/AT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1990, at486,     ibm5170, 0,       at486,     0,    at_state,      at,      "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1989, neat,      ibm5170, 0,       neat,      0,    at_state,      at,      "<generic>",  "NEAT (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP ( 1989, ec1842,    ibm5150, 0,       ec1842,    0,    at_state,      at,      "<unknown>",  "EC-1842", MACHINE_NOT_WORKING )
-COMP ( 1993, ec1849,    ibm5170, 0,       ec1842,    0,    at_state,      at,      "<unknown>",  "EC-1849", MACHINE_NOT_WORKING )
-COMP ( 1993, megapc,    0,       0,       megapc,    0,    megapc_state,  megapc,   "Amstrad plc", "MegaPC", MACHINE_NOT_WORKING )
-COMP ( 199?, megapcpl,  megapc,  0,       megapcpl,  0,    megapc_state,  megapcpl, "Amstrad plc", "MegaPC Plus", MACHINE_NOT_WORKING )
-COMP ( 199?, megapcpla, megapc,  0,       megapcpla, 0,    at_state,      megapcpla,"Amstrad plc", "MegaPC Plus (WINBUS chipset)", MACHINE_NOT_WORKING )
-COMP ( 1989, pc2386,    ibm5170, 0,       at386l,    0,    at_state,      at,      "Amstrad plc", "Amstrad PC2386", MACHINE_NOT_WORKING )
-COMP ( 1991, aprfte,    ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot FT//ex 486 (J3 Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1991, ftsserv,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot FTs (Scorpion)", MACHINE_NOT_WORKING )
-COMP ( 1992, aprpand,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot FTs (Panther Rev F 1.02.26)", MACHINE_NOT_WORKING )
-COMP ( 1990, aplanst,   ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot LANstation (Krypton Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1990, aplannb,   ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot LANstation (Novell Remote Boot)", MACHINE_NOT_WORKING )
-COMP ( 1992, aplscar,   ibm5170, 0,       at486l,    0,    at_state,      at,      "Apricot",  "Apricot LS Pro (Caracal Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1992, aplsbon,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot LS Pro (Bonsai Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1988, xb42663,   ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot Qi 300 (Rev D,E & F Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1988, qi600,     ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot Qi 600 (Neptune Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1990, qi900,     ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot Qi 900 (Scorpion Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1989, apvxft,    ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot VX FT server", MACHINE_NOT_WORKING )
-COMP ( 1991, apxenls3,  ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN-LS (Venus IV Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1993, apxlsam,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN-LS II (Samurai Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1987, apxeni,    ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot XEN-i 386 (Leopard Motherboard)" , MACHINE_NOT_WORKING )
-COMP ( 1989, xb42639,   ibm5170, 0,       xb42639,   0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus I Motherboard 286)" , MACHINE_NOT_WORKING )
-COMP ( 1990, xb42639a,  ibm5170, 0,       xb42639,   0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus II Motherboard 286)" , MACHINE_NOT_WORKING )
-COMP ( 1989, xb42664,   ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus I Motherboard 386)" , MACHINE_NOT_WORKING )
-COMP ( 1990, xb42664a,  ibm5170, 0,       at386,     0,    at_state,      at,      "Apricot",  "Apricot XEN-S (Venus II Motherboard 386)" , MACHINE_NOT_WORKING )
-COMP ( 1993, apxena1,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN PC (A1 Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1993, apxenp2,   ibm5170, 0,       at486,     0,    at_state,      at,      "Apricot",  "Apricot XEN PC (P2 Motherboard)", MACHINE_NOT_WORKING )
-COMP ( 1990, c386sx16,  ibm5170, 0,       at386sx,   0,    at_state,      at,      "Commodore Business Machines", "Commodore 386SX-16", MACHINE_NOT_WORKING )
-COMP ( 1988, pc30iii,   ibm5170, 0,       pc30iii,   0,    at_state,      at,      "Commodore Business Machines",  "PC 30-III", MACHINE_NOT_WORKING )
-COMP ( 1988, pc40iii,   ibm5170, 0,       pc40iii,   0,    at_state,      at,      "Commodore Business Machines",  "PC 40-III", MACHINE_NOT_WORKING )
-COMP ( 1995, ficpio2,   ibm5170, 0,       ficpio2,   0,    at_state,      atpci,   "FIC", "486-PIO-2", MACHINE_NOT_WORKING )
-COMP ( 1985, k286i,     ibm5170, 0,       k286i,     0,    at_state,      at,      "Kaypro",   "286i", MACHINE_NOT_WORKING )
-COMP ( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,    at_state,      at,      "Toshiba",  "T2000SX", MACHINE_NOT_WORKING )
-COMP ( 199?, mbc28,     ibm5170, 0,       at386sx,   0,    at_state,      at,      "Sanyo",  "MBC-28", MACHINE_NOT_WORKING )
-COMP ( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,    at_state,      at,      "Siemens",  "PCD-2", MACHINE_NOT_WORKING )
-COMP ( 1987, comportii ,ibm5170, 0,       comportii, 0,    at_state,      at,      "Compaq",   "Portable II", MACHINE_NOT_WORKING )
-COMP ( 1987, comportiii,ibm5170, 0,       comportiii,0,    at_state,      at,      "Compaq",   "Portable III", MACHINE_NOT_WORKING )
-COMP ( 1986, ews286,    ibm5170, 0,       ews286,    0,    at_state,      at,      "Ericsson", "Ericsson WS286", MACHINE_NOT_WORKING )
-//COMP ( 1988, nws286,    ibm5170,  0,      ews286,    0,    at_state,      at,      "Nokia Data", "Nokia Data WS286", MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT  CLASS         INIT            COMPANY        FULLNAME                FLAGS
+COMP( 1984, ibm5170,   0,       ibm5150, ibm5170,   0,     at_state,     init_at,        "International Business Machines",  "IBM PC/AT 5170", MACHINE_NOT_WORKING )
+COMP( 1985, ibm5170a,  ibm5170, 0,       ibm5170a,  0,     at_state,     init_at,        "International Business Machines",  "IBM PC/AT 5170 8MHz", MACHINE_NOT_WORKING )
+COMP( 1985, ibm5162,   ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "International Business Machines",  "IBM PC/XT-286 5162", MACHINE_NOT_WORKING )
+COMP( 1989, ibmps1es,  ibm5170, 0,       ibmps1,    0,     at_state,     init_at,        "International Business Machines",  "IBM PS/1 (Spanish)", MACHINE_NOT_WORKING )
+COMP( 1987, at,        ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "<generic>",   "PC/AT (CGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1987, atvga,     ibm5170, 0,       atvga,     0,     at_state,     init_at,        "<generic>",   "PC/AT (VGA, MF2 Keyboard)" , MACHINE_NOT_WORKING )
+COMP( 1988, at386,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "<generic>",   "PC/AT 386 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1988, ct386sx,   ibm5170, 0,       ct386sx,   0,     at_state,     init_at,        "<generic>",   "NEAT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1988, at386sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<generic>",   "PC/AT 386SX (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1990, at486,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "<generic>",   "PC/AT 486 (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1989, neat,      ibm5170, 0,       neat,      0,     at_state,     init_at,        "<generic>",   "NEAT (VGA, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1989, ec1842,    ibm5150, 0,       ec1842,    0,     at_state,     init_at,        "<unknown>",   "EC-1842", MACHINE_NOT_WORKING )
+COMP( 1993, ec1849,    ibm5170, 0,       ec1842,    0,     at_state,     init_at,        "<unknown>",   "EC-1849", MACHINE_NOT_WORKING )
+COMP( 1993, megapc,    0,       0,       megapc,    0,     megapc_state, init_megapc,    "Amstrad plc", "MegaPC", MACHINE_NOT_WORKING )
+COMP( 199?, megapcpl,  megapc,  0,       megapcpl,  0,     megapc_state, init_megapcpl,  "Amstrad plc", "MegaPC Plus", MACHINE_NOT_WORKING )
+COMP( 199?, megapcpla, megapc,  0,       megapcpla, 0,     at_state,     init_megapcpla, "Amstrad plc", "MegaPC Plus (WINBUS chipset)", MACHINE_NOT_WORKING )
+COMP( 1989, pc2386,    ibm5170, 0,       at386l,    0,     at_state,     init_at,        "Amstrad plc", "Amstrad PC2386", MACHINE_NOT_WORKING )
+COMP( 1991, aprfte,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot FT//ex 486 (J3 Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1991, ftsserv,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot FTs (Scorpion)", MACHINE_NOT_WORKING )
+COMP( 1992, aprpand,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot FTs (Panther Rev F 1.02.26)", MACHINE_NOT_WORKING )
+COMP( 1990, aplanst,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot LANstation (Krypton Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1990, aplannb,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot LANstation (Novell Remote Boot)", MACHINE_NOT_WORKING )
+COMP( 1992, aplscar,   ibm5170, 0,       at486l,    0,     at_state,     init_at,        "Apricot",     "Apricot LS Pro (Caracal Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1992, aplsbon,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot LS Pro (Bonsai Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1988, xb42663,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot Qi 300 (Rev D,E & F Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1988, qi600,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot Qi 600 (Neptune Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1990, qi900,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot Qi 900 (Scorpion Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1989, apvxft,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot VX FT server", MACHINE_NOT_WORKING )
+COMP( 1991, apxenls3,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN-LS (Venus IV Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1993, apxlsam,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN-LS II (Samurai Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1987, apxeni,    ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN-i 386 (Leopard Motherboard)" , MACHINE_NOT_WORKING )
+COMP( 1989, xb42639,   ibm5170, 0,       xb42639,   0,     at_state,     init_at,        "Apricot",     "Apricot XEN-S (Venus I Motherboard 286)" , MACHINE_NOT_WORKING )
+COMP( 1990, xb42639a,  ibm5170, 0,       xb42639,   0,     at_state,     init_at,        "Apricot",     "Apricot XEN-S (Venus II Motherboard 286)" , MACHINE_NOT_WORKING )
+COMP( 1989, xb42664,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN-S (Venus I Motherboard 386)" , MACHINE_NOT_WORKING )
+COMP( 1990, xb42664a,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN-S (Venus II Motherboard 386)" , MACHINE_NOT_WORKING )
+COMP( 1993, apxena1,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN PC (A1 Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1993, apxenp2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Apricot",     "Apricot XEN PC (P2 Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1990, c386sx16,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Commodore Business Machines", "Commodore 386SX-16", MACHINE_NOT_WORKING )
+COMP( 1988, pc30iii,   ibm5170, 0,       pc30iii,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 30-III", MACHINE_NOT_WORKING )
+COMP( 1988, pc40iii,   ibm5170, 0,       pc40iii,   0,     at_state,     init_at,        "Commodore Business Machines",  "PC 40-III", MACHINE_NOT_WORKING )
+COMP( 1995, ficpio2,   ibm5170, 0,       ficpio2,   0,     at_state,     init_atpci,     "FIC", "486-PIO-2", MACHINE_NOT_WORKING )
+COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
+COMP( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Toshiba",     "T2000SX", MACHINE_NOT_WORKING )
+COMP( 199?, mbc28,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Sanyo",       "MBC-28", MACHINE_NOT_WORKING )
+COMP( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,     at_state,     init_at,        "Siemens",     "PCD-2", MACHINE_NOT_WORKING )
+COMP( 1987, comportii ,ibm5170, 0,       comportii, 0,     at_state,     init_at,        "Compaq",      "Portable II", MACHINE_NOT_WORKING )
+COMP( 1987, comportiii,ibm5170, 0,       comportiii,0,     at_state,     init_at,        "Compaq",      "Portable III", MACHINE_NOT_WORKING )
+COMP( 1986, ews286,    ibm5170, 0,       ews286,    0,     at_state,     init_at,        "Ericsson",    "Ericsson WS286", MACHINE_NOT_WORKING )
+//COMP( 1988, nws286,    ibm5170,  0,      ews286,    0,     at_state,     at,        "Nokia Data",  "Nokia Data WS286", MACHINE_NOT_WORKING )

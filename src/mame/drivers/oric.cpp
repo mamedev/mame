@@ -960,9 +960,9 @@ ROM_START(prav8dd)
 ROM_END
 
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE     INPUT     STATE            INIT  COMPANY      FULLNAME                 FLAGS
-COMP( 1983, oric1,     0,      0,      oric,       oric,     oric_state,      0,    "Tangerine", "Oric 1" ,               0 )
-COMP( 1984, orica,     oric1,  0,      oric,       orica,    oric_state,      0,    "Tangerine", "Oric Atmos" ,           0 )
-COMP( 1985, prav8d,    oric1,  0,      prav8d,     prav8d,   oric_state,      0,    "Pravetz",   "Pravetz 8D",            0 )
-COMP( 1989, prav8dd,   oric1,  0,      prav8d,     prav8d,   oric_state,      0,    "Pravetz",   "Pravetz 8D (Disk ROM)", MACHINE_UNOFFICIAL )
-COMP( 1986, telstrat,  oric1,  0,      telstrat,   telstrat, telestrat_state, 0,    "Tangerine", "Oric Telestrat",        0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY      FULLNAME                 FLAGS
+COMP( 1983, oric1,    0,      0,      oric,     oric,     oric_state,      empty_init, "Tangerine", "Oric 1" ,               0 )
+COMP( 1984, orica,    oric1,  0,      oric,     orica,    oric_state,      empty_init, "Tangerine", "Oric Atmos" ,           0 )
+COMP( 1985, prav8d,   oric1,  0,      prav8d,   prav8d,   oric_state,      empty_init, "Pravetz",   "Pravetz 8D",            0 )
+COMP( 1989, prav8dd,  oric1,  0,      prav8d,   prav8d,   oric_state,      empty_init, "Pravetz",   "Pravetz 8D (Disk ROM)", MACHINE_UNOFFICIAL )
+COMP( 1986, telstrat, oric1,  0,      telstrat, telstrat, telestrat_state, empty_init, "Tangerine", "Oric Telestrat",        0 )

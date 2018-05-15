@@ -170,7 +170,7 @@ static const gfx_layout galaxy_charlayout =
 	8                   /* every char takes 1 x 16 bytes */
 };
 
-static GFXDECODE_START( galaxy )
+static GFXDECODE_START( gfx_galaxy )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxy_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -193,7 +193,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxy)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
@@ -275,6 +275,6 @@ ROM_START (galaxyp)
 	ROM_LOAD ("galchr.bin", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT    STATE         INIT    COMPANY                                   FULLNAME */
-COMP(1983,  galaxy,     0,      0,  galaxy, galaxy,  galaxy_state, galaxy, "Voja Antonic / Elektronika inzenjering", "Galaksija",      0)
-COMP(1985,  galaxyp,    galaxy, 0,  galaxyp,galaxyp, galaxy_state, galaxyp,"Nenad Dunjic",                           "Galaksija plus", 0)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT          COMPANY                                   FULLNAME */
+COMP( 1983, galaxy,  0,      0,      galaxy,  galaxy,  galaxy_state, init_galaxy,  "Voja Antonic / Elektronika inzenjering", "Galaksija",      0)
+COMP( 1985, galaxyp, galaxy, 0,      galaxyp, galaxyp, galaxy_state, init_galaxyp, "Nenad Dunjic",                           "Galaksija plus", 0)

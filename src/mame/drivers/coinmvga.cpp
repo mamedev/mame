@@ -243,8 +243,8 @@ public:
 		m_palette2(*this, "palette2") { }
 
 	required_shared_ptr<uint16_t> m_vram;
-	DECLARE_DRIVER_INIT(colorama);
-	DECLARE_DRIVER_INIT(cmrltv75);
+	void init_colorama();
+	void init_cmrltv75();
 	virtual void video_start() override;
 	uint32_t screen_update_coinmvga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -600,11 +600,11 @@ static const gfx_layout tiles16x16_layout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( coinmvga )
+static GFXDECODE_START( gfx_coinmvga )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x000, 16 )  /* Foreground GFX */
 GFXDECODE_END
 
-static GFXDECODE_START( coinmvga2 )
+static GFXDECODE_START( gfx_coinmvga2 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0x000, 1 )  /* Background GFX */
 GFXDECODE_END
 
@@ -654,8 +654,8 @@ MACHINE_CONFIG_START(coinmvga_state::coinmvga)
 	MCFG_SCREEN_UPDATE_DRIVER(coinmvga_state, screen_update_coinmvga)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", coinmvga)
-	MCFG_GFXDECODE_ADD("gfxdecode2", "palette2", coinmvga2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_coinmvga)
+	MCFG_DEVICE_ADD("gfxdecode2", GFXDECODE, "palette2", gfx_coinmvga2)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -879,11 +879,11 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(coinmvga_state,colorama)
+void coinmvga_state::init_colorama()
 {
 }
 
-DRIVER_INIT_MEMBER(coinmvga_state,cmrltv75)
+void coinmvga_state::init_cmrltv75()
 {
 }
 
@@ -892,9 +892,9 @@ DRIVER_INIT_MEMBER(coinmvga_state,cmrltv75)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY                    FULLNAME                                       FLAGS
-GAME( 2000, colorama,  0,        coinmvga, coinmvga, coinmvga_state, colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521, English)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, coloramas, colorama, coinmvga, coinmvga, coinmvga_state, colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521 V13, Spanish)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, coinmvga_state, cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette P497 V75 (Y2K, Spanish)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, coinmvga_state, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, coinmvga_state, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY                    FULLNAME                                       FLAGS
+GAME( 2000, colorama,  0,        coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521, English)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, coloramas, colorama, coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521 V13, Spanish)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, coinmvga_state, init_cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette P497 V75 (Y2K, Spanish)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, coinmvga_state, empty_init,    ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, coinmvga_state, empty_init,    ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

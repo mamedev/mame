@@ -319,7 +319,7 @@ static const gfx_layout tank_layout =
 };
 
 
-static GFXDECODE_START( tank8 )
+static GFXDECODE_START( gfx_tank8 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_1, 0, 10 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_2, 0, 10 )
 	GFXDECODE_ENTRY( "gfx2", 0, tank_layout,   0, 8 )
@@ -345,7 +345,7 @@ MACHINE_CONFIG_START(tank8_state::tank8)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tank8_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tank8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tank8)
 	MCFG_PALETTE_ADD("palette", 20)
 	MCFG_PALETTE_INDIRECT_ENTRIES(10)
 	MCFG_PALETTE_INIT_OWNER(tank8_state, tank8)
@@ -461,28 +461,25 @@ ROM_START( tank8 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(tank8_state,decode)
+void tank8_state::init_decode()
 {
 	const uint8_t* DECODE = memregion("user1")->base();
-
 	uint8_t* p1 = memregion("maincpu")->base() + 0x00000;
 	uint8_t* p2 = memregion("maincpu")->base() + 0x10000;
 
-	int i;
-
-	for (i = 0x0400; i <= 0x17ff; i++)
+	for (int i = 0x0400; i <= 0x17ff; i++)
 	{
 		p1[i] = DECODE[p2[i]];
 	}
-	for (i = 0xf800; i <= 0xffff; i++)
+	for (int i = 0xf800; i <= 0xffff; i++)
 	{
 		p1[i] = DECODE[p2[i]];
 	}
 }
 
 
-GAME( 1976, tank8,    0,        tank8,    tank8, tank8_state,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 1)",  MACHINE_SUPPORTS_SAVE)
-GAME( 1976, tank8a,   tank8,    tank8,    tank8, tank8_state,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1976, tank8b,   tank8,    tank8,    tank8, tank8_state,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 3)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1976, tank8c,   tank8,    tank8,    tank8, tank8_state,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 4)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1976, tank8d,   tank8,    tank8,    tank8, tank8_state,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 5)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, tank8,    0,        tank8,    tank8, tank8_state, empty_init,  ROT0, "Atari (Kee Games)", "Tank 8 (set 1)",  MACHINE_SUPPORTS_SAVE)
+GAME( 1976, tank8a,   tank8,    tank8,    tank8, tank8_state, init_decode, ROT0, "Atari (Kee Games)", "Tank 8 (set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, tank8b,   tank8,    tank8,    tank8, tank8_state, init_decode, ROT0, "Atari (Kee Games)", "Tank 8 (set 3)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, tank8c,   tank8,    tank8,    tank8, tank8_state, empty_init,  ROT0, "Atari (Kee Games)", "Tank 8 (set 4)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, tank8d,   tank8,    tank8,    tank8, tank8_state, empty_init,  ROT0, "Atari (Kee Games)", "Tank 8 (set 5)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

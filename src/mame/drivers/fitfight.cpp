@@ -698,7 +698,7 @@ static const gfx_layout bbprot_sprite_layout =
 	16*16
 };
 
-static GFXDECODE_START( fitfight )
+static GFXDECODE_START( gfx_fitfight )
 	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,   0x000, 256  ) /* tx tiles */
 	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,   0x200, 256  ) /* mid tiles */
 	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,   0x400, 256  ) /* bg tiles */
@@ -706,7 +706,7 @@ static GFXDECODE_START( fitfight )
 
 GFXDECODE_END
 
-static GFXDECODE_START( prot )
+static GFXDECODE_START( gfx_prot )
 	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,     0x0000, 256  ) /* tx tiles */
 	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,     0x0800, 256  ) /* mid tiles */
 	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,     0x1000, 256  ) /* bg tiles */
@@ -741,7 +741,7 @@ MACHINE_CONFIG_START(fitfight_state::fitfight)
 	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, fitfight_state, snd_portc_w))
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fitfight_state,  snd_irq)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fitfight)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fitfight)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -768,7 +768,7 @@ MACHINE_CONFIG_START(fitfight_state::bbprot)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", prot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_prot)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -993,7 +993,7 @@ ROM_END
 
 /* INIT */
 
-DRIVER_INIT_MEMBER(fitfight_state,fitfight)
+void fitfight_state::init_fitfight()
 {
 //  uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 //  mem16[0x0165B2/2] = 0x4e71; // for now so it boots
@@ -1001,7 +1001,7 @@ DRIVER_INIT_MEMBER(fitfight_state,fitfight)
 	m_bbprot_kludge = 0;
 }
 
-DRIVER_INIT_MEMBER(fitfight_state,histryma)
+void fitfight_state::init_histryma()
 {
 //  uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 //  mem16[0x017FDC/2] = 0x4e71; // for now so it boots
@@ -1009,21 +1009,21 @@ DRIVER_INIT_MEMBER(fitfight_state,histryma)
 	m_bbprot_kludge = 0;
 }
 
-DRIVER_INIT_MEMBER(fitfight_state,bbprot)
+void fitfight_state::init_bbprot()
 {
 	m_bbprot_kludge = 1;
 }
 
-DRIVER_INIT_MEMBER(fitfight_state,hotmindff)
+void fitfight_state::init_hotmindff()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(fitfight_state::hotmindff_unk_r),this));
-	DRIVER_INIT_CALL(fitfight);
+	init_fitfight();
 }
 
 
 /* GAME */
 
-GAME( 199?, fitfight,  0,       fitfight, fitfight, fitfight_state, fitfight,  ROT0, "bootleg",   "Fit of Fighting",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, histryma,  0,       fitfight, histryma, fitfight_state, histryma,  ROT0, "bootleg",   "The History of Martial Arts",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, bbprot,    0,       bbprot,   bbprot,   fitfight_state, bbprot,    ROT0, "<unknown>", "unknown fighting game 'BB' (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, hotmindff, hotmind, fitfight, fitfight, fitfight_state, hotmindff, ROT0, "Playmark",  "Hot Mind (Fit of Fighting hardware)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // need to fix scroll offsets + inputs
+GAME( 199?, fitfight,  0,       fitfight, fitfight, fitfight_state, init_fitfight,  ROT0, "bootleg",   "Fit of Fighting",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, histryma,  0,       fitfight, histryma, fitfight_state, init_histryma,  ROT0, "bootleg",   "The History of Martial Arts",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, bbprot,    0,       bbprot,   bbprot,   fitfight_state, init_bbprot,    ROT0, "<unknown>", "unknown fighting game 'BB' (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, hotmindff, hotmind, fitfight, fitfight, fitfight_state, init_hotmindff, ROT0, "Playmark",  "Hot Mind (Fit of Fighting hardware)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // need to fix scroll offsets + inputs

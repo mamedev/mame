@@ -233,5 +233,5 @@ ROM_START(papillon)
 ROM_END
 
 
-GAME(1986, break86,  0,    vd,  break86,  vd_state, 0,  ROT0,  "Video Dens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, papillon, 0,    vd,  papillon, vd_state, 0,  ROT0,  "Video Dens", "Papillon",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, break86,  0,    vd,  break86,  vd_state, empty_init, ROT0,  "Video Dens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, papillon, 0,    vd,  papillon, vd_state, empty_init, ROT0,  "Video Dens", "Papillon",  MACHINE_IS_SKELETON_MECHANICAL)

@@ -349,7 +349,7 @@ static const gfx_layout charlayout =
 	8*8                    /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( proteus3 )
+static GFXDECODE_START( gfx_proteus3 )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -390,7 +390,7 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*12-1)
 	MCFG_SCREEN_UPDATE_DRIVER(proteus3_state, screen_update_proteus3)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", proteus3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_proteus3)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
@@ -482,5 +482,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY                  FULLNAME       FLAGS
-COMP( 1978, proteus3, 0,      0,      proteus3, proteus3, proteus3_state, 0,    "Proteus International", "Proteus III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                  FULLNAME       FLAGS
+COMP( 1978, proteus3, 0,      0,      proteus3, proteus3, proteus3_state, empty_init, "Proteus International", "Proteus III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

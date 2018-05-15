@@ -40,8 +40,8 @@ public:
 	m_wom(*this, "wom")
 	{ }
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	DECLARE_WRITE16_MEMBER( write_protect_w );
 
@@ -71,8 +71,8 @@ public:
 	m_zorro2_int6(0)
 	{ }
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	DECLARE_WRITE_LINE_MEMBER( zorro2_int2_w );
 	DECLARE_WRITE_LINE_MEMBER( zorro2_int6_w );
@@ -110,8 +110,8 @@ public:
 	m_side_int6(0)
 	{ }
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	DECLARE_WRITE_LINE_MEMBER( side_int2_w );
 	DECLARE_WRITE_LINE_MEMBER( side_int6_w );
@@ -148,8 +148,8 @@ public:
 	m_tpi_irq(0)
 	{ }
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	DECLARE_READ16_MEMBER( clock_r );
 	DECLARE_WRITE16_MEMBER( clock_w );
@@ -199,8 +199,8 @@ public:
 	DECLARE_READ32_MEMBER( motherboard_r );
 	DECLARE_WRITE32_MEMBER( motherboard_w );
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	void a3000(machine_config &config);
 	void a3000n(machine_config &config);
@@ -224,8 +224,8 @@ public:
 	DECLARE_READ16_MEMBER( clock_r );
 	DECLARE_WRITE16_MEMBER( clock_w );
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	void a500pn(machine_config &config);
 	void a500p(machine_config &config);
@@ -257,8 +257,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	static const uint8_t GAYLE_ID = 0xd0;
 
@@ -282,8 +282,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	static const uint8_t GAYLE_ID = 0xd1;
 
@@ -318,8 +318,8 @@ public:
 	DECLARE_READ32_MEMBER( motherboard_r );
 	DECLARE_WRITE32_MEMBER( motherboard_w );
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	void a400030n(machine_config &config);
 	void a4000tn(machine_config &config);
@@ -360,8 +360,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER( cd32_input );
 	DECLARE_CUSTOM_INPUT_MEMBER( cd32_sel_mirror_input );
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	required_ioport_array<2> m_player_ports;
 
@@ -468,123 +468,123 @@ WRITE_LINE_MEMBER( cdtv_state::tpi_int_w )
 //**************************************************************************
 
 // ocs chipset (agnus with support for 512k or 1mb chip ram, denise)
-DRIVER_INIT_MEMBER( a1000_state, pal )
+void a1000_state::init_pal()
 {
 	m_agnus_id = AGNUS_PAL;     // 8367
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( a1000_state, ntsc )
+void a1000_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_NTSC;    // 8361
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( a2000_state, pal )
+void a2000_state::init_pal()
 {
 	m_agnus_id = AGNUS_PAL;     // 8371 (later versions 8372A)
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( a2000_state, ntsc )
+void a2000_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_NTSC;    // 8370 (later versions 8372A)
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( a500_state, pal )
+void a500_state::init_pal()
 {
 	m_agnus_id = AGNUS_PAL;     // 8371 (later versions 8372A)
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( a500_state, ntsc )
+void a500_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_NTSC;    // 8370 (later versions 8372A)
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( cdtv_state, pal )
+void cdtv_state::init_pal()
 {
 	m_agnus_id = AGNUS_HR_PAL;  // 8372A
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( cdtv_state, ntsc )
+void cdtv_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_HR_NTSC; // 8372A
 	m_denise_id = DENISE;       // 8362
 }
 
 // ecs chipset (agnus with support for 2mb chip ram, super denise)
-DRIVER_INIT_MEMBER( a3000_state, pal )
+void a3000_state::init_pal()
 {
 	m_agnus_id = AGNUS_HR_PAL_NEW;  // 8372B (early versions: 8372AB)
 	m_denise_id = DENISE_HR;        // 8373
 }
 
-DRIVER_INIT_MEMBER( a3000_state, ntsc )
+void a3000_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_HR_NTSC_NEW; // 8372B (early versions: 8372AB)
 	m_denise_id = DENISE_HR;        // 8373
 }
 
-DRIVER_INIT_MEMBER( a500p_state, pal )
+void a500p_state::init_pal()
 {
 	m_agnus_id = AGNUS_HR_PAL;  // 8375 (390544-01)
 	m_denise_id = DENISE_HR;    // 8373
 }
 
-DRIVER_INIT_MEMBER( a500p_state, ntsc )
+void a500p_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_HR_NTSC; // 8375 (390544-02)
 	m_denise_id = DENISE_HR;    // 8373
 }
 
-DRIVER_INIT_MEMBER( a600_state, pal )
+void a600_state::init_pal()
 {
 	m_agnus_id = AGNUS_HR_PAL;  // 8375 (390544-01)
 	m_denise_id = DENISE_HR;    // 8373
 }
 
-DRIVER_INIT_MEMBER( a600_state, ntsc )
+void a600_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_HR_NTSC; // 8375 (390544-02)
 	m_denise_id = DENISE_HR;    // 8373
 }
 
 // aga chipset (alice and lisa)
-DRIVER_INIT_MEMBER( a1200_state, pal )
+void a1200_state::init_pal()
 {
 	m_agnus_id = ALICE_PAL_NEW;
 	m_denise_id = LISA;
 }
 
-DRIVER_INIT_MEMBER( a1200_state, ntsc )
+void a1200_state::init_ntsc()
 {
 	m_agnus_id = ALICE_NTSC_NEW;
 	m_denise_id = LISA;
 }
 
-DRIVER_INIT_MEMBER( a4000_state, pal )
+void a4000_state::init_pal()
 {
 	m_agnus_id = ALICE_PAL_NEW;
 	m_denise_id = LISA;
 }
 
-DRIVER_INIT_MEMBER( a4000_state, ntsc )
+void a4000_state::init_ntsc()
 {
 	m_agnus_id = ALICE_NTSC_NEW;
 	m_denise_id = LISA;
 }
 
-DRIVER_INIT_MEMBER( cd32_state, pal )
+void cd32_state::init_pal()
 {
 	m_agnus_id = ALICE_PAL_NEW;
 	m_denise_id = LISA;
 }
 
-DRIVER_INIT_MEMBER( cd32_state, ntsc )
+void cd32_state::init_ntsc()
 {
 	m_agnus_id = ALICE_NTSC_NEW;
 	m_denise_id = LISA;
@@ -2261,31 +2261,31 @@ ROM_END
 //**************************************************************************
 
 // OCS Chipset
-COMP( 1985, a1000,    0,      0, a1000,    amiga, a1000_state, pal,  "Commodore", "Amiga 1000 (PAL)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1985, a1000n,   a1000,  0, a1000n,   amiga, a1000_state, ntsc, "Commodore", "Amiga 1000 (NTSC)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1987, a2000,    0,      0, a2000,    amiga, a2000_state, pal,  "Commodore", "Amiga 2000 (PAL)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1987, a2000n,   a2000,  0, a2000n,   amiga, a2000_state, ntsc, "Commodore", "Amiga 2000 (NTSC)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1987, a500,     0,      0, a500,     amiga, a500_state,  pal,  "Commodore", "Amiga 500 (PAL)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1987, a500n,    a500,   0, a500n,    amiga, a500_state,  ntsc, "Commodore", "Amiga 500 (NTSC)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1990, cdtv,     0,      0, cdtv,     amiga, cdtv_state,  pal,  "Commodore", "CDTV (PAL)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1990, cdtvn,    cdtv,   0, cdtvn,    amiga, cdtv_state,  ntsc, "Commodore", "CDTV (NTSC)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, a1000,    0,      0, a1000,    amiga, a1000_state, init_pal,  "Commodore", "Amiga 1000 (PAL)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, a1000n,   a1000,  0, a1000n,   amiga, a1000_state, init_ntsc, "Commodore", "Amiga 1000 (NTSC)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1987, a2000,    0,      0, a2000,    amiga, a2000_state, init_pal,  "Commodore", "Amiga 2000 (PAL)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1987, a2000n,   a2000,  0, a2000n,   amiga, a2000_state, init_ntsc, "Commodore", "Amiga 2000 (NTSC)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1987, a500,     0,      0, a500,     amiga, a500_state,  init_pal,  "Commodore", "Amiga 500 (PAL)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1987, a500n,    a500,   0, a500n,    amiga, a500_state,  init_ntsc, "Commodore", "Amiga 500 (NTSC)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1990, cdtv,     0,      0, cdtv,     amiga, cdtv_state,  init_pal,  "Commodore", "CDTV (PAL)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1990, cdtvn,    cdtv,   0, cdtvn,    amiga, cdtv_state,  init_ntsc, "Commodore", "CDTV (NTSC)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // ECS Chipset
-COMP( 1990, a3000,    0,      0, a3000,    amiga, a3000_state, pal,  "Commodore", "Amiga 3000 (PAL)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1990, a3000n,   a3000,  0, a3000n,   amiga, a3000_state, ntsc, "Commodore", "Amiga 3000 (NTSC)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1992, a500p,    0,      0, a500p,    amiga, a500p_state, pal,  "Commodore", "Amiga 500 Plus (PAL)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1992, a500pn,   a500p,  0, a500pn,   amiga, a500p_state, ntsc, "Commodore", "Amiga 500 Plus (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1992, a600,     0,      0, a600,     amiga, a600_state,  pal,  "Commodore", "Amiga 600 (PAL)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1992, a600n,    a600,   0, a600n,    amiga, a600_state,  ntsc, "Commodore", "Amiga 600 (NTSC)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1990, a3000,    0,      0, a3000,    amiga, a3000_state, init_pal,  "Commodore", "Amiga 3000 (PAL)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1990, a3000n,   a3000,  0, a3000n,   amiga, a3000_state, init_ntsc, "Commodore", "Amiga 3000 (NTSC)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1992, a500p,    0,      0, a500p,    amiga, a500p_state, init_pal,  "Commodore", "Amiga 500 Plus (PAL)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1992, a500pn,   a500p,  0, a500pn,   amiga, a500p_state, init_ntsc, "Commodore", "Amiga 500 Plus (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1992, a600,     0,      0, a600,     amiga, a600_state,  init_pal,  "Commodore", "Amiga 600 (PAL)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1992, a600n,    a600,   0, a600n,    amiga, a600_state,  init_ntsc, "Commodore", "Amiga 600 (NTSC)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // AGA Chipset
-COMP( 1992, a1200,    0,      0, a1200,    amiga, a1200_state, pal,  "Commodore", "Amiga 1200 (PAL)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1992, a1200n,   a1200,  0, a1200n,   amiga, a1200_state, ntsc, "Commodore", "Amiga 1200 (NTSC)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1992, a4000,    0,      0, a4000,    amiga, a4000_state, pal,  "Commodore", "Amiga 4000/040 (PAL)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1992, a4000n,   a4000,  0, a4000n,   amiga, a4000_state, ntsc, "Commodore", "Amiga 4000/040 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1993, a400030,  a4000,  0, a400030,  amiga, a4000_state, pal,  "Commodore", "Amiga 4000/030 (PAL)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1993, a400030n, a4000,  0, a400030n, amiga, a4000_state, ntsc, "Commodore", "Amiga 4000/030 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1993, cd32,     0,      0, cd32,     cd32,  cd32_state,  pal,  "Commodore", "Amiga CD32 (PAL)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1993, cd32n,    cd32,   0, cd32n,    cd32,  cd32_state,  ntsc, "Commodore", "Amiga CD32 (NTSC)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1994, a4000t,   0,      0, a4000t,   amiga, a4000_state, pal,  "Commodore", "Amiga 4000T (PAL)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1994, a4000tn,  a4000t, 0, a4000tn,  amiga, a4000_state, ntsc, "Commodore", "Amiga 4000T (NTSC)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1992, a1200,    0,      0, a1200,    amiga, a1200_state, init_pal,  "Commodore", "Amiga 1200 (PAL)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1992, a1200n,   a1200,  0, a1200n,   amiga, a1200_state, init_ntsc, "Commodore", "Amiga 1200 (NTSC)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1992, a4000,    0,      0, a4000,    amiga, a4000_state, init_pal,  "Commodore", "Amiga 4000/040 (PAL)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1992, a4000n,   a4000,  0, a4000n,   amiga, a4000_state, init_ntsc, "Commodore", "Amiga 4000/040 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1993, a400030,  a4000,  0, a400030,  amiga, a4000_state, init_pal,  "Commodore", "Amiga 4000/030 (PAL)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1993, a400030n, a4000,  0, a400030n, amiga, a4000_state, init_ntsc, "Commodore", "Amiga 4000/030 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1993, cd32,     0,      0, cd32,     cd32,  cd32_state,  init_pal,  "Commodore", "Amiga CD32 (PAL)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1993, cd32n,    cd32,   0, cd32n,    cd32,  cd32_state,  init_ntsc, "Commodore", "Amiga CD32 (NTSC)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1994, a4000t,   0,      0, a4000t,   amiga, a4000_state, init_pal,  "Commodore", "Amiga 4000T (PAL)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1994, a4000tn,  a4000t, 0, a4000tn,  amiga, a4000_state, init_ntsc, "Commodore", "Amiga 4000T (NTSC)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

@@ -50,4 +50,4 @@ ROM_START( qvt70 )
 	ROM_LOAD( "251513-03_revj.u11", 0x10000, 0x20000, CRC(c56796fe) SHA1(afe024ff93d5e75dc18041219d61e1a22fc6d883) )
 ROM_END
 
-COMP( 1992, qvt70, 0, 0, qvt70, qvt70, qvt70_state, 0, "Qume", "QVT-70", MACHINE_IS_SKELETON )
+COMP( 1992, qvt70, 0, 0, qvt70, qvt70, qvt70_state, empty_init, "Qume", "QVT-70", MACHINE_IS_SKELETON )

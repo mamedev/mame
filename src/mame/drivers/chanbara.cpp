@@ -95,7 +95,7 @@ public:
 	DECLARE_WRITE8_MEMBER(chanbara_colorram2_w);
 	DECLARE_WRITE8_MEMBER(chanbara_ay_out_0_w);
 	DECLARE_WRITE8_MEMBER(chanbara_ay_out_1_w);
-	DECLARE_DRIVER_INIT(chanbara);
+	void init_chanbara();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	virtual void machine_start() override;
@@ -347,7 +347,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( chanbara )
+static GFXDECODE_START( gfx_chanbara )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,   0x40, 32 )
 	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout, 0x80, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tile16layout, 0, 32 )
@@ -405,7 +405,7 @@ MACHINE_CONFIG_START(chanbara_state::chanbara)
 	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chanbara)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chanbara)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(chanbara_state, chanbara)
@@ -458,14 +458,13 @@ ROM_START( chanbara )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(chanbara_state,chanbara)
+void chanbara_state::init_chanbara()
 {
-	uint8_t   *src = memregion("gfx4")->base();
-	uint8_t   *dst = memregion("gfx3")->base() + 0x4000;
-	uint8_t   *bg = memregion("user1")->base();
+	uint8_t *src = memregion("gfx4")->base();
+	uint8_t *dst = memregion("gfx3")->base() + 0x4000;
+	uint8_t *bg = memregion("user1")->base();
 
-	int i;
-	for (i = 0; i < 0x1000; i++)
+	for (int i = 0; i < 0x1000; i++)
 	{
 		dst[i + 0x1000] = src[i] & 0xf0;
 		dst[i + 0x0000] = (src[i] & 0x0f) << 4;
@@ -476,4 +475,4 @@ DRIVER_INIT_MEMBER(chanbara_state,chanbara)
 	membank("bank1")->configure_entries(0, 2, &bg[0x0000], 0x4000);
 }
 
-GAME( 1985, chanbara, 0,  chanbara, chanbara, chanbara_state, chanbara, ROT270, "Data East", "Chanbara", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1985, chanbara, 0, chanbara, chanbara, chanbara_state, init_chanbara, ROT270, "Data East", "Chanbara", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

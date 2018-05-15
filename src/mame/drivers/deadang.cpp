@@ -14,7 +14,7 @@
 
     - ghunter trackball input is broken
     - coin lockouts
-    - popnrun: inputs, can't coin it up, needs gfxs dumped and sorted out 
+    - popnrun: inputs, can't coin it up, needs gfxs dumped and sorted out
       (SIP modules like airraid);
 
 
@@ -301,7 +301,7 @@ static const gfx_layout popnrun_spritelayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( deadang )
+static GFXDECODE_START( gfx_deadang )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, charlayout,    512, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, spritelayout,  768, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0x000000, spritelayout, 1024, 16 )
@@ -309,7 +309,7 @@ static GFXDECODE_START( deadang )
 	GFXDECODE_ENTRY( "gfx5", 0x000000, spritelayout,    0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( popnrun )
+static GFXDECODE_START( gfx_popnrun )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, popnrun_charlayout,   0x20, 4 )
 	// TODO: probably runs on ROM based palette or just uses the first three entries?
 	GFXDECODE_ENTRY( "gfx2", 0x000000, spritelayout,    0, 8 )
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(deadang_state::deadang)
 	MCFG_SCREEN_UPDATE_DRIVER(deadang_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deadang)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deadang)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -404,35 +404,35 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(popnrun_state::popnrun)
 	deadang(config);
-	
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(popnrun_main_map)
 
 	MCFG_DEVICE_MODIFY("sub")
 	MCFG_DEVICE_PROGRAM_MAP(popnrun_sub_map)
-	
+
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(popnrun_sound_map)
 	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(popnrun_state, popnrun_screen_update)
-	
+
 	MCFG_DEVICE_REMOVE("watchdog")
-	
-	MCFG_GFXDECODE_MODIFY("gfxdecode", popnrun)
-	
+
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_popnrun)
+
 	MCFG_DEVICE_REMOVE("ym1")
 	MCFG_DEVICE_REMOVE("ym2")
 	MCFG_DEVICE_REMOVE("adpcm1")
 	MCFG_DEVICE_REMOVE("adpcm2")
-	
+
 	MCFG_DEVICE_MODIFY("seibu_sound")
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
 	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
-	
+
 	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
@@ -460,8 +460,8 @@ ROM_START( popnrun )
 	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD( "gfx2.bin",  0x0000, 0x80000, NO_DUMP )
 	// debugging fill, remove me
-	ROM_FILL(              0x0000, 0x80000, 0x33 ) 
-	
+	ROM_FILL(              0x0000, 0x80000, 0x33 )
+
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_ERASE00 ) /* pf1 layer */
 	ROM_LOAD( "gfx3.bin",  0x0000, 0x100000, NO_DUMP )
 
@@ -504,7 +504,7 @@ ROM_START( popnruna )
 	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF ) /* Sprites */
 	ROM_LOAD( "gfx2.bin",  0x0000, 0x80000, NO_DUMP )
 	// debugging fill, remove me
-	ROM_FILL(              0x0000, 0x80000, 0x33 ) 
+	ROM_FILL(              0x0000, 0x80000, 0x33 )
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_ERASE00 ) /* pf1 layer */
 	ROM_LOAD( "gfx3.bin",  0x0000, 0x100000, NO_DUMP )
@@ -715,19 +715,19 @@ ROM_END
 
 /* Driver Initialization */
 
-DRIVER_INIT_MEMBER(deadang_state,deadang)
+void deadang_state::init_deadang()
 {
 	m_adpcm1->decrypt();
 	m_adpcm2->decrypt();
 }
 
-DRIVER_INIT_MEMBER(popnrun_state,popnrun)
+void popnrun_state::init_popnrun()
 {
 //	m_adpcm1->decrypt();
 //	m_adpcm2->decrypt();
 }
 
-DRIVER_INIT_MEMBER(deadang_state,ghunter)
+void deadang_state::init_ghunter()
 {
 	m_adpcm1->decrypt();
 	m_adpcm2->decrypt();
@@ -737,10 +737,10 @@ DRIVER_INIT_MEMBER(deadang_state,ghunter)
 }
 
 /* Game Drivers */
-GAME( 1987, popnrun,  0,        popnrun, deadang, popnrun_state, popnrun, ROT0, "Seibu Kaihatsu / Yukai Tsukai",         "Pop'n Run - The Videogame (set 1)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, popnruna, popnrun,  popnrun, deadang, popnrun_state, popnrun, ROT0, "Seibu Kaihatsu / Yukai Tsukai",         "Pop'n Run - The Videogame (set 2)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, popnrun,  0,       popnrun, deadang, popnrun_state, init_popnrun, ROT0, "Seibu Kaihatsu / Yukai Tsukai",         "Pop'n Run - The Videogame (set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, popnruna, popnrun, popnrun, deadang, popnrun_state, init_popnrun, ROT0, "Seibu Kaihatsu / Yukai Tsukai",         "Pop'n Run - The Videogame (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, deadang,  0,       deadang, deadang, deadang_state, deadang, ROT0, "Seibu Kaihatsu",                        "Dead Angle",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, leadang,  deadang, deadang, deadang, deadang_state, deadang, ROT0, "Seibu Kaihatsu",                        "Lead Angle (Japan)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ghunter,  deadang, deadang, ghunter, deadang_state, ghunter, ROT0, "Seibu Kaihatsu",                        "Gang Hunter / Dead Angle",         MACHINE_SUPPORTS_SAVE ) // Title is 'Gang Hunter' or 'Dead Angle' depending on control method dipswitch
-GAME( 1988, ghunters, deadang, deadang, ghunter, deadang_state, ghunter, ROT0, "Seibu Kaihatsu (Segasa/Sonic license)", "Gang Hunter / Dead Angle (Spain)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, deadang,  0,       deadang, deadang, deadang_state, init_deadang, ROT0, "Seibu Kaihatsu",                        "Dead Angle",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leadang,  deadang, deadang, deadang, deadang_state, init_deadang, ROT0, "Seibu Kaihatsu",                        "Lead Angle (Japan)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ghunter,  deadang, deadang, ghunter, deadang_state, init_ghunter, ROT0, "Seibu Kaihatsu",                        "Gang Hunter / Dead Angle",          MACHINE_SUPPORTS_SAVE ) // Title is 'Gang Hunter' or 'Dead Angle' depending on control method dipswitch
+GAME( 1988, ghunters, deadang, deadang, ghunter, deadang_state, init_ghunter, ROT0, "Seibu Kaihatsu (Segasa/Sonic license)", "Gang Hunter / Dead Angle (Spain)",  MACHINE_SUPPORTS_SAVE )

@@ -389,7 +389,7 @@ static const gfx_layout mugsmash2_layout =
 	32*8
 };
 
-static GFXDECODE_START( mugsmash )
+static GFXDECODE_START( gfx_mugsmash )
 	GFXDECODE_ENTRY( "gfx1", 0, mugsmash_layout,   0x00, 16  ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, mugsmash2_layout,  0x100, 256  ) /* bg tiles */
 GFXDECODE_END
@@ -416,7 +416,7 @@ MACHINE_CONFIG_START(mugsmash_state::mugsmash)
 	MCFG_SCREEN_UPDATE_DRIVER(mugsmash_state, screen_update_mugsmash)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mugsmash)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mugsmash)
 
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
@@ -465,4 +465,4 @@ ROM_START( mugsmash )
 	ROM_LOAD( "mugs_15.bin", 0x180000, 0x080000, CRC(82e8187c) SHA1(c7a0e1b3d90dbbe2588886a27a07a9c336447ae3) )
 ROM_END
 
-GAME( 1990?, mugsmash, 0, mugsmash, mugsmash, mugsmash_state, 0, ROT0, "Electronic Devices Italy / 3D Games England", "Mug Smashers", MACHINE_SUPPORTS_SAVE )
+GAME( 1990?, mugsmash, 0, mugsmash, mugsmash, mugsmash_state, empty_init, ROT0, "Electronic Devices Italy / 3D Games England", "Mug Smashers", MACHINE_SUPPORTS_SAVE )

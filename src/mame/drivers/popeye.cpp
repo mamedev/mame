@@ -569,7 +569,7 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( popeye )
+static GFXDECODE_START( gfx_popeye )
 	GFXDECODE_SCALE( "gfx1", 0, charlayout,   16, 16, 2, 2 ) /* chars */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16+16*2, 8 ) /* sprites */
 GFXDECODE_END
@@ -603,7 +603,7 @@ MACHINE_CONFIG_START(tnx1_state::config)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tnx1_state, screen_vblank))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popeye)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popeye)
 	MCFG_PALETTE_ADD("palette", 16+16*2+8*4)
 	MCFG_PALETTE_INIT_OWNER(tnx1_state, palette_init)
 
@@ -965,13 +965,13 @@ ROM_START( popeyehs )
 ROM_END
 
 
-GAME( 1981, skyskipr, 0,        config,  skyskipr, tnx1_state,       0, ROT0, "Nintendo", "Sky Skipper",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeye,   0,        config,  popeye,   tpp2_state,       0, ROT0, "Nintendo", "Popeye (revision D)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeu,  popeye,   config,  popeye,   tpp2_noalu_state, 0, ROT0, "Nintendo", "Popeye (revision D not protected)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyef,  popeye,   config,  popeyef,  tpp2_noalu_state, 0, ROT0, "Nintendo", "Popeye (revision F)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyebl, popeye,   config,  popeye,   popeyebl_state,   0, ROT0, "bootleg",  "Popeye (bootleg set 1)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeb2, popeye,   config,  popeye,   popeyebl_state,   0, ROT0, "bootleg",  "Popeye (bootleg set 2)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyeb3, popeye,   config,  popeye,   tpp2_noalu_state, 0, ROT0, "bootleg",  "Popeye (bootleg set 3)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyej,  popeye,   config,  popeye,   tpp1_state,       0, ROT0, "Nintendo", "Popeye (Japan)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyejo, popeye,   config,  popeye,   tpp1_state,       0, ROT0, "Nintendo", "Popeye (Japan, Older)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popeyehs, popeye,   config,  popeye,   brazehs<tpp2_noalu_state>, 0, ROT0, "hack (Braze Technologies)", "Popeye (Braze High Score Kit P1.00D)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, skyskipr, 0,        config,  skyskipr, tnx1_state,       empty_init, ROT0, "Nintendo", "Sky Skipper",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeye,   0,        config,  popeye,   tpp2_state,       empty_init, ROT0, "Nintendo", "Popeye (revision D)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeu,  popeye,   config,  popeye,   tpp2_noalu_state, empty_init, ROT0, "Nintendo", "Popeye (revision D not protected)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyef,  popeye,   config,  popeyef,  tpp2_noalu_state, empty_init, ROT0, "Nintendo", "Popeye (revision F)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyebl, popeye,   config,  popeye,   popeyebl_state,   empty_init, ROT0, "bootleg",  "Popeye (bootleg set 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeb2, popeye,   config,  popeye,   popeyebl_state,   empty_init, ROT0, "bootleg",  "Popeye (bootleg set 2)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyeb3, popeye,   config,  popeye,   tpp2_noalu_state, empty_init, ROT0, "bootleg",  "Popeye (bootleg set 3)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyej,  popeye,   config,  popeye,   tpp1_state,       empty_init, ROT0, "Nintendo", "Popeye (Japan)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyejo, popeye,   config,  popeye,   tpp1_state,       empty_init, ROT0, "Nintendo", "Popeye (Japan, Older)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyehs, popeye,   config,  popeye,   brazehs<tpp2_noalu_state>, empty_init, ROT0, "hack (Braze Technologies)", "Popeye (Braze High Score Kit P1.00D)", MACHINE_SUPPORTS_SAVE )

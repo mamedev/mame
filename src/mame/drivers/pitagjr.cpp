@@ -234,5 +234,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   STATE          INIT   COMPANY  FULLNAME           FLAGS
-COMP( 199?, pitagjr,  0,      0,      pitajr,  pitajr, pitagjr_state, 0,    "VTech", "Pitagorin Junior", MACHINE_IS_SKELETON )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS          INIT        COMPANY  FULLNAME            FLAGS
+COMP( 199?, pitagjr, 0,      0,      pitajr,  pitajr, pitagjr_state, empty_init, "VTech", "Pitagorin Junior", MACHINE_IS_SKELETON )

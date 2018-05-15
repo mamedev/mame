@@ -10,7 +10,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/6821pia.h"
 #include "machine/input_merger.h"
 #include "machine/pit8253.h"
@@ -114,7 +114,7 @@ public:
 	DECLARE_WRITE8_MEMBER(osbexec_c000_w);
 	DECLARE_READ8_MEMBER(osbexec_kbd_r);
 	DECLARE_READ8_MEMBER(osbexec_rtc_r);
-	DECLARE_DRIVER_INIT(osbexec);
+	void init_osbexec();
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
 	DECLARE_READ8_MEMBER(osbexec_pia0_a_r);
@@ -528,7 +528,7 @@ TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 }
 
 
-DRIVER_INIT_MEMBER(osbexec_state,osbexec)
+void osbexec_state::init_osbexec()
 {
 	m_fontram_region = machine().memory().region_alloc( "fontram", 0x1000, 1, ENDIANNESS_LITTLE);
 	m_vram_region = machine().memory().region_alloc( "vram", 0x2000, 1, ENDIANNESS_LITTLE );
@@ -646,5 +646,5 @@ ROM_START( osbexec )
 	ROM_LOAD( "execv12.ud18", 0x0000, 0x2000, CRC(70798c2f) SHA1(2145a72da563bed1d6d455c77e48cc011a5f1153) )    /* Checksum C6B2 */
 ROM_END
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT      COMPANY     FULLNAME        FLAGS
-COMP( 1982, osbexec,    0,      0,      osbexec,    osbexec, osbexec_state, osbexec,  "Osborne",  "Executive",    MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME     FLAGS
+COMP( 1982, osbexec, 0,      0,      osbexec, osbexec, osbexec_state, init_osbexec, "Osborne", "Executive", MACHINE_NOT_WORKING )

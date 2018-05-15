@@ -349,7 +349,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( appoooh )
+static GFXDECODE_START( gfx_appoooh )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     32*8, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,      0, 32 )
@@ -382,7 +382,7 @@ static const gfx_layout robowres_spritelayout =
 };
 
 
-static GFXDECODE_START( robowres )
+static GFXDECODE_START( gfx_robowres )
 	GFXDECODE_ENTRY( "gfx1", 0, robowres_charlayout,        0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, robowres_charlayout,         0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, robowres_spritelayout,      0, 32 )
@@ -459,7 +459,7 @@ MACHINE_CONFIG_START(appoooh_state::appoooh)
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_appoooh)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", appoooh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_appoooh)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 
 	MCFG_PALETTE_INIT_OWNER(appoooh_state,appoooh)
@@ -481,7 +481,7 @@ MACHINE_CONFIG_START(appoooh_state::robowres)
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_robowres)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", robowres)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_robowres)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 
 	MCFG_PALETTE_INIT_OWNER(appoooh_state,robowres)
@@ -603,7 +603,7 @@ ROM_END
  *************************************/
 
 
-DRIVER_INIT_MEMBER(appoooh_state,robowresb)
+void appoooh_state::init_robowresb()
 {
 	memcpy(m_decrypted_opcodes, memregion("maincpu")->base() + 0x1c000, 0x8000);
 }
@@ -615,6 +615,6 @@ DRIVER_INIT_MEMBER(appoooh_state,robowresb)
  *
  *************************************/
 
-GAME( 1984, appoooh,   0,        appoooh,  appoooh,  appoooh_state, 0,         ROT0, "Sanritsu / Sega", "Appoooh",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, robowres,  0,        robowrese,robowres, appoooh_state, 0,         ROT0, "Sanritsu / Sega", "Robo Wres 2001",           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, robowresb, robowres, robowres, robowres, appoooh_state, robowresb, ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, appoooh,   0,        appoooh,   appoooh,  appoooh_state, empty_init,     ROT0, "Sanritsu / Sega", "Appoooh",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, robowres,  0,        robowrese, robowres, appoooh_state, empty_init,     ROT0, "Sanritsu / Sega", "Robo Wres 2001",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, robowresb, robowres, robowres,  robowres, appoooh_state, init_robowresb, ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", MACHINE_SUPPORTS_SAVE )

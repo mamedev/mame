@@ -717,11 +717,11 @@ static const gfx_layout jtces40_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( jtces23 )
+static GFXDECODE_START( gfx_jtces23 )
 	GFXDECODE_ENTRY( UB8830D_TAG, 0x1000, jtces23_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( jtces40 )
+static GFXDECODE_START( gfx_jtces40 )
 	GFXDECODE_ENTRY( UB8830D_TAG, 0x1000, jtces40_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -792,7 +792,7 @@ MACHINE_CONFIG_START(jtces23_state::jtces23)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jtces23)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jtces23)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
@@ -815,7 +815,7 @@ MACHINE_CONFIG_START(jtces40_state::jtces40)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jtces40)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jtces40)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(jtc_state,jtc_es40)
 
@@ -855,8 +855,8 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT    STATE          INIT  COMPANY             FULLNAME                    FLAGS */
-COMP( 1987, jtc,        0,       0,     jtc,    jtc,     jtc_state,     0,    "Jugend+Technik",   "CompJU+TEr",               MACHINE_NOT_WORKING )
-COMP( 1988, jtces88,    jtc,     0,     jtces88,jtc,     jtces88_state, 0,    "Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)", MACHINE_NOT_WORKING )
-COMP( 1989, jtces23,    jtc,     0,     jtces23,jtces23, jtces23_state, 0,    "Jugend+Technik",   "CompJU+TEr (ES 2.3)",      MACHINE_NOT_WORKING )
-COMP( 1990, jtces40,    jtc,     0,     jtces40,jtces40, jtces40_state, 0,    "Jugend+Technik",   "CompJU+TEr (ES 4.0)",      MACHINE_NOT_WORKING )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY           FULLNAME                    FLAGS */
+COMP( 1987, jtc,     0,      0,      jtc,     jtc,     jtc_state,     empty_init, "Jugend+Technik", "CompJU+TEr",               MACHINE_NOT_WORKING )
+COMP( 1988, jtces88, jtc,    0,      jtces88, jtc,     jtces88_state, empty_init, "Jugend+Technik", "CompJU+TEr (EMR-ES 1988)", MACHINE_NOT_WORKING )
+COMP( 1989, jtces23, jtc,    0,      jtces23, jtces23, jtces23_state, empty_init, "Jugend+Technik", "CompJU+TEr (ES 2.3)",      MACHINE_NOT_WORKING )
+COMP( 1990, jtces40, jtc,    0,      jtces40, jtces40, jtces40_state, empty_init, "Jugend+Technik", "CompJU+TEr (ES 4.0)",      MACHINE_NOT_WORKING )

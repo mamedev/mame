@@ -31,7 +31,7 @@ public:
 		m_priorityram(*this, "priorityram")
 	{ }
 
-	DECLARE_DRIVER_INIT(blstroid);
+	void init_blstroid();
 	void blstroid(machine_config &config);
 
 protected:

@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sensors_w);
 	DECLARE_READ16_MEMBER(drill_irq_r);
 	DECLARE_WRITE16_MEMBER(drill_irq_w);
-	DECLARE_DRIVER_INIT(drill);
+	void init_drill();
 	DECLARE_MACHINE_START(drill);
 	DECLARE_MACHINE_RESET(drill);
 	INTERRUPT_GEN_MEMBER(drill_vblank_irq);
@@ -312,7 +312,7 @@ static const gfx_layout tile_layout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( 2mindril )
+static GFXDECODE_START( gfx_2mindril )
 	GFXDECODE_ENTRY( nullptr,   0x000000, charlayout,       0x0000, 0x0400>>4 ) /* Dynamically modified */
 	GFXDECODE_ENTRY( "gfx2", 0x000000, tile_layout,      0x0000, 0x2000>>4 ) /* Tiles area */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, spriteram_layout, 0x1000, 0x1000>>4 ) /* Sprites area */
@@ -359,7 +359,7 @@ MACHINE_CONFIG_START(_2mindril_state::drill)
 	MCFG_DEVICE_PROGRAM_MAP(drill_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _2mindril_state,  drill_vblank_irq)
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(_2mindril_state, drill_device_irq, 60)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 2mindril)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_2mindril)
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSW"))
@@ -473,10 +473,10 @@ void _2mindril_state::tile_decode()
 	}
 }
 
-DRIVER_INIT_MEMBER(_2mindril_state,drill)
+void _2mindril_state::init_drill()
 {
-	m_f3_game=TMDRILL;
+	m_f3_game = TMDRILL;
 	tile_decode();
 }
 
-GAME( 1993, 2mindril,    0,        drill,    drill, _2mindril_state,    drill, ROT0,  "Taito", "Two Minute Drill", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)
+GAME( 1993, 2mindril, 0, drill, drill, _2mindril_state, init_drill, ROT0, "Taito", "Two Minute Drill", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)

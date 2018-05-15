@@ -18,7 +18,7 @@
 #include "machine/bfm_sc45_helper.h"
 #include "speaker.h"
 
-DRIVER_INIT_MEMBER(adder5_state,ad5)
+void adder5_state::init_ad5()
 {
 	// sc5 roms always start with SC5
 	uint8_t *src = memregion( "maincpu" )->base();

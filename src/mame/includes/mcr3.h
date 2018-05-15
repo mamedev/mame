@@ -46,15 +46,15 @@ public:
 	DECLARE_WRITE8_MEMBER(spyhunt_op4_w);
 	DECLARE_READ8_MEMBER(turbotag_ip2_r);
 	DECLARE_READ8_MEMBER(turbotag_kludge_r);
-	DECLARE_DRIVER_INIT(crater);
-	DECLARE_DRIVER_INIT(demoderm);
-	DECLARE_DRIVER_INIT(turbotag);
-	DECLARE_DRIVER_INIT(powerdrv);
-	DECLARE_DRIVER_INIT(stargrds);
-	DECLARE_DRIVER_INIT(maxrpm);
-	DECLARE_DRIVER_INIT(rampage);
-	DECLARE_DRIVER_INIT(spyhunt);
-	DECLARE_DRIVER_INIT(sarge);
+	void init_crater();
+	void init_demoderm();
+	void init_turbotag();
+	void init_powerdrv();
+	void init_stargrds();
+	void init_maxrpm();
+	void init_rampage();
+	void init_spyhunt();
+	void init_sarge();
 	DECLARE_VIDEO_START(spyhunt);
 	DECLARE_PALETTE_INIT(spyhunt);
 

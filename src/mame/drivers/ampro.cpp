@@ -24,7 +24,7 @@ ToDo:
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
@@ -44,7 +44,7 @@ public:
 		, m_floppy0(*this, "fdc:0")
 	{ }
 
-	DECLARE_DRIVER_INIT(ampro);
+	void init_ampro();
 	DECLARE_MACHINE_RESET(ampro);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE8_MEMBER(port00_w);
@@ -140,7 +140,7 @@ MACHINE_RESET_MEMBER( ampro_state, ampro )
 	membank("bankw0")->set_entry(0); // always write to ram
 }
 
-DRIVER_INIT_MEMBER( ampro_state, ampro )
+void ampro_state::init_ampro()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -196,5 +196,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT    COMPANY      FULLNAME            FLAGS
-COMP( 1980, ampro,  0,      0,       ampro,     ampro,   ampro_state,   ampro,  "Ampro",     "Little Z80 Board", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME            FLAGS
+COMP( 1980, ampro, 0,      0,      ampro,   ampro, ampro_state, init_ampro, "Ampro", "Little Z80 Board", 0 )

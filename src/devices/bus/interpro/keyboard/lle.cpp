@@ -23,16 +23,59 @@
  *    70, 71, 72                    keyswitch matrix connectors?
  *    5?-64                         status LEDs
  *
+ * TODO
+ *   - not functional, WIP
+ *   - requires ~500us after start before ready to accept commands
+ *   - keyboard matrix is not yet mapped
  */
+
+/*
+ * Work in progress notes
+ *
+ * 11MHz XTAL / 15 / 32 gives 22.916kHz clock (~43.6us/cycle)
+ *   - prescaler loaded with 0xfa, gives ~262us/tick (~3.819kHz)
+ *
+ * P1
+ *   0x01
+ *   0x02
+ *   0x04
+ *   0x08
+ *   0x10 - speaker out
+ *   0x20
+ *   0x40 - bus data valid?
+ *   0x80
+ *
+ * P2
+ *   0x0f - bank select
+ *   0x20 - serial tx, inverted
+ *
+ * T0
+ *   serial rx, inverted
+ *
+ * T1
+ *
+ * At runtime, R7 contains status flags:
+ *   0x01
+ *   0x02
+ *   0x04
+ *   0x08 - tx buffer empty?
+ *   0x10 - rx double ESC?
+ *   0x20 - timer 0x3a expired
+ *   0x40 - rx complete
+ *   0x80 - rx timer active
+ */
+
 #include "emu.h"
 #include "lle.h"
 
-#include "cpu/mcs48/mcs48.h"
-
-#include "machine/keyboard.ipp"
 #include "speaker.h"
+#include "machine/keyboard.ipp"
 
-#define VERBOSE 0
+#define LOG_GENERAL (1U << 0)
+#define LOG_RXTX    (1U << 1)
+#define LOG_PORT    (1U << 2)
+
+#define VERBOSE (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE_NS(INTERPRO_LLE_EN_US_KEYBOARD, bus::interpro::keyboard, lle_en_us_device, "kbd_lle_en_us", "InterPro Keyboard (LLE, US English)")
@@ -129,10 +172,10 @@ INPUT_PORTS_END
 
 ROM_START(lle_en_us)
 	ROM_REGION(0x800, "mcu", 0)
-	ROM_LOAD("i8049ah.5", 0x0, 0x800, NO_DUMP)
+	ROM_LOAD("i8049ah.5", 0x0, 0x800, CRC(7b74f43b) SHA1(c43d41ac52df4d1282edc06f891cf27ef9255faa))
 
 	ROM_REGION(0x1000, "eprom", 0)
-	ROM_LOAD("sd03595.37", 0x0, 0x1000, NO_DUMP)
+	ROM_LOAD("sd03595.37", 0x0, 0x1000, CRC(263ed215) SHA1(4de550ff1eec7996c7f26e92c5d268aa24024a7f))
 ROM_END
 
 } // anonymous namespace
@@ -143,15 +186,27 @@ lle_device_base::lle_device_base(machine_config const &mconfig, device_type type
 	, device_matrix_keyboard_interface(mconfig, *this, "row_0", "row_1", "row_2", "row_3", "row_4")
 	, m_mcu(*this, "mcu")
 	, m_bell(*this, "bell")
+	, m_ext(*this, "ext")
+	, m_txd(0)
 {
 }
-
-WRITE_LINE_MEMBER(lle_device_base::input_txd)
-{
-}
-
 MACHINE_CONFIG_START(lle_device_base::device_add_mconfig)
 	MCFG_DEVICE_ADD("mcu", I8049, 11_MHz_XTAL)
+	MCFG_DEVICE_ADDRESS_MAP(AS_IO, io_map)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, lle_device_base, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, lle_device_base, t1_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, lle_device_base, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, lle_device_base, p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, lle_device_base, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, lle_device_base, p2_w))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, lle_device_base, bus_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, lle_device_base, bus_w))
+
+	MCFG_DEVICE_ADD(m_ext, ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(ext_map)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
 
 	SPEAKER(config, "keyboard").front_center();
 	MCFG_DEVICE_ADD("bell", SPEAKER_SOUND, 0)
@@ -164,6 +219,102 @@ void lle_device_base::device_start()
 
 void lle_device_base::device_reset()
 {
+}
+
+void lle_device_base::io_map(address_map &map)
+{
+	map(0, 0xff).m(m_ext, FUNC(address_map_bank_device::amap8));
+}
+
+void lle_device_base::ext_map(address_map &map)
+{
+	map(0, 0xfff).rom().region("eprom", 0);
+
+	map(0x7fe, 0x7fe).w(this, FUNC(lle_device_base::latch_w));
+}
+
+READ_LINE_MEMBER(lle_device_base::t0_r)
+{
+	if ((VERBOSE & LOG_RXTX) && (m_mcu->pc() == 0x8e) && m_txd == 0)
+	{
+		auto const suppressor(machine().disable_side_effects());
+
+		address_space &mcu_ram(m_mcu->space(AS_DATA));
+		const u8 input(mcu_ram.read_byte(0x42));
+
+		LOGMASKED(LOG_RXTX, "received byte 0x%02x\n", input);
+	}
+
+	return m_txd;
+}
+
+READ_LINE_MEMBER(lle_device_base::t1_r)
+{
+	// TODO: possibly one of the modifiers?
+
+	return CLEAR_LINE;
+}
+
+READ8_MEMBER(lle_device_base::p1_r)
+{
+	LOGMASKED(LOG_PORT, "p1_r (%s)\n", machine().describe_context());
+
+	return 0xff;
+}
+
+WRITE8_MEMBER(lle_device_base::p1_w)
+{
+	LOGMASKED(LOG_PORT, "p1_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	m_bell->level_w(BIT(data, 4));
+}
+
+READ8_MEMBER(lle_device_base::p2_r)
+{
+	LOGMASKED(LOG_PORT, "p2_r (%s)\n", machine().describe_context());
+
+	return 0xff;
+}
+
+WRITE8_MEMBER(lle_device_base::p2_w)
+{
+	LOGMASKED(LOG_PORT, "p2_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	if ((VERBOSE & LOG_RXTX) && (m_mcu->pc() == 0x1d || m_mcu->pc() == 0x21))
+	{
+		auto const suppressor(machine().disable_side_effects());
+
+		address_space &mcu_ram(m_mcu->space(AS_DATA));
+		const u8 txd_state(mcu_ram.read_byte(0x1d));
+		const u8 output(mcu_ram.read_byte(0x2d));
+
+		if (txd_state == 0x20)
+			LOGMASKED(LOG_RXTX, "transmitting byte 0x%02x\n", output);
+	}
+
+	m_ext->set_bank(data & 0x0f);
+
+	// serial transmit
+	output_rxd((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+READ8_MEMBER(lle_device_base::bus_r)
+{
+	LOGMASKED(LOG_PORT, "bus_r (%s)\n", machine().describe_context());
+
+	return 0xff;
+}
+
+WRITE8_MEMBER(lle_device_base::bus_w)
+{
+	LOGMASKED(LOG_PORT, "bus_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	m_bus = data;
+}
+
+WRITE8_MEMBER(lle_device_base::latch_w)
+{
+	LOGMASKED(LOG_PORT, "latch_w 0x%02x (%s)\n", data, machine().describe_context());
 }
 
 lle_en_us_device::lle_en_us_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)

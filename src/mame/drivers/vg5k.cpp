@@ -98,7 +98,7 @@ public:
 	DECLARE_WRITE8_MEMBER ( ef9345_io_w );
 	DECLARE_READ8_MEMBER ( cassette_r );
 	DECLARE_WRITE8_MEMBER ( cassette_w );
-	DECLARE_DRIVER_INIT(vg5k);
+	void init_vg5k();
 	TIMER_CALLBACK_MEMBER(z80_irq_clear);
 	TIMER_DEVICE_CALLBACK_MEMBER(z80_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg5k_scanline);
@@ -336,20 +336,20 @@ static const gfx_layout vg5k_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( vg5k )
+static GFXDECODE_START( gfx_vg5k )
 	GFXDECODE_ENTRY( "ef9345", 0x2000, vg5k_charlayout, 0, 4 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER(vg5k_state,vg5k)
+void vg5k_state::init_vg5k()
 {
 	uint8_t *FNT = memregion("ef9345")->base();
-	uint16_t a,b,c,d,dest=0x2000;
+	uint16_t dest = 0x2000;
 
 	/* Unscramble the chargen rom as the format is too complex for gfxdecode to handle unaided */
-	for (a = 0; a < 8192; a+=4096)
-		for (b = 0; b < 2048; b+=64)
-			for (c = 0; c < 4; c++)
-				for (d = 0; d < 64; d+=4)
+	for (uint16_t a = 0; a < 8192; a+=4096)
+		for (uint16_t b = 0; b < 2048; b+=64)
+			for (uint16_t c = 0; c < 4; c++)
+				for (uint16_t d = 0; d < 64; d+=4)
 					FNT[dest++]=FNT[a|b|c|d];
 
 
@@ -385,7 +385,7 @@ MACHINE_CONFIG_START(vg5k_state::vg5k)
 	MCFG_SCREEN_SIZE(336, 300)
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vg5k)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vg5k)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
@@ -427,5 +427,5 @@ ROM_START( vg5k )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY     FULLNAME   FLAGS
-COMP( 1984, vg5k,   0,      0,      vg5k,    vg5k,  vg5k_state,  vg5k, "Philips",  "VG-5000", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY    FULLNAME   FLAGS
+COMP( 1984, vg5k, 0,      0,      vg5k,    vg5k,  vg5k_state, init_vg5k, "Philips", "VG-5000", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

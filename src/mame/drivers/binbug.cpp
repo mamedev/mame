@@ -53,7 +53,7 @@
 #include "emu.h"
 #include "bus/rs232/keyboard.h"
 #include "cpu/s2650/s2650.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
@@ -222,7 +222,7 @@ static const gfx_layout dg640_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( dg640 )
+static GFXDECODE_START( gfx_dg640 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, dg640_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(binbug_state::binbug)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dg640)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dg640)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Keyboard */
@@ -344,8 +344,8 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT  COMPANY      FULLNAME      FLAGS
-COMP( 1980, binbug, pipbug,   0,     binbug,    binbug, binbug_state, 0,    "MicroByte", "BINBUG 3.6", 0 )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT        COMPANY      FULLNAME      FLAGS
+COMP( 1980, binbug, pipbug,   0,     binbug,    binbug, binbug_state, empty_init, "MicroByte", "BINBUG 3.6", 0 )
 
 
 
@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(dg680_state::dg680)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dg640)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dg640)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Keyboard */
@@ -593,5 +593,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  CLASS        INIT  COMPANY            FULLNAME                   FLAGS
-COMP( 1980, dg680, 0,      0,       dg680,   dg680, dg680_state, 0,    "David Griffiths", "DG680 with DGOS-Z80 1.4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY            FULLNAME                   FLAGS
+COMP( 1980, dg680, 0,      0,      dg680,   dg680, dg680_state, empty_init, "David Griffiths", "DG680 with DGOS-Z80 1.4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

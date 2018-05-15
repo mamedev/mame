@@ -54,7 +54,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "machine/k7659kb.h"
 #include "machine/z80ctc.h"
@@ -249,7 +249,7 @@ static const gfx_layout pcm_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( pcm )
+static GFXDECODE_START( gfx_pcm )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pcm_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -269,7 +269,7 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcm)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Sound */
@@ -328,5 +328,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY           FULLNAME  FLAGS */
-COMP( 1988, pcm,    0,      0,       pcm,       pcm,   pcm_state,  0,    "Mugler/Mathes",  "PC/M",   0)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY          FULLNAME  FLAGS */
+COMP( 1988, pcm,  0,      0,      pcm,     pcm,   pcm_state, empty_init, "Mugler/Mathes", "PC/M",   0)

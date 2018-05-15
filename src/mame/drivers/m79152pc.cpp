@@ -120,7 +120,7 @@ static const gfx_layout m79152pc_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( m79152pc )
+static GFXDECODE_START( gfx_m79152pc )
 	GFXDECODE_ENTRY( "chargen", 0x0000, m79152pc_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -138,7 +138,7 @@ MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 300-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m79152pc_state, screen_update_m79152pc)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m79152pc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m79152pc)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
@@ -177,5 +177,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY       FULLNAME         FLAGS
-COMP( ????, m79152pc,  0,       0,       m79152pc,  m79152pc, m79152pc_state, 0,    "Mera-Elzab", "MERA 79152 PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY       FULLNAME         FLAGS
+COMP( ????, m79152pc, 0,      0,      m79152pc, m79152pc, m79152pc_state, empty_init, "Mera-Elzab", "MERA 79152 PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

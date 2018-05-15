@@ -1728,7 +1728,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( taitosj )
+static GFXDECODE_START( gfx_taitosj )
 	GFXDECODE_ENTRY( nullptr, 0x9000, charlayout,   0, 8 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( nullptr, 0x9000, spritelayout, 0, 8 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( nullptr, 0xa800, charlayout,   0, 8 )    /* the game dynamically modifies this */
@@ -1781,7 +1781,7 @@ MACHINE_CONFIG_START(taitosj_state::nomcu)
 	MCFG_SCREEN_UPDATE_DRIVER(taitosj_state, screen_update_taitosj)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitosj)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitosj)
 	MCFG_PALETTE_ADD("palette", 64)
 
 
@@ -2815,12 +2815,12 @@ void taitosj_state::init_common()
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&taitosj_state::reset_common, this));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,taitosj)
+void taitosj_state::init_taitosj()
 {
 	init_common();
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,spacecr)
+void taitosj_state::init_spacecr()
 {
 	init_common();
 
@@ -2828,7 +2828,7 @@ DRIVER_INIT_MEMBER(taitosj_state,spacecr)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd48b, 0xd48b, read8_delegate(FUNC(taitosj_state::spacecr_prot_r),this));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,alpine)
+void taitosj_state::init_alpine()
 {
 	init_common();
 
@@ -2837,7 +2837,7 @@ DRIVER_INIT_MEMBER(taitosj_state,alpine)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50f, 0xd50f, write8_delegate(FUNC(taitosj_state::alpine_protection_w),this));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,alpinea)
+void taitosj_state::init_alpinea()
 {
 	init_common();
 
@@ -2846,7 +2846,7 @@ DRIVER_INIT_MEMBER(taitosj_state,alpinea)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50e, 0xd50e, write8_delegate(FUNC(taitosj_state::alpinea_bankswitch_w),this));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,junglhbr)
+void taitosj_state::init_junglhbr()
 {
 	init_common();
 
@@ -2854,28 +2854,28 @@ DRIVER_INIT_MEMBER(taitosj_state,junglhbr)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x9000, 0xbfff, write8_delegate(FUNC(taitosj_state::junglhbr_characterram_w),this));
 }
 
-GAME( 1981, spaceskr, 0,        nomcu,    spaceskr, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Space Seeker", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, spacecr,  0,        nomcu,    spacecr,  taitosj_state,   spacecr, ROT90,  "Taito Corporation", "Space Cruiser", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, junglek,  0,        nomcu,    junglek,  taitosj_state,   taitosj, ROT180, "Taito Corporation", "Jungle King (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, junglekas,junglek,  nomcu,    junglek,  taitosj_state,   taitosj, ROT180, "Taito Corporation", "Jungle King (alternate sound)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, junglekj2,junglek,  nomcu,    junglek,  taitosj_state,   taitosj, ROT180, "Taito Corporation", "Jungle King (Japan, earlier)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jungleh,  junglek,  nomcu,    junglek,  taitosj_state,   taitosj, ROT180, "Taito America Corporation", "Jungle Hunt (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, junglehbr,junglek,  nomcu,    junglek,  taitosj_state,   junglhbr,ROT180, "Taito do Brasil",   "Jungle Hunt (Brazil)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, piratpet, junglek,  nomcu,    piratpet, taitosj_state,   taitosj, ROT180, "Taito America Corporation", "Pirate Pete", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jungleby, junglek,  nomcu,    junglek,  taitosj_state,   taitosj, ROT180, "bootleg", "Jungle Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, alpine,   0,        nomcu,    alpine,   taitosj_state,   alpine,  ROT270, "Taito Corporation", "Alpine Ski (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, alpinea,  alpine,   nomcu,    alpinea,  taitosj_state,   alpinea, ROT270, "Taito Corporation", "Alpine Ski (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, timetunl, 0,        nomcu,    timetunl, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Time Tunnel", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, wwestern, 0,        nomcu,    wwestern, taitosj_state,   taitosj, ROT270, "Taito Corporation", "Wild Western (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, wwestern1,wwestern, nomcu,    wwestern, taitosj_state,   taitosj, ROT270, "Taito Corporation", "Wild Western (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, frontlin, 0,        mcu,      frontlin, taitosj_state,   taitosj, ROT270, "Taito Corporation", "Front Line", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, elevator, 0,        mcu,      elevator, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Elevator Action (5 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, elevatorb,elevator, nomcu,    elevator, taitosj_state,   taitosj, ROT0,   "bootleg", "Elevator Action (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, elevator4,elevator, mcu,      elevator, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Elevator Action (4 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tinstar,  0,        mcu,      tinstar,  taitosj_state,   taitosj, ROT0,   "Taito Corporation", "The Tin Star (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tinstar2, tinstar,  mcu,      tinstar,  taitosj_state,   taitosj, ROT0,   "Taito Corporation", "The Tin Star (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, waterski, 0,        nomcu,    waterski, taitosj_state,   taitosj, ROT270, "Taito Corporation", "Water Ski", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bioatack, 0,        nomcu,    bioatack, taitosj_state,   taitosj, ROT270, "Taito Corporation (Fox Video Games license)", "Bio Attack", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sfposeid, 0,        mcu,      sfposeid, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Sea Fighter Poseidon", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hwrace,   0,        nomcu,    hwrace,   taitosj_state,   taitosj, ROT270, "Taito Corporation", "High Way Race", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kikstart, 0,        kikstart, kikstart, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Kick Start - Wheelie King", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, spaceskr, 0,        nomcu,    spaceskr, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Space Seeker", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, spacecr,  0,        nomcu,    spacecr,  taitosj_state, init_spacecr, ROT90,  "Taito Corporation", "Space Cruiser", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, junglek,  0,        nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation", "Jungle King (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, junglekas,junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation", "Jungle King (alternate sound)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, junglekj2,junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation", "Jungle King (Japan, earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jungleh,  junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito America Corporation", "Jungle Hunt (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, junglehbr,junglek,  nomcu,    junglek,  taitosj_state, init_junglhbr,ROT180, "Taito do Brasil",   "Jungle Hunt (Brazil)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, piratpet, junglek,  nomcu,    piratpet, taitosj_state, init_taitosj, ROT180, "Taito America Corporation", "Pirate Pete", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jungleby, junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "bootleg", "Jungle Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, alpine,   0,        nomcu,    alpine,   taitosj_state, init_alpine,  ROT270, "Taito Corporation", "Alpine Ski (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, alpinea,  alpine,   nomcu,    alpinea,  taitosj_state, init_alpinea, ROT270, "Taito Corporation", "Alpine Ski (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, timetunl, 0,        nomcu,    timetunl, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Time Tunnel", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wwestern, 0,        nomcu,    wwestern, taitosj_state, init_taitosj, ROT270, "Taito Corporation", "Wild Western (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wwestern1,wwestern, nomcu,    wwestern, taitosj_state, init_taitosj, ROT270, "Taito Corporation", "Wild Western (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, frontlin, 0,        mcu,      frontlin, taitosj_state, init_taitosj, ROT270, "Taito Corporation", "Front Line", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, elevator, 0,        mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Elevator Action (5 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, elevatorb,elevator, nomcu,    elevator, taitosj_state, init_taitosj, ROT0,   "bootleg", "Elevator Action (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, elevator4,elevator, mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Elevator Action (4 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tinstar,  0,        mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "The Tin Star (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tinstar2, tinstar,  mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "The Tin Star (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, waterski, 0,        nomcu,    waterski, taitosj_state, init_taitosj, ROT270, "Taito Corporation", "Water Ski", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bioatack, 0,        nomcu,    bioatack, taitosj_state, init_taitosj, ROT270, "Taito Corporation (Fox Video Games license)", "Bio Attack", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sfposeid, 0,        mcu,      sfposeid, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Sea Fighter Poseidon", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hwrace,   0,        nomcu,    hwrace,   taitosj_state, init_taitosj, ROT270, "Taito Corporation", "High Way Race", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kikstart, 0,        kikstart, kikstart, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Kick Start - Wheelie King", MACHINE_SUPPORTS_SAVE )

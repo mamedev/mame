@@ -1844,7 +1844,7 @@ static const gfx_layout road_layout =
                                 Big Run
 **************************************************************************/
 
-static GFXDECODE_START( bigrun )
+static GFXDECODE_START( gfx_bigrun )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x0e00/2 , 16 ) // Scroll 0
 	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x1600/2 , 16 ) // Scroll 1
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x3600/2 , 16 ) // Scroll 2
@@ -1857,7 +1857,7 @@ GFXDECODE_END
                                 Cisco Heat
 **************************************************************************/
 
-static GFXDECODE_START( cischeat )
+static GFXDECODE_START( gfx_cischeat )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x1c00/2, 32  ) // Scroll 0
 	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x2c00/2, 32  ) // Scroll 1
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x6c00/2, 32  ) // Scroll 2
@@ -1870,7 +1870,7 @@ GFXDECODE_END
                             F1 GrandPrix Star
 **************************************************************************/
 
-static GFXDECODE_START( f1gpstar )
+static GFXDECODE_START( gfx_f1gpstar )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,  0x1e00/2, 16  ) // Scroll 0
 	//GFXDECODE_ENTRY( "scroll1", 0, tiles_8x8,  0x2e00/2, 16  ) // Scroll 1
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,  0x6e00/2, 16  ) // Scroll 2
@@ -1883,7 +1883,7 @@ GFXDECODE_END
                                 Scud Hammer
 **************************************************************************/
 
-static GFXDECODE_START( scudhamm )
+static GFXDECODE_START( gfx_scudhamm )
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,          0x1e00/2, 16  )   // Scroll 0
 	//GFXDECODE_ENTRY( "scroll0", 0, tiles_8x8,          0x0000/2, 16  )   // UNUSED
 	//GFXDECODE_ENTRY( "scroll2", 0, tiles_8x8,          0x4e00/2, 16  )   // Scroll 2
@@ -1961,7 +1961,7 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_bigrun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigrun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigrun)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x4000/2)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -2012,7 +2012,7 @@ MACHINE_CONFIG_START(cischeat_state::cischeat)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_cischeat)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cischeat)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cischeat)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -2049,7 +2049,7 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstar)
 	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_sound_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", f1gpstar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1gpstar)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -2132,7 +2132,7 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scudhamm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scudhamm)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -2223,7 +2223,7 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scudhamm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scudhamm)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -2426,7 +2426,7 @@ ROM_START( bigrun )
 	ROM_LOAD( "br8951b.23",  0x000000, 0x010000, CRC(b9474fec) SHA1(f1f0eab014e8f52572484b83f56189e0ff6f2b0d) ) // 000xxxxxxxxxxxxx
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state,bigrun)
+void cischeat_state::init_bigrun()
 {
 	cischeat_untangle_sprites("sprites");   // Untangle sprites
 	phantasm_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
@@ -2545,7 +2545,7 @@ ROM_START( cischeat )
 	ROM_LOAD( "ch9072.03",  0x000000, 0x040000, CRC(7e79151a) SHA1(5a305cff8600446be426641ce112208b379094b9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state,cischeat)
+void cischeat_state::init_cischeat()
 {
 	cischeat_untangle_sprites("sprites");   // Untangle sprites
 	astyanax_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
@@ -2843,7 +2843,7 @@ ROM_START( f1gpstaro )
 	ROM_LOAD( "pr90015b",  0x000000, 0x000100, CRC(be240dac) SHA1(6203b73c1a5e09e525380a78b555c3818929d5eb) )   // FIXED BITS (000xxxxx000xxxx1)
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state,f1gpstar)
+void cischeat_state::init_f1gpstar()
 {
 	cischeat_untangle_sprites("sprites");
 }
@@ -3616,7 +3616,7 @@ ROM_START( captflag )
 	ROM_LOAD( "mr92027-09_w26.ic18", 0x000000, 0x100000, CRC(3aaa332a) SHA1(6c19364069e0b077a07ac4f9c4b0cf0c0985a42a) ) // 1 on the PCB
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state, captflag)
+void cischeat_state::init_captflag()
 {
 	m_oki1_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki1")->base(), 0x20000);
 	m_oki2_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki2")->base(), 0x20000);
@@ -3631,13 +3631,13 @@ DRIVER_INIT_MEMBER(cischeat_state, captflag)
 
 ***************************************************************************/
 
-GAMEL( 1989, bigrun,   0,        bigrun,   bigrun,   cischeat_state, bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
-GAMEL( 1990, cischeat, 0,        cischeat, cischeat, cischeat_state, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
-GAMEL( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v3.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAMEL( 1991, f1gpstaro,f1gpstar, f1gpstar, f1gpstar, cischeat_state, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v2.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, cischeat_state, 0,        ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, cischeat_state, 0,        ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1992, wildplt,  0,        wildplt,  wildplt,  cischeat_state, f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
-GAMEL( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstr2, cischeat_state, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
-GAME ( 1993, captflag, 0,        captflag, captflag, cischeat_state, captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
-GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, cischeat_state, 0,        ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )
+GAMEL( 1989, bigrun,    0,        bigrun,   bigrun,   cischeat_state, init_bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )    // there's a 13th Rallye version (1991) (only on the SNES? Could just be updated title, 1989 -> 11th Paris-Dakar ...)
+GAMEL( 1990, cischeat,  0,        cischeat, cischeat, cischeat_state, init_cischeat, ROT0,   "Jaleco", "Cisco Heat",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cischeat )
+GAMEL( 1991, f1gpstar,  0,        f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v3.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAMEL( 1991, f1gpstaro, f1gpstar, f1gpstar, f1gpstar, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Grand Prix Star (v2.0)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAME(  1992, armchmp2,  0,        armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II v2.6",            MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1992, armchmp2o, armchmp2, armchmp2, armchmp2, cischeat_state, empty_init,    ROT270, "Jaleco", "Arm Champs II v1.7",            MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1992, wildplt,   0,        wildplt,  wildplt,  cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "Wild Pilot",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // busted timings
+GAMEL( 1993, f1gpstr2,  0,        f1gpstr2, f1gpstr2, cischeat_state, init_f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
+GAME(  1993, captflag,  0,        captflag, captflag, cischeat_state, init_captflag, ROT270, "Jaleco", "Captain Flag (Japan)",          MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1994, scudhamm,  0,        scudhamm, scudhamm, cischeat_state, empty_init,    ROT270, "Jaleco", "Scud Hammer",                   MACHINE_IMPERFECT_GRAPHICS )

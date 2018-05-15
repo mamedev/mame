@@ -182,7 +182,7 @@ static const gfx_layout spritelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( scotrsht )
+static GFXDECODE_START( gfx_scotrsht )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 16*8 ) /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16*8, 16*8 ) /* sprites */
 GFXDECODE_END
@@ -209,7 +209,7 @@ MACHINE_CONFIG_START(scotrsht_state::scotrsht)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, scotrsht_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scotrsht)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scotrsht)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(scotrsht_state, scotrsht)
@@ -254,4 +254,4 @@ ROM_START( scotrsht )
 	ROM_LOAD( "gx545_6301_8f.bin", 0x0400, 0x0100, CRC(c1c7cf58) SHA1(08452228bf13e43ce4a05806f79e9cd1542416f1) ) /* sprites lookup */
 ROM_END
 
-GAME( 1985, scotrsht, 0, scotrsht, scotrsht, scotrsht_state, 0, ROT90,"Konami", "Scooter Shooter", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, scotrsht, 0, scotrsht, scotrsht, scotrsht_state, empty_init, ROT90,"Konami", "Scooter Shooter", MACHINE_SUPPORTS_SAVE )

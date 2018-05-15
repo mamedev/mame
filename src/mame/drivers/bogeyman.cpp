@@ -192,7 +192,7 @@ static const gfx_layout sprites =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( bogeyman )
+static GFXDECODE_START( gfx_bogeyman )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout1,     16, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout2,     16, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,          0,  2 )
@@ -248,7 +248,7 @@ MACHINE_CONFIG_START(bogeyman_state::bogeyman)
 	MCFG_SCREEN_UPDATE_DRIVER(bogeyman_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bogeyman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bogeyman)
 	MCFG_PALETTE_ADD("palette", 16+256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 	MCFG_PALETTE_INIT_OWNER(bogeyman_state, bogeyman)
@@ -298,4 +298,4 @@ ROM_END
 
 /* Game Driver */
 
-GAME( 1985, bogeyman, 0, bogeyman, bogeyman, bogeyman_state, 0, ROT0, "Technos Japan", "Bogey Manor", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bogeyman, 0, bogeyman, bogeyman, bogeyman_state, empty_init, ROT0, "Technos Japan", "Bogey Manor", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

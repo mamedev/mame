@@ -279,7 +279,7 @@ static const gfx_layout layout_16x16x4_swap =
 };
 
 
-static GFXDECODE_START( powerins )
+static GFXDECODE_START( gfx_powerins )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,      0x000, 0x20 ) // [0] Tiles
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,        0x200, 0x10 ) // [1] Tiles
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x4_swap, 0x400, 0x40 ) // [2] Sprites
@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(powerins_state::powerins)
 	MCFG_SCREEN_UPDATE_DRIVER(powerins_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerins)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerins)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -741,8 +741,8 @@ ROM_END
 
 
 /* all supported sets give a 93.10.20 date */
-GAME( 1993, powerins,  0,        powerins,  powerins, powerins_state, 0, ROT0, "Atlus", "Power Instinct (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, powerinsj, powerins, powerins,  powerinj, powerins_state, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, powerinsp, powerins, powerins,  powerinj, powerins_state, 0, ROT0, "Atlus", "Power Instinct (USA, prototype)", MACHINE_SUPPORTS_SAVE ) // boots as 93.10.20 just like the other sets, but code is different
-GAME( 1993, powerinsa, powerins, powerinsa, powerins, powerins_state, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, powerinsb, powerins, powerinsb, powerins, powerins_state, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerins,  0,        powerins,  powerins, powerins_state, empty_init, ROT0, "Atlus", "Power Instinct (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerinsj, powerins, powerins,  powerinj, powerins_state, empty_init, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerinsp, powerins, powerins,  powerinj, powerins_state, empty_init, ROT0, "Atlus", "Power Instinct (USA, prototype)", MACHINE_SUPPORTS_SAVE ) // boots as 93.10.20 just like the other sets, but code is different
+GAME( 1993, powerinsa, powerins, powerinsa, powerins, powerins_state, empty_init, ROT0, "bootleg", "Power Instinct (USA, bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, powerinsb, powerins, powerinsb, powerins, powerins_state, empty_init, ROT0, "bootleg", "Power Instinct (USA, bootleg set 2)", MACHINE_SUPPORTS_SAVE )

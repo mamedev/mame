@@ -44,7 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_cart);
 	DECLARE_READ8_MEMBER(read_cart);
 
-	DECLARE_DRIVER_INIT(gamate);
+	void init_gamate();
 
 	uint32_t screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -144,7 +144,7 @@ static INPUT_PORTS_START( gamate )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(gamate_state,gamate)
+void gamate_state::init_gamate()
 {
 	timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamate_state::gamate_timer),this));
 	timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamate_state::gamate_timer2),this));
@@ -228,5 +228,5 @@ ROM_START(gamate)
 ROM_END
 
 
-//    YEAR  NAME     PARENT  COMPAT    MACHINE  INPUT   CLASS         INIT    COMPANY     FULLNAME  FLAGS
-CONS( 1990, gamate,  0,      0,        gamate,  gamate, gamate_state, gamate, "Bit Corp", "Gamate", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY     FULLNAME  FLAGS
+CONS( 1990, gamate, 0,      0,      gamate,  gamate, gamate_state, init_gamate, "Bit Corp", "Gamate", 0 )

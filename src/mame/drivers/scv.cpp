@@ -642,7 +642,7 @@ static const gfx_layout scv_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( scv )
+static GFXDECODE_START( gfx_scv )
 	GFXDECODE_ENTRY( "charrom", 0x0000, scv_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -673,7 +673,7 @@ MACHINE_CONFIG_START(scv_state::scv)
 	MCFG_SCREEN_UPDATE_DRIVER(scv_state, screen_update_scv)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scv)
 	MCFG_PALETTE_ADD( "palette", 16 )
 	MCFG_PALETTE_INIT_OWNER(scv_state, scv)
 
@@ -720,6 +720,6 @@ ROM_START( scv_pal )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE      INIT    COMPANY  FULLNAME                       FLAGS */
-CONS( 1984, scv,     0,      0,      scv,     scv,   scv_state, 0,      "Epoch", "Super Cassette Vision",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 198?, scv_pal, scv,    0,      scv_pal, scv,   scv_state, 0,      "Yeno",  "Super Cassette Vision (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                       FLAGS */
+CONS( 1984, scv,     0,      0,      scv,     scv,   scv_state, empty_init, "Epoch", "Super Cassette Vision",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 198?, scv_pal, scv,    0,      scv_pal, scv,   scv_state, empty_init, "Yeno",  "Super Cassette Vision (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

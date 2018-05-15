@@ -749,7 +749,7 @@ INPUT_PORTS_END
 
 static GFXLAYOUT_RAW(imds2_charlayout , 8 , 8 , 8 , 64)
 
-static GFXDECODE_START(imds2)
+static GFXDECODE_START(gfx_imds2)
 	GFXDECODE_ENTRY("gfx1" , 0x0000 , imds2_charlayout , 0 , 1)
 GFXDECODE_END
 
@@ -841,7 +841,7 @@ MACHINE_CONFIG_START(imds2_state::imds2)
 		MCFG_SCREEN_ADD("screen" , RASTER)
 		MCFG_SCREEN_UPDATE_DEVICE("ioccrtc" , i8275_device , screen_update)
 		MCFG_SCREEN_REFRESH_RATE(50)
-		MCFG_GFXDECODE_ADD("gfxdecode" , "palette" , imds2)
+		MCFG_DEVICE_ADD("gfxdecode" , GFXDECODE, "palette" , gfx_imds2)
 		MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 		SPEAKER(config, "mono").front_center();
@@ -923,5 +923,5 @@ ROM_START(imds2)
 		ROM_LOAD ("ioc_a19.bin" , 0x0000 , 0x0400 , CRC(47487d0f) SHA1(0ed98f9f06622949ee3cc2ffc572fb9702db0f81))
 ROM_END
 
-/*    YEAR  NAME       PARENT    COMPAT MACHINE INPUT   STATE        INIT  COMPANY       FULLNAME */
-COMP( 1979, imds2,     0,        0,     imds2,  imds2,  imds2_state, 0,    "Intel",      "Intellec MDS-II" , 0)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME */
+COMP( 1979, imds2, 0,      0,      imds2,   imds2, imds2_state, empty_init, "Intel", "Intellec MDS-II" , 0)

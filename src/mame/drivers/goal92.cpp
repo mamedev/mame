@@ -268,7 +268,7 @@ static const gfx_layout layout_16x16x4_2 =
 };
 #endif
 
-static GFXDECODE_START( goal92 )
+static GFXDECODE_START( gfx_goal92 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,        0*16, 8*16 ) // Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,         48*16,   16 ) // Text Layer
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,        0*16,   16 ) // BG Layer
@@ -318,7 +318,7 @@ MACHINE_CONFIG_START(goal92_state::goal92)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, goal92_state, screen_vblank_goal92))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goal92)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goal92)
 	MCFG_PALETTE_ADD("palette", 128*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -403,4 +403,4 @@ ROM_END
 
 
 
-GAME( 1992, goal92,   cupsoc, goal92,   goal92, goal92_state, 0, ROT0, "bootleg", "Goal! '92", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, goal92, cupsoc, goal92, goal92, goal92_state, empty_init, ROT0, "bootleg", "Goal! '92", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

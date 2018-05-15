@@ -282,11 +282,11 @@ static const gfx_layout tiles8x8x2_layout =
 	8*8
 };
 
-static GFXDECODE_START( galaxia )
+static GFXDECODE_START( gfx_galaxia )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x2_layout, 0, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( astrowar )
+static GFXDECODE_START( gfx_astrowar )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x1_layout, 0, 8 )
 GFXDECODE_END
 
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(galaxia_state::galaxia)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxia_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxia)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxia)
 	MCFG_PALETTE_ADD("palette", 0x18+2)
 
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,galaxia)
@@ -356,7 +356,7 @@ MACHINE_CONFIG_START(galaxia_state::astrowar)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxia_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrowar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_astrowar)
 	MCFG_PALETTE_ADD("palette", 0x18+2)
 
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,astrowar)
@@ -480,8 +480,8 @@ ROM_START( astrowar )
 	ROM_LOAD( "astro.3d",  0x00400, 0x0400, CRC(822505aa) SHA1(f9d3465e14bb850a286f8b4f42aa0a4044413b67) )
 ROM_END
 
-GAME( 1979, galaxia,  0,       galaxia,  galaxia, galaxia_state, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1979, galaxiaa, galaxia, galaxia,  galaxia, galaxia_state, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1979, galaxiab, galaxia, galaxia,  galaxia, galaxia_state, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 3)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1979, galaxiac, galaxia, galaxia,  galaxia, galaxia_state, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 4)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1980, astrowar, 0,       astrowar, galaxia, galaxia_state, 0, ROT90, "Zaccaria / Zelco", "Astro Wars", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxia,  0,       galaxia,  galaxia, galaxia_state, empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxiaa, galaxia, galaxia,  galaxia, galaxia_state, empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxiab, galaxia, galaxia,  galaxia, galaxia_state, empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 3)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxiac, galaxia, galaxia,  galaxia, galaxia_state, empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 4)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1980, astrowar, 0,       astrowar, galaxia, galaxia_state, empty_init, ROT90, "Zaccaria / Zelco", "Astro Wars", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

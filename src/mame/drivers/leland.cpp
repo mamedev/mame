@@ -2951,7 +2951,7 @@ void leland_state::init_master_ports(uint8_t mvram_base, uint8_t io_base)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,cerberus)
+void leland_state::init_cerberus()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::cerberus_bankswitch;
@@ -2968,7 +2968,7 @@ DRIVER_INIT_MEMBER(leland_state,cerberus)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,mayhem)
+void leland_state::init_mayhem()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::mayhem_bankswitch;
@@ -2978,7 +2978,7 @@ DRIVER_INIT_MEMBER(leland_state,mayhem)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,powrplay)
+void leland_state::init_powrplay()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::mayhem_bankswitch;
@@ -2988,7 +2988,7 @@ DRIVER_INIT_MEMBER(leland_state,powrplay)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,wseries)
+void leland_state::init_wseries()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::mayhem_bankswitch;
@@ -2998,7 +2998,7 @@ DRIVER_INIT_MEMBER(leland_state,wseries)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,alleymas)
+void leland_state::init_alleymas()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::mayhem_bankswitch;
@@ -3014,7 +3014,7 @@ DRIVER_INIT_MEMBER(leland_state,alleymas)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,upyoural)
+void leland_state::init_upyoural()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::mayhem_bankswitch;
@@ -3024,7 +3024,7 @@ DRIVER_INIT_MEMBER(leland_state,upyoural)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,dangerz)
+void leland_state::init_dangerz()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::dangerz_bankswitch;
@@ -3042,7 +3042,7 @@ DRIVER_INIT_MEMBER(leland_state,dangerz)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,basebal2)
+void leland_state::init_basebal2()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::basebal2_bankswitch;
@@ -3052,7 +3052,7 @@ DRIVER_INIT_MEMBER(leland_state,basebal2)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,dblplay)
+void leland_state::init_dblplay()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::basebal2_bankswitch;
@@ -3062,7 +3062,7 @@ DRIVER_INIT_MEMBER(leland_state,dblplay)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,strkzone)
+void leland_state::init_strkzone()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::basebal2_bankswitch;
@@ -3072,7 +3072,7 @@ DRIVER_INIT_MEMBER(leland_state,strkzone)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,redlin2p)
+void leland_state::init_redlin2p()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::redline_bankswitch;
@@ -3090,7 +3090,7 @@ DRIVER_INIT_MEMBER(leland_state,redlin2p)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,quarterb)
+void leland_state::init_quarterb()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3102,7 +3102,7 @@ DRIVER_INIT_MEMBER(leland_state,quarterb)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,viper)
+void leland_state::init_viper()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3124,7 +3124,7 @@ DRIVER_INIT_MEMBER(leland_state,viper)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,teamqb)
+void leland_state::init_teamqb()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3142,7 +3142,7 @@ DRIVER_INIT_MEMBER(leland_state,teamqb)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,aafb)
+void leland_state::init_aafb()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3160,7 +3160,7 @@ DRIVER_INIT_MEMBER(leland_state,aafb)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,aafbb)
+void leland_state::init_aafbb()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3178,7 +3178,7 @@ DRIVER_INIT_MEMBER(leland_state,aafbb)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,aafbd2p)
+void leland_state::init_aafbd2p()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3196,7 +3196,7 @@ DRIVER_INIT_MEMBER(leland_state,aafbd2p)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,offroad)
+void leland_state::init_offroad()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::offroad_bankswitch;
@@ -3216,7 +3216,7 @@ DRIVER_INIT_MEMBER(leland_state,offroad)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,offroadt)
+void leland_state::init_offroadt()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::offroad_bankswitch;
@@ -3235,7 +3235,7 @@ DRIVER_INIT_MEMBER(leland_state,offroadt)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,pigout)
+void leland_state::init_pigout()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::offroad_bankswitch;
@@ -3252,7 +3252,7 @@ DRIVER_INIT_MEMBER(leland_state,pigout)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,ataxx)
+void leland_state::init_ataxx()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
@@ -3262,7 +3262,7 @@ DRIVER_INIT_MEMBER(leland_state,ataxx)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,ataxxj)
+void leland_state::init_ataxxj()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
@@ -3272,7 +3272,7 @@ DRIVER_INIT_MEMBER(leland_state,ataxxj)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,wsf)
+void leland_state::init_wsf()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
@@ -3284,7 +3284,7 @@ DRIVER_INIT_MEMBER(leland_state,wsf)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,indyheat)
+void leland_state::init_indyheat()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
@@ -3301,7 +3301,7 @@ DRIVER_INIT_MEMBER(leland_state,indyheat)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,brutforc)
+void leland_state::init_brutforc()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
@@ -3313,7 +3313,7 @@ DRIVER_INIT_MEMBER(leland_state,brutforc)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,asylum)
+void leland_state::init_asylum()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
@@ -3336,51 +3336,51 @@ DRIVER_INIT_MEMBER(leland_state,asylum)
  *************************************/
 
 /* small master banks, small slave banks */
-GAME( 1985, cerberus, 0,       leland,   cerberus, leland_state, cerberus, ROT0,   "Cinematronics", "Cerberus", 0 )
-GAME( 1985, mayhem,   0,       leland,   mayhem, leland_state,   mayhem,   ROT0,   "Cinematronics", "Mayhem 2002", 0 )
-GAME( 1985, powrplay, 0,       leland,   mayhem, leland_state,   powrplay, ROT0,   "Cinematronics", "Power Play", 0 )
-GAME( 1985, wseries,  0,       leland,   wseries, leland_state,  wseries,  ROT0,   "Cinematronics", "World Series: The Season (rev 1)", 0 )
-GAME( 1985, wseries0, wseries, leland,   wseries, leland_state,  wseries,  ROT0,   "Cinematronics", "World Series: The Season (rev 0)", 0 )
-GAME( 1986, alleymas, 0,       leland,   alleymas, leland_state, alleymas, ROT270, "Cinematronics", "Alley Master", 0 )
-GAME( 1987, upyoural, 0,       leland,   upyoural, leland_state, upyoural, ROT270, "Cinematronics", "Up Your Alley", 0 )
+GAME( 1985, cerberus,   0,        leland,   cerberus,   leland_state, init_cerberus, ROT0,   "Cinematronics", "Cerberus", 0 )
+GAME( 1985, mayhem,     0,        leland,   mayhem,     leland_state, init_mayhem,   ROT0,   "Cinematronics", "Mayhem 2002", 0 )
+GAME( 1985, powrplay,   0,        leland,   mayhem,     leland_state, init_powrplay, ROT0,   "Cinematronics", "Power Play", 0 )
+GAME( 1985, wseries,    0,        leland,   wseries,    leland_state, init_wseries,  ROT0,   "Cinematronics", "World Series: The Season (rev 1)", 0 )
+GAME( 1985, wseries0,   wseries,  leland,   wseries,    leland_state, init_wseries,  ROT0,   "Cinematronics", "World Series: The Season (rev 0)", 0 )
+GAME( 1986, alleymas,   0,        leland,   alleymas,   leland_state, init_alleymas, ROT270, "Cinematronics", "Alley Master", 0 )
+GAME( 1987, upyoural,   0,        leland,   upyoural,   leland_state, init_upyoural, ROT270, "Cinematronics", "Up Your Alley", 0 )
 
 /* odd master banks, small slave banks */
-GAME( 1986, dangerz,  0,       leland,   dangerz, leland_state,  dangerz,  ROT0,   "Cinematronics", "Danger Zone", 0 )
+GAME( 1986, dangerz,    0,        leland,   dangerz,    leland_state, init_dangerz,  ROT0,   "Cinematronics", "Danger Zone", 0 )
 
 /* small master banks + extra top board, small slave banks */
-GAME( 1987, basebal2, 0,       leland,   basebal2, leland_state, basebal2, ROT0,   "Cinematronics", "Baseball: The Season II", 0 )
-GAME( 1987, dblplay,  0,       leland,   basebal2, leland_state, dblplay,  ROT0,   "Leland Corporation / Tradewest", "Super Baseball Double Play Home Run Derby", 0 )
-GAME( 1988, strkzone, 0,       leland,   basebal2, leland_state, strkzone, ROT0,   "Leland Corporation", "Strike Zone Baseball", 0 )
+GAME( 1987, basebal2,   0,        leland,   basebal2,   leland_state, init_basebal2, ROT0,   "Cinematronics", "Baseball: The Season II", 0 )
+GAME( 1987, dblplay,    0,        leland,   basebal2,   leland_state, init_dblplay,  ROT0,   "Leland Corporation / Tradewest", "Super Baseball Double Play Home Run Derby", 0 )
+GAME( 1988, strkzone,   0,        leland,   basebal2,   leland_state, init_strkzone, ROT0,   "Leland Corporation", "Strike Zone Baseball", 0 )
 
 /* large master banks, small slave banks, 80186 sound */
-GAME( 1987, redlin2p, 0,       redline,  redline, leland_state,  redlin2p, ROT270, "Cinematronics (Tradewest license)", "Redline Racer (2 players)", 0 )
-GAME( 1987, quarterb, 0,       quarterb, quarterb, leland_state, quarterb, ROT270, "Leland Corporation", "Quarterback (rev 5)", 0 )
-GAME( 1987, quarterba,quarterb,quarterb, quarterb, leland_state, quarterb, ROT270, "Leland Corporation", "Quarterback (rev 2)", 0 )
-GAME( 1987, quarterbc,quarterb,quarterb, quarterb, leland_state, quarterb, ROT270, "Leland Corporation", "Quarterback (rev 1, cocktail)", 0 )
+GAME( 1987, redlin2p,   0,        redline,  redline,    leland_state, init_redlin2p, ROT270, "Cinematronics (Tradewest license)", "Redline Racer (2 players)", 0 )
+GAME( 1987, quarterb,   0,        quarterb, quarterb,   leland_state, init_quarterb, ROT270, "Leland Corporation", "Quarterback (rev 5)", 0 )
+GAME( 1987, quarterba,  quarterb, quarterb, quarterb,   leland_state, init_quarterb, ROT270, "Leland Corporation", "Quarterback (rev 2)", 0 )
+GAME( 1987, quarterbc,  quarterb, quarterb, quarterb,   leland_state, init_quarterb, ROT270, "Leland Corporation", "Quarterback (rev 1, cocktail)", 0 )
 
 /* large master banks, large slave banks, 80186 sound */
-GAME( 1988, viper,    0,       lelandi,  dangerz, leland_state,  viper,    ROT0,   "Leland Corporation", "Viper (rev 3)", 0 )
-GAME( 1988, teamqb,   0,       lelandi,  teamqb, leland_state,   teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (rev 3)", 0 )
-GAME( 1988, teamqb2,  teamqb,  lelandi,  teamqb, leland_state,   teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (rev 2)", 0 )
-GAME( 1989, aafb,     0,       lelandi,  teamqb, leland_state,   aafb,     ROT270, "Leland Corporation", "All American Football (rev E)", 0 )
-GAME( 1989, aafbd2p,  aafb,    lelandi,  aafb2p, leland_state,   aafbd2p,  ROT270, "Leland Corporation", "All American Football (rev D, 2 Players)", 0 )
-GAME( 1989, aafbc,    aafb,    lelandi,  teamqb, leland_state,   aafbb,    ROT270, "Leland Corporation", "All American Football (rev C)", 0 )
-GAME( 1989, aafbb,    aafb,    lelandi,  teamqb, leland_state,   aafbb,    ROT270, "Leland Corporation", "All American Football (rev B)", MACHINE_NOT_WORKING )
+GAME( 1988, viper,      0,        lelandi,  dangerz,    leland_state, init_viper,    ROT0,   "Leland Corporation", "Viper (rev 3)", 0 )
+GAME( 1988, teamqb,     0,        lelandi,  teamqb,     leland_state, init_teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (rev 3)", 0 )
+GAME( 1988, teamqb2,    teamqb,   lelandi,  teamqb,     leland_state, init_teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (rev 2)", 0 )
+GAME( 1989, aafb,       0,        lelandi,  teamqb,     leland_state, init_aafb,     ROT270, "Leland Corporation", "All American Football (rev E)", 0 )
+GAME( 1989, aafbd2p,    aafb,     lelandi,  aafb2p,     leland_state, init_aafbd2p,  ROT270, "Leland Corporation", "All American Football (rev D, 2 Players)", 0 )
+GAME( 1989, aafbc,      aafb,     lelandi,  teamqb,     leland_state, init_aafbb,    ROT270, "Leland Corporation", "All American Football (rev C)", 0 )
+GAME( 1989, aafbb,      aafb,     lelandi,  teamqb,     leland_state, init_aafbb,    ROT270, "Leland Corporation", "All American Football (rev B)", MACHINE_NOT_WORKING )
 
 /* huge master banks, large slave banks, 80186 sound */
-GAME( 1989, offroad,    0,       lelandi,  offroad, leland_state,    offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 4)", 0 )
-GAME( 1989, offroad3,   offroad, lelandi,  offroad, leland_state,    offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 3)", 0 )
-GAME( 1989, offroadt,   0,       lelandi,  offroad, leland_state,    offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak", 0 )
-GAME( 1989, offroadt2p, offroadt,lelandi,  offroadt2p, leland_state, offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak (rev 4, 2 Players)", 0 )
-GAME( 1990, pigout,     0,       lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 2?)", 0 ) /* need to verify revision */
-GAME( 1990, pigouta,    pigout,  lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 1)", 0 )
+GAME( 1989, offroad,    0,        lelandi,  offroad,    leland_state, init_offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 4)", 0 )
+GAME( 1989, offroad3,   offroad,  lelandi,  offroad,    leland_state, init_offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 3)", 0 )
+GAME( 1989, offroadt,   0,        lelandi,  offroad,    leland_state, init_offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak", 0 )
+GAME( 1989, offroadt2p, offroadt, lelandi,  offroadt2p, leland_state, init_offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak (rev 4, 2 Players)", 0 )
+GAME( 1990, pigout,     0,        lelandi,  pigout,     leland_state, init_pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 2?)", 0 ) /* need to verify revision */
+GAME( 1990, pigouta,    pigout,   lelandi,  pigout,     leland_state, init_pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 1)", 0 )
 
 /* Ataxx-era PCB, 80186 sound */
-GAME( 1990, ataxx,    0,      ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 5)", 0 )
-GAME( 1990, ataxxa,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 4)", 0 )
-GAME( 1990, ataxxe,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (Europe)", 0 )
-GAME( 1990, ataxxj,   ataxx,  ataxx,   ataxx,    leland_state, ataxxj,   ROT0,   "Leland Corporation (Capcom license)", "Ataxx (Japan)", 0 )
-GAME( 1990, wsf,      0,      wsf,     wsf,      leland_state, wsf,      ROT0,   "Leland Corporation", "World Soccer Finals (rev 3)", 0 )
-GAME( 1991, indyheat, 0,      wsf,     indyheat, leland_state, indyheat, ROT0,   "Leland Corporation", "Danny Sullivan's Indy Heat (rev 1)", 0 )
-GAME( 1991, brutforc, 0,      wsf,     brutforc, leland_state, brutforc, ROT0,   "Leland Corporation", "Brute Force", 0 )
-GAME( 1991, asylum,   0,      wsf,     brutforc, leland_state, asylum,   ROT270, "Leland Corporation", "Asylum (prototype)", 0 )
+GAME( 1990, ataxx,      0,        ataxx,    ataxx,      leland_state, init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 5)", 0 )
+GAME( 1990, ataxxa,     ataxx,    ataxx,    ataxx,      leland_state, init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 4)", 0 )
+GAME( 1990, ataxxe,     ataxx,    ataxx,    ataxx,      leland_state, init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (Europe)", 0 )
+GAME( 1990, ataxxj,     ataxx,    ataxx,    ataxx,      leland_state, init_ataxxj,   ROT0,   "Leland Corporation (Capcom license)", "Ataxx (Japan)", 0 )
+GAME( 1990, wsf,        0,        wsf,      wsf,        leland_state, init_wsf,      ROT0,   "Leland Corporation", "World Soccer Finals (rev 3)", 0 )
+GAME( 1991, indyheat,   0,        wsf,      indyheat,   leland_state, init_indyheat, ROT0,   "Leland Corporation", "Danny Sullivan's Indy Heat (rev 1)", 0 )
+GAME( 1991, brutforc,   0,        wsf,      brutforc,   leland_state, init_brutforc, ROT0,   "Leland Corporation", "Brute Force", 0 )
+GAME( 1991, asylum,     0,        wsf,      brutforc,   leland_state, init_asylum,   ROT270, "Leland Corporation", "Asylum (prototype)", 0 )

@@ -269,7 +269,7 @@ static const gfx_layout spritelayout =
 	32*4*8
 };
 
-static GFXDECODE_START( pandoras )
+static GFXDECODE_START( gfx_pandoras )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
 GFXDECODE_END
@@ -347,7 +347,7 @@ MACHINE_CONFIG_START(pandoras_state::pandoras)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pandoras_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pandoras)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pandoras)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pandoras_state, pandoras)
@@ -407,4 +407,4 @@ ROM_START( pandoras )
 ROM_END
 
 
-GAME( 1984, pandoras, 0, pandoras, pandoras, pandoras_state, 0, ROT90, "Konami / Interlogic", "Pandora's Palace", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pandoras, 0, pandoras, pandoras, pandoras_state, empty_init, ROT90, "Konami / Interlogic", "Pandora's Palace", MACHINE_SUPPORTS_SAVE )

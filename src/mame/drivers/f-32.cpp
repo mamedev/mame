@@ -376,5 +376,5 @@ ROM_START( royalpk2 )
 ROM_END
 
 
-GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, mosaicf2_state, 0,        ROT0, "F2 System", "Mosaic (F2 System)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, royalpk2, 0, royalpk2, royalpk2, mosaicf2_state, 0,        ROT0, "F2 System", "Royal Poker 2 (Network version 3.12)", MACHINE_NOT_WORKING )
+GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, mosaicf2_state, empty_init, ROT0, "F2 System", "Mosaic (F2 System)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, royalpk2, 0, royalpk2, royalpk2, mosaicf2_state, empty_init, ROT0, "F2 System", "Royal Poker 2 (Network version 3.12)", MACHINE_NOT_WORKING )

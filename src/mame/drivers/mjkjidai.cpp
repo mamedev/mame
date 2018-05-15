@@ -269,7 +269,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( mjkjidai )
+static GFXDECODE_START( gfx_mjkjidai )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 16 )
 GFXDECODE_END
@@ -326,7 +326,7 @@ MACHINE_CONFIG_START(mjkjidai_state::mjkjidai)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mjkjidai_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mjkjidai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mjkjidai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 
 	/* sound hardware */
@@ -379,4 +379,4 @@ ROM_START( mjkjidai )
 ROM_END
 
 
-GAME( 1986, mjkjidai, 0, mjkjidai, mjkjidai, mjkjidai_state, 0, ROT0, "Sanritsu",  "Mahjong Kyou Jidai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mjkjidai, 0, mjkjidai, mjkjidai, mjkjidai_state, empty_init, ROT0, "Sanritsu",  "Mahjong Kyou Jidai (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

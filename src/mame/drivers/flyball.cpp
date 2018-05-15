@@ -396,7 +396,7 @@ static const gfx_layout flyball_sprites_layout =
 	0x100     /* increment */
 };
 
-static GFXDECODE_START( flyball )
+static GFXDECODE_START( gfx_flyball )
 	GFXDECODE_ENTRY( "gfx1", 0, flyball_tiles_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, flyball_sprites_layout, 2, 2 )
 GFXDECODE_END
@@ -478,7 +478,7 @@ MACHINE_CONFIG_START(flyball_state::flyball)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flyball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flyball)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(flyball_state, flyball)
 
@@ -543,5 +543,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1976, flyball,  0,       flyball, flyball, flyball_state, 0, 0, "Atari", "Flyball (rev 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1976, flyball1, flyball, flyball, flyball, flyball_state, 0, 0, "Atari", "Flyball (rev 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, flyball,  0,       flyball, flyball, flyball_state, empty_init, 0, "Atari", "Flyball (rev 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, flyball1, flyball, flyball, flyball, flyball_state, empty_init, 0, "Atari", "Flyball (rev 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

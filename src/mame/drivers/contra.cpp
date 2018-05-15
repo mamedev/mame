@@ -187,7 +187,7 @@ static const gfx_layout gfxlayout =
 	32*8
 };
 
-static GFXDECODE_START( contra )
+static GFXDECODE_START( gfx_contra )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,       0, 8*16 )
 	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout, 8*16*16, 8*16 )
 GFXDECODE_END
@@ -228,7 +228,7 @@ MACHINE_CONFIG_START(contra_state::contra)
 	MCFG_SCREEN_UPDATE_DRIVER(contra_state, screen_update_contra)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", contra)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_contra)
 
 	MCFG_PALETTE_ADD("palette", 2*8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
@@ -574,13 +574,13 @@ ROM_START( contrabj1 )
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #1 char lookup table */
 ROM_END
 
-GAME( 1987, contra,    0,      contra, contra,  contra_state, 0, ROT90, "Konami",  "Contra (US / Asia, set 1)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1987, contra1,   contra, contra, contra,  contra_state, 0, ROT90, "Konami",  "Contra (US / Asia, set 2)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1987, contrae,   contra, contra, contra,  contra_state, 0, ROT90, "Konami",  "Contra (US / Asia, set 3)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1987, contraj,   contra, contra, contra,  contra_state, 0, ROT90, "Konami",  "Contra (Japan, set 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, contraj1,  contra, contra, contra,  contra_state, 0, ROT90, "Konami",  "Contra (Japan, set 2)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gryzor,    contra, contra, gryzor,  contra_state, 0, ROT90, "Konami",  "Gryzor (set 1)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gryzor1,   contra, contra, gryzor,  contra_state, 0, ROT90, "Konami",  "Gryzor (set 2)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1987, contrab,   contra, contra, contra,  contra_state, 0, ROT90, "bootleg", "Contra (bootleg)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1987, contrabj,  contra, contra, contra,  contra_state, 0, ROT90, "bootleg", "Contra (Japan bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, contrabj1, contra, contra, contra,  contra_state, 0, ROT90, "bootleg", "Contra (Japan bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contra,    0,      contra, contra, contra_state, empty_init, ROT90, "Konami",  "Contra (US / Asia, set 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contra1,   contra, contra, contra, contra_state, empty_init, ROT90, "Konami",  "Contra (US / Asia, set 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contrae,   contra, contra, contra, contra_state, empty_init, ROT90, "Konami",  "Contra (US / Asia, set 3)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contraj,   contra, contra, contra, contra_state, empty_init, ROT90, "Konami",  "Contra (Japan, set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contraj1,  contra, contra, contra, contra_state, empty_init, ROT90, "Konami",  "Contra (Japan, set 2)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gryzor,    contra, contra, gryzor, contra_state, empty_init, ROT90, "Konami",  "Gryzor (set 1)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gryzor1,   contra, contra, gryzor, contra_state, empty_init, ROT90, "Konami",  "Gryzor (set 2)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contrab,   contra, contra, contra, contra_state, empty_init, ROT90, "bootleg", "Contra (bootleg)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contrabj,  contra, contra, contra, contra_state, empty_init, ROT90, "bootleg", "Contra (Japan bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contrabj1, contra, contra, contra, contra_state, empty_init, ROT90, "bootleg", "Contra (Japan bootleg, set 2)", MACHINE_SUPPORTS_SAVE )

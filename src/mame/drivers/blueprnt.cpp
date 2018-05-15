@@ -322,7 +322,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( blueprnt )
+static GFXDECODE_START( gfx_blueprnt )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar,     0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     128*4,   1 )
 GFXDECODE_END
@@ -373,7 +373,7 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 	MCFG_SCREEN_UPDATE_DRIVER(blueprnt_state, screen_update_blueprnt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blueprnt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blueprnt)
 	MCFG_PALETTE_ADD("palette", 128*4+8)
 	MCFG_PALETTE_INIT_OWNER(blueprnt_state, blueprnt)
 
@@ -503,7 +503,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, blueprnt,  0,        blueprnt, blueprnt, blueprnt_state, 0, ROT270, "Zilec Electronics / Bally Midway", "Blue Print (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, blueprntj, blueprnt, blueprnt, blueprnt, blueprnt_state, 0, ROT270, "Zilec Electronics / Jaleco",       "Blue Print (Jaleco)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, saturnzi,  0,        blueprnt, saturn,   blueprnt_state, 0, ROT270, "Zilec Electronics / Jaleco",       "Saturn", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, grasspin,  0,        grasspin, grasspin, blueprnt_state, 0, ROT270, "Zilec Electronics / Jaleco",       "Grasspin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // a few issues with dip reading + video hw, but nothing major
+GAME( 1982, blueprnt,  0,        blueprnt, blueprnt, blueprnt_state, empty_init, ROT270, "Zilec Electronics / Bally Midway", "Blue Print (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, blueprntj, blueprnt, blueprnt, blueprnt, blueprnt_state, empty_init, ROT270, "Zilec Electronics / Jaleco",       "Blue Print (Jaleco)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, saturnzi,  0,        blueprnt, saturn,   blueprnt_state, empty_init, ROT270, "Zilec Electronics / Jaleco",       "Saturn", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, grasspin,  0,        grasspin, grasspin, blueprnt_state, empty_init, ROT270, "Zilec Electronics / Jaleco",       "Grasspin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // a few issues with dip reading + video hw, but nothing major

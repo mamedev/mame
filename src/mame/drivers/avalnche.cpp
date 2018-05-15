@@ -304,6 +304,6 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1978, avalnche, 0,        avalnche, avalnche, avalnche_state, 0, ROT0, "Atari",            "Avalanche", MACHINE_SUPPORTS_SAVE, layout_avalnche )
-GAMEL( 1978, cascade,  avalnche, avalnche, cascade,  avalnche_state, 0, ROT0, "bootleg? (Sidam)", "Cascade", MACHINE_SUPPORTS_SAVE, layout_avalnche )
-GAME ( 1977, catchp,   0,        acatch,   catch,    avalnche_state, 0, ROT0, "Atari",            "Catch (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // pre-production board, evolved into Avalanche
+GAMEL( 1978, avalnche, 0,        avalnche, avalnche, avalnche_state, empty_init, ROT0, "Atari",            "Avalanche", MACHINE_SUPPORTS_SAVE, layout_avalnche )
+GAMEL( 1978, cascade,  avalnche, avalnche, cascade,  avalnche_state, empty_init, ROT0, "bootleg? (Sidam)", "Cascade", MACHINE_SUPPORTS_SAVE, layout_avalnche )
+GAME(  1977, catchp,   0,        acatch,   catch,    avalnche_state, empty_init, ROT0, "Atari",            "Catch (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // pre-production board, evolved into Avalanche

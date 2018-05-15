@@ -141,5 +141,5 @@ ROM_START( asst128 )
 	ROM_LOAD( "asst128cg.bin", 0, 0x2000, NO_DUMP )
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT   STATE          INIT  COMPANY      FULLNAME         FLAGS
-COMP( 198?, asst128,    ibm5150,    0,          asst128,    0,      asst128_state, 0,    "Schetmash", "Assistent 128", MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS          INIT        COMPANY      FULLNAME         FLAGS
+COMP( 198?, asst128, ibm5150, 0,      asst128, 0,     asst128_state, empty_init, "Schetmash", "Assistent 128", MACHINE_NOT_WORKING)

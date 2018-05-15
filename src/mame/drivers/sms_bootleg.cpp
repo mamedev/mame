@@ -377,12 +377,12 @@ static INPUT_PORTS_START( sms_supergame )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(smsbootleg_state,sms_supergame)
+void smsbootleg_state::init_sms_supergame()
 {
 	uint8_t* rom = memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes();
 
-	for (int i = 0;i < size;i++)
+	for (int i = 0; i < size; i++)
 	{
 		rom[i] ^= 0x80;
 	}
@@ -437,5 +437,5 @@ ROM_END
 
 
 // these haven't been set as clones because they contain different games
-GAME( 199?, smssgame,  0,    sms_supergame, sms_supergame, smsbootleg_state,  sms_supergame,  ROT0, "Sono Corp Japan", "Super Game (Sega Master System Multi-game bootleg)", MACHINE_NOT_WORKING )
-GAME( 1990, smssgamea, 0,    sms_supergame, sms_supergame, smsbootleg_state,  sms_supergame,  ROT0, "Seo Jin (TV-Tuning license)", "Super Game (Sega Master System Multi-game bootleg) (alt games)", MACHINE_NOT_WORKING ) // for German market?
+GAME( 199?, smssgame,  0,    sms_supergame, sms_supergame, smsbootleg_state, init_sms_supergame, ROT0, "Sono Corp Japan", "Super Game (Sega Master System Multi-game bootleg)", MACHINE_NOT_WORKING )
+GAME( 1990, smssgamea, 0,    sms_supergame, sms_supergame, smsbootleg_state, init_sms_supergame, ROT0, "Seo Jin (TV-Tuning license)", "Super Game (Sega Master System Multi-game bootleg) (alt games)", MACHINE_NOT_WORKING ) // for German market?

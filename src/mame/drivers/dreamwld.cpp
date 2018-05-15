@@ -713,7 +713,7 @@ static const gfx_layout layout_16x16x4 =
 	16*16*4
 };
 
-static GFXDECODE_START( dreamwld )
+static GFXDECODE_START( gfx_dreamwld )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x000, 0x40 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x800, 0x48 ) // [1] Layer 0 + 1
 GFXDECODE_END
@@ -766,7 +766,7 @@ MACHINE_CONFIG_START(dreamwld_state::baryon)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dreamwld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dreamwld)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1241,10 +1241,10 @@ ROM_START( gaialast )
 	ROM_LOAD( "9", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
 
-GAME( 1997, baryon,   0,        baryon,   baryon,   dreamwld_state, 0, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 1)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1997, baryona,  baryon,   baryon,   baryon,   dreamwld_state, 0, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 2)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1998, cutefght, 0,        dreamwld, cutefght, dreamwld_state, 0, ROT0,   "SemiCom",                        "Cute Fighter",                                               MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rolcrush, 0,        baryon,   rolcrush, dreamwld_state, 0, ROT0,   "SemiCom / Exit (Trust license)", "Rolling Crush (version 1.07.E - 1999/02/11, Trust license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rolcrusha,rolcrush, baryon,   rolcrush, dreamwld_state, 0, ROT0,   "SemiCom / Exit",                 "Rolling Crush (version 1.03.E - 1999/01/29)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1999, gaialast, 0,        baryon,   gaialast, dreamwld_state, 0, ROT0,   "SemiCom / XESS",                 "Gaia - The Last Choice of Earth",                            MACHINE_SUPPORTS_SAVE )
-GAME( 2000, dreamwld, 0,        dreamwld, dreamwld, dreamwld_state, 0, ROT0,   "SemiCom",                        "Dream World",                                                MACHINE_SUPPORTS_SAVE )
+GAME( 1997, baryon,   0,        baryon,   baryon,   dreamwld_state, empty_init, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 1)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1997, baryona,  baryon,   baryon,   baryon,   dreamwld_state, empty_init, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 2)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1998, cutefght, 0,        dreamwld, cutefght, dreamwld_state, empty_init, ROT0,   "SemiCom",                        "Cute Fighter",                                               MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rolcrush, 0,        baryon,   rolcrush, dreamwld_state, empty_init, ROT0,   "SemiCom / Exit (Trust license)", "Rolling Crush (version 1.07.E - 1999/02/11, Trust license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rolcrusha,rolcrush, baryon,   rolcrush, dreamwld_state, empty_init, ROT0,   "SemiCom / Exit",                 "Rolling Crush (version 1.03.E - 1999/01/29)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1999, gaialast, 0,        baryon,   gaialast, dreamwld_state, empty_init, ROT0,   "SemiCom / XESS",                 "Gaia - The Last Choice of Earth",                            MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dreamwld, 0,        dreamwld, dreamwld, dreamwld_state, empty_init, ROT0,   "SemiCom",                        "Dream World",                                                MACHINE_SUPPORTS_SAVE )

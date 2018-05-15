@@ -80,4 +80,4 @@ ROM_START( ribrac )
 	ROM_LOAD( "ribbitr_snd.u11", 0x30000, 0x10000, NO_DUMP )
 ROM_END
 
-GAME( 1993, ribrac,  0,    laz_ribrac, laz_ribrac, laz_ribrac_state,  0, ROT0, "Lazer-tron", "Ribbit Racing (Lazer-tron)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1993, ribrac, 0, laz_ribrac, laz_ribrac, laz_ribrac_state, empty_init, ROT0, "Lazer-tron", "Ribbit Racing (Lazer-tron)", MACHINE_IS_SKELETON_MECHANICAL )

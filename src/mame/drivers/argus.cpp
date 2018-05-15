@@ -461,20 +461,20 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-static GFXDECODE_START( argus )
+static GFXDECODE_START( gfx_argus )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0*16,  8 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  8*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 24*16, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, charlayout, 40*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( valtric )
+static GFXDECODE_START( gfx_valtric )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout, 32*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( butasan )
+static GFXDECODE_START( gfx_butasan )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 12*16, 16 )
@@ -503,7 +503,7 @@ MACHINE_CONFIG_START(argus_state::argus)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(argus_state, screen_update_argus)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", argus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_argus)
 	MCFG_PALETTE_ADD("palette", 896)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
@@ -545,7 +545,7 @@ MACHINE_CONFIG_START(argus_state::valtric)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(argus_state, screen_update_valtric)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", valtric)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_valtric)
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
@@ -593,7 +593,7 @@ MACHINE_CONFIG_START(argus_state::butasan)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(argus_state, screen_update_butasan)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", butasan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_butasan)
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
@@ -757,8 +757,8 @@ ROM_START( butasanj )
 ROM_END
 
 
-/*  ( YEAR   NAME     PARENT  MACHINE   INPUT    STATE         INIT  MONITOR  COMPANY                 FULLNAME ) */
-GAME( 1986, argus,    0,      argus,    argus,   argus_state,  0,    ROT270,  "NMK (Jaleco license)", "Argus",                                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, valtric,  0,      valtric,  valtric, argus_state,  0,    ROT270,  "NMK (Jaleco license)", "Valtric",                                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, butasan,  0,      butasan,  butasan, argus_state,  0,    ROT0,    "NMK (Jaleco license)", "Butasan - Pig's & Bomber's (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, butasanj, butasan,butasan,  butasan, argus_state,  0,    ROT0,    "NMK (Jaleco license)", "Butasan (Japan, Japanese)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+/*  ( YEAR   NAME     PARENT   MACHINE   INPUT    STATE        INIT        MONITOR COMPANY                 FULLNAME ) */
+GAME( 1986, argus,    0,       argus,    argus,   argus_state, empty_init, ROT270, "NMK (Jaleco license)", "Argus",                                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, valtric,  0,       valtric,  valtric, argus_state, empty_init, ROT270, "NMK (Jaleco license)", "Valtric",                                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, butasan,  0,       butasan,  butasan, argus_state, empty_init, ROT0,   "NMK (Jaleco license)", "Butasan - Pig's & Bomber's (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, butasanj, butasan, butasan,  butasan, argus_state, empty_init, ROT0,   "NMK (Jaleco license)", "Butasan (Japan, Japanese)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

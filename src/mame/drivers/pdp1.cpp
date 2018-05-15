@@ -300,7 +300,7 @@ static const uint8_t pdp1_palette[] =
 
 static const uint8_t total_colors_needed = pen_crt_num_levels + sizeof(pdp1_colors) / 3;
 
-static GFXDECODE_START( pdp1 )
+static GFXDECODE_START( gfx_pdp1 )
 	GFXDECODE_ENTRY( "gfx1", 0, fontlayout, pen_crt_num_levels + sizeof(pdp1_colors) / 3, 3 )
 GFXDECODE_END
 
@@ -1947,7 +1947,7 @@ MACHINE_CONFIG_START(pdp1_state::pdp1)
 	MCFG_DEVICE_ADD("typewriter", PDP1_PRINTER, 0)
 	MCFG_DEVICE_ADD("drum", PDP1_CYLINDER, 0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pdp1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pdp1)
 	MCFG_PALETTE_ADD("palette", total_colors_needed + sizeof(pdp1_palette))
 	MCFG_PALETTE_INDIRECT_ENTRIES(total_colors_needed)
 	MCFG_PALETTE_INIT_OWNER(pdp1_state, pdp1)
@@ -1967,5 +1967,5 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT CLASS        INIT  COMPANY                           FULLNAME  FLAGS
-COMP( 1961, pdp1,     0,        0,      pdp1,     pdp1, pdp1_state,  0,    "Digital Equipment Corporation",  "PDP-1",  MACHINE_NO_SOUND_HW )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT CLASS       INIT        COMPANY                           FULLNAME  FLAGS
+COMP( 1961, pdp1, 0,      0,      pdp1,    pdp1, pdp1_state, empty_init, "Digital Equipment Corporation",  "PDP-1",  MACHINE_NO_SOUND_HW )

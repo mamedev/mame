@@ -305,7 +305,7 @@ static const gfx_layout dgnbeta_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( dgnbeta )
+static GFXDECODE_START( gfx_dgnbeta )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dgnbeta_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -338,7 +338,7 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", hd6845_device, screen_update )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dgnbeta)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dgnbeta)
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(dgnbeta_palette) / 3)
 	MCFG_PALETTE_INIT_OWNER(dgn_beta_state, dgn)
 
@@ -420,5 +420,5 @@ ROM_START(dgnbeta)
 	ROM_LOAD("betachar.rom" ,0x0000 ,0x2000 ,CRC(ca79d66c) SHA1(8e2090d471dd97a53785a7f44a49d3c8c85b41f2))
 ROM_END
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    CLASS           INIT    COMPANY             FULLNAME                  FLAGS
-COMP( 1984, dgnbeta,    0,      0,      dgnbeta,    dgnbeta, dgn_beta_state, 0,      "Dragon Data Ltd",  "Dragon 128 (Beta)",      MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS           INIT        COMPANY            FULLNAME             FLAGS
+COMP( 1984, dgnbeta, 0,      0,      dgnbeta, dgnbeta, dgn_beta_state, empty_init, "Dragon Data Ltd", "Dragon 128 (Beta)", MACHINE_NO_SOUND )

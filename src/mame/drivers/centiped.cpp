@@ -1670,12 +1670,12 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( centiped )
+static GFXDECODE_START( gfx_centiped )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   4, 4*4*4 )
 GFXDECODE_END
 
-static GFXDECODE_START( milliped )
+static GFXDECODE_START( gfx_milliped )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 4 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 4*4, 4*4*4*4 )
 GFXDECODE_END
@@ -1699,7 +1699,7 @@ static const gfx_layout warlords_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( warlords )
+static GFXDECODE_START( gfx_warlords )
 	GFXDECODE_ENTRY( "gfx1", 0x000, warlords_charlayout, 0,   8 )
 	GFXDECODE_ENTRY( "gfx1", 0x200, warlords_charlayout, 8*4, 8*4 )
 GFXDECODE_END
@@ -1741,7 +1741,7 @@ MACHINE_CONFIG_START(centiped_state::centiped_base)
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_centiped)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", centiped)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_centiped)
 	MCFG_PALETTE_ADD("palette", 4+4*4*4*4)
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,centiped)
@@ -1844,7 +1844,7 @@ MACHINE_CONFIG_START(centiped_state::milliped)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, control_select_w)) // CNTRLSEL
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", milliped)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_milliped)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4*4+4*4*4*4*4)
 
@@ -1890,7 +1890,7 @@ MACHINE_CONFIG_START(centiped_state::warlords)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led3")) MCFG_DEVCB_INVERT // LED 4
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", warlords)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_warlords)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(8*4+8*4)
 
@@ -1952,7 +1952,7 @@ MACHINE_CONFIG_START(centiped_state::bullsdrt)
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_bullsdrt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", centiped)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_centiped)
 	MCFG_PALETTE_ADD("palette", 4+4*4*4*4)
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,bullsdrt)
@@ -2268,13 +2268,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(centiped_state,bullsdrt)
+void centiped_state::init_bullsdrt()
 {
 	m_dsw_select = 0;
 }
 
 
-DRIVER_INIT_MEMBER(centiped_state,multiped)
+void centiped_state::init_multiped()
 {
 	uint8_t *src = memregion("user1")->base();
 	uint8_t *dest = memregion("maincpu")->base();
@@ -2297,24 +2297,24 @@ DRIVER_INIT_MEMBER(centiped_state,multiped)
  *************************************/
 
 // Centipede, Millipede, and clones
-GAME( 1980, centiped,  0,        centiped,  centiped4, centiped_state, 0,        ROT270, "Atari", "Centipede (revision 4)", MACHINE_SUPPORTS_SAVE ) /* 1 Player Only with Timer Options */
-GAME( 1980, centiped3, centiped, centiped,  centiped,  centiped_state, 0,        ROT270, "Atari", "Centipede (revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, centiped2, centiped, centiped,  centiped,  centiped_state, 0,        ROT270, "Atari", "Centipede (revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, centiped1, centiped, centiped,  centiped,  centiped_state, 0,        ROT270, "Atari", "Centipede (revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, centipedj, centiped, centipedj, centipedj, centiped_state, 0,        ROT270, "Atari", "Centipede (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, centipdb,  centiped, centipdb,  centiped,  centiped_state, 0,        ROT270, "bootleg", "Centipede (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, centipdd,  centiped, centiped,  centiped,  centiped_state, 0,        ROT270, "hack (Two-Bit Score)", "Centipede Dux (hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, caterplr,  centiped, caterplr,  caterplr,  centiped_state, 0,        ROT270, "bootleg (Olympia)", "Caterpillar (bootleg of Centipede)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, millpac,   centiped, centipdb,  centiped,  centiped_state, 0,        ROT270, "bootleg? (Valadon Automation)", "Millpac (bootleg of Centipede)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, magworm,   centiped, magworm,   magworm,   centiped_state, 0,        ROT270, "bootleg (Sidam)", "Magic Worm (bootleg of Centipede, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, magworma,  centiped, magworm,   magworm,   centiped_state, 0,        ROT270, "bootleg", "Magic Worm (bootleg of Centipede, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1982, milliped,  0,        milliped,  milliped,  centiped_state, 0,        ROT270, "Atari", "Millipede", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, millipdd,  milliped, milliped,  milliped,  centiped_state, 0,        ROT270, "hack (Two-Bit Score)", "Millipede Dux (hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, multiped,  0,        multiped,  multiped,  centiped_state, multiped, ROT270, "hack (Braze Technologies)", "Multipede (Centipede/Millipede multigame kit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, centiped,  0,        centiped,  centiped4, centiped_state, empty_init,    ROT270, "Atari", "Centipede (revision 4)", MACHINE_SUPPORTS_SAVE ) /* 1 Player Only with Timer Options */
+GAME( 1980, centiped3, centiped, centiped,  centiped,  centiped_state, empty_init,    ROT270, "Atari", "Centipede (revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, centiped2, centiped, centiped,  centiped,  centiped_state, empty_init,    ROT270, "Atari", "Centipede (revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, centiped1, centiped, centiped,  centiped,  centiped_state, empty_init,    ROT270, "Atari", "Centipede (revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, centipedj, centiped, centipedj, centipedj, centiped_state, empty_init,    ROT270, "Atari", "Centipede (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, centipdb,  centiped, centipdb,  centiped,  centiped_state, empty_init,    ROT270, "bootleg", "Centipede (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, centipdd,  centiped, centiped,  centiped,  centiped_state, empty_init,    ROT270, "hack (Two-Bit Score)", "Centipede Dux (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, caterplr,  centiped, caterplr,  caterplr,  centiped_state, empty_init,    ROT270, "bootleg (Olympia)", "Caterpillar (bootleg of Centipede)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, millpac,   centiped, centipdb,  centiped,  centiped_state, empty_init,    ROT270, "bootleg? (Valadon Automation)", "Millpac (bootleg of Centipede)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, magworm,   centiped, magworm,   magworm,   centiped_state, empty_init,    ROT270, "bootleg (Sidam)", "Magic Worm (bootleg of Centipede, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, magworma,  centiped, magworm,   magworm,   centiped_state, empty_init,    ROT270, "bootleg", "Magic Worm (bootleg of Centipede, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1982, milliped,  0,        milliped,  milliped,  centiped_state, empty_init,    ROT270, "Atari", "Millipede", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, millipdd,  milliped, milliped,  milliped,  centiped_state, empty_init,    ROT270, "hack (Two-Bit Score)", "Millipede Dux (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, multiped,  0,        multiped,  multiped,  centiped_state, init_multiped, ROT270, "hack (Braze Technologies)", "Multipede (Centipede/Millipede multigame kit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // other Atari games
-GAME( 1980, warlords,  0,        warlords,  warlords,  centiped_state, 0,        ROT0,   "Atari", "Warlords", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mazeinv,   0,        mazeinv,   mazeinv,   centiped_state, 0,        ROT270, "Atari", "Maze Invaders (prototype)", 0 )
+GAME( 1980, warlords,  0,        warlords,  warlords,  centiped_state, empty_init,    ROT0,   "Atari", "Warlords", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mazeinv,   0,        mazeinv,   mazeinv,   centiped_state, empty_init,    ROT270, "Atari", "Maze Invaders (prototype)", 0 )
 
 // other manufacturers
-GAME( 1985, bullsdrt,  0,        bullsdrt,  bullsdrt,  centiped_state, bullsdrt, ROT270, "Shinkai Inc. (Magic Electronics Inc. license)", "Bulls Eye Darts", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bullsdrt,  0,        bullsdrt,  bullsdrt,  centiped_state, init_bullsdrt, ROT270, "Shinkai Inc. (Magic Electronics Inc. license)", "Bulls Eye Darts", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

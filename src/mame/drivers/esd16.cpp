@@ -585,16 +585,16 @@ static const gfx_layout hedpanic_layout_16x16x8 =
 };
 
 
-static GFXDECODE_START( esd16 )
-	GFXDECODE_ENTRY( "spr", 0, hedpanic_sprite_16x16x5, 0x200, 8 ) // [0] Sprites
-	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,   0x000, 2 ) // [1] Layers
-	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8,   0x000, 2 ) // [1] Layers
+static GFXDECODE_START( gfx_esd16 )
+	GFXDECODE_ENTRY( "spr", 0, hedpanic_sprite_16x16x5, 0x200, 8 )      // [0] Sprites
+	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,   0x000, 2 )      // [1] Layers
+	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8, 0x000, 2 )      // [1] Layers
 GFXDECODE_END
 
-static GFXDECODE_START( jumppop )
-	GFXDECODE_ENTRY( "spr", 0, jumppop_sprite_16x16x4,  0x000, 0x40 )   /* Sprites 16x16 */ // has 4bpp sprites, unlike the others
-	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,   0x000, 4 )  /* Characters 8x8 */
-	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8, 0x000, 4 )  /* Tiles 16x16 */
+static GFXDECODE_START( gfx_jumppop )
+	GFXDECODE_ENTRY( "spr", 0, jumppop_sprite_16x16x4,  0x000, 0x40 )   // Sprites 16x16 - has 4bpp sprites, unlike the others
+	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,   0x000, 4 )      // Characters 8x8
+	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8, 0x000, 4 )      // Tiles 16x16
 GFXDECODE_END
 
 
@@ -659,7 +659,7 @@ MACHINE_CONFIG_START(esd16_state::esd16)
 	MCFG_DECO_SPRITE_FLIPALLX(1)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esd16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esd16)
 	MCFG_PALETTE_ADD("palette", 0x1000/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -688,7 +688,7 @@ MACHINE_CONFIG_START(esd16_state::jumppop)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_CLOCK( XTAL(14'000'000)/4) /* 3.5MHz - Verified */
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", jumppop)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_jumppop)
 
 	MCFG_DEVICE_REPLACE("ymsnd", YM3812, XTAL(14'000'000)/4) /* 3.5MHz - Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -1669,31 +1669,31 @@ ROM_END
 ***************************************************************************/
 
 /* ESD 11-09-98 */
-GAME( 1999, multchmp,  0,        esd16,    multchmp, esd16_state, 0, ROT0, "ESD",         "Multi Champ (World, ver. 2.5)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1998, multchmpk, multchmp, esd16,    multchmp, esd16_state, 0, ROT0, "ESD",         "Multi Champ (Korea, older)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1998, multchmpa, multchmp, esd16,    multchmp, esd16_state, 0, ROT0, "ESD",         "Multi Champ (World, older)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1999, multchmp,  0,        esd16,    multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, ver. 2.5)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1998, multchmpk, multchmp, esd16,    multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (Korea, older)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1998, multchmpa, multchmp, esd16,    multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, older)",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, jumppop,   0,        jumppop,  jumppop,  esd16_state, 0, ROT0, "ESD",         "Jumping Pop (set 1)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 2001, jumppope,  jumppop,  jumppop,  jumppop,  esd16_state, 0, ROT0, "Emag Soft",   "Jumping Pop (set 2)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 2001, jumppop,   0,        jumppop,  jumppop,  esd16_state, empty_init, ROT0, "ESD",         "Jumping Pop (set 1)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 2001, jumppope,  jumppop,  jumppop,  jumppop,  esd16_state, empty_init, ROT0, "Emag Soft",   "Jumping Pop (set 2)",                        MACHINE_SUPPORTS_SAVE )
 
 /* ESD 05-28-99 */
-GAME( 1999, hedpanico, hedpanic, hedpanio, hedpanic, esd16_state, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hedpanico, hedpanic, hedpanio, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)",         MACHINE_SUPPORTS_SAVE )
 
 /* ESD 06-10-1999 */
-GAME( 1999, hedpanica, hedpanic, hedpanic, hedpanic, esd16_state, 0, ROT0, "ESD",         "Head Panic (ver. 0702, 02/07/1999)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hedpanica, hedpanic, hedpanic, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0702, 02/07/1999)",         MACHINE_SUPPORTS_SAVE )
 
 /* ESD 08-26-1999 */
-GAME( 2000, mchampdx,  0,        mchampdx, hedpanic, esd16_state, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, mchampdxa, mchampdx, mchampdx, hedpanic, esd16_state, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, mchampdxb, mchampdx, mchampdx, hedpanic, esd16_state, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hedpanic,  0,        hedpanic, hedpanic, esd16_state, 0, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hedpanicf, hedpanic, hedpanic, hedpanic, esd16_state, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mchampdx,  0,        mchampdx, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, mchampdxa, mchampdx, mchampdx, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, mchampdxb, mchampdx, mchampdx, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hedpanic,  0,        hedpanic, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hedpanicf, hedpanic, hedpanic, hedpanic, esd16_state, empty_init, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)",         MACHINE_SUPPORTS_SAVE )
 
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
-GAME( 2000, deluxe5,   0,        tangtang, hedpanic, esd16_state, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)",    MACHINE_SUPPORTS_SAVE ) // all 4 sets report the same version number?
-GAME( 2000, deluxe5a,  deluxe5,  tangtang, hedpanic, esd16_state, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2000, deluxe5b,  deluxe5,  tangtang, hedpanic, esd16_state, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2000, deluxe4u,  deluxe5,  tangtang, hedpanic, esd16_state, 0, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe5,   0,        tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)",    MACHINE_SUPPORTS_SAVE ) // all 4 sets report the same version number?
+GAME( 2000, deluxe5a,  deluxe5,  tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe5b,  deluxe5,  tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe4u,  deluxe5,  tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, tangtang,  0,        tangtang, hedpanic, esd16_state, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)",          MACHINE_SUPPORTS_SAVE )
-GAME( 2001, swatpolc,  0,        hedpanic, swatpolc, esd16_state, 0, ROT0, "ESD",         "SWAT Police",                                MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tangtang,  0,        tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)",          MACHINE_SUPPORTS_SAVE )
+GAME( 2001, swatpolc,  0,        hedpanic, swatpolc, esd16_state, empty_init, ROT0, "ESD",         "SWAT Police",                                MACHINE_SUPPORTS_SAVE )

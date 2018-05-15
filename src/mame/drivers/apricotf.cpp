@@ -191,7 +191,7 @@ static const gfx_layout charset_8x8 =
 };
 
 
-static GFXDECODE_START( act_f1 )
+static GFXDECODE_START( gfx_act_f1 )
 	GFXDECODE_ENTRY( I8086_TAG, 0x0800, charset_8x8, 0, 1 )
 GFXDECODE_END
 
@@ -360,7 +360,7 @@ MACHINE_CONFIG_START(f1_state::act_f1)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", act_f1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_act_f1)
 
 	/* Devices */
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
@@ -423,8 +423,8 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE     INIT  COMPANY  FULLNAME        FLAGS
-COMP( 1984, f1,    0,      0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1984, f1e,   f1,     0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F1e",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1984, f2,    f1,     0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F2",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1985, f10,   f1,     0,      act_f1,  act,   f1_state, 0,    "ACT",   "Apricot F10",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS     INIT        COMPANY  FULLNAME       FLAGS
+COMP( 1984, f1,   0,      0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, f1e,  f1,     0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F1e", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1984, f2,   f1,     0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F2",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1985, f10,  f1,     0,      act_f1,  act,   f1_state, empty_init, "ACT",   "Apricot F10", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

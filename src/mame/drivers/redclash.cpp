@@ -325,7 +325,7 @@ static const gfx_layout spritelayout16x16bis =
 	32*32
 };
 
-static GFXDECODE_START( redclash )
+static GFXDECODE_START( gfx_redclash )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,          0,  8 )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, spritelayout8x8,   4*8, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout16x16, 4*8, 16 )
@@ -361,7 +361,7 @@ MACHINE_CONFIG_START(redclash_state::zerohour)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, redclash_state, screen_vblank_redclash))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", redclash)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_redclash)
 	MCFG_PALETTE_ADD("palette", 4*8+4*16+32)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+32)
 	MCFG_PALETTE_INIT_OWNER(redclash_state,redclash)
@@ -388,7 +388,7 @@ MACHINE_CONFIG_START(redclash_state::redclash)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, redclash_state, screen_vblank_redclash))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", redclash)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_redclash)
 	MCFG_PALETTE_ADD("palette", 4*8+4*16+32)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+32)
 	MCFG_PALETTE_INIT_OWNER(redclash_state,redclash)
@@ -565,7 +565,7 @@ ROM_START( redclashk )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(redclash_state, redclash)
+void redclash_state::init_redclash()
 {
 	uint8_t const *const src = memregion("gfx2")->base();
 	uint8_t *const dst = memregion("gfx3")->base();
@@ -580,9 +580,9 @@ DRIVER_INIT_MEMBER(redclash_state, redclash)
 }
 
 
-GAME( 1980, zerohour,  0,        zerohour, zerohour, redclash_state, redclash, ROT270, "Universal",               "Zero Hour (set 1)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohoura, zerohour, zerohour, zerohour, redclash_state, redclash, ROT270, "Universal",               "Zero Hour (set 2)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, zerohouri, zerohour, zerohour, zerohour, redclash_state, redclash, ROT270, "bootleg (Inder SA)",      "Zero Hour (Inder)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclash,  0,        redclash, redclash, redclash_state, redclash, ROT270, "Tehkan",                  "Red Clash (set 1)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclasha, redclash, redclash, redclash, redclash_state, redclash, ROT270, "Tehkan",                  "Red Clash (set 2)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, redclashk, redclash, redclash, redclash, redclash_state, redclash, ROT270, "Tehkan (Kaneko license)", "Red Clash (Kaneko)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohour,  0,        zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",               "Zero Hour (set 1)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohoura, zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "Universal",               "Zero Hour (set 2)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, zerohouri, zerohour, zerohour, zerohour, redclash_state, init_redclash, ROT270, "bootleg (Inder SA)",      "Zero Hour (Inder)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclash,  0,        redclash, redclash, redclash_state, init_redclash, ROT270, "Tehkan",                  "Red Clash (set 1)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclasha, redclash, redclash, redclash, redclash_state, init_redclash, ROT270, "Tehkan",                  "Red Clash (set 2)",  MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redclashk, redclash, redclash, redclash, redclash_state, init_redclash, ROT270, "Tehkan (Kaneko license)", "Red Clash (Kaneko)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

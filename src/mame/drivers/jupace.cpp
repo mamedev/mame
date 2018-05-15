@@ -555,7 +555,7 @@ static const gfx_layout ace_charlayout =
 //  GFXDECODE( ace )
 //-------------------------------------------------
 
-static GFXDECODE_START( ace )
+static GFXDECODE_START( gfx_ace )
 	GFXDECODE_ENTRY( Z80_TAG, 0xfc00, ace_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -769,7 +769,7 @@ MACHINE_CONFIG_START(ace_state::ace)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ace)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ace)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -839,5 +839,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT  STATE      INIT  COMPANY           FULLNAME       FLAGS
-COMP( 1981, jupace,  0,        0,      ace,       ace,   ace_state, 0,    "Jupiter Cantab", "Jupiter Ace", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY           FULLNAME       FLAGS
+COMP( 1981, jupace, 0,      0,      ace,     ace,   ace_state, empty_init, "Jupiter Cantab", "Jupiter Ace", 0 )

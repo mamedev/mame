@@ -214,7 +214,7 @@ static const gfx_layout charlayout1 =
 	8*1
 };
 
-static GFXDECODE_START( momoko )
+static GFXDECODE_START( gfx_momoko )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout1,      0,  24 ) /* TEXT */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, tilelayout,     256,  16 ) /* BG */
 	GFXDECODE_ENTRY( "gfx3", 0x0000, charlayout,       0,   1 ) /* FG */
@@ -276,7 +276,7 @@ MACHINE_CONFIG_START(momoko_state::momoko)
 	MCFG_SCREEN_UPDATE_DRIVER(momoko_state, screen_update_momoko)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", momoko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_momoko)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -425,6 +425,6 @@ ROM_START( momokob ) // bootleg board, almost exact copy of an original one
 	ROM_LOAD( "momoko-b.bin", 0x0100,  0x0020, CRC(427b0e5c) SHA1(aa2797b899571527cc96013fd3420b841954ee67) )
 ROM_END
 
-GAME( 1986, momoko,       0, momoko, momoko, momoko_state, 0, ROT0, "Jaleco",  "Momoko 120% (Japanese text)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, momokoe, momoko, momoko, momoko, momoko_state, 0, ROT0, "Jaleco",  "Momoko 120% (English text)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, momokob, momoko, momoko, momoko, momoko_state, 0, ROT0, "bootleg", "Momoko 120% (bootleg)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, momoko,       0, momoko, momoko, momoko_state, empty_init, ROT0, "Jaleco",  "Momoko 120% (Japanese text)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, momokoe, momoko, momoko, momoko, momoko_state, empty_init, ROT0, "Jaleco",  "Momoko 120% (English text)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, momokob, momoko, momoko, momoko, momoko_state, empty_init, ROT0, "bootleg", "Momoko 120% (bootleg)",       MACHINE_SUPPORTS_SAVE )

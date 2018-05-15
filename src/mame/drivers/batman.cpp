@@ -169,7 +169,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( batman )
+static GFXDECODE_START( gfx_batman )
 	GFXDECODE_ENTRY( "gfx3", 0, pfmolayout,  512, 32 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,  256, 16 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, anlayout,      0, 64 )      /* characters 8x8 */
@@ -195,7 +195,7 @@ MACHINE_CONFIG_START(batman_state::batman)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", batman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_batman)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
@@ -292,4 +292,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, batman, 0, batman, batman, batman_state, 0, ROT0, "Atari Games", "Batman", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, batman, 0, batman, batman, batman_state, empty_init, ROT0, "Atari Games", "Batman", MACHINE_SUPPORTS_SAVE )

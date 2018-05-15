@@ -44,7 +44,7 @@ public:
 		m_pokey(*this, "pokey%u", 1U)
 	{ }
 
-	DECLARE_DRIVER_INIT(irobot);
+	void init_irobot();
 
 	void irobot(machine_config &config);
 

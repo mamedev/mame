@@ -293,7 +293,7 @@ static const gfx_layout charlayout_3bpp =
 };
 
 
-static GFXDECODE_START( speedatk )
+static GFXDECODE_START( gfx_speedatk )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_1bpp,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout_3bpp,   0, 32 )
 GFXDECODE_END
@@ -329,7 +329,7 @@ MACHINE_CONFIG_START(speedatk_state::speedatk)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speedatk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speedatk)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(speedatk_state, speedatk)
@@ -364,4 +364,4 @@ ROM_START( speedatk )
 	ROM_LOAD( "cb2.bpr",      0x0020, 0x0100, CRC(a604cf96) SHA1(a4ef6e77dcd3abe4c27e8e636222a5ee711a51f5) ) /* lookup table */
 ROM_END
 
-GAME( 1984, speedatk, 0, speedatk, speedatk, speedatk_state, 0, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, speedatk, 0, speedatk, speedatk, speedatk_state, empty_init, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", MACHINE_SUPPORTS_SAVE )

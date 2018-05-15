@@ -256,7 +256,7 @@ static const gfx_layout obj_layout =
 };
 
 
-static GFXDECODE_START( tunhunt )
+static GFXDECODE_START( gfx_tunhunt )
 	GFXDECODE_ENTRY( "gfx1", 0x000, alpha_layout, 0x10, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0x200, obj_layout,   0x18, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x000, obj_layout,   0x18, 1 ) /* second bank, or second bitplane? */
@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(tunhunt_state::tunhunt)
 	MCFG_SCREEN_UPDATE_DRIVER(tunhunt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tunhunt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tunhunt)
 	MCFG_PALETTE_ADD("palette", 0x1a)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(tunhunt_state, tunhunt)
@@ -395,5 +395,5 @@ ROM_END
  *************************************/
 
 /*         rom       parent   machine    inp      state          init */
-GAME( 1979,tunhunt,  0,       tunhunt,   tunhunt, tunhunt_state,    0,  ORIENTATION_SWAP_XY, "Atari", "Tunnel Hunt", MACHINE_SUPPORTS_SAVE )
-GAME( 1981,tunhuntc, tunhunt, tunhunt,   tunhunt, tunhunt_state,    0,  ORIENTATION_SWAP_XY, "Atari (Centuri license)", "Tunnel Hunt (Centuri)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979,tunhunt,  0,       tunhunt,   tunhunt, tunhunt_state, empty_init, ORIENTATION_SWAP_XY, "Atari", "Tunnel Hunt", MACHINE_SUPPORTS_SAVE )
+GAME( 1981,tunhuntc, tunhunt, tunhunt,   tunhunt, tunhunt_state, empty_init, ORIENTATION_SWAP_XY, "Atari (Centuri license)", "Tunnel Hunt (Centuri)", MACHINE_SUPPORTS_SAVE )

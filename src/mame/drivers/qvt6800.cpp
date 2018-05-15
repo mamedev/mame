@@ -139,7 +139,7 @@ ROM_START( qvt102 )
 	ROM_LOAD( "k301.u302",  0x0000, 0x0400, CRC(67564b20) SHA1(5897ff920f8fae4aa498d3a4dfd45b58183c041d) )
 ROM_END
 
-COMP( 1983, qvt102, 0, 0, qvt102, qvt6800, qvt6800_state, 0, "Qume", "QVT-102", MACHINE_IS_SKELETON )
+COMP( 1983, qvt102, 0, 0, qvt102, qvt6800, qvt6800_state, empty_init, "Qume", "QVT-102", MACHINE_IS_SKELETON )
 
 
 
@@ -159,4 +159,4 @@ ROM_START( qvt190 )
 	ROM_LOAD( "95864-304.u17", 0x0000, 0x2000, CRC(2792e99b) SHA1(4a84d029d0e63975fc95dc7056d2523193dff986) )
 ROM_END
 
-COMP( 1987, qvt190, 0, 0, qvt190, qvt6800, qvt6800_state, 0, "Qume", "QVT-190", MACHINE_IS_SKELETON )
+COMP( 1987, qvt190, 0, 0, qvt190, qvt6800, qvt6800_state, empty_init, "Qume", "QVT-190", MACHINE_IS_SKELETON )

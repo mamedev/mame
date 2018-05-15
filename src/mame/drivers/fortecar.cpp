@@ -345,7 +345,7 @@ public:
 
 	void fortecar(machine_config &config);
 
-	DECLARE_DRIVER_INIT(fortecar);
+	void init_fortecar();
 
 protected:
 	virtual void machine_start() override;
@@ -658,7 +658,7 @@ static const gfx_layout tiles8x8_layout_6bpp =
 *      Graphics Decode Information      *
 ****************************************/
 
-static GFXDECODE_START( fortecar )
+static GFXDECODE_START( gfx_fortecar )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout_3bpp, 0x000, 0x20 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout_6bpp, 0x100, 0x04 )
 GFXDECODE_END
@@ -713,7 +713,7 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 
 	MCFG_V3021_ADD("rtc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fortecar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fortecar)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(fortecar_state, fortecar)
 
@@ -779,7 +779,7 @@ ROM_END
 *           Driver Init            *
 ***********************************/
 
-DRIVER_INIT_MEMBER(fortecar_state, fortecar)
+void fortecar_state::init_fortecar()
 {
 	// ...
 }
@@ -789,6 +789,6 @@ DRIVER_INIT_MEMBER(fortecar_state, fortecar)
 *          Game Drivers            *
 ***********************************/
 
-//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT   COMPANY        FULLNAME                        FLAGS                LAYOUT
-GAMEL( 1994, fortecrd, 0,        fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 110, Spanish)", 0,                   layout_fortecrd )
-GAMEL( 1994, fortecar, fortecrd, fortecar, fortecar, fortecar_state, fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 103, English)", MACHINE_NOT_WORKING, layout_fortecrd )
+//     YEAR  NAME      PARENT    MACHINE   INPUT     CLASS           INIT           ROT   COMPANY       FULLNAME                         FLAGS                LAYOUT
+GAMEL( 1994, fortecrd, 0,        fortecar, fortecar, fortecar_state, init_fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 110, Spanish)", 0,                   layout_fortecrd )
+GAMEL( 1994, fortecar, fortecrd, fortecar, fortecar, fortecar_state, init_fortecar, ROT0, "Fortex Ltd", "Forte Card (Ver 103, English)", MACHINE_NOT_WORKING, layout_fortecrd )

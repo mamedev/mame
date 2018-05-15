@@ -316,13 +316,13 @@ static const gfx_layout qwak_sprite_layout =
 };
 
 
-static GFXDECODE_START( runaway )
+static GFXDECODE_START( gfx_runaway )
 	GFXDECODE_ENTRY( "gfx1", 0x000, runaway_tile_layout,   0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x800, runaway_sprite_layout, 8, 1 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( qwak )
+static GFXDECODE_START( gfx_qwak )
 	GFXDECODE_ENTRY( "gfx1", 0x800, qwak_tile_layout,   0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x000, qwak_sprite_layout, 0, 1 )
 GFXDECODE_END
@@ -345,7 +345,7 @@ MACHINE_CONFIG_START(runaway_state::runaway)
 	MCFG_SCREEN_UPDATE_DRIVER(runaway_state, screen_update_runaway)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", runaway)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_runaway)
 	MCFG_PALETTE_ADD("palette", 16)
 
 
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(runaway_state::qwak)
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", qwak)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_qwak)
 
 	MCFG_VIDEO_START_OVERRIDE(runaway_state,qwak)
 	MCFG_SCREEN_MODIFY("screen")
@@ -416,5 +416,5 @@ ROM_START( qwak )
 ROM_END
 
 
-GAME( 1982, qwak,    0, qwak,    qwak,    runaway_state, 0, ROT270, "Atari", "Qwak (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, runaway, 0, runaway, runaway, runaway_state, 0, ROT0,   "Atari", "Runaway (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qwak,    0, qwak,    qwak,    runaway_state, empty_init, ROT270, "Atari", "Qwak (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, runaway, 0, runaway, runaway, runaway_state, empty_init, ROT0,   "Atari", "Runaway (prototype)", MACHINE_SUPPORTS_SAVE )

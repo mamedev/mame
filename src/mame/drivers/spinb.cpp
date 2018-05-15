@@ -89,9 +89,9 @@ public:
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5a_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5m_w);
-	DECLARE_DRIVER_INIT(game0);
-	DECLARE_DRIVER_INIT(game1);
-	DECLARE_DRIVER_INIT(game2);
+	void init_game0();
+	void init_game1();
+	void init_game2();
 	DECLARE_PALETTE_INIT(spinb);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void jolypark(machine_config &config);
@@ -548,14 +548,14 @@ void spinb_state::machine_start()
 	save_item(NAME(m_dmdram)); // make it visible in the debugger
 }
 
-DRIVER_INIT_MEMBER( spinb_state, game0 )
+void spinb_state::init_game0()
 {
 	m_p_audio = memregion("audiorom")->base();
 	m_p_music = memregion("musicrom")->base();
 	m_game = 0;
 }
 
-DRIVER_INIT_MEMBER( spinb_state, game1 )
+void spinb_state::init_game1()
 {
 	m_p_audio = memregion("audiorom")->base();
 	m_p_music = memregion("musicrom")->base();
@@ -563,7 +563,7 @@ DRIVER_INIT_MEMBER( spinb_state, game1 )
 	m_game = 1;
 }
 
-DRIVER_INIT_MEMBER( spinb_state, game2 )
+void spinb_state::init_game2()
 {
 	m_p_audio = memregion("audiorom")->base();
 	m_p_music = memregion("musicrom")->base();
@@ -884,8 +884,8 @@ ROM_START(vrnwrld)
 	ROM_LOAD("vws7ic27.rom", 0x100000, 0x80000, CRC(7335b29c) SHA1(4de6de09f069feecbad2e5ef50032e8d381ff9b1))
 ROM_END
 
-GAME(1993, bushido,   0,       spinb,    spinb, spinb_state, game0,  ROT0,  "Inder/Spinball", "Bushido (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993, bushidoa,  bushido, spinb,    spinb, spinb_state, game0,  ROT0,  "Inder/Spinball", "Bushido (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995, mach2,     0,       spinb,    spinb, spinb_state, game0,  ROT0,  "Spinball",       "Mach 2",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996, jolypark,  0,       jolypark, spinb, spinb_state, game1,  ROT0,  "Spinball",       "Jolly Park",      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996, vrnwrld,   0,       vrnwrld,  spinb, spinb_state, game2,  ROT0,  "Spinball",       "Verne's World",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993, bushido,   0,       spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993, bushidoa,  bushido, spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995, mach2,     0,       spinb,    spinb, spinb_state, init_game0, ROT0, "Spinball",       "Mach 2",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996, jolypark,  0,       jolypark, spinb, spinb_state, init_game1, ROT0, "Spinball",       "Jolly Park",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996, vrnwrld,   0,       vrnwrld,  spinb, spinb_state, init_game2, ROT0, "Spinball",       "Verne's World",   MACHINE_IS_SKELETON_MECHANICAL)

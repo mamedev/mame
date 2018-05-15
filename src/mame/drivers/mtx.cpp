@@ -25,7 +25,7 @@
 
 #include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"
@@ -428,10 +428,10 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   STATE        INIT    COMPANY         FULLNAME   FLAGS
-COMP( 1983, mtx512,   0,        0,      mtx512,   mtx512, mtx_state,   0,      "Memotech Ltd", "MTX 512", 0 )
-COMP( 1983, mtx500,   mtx512,   0,      mtx500,   mtx512, mtx_state,   0,      "Memotech Ltd", "MTX 500", 0 )
-COMP( 1984, rs128,    mtx512,   0,      rs128,    mtx512, mtx_state,   0,      "Memotech Ltd", "RS 128",  0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS      INIT        COMPANY         FULLNAME   FLAGS
+COMP( 1983, mtx512, 0,      0,      mtx512,  mtx512, mtx_state, empty_init, "Memotech Ltd", "MTX 512", 0 )
+COMP( 1983, mtx500, mtx512, 0,      mtx500,  mtx512, mtx_state, empty_init, "Memotech Ltd", "MTX 500", 0 )
+COMP( 1984, rs128,  mtx512, 0,      rs128,   mtx512, mtx_state, empty_init, "Memotech Ltd", "RS 128",  0 )
 
 
 /*

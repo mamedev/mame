@@ -649,7 +649,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( jubileep )      /* 4 different graphics banks */
+static GFXDECODE_START( gfx_jubileep )      /* 4 different graphics banks */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, tilelayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, tilelayout, 0, 1 )
@@ -678,7 +678,7 @@ MACHINE_CONFIG_START(jubilee_state::jubileep)
 	MCFG_SCREEN_UPDATE_DRIVER(jubilee_state, screen_update_jubileep)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jubileep)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jubileep)
 	MCFG_PALETTE_ADD("palette",8)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
@@ -711,5 +711,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT   COMPANY    FULLNAME                     FLAGS
-GAME( 1985, jubileep, 0,      jubileep, jubileep, jubilee_state, 0,    ROT0, "Jubilee", "Double-Up Poker (Jubilee)", MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT        ROT   COMPANY    FULLNAME                     FLAGS
+GAME( 1985, jubileep, 0,      jubileep, jubileep, jubilee_state, empty_init, ROT0, "Jubilee", "Double-Up Poker (Jubilee)", MACHINE_NO_SOUND )

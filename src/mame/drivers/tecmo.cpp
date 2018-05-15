@@ -690,7 +690,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( tecmo )
+static GFXDECODE_START( gfx_tecmo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 256, 16 )   /* colors 256 - 511 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 16 )   /* colors   0 - 255 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 512, 16 )   /* colors 512 - 767 */
@@ -732,7 +732,7 @@ MACHINE_CONFIG_START(tecmo_state::rygar)
 	MCFG_SCREEN_UPDATE_DRIVER(tecmo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tecmo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tecmo)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -1316,22 +1316,22 @@ ROM_END
    video_type is used to distinguish Rygar, Silkworm and Gemini Wing.
    This is needed because there is a difference in the tile and sprite indexing.
 */
-DRIVER_INIT_MEMBER(tecmo_state,rygar)
+void tecmo_state::init_rygar()
 {
 	m_video_type = 0;
 }
 
-DRIVER_INIT_MEMBER(tecmo_state,silkworm)
+void tecmo_state::init_silkworm()
 {
 	m_video_type = 1;
 }
 
-DRIVER_INIT_MEMBER(tecmo_state,gemini)
+void tecmo_state::init_gemini()
 {
 	m_video_type = 2;
 }
 
-DRIVER_INIT_MEMBER(tecmo_state,backfirt)
+void tecmo_state::init_backfirt()
 {
 	m_video_type = 2;
 
@@ -1345,14 +1345,14 @@ DRIVER_INIT_MEMBER(tecmo_state,backfirt)
 
 
 
-GAME( 1986, rygar,     0,        rygar,     rygar,     tecmo_state, rygar,    ROT0,  "Tecmo",   "Rygar (US set 1)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rygar2,    rygar,    rygar,     rygar,     tecmo_state, rygar,    ROT0,  "Tecmo",   "Rygar (US set 2)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rygar3,    rygar,    rygar,     rygar,     tecmo_state, rygar,    ROT0,  "Tecmo",   "Rygar (US set 3 Old Version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rygarj,    rygar,    rygar,     rygar,     tecmo_state, rygar,    ROT0,  "Tecmo",   "Argus no Senshi (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gemini,    0,        gemini,    gemini,    tecmo_state, gemini,   ROT90, "Tecmo",   "Gemini Wing (Japan)",          MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
-GAME( 1987, geminib,   gemini,   geminib,   gemini,    tecmo_state, gemini,   ROT90, "bootleg", "Gemini Wing (bootleg)",        MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
-GAME( 1988, silkworm,  0,        silkworm,  silkworm,  tecmo_state, silkworm, ROT0,  "Tecmo",   "Silk Worm (World)",            MACHINE_SUPPORTS_SAVE ) // No regional "Warning, if you are playing ..." screen
-GAME( 1988, silkwormj, silkworm, silkworm,  silkworm,  tecmo_state, silkworm, ROT0,  "Tecmo",   "Silk Worm (Japan)",            MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
-GAME( 1988, silkwormp, silkworm, silkwormp, silkwormp, tecmo_state, silkworm, ROT0,  "Tecmo",   "Silk Worm (prototype)",        MACHINE_SUPPORTS_SAVE ) // prototype
-GAME( 1988, silkwormb, silkworm, silkwormp, silkwormp, tecmo_state, silkworm, ROT0,  "bootleg", "Silk Worm (bootleg)",          MACHINE_SUPPORTS_SAVE ) // bootleg of (a different?) prototype
-GAME( 1988, backfirt,  0,        backfirt,  backfirt,  tecmo_state, backfirt, ROT0,  "Tecmo",   "Back Fire (Tecmo, bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rygar,     0,        rygar,     rygar,     tecmo_state, init_rygar,    ROT0,  "Tecmo",   "Rygar (US set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rygar2,    rygar,    rygar,     rygar,     tecmo_state, init_rygar,    ROT0,  "Tecmo",   "Rygar (US set 2)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rygar3,    rygar,    rygar,     rygar,     tecmo_state, init_rygar,    ROT0,  "Tecmo",   "Rygar (US set 3 Old Version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rygarj,    rygar,    rygar,     rygar,     tecmo_state, init_rygar,    ROT0,  "Tecmo",   "Argus no Senshi (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gemini,    0,        gemini,    gemini,    tecmo_state, init_gemini,   ROT90, "Tecmo",   "Gemini Wing (Japan)",          MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
+GAME( 1987, geminib,   gemini,   geminib,   gemini,    tecmo_state, init_gemini,   ROT90, "bootleg", "Gemini Wing (bootleg)",        MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
+GAME( 1988, silkworm,  0,        silkworm,  silkworm,  tecmo_state, init_silkworm, ROT0,  "Tecmo",   "Silk Worm (World)",            MACHINE_SUPPORTS_SAVE ) // No regional "Warning, if you are playing ..." screen
+GAME( 1988, silkwormj, silkworm, silkworm,  silkworm,  tecmo_state, init_silkworm, ROT0,  "Tecmo",   "Silk Worm (Japan)",            MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
+GAME( 1988, silkwormp, silkworm, silkwormp, silkwormp, tecmo_state, init_silkworm, ROT0,  "Tecmo",   "Silk Worm (prototype)",        MACHINE_SUPPORTS_SAVE ) // prototype
+GAME( 1988, silkwormb, silkworm, silkwormp, silkwormp, tecmo_state, init_silkworm, ROT0,  "bootleg", "Silk Worm (bootleg)",          MACHINE_SUPPORTS_SAVE ) // bootleg of (a different?) prototype
+GAME( 1988, backfirt,  0,        backfirt,  backfirt,  tecmo_state, init_backfirt, ROT0,  "Tecmo",   "Back Fire (Tecmo, bootleg)",   MACHINE_SUPPORTS_SAVE )

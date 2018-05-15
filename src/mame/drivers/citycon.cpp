@@ -157,7 +157,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( citycon )
+static GFXDECODE_START( gfx_citycon )
 //  GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 512, 32 ) /* colors 512-639 */
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 640, 32 ) /* colors 512-639 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout, 0, 16 ) /* colors 0-255 */
@@ -207,7 +207,7 @@ MACHINE_CONFIG_START(citycon_state::citycon)
 	MCFG_SCREEN_UPDATE_DRIVER(citycon_state, screen_update_citycon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", citycon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_citycon)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 640+1024)   /* 640 real palette + 1024 virtual palette */
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -320,10 +320,9 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(citycon_state,citycon)
+void citycon_state::init_citycon()
 {
 	uint8_t *rom = memregion("gfx1")->base();
-	int i;
 
 	/*
 	  City Connection controls the text color code for each _scanline_, not
@@ -331,14 +330,12 @@ DRIVER_INIT_MEMBER(citycon_state,citycon)
 	  I convert the 2bpp char data into 5bpp, and create a virtual palette so
 	  characters can still be drawn in one pass.
 	  */
-	for (i = 0x0fff; i >= 0; i--)
+	for (int i = 0x0fff; i >= 0; i--)
 	{
-		int mask;
-
 		rom[3 * i] = rom[i];
 		rom[3 * i + 1] = 0;
 		rom[3 * i + 2] = 0;
-		mask = rom[i] | (rom[i] << 4) | (rom[i] >> 4);
+		int mask = rom[i] | (rom[i] << 4) | (rom[i] >> 4);
 		if (i & 0x01) rom[3 * i + 1] |= mask & 0xf0;
 		if (i & 0x02) rom[3 * i + 1] |= mask & 0x0f;
 		if (i & 0x04) rom[3 * i + 2] |= mask & 0xf0;
@@ -347,6 +344,6 @@ DRIVER_INIT_MEMBER(citycon_state,citycon)
 
 
 
-GAME( 1985, citycon,  0,       citycon, citycon, citycon_state, citycon, ROT0, "Jaleco", "City Connection (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, citycona, citycon, citycon, citycon, citycon_state, citycon, ROT0, "Jaleco", "City Connection (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cruisin,  citycon, citycon, citycon, citycon_state, citycon, ROT0, "Jaleco (Kitkorp license)", "Cruisin", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, citycon,  0,       citycon, citycon, citycon_state, init_citycon, ROT0, "Jaleco", "City Connection (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, citycona, citycon, citycon, citycon, citycon_state, init_citycon, ROT0, "Jaleco", "City Connection (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cruisin,  citycon, citycon, citycon, citycon_state, init_citycon, ROT0, "Jaleco (Kitkorp license)", "Cruisin", MACHINE_SUPPORTS_SAVE )

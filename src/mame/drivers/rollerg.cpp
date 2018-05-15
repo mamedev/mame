@@ -350,5 +350,5 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1991, rollerg,  0,       rollerg, rollerg, rollerg_state, 0, ROT0, "Konami", "Rollergames (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rollergj, rollerg, rollerg, rollerg, rollerg_state, 0, ROT0, "Konami", "Rollergames (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rollerg,  0,       rollerg, rollerg, rollerg_state, empty_init, ROT0, "Konami", "Rollergames (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rollergj, rollerg, rollerg, rollerg, rollerg_state, empty_init, ROT0, "Konami", "Rollergames (Japan)", MACHINE_SUPPORTS_SAVE )

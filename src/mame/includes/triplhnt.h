@@ -50,7 +50,7 @@ public:
 		m_code_ram(*this, "code_ram")
 	{ }
 
-	DECLARE_DRIVER_INIT(triplhnt);
+	void init_triplhnt();
 	void triplhnt(machine_config &config);
 
 protected:

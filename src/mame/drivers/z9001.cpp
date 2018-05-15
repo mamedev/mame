@@ -29,7 +29,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
@@ -198,7 +198,7 @@ void z9001_state::kbd_put(u8 data)
 	m_maincpu->space(AS_PROGRAM).write_byte(0x0025, data);
 }
 
-static GFXDECODE_START( z9001 )
+static GFXDECODE_START( gfx_z9001 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, z9001_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -219,7 +219,7 @@ MACHINE_CONFIG_START(z9001_state::z9001)
 	MCFG_SCREEN_UPDATE_DRIVER(z9001_state, screen_update_z9001)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", z9001)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_z9001)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	/* Sound */
@@ -308,10 +308,10 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT  COMPANY     FULLNAME              FLAGS
-COMP( 1984, z9001,    0,       0,      z9001,   z9001, z9001_state, 0,    "Robotron", "Z9001 (KC 85/1.10)", MACHINE_NOT_WORKING )
-COMP( 1986, kc85_111, z9001,   0,      z9001,   z9001, z9001_state, 0,    "Robotron", "KC 85/1.11",         MACHINE_NOT_WORKING )
-COMP( 1987, kc87_10,  z9001,   0,      z9001,   z9001, z9001_state, 0,    "Robotron", "KC 87.10",           MACHINE_NOT_WORKING )
-COMP( 1987, kc87_11,  z9001,   0,      z9001,   z9001, z9001_state, 0,    "Robotron", "KC 87.11",           MACHINE_NOT_WORKING )
-COMP( 1987, kc87_20,  z9001,   0,      z9001,   z9001, z9001_state, 0,    "Robotron", "KC 87.20",           MACHINE_NOT_WORKING )
-COMP( 1987, kc87_21,  z9001,   0,      z9001,   z9001, z9001_state, 0,    "Robotron", "KC 87.21",           MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME              FLAGS
+COMP( 1984, z9001,    0,      0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "Z9001 (KC 85/1.10)", MACHINE_NOT_WORKING )
+COMP( 1986, kc85_111, z9001,  0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "KC 85/1.11",         MACHINE_NOT_WORKING )
+COMP( 1987, kc87_10,  z9001,  0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "KC 87.10",           MACHINE_NOT_WORKING )
+COMP( 1987, kc87_11,  z9001,  0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "KC 87.11",           MACHINE_NOT_WORKING )
+COMP( 1987, kc87_20,  z9001,  0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "KC 87.20",           MACHINE_NOT_WORKING )
+COMP( 1987, kc87_21,  z9001,  0,      z9001,   z9001, z9001_state, empty_init, "Robotron", "KC 87.21",           MACHINE_NOT_WORKING )

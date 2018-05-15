@@ -215,7 +215,7 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( commando )
+static GFXDECODE_START( gfx_commando )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   192, 16 ) // colors 192-255
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0, 16 ) // colors   0-127
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 128,  4 ) // colors 128-191
@@ -275,7 +275,7 @@ MACHINE_CONFIG_START(commando_state::commando)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, commando_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", commando)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_commando)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
@@ -669,7 +669,7 @@ ROM_END
 
 /* Driver Initialization */
 
-DRIVER_INIT_MEMBER(commando_state,commando)
+void commando_state::init_commando()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -682,7 +682,7 @@ DRIVER_INIT_MEMBER(commando_state,commando)
 	}
 }
 
-DRIVER_INIT_MEMBER(commando_state,spaceinv)
+void commando_state::init_spaceinv()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -696,12 +696,12 @@ DRIVER_INIT_MEMBER(commando_state,spaceinv)
 
 /* Game Drivers */
 
-GAME( 1985, commando,  0,        commando, commando, commando_state, commando, ROT270, "Capcom", "Commando (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandou, commando, commando, commandou,commando_state, commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandou2,commando, commando, commando, commando_state, commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandoj, commando, commando, commando, commando_state, commando, ROT270, "Capcom", "Senjou no Ookami", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandob, commando, commando, commando, commando_state, spaceinv, ROT270, "bootleg", "Commando (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandob2,commando, commando, commando, commando_state, commando, ROT270, "bootleg", "Commando (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sinvasn,   commando, commando, commando, commando_state, commando, ROT270, "Capcom", "Space Invasion (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sinvasnb,  commando, commando, commando, commando_state, spaceinv, ROT270, "bootleg", "Space Invasion (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, mercenario,commando, commando, commando, commando_state, spaceinv, ROT270, "bootleg", "Mercenario (Commando bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commando,   0,        commando, commando, commando_state, init_commando, ROT270, "Capcom", "Commando (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandou,  commando, commando, commandou,commando_state, init_commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandou2, commando, commando, commando, commando_state, init_commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandoj,  commando, commando, commando, commando_state, init_commando, ROT270, "Capcom", "Senjou no Ookami", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandob,  commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg", "Commando (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandob2, commando, commando, commando, commando_state, init_commando, ROT270, "bootleg", "Commando (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sinvasn,    commando, commando, commando, commando_state, init_commando, ROT270, "Capcom", "Space Invasion (Europe)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sinvasnb,   commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg", "Space Invasion (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, mercenario, commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg", "Mercenario (Commando bootleg)", MACHINE_SUPPORTS_SAVE )

@@ -17,7 +17,7 @@ Atari Poolshark Driver
 
 
 
-DRIVER_INIT_MEMBER(poolshrk_state,poolshrk)
+void poolshrk_state::init_poolshrk()
 {
 	uint8_t* pSprite = memregion("gfx1")->base();
 	uint8_t* pOffset = memregion("proms")->base();
@@ -201,7 +201,7 @@ static const gfx_layout poolshrk_tile_layout =
 };
 
 
-static GFXDECODE_START( poolshrk )
+static GFXDECODE_START( gfx_poolshrk )
 	GFXDECODE_ENTRY( "gfx1", 0, poolshrk_sprite_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, poolshrk_tile_layout, 0, 1 )
 GFXDECODE_END
@@ -233,7 +233,7 @@ MACHINE_CONFIG_START(poolshrk_state::poolshrk)
 	MCFG_SCREEN_UPDATE_DRIVER(poolshrk_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", poolshrk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_poolshrk)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(poolshrk_state, poolshrk)
 
@@ -262,4 +262,4 @@ ROM_START( poolshrk )
 ROM_END
 
 
-GAME( 1977, poolshrk, 0, poolshrk, poolshrk, poolshrk_state, poolshrk, 0, "Atari", "Poolshark", MACHINE_SUPPORTS_SAVE )
+GAME( 1977, poolshrk, 0, poolshrk, poolshrk, poolshrk_state, init_poolshrk, 0, "Atari", "Poolshark", MACHINE_SUPPORTS_SAVE )

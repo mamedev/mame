@@ -307,13 +307,13 @@ void mc68hc11_cpu_device::hc11_regs_w(uint32_t address, uint8_t value)
 
 uint8_t mc68hc11_cpu_device::FETCH()
 {
-	return m_direct->read_byte(m_pc++);
+	return m_cache->read_byte(m_pc++);
 }
 
 uint16_t mc68hc11_cpu_device::FETCH16()
 {
 	uint16_t w;
-	w = (m_direct->read_byte(m_pc) << 8) | (m_direct->read_byte(m_pc+1));
+	w = m_cache->read_word(m_pc);
 	m_pc += 2;
 	return w;
 }
@@ -397,7 +397,7 @@ void mc68hc11_cpu_device::device_start()
 	m_internal_ram.resize(m_internal_ram_size);
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_pc));

@@ -187,5 +187,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY       FULLNAME  FLAGS
-COMP( 198?, konin,  0,      0,       konin,     konin, konin_state, 0,    "Mera-Elzab", "Konin",  MACHINE_IS_SKELETON )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY       FULLNAME  FLAGS
+COMP( 198?, konin, 0,      0,      konin,   konin, konin_state, empty_init, "Mera-Elzab", "Konin",  MACHINE_IS_SKELETON )

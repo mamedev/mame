@@ -1526,7 +1526,7 @@ MACHINE_RESET_MEMBER(eolith_state,eolith)
 	m_soundcpu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 
-DRIVER_INIT_MEMBER(eolith_state,eolith)
+void eolith_state::init_eolith()
 {
 	init_speedup();
 
@@ -1534,11 +1534,11 @@ DRIVER_INIT_MEMBER(eolith_state,eolith)
 	m_sndbank->configure_entries(0, 16, memregion("sounddata")->base(), 0x8000);
 }
 
-DRIVER_INIT_MEMBER(eolith_state,landbrk)
+void eolith_state::init_landbrk()
 {
 	m_coin_counter_bit = 0x1000;
 
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
 /*
@@ -1559,32 +1559,32 @@ void eolith_state::patch_mcu_protection(uint32_t address)
 	rombase[address/4] = (rombase[address/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 }
 
-DRIVER_INIT_MEMBER(eolith_state,landbrka)
+void eolith_state::init_landbrka()
 {
 	patch_mcu_protection(0x14f00);
 	m_coin_counter_bit = 0x2000;
 
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
-DRIVER_INIT_MEMBER(eolith_state,landbrkb)
+void eolith_state::init_landbrkb()
 {
 	patch_mcu_protection(0x14da8);
 	m_coin_counter_bit = 0x2000;
 
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
-DRIVER_INIT_MEMBER(eolith_state,hidctch2)
+void eolith_state::init_hidctch2()
 {
 	patch_mcu_protection(0x0bcc8);
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
-DRIVER_INIT_MEMBER(eolith_state,hidnc2k)
+void eolith_state::init_hidnc2k()
 {
 	patch_mcu_protection(0x17b2c);
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
 /* Eolith Speedup Handling */
@@ -1721,23 +1721,23 @@ CUSTOM_INPUT_MEMBER(eolith_state::stealsee_speedup_getvblank)
  *
  *************************************/
 
-GAME( 1998, linkypip,  0,        eolith45, linkypip,  eolith_state, eolith,   ROT0, "Eolith", "Linky Pipe", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, ironfort,  0,        ironfort, ironfort,  eolith_state, eolith,   ROT0, "Eolith", "Iron Fortress", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, ironfortc, ironfort, ironfort, ironfortc, eolith_state, eolith,   ROT0, "Eolith (Excellent Competence Ltd. license)", "Gongtit Jiucoi Iron Fortress (Hong Kong)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Licensed/Distributed to Hong Kong company Excellent Competence Ltd.
-GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith_state, eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
-GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith_state, eolith,   ROT0, "Eolith", "Raccoon World", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith_state, eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, candy,     0,        eolith50, candy,     eolith_state, eolith,   ROT0, "Eolith", "Candy Candy",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, hidctch2,  0,        eolith50, hidctch2,  eolith_state, hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03) (Kor/Eng) (AT89c52 protected)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, hidctch2a, hidctch2, eolith50, hidctch2,  eolith_state, eolith,   ROT0, "Eolith", "Hidden Catch 2 (pcb ver 1.00) (Kor/Eng/Jpn/Chi)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, hidnc2k,   0,        eolith50, hidctch2,  eolith_state, hidnc2k,  ROT0, "Eolith", "Hidden Catch 2000 (AT89c52 protected)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, landbrk,   0,        eolith45, landbrk,   eolith_state, landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
-GAME( 1999, landbrka,  landbrk,  eolith45, landbrk,   eolith_state, landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03) (AT89c52 protected)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
-GAME( 1999, landbrkb,  landbrk,  eolith45, landbrk,   eolith_state, landbrkb, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 1.0) (AT89c52 protected)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
-GAME( 1999, nhidctch,  0,        eolith45, hidctch2,  eolith_state, eolith,   ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or New Teurrin Geurim Chajgi '98
-GAME( 1999, penfan,    0,        eolith45, penfan,    eolith_state, eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 1)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // alt title of Ribbon
-GAME( 1999, penfana,   penfan,   eolith45, penfan,    eolith_state, eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, stealsee,  0,        eolith45, stealsee,  eolith_state, eolith,   ROT0, "Moov Generation / Eolith", "Steal See",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hidctch3,  0,        hidctch3, hidctch3,  eolith_state, eolith,   ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, fort2b,    0,        eolith50, common,    eolith_state, eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (World) (ver 1.01 / pcb ver 3.05)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Language selection is greyed out in Service Mode
-GAME( 2001, fort2ba,   fort2b,   eolith50, common,    eolith_state, eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (Korea) (ver 1.00 / pcb ver 3.05)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ^^
+GAME( 1998, linkypip,  0,        eolith45, linkypip,  eolith_state, init_eolith,   ROT0, "Eolith", "Linky Pipe", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, ironfort,  0,        ironfort, ironfort,  eolith_state, init_eolith,   ROT0, "Eolith", "Iron Fortress", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, ironfortc, ironfort, ironfort, ironfortc, eolith_state, init_eolith,   ROT0, "Eolith (Excellent Competence Ltd. license)", "Gongtit Jiucoi Iron Fortress (Hong Kong)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Licensed/Distributed to Hong Kong company Excellent Competence Ltd.
+GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
+GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith_state, init_eolith,   ROT0, "Eolith", "Raccoon World", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith_state, init_eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, candy,     0,        eolith50, candy,     eolith_state, init_eolith,   ROT0, "Eolith", "Candy Candy",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hidctch2,  0,        eolith50, hidctch2,  eolith_state, init_hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03) (Kor/Eng) (AT89c52 protected)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hidctch2a, hidctch2, eolith50, hidctch2,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch 2 (pcb ver 1.00) (Kor/Eng/Jpn/Chi)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hidnc2k,   0,        eolith50, hidctch2,  eolith_state, init_hidnc2k,  ROT0, "Eolith", "Hidden Catch 2000 (AT89c52 protected)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, landbrk,   0,        eolith45, landbrk,   eolith_state, init_landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
+GAME( 1999, landbrka,  landbrk,  eolith45, landbrk,   eolith_state, init_landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03) (AT89c52 protected)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
+GAME( 1999, landbrkb,  landbrk,  eolith45, landbrk,   eolith_state, init_landbrkb, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 1.0) (AT89c52 protected)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
+GAME( 1999, nhidctch,  0,        eolith45, hidctch2,  eolith_state, init_eolith,   ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or New Teurrin Geurim Chajgi '98
+GAME( 1999, penfan,    0,        eolith45, penfan,    eolith_state, init_eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 1)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // alt title of Ribbon
+GAME( 1999, penfana,   penfan,   eolith45, penfan,    eolith_state, init_eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, stealsee,  0,        eolith45, stealsee,  eolith_state, init_eolith,   ROT0, "Moov Generation / Eolith", "Steal See",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hidctch3,  0,        hidctch3, hidctch3,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, fort2b,    0,        eolith50, common,    eolith_state, init_eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (World) (ver 1.01 / pcb ver 3.05)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Language selection is greyed out in Service Mode
+GAME( 2001, fort2ba,   fort2b,   eolith50, common,    eolith_state, init_eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (Korea) (ver 1.00 / pcb ver 3.05)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ^^

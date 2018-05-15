@@ -86,9 +86,9 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 
-	DECLARE_DRIVER_INIT(spkleftover);
-	DECLARE_DRIVER_INIT(spk116it);
-	DECLARE_DRIVER_INIT(3super8);
+	void init_spkleftover();
+	void init_spk116it();
+	void init_3super8();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -555,7 +555,7 @@ static const gfx_layout layout3s8_8x8x6 =
 	16*8
 };
 
-static GFXDECODE_START( spoker )
+static GFXDECODE_START( gfx_spoker )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, layout_8x8x6,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, layout_8x32x6, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, layout_8x32x6, 0, 16 )
@@ -563,7 +563,7 @@ static GFXDECODE_START( spoker )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, layout_8x32x6, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( 3super8 )
+static GFXDECODE_START( gfx_3super8 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, layout3s8_8x8x6, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, layout_8x32x6,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, layout_8x32x6,   0, 16 )
@@ -626,7 +626,7 @@ MACHINE_CONFIG_START(spoker_state::spoker)
 	MCFG_SCREEN_UPDATE_DRIVER(spoker_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spoker)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -653,7 +653,7 @@ MACHINE_CONFIG_START(spoker_state::_3super8)
 	MCFG_DEVICE_REMOVE("ppi8255_0")
 	MCFG_DEVICE_REMOVE("ppi8255_1")
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", 3super8)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_3super8)
 
 	MCFG_DEVICE_REMOVE("ymsnd")
 MACHINE_CONFIG_END
@@ -896,27 +896,23 @@ ROM_END
                               Driver Init
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(spoker_state, spkleftover)
+void spoker_state::init_spkleftover()
 {
 /*  The last 4K have the scheme/table for the whole encryption.
     Maybe a leftover...
 */
-	int A, B;
 	uint8_t *rom = memregion("maincpu")->base();
-
-	for (A = 0; A < 0x10000; A++)
+	for (int A = 0; A < 0x10000; A++)
 	{
-		B = ((A & 0x0fff) | 0xf000);
+		int B = ((A & 0x0fff) | 0xf000);
 		rom[A] = rom[A] ^ rom[B];
 	}
 }
 
-DRIVER_INIT_MEMBER(spoker_state, spk116it)
+void spoker_state::init_spk116it()
 {
-	int A;
 	uint8_t *rom = memregion("maincpu")->base();
-
-	for (A = 0; A < 0x10000; A++)
+	for (int A = 0; A < 0x10000; A++)
 	{
 		rom[A] ^= 0x02;
 		if ((A & 0x0208) == 0x0208) rom[A] ^= 0x20;
@@ -926,33 +922,34 @@ DRIVER_INIT_MEMBER(spoker_state, spk116it)
 	}
 }
 
-DRIVER_INIT_MEMBER(spoker_state, 3super8)
+void spoker_state::init_3super8()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	int i;
 
 	/* Decryption is probably done using one macrocell/output on an address decoding pal which we do not have a dump of */
 	/* The encryption is quite awful actually, especially since the program rom is entirely blank/0xFF but encrypted on its second half, exposing the entire function in plaintext */
 	/* Input: A6, A7, A8, A9, A11; Output: D5 XOR */
 	/* function: (A6&A8)&((!A7&A11)|(A9&!A11)); */
 	/* nor-reduced: !(!(!(!A6|!A8))|!(!(A7|!A11)|!(!A9|A11))); */
-	for(i=0;i<0x20000;i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
-		uint8_t a6, a7, a8, a9, a11, d5 = 0;
-		a6 = BIT(i,6); a7 = BIT(i,7); a8 = BIT(i,8); a9 = BIT(i,9); a11 = BIT(i,11);
-		d5 = (a6 & a8) & ((~a7 & a11) | (a9 & ~a11));
-		ROM[i] ^= d5*0x20;
+		uint8_t a6  = BIT(i, 6);
+		uint8_t a7  = BIT(i, 7);
+		uint8_t a8  = BIT(i, 8);
+		uint8_t a9  = BIT(i, 9);
+		uint8_t a11 = BIT(i, 11);
+		uint8_t d5 = (a6 & a8) & ((~a7 & a11) | (a9 & ~a11));
+		ROM[i] ^= d5 * 0x20;
 	}
 
 	/* cheesy hack: take gfx roms from spk116it and rearrange them for this game needs */
 	{
 		uint8_t *src = memregion("rep_gfx")->base();
 		uint8_t *dst = memregion("gfx1")->base();
-		uint8_t x;
 
-		for(x=0;x<3;x++)
+		for (uint8_t x = 0; x < 3; x++)
 		{
-			for(i=0;i<0x20000;i+=4)
+			for (int i = 0; i < 0x20000; i += 4)
 			{
 				dst[i+0+x*0x40000] = src[i+0+x*0x40000];
 				dst[i+1+x*0x40000] = src[i+2+x*0x40000];
@@ -969,13 +966,13 @@ DRIVER_INIT_MEMBER(spoker_state, 3super8)
 ***************************************************************************/
 
 /*    YEAR   NAME        PARENT    MACHINE  INPUT    STATE          INIT         ROT     COMPANY      FULLNAME                   FLAGS  */
-GAME( 1996,  spk306us,   0,        spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v306US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk205us,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v205US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk203us,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk200ua,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1993?, spk116it,   spk306us, spoker,  spoker,  spoker_state,  spk116it,    ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk116itmx, spk306us, spoker,  spoker,  spoker_state,  0,           ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1993?, spk115it,   spk306us, spoker,  spoker,  spoker_state,  spk116it,    ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk114it,   spk306us, spoker,  spoker,  spoker_state,  0,           ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk102ua,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1993?, 3super8,    0,        _3super8,3super8, spoker_state,  3super8,     ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
+GAME( 1996,  spk306us,   0,        spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v306US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk205us,   spk306us, spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v205US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk203us,   spk306us, spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk200ua,   spk306us, spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1993?, spk116it,   spk306us, spoker,  spoker,  spoker_state,  init_spk116it,    ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk116itmx, spk306us, spoker,  spoker,  spoker_state,  empty_init,       ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1993?, spk115it,   spk306us, spoker,  spoker,  spoker_state,  init_spk116it,    ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk114it,   spk306us, spoker,  spoker,  spoker_state,  empty_init,       ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk102ua,   spk306us, spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1993?, 3super8,    0,        _3super8,3super8, spoker_state,  init_3super8,     ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped

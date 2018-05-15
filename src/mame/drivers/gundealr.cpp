@@ -405,7 +405,7 @@ static const gfx_layout layout16x16x4 =
 	16*16*4
 };
 
-static GFXDECODE_START( gundealr )
+static GFXDECODE_START( gfx_gundealr )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x4,     0, 16 ) /* colors 0-255 */
 	GFXDECODE_ENTRY( "gfx2", 0, layout16x16x4, 256, 16 ) /* colors 256-511 */
 GFXDECODE_END
@@ -455,7 +455,7 @@ MACHINE_CONFIG_START(gundealr_state::gundealr)
 	MCFG_SCREEN_UPDATE_DRIVER(gundealr_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gundealr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gundealr)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	/* sound hardware */
@@ -677,11 +677,11 @@ ROM_END
 
 
 
-GAME( 1990, gundealr,   0,        gundealr, gundealr, gundealr_state, 0, ROT270, "Dooyong", "Gun Dealer",                MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gundealra,  gundealr, gundealr, gundealr, gundealr_state, 0, ROT270, "Dooyong", "Gun Dealer (alt card set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gundealrt,  gundealr, gundealr, gundealt, gundealr_state, 0, ROT270, "Dooyong (Tecmo license)", "Gun Dealer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gundealrbl, gundealr, gundealrbl, gundealr, gundealr_state, 0, ROT270, "Dooyong", "Gun Dealer (Yam! Yam!? hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealr,   0,        gundealr,   gundealr, gundealr_state, empty_init, ROT270, "Dooyong", "Gun Dealer",                MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealra,  gundealr, gundealr,   gundealr, gundealr_state, empty_init, ROT270, "Dooyong", "Gun Dealer (alt card set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealrt,  gundealr, gundealr,   gundealt, gundealr_state, empty_init, ROT270, "Dooyong (Tecmo license)", "Gun Dealer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealrbl, gundealr, gundealrbl, gundealr, gundealr_state, empty_init, ROT270, "Dooyong", "Gun Dealer (Yam! Yam!? hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, yamyam,     0,        yamyam,   yamyam,   gundealr_state, 0, ROT0,   "Dooyong", "Yam! Yam!?",                MACHINE_SUPPORTS_SAVE )
-GAME( 1990, yamyamk,    yamyam,   yamyam,   yamyam,   gundealr_state, 0, ROT0,   "Dooyong", "Yam! Yam!? (Korea)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, wiseguy,    yamyam,   yamyam,   yamyam,   gundealr_state, 0, ROT0,   "Dooyong", "Wise Guy",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, yamyam,     0,        yamyam,     yamyam,   gundealr_state, empty_init, ROT0,   "Dooyong", "Yam! Yam!?",                MACHINE_SUPPORTS_SAVE )
+GAME( 1990, yamyamk,    yamyam,   yamyam,     yamyam,   gundealr_state, empty_init, ROT0,   "Dooyong", "Yam! Yam!? (Korea)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, wiseguy,    yamyam,   yamyam,     yamyam,   gundealr_state, empty_init, ROT0,   "Dooyong", "Wise Guy",                  MACHINE_SUPPORTS_SAVE )

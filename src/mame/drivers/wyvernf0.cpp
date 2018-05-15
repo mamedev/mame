@@ -601,7 +601,7 @@ static const gfx_layout layout_8x8x4 =
 	8*8
 };
 
-static GFXDECODE_START( wyvernf0 )
+static GFXDECODE_START( gfx_wyvernf0 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_8x8x4, 0, 32 ) // [0] sprites
 	GFXDECODE_ENTRY( "tiles",   0, layout_8x8x4, 0, 32 ) // [1] tilemaps
 GFXDECODE_END
@@ -668,7 +668,7 @@ MACHINE_CONFIG_START(wyvernf0_state::wyvernf0)
 	MCFG_SCREEN_UPDATE_DRIVER(wyvernf0_state, screen_update_wyvernf0)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wyvernf0)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wyvernf0)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -745,4 +745,4 @@ ROM_START( wyvernf0 )
 	ROM_LOAD( "a39_12.ic74",  0x6000, 0x2000, CRC(1cc389de) SHA1(4213484d3a82688f312811e7a5c4d128e40584c3) )
 ROM_END
 
-GAME( 1985, wyvernf0, 0, wyvernf0, wyvernf0, wyvernf0_state, 0, ROT270, "Taito", "Wyvern F-0", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)
+GAME( 1985, wyvernf0, 0, wyvernf0, wyvernf0, wyvernf0_state, empty_init, ROT270, "Taito", "Wyvern F-0", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)

@@ -195,8 +195,8 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(4roses);
-	DECLARE_DRIVER_INIT(rugby);
+	void init_4roses();
+	void init_rugby();
 	void _4roses(machine_config &config);
 	void rugby(machine_config &config);
 private:
@@ -431,7 +431,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( 4roses )
+static GFXDECODE_START( gfx_4roses )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -458,7 +458,7 @@ MACHINE_CONFIG_START(_4roses_state::_4roses)
 	MCFG_SCREEN_UPDATE_DRIVER(_4roses_state, screen_update_funworld)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 4roses)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_4roses)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_INIT_OWNER(_4roses_state,funworld)
@@ -553,14 +553,14 @@ ROM_END
 *  Driver Initialization  *
 **************************/
 
-DRIVER_INIT_MEMBER(_4roses_state,4roses)
+void _4roses_state::init_4roses()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	for (offs_t addr = 0x8000; addr < 0x10000; addr++)
 		rom[addr] = bitswap<8>(rom[addr] ^ 0xca, 6, 5, 4, 3, 2, 1, 0, 7);
 }
 
-DRIVER_INIT_MEMBER(_4roses_state,rugby)
+void _4roses_state::init_rugby()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	for (offs_t addr = 0x8000; addr < 0x10000; addr++)
@@ -572,7 +572,7 @@ DRIVER_INIT_MEMBER(_4roses_state,rugby)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME     PARENT  MACHINE  INPUT   STATE          INIT    ROT   COMPANY      FULLNAME                         FLAGS  */
-GAME( 1999, 4roses,  0,      _4roses, 4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, 4rosesa, 4roses, _4roses, 4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, rugby,   0,      rugby,   4roses, _4roses_state, rugby,  ROT0, "C.M.C.",    "Rugby? (four roses hardware)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+/*    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS          INIT         ROT   COMPANY      FULLNAME                         FLAGS  */
+GAME( 1999, 4roses,  0,      _4roses, 4roses, _4roses_state, init_4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, 4rosesa, 4roses, _4roses, 4roses, _4roses_state, init_4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, rugby,   0,      rugby,   4roses, _4roses_state, init_rugby,  ROT0, "C.M.C.",    "Rugby? (four roses hardware)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

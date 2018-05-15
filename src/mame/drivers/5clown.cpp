@@ -500,7 +500,7 @@ public:
 	DECLARE_READ8_MEMBER(pia0_b_r);
 	DECLARE_READ8_MEMBER(pia1_b_r);
 	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
-	DECLARE_DRIVER_INIT(fclown);
+	void init_fclown();
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -1010,7 +1010,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( fclown )
+static GFXDECODE_START( gfx_fclown )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 16 )
 GFXDECODE_END
@@ -1050,7 +1050,7 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 	MCFG_SCREEN_UPDATE_DRIVER(_5clown_state, screen_update_fclown)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fclown)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fclown)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(_5clown_state, _5clown)
 
@@ -1173,45 +1173,40 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(_5clown_state,fclown)
+void _5clown_state::init_fclown()
 {
 	/* Decrypting main program */
-
-	int x;
 	uint8_t *src = memregion( "maincpu" )->base();
 
-	for (x = 0x0000; x < 0x10000; x++)
+	for (int x = 0x0000; x < 0x10000; x++)
 	{
 		src[x] = src[x] ^ 0x20;     /* Decrypting byte */
 	}
 
 
 	/* Decrypting GFX by segments */
-
 	uint8_t *gfx1_src = memregion( "gfx1" )->base();
 	uint8_t *gfx2_src = memregion( "gfx2" )->base();
 
-	for (x = 0x2000; x < 0x3000; x++)
+	for (int x = 0x2000; x < 0x3000; x++)
 	{
 		gfx1_src[x] = gfx1_src[x] ^ 0x22;   /* Decrypting bulk GFX segment 7000-7fff */
 	}
 
-	for (x = 0x0000; x < 0x1000; x++)
+	for (int x = 0x0000; x < 0x1000; x++)
 	{
 		gfx2_src[x] = gfx2_src[x] ^ 0x3f;   /* Decrypting bulk GFX segment 6000-6fff */
 	}
 
-	for (x = 0x2000; x < 0x3000; x++)
+	for (int x = 0x2000; x < 0x3000; x++)
 	{
 		gfx2_src[x] = gfx2_src[x] ^ 0x22;   /* Decrypting bulk GFX segment 4000-4fff */
 	}
 
 
 	/* Decrypting sound samples */
-
 	uint8_t *samples_src = memregion( "oki6295" )->base();
-
-	for (x = 0x0000; x < 0x10000; x++)
+	for (int x = 0x0000; x < 0x10000; x++)
 	{
 		if (samples_src[x] & 0x02)                      /* If bit 1 is active... */
 		{
@@ -1230,7 +1225,7 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE INPUT   STATE          INIT    ROT   COMPANY  FULLNAME                       FLAGS...
-GAME( 1993, 5clown,   0,      fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, 5clowna,  5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, 5clownsp, 5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (Spanish hack)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE INPUT   CLASS          INIT         ROT   COMPANY  FULLNAME                       FLAGS...
+GAME( 1993, 5clown,   0,      fclown, fclown, _5clown_state, init_fclown, ROT0, "IGS",   "Five Clown (English, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, 5clowna,  5clown, fclown, fclown, _5clown_state, init_fclown, ROT0, "IGS",   "Five Clown (English, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, 5clownsp, 5clown, fclown, fclown, _5clown_state, init_fclown, ROT0, "IGS",   "Five Clown (Spanish hack)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

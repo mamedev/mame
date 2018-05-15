@@ -234,7 +234,7 @@ static const gfx_layout tiles4x4_fg_layout =
 	4*32
 };
 
-static GFXDECODE_START( pass )
+static GFXDECODE_START( gfx_pass )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles4x4_fg_layout, 256, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 2 )
 GFXDECODE_END
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(pass_state::pass)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pass)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pass)
 
 
 	/* sound hardware */
@@ -302,4 +302,4 @@ ROM_START( pass )
 ROM_END
 
 
-GAME( 1992, pass, 0, pass, pass, pass_state, 0, ROT0, "Oksan", "Pass", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pass, 0, pass, pass, pass_state, empty_init, ROT0, "Oksan", "Pass", MACHINE_SUPPORTS_SAVE )

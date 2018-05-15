@@ -102,7 +102,7 @@ static const gfx_layout charlayout =
 	8*8*8
 };
 
-static GFXDECODE_START( ichibanjyan )
+static GFXDECODE_START( gfx_ichibanjyan )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0, 1 )
 GFXDECODE_END
@@ -136,7 +136,7 @@ MACHINE_CONFIG_START(ichibanjyan_state::ichibanjyan)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ichibanjyan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ichibanjyan)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
@@ -172,4 +172,4 @@ ROM_START( ichiban )
 	ROM_LOAD( "mjb.u38", 0x400, 0x200, CRC(0ef881cb) SHA1(44b61a443d683f5cb2d1b1a4f74d8a8f41021de5) )
 ROM_END
 
-GAME( 199?, ichiban,  0,   ichibanjyan,  ichibanjyan, ichibanjyan_state,  0,       ROT0, "Excel",      "Ichi Ban Jyan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, ichiban, 0, ichibanjyan, ichibanjyan, ichibanjyan_state, empty_init, ROT0, "Excel",      "Ichi Ban Jyan", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

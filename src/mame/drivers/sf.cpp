@@ -516,7 +516,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( sf )
+static GFXDECODE_START( gfx_sf )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 512, 16 )
@@ -564,7 +564,7 @@ MACHINE_CONFIG_START(sf_state::sfan)
 	MCFG_SCREEN_UPDATE_DRIVER(sf_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sf)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1102,10 +1102,10 @@ ROM_END
 
 
 
-GAME( 1987, sf,   0,  sfus, sfus, sf_state, 0, ROT0, "Capcom", "Street Fighter (US, set 1)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom copyright
-GAME( 1987, sfua, sf, sfjp, sfjp, sf_state, 0, ROT0, "Capcom", "Street Fighter (US, set 2) (protected)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom USA copyright
-GAME( 1987, sfj,  sf, sfjp, sfjp, sf_state, 0, ROT0, "Capcom", "Street Fighter (Japan) (protected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sfjan,sf, sfan, sfan, sf_state, 0, ROT0, "Capcom", "Street Fighter (Japan, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sfan, sf, sfan, sfan, sf_state, 0, ROT0, "Capcom", "Street Fighter (World, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sfp,  sf, sfp,  sfan, sf_state, 0, ROT0, "Capcom", "Street Fighter (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, sfw,  sf, sfjp, sfjp, sf_state, 0, ROT0, "Capcom", "Street Fighter (World) (protected)", MACHINE_SUPPORTS_SAVE )  // Shows Capcom copyright
+GAME( 1987, sf,   0,  sfus, sfus, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (US, set 1)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom copyright
+GAME( 1987, sfua, sf, sfjp, sfjp, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (US, set 2) (protected)", MACHINE_SUPPORTS_SAVE ) // Shows Capcom USA copyright
+GAME( 1987, sfj,  sf, sfjp, sfjp, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (Japan) (protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfjan,sf, sfan, sfan, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (Japan, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfan, sf, sfan, sfan, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (World, pneumatic buttons)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfp,  sf, sfp,  sfan, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sfw,  sf, sfjp, sfjp, sf_state, empty_init, ROT0, "Capcom", "Street Fighter (World) (protected)", MACHINE_SUPPORTS_SAVE )  // Shows Capcom copyright

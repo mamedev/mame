@@ -293,7 +293,7 @@ static const gfx_layout dim68k_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( dim68k )
+static GFXDECODE_START( gfx_dim68k )
 	GFXDECODE_ENTRY( "chargen", 0x0000, dim68k_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -320,7 +320,7 @@ MACHINE_CONFIG_START(dim68k_state::dim68k)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 250-1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dim68k)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dim68k)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -401,5 +401,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY        FULLNAME           FLAGS
-COMP( 1984, dim68k, 0,      0,      dim68k,   dim68k, dim68k_state, 0,    "Micro Craft", "Dimension 68000", MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME           FLAGS
+COMP( 1984, dim68k, 0,      0,      dim68k,  dim68k, dim68k_state, empty_init, "Micro Craft", "Dimension 68000", MACHINE_NOT_WORKING)

@@ -117,7 +117,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tms57002_data_word_w);
 	DECLARE_READ16_MEMBER(tms57002_status_word_r);
 	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
-	DECLARE_DRIVER_INIT(konamigq);
+	void init_konamigq();
 	DECLARE_MACHINE_START(konamigq);
 	DECLARE_MACHINE_RESET(konamigq);
 	INTERRUPT_GEN_MEMBER(tms_sync);
@@ -312,7 +312,7 @@ void konamigq_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, i
 {
 }
 
-DRIVER_INIT_MEMBER(konamigq_state,konamigq)
+void konamigq_state::init_konamigq()
 {
 }
 
@@ -479,4 +479,4 @@ ROM_START( cryptklr )
 	DISK_IMAGE( "420uaa04", 0, SHA1(67cb1418fc0de2a89fc61847dc9efb9f1bebb347) )
 ROM_END
 
-GAME( 1995, cryptklr, 0, konamigq, konamigq, konamigq_state, konamigq, ROT0, "Konami", "Crypt Killer (GQ420 UAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, cryptklr, 0, konamigq, konamigq, konamigq_state, init_konamigq, ROT0, "Konami", "Crypt Killer (GQ420 UAA)", MACHINE_IMPERFECT_GRAPHICS )

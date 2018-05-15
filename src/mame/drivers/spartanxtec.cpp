@@ -328,7 +328,7 @@ static const gfx_layout tiles16x16_layout =
 };
 
 
-static GFXDECODE_START( news )
+static GFXDECODE_START( gfx_news )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x100, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0, 32 )
 GFXDECODE_END
@@ -387,7 +387,7 @@ MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(spartanxtec_state,spartanxtec)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", news)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_news)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -449,4 +449,4 @@ ROM_END
 
 
 
-GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, spartanxtec_state,  0, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )
+GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, spartanxtec_state, empty_init, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )

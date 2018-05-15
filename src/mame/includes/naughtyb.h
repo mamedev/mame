@@ -21,8 +21,8 @@ public:
 	void popflame(machine_config &config);
 	void naughtyb(machine_config &config);
 
-	DECLARE_DRIVER_INIT(trvmstr);
-	DECLARE_DRIVER_INIT(popflame);
+	void init_trvmstr();
+	void init_popflame();
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 

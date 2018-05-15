@@ -185,5 +185,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY   FULLNAME  FLAGS
-COMP( 1982, pmi80,  0,       0,      pmi80,     pmi80, pmi80_state, 0,    "Tesla",  "PMI-80", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
+COMP( 1982, pmi80, 0,      0,      pmi80,   pmi80, pmi80_state, empty_init, "Tesla", "PMI-80", MACHINE_NO_SOUND_HW)

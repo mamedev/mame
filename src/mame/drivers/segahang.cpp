@@ -747,7 +747,7 @@ INPUT_PORTS_END
 //  GRAPHICS DECODING
 //**************************************************************************
 
-static GFXDECODE_START( segahang )
+static GFXDECODE_START( gfx_segahang )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1024 )
 GFXDECODE_END
 
@@ -783,7 +783,7 @@ MACHINE_CONFIG_START(segahang_state::shared_base)
 	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segahang)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segahang)
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2090,7 +2090,7 @@ ROM_END
 //  init_generic - common initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segahang_state,generic)
+void segahang_state::init_generic()
 {
 	// point globals to allocated memory regions
 	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<uint16_t *>(memshare("roadram")->ptr());
@@ -2105,31 +2105,31 @@ DRIVER_INIT_MEMBER(segahang_state,generic)
 //  init_* - game-specific initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segahang_state,sharrier)
+void segahang_state::init_sharrier()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_sharrier_video = true;
 	m_i8751_vblank_hook = i8751_sim_delegate(&segahang_state::sharrier_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segahang_state,enduror)
+void segahang_state::init_enduror()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_sharrier_video = true;
 }
 
-DRIVER_INIT_MEMBER(segahang_state,endurobl)
+void segahang_state::init_endurobl()
 {
-	DRIVER_INIT_CALL(enduror);
+	init_enduror();
 	// assemble decrypted half of ROM and register it
 	uint16_t *rom = reinterpret_cast<uint16_t *>(memregion("maincpu")->base());
 	memcpy(m_decrypted_opcodes + 0x00000/2, rom + 0x30000/2, 0x10000);
 	memcpy(m_decrypted_opcodes + 0x10000/2, rom + 0x10000/2, 0x20000);
 }
 
-DRIVER_INIT_MEMBER(segahang_state,endurob2)
+void segahang_state::init_endurob2()
 {
-	DRIVER_INIT_CALL(enduror);
+	init_enduror();
 
 	// assemble decrypted half of ROM and register it
 	uint16_t *rom = reinterpret_cast<uint16_t *>(memregion("maincpu")->base());
@@ -2143,24 +2143,24 @@ DRIVER_INIT_MEMBER(segahang_state,endurob2)
 //**************************************************************************
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,     INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1985, hangon,     0,        hangon,   hangon,    segahang_state,generic, ROT0,   "Sega", "Hang-On (Rev A)", 0 )
-GAME( 1985, hangon1,    hangon,   hangon,   hangon,    segahang_state,generic, ROT0,   "Sega", "Hang-On", 0 )
-GAME( 1985, hangon2,    hangon,   hangon,   hangon2,   segahang_state,generic, ROT0,   "Sega", "Hang-On (ride-on)", 0 )
+GAME( 1985, hangon,     0,        hangon,   hangon,    segahang_state, init_generic,  ROT0, "Sega", "Hang-On (Rev A)", 0 )
+GAME( 1985, hangon1,    hangon,   hangon,   hangon,    segahang_state, init_generic,  ROT0, "Sega", "Hang-On", 0 )
+GAME( 1985, hangon2,    hangon,   hangon,   hangon2,   segahang_state, init_generic,  ROT0, "Sega", "Hang-On (ride-on)", 0 )
 
-GAME( 1987, shangonro,  shangon,  shangonro,shangonro, segahang_state,generic, ROT0,   "Sega", "Super Hang-On (Hang-On conversion, ride-on, Japan, FD1094 317-0038)", 0 )
-GAME( 1987, shangonho,  shangon,  shangonro,shangupb,  segahang_state,generic, ROT0,   "Sega", "Super Hang-On (Hang-On conversion, Japan, FD1094 317-0039)", 0 )
-GAME( 1992, shangonrb,  shangon,  shangupb, shangupb,  segahang_state,generic, ROT0,   "bootleg", "Super Hang-On (Hang-On conversion, bootleg)", 0 )
-GAME( 1987, shangonrb2, shangon,  shangupb, shangupb,  segahang_state,generic, ROT0,   "bootleg (Beta)", "Super Hang-On (Hang-On conversion, Beta bootleg)", 0 )
+GAME( 1987, shangonro,  shangon,  shangonro,shangonro, segahang_state, init_generic,  ROT0, "Sega", "Super Hang-On (Hang-On conversion, ride-on, Japan, FD1094 317-0038)", 0 )
+GAME( 1987, shangonho,  shangon,  shangonro,shangupb,  segahang_state, init_generic,  ROT0, "Sega", "Super Hang-On (Hang-On conversion, Japan, FD1094 317-0039)", 0 )
+GAME( 1992, shangonrb,  shangon,  shangupb, shangupb,  segahang_state, init_generic,  ROT0, "bootleg", "Super Hang-On (Hang-On conversion, bootleg)", 0 )
+GAME( 1987, shangonrb2, shangon,  shangupb, shangupb,  segahang_state, init_generic,  ROT0, "bootleg (Beta)", "Super Hang-On (Hang-On conversion, Beta bootleg)", 0 )
 
-GAME( 1985, sharrier,   0,        sharrier, sharrier,  segahang_state,sharrier,ROT0,   "Sega", "Space Harrier (Rev A, 8751 315-5163A)", 0 )
-GAME( 1985, sharrier1,  sharrier, sharrier, sharrier,  segahang_state,sharrier,ROT0,   "Sega", "Space Harrier (8751 315-5163)", 0 )
+GAME( 1985, sharrier,   0,        sharrier, sharrier,  segahang_state, init_sharrier, ROT0, "Sega", "Space Harrier (Rev A, 8751 315-5163A)", 0 )
+GAME( 1985, sharrier1,  sharrier, sharrier, sharrier,  segahang_state, init_sharrier, ROT0, "Sega", "Space Harrier (8751 315-5163)", 0 )
 
-GAME( 1986, enduror,    0,        enduror,  enduror,   segahang_state,enduror, ROT0,   "Sega", "Enduro Racer (YM2151) (FD1089B 317-0013A)", 0 )
-GAME( 1986, endurora,   enduror,  enduror,  enduror,   segahang_state,enduror, ROT0,   "Sega", "Enduro Racer (YM2151) (mask ROM sprites, FD1089B 317-0013A)", 0 )
-GAME( 1986, enduror1,   enduror,  enduror1, enduror,   segahang_state,enduror, ROT0,   "Sega", "Enduro Racer (YM2203) (FD1089B 317-0013A)", 0 )
-GAME( 1986, endurobl,   enduror,  endurobl, enduror,   segahang_state,endurobl,ROT0,   "bootleg", "Enduro Racer (bootleg set 1)", 0 )
-GAME( 1986, endurob2,   enduror,  endurob2, enduror,   segahang_state,endurob2,ROT0,   "bootleg", "Enduro Racer (bootleg set 2)", MACHINE_NOT_WORKING )
+GAME( 1986, enduror,    0,        enduror,  enduror,   segahang_state, init_enduror,  ROT0, "Sega", "Enduro Racer (YM2151) (FD1089B 317-0013A)", 0 )
+GAME( 1986, endurora,   enduror,  enduror,  enduror,   segahang_state, init_enduror,  ROT0, "Sega", "Enduro Racer (YM2151) (mask ROM sprites, FD1089B 317-0013A)", 0 )
+GAME( 1986, enduror1,   enduror,  enduror1, enduror,   segahang_state, init_enduror,  ROT0, "Sega", "Enduro Racer (YM2203) (FD1089B 317-0013A)", 0 )
+GAME( 1986, endurobl,   enduror,  endurobl, enduror,   segahang_state, init_endurobl, ROT0, "bootleg", "Enduro Racer (bootleg set 1)", 0 )
+GAME( 1986, endurob2,   enduror,  endurob2, enduror,   segahang_state, init_endurob2, ROT0, "bootleg", "Enduro Racer (bootleg set 2)", MACHINE_NOT_WORKING )
 
 
-GAME( 1986, endurord,   enduror,  endurord,  enduror,   segahang_state,enduror, ROT0,   "bootleg", "Enduro Racer (YM2151) (bootleg of FD1089B 317-0013A set)", 0 )
-GAME( 1986, enduror1d,  enduror,  enduror1d, enduror,   segahang_state,enduror, ROT0,   "bootleg", "Enduro Racer (YM2203) (bootleg of FD1089B 317-0013A set)", 0 )
+GAME( 1986, endurord,   enduror,  endurord,  enduror,  segahang_state, init_enduror,  ROT0, "bootleg", "Enduro Racer (YM2151) (bootleg of FD1089B 317-0013A set)", 0 )
+GAME( 1986, enduror1d,  enduror,  enduror1d, enduror,  segahang_state, init_enduror,  ROT0, "bootleg", "Enduro Racer (YM2203) (bootleg of FD1089B 317-0013A set)", 0 )

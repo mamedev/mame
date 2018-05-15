@@ -360,7 +360,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( gyruss )
+static GFXDECODE_START( gfx_gyruss )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0, 16 )  /* upper half */
 	GFXDECODE_ENTRY( "gfx1", 0x0010, spritelayout, 0, 16 )  /* lower half */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout,   16*16, 16 )
@@ -508,7 +508,7 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gyruss_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gyruss)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gyruss)
 	MCFG_PALETTE_ADD("palette", 16*4+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gyruss_state, gyruss)
@@ -713,7 +713,7 @@ ROM_START( venus )
 ROM_END
 
 
-GAME( 1983, gyruss,   0,        gyruss,   gyruss,   gyruss_state, 0, ROT90, "Konami", "Gyruss", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, gyrussce, gyruss,   gyruss,   gyrussce, gyruss_state, 0, ROT90, "Konami (Centuri license)", "Gyruss (Centuri)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, gyrussb,  gyruss,   gyruss,   gyruss,   gyruss_state, 0, ROT90, "bootleg?", "Gyruss (bootleg?)", MACHINE_SUPPORTS_SAVE ) /* Supposed Taito NZ license, but (c) Konami */
-GAME( 1983, venus,    gyruss,   gyruss,   gyruss,   gyruss_state, 0, ROT90, "bootleg", "Venus (bootleg of Gyruss)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, gyruss,   0,      gyruss, gyruss,   gyruss_state, empty_init, ROT90, "Konami", "Gyruss", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, gyrussce, gyruss, gyruss, gyrussce, gyruss_state, empty_init, ROT90, "Konami (Centuri license)", "Gyruss (Centuri)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, gyrussb,  gyruss, gyruss, gyruss,   gyruss_state, empty_init, ROT90, "bootleg?", "Gyruss (bootleg?)", MACHINE_SUPPORTS_SAVE ) /* Supposed Taito NZ license, but (c) Konami */
+GAME( 1983, venus,    gyruss, gyruss, gyruss,   gyruss_state, empty_init, ROT90, "bootleg", "Venus (bootleg of Gyruss)", MACHINE_SUPPORTS_SAVE )

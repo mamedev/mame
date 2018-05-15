@@ -310,7 +310,7 @@ static const gfx_layout balllayout =
 	16*8    /* every sprite takes 16 consecutive bytes */
 };
 
-static GFXDECODE_START( bking )
+static GFXDECODE_START( gfx_bking )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0,           4  ) /* playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, crowlayout, 4*8,         4  ) /* crow */
 	GFXDECODE_ENTRY( "gfx3", 0, balllayout, 4*8+4*4,     4  ) /* ball 1 */
@@ -417,7 +417,7 @@ MACHINE_CONFIG_START(bking_state::bking)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bking_state, screen_vblank_bking))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bking)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bking)
 	MCFG_PALETTE_ADD("palette", 4*8+4*4+4*2+4*2)
 	MCFG_PALETTE_INIT_OWNER(bking_state, bking)
 
@@ -748,6 +748,6 @@ ROM_START( bking3 )
 ROM_END
 
 
-GAME( 1982, bking,  0, bking,  bking,  bking_state, 0, ROT270, "Taito Corporation", "Birdie King",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bking2, 0, bking,  bking2, bking_state, 0, ROT90,  "Taito Corporation", "Birdie King 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bking3, 0, bking3, bking2, bking_state, 0, ROT90,  "Taito Corporation", "Birdie King 3", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bking,  0, bking,  bking,  bking_state, empty_init, ROT270, "Taito Corporation", "Birdie King",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bking2, 0, bking,  bking2, bking_state, empty_init, ROT90,  "Taito Corporation", "Birdie King 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bking3, 0, bking3, bking2, bking_state, empty_init, ROT90,  "Taito Corporation", "Birdie King 3", MACHINE_SUPPORTS_SAVE )

@@ -335,7 +335,7 @@ static const gfx_layout oneshot8x8_layout =
 };
 
 
-static GFXDECODE_START( oneshot )
+static GFXDECODE_START( gfx_oneshot )
 	GFXDECODE_ENTRY( "gfx1", 0, oneshot16x16_layout,   0x00, 4  ) /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, oneshot8x8_layout,     0x00, 4  ) /* sprites */
 GFXDECODE_END
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(oneshot_state::oneshot)
 	MCFG_SCREEN_UPDATE_DRIVER(oneshot_state, screen_update_oneshot)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", oneshot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_oneshot)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -497,6 +497,6 @@ ROM_END
 
 
 
-GAME( 1995, maddonna, 0,        maddonna, maddonna, oneshot_state, 0, ROT0, "Tuning",  "Mad Donna (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, maddonnb, maddonna, maddonna, maddonna, oneshot_state, 0, ROT0, "Tuning",  "Mad Donna (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, oneshot,  0,        oneshot,  oneshot , oneshot_state, 0, ROT0, "Promat",  "One Shot One Kill", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, maddonna, 0,        maddonna, maddonna, oneshot_state, empty_init, ROT0, "Tuning",  "Mad Donna (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, maddonnb, maddonna, maddonna, maddonna, oneshot_state, empty_init, ROT0, "Tuning",  "Mad Donna (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, oneshot,  0,        oneshot,  oneshot , oneshot_state, empty_init, ROT0, "Promat",  "One Shot One Kill", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

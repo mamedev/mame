@@ -1410,7 +1410,7 @@ static const gfx_layout spritelayout6464 =
 	spritelayout6464_yoffset
 };
 
-static GFXDECODE_START( nemesis )
+static GFXDECODE_START( gfx_nemesis )
 	GFXDECODE_RAM( "charram", 0x0, charlayout,   0, 0x80 )
 	GFXDECODE_RAM( "charram", 0x0, spritelayout, 0, 0x80 )
 	GFXDECODE_RAM( "charram", 0x0, spritelayout3216, 0, 0x80 )
@@ -1490,7 +1490,7 @@ MACHINE_CONFIG_START(nemesis_state::nemesis)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nemesis_state, nemesis_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1559,7 +1559,7 @@ MACHINE_CONFIG_START(nemesis_state::gx400)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1630,7 +1630,7 @@ MACHINE_CONFIG_START(nemesis_state::konamigt)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1699,7 +1699,7 @@ MACHINE_CONFIG_START(nemesis_state::rf2_gx400)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1760,7 +1760,7 @@ MACHINE_CONFIG_START(nemesis_state::salamand)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nemesis_state, nemesis_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(8)
@@ -1812,7 +1812,7 @@ MACHINE_CONFIG_START(nemesis_state::blkpnthr)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nemesis_state, blkpnthr_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(8)
@@ -1859,7 +1859,7 @@ MACHINE_CONFIG_START(nemesis_state::citybomb)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nemesis_state, nemesis_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(8)
@@ -1910,7 +1910,7 @@ MACHINE_CONFIG_START(nemesis_state::nyanpani)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nemesis_state, nemesis_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(8)
@@ -1965,7 +1965,7 @@ MACHINE_CONFIG_START(nemesis_state::hcrash)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(8)
@@ -2407,24 +2407,24 @@ ROM_END
 
 
 
-GAME( 1985, nemesis,   0,         nemesis,    nemesis,  nemesis_state,  0,    ROT0,   "Konami", "Nemesis (ROM version)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nemesisuk, nemesis,   nemesis,    nemesuk,  nemesis_state,  0,    ROT0,   "Konami", "Nemesis (World?, ROM version)",  MACHINE_SUPPORTS_SAVE )
-GAMEL(1985, konamigt,  0,         konamigt,   konamigt, nemesis_state,  0,    ROT0,   "Konami", "Konami GT",                      MACHINE_SUPPORTS_SAVE, layout_konamigt )
-GAME( 1985, rf2,       konamigt,  rf2_gx400,  rf2,      nemesis_state,  0,    ROT0,   "Konami", "Konami RF2 - Red Fighter",       MACHINE_SUPPORTS_SAVE )
-GAME( 1985, twinbee,   0,         gx400,      twinbee,  nemesis_state,  0,    ROT90,  "Konami", "TwinBee (ROM version)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gradius,   nemesis,   gx400,      gradius,  nemesis_state,  0,    ROT0,   "Konami", "Gradius (Japan, ROM version)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gwarrior,  0,         gx400,      gwarrior, nemesis_state,  0,    ROT0,   "Konami", "Galactic Warriors",              MACHINE_SUPPORTS_SAVE )
-GAME( 1986, salamand,  0,         salamand,   salamand, nemesis_state,  0,    ROT0,   "Konami", "Salamander (version D)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1986, salamandj, salamand,  salamand,   salamand, nemesis_state,  0,    ROT0,   "Konami", "Salamander (version J)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lifefrce,  salamand,  salamand,   salamand, nemesis_state,  0,    ROT0,   "Konami", "Lifeforce (US)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, lifefrcej, salamand,  salamand,   lifefrcj, nemesis_state,  0,    ROT0,   "Konami", "Lifeforce (Japan)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blkpnthr,  0,         blkpnthr,   blkpnthr, nemesis_state,  0,    ROT0,   "Konami", "Black Panther",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, citybomb,  0,         citybomb,   citybomb, nemesis_state,  0,    ROT270, "Konami", "City Bomber (World)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1987, citybombj, citybomb,  citybomb,   citybomb, nemesis_state,  0,    ROT270, "Konami", "City Bomber (Japan)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hcrash,    0,         hcrash,     hcrash,   nemesis_state,  0,    ROT0,   "Konami", "Hyper Crash (version D)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hcrashc,   hcrash,    hcrash,     hcrash,   nemesis_state,  0,    ROT0,   "Konami", "Hyper Crash (version C)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kittenk,   0,         nyanpani,   nyanpani, nemesis_state,  0,    ROT0,   "Konami", "Kitten Kaboodle",                MACHINE_SUPPORTS_SAVE )
-GAME( 1988, nyanpani,  kittenk,   nyanpani,   nyanpani, nemesis_state,  0,    ROT0,   "Konami", "Nyan Nyan Panic (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME(  1985, nemesis,   0,         nemesis,    nemesis,  nemesis_state, empty_init, ROT0,   "Konami", "Nemesis (ROM version)",          MACHINE_SUPPORTS_SAVE )
+GAME(  1985, nemesisuk, nemesis,   nemesis,    nemesuk,  nemesis_state, empty_init, ROT0,   "Konami", "Nemesis (World?, ROM version)",  MACHINE_SUPPORTS_SAVE )
+GAMEL( 1985, konamigt,  0,         konamigt,   konamigt, nemesis_state, empty_init, ROT0,   "Konami", "Konami GT",                      MACHINE_SUPPORTS_SAVE, layout_konamigt )
+GAME(  1985, rf2,       konamigt,  rf2_gx400,  rf2,      nemesis_state, empty_init, ROT0,   "Konami", "Konami RF2 - Red Fighter",       MACHINE_SUPPORTS_SAVE )
+GAME(  1985, twinbee,   0,         gx400,      twinbee,  nemesis_state, empty_init, ROT90,  "Konami", "TwinBee (ROM version)",          MACHINE_SUPPORTS_SAVE )
+GAME(  1985, gradius,   nemesis,   gx400,      gradius,  nemesis_state, empty_init, ROT0,   "Konami", "Gradius (Japan, ROM version)",   MACHINE_SUPPORTS_SAVE )
+GAME(  1985, gwarrior,  0,         gx400,      gwarrior, nemesis_state, empty_init, ROT0,   "Konami", "Galactic Warriors",              MACHINE_SUPPORTS_SAVE )
+GAME(  1986, salamand,  0,         salamand,   salamand, nemesis_state, empty_init, ROT0,   "Konami", "Salamander (version D)",         MACHINE_SUPPORTS_SAVE )
+GAME(  1986, salamandj, salamand,  salamand,   salamand, nemesis_state, empty_init, ROT0,   "Konami", "Salamander (version J)",         MACHINE_SUPPORTS_SAVE )
+GAME(  1986, lifefrce,  salamand,  salamand,   salamand, nemesis_state, empty_init, ROT0,   "Konami", "Lifeforce (US)",                 MACHINE_SUPPORTS_SAVE )
+GAME(  1987, lifefrcej, salamand,  salamand,   lifefrcj, nemesis_state, empty_init, ROT0,   "Konami", "Lifeforce (Japan)",              MACHINE_SUPPORTS_SAVE )
+GAME(  1987, blkpnthr,  0,         blkpnthr,   blkpnthr, nemesis_state, empty_init, ROT0,   "Konami", "Black Panther",                  MACHINE_SUPPORTS_SAVE )
+GAME(  1987, citybomb,  0,         citybomb,   citybomb, nemesis_state, empty_init, ROT270, "Konami", "City Bomber (World)",            MACHINE_SUPPORTS_SAVE )
+GAME(  1987, citybombj, citybomb,  citybomb,   citybomb, nemesis_state, empty_init, ROT270, "Konami", "City Bomber (Japan)",            MACHINE_SUPPORTS_SAVE )
+GAME(  1987, hcrash,    0,         hcrash,     hcrash,   nemesis_state, empty_init, ROT0,   "Konami", "Hyper Crash (version D)",        MACHINE_SUPPORTS_SAVE )
+GAME(  1987, hcrashc,   hcrash,    hcrash,     hcrash,   nemesis_state, empty_init, ROT0,   "Konami", "Hyper Crash (version C)",        MACHINE_SUPPORTS_SAVE )
+GAME(  1988, kittenk,   0,         nyanpani,   nyanpani, nemesis_state, empty_init, ROT0,   "Konami", "Kitten Kaboodle",                MACHINE_SUPPORTS_SAVE )
+GAME(  1988, nyanpani,  kittenk,   nyanpani,   nyanpani, nemesis_state, empty_init, ROT0,   "Konami", "Nyan Nyan Panic (Japan)",        MACHINE_SUPPORTS_SAVE )
 
 /*
 
@@ -2728,7 +2728,7 @@ MACHINE_CONFIG_START(nemesis_state::bubsys)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -2787,4 +2787,4 @@ ROM_START( bubsys )
 	ROM_LOAD( "sram2.ic3", 0x2000, 0x2000, CRC(dda768be) SHA1(e98bae3ccf63eb67193346e9c40257a3ddb88e59) )
 ROM_END
 
-GAME( 1985, bubsys,   0,         bubsys,    nemesis, nemesis_state,   0,    ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+GAME( 1985, bubsys,   0,         bubsys,    nemesis, nemesis_state, empty_init, ROT0,   "Konami", "Bubble System BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )

@@ -8,6 +8,7 @@
 #include "sunkbd.h"
 #include "machine/keyboard.h"
 #include "sound/beep.h"
+#include "diserial.h"
 
 
 namespace bus { namespace sunkbd {

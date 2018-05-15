@@ -113,8 +113,8 @@ public:
 	// for callback
 	DECLARE_READ8_MEMBER(read_full_space);
 
-	DECLARE_DRIVER_INIT(rad_gtg);
-	DECLARE_DRIVER_INIT(rad_foot);
+	void init_rad_gtg();
+	void init_rad_foot();
 
 	void bank_map(address_map &map);
 	void radica_eu3a14_map(address_map &map);
@@ -763,7 +763,7 @@ static const gfx_layout helper8x8x4_layout =
 };
 
 
-static GFXDECODE_START( helper )
+static GFXDECODE_START( gfx_helper )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x2_layout,    0x0, 128  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x4_layout,    0x0, 32  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x8_layout,    0x0, 2  )
@@ -787,7 +787,7 @@ MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(24)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", helper)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_helper)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -815,14 +815,14 @@ MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14_adc)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", radica_eu3a14_state, scanline_cb, "screen", 0, 1)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(radica_eu3a14_state, rad_gtg)
+void radica_eu3a14_state::init_rad_gtg()
 {
 	// must be registers to control this
 	m_tilerambase = 0x0a00 - 0x200;
 	m_spriterambase = 0x0220 - 0x200;
 }
 
-DRIVER_INIT_MEMBER(radica_eu3a14_state, rad_foot)
+void radica_eu3a14_state::init_rad_foot()
 {
 	// must be registers to control this
 	m_tilerambase = 0x0200 - 0x200;
@@ -840,7 +840,7 @@ ROM_START( rad_foot )
 	ROM_LOAD( "connectvfootball.bin", 0x000000, 0x400000, CRC(00ac4fc0) SHA1(2b60ae5c6bc7e9ef7cdbd3f6a0a0657ed3ab5afe) )
 ROM_END
 
-CONS( 2006, rad_gtg,  0,   0,  radica_eu3a14_adc,  rad_gtg,       radica_eu3a14_state, rad_gtg, "Radica (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
+CONS( 2006, rad_gtg,  0, 0, radica_eu3a14_adc, rad_gtg,       radica_eu3a14_state, init_rad_gtg,  "Radica (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
 
 // also has a Connectv Real Soccer logo in the roms, apparently unused, maybe that was to be the US title (without the logo being changed to Play TV) but Play TV Soccer ended up being a different game licensed from Epoch instead.
-CONS( 2006, rad_foot, 0,   0,  radica_eu3a14,      radica_eu3a14, radica_eu3a14_state, rad_foot, "Radica", "Connectv Football", MACHINE_NOT_WORKING )
+CONS( 2006, rad_foot, 0, 0, radica_eu3a14,     radica_eu3a14, radica_eu3a14_state, init_rad_foot, "Radica", "Connectv Football", MACHINE_NOT_WORKING )

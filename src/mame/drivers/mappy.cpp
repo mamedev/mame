@@ -1273,22 +1273,22 @@ static const gfx_layout spritelayout_4bpp =
 
 
 
-static GFXDECODE_START( superpac )
+static GFXDECODE_START( gfx_superpac )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_2bpp, 64*4, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( phozon )
+static GFXDECODE_START( gfx_phozon )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_8x8, 64*4, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( mappy )
+static GFXDECODE_START( gfx_mappy )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_4bpp, 64*4, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( todruaga )
+static GFXDECODE_START( gfx_todruaga )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_4bpp, 64*4, 64 )
 GFXDECODE_END
@@ -1343,7 +1343,7 @@ MACHINE_CONFIG_START(mappy_state::superpac_common)
 	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superpac)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superpac)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,superpac)
@@ -1471,7 +1471,7 @@ MACHINE_CONFIG_START(mappy_state::phozon)
 	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phozon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phozon)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,phozon)
@@ -1521,7 +1521,7 @@ MACHINE_CONFIG_START(mappy_state::mappy_common)
 	MCFG_74157_B_IN_CB(IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mappy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mappy)
 	MCFG_PALETTE_ADD("palette", 64*4+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,mappy)
@@ -1585,7 +1585,7 @@ MACHINE_CONFIG_START(mappy_state::todruaga)
 	digdug2(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", todruaga)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_todruaga)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64*4+64*16)
 MACHINE_CONFIG_END
@@ -2067,7 +2067,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(mappy_state,grobda)
+void mappy_state::init_grobda()
 {
 	/* The speech in Grobda might not be a standard Namco sound feature, but rather a hack.
 	   The hardware automatically cycles the bottom 6 address lines of sound RAM, so they
@@ -2081,7 +2081,7 @@ DRIVER_INIT_MEMBER(mappy_state,grobda)
 }
 
 
-DRIVER_INIT_MEMBER(mappy_state,digdug2)
+void mappy_state::init_digdug2()
 {
 	/* appears to not use the watchdog */
 	m_maincpu->space(AS_PROGRAM).nop_write(0x8000, 0x8000);
@@ -2089,25 +2089,25 @@ DRIVER_INIT_MEMBER(mappy_state,digdug2)
 
 
 /* 2x6809, static tilemap, 2bpp sprites (Super Pacman type)  */
-GAME( 1982, superpac, 0,        superpac, superpac,  mappy_state, 0,        ROT90, "Namco", "Super Pac-Man", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, superpacm,superpac, superpac, superpac,  mappy_state, 0,        ROT90, "Namco (Bally Midway license)", "Super Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnpal,  0,        pacnpal,  pacnpal,   mappy_state, 0,        ROT90, "Namco", "Pac & Pal", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnpal2, pacnpal,  pacnpal,  pacnpal,   mappy_state, 0,        ROT90, "Namco", "Pac & Pal (older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnchmp, pacnpal,  pacnpal,  pacnpal,   mappy_state, 0,        ROT90, "Namco", "Pac-Man & Chomp Chomp", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda,   0,        grobda,   grobda,    mappy_state, grobda,   ROT90, "Namco", "Grobda (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda2,  grobda,   grobda,   grobda,    mappy_state, grobda,   ROT90, "Namco", "Grobda (Old Ver. set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda3,  grobda,   grobda,   grobda,    mappy_state, grobda,   ROT90, "Namco", "Grobda (Old Ver. set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, superpac,  0,        superpac, superpac,  mappy_state, empty_init,   ROT90, "Namco", "Super Pac-Man", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, superpacm, superpac, superpac, superpac,  mappy_state, empty_init,   ROT90, "Namco (Bally Midway license)", "Super Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnpal,   0,        pacnpal,  pacnpal,   mappy_state, empty_init,   ROT90, "Namco", "Pac & Pal", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnpal2,  pacnpal,  pacnpal,  pacnpal,   mappy_state, empty_init,   ROT90, "Namco", "Pac & Pal (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnchmp,  pacnpal,  pacnpal,  pacnpal,   mappy_state, empty_init,   ROT90, "Namco", "Pac-Man & Chomp Chomp", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda,    0,        grobda,   grobda,    mappy_state, init_grobda,  ROT90, "Namco", "Grobda (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda2,   grobda,   grobda,   grobda,    mappy_state, init_grobda,  ROT90, "Namco", "Grobda (Old Ver. set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda3,   grobda,   grobda,   grobda,    mappy_state, init_grobda,  ROT90, "Namco", "Grobda (Old Ver. set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* 3x6809, static tilemap, 2bpp sprites (Gaplus type) */
-GAME( 1983, phozon,   0,        phozon,    phozon,   mappy_state, 0,        ROT90, "Namco", "Phozon (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, phozons,  phozon,   phozon,    phozon,   mappy_state, 0,        ROT90, "Namco (Sidam license)", "Phozon (Sidam)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, phozon,    0,        phozon,    phozon,   mappy_state, empty_init,   ROT90, "Namco", "Phozon (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, phozons,   phozon,   phozon,    phozon,   mappy_state, empty_init,   ROT90, "Namco (Sidam license)", "Phozon (Sidam)", MACHINE_SUPPORTS_SAVE )
 
 /* 2x6809, scroling tilemap, 4bpp sprites (Super Pacman type) */
-GAME( 1983, mappy,    0,        mappy,     mappy,    mappy_state, 0,        ROT90, "Namco", "Mappy (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mappyj,   mappy,    mappy,     mappy,    mappy_state, 0,        ROT90, "Namco", "Mappy (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruaga, 0,        todruaga,  todruaga, mappy_state, 0,        ROT90, "Namco", "The Tower of Druaga (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruagao,todruaga, todruaga,  todruaga, mappy_state, 0,        ROT90, "Namco", "The Tower of Druaga (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruagas,todruaga, todruaga,  todruaga, mappy_state, 0,        ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, digdug2,  0,        digdug2,   digdug2,  mappy_state, digdug2,  ROT90, "Namco", "Dig Dug II (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, digdug2o, digdug2,  digdug2,   digdug2,  mappy_state, digdug2,  ROT90, "Namco", "Dig Dug II (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, motos,    0,        motos,     motos,    mappy_state, 0,        ROT90, "Namco", "Motos", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mappy,     0,        mappy,     mappy,    mappy_state, empty_init,   ROT90, "Namco", "Mappy (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mappyj,    mappy,    mappy,     mappy,    mappy_state, empty_init,   ROT90, "Namco", "Mappy (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruaga,  0,        todruaga,  todruaga, mappy_state, empty_init,   ROT90, "Namco", "The Tower of Druaga (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruagao, todruaga, todruaga,  todruaga, mappy_state, empty_init,   ROT90, "Namco", "The Tower of Druaga (Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruagas, todruaga, todruaga,  todruaga, mappy_state, empty_init,   ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, digdug2,   0,        digdug2,   digdug2,  mappy_state, init_digdug2, ROT90, "Namco", "Dig Dug II (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, digdug2o,  digdug2,  digdug2,   digdug2,  mappy_state, init_digdug2, ROT90, "Namco", "Dig Dug II (Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, motos,     0,        motos,     motos,    mappy_state, empty_init,   ROT90, "Namco", "Motos", MACHINE_SUPPORTS_SAVE )

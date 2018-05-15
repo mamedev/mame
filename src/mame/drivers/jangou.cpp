@@ -94,8 +94,8 @@ public:
 	DECLARE_READ8_MEMBER(jngolady_rng_r);
 	DECLARE_READ8_MEMBER(input_mux_r);
 	DECLARE_READ8_MEMBER(input_system_r);
-	DECLARE_DRIVER_INIT(jngolady);
-	DECLARE_DRIVER_INIT(luckygrl);
+	void init_jngolady();
+	void init_luckygrl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -1244,15 +1244,14 @@ READ8_MEMBER(jangou_state::jngolady_rng_r)
 	return machine().rand();
 }
 
-DRIVER_INIT_MEMBER(jangou_state,jngolady)
+void jangou_state::init_jngolady()
 {
 	m_nsc->space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8_delegate(FUNC(jangou_state::jngolady_rng_r),this) );
 }
 
-DRIVER_INIT_MEMBER(jangou_state,luckygrl)
+void jangou_state::init_luckygrl()
 {
 	// this is WRONG
-	int A;
 	uint8_t *ROM = memregion("cpu0")->base();
 
 	unsigned char patn1[32] = {
@@ -1265,7 +1264,7 @@ DRIVER_INIT_MEMBER(jangou_state,luckygrl)
 		0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88
 	};
 
-	for (A = 0; A < 0x3000; A++)
+	for (int A = 0; A < 0x3000; A++)
 	{
 		uint8_t dat = ROM[A];
 		if (A&0x100) dat = dat ^ patn2[A & 0x1f];
@@ -1277,10 +1276,9 @@ DRIVER_INIT_MEMBER(jangou_state,luckygrl)
 
 	#if 0
 	{
-		FILE *fp;
 		char filename[256];
 		sprintf(filename,"decrypted_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
+		FILE *fp = fopen(filename, "w+b");
 		if (fp)
 		{
 			fwrite(ROM, 0x3000, 1, fp);
@@ -1298,16 +1296,16 @@ DRIVER_INIT_MEMBER(jangou_state,luckygrl)
  *
  *************************************/
 
-GAME( 1983,  jangou,     0,        jangou,   jangou,   jangou_state,  0,        ROT0, "Nichibutsu",     "Jangou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983,  macha,      0,        jangou,   macha,    jangou_state,  0,        ROT0, "Logitec",        "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  jngolady,   0,        jngolady, jngolady, jangou_state,  jngolady, ROT0, "Nichibutsu",     "Jangou Lady (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrl,   0,        cntrygrl, cntrygrl, jangou_state,  0,        ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrla,  cntrygrl, cntrygrl, cntrygrl, jangou_state,  0,        ROT0, "Nichibutsu",     "Country Girl (Japan set 2)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  fruitbun,   cntrygrl, cntrygrl, cntrygrl, jangou_state,  0,        ROT0, "Nichibutsu",     "Fruits & Bunny (World?)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985,  roylcrdn,   0,        roylcrdn, roylcrdn, jangou_state,  0,        ROT0, "Nichibutsu",     "Royal Card (Nichibutsu)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  jangou,    0,        jangou,   jangou,   jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Jangou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  macha,     0,        jangou,   macha,    jangou_state,  empty_init,    ROT0, "Logitec",        "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  jngolady,  0,        jngolady, jngolady, jangou_state,  init_jngolady, ROT0, "Nichibutsu",     "Jangou Lady (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrl,  0,        cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrla, cntrygrl, cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Country Girl (Japan set 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  fruitbun,  cntrygrl, cntrygrl, cntrygrl, jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Fruits & Bunny (World?)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985,  roylcrdn,  0,        roylcrdn, roylcrdn, jangou_state,  empty_init,    ROT0, "Nichibutsu",     "Royal Card (Nichibutsu)", MACHINE_SUPPORTS_SAVE )
 
 /* The following might not run there... */
-GAME( 1984?, luckygrl,   0,        cntrygrl, cntrygrl, jangou_state,  luckygrl, ROT0, "Wing Co., Ltd.", "Lucky Girl? (Wing)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984?, luckygrl,  0,        cntrygrl, cntrygrl, jangou_state,  init_luckygrl, ROT0, "Wing Co., Ltd.", "Lucky Girl? (Wing)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 /*
 Some other games that might run on this HW:

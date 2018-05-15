@@ -201,7 +201,7 @@ static const gfx_layout mikrosha_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( mikrosha )
+static GFXDECODE_START( gfx_mikrosha )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikrosha_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -240,7 +240,7 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mikrosha)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mikrosha)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(mikrosha_state,radio86)
 
@@ -284,6 +284,6 @@ ROM_START( m86rk )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME      PARENT   COMPAT    MACHINE     INPUT     STATE           INIT        COMPANY     FULLNAME        FLAGS
-COMP( 1987, mikrosha, radio86, 0,        mikrosha,   mikrosha, mikrosha_state, radio86,    "Lianozovo Electromechanical Factory",      "Mikrosha",     0)
-COMP( 1987, m86rk,    radio86, 0,        mikrosha,   mikrosha, mikrosha_state, radio86,    "<unknown>",        "Mikrosha-86RK",        0)
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT          COMPANY                                FULLNAME         FLAGS
+COMP( 1987, mikrosha, radio86, 0,      mikrosha, mikrosha, mikrosha_state, init_radio86, "Lianozovo Electromechanical Factory", "Mikrosha",      0)
+COMP( 1987, m86rk,    radio86, 0,      mikrosha, mikrosha, mikrosha_state, init_radio86, "<unknown>",                           "Mikrosha-86RK", 0)

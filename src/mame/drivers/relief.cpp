@@ -256,7 +256,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( relief )
+static GFXDECODE_START( gfx_relief )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout,   0, 64 )     /* alpha & playfield */
 	GFXDECODE_ENTRY( "gfx1", 1, molayout, 256, 16 )     /* sprites */
 GFXDECODE_END
@@ -281,7 +281,7 @@ MACHINE_CONFIG_START(relief_state::relief)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", relief)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_relief)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
@@ -428,7 +428,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(relief_state,relief)
+void relief_state::init_relief()
 {
 	m_okibank->configure_entries(0, 8, memregion("oki")->base(), 0x20000);
 	m_okibank->set_entry(0);
@@ -443,6 +443,6 @@ DRIVER_INIT_MEMBER(relief_state,relief)
  *
  *************************************/
 
-GAME( 1992, relief,  0,      relief, relief, relief_state, relief, ROT0, "Atari Games", "Relief Pitcher (set 1, 07 Jun 1992 / 28 May 1992)", 0 )
-GAME( 1992, relief2, relief, relief, relief, relief_state, relief, ROT0, "Atari Games", "Relief Pitcher (set 2, 26 Apr 1992 / 08 Apr 1992)", 0 )
-GAME( 1992, relief3, relief, relief, relief, relief_state, relief, ROT0, "Atari Games", "Relief Pitcher (set 3, 10 Apr 1992 / 08 Apr 1992)", 0 )
+GAME( 1992, relief,  0,      relief, relief, relief_state, init_relief, ROT0, "Atari Games", "Relief Pitcher (set 1, 07 Jun 1992 / 28 May 1992)", 0 )
+GAME( 1992, relief2, relief, relief, relief, relief_state, init_relief, ROT0, "Atari Games", "Relief Pitcher (set 2, 26 Apr 1992 / 08 Apr 1992)", 0 )
+GAME( 1992, relief3, relief, relief, relief, relief_state, init_relief, ROT0, "Atari Games", "Relief Pitcher (set 3, 10 Apr 1992 / 08 Apr 1992)", 0 )

@@ -723,7 +723,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( wiz )
+static GFXDECODE_START( gfx_wiz )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x6000, charlayout,   0, 32 )
@@ -735,7 +735,7 @@ static GFXDECODE_START( wiz )
 	GFXDECODE_ENTRY( "gfx2", 0x6000, spritelayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( stinger )
+static GFXDECODE_START( gfx_stinger )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout,   0, 32 )
@@ -810,7 +810,7 @@ MACHINE_CONFIG_START(wiz_state::kungfut)
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_kungfut)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stinger)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stinger)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(wiz_state, wiz)
 
@@ -837,7 +837,7 @@ MACHINE_CONFIG_START(wiz_state::wiz)
 	MCFG_DEVICE_PROGRAM_MAP(wiz_main_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", wiz)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wiz)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_wiz)
 MACHINE_CONFIG_END
@@ -1131,7 +1131,7 @@ ROM_START( scionc )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(wiz_state,stinger)
+void wiz_state::init_stinger()
 {
 	static const uint8_t swap_xor_table[4][4] =
 	{
@@ -1146,9 +1146,6 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 
 	for (int a = 0x0000; a < 0xc000; a++)
 	{
-		int row;
-		uint8_t src;
-
 		if (a & 0x2040)
 		{
 			/* not encrypted */
@@ -1156,10 +1153,10 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 		}
 		else
 		{
-			src = rom[a];
+			const uint8_t src = rom[a];
 
 			/* pick the translation table from bits 3 and 5 of the address */
-			row = ((a >> 3) & 1) + (((a >> 5) & 1) << 1);
+			int row = ((a >> 3) & 1) + (((a >> 5) & 1) << 1);
 
 			/* decode the opcodes */
 			tbl = swap_xor_table[row];
@@ -1169,12 +1166,12 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 }
 
 
-GAME( 1983, stinger,  0,       stinger, stinger,  wiz_state, stinger, ROT90,  "Seibu Denshi", "Stinger", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, stinger2, stinger, stinger, stinger2, wiz_state, stinger, ROT90,  "Seibu Denshi", "Stinger (prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, scion,    0,       scion,   scion,    wiz_state, 0,       ROT0,   "Seibu Denshi", "Scion", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, scionc,   scion,   scion,   scion,    wiz_state, 0,       ROT0,   "Seibu Denshi (Cinematronics license)", "Scion (Cinematronics)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kungfut,  0,       kungfut, kungfut,  wiz_state, 0,       ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE )
-GAME( 1984, kungfuta, kungfut, kungfut, kungfut,  wiz_state, 0,       ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE ) /* board was a bootleg but set might still be original */
-GAME( 1985, wiz,      0,       wiz,     wiz,      wiz_state, 0,       ROT270, "Seibu Kaihatsu", "Wiz", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, wizt,     wiz,     wiz,     wiz,      wiz_state, 0,       ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, wizta,    wiz,     wiz,     wiz,      wiz_state, 0,       ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, stinger,  0,       stinger, stinger,  wiz_state, init_stinger, ROT90,  "Seibu Denshi", "Stinger", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, stinger2, stinger, stinger, stinger2, wiz_state, init_stinger, ROT90,  "Seibu Denshi", "Stinger (prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, scion,    0,       scion,   scion,    wiz_state, empty_init,   ROT0,   "Seibu Denshi", "Scion", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, scionc,   scion,   scion,   scion,    wiz_state, empty_init,   ROT0,   "Seibu Denshi (Cinematronics license)", "Scion (Cinematronics)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kungfut,  0,       kungfut, kungfut,  wiz_state, empty_init,   ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE )
+GAME( 1984, kungfuta, kungfut, kungfut, kungfut,  wiz_state, empty_init,   ROT0,   "Seibu Kaihatsu", "Kung-Fu Taikun (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_MICROPHONE ) /* board was a bootleg but set might still be original */
+GAME( 1985, wiz,      0,       wiz,     wiz,      wiz_state, empty_init,   ROT270, "Seibu Kaihatsu", "Wiz", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wizt,     wiz,     wiz,     wiz,      wiz_state, empty_init,   ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wizta,    wiz,     wiz,     wiz,      wiz_state, empty_init,   ROT270, "Seibu Kaihatsu (Taito license)", "Wiz (Taito, set 2)", MACHINE_SUPPORTS_SAVE )

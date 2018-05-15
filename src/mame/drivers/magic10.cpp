@@ -136,12 +136,12 @@ public:
 	DECLARE_READ16_MEMBER(hotslot_copro_r);
 	DECLARE_WRITE16_MEMBER(hotslot_copro_w);
 	DECLARE_WRITE16_MEMBER(magic10_out_w);
-	DECLARE_DRIVER_INIT(sgsafari);
-	DECLARE_DRIVER_INIT(suprpool);
-	DECLARE_DRIVER_INIT(magic102);
-	DECLARE_DRIVER_INIT(magic10);
-	DECLARE_DRIVER_INIT(hotslot);
-	DECLARE_DRIVER_INIT(altaten);
+	void init_sgsafari();
+	void init_suprpool();
+	void init_magic102();
+	void init_magic10();
+	void init_hotslot();
+	void init_altaten();
 	TILE_GET_INFO_MEMBER(get_layer0_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer1_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
@@ -685,7 +685,7 @@ static const gfx_layout tiles16x16_layout =
 *      Graphics Decode      *
 ****************************/
 
-static GFXDECODE_START( magic10 )
+static GFXDECODE_START( gfx_magic10 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 16 )
 GFXDECODE_END
@@ -715,7 +715,7 @@ MACHINE_CONFIG_START(magic10_state::magic10)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magic10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magic10)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1405,25 +1405,25 @@ ROM_END
 *       Driver Init         *
 ****************************/
 
-DRIVER_INIT_MEMBER(magic10_state, magic10)
+void magic10_state::init_magic10()
 {
 	m_layer2_offset[0] = 32;
 	m_layer2_offset[1] = 2;
 }
 
-DRIVER_INIT_MEMBER(magic10_state, magic102)
+void magic10_state::init_magic102()
 {
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 20;
 }
 
-DRIVER_INIT_MEMBER(magic10_state, suprpool)
+void magic10_state::init_suprpool()
 {
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 16;
 }
 
-DRIVER_INIT_MEMBER(magic10_state, hotslot)
+void magic10_state::init_hotslot()
 {
 /*  a value of -56 center the playfield, but displace the intro and initial screen.
     a value of -64 center the intro and initial screen, but displace the playfield.
@@ -1432,13 +1432,13 @@ DRIVER_INIT_MEMBER(magic10_state, hotslot)
 	m_layer2_offset[1] = 0; // Y offset.
 }
 
-DRIVER_INIT_MEMBER(magic10_state, sgsafari)
+void magic10_state::init_sgsafari()
 {
 	m_layer2_offset[0] = 16;
 	m_layer2_offset[1] = 20;
 }
 
-DRIVER_INIT_MEMBER(magic10_state, altaten)
+void magic10_state::init_altaten()
 {
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 16;
@@ -1455,16 +1455,16 @@ DRIVER_INIT_MEMBER(magic10_state, altaten)
 *        Game Drivers         *
 ******************************/
 
-//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      ROT   COMPANY                 FULLNAME                          FLAGS            LAYOUT
-GAMEL( 1995, magic10,  0,        magic10,  magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",        0,               layout_sgsafari )
-GAMEL( 1995, magic10a, magic10,  magic10,  magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        0,               layout_sgsafari )
-GAMEL( 1995, magic10b, magic10,  magic10a, magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,               layout_sgsafari )
-GAMEL( 1995, magic10c, magic10,  magic10a, magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        0,               layout_sgsafari )
-GAME(  1997, magic102, 0,        magic102, magic102, magic10_state, magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver 1.1)",         MACHINE_NOT_WORKING )
-GAME(  1998, suprpool, 0,        magic102, magic102, magic10_state, suprpool, ROT0, "ABM Games",            "Super Pool (ver. 1.2)",          MACHINE_NOT_WORKING )
-GAME(  1996, hotslot,  0,        hotslot,  hotslot,  magic10_state, hotslot,  ROT0, "ABM Electronics",      "Hot Slot (ver. 05.01)",          MACHINE_NOT_WORKING )
-GAME(  1999, mcolors,  0,        magic102, magic102, magic10_state, magic102, ROT0, "<unknown>",            "Magic Colors (ver. 1.7a)",       MACHINE_NOT_WORKING )
-GAMEL( 1996, sgsafari, 0,        sgsafari, sgsafari, magic10_state, sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver 3.11)",   0,               layout_sgsafari )
-GAMEL( 1995, musicsrt, 0,        magic10a, musicsrt, magic10_state, magic10,  ROT0, "ABM Games",            "Music Sort (ver 2.02, English)", 0,               layout_musicsrt )
-GAME(  1998, lunaprk,  0,        magic102, magic102, magic10_state, suprpool, ROT0, "ABM Games",            "Luna Park (ver. 1.2)",           MACHINE_NOT_WORKING )
-GAME(  199?, altaten,  0,        magic102, magic102, magic10_state, altaten,  ROT0, "<unknown>",            "Alta Tensione (ver. 2.01a)",     MACHINE_NOT_WORKING )
+//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT           ROT   COMPANY                 FULLNAME                          FLAGS            LAYOUT
+GAMEL( 1995, magic10,  0,        magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",        0,               layout_sgsafari )
+GAMEL( 1995, magic10a, magic10,  magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        0,               layout_sgsafari )
+GAMEL( 1995, magic10b, magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,               layout_sgsafari )
+GAMEL( 1995, magic10c, magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        0,               layout_sgsafari )
+GAME(  1997, magic102, 0,        magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver 1.1)",         MACHINE_NOT_WORKING )
+GAME(  1998, suprpool, 0,        magic102, magic102, magic10_state, init_suprpool, ROT0, "ABM Games",            "Super Pool (ver. 1.2)",          MACHINE_NOT_WORKING )
+GAME(  1996, hotslot,  0,        hotslot,  hotslot,  magic10_state, init_hotslot,  ROT0, "ABM Electronics",      "Hot Slot (ver. 05.01)",          MACHINE_NOT_WORKING )
+GAME(  1999, mcolors,  0,        magic102, magic102, magic10_state, init_magic102, ROT0, "<unknown>",            "Magic Colors (ver. 1.7a)",       MACHINE_NOT_WORKING )
+GAMEL( 1996, sgsafari, 0,        sgsafari, sgsafari, magic10_state, init_sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver 3.11)",   0,               layout_sgsafari )
+GAMEL( 1995, musicsrt, 0,        magic10a, musicsrt, magic10_state, init_magic10,  ROT0, "ABM Games",            "Music Sort (ver 2.02, English)", 0,               layout_musicsrt )
+GAME(  1998, lunaprk,  0,        magic102, magic102, magic10_state, init_suprpool, ROT0, "ABM Games",            "Luna Park (ver. 1.2)",           MACHINE_NOT_WORKING )
+GAME(  199?, altaten,  0,        magic102, magic102, magic10_state, init_altaten,  ROT0, "<unknown>",            "Alta Tensione (ver. 2.01a)",     MACHINE_NOT_WORKING )

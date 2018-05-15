@@ -428,7 +428,7 @@ static const gfx_layout objlayout =
 	16*16*4
 };
 
-static GFXDECODE_START( quizdna )
+static GFXDECODE_START( gfx_quizdna )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, fglayout,  0x7e0,  16 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, bglayout,  0x000, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, objlayout, 0x600,  32 )
@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(quizdna_state::quizdna)
 	MCFG_SCREEN_UPDATE_DRIVER(quizdna_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizdna)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quizdna)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -575,6 +575,6 @@ ROM_START( gekiretu )
 	ROM_LOAD( "quiz3.148",    0x000000,  0x000020, CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
 ROM_END
 
-GAME( 1991, gakupara, 0, gakupara, gakupara, quizdna_state, 0, ROT0, "NMK",  "Quiz Gakuen Paradise (Japan)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1992, quizdna,  0, quizdna,  quizdna,  quizdna_state, 0, ROT0, "Face", "Quiz DNA no Hanran (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gekiretu, 0, gekiretu, gekiretu, quizdna_state, 0, ROT0, "Face", "Quiz Gekiretsu Scramble (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gakupara, 0, gakupara, gakupara, quizdna_state, empty_init, ROT0, "NMK",  "Quiz Gakuen Paradise (Japan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quizdna,  0, quizdna,  quizdna,  quizdna_state, empty_init, ROT0, "Face", "Quiz DNA no Hanran (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gekiretu, 0, gekiretu, gekiretu, quizdna_state, empty_init, ROT0, "Face", "Quiz Gekiretsu Scramble (Japan)", MACHINE_SUPPORTS_SAVE )

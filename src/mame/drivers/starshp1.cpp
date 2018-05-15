@@ -281,7 +281,7 @@ static const gfx_layout shiplayout =
 };
 
 
-static GFXDECODE_START( starshp1 )
+static GFXDECODE_START( gfx_starshp1 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 2, 2 )
 	GFXDECODE_ENTRY( "gfx3", 0, shiplayout,   6, 2 )
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(starshp1_state::starshp1)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, starshp1_state, screen_vblank_starshp1))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", starshp1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_starshp1)
 	MCFG_PALETTE_ADD("palette", 19)
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(starshp1_state, starshp1)
@@ -406,5 +406,5 @@ ROM_START( starshpp )
 ROM_END
 
 
-GAME( 1977, starshp1, 0,        starshp1, starshp1, starshp1_state, 0, ORIENTATION_FLIP_X, "Atari", "Starship 1",              MACHINE_IMPERFECT_SOUND )
-GAME( 1977, starshpp, starshp1, starshp1, starshp1, starshp1_state, 0, ORIENTATION_FLIP_X, "Atari", "Starship 1 (prototype?)", MACHINE_IMPERFECT_SOUND )
+GAME( 1977, starshp1, 0,        starshp1, starshp1, starshp1_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Starship 1",              MACHINE_IMPERFECT_SOUND )
+GAME( 1977, starshpp, starshp1, starshp1, starshp1, starshp1_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Starship 1 (prototype?)", MACHINE_IMPERFECT_SOUND )
