@@ -62,6 +62,7 @@
 #include "machine/tms9914.h"
 #include "sound/sn76496.h"
 #include "bus/hp_dio/hp_dio.h"
+#include "bus/hp_dio/hp98543.h"
 #include "bus/hp_dio/hp98544.h"
 #include "bus/hp_hil/hp_hil.h"
 #include "bus/hp_hil/hil_devices.h"
@@ -430,6 +431,7 @@ READ8_MEMBER(hp9k3xx_state::iocpu_test0_r)
 
 static void dio16_cards(device_slot_interface &device)
 {
+	device.option_add("98543", HPDIO_98543); /* 98543 Medium Resolution Color Card */
 	device.option_add("98544", HPDIO_98544); /* 98544 High Resolution Monochrome Card */
 	device.option_add("98603a", HPDIO_98603A); /* 98603A ROM BASIC (4.0) */
 	device.option_add("98603b", HPDIO_98603B); /* 98603B ROM BASIC (5.1) */
