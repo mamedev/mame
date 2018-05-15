@@ -29,7 +29,8 @@ Notes:
 To Do:
 
 Phoenix:
-- Emulate the different sound system used at least by phoenixc2 and griffono.
+- Emulate the different sound system used at least by phoenixc2, griffono,
+   and nextfase.
 - Better documentation of the bootlegs.
 
 Survival:
@@ -1244,6 +1245,10 @@ ROM_START( griffono )  // verified single PCB with piggyback sound PCB instead o
 	ROM_LOAD( "sn74s471n.11k",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
 ROM_END
 
+/*
+  There is no MN6221AA Melody-Alarm Generator.
+  There is a EPSON Electronics 7910CG Multi-Melody IC instead.
+*/
 ROM_START( nextfase )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nf01.bin",   0x0000, 0x0800, CRC(b31ce820) SHA1(dfdb17995a14b66d2571c2c8de481d2792f9ce6a) )
