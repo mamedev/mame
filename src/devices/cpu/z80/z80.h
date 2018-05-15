@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "z80daisy.h"
+#include "machine/z80daisy.h"
 
 #define MCFG_Z80_SET_IRQACK_CALLBACK(_devcb) \
 	devcb = &downcast<z80_device &>(*device).set_irqack_cb(DEVCB_##_devcb);

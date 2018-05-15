@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_DEVICES_CPU_Z80_Z80DAISY_GENERIC_H
-#define MAME_DEVICES_CPU_Z80_Z80DAISY_GENERIC_H
+#ifndef MAME_MACHINE_Z80DAISY_GENERIC_H
+#define MAME_MACHINE_Z80DAISY_GENERIC_H
 
 #pragma once
 
@@ -67,4 +67,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(Z80DAISY_GENERIC, z80daisy_generic_device)
 
-#endif // MAME_DEVICES_CPU_Z80_Z80DAISY_GENERIC_H
+#endif // MAME_MACHINE_Z80DAISY_GENERIC_H
