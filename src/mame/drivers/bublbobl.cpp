@@ -826,9 +826,12 @@ MACHINE_RESET_MEMBER(bublbobl_state,common) // things common on both tokio and b
 	m_soundnmi->in_w<0>(0); // clear sound NMI stuff
 	m_soundnmi->in_w<1>(0);
 	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); // if a subcpu nmi is active (extremely remote chance), it is cleared
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE); // maincpu is reset
-	m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE); // subcpu is reset
-	common_sreset(PULSE_LINE); // /SRESET is pulsed
+	if (!m_sreset_old)
+	{
+		// /SRESET is pulsed
+		common_sreset(ASSERT_LINE);
+		common_sreset(CLEAR_LINE);
+	}
 }
 
 

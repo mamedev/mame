@@ -216,7 +216,7 @@ public:
 	TIMER_CALLBACK_MEMBER( sh4_timer_callback );
 	TIMER_CALLBACK_MEMBER( sh4_dmac_callback );
 
-	void sh4_set_frt_input(int state);
+	virtual void set_frt_input(int state) override;
 	void sh4_set_irln_input(int value);
 	//void sh4_set_ftcsr_callback(sh4_ftcsr_callback callback);
 	int sh4_dma_data(struct sh4_device_dma *s);

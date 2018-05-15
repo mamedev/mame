@@ -168,6 +168,9 @@ public:
 	virtual void WW(offs_t A, uint16_t V) = 0;
 	virtual void WL(offs_t A, uint32_t V) = 0;
 
+	virtual void set_frt_input(int state) = 0;
+	void pulse_frt_input() { set_frt_input(ASSERT_LINE); set_frt_input(CLEAR_LINE); }
+
 protected:
 	// compilation boundaries -- how far back/forward does the analysis extend?
 	enum : u32
