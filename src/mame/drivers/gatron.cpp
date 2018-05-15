@@ -337,6 +337,8 @@
 
 
 #define MASTER_CLOCK    XTAL(16'000'000)
+#define CPU_CLOCK       MASTER_CLOCK / 24    // 666.66 kHz, guess...
+
 
 /****************************
 *    Read/Write Handlers    *
@@ -453,7 +455,7 @@ void gatron_state::gat_map(address_map &map)
 	map(0x6000, 0x63ff).ram().w(this, FUNC(gatron_state::gat_videoram_w)).share("videoram");
 	map(0x8000, 0x87ff).ram().share("nvram");                          /* battery backed RAM */
 	map(0xa000, 0xa000).w("snsnd", FUNC(sn76489_device::write));       /* PSG */
-	map(0xe000, 0xe000).w(this, FUNC(gatron_state::output_port_0_w));                         /* lamps */
+	map(0xe000, 0xe000).w(this, FUNC(gatron_state::output_port_0_w));  /* lamps */
 }
 
 void gatron_state::gat_portmap(address_map &map)
@@ -568,7 +570,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gatron_state::gat)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/24)   /* 666.66 kHz, guess */
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/24)
 	MCFG_DEVICE_PROGRAM_MAP(gat_map)
 	MCFG_DEVICE_IO_MAP(gat_portmap)
 
