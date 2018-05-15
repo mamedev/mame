@@ -15473,6 +15473,10 @@ ip2400                          // Intergraph InterPro/InterServe 24x0
 ip2500                          // Intergraph InterPro/InterServe 25x0
 ip2700                          // Intergraph InterPro/InterServe 27x0
 ip2800                          // Intergraph InterPro/InterServe 28x0
+ip6000                          // Intergraph InterPro/InterServe 60x0
+ip6400                          // Intergraph InterPro/InterServe 64x0
+ip6700                          // Intergraph InterPro/InterServe 67x0
+ip6800                          // Intergraph InterPro/InterServe 68x0
 
 @source:intrscti.cpp
 intrscti                        // ????

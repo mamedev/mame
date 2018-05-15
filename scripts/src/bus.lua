@@ -3404,6 +3404,8 @@ if (BUSES["INTERPRO_SR"]~=null) then
 		MAME_DIR .. "src/devices/bus/interpro/sr/sr_cards.h",
 		MAME_DIR .. "src/devices/bus/interpro/sr/gt.cpp",
 		MAME_DIR .. "src/devices/bus/interpro/sr/gt.h",
+		MAME_DIR .. "src/devices/bus/interpro/sr/edge.cpp",
+		MAME_DIR .. "src/devices/bus/interpro/sr/edge.h",
 	}
 end
 
