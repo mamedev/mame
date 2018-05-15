@@ -1223,7 +1223,7 @@ ROM_END
 
 
 /*
-A PCB with V1.3 program ROMs was seen with different styled labels:
+A WWF: Wrestlemania PCB with V1.3 program ROMs was seen with different styled labels:
 
 U2  WRESTLEMANIA 5/17/95  5D00 - crossed out and hand written 6-6-95 5500
 U3  WRESTLEMANIA 5/2/95  8300
