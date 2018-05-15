@@ -286,7 +286,7 @@ GFXDECODE_END
 
 DECO16IC_BANK_CB_MEMBER(cbuster_state::bank_callback)
 {
-	return ((bank >> 4) & 0x7) * 0x1000;
+	return (bank & 0x70) << 8;
 }
 
 void cbuster_state::machine_start()
