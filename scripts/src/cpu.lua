@@ -2463,8 +2463,6 @@ if (CPUS["Z180"]~=null) then
 		MAME_DIR .. "src/devices/cpu/z180/z180ops.h",
 		MAME_DIR .. "src/devices/cpu/z180/z180tbl.h",
 		MAME_DIR .. "src/devices/cpu/z180/z180xy.hxx",
-		MAME_DIR .. "src/devices/cpu/z80/z80daisy.cpp",
-		MAME_DIR .. "src/devices/cpu/z80/z80daisy.h",
 	}
 end
 
