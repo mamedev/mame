@@ -528,10 +528,10 @@ void astrocde_state::port_map_discrete(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x0f).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
-	map(0x10, 0x10).portr("HANDLE0");
-	map(0x11, 0x11).portr("HANDLE1");
-	map(0x12, 0x12).portr("HANDLE2");
-	map(0x13, 0x13).portr("HANDLE3");
+	map(0x10, 0x10).portr("P1HANDLE");
+	map(0x11, 0x11).portr("P2HANDLE");
+	map(0x12, 0x12).portr("P3HANDLE");
+	map(0x13, 0x13).portr("P4HANDLE");
 	map(0x19, 0x19).w(this, FUNC(astrocde_state::expand_register_w));
 	map(0x40, 0x40).mirror(0x18).w(this, FUNC(astrocde_state::seawolf2_sound_1_w));
 	map(0x41, 0x41).mirror(0x18).w(this, FUNC(astrocde_state::seawolf2_sound_2_w));

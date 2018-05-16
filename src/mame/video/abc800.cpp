@@ -143,12 +143,12 @@ PALETTE_INIT_MEMBER( abc800c_state, abc800c )
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
-	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // green
+	palette.set_pen_color(2, rgb_t::green());
 	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0x00)); // yellow
 	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0xff)); // blue
 	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0xff)); // magenta
 	palette.set_pen_color(6, rgb_t(0x00, 0xff, 0xff)); // cyan
-	palette.set_pen_color(7, rgb_t(0xff, 0xff, 0xff)); // white
+	palette.set_pen_color(7, rgb_t::white());
 }
 
 
@@ -282,7 +282,7 @@ MACHINE_CONFIG_START(abc800m_state::abc800m_video)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)
 	MCFG_MC6845_UPDATE_ROW_CB(abc800m_state, abc800m_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(Z80DART_TAG, z80dart_device, rib_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(Z80DART_TAG, z80dart_device, rib_w)) MCFG_DEVCB_XOR(1)
 
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t(0xff, 0xff, 0x00))
 	MCFG_SCREEN_UPDATE_DRIVER(abc800m_state, screen_update)
