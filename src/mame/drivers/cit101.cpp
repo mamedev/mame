@@ -104,6 +104,7 @@ private:
 	u8 m_e0_latch;
 
 	bool m_blink;
+	u8 m_brightness;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -119,8 +120,11 @@ void cit101_state::machine_start()
 	subdevice<i8251_device>("comuart")->write_cts(0);
 	subdevice<i8251_device>("kbduart")->write_cts(0);
 
+	m_brightness = 0xff;
+
 	save_item(NAME(m_e0_latch));
 	save_item(NAME(m_blink));
+	save_item(NAME(m_brightness));
 }
 
 
@@ -137,10 +141,10 @@ void cit101_state::draw_line(uint32_t *pixptr, int minx, int maxx, int line, boo
 	u8 char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
 	if (last_line && BIT(attr, 0))
 		char_data ^= 0xff;
-	rgb_t on_color = (BIT(attr, 1) != BIT(scrattr, 0)) ? rgb_t::black() : rgb_t::white();
-	rgb_t off_color = (BIT(attr, 1) != BIT(scrattr, 0)) ? rgb_t::white() : rgb_t::black();
+	rgb_t on_color = (BIT(attr, 1) != BIT(scrattr, 0)) ? rgb_t::black() : rgb_t(m_brightness, m_brightness, m_brightness);
+	rgb_t off_color = (BIT(attr, 1) != BIT(scrattr, 0)) ? rgb_t(m_brightness, m_brightness, m_brightness) : rgb_t::black();
 	if (BIT(attr, 3) && m_blink)
-		on_color = rgb_t(0xc0, 0xc0, 0xc0);
+		on_color = rgb_t(m_brightness * 0.75, m_brightness * 0.75, m_brightness * 0.75);
 	bool last_bit = false;
 	for (int x = 0; x <= maxx; x++)
 	{
@@ -162,10 +166,10 @@ void cit101_state::draw_line(uint32_t *pixptr, int minx, int maxx, int line, boo
 				char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
 				if (last_line && BIT(attr, 0))
 					char_data ^= 0xff;
-				on_color = (BIT(attr, 1) != BIT(scrattr, 0)) ? rgb_t::black() : rgb_t::white();
-				off_color = (BIT(attr, 1) != BIT(scrattr, 0)) ? rgb_t::white() : rgb_t::black();
+				on_color = BIT(attr, 1) ? rgb_t::black() : rgb_t(m_brightness, m_brightness, m_brightness);
+				off_color = BIT(attr, 1) ? rgb_t(m_brightness, m_brightness, m_brightness) : rgb_t::black();
 				if (BIT(attr, 3) && m_blink)
-					on_color = rgb_t(0xc0, 0xc0, 0xc0);
+					on_color = rgb_t(m_brightness * 0.75, m_brightness * 0.75, m_brightness * 0.75);
 				last_bit = false;
 			}
 		}
@@ -266,6 +270,8 @@ WRITE8_MEMBER(cit101_state::screen_control_w)
 
 WRITE8_MEMBER(cit101_state::brightness_w)
 {
+	// Function of upper 3 bits is unknown
+	m_brightness = pal5bit(~data & 0x1f);
 }
 
 WRITE8_MEMBER(cit101_state::nvr_address_w)
