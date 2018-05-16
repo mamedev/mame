@@ -42,6 +42,9 @@ public:
 	DECLARE_READ8_MEMBER(dma68k_r);
 	DECLARE_WRITE8_MEMBER(dma68k_w);
 
+	DECLARE_READ8_MEMBER(dma8237_2_dmaread);
+	DECLARE_WRITE8_MEMBER(dma8237_2_dmawrite);
+
 	DECLARE_READ8_MEMBER(boardlogic_mmio_r);
 	DECLARE_WRITE8_MEMBER(boardlogic_mmio_w);
 

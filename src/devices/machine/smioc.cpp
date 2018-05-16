@@ -121,6 +121,9 @@ MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	/* DMA */
 	for (required_device<am9517a_device> &dma : m_dma8237)
 		AM9517A(config, dma, 20_MHz_XTAL / 4); // Clock division unknown
+	MCFG_AM9517A_IN_MEMR_CB(READ8(smioc_device, dma8237_2_dmaread))
+	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(smioc_device, dma8237_2_dmawrite))
+
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(smioc_device, dma8237_2_hreq_w))
 	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(smioc_device, dma8237_dack_2_0_w))
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(smioc_device, dma8237_dack_2_1_w))
@@ -131,9 +134,18 @@ MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	/* Port 1: Console */
 	for (required_device<rs232_port_device> &rs232_port : m_rs232_p)
 		RS232_PORT(config, rs232_port, default_rs232_devices, nullptr);
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("scc2698b", scc2698b_device, port_a_rx_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("scc2698b", scc2698b_device, port_b_rx_w))
 
 	/* SCC2698B */
-	MCFG_DEVICE_ADD("scc2698b", SCC2698B, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("scc2698b", SCC2698B, XTAL(3'686'400))
+	//MCFG_SCC2698B_TX_CALLBACK(a, DEVWRITELINE("rs232_p1", rs232_port_device, write_txd))
+	//MCFG_SCC2698B_MPP1_CALLBACK(a, DEVWRITELINE("dma8237_2", am9517a_device, dreq1_w)) // MPP1 output is TxRDY, DREQ1 is UART 0 TX request
+	//MCFG_SCC2698B_MPP2_CALLBACK(a, DEVWRITELINE("dma8237_2", am9517a_device, dreq0_w)) // MPP2 output is RxRDY, DREQ0 is UART 0 RX request
+	//MCFG_SCC2698B_TX_CALLBACK(b, DEVWRITELINE("rs232_p2", rs232_port_device, write_txd))
+	//MCFG_SCC2698B_MPP1_CALLBACK(b, DEVWRITELINE("dma8237_2", am9517a_device, dreq3_w)) 
+	//MCFG_SCC2698B_MPP2_CALLBACK(b, DEVWRITELINE("dma8237_2", am9517a_device, dreq2_w)) 
+
 
 MACHINE_CONFIG_END
 
@@ -379,23 +391,33 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 // For now pretend the UART is always ready.
 WRITE_LINE_MEMBER(smioc_device::dma8237_dack_2_0_w)
 {
-	m_dma8237_2->dreq0_w(1); // Disable channel 0 (UART 0 RX)
+	//m_dma8237_2->dreq0_w(1); // Disable channel 0 (UART 0 RX)
 }
 WRITE_LINE_MEMBER(smioc_device::dma8237_dack_2_1_w)
 {
-	m_dma8237_2->dreq1_w(!state); // Uart 0 TX
+	//m_dma8237_2->dreq1_w(!state); // Uart 0 TX
 }
 WRITE_LINE_MEMBER(smioc_device::dma8237_dack_2_2_w)
 {
-	m_dma8237_2->dreq2_w(1); // Disable channel 2 (UART 1 RX)
+	//m_dma8237_2->dreq2_w(1); // Disable channel 2 (UART 1 RX)
 }
 WRITE_LINE_MEMBER(smioc_device::dma8237_dack_2_3_w)
 {
-	m_dma8237_2->dreq3_w(!state);
+	//m_dma8237_2->dreq3_w(!state);
 }
 
 WRITE_LINE_MEMBER(smioc_device::dma8237_2_hreq_w)
 {
 	m_dma8237_2->hack_w(state);
+}
+
+READ8_MEMBER(smioc_device::dma8237_2_dmaread)
+{
+	logerror("dma2read\n");
+	return 0;
+}
+WRITE8_MEMBER(smioc_device::dma8237_2_dmawrite)
+{
+	logerror("dma2write 0x%x\n", data);
 }
 

@@ -9,16 +9,31 @@ class scc2698b_device;
 
 #define SCC2698B_RX_FIFO_SIZE	3
 
+// _port should be a letter port index from "a" .. "h"
+#define MCFG_SCC2698B_TX_CALLBACK(_port, _cb) \
+	devcb = &(downcast<scc2698b_device &>(*device).m_channel_##_port)->set_tx_cb(DEVCB_##_cb);
+
+#define MCFG_SCC2698B_MPP1_CALLBACK(_port, _cb) \
+	devcb = &(downcast<scc2698b_device &>(*device).m_channel_##_port)->set_mpp1_cb(DEVCB_##_cb);
+
+#define MCFG_SCC2698B_MPP2_CALLBACK(_port, _cb) \
+	devcb = &(downcast<scc2698b_device &>(*device).m_channel_##_port)->set_mpp2_cb(DEVCB_##_cb);
+
+#define MCFG_SCC2698B_MPO_CALLBACK(_port, _cb) \
+	devcb = &(downcast<scc2698b_device &>(*device).m_channel_##_port)->set_mpo_cb(DEVCB_##_cb);
+
+
+
 class scc2698b_channel : public device_t, public device_serial_interface
 {
 	friend class scc2698b_device;
 public:
 	scc2698b_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_tx_cb(device_t &device, Object &&cb) { return downcast<scc2698b_channel &>(device).write_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_mpp1_cb(device_t &device, Object &&cb) { return downcast<scc2698b_channel &>(device).write_mpp1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_mpp2_cb(device_t &device, Object &&cb) { return downcast<scc2698b_channel &>(device).write_mpp2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_mpo_cb(device_t &device, Object &&cb) { return downcast<scc2698b_channel &>(device).write_mpo.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_tx_cb(Object &&cb) { return write_tx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_mpp1_cb(Object &&cb) { return write_mpp1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_mpp2_cb(Object &&cb) { return write_mpp2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_mpo_cb(Object &&cb) { return write_mpo.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(mpi0_w);
 	DECLARE_WRITE_LINE_MEMBER(mpi1_w);
@@ -34,10 +49,18 @@ public:
 	void reset_tx();
 	void reset_rx();
 
+	void set_tx_enable(bool enable);
+	void set_rx_enable(bool enable);
+
 	void update_serial_configuration();
 
 	void set_tx_bittime(const attotime &bittime);
 	void set_rx_bittime(const attotime &bittime);
+
+	void set_mpp_output(bool output);
+
+
+	int read_SR();
 
 protected:
 	virtual void device_start() override;
@@ -54,6 +77,13 @@ protected:
 	int rx_bytecount;
 
 	u8 MR1, MR2, SR, CR, CSR;
+
+	bool tx_enable;
+	bool rx_enable;
+
+	void recompute_pin_output(bool force = false);
+	int mpp1_value, mpp2_value;
+	bool mpp_is_output;
 
 };
 
@@ -84,6 +114,15 @@ public:
 	required_device<scc2698b_channel> m_channel_f;
 	required_device<scc2698b_channel> m_channel_g;
 	required_device<scc2698b_channel> m_channel_h;
+
+	DECLARE_WRITE_LINE_MEMBER(port_a_rx_w);
+	DECLARE_WRITE_LINE_MEMBER(port_b_rx_w);
+	DECLARE_WRITE_LINE_MEMBER(port_c_rx_w);
+	DECLARE_WRITE_LINE_MEMBER(port_d_rx_w);
+	DECLARE_WRITE_LINE_MEMBER(port_e_rx_w);
+	DECLARE_WRITE_LINE_MEMBER(port_f_rx_w);
+	DECLARE_WRITE_LINE_MEMBER(port_g_rx_w);
+	DECLARE_WRITE_LINE_MEMBER(port_h_rx_w);
 
 
 protected:

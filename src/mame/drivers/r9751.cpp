@@ -72,7 +72,7 @@
 
 #define TRACE_DEVICE 0x0
 
-#define ENABLE_TRACE_SMIOC 1
+#define ENABLE_TRACE_SMIOC 0
 
 #if ENABLE_TRACE_SMIOC
 #define TRACE_SMIOC_READ(address, data, reg, text) UnifiedTrace((address),(data)," Read", "SMIOC", (reg), (text))

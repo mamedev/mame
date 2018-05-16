@@ -15,6 +15,11 @@ Notes:
 	completed we will consider merging the devices if it's
 	practical.
 
+Quirks:
+	* Reading the RX Holding register will advance the HW FIFO even if
+	  there is no data to be read. This is not currently emulated but
+	  might be interesting to characterize in HW and emulate properly.
+
 *********************************************************************/
 
 
@@ -80,12 +85,20 @@ void scc2698b_channel::device_start()
 void scc2698b_channel::device_reset()
 {
 	reset_all();
+	recompute_pin_output(true);
 }
 
 void scc2698b_channel::rcv_complete()
 {
 	// Completed Byte Receive
 	receive_register_extract();
+
+	if (rx_enable == false)
+	{
+		// Skip receive
+		return;
+	}
+
 	int byte = get_received_char();
 	if (rx_bytecount >= SCC2698B_RX_FIFO_SIZE)
 	{
@@ -95,6 +108,7 @@ void scc2698b_channel::rcv_complete()
 	{
 		rx_fifo[rx_bytecount++] = byte;
 	}
+	recompute_pin_output();
 }
 void scc2698b_channel::tra_complete()
 {
@@ -108,6 +122,7 @@ void scc2698b_channel::tra_complete()
 	{
 		tx_transmitting = 0;
 	}
+	recompute_pin_output();
 }
 void scc2698b_channel::tra_callback()
 {
@@ -118,6 +133,11 @@ void scc2698b_channel::tra_callback()
 
 void scc2698b_channel::write_TXH(int txh)
 {
+	if (tx_enable == false)
+	{
+		logerror("Warning: TX Holding byte ignored because transmitter is disabled.\n");
+		return;
+	}
 	if (tx_transmitting)
 	{
 		if (tx_bytecount == 0)
@@ -140,6 +160,7 @@ void scc2698b_channel::write_TXH(int txh)
 		transmit_register_setup(txh);
 		tx_transmitting = 1;
 	}
+	recompute_pin_output();
 }
 
 int scc2698b_channel::read_RXH()
@@ -157,6 +178,7 @@ int scc2698b_channel::read_RXH()
 			rx_fifo[i - 1] = rx_fifo[i];
 		}
 		rx_bytecount--;
+		recompute_pin_output();
 		return byte;
 	}
 }
@@ -173,17 +195,88 @@ void scc2698b_channel::reset_tx()
 	tx_fifo = 0;
 	tx_bytecount = 0;
 	transmit_register_reset();
+	set_tx_enable(false);
 }
 void scc2698b_channel::reset_rx()
 {
 	rx_bytecount = 0;
 	receive_register_reset();
+	set_rx_enable(false);
+}
+
+void scc2698b_channel::set_tx_enable(bool enable)
+{
+	tx_enable = enable;
+	recompute_pin_output();
+}
+void scc2698b_channel::set_rx_enable(bool enable)
+{
+	if (rx_enable == false && enable == true)
+	{
+		receive_register_reset();
+	}
+	rx_enable = enable;
+	recompute_pin_output();
 }
 
 
 void scc2698b_channel::update_serial_configuration()
 {
+	// void set_data_frame(int start_bit_count, int data_bit_count, parity_t parity, stop_bits_t stop_bits);
+	
+	// Note: unimplemented RTS/CTS control, Error mode bit.
 
+	int start_bit_count = 1;
+
+	int data_bit_count = (MR1 & 3) + 5;
+
+	parity_t parity_mode = PARITY_NONE;
+	switch ((MR1 >> 3) & 3)
+	{
+	case 0: // Parity enabled
+		parity_mode = (MR1 & 4) ? PARITY_ODD : PARITY_EVEN;
+		break;
+	case 1: // Force parity (force parity bit to a constant)
+		parity_mode = (MR1 & 4) ? PARITY_MARK : PARITY_SPACE;
+		break;
+	case 2: // No parity
+		parity_mode = PARITY_NONE;
+		break;
+	default:
+		logerror("Warning: Unsupported special parity mode selected.\n");
+		break;
+	}
+
+	stop_bits_t stop_bits;
+	int stopbitlength = MR2 & 0x0F;
+	// Round up to the next highest even bit length.
+	// In reality there are a variety of options.
+	if (stopbitlength < 8)
+	{
+		stop_bits = STOP_BITS_1;
+	}
+	else
+	{
+		stop_bits = STOP_BITS_2;
+	}
+
+	// Check the channel mode
+	switch ((MR2 >> 6) & 3)
+	{
+	case 0: // Normal
+		break;
+	case 1: // Auto-Echo (receive, and repeat RX line to TX)
+	case 2: // Local loopback (TX=1, RX ignored, receive bytes written to TX through internal loopback)
+	case 3: // Remote loop (No receiving, but repeat RX line to TX)
+		logerror("Warning: Unsupported channel mode selected.\n");
+	}
+
+	const char* parity_strings[] = { "None", "Odd", "Even", "Mark", "Space" };
+	const char* stop_bit_strings[] = { "0","1","1.5","2" };
+	logerror("Reconfigured channel to %d data bits, %s Parity, %s stop bits\n", data_bit_count, parity_strings[parity_mode], stop_bit_strings[stop_bits]);
+
+
+	set_data_frame(start_bit_count, data_bit_count, parity_mode, stop_bits);
 }
 
 
@@ -195,6 +288,56 @@ void scc2698b_channel::set_tx_bittime(const attotime &bittime)
 void scc2698b_channel::set_rx_bittime(const attotime &bittime)
 {
 	set_rcv_rate(bittime);
+}
+
+
+int scc2698b_channel::read_SR()
+{
+	int data = SR;
+
+	// Compute dynamic bits of SR
+	data &= 0xF0; // Clear dynamic bits
+
+	// SR(3) TxEMT Transmitter empty
+	if (tx_enable && tx_transmitting == 0) data |= 0x08;
+	// SR(2) TxRDY Transmitter Ready
+	if (tx_enable && tx_bytecount == 0) data |= 0x04;
+	// SR(1) FFULL RX Fifo Full
+	if (rx_bytecount == SCC2698B_RX_FIFO_SIZE) data |= 0x02;
+	// SR(0) RxRDY Receiver Ready (Data has been received)
+	if (rx_bytecount > 0) data |= 0x01;
+
+	return data;
+}
+
+void scc2698b_channel::set_mpp_output(bool output)
+{
+	mpp_is_output = output;
+	recompute_pin_output();
+}
+
+void scc2698b_channel::recompute_pin_output(bool force)
+{
+	int new_mpp1 = 0, new_mpp2 = 0;
+	int SR = read_SR();
+	if (mpp_is_output)
+	{
+		// TxRDY
+		new_mpp1 = (SR & 4) ? 1 : 0;
+		// RxRDY
+		new_mpp2 = (SR & 1) ? 1 : 0;
+
+		if (new_mpp1 != mpp1_value || force)
+		{
+			write_mpp1(new_mpp1);
+			mpp1_value = new_mpp1;
+		}
+		if (new_mpp2 != mpp2_value || force)
+		{
+			write_mpp2(new_mpp2);
+			mpp2_value = new_mpp2;
+		}
+	}
 }
 
 
@@ -240,6 +383,7 @@ void scc2698b_device::device_start()
 	write_intr_B.resolve_safe();
 	write_intr_C.resolve_safe();
 	write_intr_D.resolve_safe();
+
 }
 
 
@@ -379,7 +523,13 @@ void scc2698b_device::write_reg(int offset, uint8_t data)
 		break;
 	case 13: // OPCRA
 		TRACE_REGISTER_WRITE(offset, data, "OPCRA");
-
+		// Set the MPP pin input/ouput based on OPCR bit 7
+		{
+			scc2698b_channel* channel = get_channel(device * 2);
+			channel->set_mpp_output(!!(data & 0x80));
+			channel = get_channel(device * 2 + 1);
+			channel->set_mpp_output(!!(data & 0x80));
+		}
 		break;
 	case 14: // Reserved
 		TRACE_REGISTER_WRITE(offset, data, "Reserved");
@@ -389,6 +539,16 @@ void scc2698b_device::write_reg(int offset, uint8_t data)
 		break;
 	}
 }
+
+WRITE_LINE_MEMBER(scc2698b_device::port_a_rx_w) { m_channel_a->rx_w(state); }
+WRITE_LINE_MEMBER(scc2698b_device::port_b_rx_w) { m_channel_b->rx_w(state); }
+WRITE_LINE_MEMBER(scc2698b_device::port_c_rx_w) { m_channel_c->rx_w(state); }
+WRITE_LINE_MEMBER(scc2698b_device::port_d_rx_w) { m_channel_d->rx_w(state); }
+WRITE_LINE_MEMBER(scc2698b_device::port_e_rx_w) { m_channel_e->rx_w(state); }
+WRITE_LINE_MEMBER(scc2698b_device::port_f_rx_w) { m_channel_f->rx_w(state); }
+WRITE_LINE_MEMBER(scc2698b_device::port_g_rx_w) { m_channel_g->rx_w(state); }
+WRITE_LINE_MEMBER(scc2698b_device::port_h_rx_w) { m_channel_h->rx_w(state); }
+
 
 scc2698b_channel* scc2698b_device::get_channel(int port)
 {
@@ -441,7 +601,7 @@ void scc2698b_device::write_MR(int port, int value)
 	}
 	channel->moderegister_ptr = !channel->moderegister_ptr;
 
-	// todo: Change channel serial configuration
+	channel->update_serial_configuration();
 }
 void scc2698b_device::write_CSR(int port, int value)
 {
@@ -454,6 +614,23 @@ void scc2698b_device::write_CR(int port, int value)
 {
 	scc2698b_channel* channel = get_channel(port);
 	// Todo: enable/disable TX/RX
+	if (value & 1) // Enable RX
+	{
+		channel->set_rx_enable(true);
+	}
+	if (value & 2) // Disable RX
+	{
+		channel->set_rx_enable(false);
+	}
+	if (value & 4) // Enable TX
+	{
+		channel->set_tx_enable(true);
+	}
+	if (value & 8) // Disable TX
+	{
+		channel->set_tx_enable(false);
+	}
+
 
 	switch (value >> 4)
 	{
@@ -488,12 +665,12 @@ int scc2698b_device::read_MR(int port)
 	int data = 0;
 	if (channel->moderegister_ptr == 0)
 	{
-		// Write MR1
+		// Read MR1
 		data = channel->MR1;
 	}
 	else
 	{
-		// Write MR2
+		// Read MR2
 		data = channel->MR2;
 	}
 
@@ -503,22 +680,7 @@ int scc2698b_device::read_MR(int port)
 int scc2698b_device::read_SR(int port)
 {
 	scc2698b_channel* channel = get_channel(port);
-
-	int data = channel->SR;
-
-	// Compute dynamic bits of SR
-	data &= 0xF0; // Clear dynamic bits
-
-	// SR(3) TxEMT Transmitter empty
-	if (channel->tx_transmitting == 0) data |= 0x08;
-	// SR(2) TxRDY Transmitter Ready
-	if (channel->tx_bytecount == 0) data |= 0x04;
-	// SR(1) FFULL RX Fifo Full
-	if (channel->rx_bytecount == SCC2698B_RX_FIFO_SIZE) data |= 0x02;
-	// SR(0) RxRDY Receiver Ready (Data has been received)
-	if (channel->rx_bytecount > 0) data |= 0x01;
-
-	return data;
+	return channel->read_SR();
 }
 int scc2698b_device::read_RHR(int port)
 {
@@ -556,10 +718,14 @@ attotime scc2698b_device::generate_baudrate(int block, int tx, int table_index)
 
 		if (divider == 0)
 		{
+			logerror("Unimplemented baud rate selected. (%d)\n", table_index);
 			return attotime::never;
 		}
 
-		return attotime::from_hz(configured_clock()) / (divider * 8);
+		int frequency = configured_clock() / (divider * 8);
+		logerror("Set %s baud rate to %dHz (clock divider = %d)\n", tx ? "Transmit" : "Receive", frequency, divider * 8);
+
+		return attotime::from_hz(configured_clock()) * (divider * 8);
 	}
 	else
 	{
