@@ -604,11 +604,9 @@ void sound_stream::generate_samples(int samples)
 {
 	stream_sample_t **inputs = nullptr;
 	stream_sample_t **outputs = nullptr;
-	// if we're already there, skip it
-	if (samples <= 0)
-		return;
 
 	VPRINTF(("generate_samples(%p, %d)\n", (void *) this, samples));
+	assert(samples > 0);
 
 	// ensure all inputs are up to date and generate resampled data
 	for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
