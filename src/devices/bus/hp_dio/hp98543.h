@@ -44,7 +44,7 @@ private:
 	static constexpr int m_h_pix = 1024;
 	static constexpr int m_v_pix = 400;
 
-	uint8_t *m_rom;
+	required_region_ptr<uint8_t> m_rom;
 	std::vector<uint8_t> m_vram;
 };
 

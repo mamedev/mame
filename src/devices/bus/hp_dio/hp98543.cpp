@@ -70,7 +70,8 @@ dio16_98543_device::dio16_98543_device(const machine_config &mconfig, device_typ
 	device_t(mconfig, type, tag, owner, clock),
 	device_dio16_card_interface(mconfig, *this),
 	m_topcat(*this, "topcat%u", 0),
-	m_nereid(*this, "nereid")
+	m_nereid(*this, "nereid"),
+	m_rom(*this, HP98543_ROM_REGION)
 {
 	m_vram.resize(0x80000);
 }
@@ -78,8 +79,6 @@ dio16_98543_device::dio16_98543_device(const machine_config &mconfig, device_typ
 void dio16_98543_device::device_start()
 {
 	set_dio_device();
-
-	m_rom = device().machine().root_device().memregion(this->subtag(HP98543_ROM_REGION).c_str())->base();
 
 	m_dio->install_memory(
 			0x200000, 0x2fffff,
