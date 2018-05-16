@@ -308,8 +308,8 @@ public:
 	DECLARE_READ8_MEMBER(dpram_byte_r);
 	DECLARE_WRITE8_MEMBER(dpram_byte_w);
 	DECLARE_READ8_MEMBER(ack_mcu_vbl_r);
-	DECLARE_MACHINE_START(gollygho);
-	DECLARE_MACHINE_RESET(sgunner2);
+	void machine_start_gollygho();
+	void machine_reset_sgunner2();
 	void init_cosmogng();
 	void init_sgunner2();
 	void init_kyukaidk();
