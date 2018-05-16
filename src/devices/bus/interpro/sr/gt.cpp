@@ -1429,6 +1429,7 @@ void gt_device_base::write_vram(const gt_t &gt, const offs_t offset, const u8 da
 
 		buffer_write(gt, offset >> 2, data << shift_amount, 0xff << shift_amount);
 	}
-	else
-		gt.buffer[offset] = data;
+	else {
+		gt.buffer[offset & GT_BUFFER_MASK] = data;
+	}
 }
