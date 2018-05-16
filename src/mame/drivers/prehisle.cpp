@@ -190,7 +190,7 @@ static const gfx_layout spritelayout =
 	128*8   /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( prehisle )
+static GFXDECODE_START( gfx_prehisle )
 	GFXDECODE_ENTRY( "chars",   0, charlayout,  0, 16 )
 	GFXDECODE_ENTRY( "bgtiles", 0, tilelayout, 768, 16 )
 	GFXDECODE_ENTRY( "fgtiles", 0, tilelayout, 512, 16 )
@@ -219,7 +219,7 @@ MACHINE_CONFIG_START(prehisle_state::prehisle)
 	MCFG_SCREEN_UPDATE_DRIVER(prehisle_state, screen_update_prehisle)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", prehisle)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_prehisle)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -400,8 +400,8 @@ ROM_END
 /******************************************************************************/
 
 
-GAME( 1989, prehisle,  0,        prehisle, prehisle, prehisle_state, 0, ROT0, "SNK",                  "Prehistoric Isle in 1930 (World)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, prehisleu, prehisle, prehisle, prehisle, prehisle_state, 0, ROT0, "SNK",                  "Prehistoric Isle in 1930 (US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1989, prehislek, prehisle, prehisle, prehisle, prehisle_state, 0, ROT0, "SNK (Victor license)", "Prehistoric Isle in 1930 (Korea)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gensitou,  prehisle, prehisle, prehisle, prehisle_state, 0, ROT0, "SNK",                  "Genshi-Tou 1930's",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1989, prehisleb, prehisle, prehisle, prehisle, prehisle_state, 0, ROT0, "bootleg",              "Prehistoric Isle in 1930 (World, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, prehisle,  0,        prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK",                  "Prehistoric Isle in 1930 (World)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, prehisleu, prehisle, prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK",                  "Prehistoric Isle in 1930 (US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, prehislek, prehisle, prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK (Victor license)", "Prehistoric Isle in 1930 (Korea)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gensitou,  prehisle, prehisle, prehisle, prehisle_state, empty_init, ROT0, "SNK",                  "Genshi-Tou 1930's",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, prehisleb, prehisle, prehisle, prehisle, prehisle_state, empty_init, ROT0, "bootleg",              "Prehistoric Isle in 1930 (World, bootleg)", MACHINE_SUPPORTS_SAVE )

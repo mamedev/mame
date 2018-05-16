@@ -83,8 +83,8 @@ public:
 	DECLARE_READ8_MEMBER(nmi_porta_r);
 	DECLARE_READ8_MEMBER(nmi_portb_r);
 	TIMER_CALLBACK_MEMBER(pio_timer);
-	DECLARE_DRIVER_INIT(p7_lcd);
-	DECLARE_DRIVER_INIT(p7_raster);
+	void init_p7_lcd();
+	void init_p7_raster();
 	DECLARE_VIDEO_START(pasopia7);
 	DECLARE_PALETTE_INIT(p7_lcd);
 	uint32_t screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -743,7 +743,7 @@ static const gfx_layout p7_chars_16x16 =
 	16*16
 };
 
-static GFXDECODE_START( pasopia7 )
+static GFXDECODE_START( gfx_pasopia7 )
 	GFXDECODE_ENTRY( "font",   0x00000, p7_chars_8x8,    0, 0x10 )
 	GFXDECODE_ENTRY( "kanji",  0x00000, p7_chars_16x16,  0, 0x10 )
 GFXDECODE_END
@@ -981,7 +981,7 @@ MACHINE_CONFIG_START(pasopia7_state::p7_raster)
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pasopia7 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia7)
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", VDP_CLOCK) /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -1002,7 +1002,7 @@ MACHINE_CONFIG_START(pasopia7_state::p7_lcd)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(pasopia7_state,p7_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pasopia7 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia7)
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", LCD_CLOCK) /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -1058,14 +1058,14 @@ ROM_START( pasopia7lcd )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(pasopia7_state,p7_raster)
+void pasopia7_state::init_p7_raster()
 {
 	m_screen_type = 1;
 	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
 	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
-DRIVER_INIT_MEMBER(pasopia7_state,p7_lcd)
+void pasopia7_state::init_p7_lcd()
 {
 	m_screen_type = 0;
 	m_pio_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pasopia7_state::pio_timer), this));
@@ -1075,5 +1075,5 @@ DRIVER_INIT_MEMBER(pasopia7_state,p7_lcd)
 
 /* Driver */
 
-COMP( 1983, pasopia7,    0,        0,       p7_raster,     pasopia7, pasopia7_state,   p7_raster,  "Toshiba", "Pasopia 7 (Raster)", MACHINE_NOT_WORKING )
-COMP( 1983, pasopia7lcd, pasopia7, 0,       p7_lcd,        pasopia7, pasopia7_state,   p7_lcd,     "Toshiba", "Pasopia 7 (LCD)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, pasopia7,    0,        0, p7_raster, pasopia7, pasopia7_state, init_p7_raster, "Toshiba", "Pasopia 7 (Raster)", MACHINE_NOT_WORKING )
+COMP( 1983, pasopia7lcd, pasopia7, 0, p7_lcd,    pasopia7, pasopia7_state, init_p7_lcd,    "Toshiba", "Pasopia 7 (LCD)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

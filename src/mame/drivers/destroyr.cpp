@@ -429,7 +429,7 @@ static const gfx_layout destroyr_waves_layout =
 };
 
 
-static GFXDECODE_START( destroyr )
+static GFXDECODE_START( gfx_destroyr )
 	GFXDECODE_ENTRY( "gfx1", 0, destroyr_alpha_num_layout, 4, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, destroyr_minor_object_layout, 4, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, destroyr_major_object_layout, 0, 1 )
@@ -491,7 +491,7 @@ MACHINE_CONFIG_START(destroyr_state::destroyr)
 	MCFG_SCREEN_UPDATE_DRIVER(destroyr_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", destroyr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_destroyr)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(destroyr_state, destroyr)
 
@@ -549,5 +549,5 @@ ROM_START( destroyr1 )
 ROM_END
 
 
-GAMEL( 1977, destroyr,  0,        destroyr, destroyr, destroyr_state, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )
-GAMEL( 1977, destroyr1, destroyr, destroyr, destroyr, destroyr_state, 0, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )
+GAMEL( 1977, destroyr,  0,        destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )
+GAMEL( 1977, destroyr1, destroyr, destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_destroyr )

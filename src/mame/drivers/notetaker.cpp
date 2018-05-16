@@ -171,7 +171,7 @@ public:
 	// mem map stuff
 	DECLARE_READ16_MEMBER(iop_r);
 	DECLARE_WRITE16_MEMBER(iop_w);
-	DECLARE_DRIVER_INIT(notetakr);
+	void init_notetakr();
 	//variables
 	//  IPConReg
 	uint8_t m_BootSeqDone;
@@ -862,7 +862,7 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(notetaker_state,notetakr)
+void notetaker_state::init_notetakr()
 {
 	// descramble the rom; the whole thing is a gigantic scrambled mess either to ease
 	// interfacing with older xerox technologies which used A0 and D0 as the MSB bits
@@ -870,16 +870,13 @@ DRIVER_INIT_MEMBER(notetaker_state,notetakr)
 	// see http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/schematics/19790423_Notetaker_IO_Processor.pdf pages 12 and onward
 	uint16_t *romsrc = (uint16_t *)(memregion("iopload")->base());
 	uint16_t *romdst = (uint16_t *)(memregion("iop")->base());
-	uint16_t *temppointer;
-	uint16_t wordtemp;
-	uint16_t addrtemp;
 	// leave the src pointer alone, since we've only used a 0x1000 long address space
 	romdst += 0x7f800; // set the dest pointer to 0xff000 (>>1 because 16 bits data)
 	for (int i = 0; i < 0x800; i++)
 	{
-		wordtemp = bitswap<16>(*romsrc, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); // data bus is completely reversed
-		addrtemp = bitswap<11>(i, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10); // address bus is completely reversed; 11-15 should always be zero
-		temppointer = romdst+(addrtemp&0x7FF);
+		uint16_t wordtemp = bitswap<16>(*romsrc, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); // data bus is completely reversed
+		uint16_t addrtemp = bitswap<11>(i, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10); // address bus is completely reversed; 11-15 should always be zero
+		uint16_t *temppointer = romdst+(addrtemp&0x7FF);
 		*temppointer = wordtemp;
 		romsrc++;
 	}
@@ -951,6 +948,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     STATE            INIT      COMPANY  FULLNAME     FLAGS
-COMP( 1978, notetakr,  0,      0,      notetakr, notetakr, notetaker_state, notetakr, "Xerox", "NoteTaker", MACHINE_IS_SKELETON)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT           COMPANY  FULLNAME     FLAGS
+COMP( 1978, notetakr, 0,      0,      notetakr, notetakr, notetaker_state, init_notetakr, "Xerox", "NoteTaker", MACHINE_IS_SKELETON)
 

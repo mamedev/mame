@@ -794,8 +794,7 @@ MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	// Cassette drive
 	SPEAKER(config, "cass_out").front_center();
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// GROM library
 	MCFG_GROM_ADD( TI998_SYSGROM0_TAG, 0, TI998_SYSGROM_REG, 0x0000, WRITELINE(TI998_MAINBOARD_TAG, bus::ti99::internal::mainboard8_device, system_grom_ready))
@@ -924,6 +923,6 @@ ROM_END
 
 #define rom_ti99_8e rom_ti99_8
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE      INPUT   STATE         INIT  COMPANY              FULLNAME                     FLAGS
-COMP( 1983, ti99_8,  0,      0,      ti99_8_60hz, ti99_8, ti99_8_state, 0,    "Texas Instruments", "TI-99/8 Computer (US)",     MACHINE_SUPPORTS_SAVE )
-COMP( 1983, ti99_8e, ti99_8, 0,      ti99_8_50hz, ti99_8, ti99_8_state, 0,    "Texas Instruments", "TI-99/8 Computer (Europe)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE      INPUT   CLASS         INIT        COMPANY              FULLNAME                     FLAGS
+COMP( 1983, ti99_8,  0,      0,      ti99_8_60hz, ti99_8, ti99_8_state, empty_init, "Texas Instruments", "TI-99/8 Computer (US)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, ti99_8e, ti99_8, 0,      ti99_8_50hz, ti99_8, ti99_8_state, empty_init, "Texas Instruments", "TI-99/8 Computer (Europe)", MACHINE_SUPPORTS_SAVE )

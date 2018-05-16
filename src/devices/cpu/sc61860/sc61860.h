@@ -135,7 +135,7 @@ private:
 	emu_timer *m_2ms_tick_timer;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	int m_icount;
 	uint8_t m_ram[0x100]; // internal special ram, should be 0x60, 0x100 to avoid memory corruption for now
 

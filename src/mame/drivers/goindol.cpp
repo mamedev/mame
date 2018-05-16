@@ -212,7 +212,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( goindol )
+static GFXDECODE_START( gfx_goindol )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 32 )
 GFXDECODE_END
@@ -256,7 +256,7 @@ MACHINE_CONFIG_START(goindol_state::goindol)
 	MCFG_SCREEN_UPDATE_DRIVER(goindol_state, screen_update_goindol)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goindol)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goindol)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
@@ -378,7 +378,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(goindol_state,goindol)
+void goindol_state::init_goindol()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -409,7 +409,7 @@ DRIVER_INIT_MEMBER(goindol_state,goindol)
 
 
 
-GAME( 1987, goindol,  0,       goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, goindolu, goindol, goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (US)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, goindolk, goindol, goindol, goindol, goindol_state, goindol, ROT90, "SunA",    "Goindol (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, homo,     goindol, goindol, homo,    goindol_state, 0,       ROT90, "bootleg", "Homo",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, goindol,  0,       goindol, goindol, goindol_state, init_goindol, ROT90, "SunA",    "Goindol (World)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, goindolu, goindol, goindol, goindol, goindol_state, init_goindol, ROT90, "SunA",    "Goindol (US)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, goindolk, goindol, goindol, goindol, goindol_state, init_goindol, ROT90, "SunA",    "Goindol (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, homo,     goindol, goindol, homo,    goindol_state, empty_init,   ROT90, "bootleg", "Homo",            MACHINE_SUPPORTS_SAVE )

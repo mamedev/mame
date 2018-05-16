@@ -9,7 +9,7 @@ driver by David Haywood & Angelo Salese
 TODO:
 - finish dip-switches;
 - a bunch of unemulated writes at 0xe***
-- sound gets screwy if you coin it up with demo sounds on and during demo play (sound 
+- sound gets screwy if you coin it up with demo sounds on and during demo play (sound
   overlaps);
 
 ======================================================================================
@@ -265,7 +265,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static const gfx_layout tiles16x32_layout = 
+static const gfx_layout tiles16x32_layout =
 {
 	16,32,
 	RGN_FRAC(1,3),
@@ -280,7 +280,7 @@ static const gfx_layout tiles16x32_layout =
 	64*8
 };
 
-static GFXDECODE_START( sub )
+static GFXDECODE_START( gfx_sub )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x80 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x32_layout, 0, 0x80 )
 GFXDECODE_END
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(sub_state::sub)
 	MCFG_DEVICE_PROGRAM_MAP(subm_sound_map)
 	MCFG_DEVICE_IO_MAP(subm_sound_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(sub_state, sound_irq,  120) //???
-	
+
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, sub_state, int_mask_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, sub_state, flipscreen_w))
@@ -334,7 +334,7 @@ MACHINE_CONFIG_START(sub_state::sub)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sub_state, main_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sub)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sub)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
 	MCFG_PALETTE_INIT_OWNER(sub_state, sub)
@@ -387,4 +387,4 @@ ROM_START( sub )
 	ROM_LOAD( "prom pos c8 n82s129",      0x0600, 0x100, CRC(351e1ef8) SHA1(530c9012ff5abda1c4ba9787ca999ca1ae1a893d) )
 ROM_END
 
-GAME( 1985, sub,  0,    sub, sub, sub_state,  0, ROT270, "Sigma Enterprises Inc.", "Submarine (Sigma)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sub, 0, sub, sub, sub_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Submarine (Sigma)", MACHINE_SUPPORTS_SAVE )

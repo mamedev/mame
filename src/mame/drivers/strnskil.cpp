@@ -326,7 +326,7 @@ static const gfx_layout spritelayout =
 	8*8*4
 };
 
-static GFXDECODE_START( strnskil )
+static GFXDECODE_START( gfx_strnskil )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout,   512, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0,   64 )
 GFXDECODE_END
@@ -368,7 +368,7 @@ MACHINE_CONFIG_START(strnskil_state::strnskil)
 	MCFG_SCREEN_UPDATE_DRIVER(strnskil_state, screen_update_strnskil)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", strnskil)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_strnskil)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(strnskil_state, strnskil)
@@ -533,7 +533,7 @@ ROM_START( banbam )
 	ROM_LOAD( "sun-8212.ic3", 0x000,  0x800, BAD_DUMP CRC(8869611e) SHA1(c6443f3bcb0cdb4d7b1b19afcbfe339c300f36aa) )
 ROM_END
 
-DRIVER_INIT_MEMBER(strnskil_state,pettanp)
+void strnskil_state::init_pettanp()
 {
 //  AM_RANGE(0xd80c, 0xd80c) AM_WRITENOP     /* protection reset? */
 //  AM_RANGE(0xd80d, 0xd80d) AM_WRITE(protection_w) /* protection data write (pettanp) */
@@ -545,14 +545,14 @@ DRIVER_INIT_MEMBER(strnskil_state,pettanp)
 
 }
 
-DRIVER_INIT_MEMBER(strnskil_state,banbam)
+void strnskil_state::init_banbam()
 {
 	/* Fujitsu MB8841 4-Bit MCU */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(strnskil_state::banbam_protection_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd80d, 0xd80d, write8_delegate(FUNC(strnskil_state::protection_w),this));
 }
 
-GAME( 1984, strnskil, 0,        strnskil, strnskil, strnskil_state, 0,       ROT0, "Sun Electronics", "Strength & Skill",    MACHINE_SUPPORTS_SAVE )
-GAME( 1984, guiness,  strnskil, strnskil, strnskil, strnskil_state, 0,       ROT0, "Sun Electronics", "The Guiness (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, banbam,   0,        banbam,   banbam,   strnskil_state, banbam,  ROT0, "Sun Electronics", "BanBam",              MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, pettanp,  banbam,   strnskil, banbam,   strnskil_state, pettanp, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, strnskil, 0,        strnskil, strnskil, strnskil_state, empty_init,   ROT0, "Sun Electronics", "Strength & Skill",    MACHINE_SUPPORTS_SAVE )
+GAME( 1984, guiness,  strnskil, strnskil, strnskil, strnskil_state, empty_init,   ROT0, "Sun Electronics", "The Guiness (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, banbam,   0,        banbam,   banbam,   strnskil_state, init_banbam,  ROT0, "Sun Electronics", "BanBam",              MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pettanp,  banbam,   strnskil, banbam,   strnskil_state, init_pettanp, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

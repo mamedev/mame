@@ -592,11 +592,11 @@ static const gfx_layout xerox820_gfxlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( xerox820 )
+static GFXDECODE_START( gfx_xerox820 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, xerox820_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( xerox820ii )
+static GFXDECODE_START( gfx_xerox820ii )
 	GFXDECODE_ENTRY( "chargen", 0x0000, xerox820_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "chargen", 0x0800, xerox820_gfxlayout, 0, 1 )
 GFXDECODE_END
@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(10'694'250), 700, 0, 560, 260, 0, 240)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xerox820)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xerox820)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
@@ -691,7 +691,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820ii_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(10'694'250), 700, 0, 560, 260, 0, 240)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xerox820ii)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xerox820ii)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -892,10 +892,10 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     STATE             INIT  COMPANY                       FULLNAME        FLAGS
-COMP( 1980, bigboard, 0,        0,      bigboard,   xerox820, bigboard_state,   0,    "Digital Research Computers", "Big Board",    0 )
-COMP( 1981, x820,     bigboard, 0,      xerox820,   xerox820, xerox820_state,   0,    "Xerox",                      "Xerox 820",    MACHINE_NO_SOUND_HW )
-COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   0,    "Scomar",                     "MK-82",        0 )
-COMP( 1983, x820ii,   0,        0,      xerox820ii, xerox820, xerox820ii_state, 0,    "Xerox",                      "Xerox 820-II", MACHINE_NOT_WORKING )
-COMP( 1983, x168,     x820ii,   0,      xerox168,   xerox820, xerox820ii_state, 0,    "Xerox",                      "Xerox 16/8",   MACHINE_NOT_WORKING )
-COMP( 1983, mk83,     x820ii,   0,      mk83,       xerox820, xerox820_state,   0,    "Scomar",                     "MK-83",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     CLASS             INIT        COMPANY                       FULLNAME        FLAGS
+COMP( 1980, bigboard, 0,        0,      bigboard,   xerox820, bigboard_state,   empty_init, "Digital Research Computers", "Big Board",    0 )
+COMP( 1981, x820,     bigboard, 0,      xerox820,   xerox820, xerox820_state,   empty_init, "Xerox",                      "Xerox 820",    MACHINE_NO_SOUND_HW )
+COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   empty_init, "Scomar",                     "MK-82",        0 )
+COMP( 1983, x820ii,   0,        0,      xerox820ii, xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 820-II", MACHINE_NOT_WORKING )
+COMP( 1983, x168,     x820ii,   0,      xerox168,   xerox820, xerox820ii_state, empty_init, "Xerox",                      "Xerox 16/8",   MACHINE_NOT_WORKING )
+COMP( 1983, mk83,     x820ii,   0,      mk83,       xerox820, xerox820_state,   empty_init, "Scomar",                     "MK-83",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

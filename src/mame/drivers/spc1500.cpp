@@ -911,8 +911,7 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spc1500_state, psga_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, spc1500_state, psgb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, spc1500_state, centronics_busy_w))
@@ -948,5 +947,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT  COMPANY    FULLNAME    FLAGS
-COMP( 1987, spc1500,  0,      0,       spc1500,   spc1500, spc1500_state, 0,    "Samsung", "SPC-1500", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME    FLAGS
+COMP( 1987, spc1500, 0,      0,      spc1500, spc1500, spc1500_state, empty_init, "Samsung", "SPC-1500", 0 )

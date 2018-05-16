@@ -372,7 +372,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( fuuki16 )
+static GFXDECODE_START( gfx_fuuki16 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x400*2, 0x40 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x400*0, 0x40 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8, 0x400*1, 0x40 ) // [2] Layer 1
@@ -463,7 +463,7 @@ MACHINE_CONFIG_START(fuuki16_state::fuuki16)
 	MCFG_SCREEN_UPDATE_DRIVER(fuuki16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fuuki16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fuuki16)
 	MCFG_PALETTE_ADD("palette", 0x4000 / 2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -665,6 +665,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995, gogomile,  0,        fuuki16, gogomile,  fuuki16_state, 0, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gogomileo, gogomile, fuuki16, gogomileo, fuuki16_state, 0, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, pbancho,   0,        fuuki16, pbancho,   fuuki16_state, 0, ROT0, "Fuuki", "Gyakuten!! Puzzle Bancho (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gogomile,  0,        fuuki16, gogomile,  fuuki16_state, empty_init, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gogomileo, gogomile, fuuki16, gogomileo, fuuki16_state, empty_init, ROT0, "Fuuki", "Susume! Mile Smile / Go Go! Mile Smile (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, pbancho,   0,        fuuki16, pbancho,   fuuki16_state, empty_init, ROT0, "Fuuki", "Gyakuten!! Puzzle Bancho (Japan)",               MACHINE_SUPPORTS_SAVE )

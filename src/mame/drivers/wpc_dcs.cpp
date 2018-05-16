@@ -42,12 +42,12 @@ public:
 	DECLARE_WRITE8_MEMBER(switches_w);
 
 	void init();
-	DECLARE_DRIVER_INIT(dm);
-	DECLARE_DRIVER_INIT(ij);
-	DECLARE_DRIVER_INIT(jd);
-	DECLARE_DRIVER_INIT(pop);
-	DECLARE_DRIVER_INIT(sttng);
-	DECLARE_DRIVER_INIT(afv);
+	void init_dm();
+	void init_ij();
+	void init_jd();
+	void init_pop();
+	void init_sttng();
+	void init_afv();
 
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
@@ -254,42 +254,42 @@ void wpc_dcs_state::init()
 	// survive reload some days after unscathed.
 }
 
-DRIVER_INIT_MEMBER(wpc_dcs_state, dm)
+void wpc_dcs_state::init_dm()
 {
 	lamp->set_names(nullptr);
 	out->set_names(nullptr);
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_dcs_state, ij)
+void wpc_dcs_state::init_ij()
 {
 	lamp->set_names(nullptr);
 	out->set_names(nullptr);
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_dcs_state, jd)
+void wpc_dcs_state::init_jd()
 {
 	lamp->set_names(nullptr);
 	out->set_names(nullptr);
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_dcs_state, pop)
+void wpc_dcs_state::init_pop()
 {
 	lamp->set_names(nullptr);
 	out->set_names(nullptr);
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_dcs_state, sttng)
+void wpc_dcs_state::init_sttng()
 {
 	lamp->set_names(nullptr);
 	out->set_names(nullptr);
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_dcs_state, afv)
+void wpc_dcs_state::init_afv()
 {
 	lamp->set_names(nullptr);
 	out->set_names(nullptr);
@@ -869,35 +869,35 @@ ROM_START(afv_l4)
 	ROM_LOAD16_BYTE("afv_su2.l1", 0x000000, 0x080000, CRC(1aa878fc) SHA1(59a89071001b5da6ab56d691721a015773f5f0b5))
 ROM_END
 
-GAME(1994,  dm_lx4,     0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, dm,    ROT0,   "Williams",  "Demolition Man (LX-4)",                            MACHINE_MECHANICAL)
-GAME(1994,  dm_pa2,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, dm,    ROT0,   "Williams",  "Demolition Man (PA-2)",                            MACHINE_MECHANICAL)
-GAME(1994,  dm_px5,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, dm,    ROT0,   "Williams",  "Demolition Man (PX-5)",                            MACHINE_MECHANICAL)
-GAME(1994,  dm_la1,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, dm,    ROT0,   "Williams",  "Demolition Man (LA-1)",                            MACHINE_MECHANICAL)
-GAME(1994,  dm_lx3,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, dm,    ROT0,   "Williams",  "Demolition Man (LX-3)",                            MACHINE_MECHANICAL)
-GAME(1995,  dm_h5,      dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, dm,    ROT0,   "Williams",  "Demolition Man (H-5)",                             MACHINE_MECHANICAL)
-GAME(1995,  dm_h6,      dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, dm,    ROT0,   "Williams",  "Demolition Man (H-6)",                             MACHINE_MECHANICAL)
-GAME(1993,  ij_l7,      0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, ij,    ROT0,   "Williams",  "Indiana Jones (L-7)",                              MACHINE_MECHANICAL)
-GAME(1993,  ij_lg7,     ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, ij,    ROT0,   "Williams",  "Indiana Jones (LG-7)",                             MACHINE_MECHANICAL)
-GAME(1993,  ij_l6,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, ij,    ROT0,   "Williams",  "Indiana Jones (L-6)",                              MACHINE_MECHANICAL)
-GAME(1993,  ij_l5,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, ij,    ROT0,   "Williams",  "Indiana Jones (L-5)",                              MACHINE_MECHANICAL)
-GAME(1993,  ij_l4,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, ij,    ROT0,   "Williams",  "Indiana Jones (L-4)",                              MACHINE_MECHANICAL)
-GAME(1993,  ij_l3,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, ij,    ROT0,   "Williams",  "Indiana Jones (L-3)",                              MACHINE_MECHANICAL)
-GAME(1993,  jd_l7,      0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, jd,    ROT0,   "Bally",     "Judge Dredd (L-7)",                                MACHINE_MECHANICAL)
-GAME(1993,  jd_l1,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, jd,    ROT0,   "Bally",     "Judge Dredd (L-1)",                                MACHINE_MECHANICAL)
-GAME(1993,  jd_l6,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, jd,    ROT0,   "Bally",     "Judge Dredd (L-6)",                                MACHINE_MECHANICAL)
-GAME(1993,  jd_l5,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, jd,    ROT0,   "Bally",     "Judge Dredd (L-5)",                                MACHINE_MECHANICAL)
-GAME(1993,  jd_l4,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, jd,    ROT0,   "Bally",     "Judge Dredd (L-4)",                                MACHINE_MECHANICAL)
-GAME(1994,  pop_lx5,    0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, pop,   ROT0,   "Bally",     "Popeye Saves The Earth (LX-5)",                    MACHINE_MECHANICAL)
-GAME(1994,  pop_la4,    pop_lx5,    wpc_dcs,    wpc_dcs, wpc_dcs_state, pop,   ROT0,   "Bally",     "Popeye Saves The Earth (LA-4)",                    MACHINE_MECHANICAL)
-GAME(1994,  pop_pa3,    pop_lx5,    wpc_dcs,    wpc_dcs, wpc_dcs_state, pop,   ROT0,   "Bally",     "Popeye Saves The Earth (PA-3)",                    MACHINE_MECHANICAL)
-GAME(1994,  sttng_l7,   0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-7)",            MACHINE_MECHANICAL)
-GAME(1994,  sttng_x7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-7 Special)",    MACHINE_MECHANICAL)
-GAME(1993,  sttng_p8,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (P-8)",             MACHINE_MECHANICAL)
-GAME(1993,  sttng_p5,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (P-5)",             MACHINE_MECHANICAL)
-GAME(1993,  sttng_p4,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (P-4)",             MACHINE_MECHANICAL)
-GAME(1994,  sttng_s7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-7) SP1",        MACHINE_MECHANICAL)
-GAME(1994,  sttng_g7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LG-7)",            MACHINE_MECHANICAL)
-GAME(1993,  sttng_l1,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-1)",            MACHINE_MECHANICAL)
-GAME(1993,  sttng_l2,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-2)",            MACHINE_MECHANICAL)
-GAME(1994,  sttng_l3,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-3)",            MACHINE_MECHANICAL)
-GAME(1993,  afv_l4,     0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, afv,   ROT0,   "Williams",  "Addams Family Values (Coin Dropper L-4)",          MACHINE_MECHANICAL)
+GAME(1994,  dm_lx4,     0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, init_dm,    ROT0,   "Williams",  "Demolition Man (LX-4)",                            MACHINE_MECHANICAL)
+GAME(1994,  dm_pa2,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, init_dm,    ROT0,   "Williams",  "Demolition Man (PA-2)",                            MACHINE_MECHANICAL)
+GAME(1994,  dm_px5,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, init_dm,    ROT0,   "Williams",  "Demolition Man (PX-5)",                            MACHINE_MECHANICAL)
+GAME(1994,  dm_la1,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, init_dm,    ROT0,   "Williams",  "Demolition Man (LA-1)",                            MACHINE_MECHANICAL)
+GAME(1994,  dm_lx3,     dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, init_dm,    ROT0,   "Williams",  "Demolition Man (LX-3)",                            MACHINE_MECHANICAL)
+GAME(1995,  dm_h5,      dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, init_dm,    ROT0,   "Williams",  "Demolition Man (H-5)",                             MACHINE_MECHANICAL)
+GAME(1995,  dm_h6,      dm_lx4,     wpc_dcs,    wpc_dcs, wpc_dcs_state, init_dm,    ROT0,   "Williams",  "Demolition Man (H-6)",                             MACHINE_MECHANICAL)
+GAME(1993,  ij_l7,      0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, init_ij,    ROT0,   "Williams",  "Indiana Jones (L-7)",                              MACHINE_MECHANICAL)
+GAME(1993,  ij_lg7,     ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_ij,    ROT0,   "Williams",  "Indiana Jones (LG-7)",                             MACHINE_MECHANICAL)
+GAME(1993,  ij_l6,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_ij,    ROT0,   "Williams",  "Indiana Jones (L-6)",                              MACHINE_MECHANICAL)
+GAME(1993,  ij_l5,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_ij,    ROT0,   "Williams",  "Indiana Jones (L-5)",                              MACHINE_MECHANICAL)
+GAME(1993,  ij_l4,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_ij,    ROT0,   "Williams",  "Indiana Jones (L-4)",                              MACHINE_MECHANICAL)
+GAME(1993,  ij_l3,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_ij,    ROT0,   "Williams",  "Indiana Jones (L-3)",                              MACHINE_MECHANICAL)
+GAME(1993,  jd_l7,      0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, init_jd,    ROT0,   "Bally",     "Judge Dredd (L-7)",                                MACHINE_MECHANICAL)
+GAME(1993,  jd_l1,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_jd,    ROT0,   "Bally",     "Judge Dredd (L-1)",                                MACHINE_MECHANICAL)
+GAME(1993,  jd_l6,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_jd,    ROT0,   "Bally",     "Judge Dredd (L-6)",                                MACHINE_MECHANICAL)
+GAME(1993,  jd_l5,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_jd,    ROT0,   "Bally",     "Judge Dredd (L-5)",                                MACHINE_MECHANICAL)
+GAME(1993,  jd_l4,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_jd,    ROT0,   "Bally",     "Judge Dredd (L-4)",                                MACHINE_MECHANICAL)
+GAME(1994,  pop_lx5,    0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, init_pop,   ROT0,   "Bally",     "Popeye Saves The Earth (LX-5)",                    MACHINE_MECHANICAL)
+GAME(1994,  pop_la4,    pop_lx5,    wpc_dcs,    wpc_dcs, wpc_dcs_state, init_pop,   ROT0,   "Bally",     "Popeye Saves The Earth (LA-4)",                    MACHINE_MECHANICAL)
+GAME(1994,  pop_pa3,    pop_lx5,    wpc_dcs,    wpc_dcs, wpc_dcs_state, init_pop,   ROT0,   "Bally",     "Popeye Saves The Earth (PA-3)",                    MACHINE_MECHANICAL)
+GAME(1994,  sttng_l7,   0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, init_sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-7)",            MACHINE_MECHANICAL)
+GAME(1994,  sttng_x7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, init_sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-7 Special)",    MACHINE_MECHANICAL)
+GAME(1993,  sttng_p8,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, init_sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (P-8)",             MACHINE_MECHANICAL)
+GAME(1993,  sttng_p5,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, init_sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (P-5)",             MACHINE_MECHANICAL)
+GAME(1993,  sttng_p4,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, init_sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (P-4)",             MACHINE_MECHANICAL)
+GAME(1994,  sttng_s7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, init_sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-7) SP1",        MACHINE_MECHANICAL)
+GAME(1994,  sttng_g7,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, init_sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LG-7)",            MACHINE_MECHANICAL)
+GAME(1993,  sttng_l1,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, init_sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-1)",            MACHINE_MECHANICAL)
+GAME(1993,  sttng_l2,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, init_sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-2)",            MACHINE_MECHANICAL)
+GAME(1994,  sttng_l3,   sttng_l7,   wpc_dcs,    wpc_dcs, wpc_dcs_state, init_sttng, ROT0,   "Williams",  "Star Trek: The Next Generation (LX-3)",            MACHINE_MECHANICAL)
+GAME(1993,  afv_l4,     0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, init_afv,   ROT0,   "Williams",  "Addams Family Values (Coin Dropper L-4)",          MACHINE_MECHANICAL)

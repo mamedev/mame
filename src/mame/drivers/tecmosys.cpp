@@ -435,7 +435,7 @@ static const gfx_layout gfxlayout2 =
 	16*16*4
 };
 
-static GFXDECODE_START( tecmosys )
+static GFXDECODE_START( gfx_tecmosys )
 	GFXDECODE_ENTRY( "layer0", 0, gfxlayout,   0x4400, 0x40 )
 	GFXDECODE_ENTRY( "layer1", 0, gfxlayout2,  0x4000, 0x40 )
 	GFXDECODE_ENTRY( "layer2", 0, gfxlayout2,  0x4000, 0x40 )
@@ -466,7 +466,7 @@ MACHINE_CONFIG_START(tecmosys_state::tecmosys)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tecmosys)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tecmosys)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
@@ -659,24 +659,24 @@ void tecmosys_state::descramble()
 	}
 }
 
-DRIVER_INIT_MEMBER(tecmosys_state,deroon)
+void tecmosys_state::init_deroon()
 {
 	descramble();
 	prot_init(0); // machine/tecmosys.c
 }
 
-DRIVER_INIT_MEMBER(tecmosys_state,tkdensho)
+void tecmosys_state::init_tkdensho()
 {
 	descramble();
 	prot_init(1);
 }
 
-DRIVER_INIT_MEMBER(tecmosys_state,tkdensha)
+void tecmosys_state::init_tkdensha()
 {
 	descramble();
 	prot_init(2);
 }
 
-GAME( 1995, deroon,           0, tecmosys, tecmosys, tecmosys_state, deroon,     ROT0, "Tecmo", "Deroon DeroDero",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, tkdensho,         0, tecmosys, tecmosys, tecmosys_state, tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, tkdenshoa, tkdensho, tecmosys, tecmosys, tecmosys_state, tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, deroon,           0, tecmosys, tecmosys, tecmosys_state, init_deroon,     ROT0, "Tecmo", "Deroon DeroDero",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tkdensho,         0, tecmosys, tecmosys, tecmosys_state, init_tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tkdenshoa, tkdensho, tecmosys, tecmosys, tecmosys_state, init_tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

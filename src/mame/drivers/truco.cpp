@@ -472,5 +472,5 @@ ROM_START( truco )
 	ROM_LOAD( "truco.u2",   0x0c000, 0x4000, CRC(ff355750) SHA1(1538f20b1919928ffca439e4046a104ddfbc756c) )
 ROM_END
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT    STATE          INIT  ROT   COMPANY           FULLNAME      FLAGS
-GAME( 198?, truco,   0,      truco,   truco,   truco_state,   0,    ROT0, "Playtronic SRL", "Truco-Tron", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  MACHINE  INPUT    STATE        INIT         ROT   COMPANY           FULLNAME      FLAGS
+GAME( 198?, truco,   0,      truco,   truco,   truco_state, empty_init, ROT0, "Playtronic SRL", "Truco-Tron", MACHINE_SUPPORTS_SAVE )

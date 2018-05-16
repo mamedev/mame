@@ -642,7 +642,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( tigeroad )
+static GFXDECODE_START( gfx_tigeroad )
 	GFXDECODE_ENTRY( "text", 0, text_layout,      0x300, 16 )
 	GFXDECODE_ENTRY( "tiles", 0, tile_layout,     0x100, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )
@@ -673,7 +673,7 @@ MACHINE_CONFIG_START(tigeroad_state::tigeroad)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tigeroad)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tigeroad)
 
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 
@@ -751,7 +751,7 @@ MACHINE_CONFIG_START(tigeroad_state::f1dream_comad)
 
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tigeroad)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tigeroad)
 
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 
@@ -1263,21 +1263,21 @@ ROM_END
 /***************************************************************************/
 
 
-GAME( 1987, tigeroad, 0,        tigeroad, tigeroad, tigeroad_state, 0,       ROT0, "Capcom", "Tiger Road (US)", 0 )
-GAME( 1987, tigeroadu,tigeroad, tigeroad, tigeroad, tigeroad_state, 0,       ROT0, "Capcom (Romstar license)", "Tiger Road (US, Romstar license)", 0 )
-GAME( 1987, toramich, tigeroad, toramich, toramich, tigeroad_state, 0,       ROT0, "Capcom", "Tora e no Michi (Japan)", 0 )
-GAME( 1987, tigeroadb,tigeroad, tigeroad, tigeroad, tigeroad_state, 0,       ROT0, "bootleg", "Tiger Road (US bootleg)", 0 )
+GAME( 1987, tigeroad, 0,        tigeroad, tigeroad, tigeroad_state, empty_init, ROT0, "Capcom", "Tiger Road (US)", 0 )
+GAME( 1987, tigeroadu,tigeroad, tigeroad, tigeroad, tigeroad_state, empty_init, ROT0, "Capcom (Romstar license)", "Tiger Road (US, Romstar license)", 0 )
+GAME( 1987, toramich, tigeroad, toramich, toramich, tigeroad_state, empty_init, ROT0, "Capcom", "Tora e no Michi (Japan)", 0 )
+GAME( 1987, tigeroadb,tigeroad, tigeroad, tigeroad, tigeroad_state, empty_init, ROT0, "bootleg", "Tiger Road (US bootleg)", 0 )
 
 /* F1 Dream has an Intel 8751 microcontroller for protection */
-GAME( 1988, f1dream,  0,        f1dream,      f1dream,  f1dream_state,  0,       ROT0, "Capcom (Romstar license)", "F-1 Dream", 0 )
-GAME( 1988, f1dreamb, f1dream,  tigeroad,     f1dream,  tigeroad_state, 0,       ROT0, "bootleg", "F-1 Dream (bootleg, set 1)", 0 )
-GAME( 1988, f1dreamba,f1dream,  tigeroad,     f1dream,  tigeroad_state, 0,       ROT0, "bootleg", "F-1 Dream (bootleg, set 2)", 0 )
+GAME( 1988, f1dream,  0,        f1dream,      f1dream,  f1dream_state,  empty_init, ROT0, "Capcom (Romstar license)", "F-1 Dream", 0 )
+GAME( 1988, f1dreamb, f1dream,  tigeroad,     f1dream,  tigeroad_state, empty_init, ROT0, "bootleg", "F-1 Dream (bootleg, set 1)", 0 )
+GAME( 1988, f1dreamba,f1dream,  tigeroad,     f1dream,  tigeroad_state, empty_init, ROT0, "bootleg", "F-1 Dream (bootleg, set 2)", 0 )
 
 /* This Comad hardware is based around the F1 Dream design */
-GAME( 1990, pushman,  0,        pushman, pushman,   pushman_state,  0,       ROT0, "Comad", "Pushman (Korea, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pushmana, pushman,  pushman, pushman,   pushman_state,  0,       ROT0, "Comad", "Pushman (Korea, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pushmans, pushman,  pushman, pushman,   pushman_state,  0,       ROT0, "Comad (American Sammy license)", "Pushman (American Sammy license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pushmant, pushman,  pushman, pushman,   pushman_state,  0,       ROT0, "Comad (Top Tronic license)", "Pushman (Top Tronic license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushman,  0,        pushman, pushman,   pushman_state, empty_init, ROT0, "Comad", "Pushman (Korea, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushmana, pushman,  pushman, pushman,   pushman_state, empty_init, ROT0, "Comad", "Pushman (Korea, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushmans, pushman,  pushman, pushman,   pushman_state, empty_init, ROT0, "Comad (American Sammy license)", "Pushman (American Sammy license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pushmant, pushman,  pushman, pushman,   pushman_state, empty_init, ROT0, "Comad (Top Tronic license)", "Pushman (Top Tronic license)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, bballs,   0,        bballs,  bballs,    pushman_state,  0,       ROT0, "Comad", "Bouncing Balls", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, bballsa,  bballs,   bballs,  bballs,    pushman_state,  0,       ROT0, "Comad", "Bouncing Balls (Adult)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bballs,   0,        bballs,  bballs,    pushman_state, empty_init, ROT0, "Comad", "Bouncing Balls", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bballsa,  bballs,   bballs,  bballs,    pushman_state, empty_init, ROT0, "Comad", "Bouncing Balls (Adult)", MACHINE_SUPPORTS_SAVE )

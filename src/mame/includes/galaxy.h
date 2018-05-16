@@ -27,8 +27,8 @@ public:
 
 	DECLARE_READ8_MEMBER(galaxy_keyboard_r);
 	DECLARE_WRITE8_MEMBER(galaxy_latch_w);
-	DECLARE_DRIVER_INIT(galaxy);
-	DECLARE_DRIVER_INIT(galaxyp);
+	void init_galaxy();
+	void init_galaxyp();
 	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(galaxy);
 	DECLARE_MACHINE_RESET(galaxyp);

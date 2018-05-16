@@ -509,8 +509,7 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.1), RES_K(330)) // oneshot caps + res: C53 0.1u - R25 330k
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", CASSETTE_TAG).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(11'980'800)/2/2)
@@ -592,5 +591,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE         INIT    COMPANY              FULLNAME    FLAGS
-COMP( 1978, abc80,  0,      0,      abc80,  0,     abc80_state,  0,      "Luxor Datorer AB",  "ABC 80",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY             FULLNAME  FLAGS
+COMP( 1978, abc80, 0,      0,      abc80,   0,     abc80_state,  empty_init, "Luxor Datorer AB", "ABC 80", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

@@ -679,6 +679,6 @@ ROM_START( mp68a ) // ROM image from http://elektronikforumet.com/forum/viewtopi
 	ROM_LOAD( "didactb.bin", 0x0a00, 0x0200, CRC(592898dc) SHA1(2962f4817712cae97f3ab37b088fc73e66535ff8) )
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS         INIT        COMPANY             FULLNAME            FLAGS
-COMP( 1979, mp68a,      0,          0,      mp68a,      mp68a,  mp68a_state,  0,          "Didact AB",        "mp68a",            MACHINE_NO_SOUND_HW )
-COMP( 1983, md6802,     0,          0,      md6802,     md6802, md6802_state, 0,          "Didact AB",        "Mikrodator 6802",  MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME           FLAGS
+COMP( 1979, mp68a,  0,      0,      mp68a,   mp68a,  mp68a_state,  empty_init, "Didact AB", "mp68a",           MACHINE_NO_SOUND_HW )
+COMP( 1983, md6802, 0,      0,      md6802,  md6802, md6802_state, empty_init, "Didact AB", "Mikrodator 6802", MACHINE_NO_SOUND_HW )

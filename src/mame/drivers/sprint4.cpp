@@ -373,7 +373,7 @@ static const gfx_layout car_layout =
 };
 
 
-static GFXDECODE_START( sprint4 )
+static GFXDECODE_START( gfx_sprint4 )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1, 0, 5 )
 	GFXDECODE_ENTRY( "gfx2", 0, car_layout, 0, 5 )
 GFXDECODE_END
@@ -395,7 +395,7 @@ MACHINE_CONFIG_START(sprint4_state::sprint4)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint4_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprint4)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sprint4)
 	MCFG_PALETTE_ADD("palette", 10)
 	MCFG_PALETTE_INDIRECT_ENTRIES(6)
 	MCFG_PALETTE_INIT_OWNER(sprint4_state, sprint4)
@@ -461,5 +461,5 @@ ROM_START( sprint4a )
 ROM_END
 
 
-GAME( 1977, sprint4,  0,       sprint4,  sprint4, sprint4_state,  0, ROT180, "Atari", "Sprint 4 (set 1)", MACHINE_SUPPORTS_SAVE ) /* large cars */
-GAME( 1977, sprint4a, sprint4, sprint4,  sprint4, sprint4_state,  0, ROT180, "Atari", "Sprint 4 (set 2)", MACHINE_SUPPORTS_SAVE ) /* small cars */
+GAME( 1977, sprint4,  0,       sprint4,  sprint4, sprint4_state, empty_init, ROT180, "Atari", "Sprint 4 (set 1)", MACHINE_SUPPORTS_SAVE ) /* large cars */
+GAME( 1977, sprint4a, sprint4, sprint4,  sprint4, sprint4_state, empty_init, ROT180, "Atari", "Sprint 4 (set 2)", MACHINE_SUPPORTS_SAVE ) /* small cars */

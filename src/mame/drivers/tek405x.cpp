@@ -1251,7 +1251,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    STATE          INIT  COMPANY      FULLNAME           FLAGS
-COMP( 1975, tek4051,    0,       0,      tek4051,    tek4051, tek4051_state, 0,    "Tektronix", "Tektronix 4051",  MACHINE_NOT_WORKING )
-COMP( 1978, tek4052a,   tek4051, 0,      tek4052,    tek4051, tek4052_state, 0,    "Tektronix", "Tektronix 4052A", MACHINE_NOT_WORKING )
-//COMP( 1979, tek4054,  tek4051, 0,      tek4054,    tek4054, tek4052_state, 0,    "Tektronix", "Tektronix 4054",  MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME           FLAGS
+COMP( 1975, tek4051,   0,       0,      tek4051, tek4051, tek4051_state, empty_init, "Tektronix", "Tektronix 4051",  MACHINE_NOT_WORKING )
+COMP( 1978, tek4052a,  tek4051, 0,      tek4052, tek4051, tek4052_state, empty_init, "Tektronix", "Tektronix 4052A", MACHINE_NOT_WORKING )
+//COMP( 1979, tek4054,   tek4051, 0,      tek4054, tek4054, tek4052_state, empty_init, "Tektronix", "Tektronix 4054",  MACHINE_NOT_WORKING )

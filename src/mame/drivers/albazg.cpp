@@ -133,7 +133,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( yumefuda )
+static GFXDECODE_START( gfx_yumefuda )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 8 )
 GFXDECODE_END
 
@@ -390,7 +390,7 @@ MACHINE_CONFIG_START(albazg_state::yumefuda)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yumefuda )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yumefuda )
 	MCFG_PALETTE_ADD("palette", 0x80)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -423,4 +423,4 @@ ROM_START( yumefuda )
 	ROM_LOAD("zg1-007.u13", 0x000, 0x100, NO_DUMP ) //could be either PROM or PAL
 ROM_END
 
-GAME( 1991, yumefuda, 0, yumefuda, yumefuda, albazg_state, 0, ROT0, "Alba", "Yumefuda [BET]", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, yumefuda, 0, yumefuda, yumefuda, albazg_state, empty_init, ROT0, "Alba", "Yumefuda [BET]", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

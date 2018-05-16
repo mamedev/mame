@@ -1070,13 +1070,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, spacduel, 0,        spacduel, spacduel, bwidow_state, 0, ROT0, "Atari", "Space Duel (version 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacduel1,spacduel, spacduel, spacduel, bwidow_state, 0, ROT0, "Atari", "Space Duel (version 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacduel0,spacduel, spacduel, spacduel, bwidow_state, 0, ROT0, "Atari", "Space Duel (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bwidow,   0,        bwidow,   bwidow,   bwidow_state, 0, ROT0, "Atari", "Black Widow", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bwidowp,  bwidow,   bwidowp,  bwidow,   bwidow_state, 0, ROT0, "Atari", "Black Widow (prototype)", MACHINE_NOT_WORKING )
-GAME( 1982, gravitar, 0,        gravitar, gravitar, bwidow_state, 0, ROT0, "Atari", "Gravitar (version 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, gravitar2,gravitar, gravitar, gravitar, bwidow_state, 0, ROT0, "Atari", "Gravitar (version 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, gravitar1,gravitar, gravitar, gravitar, bwidow_state, 0, ROT0, "Atari", "Gravitar (version 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, lunarbat, gravitar, gravitar, gravitar, bwidow_state, 0, ROT0, "Atari", "Lunar Battle (prototype, later)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, lunarba1, gravitar, lunarbat, lunarbat, bwidow_state, 0, ROT0, "Atari", "Lunar Battle (prototype, earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacduel,  0,        spacduel, spacduel, bwidow_state, empty_init, ROT0, "Atari", "Space Duel (version 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacduel1, spacduel, spacduel, spacduel, bwidow_state, empty_init, ROT0, "Atari", "Space Duel (version 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacduel0, spacduel, spacduel, spacduel, bwidow_state, empty_init, ROT0, "Atari", "Space Duel (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bwidow,    0,        bwidow,   bwidow,   bwidow_state, empty_init, ROT0, "Atari", "Black Widow", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bwidowp,   bwidow,   bwidowp,  bwidow,   bwidow_state, empty_init, ROT0, "Atari", "Black Widow (prototype)", MACHINE_NOT_WORKING )
+GAME( 1982, gravitar,  0,        gravitar, gravitar, bwidow_state, empty_init, ROT0, "Atari", "Gravitar (version 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, gravitar2, gravitar, gravitar, gravitar, bwidow_state, empty_init, ROT0, "Atari", "Gravitar (version 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, gravitar1, gravitar, gravitar, gravitar, bwidow_state, empty_init, ROT0, "Atari", "Gravitar (version 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, lunarbat,  gravitar, gravitar, gravitar, bwidow_state, empty_init, ROT0, "Atari", "Lunar Battle (prototype, later)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, lunarba1,  gravitar, lunarbat, lunarbat, bwidow_state, empty_init, ROT0, "Atari", "Lunar Battle (prototype, earlier)", MACHINE_SUPPORTS_SAVE )

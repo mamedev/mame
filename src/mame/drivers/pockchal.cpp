@@ -129,5 +129,5 @@ MACHINE_CONFIG_END
 ROM_START( pockchal )
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT  COMPANY                FULLNAME                      FLAGS
-CONS( 199?, pockchal, 0,      0,      pockchalv1, pockchalv1, pockchalv1_state, 0,    "Benesse Corporation", "Pocket Challenge W (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                FULLNAME                      FLAGS
+CONS( 199?, pockchal, 0,      0,      pockchalv1, pockchalv1, pockchalv1_state, empty_init, "Benesse Corporation", "Pocket Challenge W (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -219,7 +219,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( shuuz )
+static GFXDECODE_START( gfx_shuuz )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 16 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,    0, 16 )      /* sprites & playfield */
 GFXDECODE_END
@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(shuuz_state::shuuz)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shuuz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shuuz)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
@@ -350,5 +350,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1990, shuuz,  0,     shuuz, shuuz,  shuuz_state,  0, ROT0, "Atari Games", "Shuuz (version 8.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, shuuz_state,  0, ROT0, "Atari Games", "Shuuz (version 7.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, shuuz,  0,     shuuz, shuuz,  shuuz_state, empty_init, ROT0, "Atari Games", "Shuuz (version 8.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, shuuz_state, empty_init, ROT0, "Atari Games", "Shuuz (version 7.1)", MACHINE_SUPPORTS_SAVE )

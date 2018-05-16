@@ -308,15 +308,6 @@ void hle_device_base::device_reset()
 	receive_register_reset();
 	transmit_register_reset();
 
-	// start with keyboard LEDs off
-	machine().output().set_led_value(LED_DISK, 0);
-	machine().output().set_led_value(LED_LOCK, 0);
-	machine().output().set_led_value(LED_UNKNOWN, 0);
-	machine().output().set_led_value(LED_L1, 0);
-	machine().output().set_led_value(LED_L2, 0);
-	machine().output().set_led_value(LED_L3, 0);
-	machine().output().set_led_value(LED_L4, 0);
-
 	// no beep
 	m_click_timer->reset();
 

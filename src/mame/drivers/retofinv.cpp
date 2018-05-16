@@ -394,7 +394,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( retofinv )
+static GFXDECODE_START( gfx_retofinv )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,             0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256*2,  64 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     64*16+256*2,  64 )
@@ -451,7 +451,7 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 	MCFG_SCREEN_UPDATE_DRIVER(retofinv_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", retofinv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_retofinv)
 	MCFG_PALETTE_ADD("palette", 256*2+64*16+64*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(retofinv_state, retofinv)
@@ -703,8 +703,8 @@ ROM_START( retofinvb3 ) // Italian bootleg PCB. Only maincpu ROMs differ from pa
 	ROM_LOAD_NIB_LOW ( "6353-1.c",  0x0400, 0x0400, CRC(77a7aaf6) SHA1(61a474f1ad09b89ff8302f2d903b86a90823116c) )
 ROM_END
 
-GAME( 1985, retofinv,   0,        retofinv,         retofinv, retofinv_state, 0, ROT90, "Taito Corporation", "Return of the Invaders",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb,  retofinv, retofinvb1,       retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg w/MCU)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb1, retofinv, retofinvb1_nomcu, retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb2, retofinv, retofinvb1_nomcu, retofin2, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, retofinvb3, retofinv, retofinvb_nomcu,  retofinv, retofinv_state, 0, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinv,   0,        retofinv,         retofinv, retofinv_state, empty_init, ROT90, "Taito Corporation", "Return of the Invaders",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb,  retofinv, retofinvb1,       retofinv, retofinv_state, empty_init, ROT90, "bootleg",           "Return of the Invaders (bootleg w/MCU)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb1, retofinv, retofinvb1_nomcu, retofinv, retofinv_state, empty_init, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb2, retofinv, retofinvb1_nomcu, retofin2, retofinv_state, empty_init, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinvb3, retofinv, retofinvb_nomcu,  retofinv, retofinv_state, empty_init, ROT90, "bootleg",           "Return of the Invaders (bootleg no MCU set 3)", MACHINE_SUPPORTS_SAVE )

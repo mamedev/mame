@@ -24,7 +24,7 @@ Oxx,yy          = Out port
 #include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/am9519.h"
 #include "machine/com8116.h"
 #include "machine/ram.h"
@@ -467,5 +467,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT  COMPANY                         FULLNAME        FLAGS
-COMP( 1983, superslv, 0,      0,      superslave, superslave, superslave_state, 0,    "Advanced Digital Corporation", "Super Slave",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                         FULLNAME        FLAGS
+COMP( 1983, superslv, 0,      0,      superslave, superslave, superslave_state, empty_init, "Advanced Digital Corporation", "Super Slave",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

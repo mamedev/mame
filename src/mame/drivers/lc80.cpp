@@ -443,7 +443,7 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY                FULLNAME                FLAGS
-COMP( 1984, lc80,   0,      0,      lc80,    lc80,  lc80_state, 0,    "VEB Mikroelektronik", "Lerncomputer LC 80",   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, lc80_2, lc80,   0,      lc80_2,  lc80,  lc80_state, 0,    "VEB Mikroelektronik", "Lerncomputer LC 80.2", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, sc80,   lc80,   0,      lc80_2,  lc80,  lc80_state, 0,    "VEB Mikroelektronik", "Schachcomputer SC-80", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                FULLNAME                FLAGS
+COMP( 1984, lc80,   0,      0,      lc80,    lc80,  lc80_state, empty_init, "VEB Mikroelektronik", "Lerncomputer LC 80",   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, lc80_2, lc80,   0,      lc80_2,  lc80,  lc80_state, empty_init, "VEB Mikroelektronik", "Lerncomputer LC 80.2", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, sc80,   lc80,   0,      lc80_2,  lc80,  lc80_state, empty_init, "VEB Mikroelektronik", "Schachcomputer SC-80", MACHINE_SUPPORTS_SAVE )

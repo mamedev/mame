@@ -52,7 +52,7 @@ public:
 		m_team(*this, "team")
 	{ }
 
-	DECLARE_DRIVER_INIT(decode);
+	void init_decode();
 	void tank8(machine_config &config);
 
 protected:

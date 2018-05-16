@@ -264,7 +264,7 @@ static const gfx_layout charlayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( vroulet )
+static GFXDECODE_START( gfx_vroulet )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,    0, 32 )
 GFXDECODE_END
 
@@ -304,7 +304,7 @@ MACHINE_CONFIG_START(vroulet_state::vroulet)
 	MCFG_SCREEN_UPDATE_DRIVER(vroulet_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vroulet)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vroulet)
 	MCFG_PALETTE_ADD("palette", 128*4)
 
 	// sound hardware
@@ -331,4 +331,4 @@ ROM_END
 
 /* Game Driver */
 
-GAME( 1989, vroulet, 0, vroulet, vroulet, vroulet_state, 0, ROT90, "World Game", "Vegas Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vroulet, 0, vroulet, vroulet, vroulet_state, empty_init, ROT90, "World Game", "Vegas Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

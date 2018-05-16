@@ -368,7 +368,7 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static GFXDECODE_START( sshangha )
+static GFXDECODE_START( gfx_sshangha )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0x200, 64 ) /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0x200, 64 ) /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 64 ) /* Sprites 16x16 */
@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(sshangha_state::sshangha)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sshangha_state, screen_update_sshangha)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sshangha)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sshangha)
 	MCFG_PALETTE_ADD("palette", 0x4000)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
@@ -497,7 +497,7 @@ ROM_START( sshanghab )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(sshangha_state,sshangha)
+void sshangha_state::init_sshangha()
 {
 #if SSHANGHA_HACK
 	/* This is a hack to allow you to use the extra features
@@ -514,5 +514,5 @@ DRIVER_INIT_MEMBER(sshangha_state,sshangha)
 }
 
 
-GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha_state, sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (Japan)", 0 )
-GAME( 1992, sshanghab,sshangha, sshanghb, sshangha, sshangha_state, sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", 0 )
+GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha_state, init_sshangha, ROT0, "Hot-B",   "Super Shanghai Dragon's Eye (Japan)", 0 )
+GAME( 1992, sshanghab,sshangha, sshanghb, sshangha, sshangha_state, init_sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", 0 )

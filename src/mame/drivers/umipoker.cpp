@@ -682,7 +682,7 @@ static const gfx_layout layout_8x8x4 =
 	8*8
 };
 
-static GFXDECODE_START( umipoker )
+static GFXDECODE_START( gfx_umipoker )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,     0, 0x40)
 GFXDECODE_END
 
@@ -715,7 +715,7 @@ MACHINE_CONFIG_START(umipoker_state::umipoker)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", 6))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", umipoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_umipoker)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
@@ -794,6 +794,6 @@ ROM_END
 *              Game Drivers               *
 ******************************************/
 
-//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE            INIT      ROT   COMPANY                  FULLNAME                                  FLAGS   LAYOUT
-GAME(  1997, umipoker,  0,        umipoker,  umipoker, umipoker_state,  0,        ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan)", 0 )                      // title screen is toggleable thru a dsw
-GAMEL( 1998, saiyukip,  0,        saiyukip,  saiyukip, saiyukip_state,  0,        ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",             0,      layout_saiyukip )
+//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT         ROT   COMPANY                  FULLNAME                                  FLAGS   LAYOUT
+GAME(  1997, umipoker,  0,        umipoker,  umipoker, umipoker_state, empty_init, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan)", 0 )                      // title screen is toggleable thru a dsw
+GAMEL( 1998, saiyukip,  0,        saiyukip,  saiyukip, saiyukip_state, empty_init, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",             0,      layout_saiyukip )

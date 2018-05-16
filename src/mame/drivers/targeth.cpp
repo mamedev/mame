@@ -85,7 +85,7 @@ static const gfx_layout tilelayout16_0x080000 =
 	32*8
 };
 
-static GFXDECODE_START( 0x080000 )
+static GFXDECODE_START( gfx_0x080000 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout16_0x080000, 0, 64 )
 GFXDECODE_END
 
@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(targeth_state::targeth)
 	MCFG_SCREEN_UPDATE_DRIVER(targeth_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x080000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x080000)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -384,6 +384,6 @@ ROM_START( targeth10 )
 	ROM_LOAD( "targeth.c3",     0x080000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
 ROM_END
 
-GAME( 1994, targeth,   0,       targeth, targeth, targeth_state, 0, ROT0, "Gaelco", "Target Hits (ver 1.1, Checksum 5152)", 0 )
-GAME( 1994, targetha,  targeth, targeth, targeth, targeth_state, 0, ROT0, "Gaelco", "Target Hits (ver 1.1, Checksum 86E1)", 0 )
-GAME( 1994, targeth10, targeth, targeth, targeth, targeth_state, 0, ROT0, "Gaelco", "Target Hits (ver 1.0, Checksum FBCB)", 0 )
+GAME( 1994, targeth,   0,       targeth, targeth, targeth_state, empty_init, ROT0, "Gaelco", "Target Hits (ver 1.1, Checksum 5152)", 0 )
+GAME( 1994, targetha,  targeth, targeth, targeth, targeth_state, empty_init, ROT0, "Gaelco", "Target Hits (ver 1.1, Checksum 86E1)", 0 )
+GAME( 1994, targeth10, targeth, targeth, targeth, targeth_state, empty_init, ROT0, "Gaelco", "Target Hits (ver 1.0, Checksum FBCB)", 0 )

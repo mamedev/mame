@@ -79,8 +79,8 @@ public:
 	DECLARE_WRITE8_MEMBER(spcking2_sound1_w);
 	DECLARE_WRITE8_MEMBER(spcking2_sound2_w);
 	DECLARE_WRITE8_MEMBER(spcking2_sound3_w);
-	DECLARE_DRIVER_INIT(kamikaze);
-	DECLARE_DRIVER_INIT(spcking2);
+	void init_kamikaze();
+	void init_spcking2();
 	DECLARE_MACHINE_START(kamikaze);
 	DECLARE_MACHINE_RESET(kamikaze);
 	DECLARE_MACHINE_START(spaceint);
@@ -838,14 +838,14 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(astinvad_state,kamikaze)
+void astinvad_state::init_kamikaze()
 {
 	/* the flip screen logic adds 32 to the Y after flipping */
 	m_flip_yoffs = 32;
 }
 
 
-DRIVER_INIT_MEMBER(astinvad_state,spcking2)
+void astinvad_state::init_spcking2()
 {
 	/* don't have the schematics, but the blanking must center the screen here */
 	m_flip_yoffs = 0;
@@ -859,9 +859,9 @@ DRIVER_INIT_MEMBER(astinvad_state,spcking2)
  *
  *************************************/
 
-GAME( 1980,  kamikaze, 0,        kamikaze, kamikaze,  astinvad_state, kamikaze, ROT270, "Leijac Corporation", "Kamikaze", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980,  astinvad, kamikaze, kamikaze, astinvad,  astinvad_state, kamikaze, ROT270, "Leijac Corporation (Stern Electronics license)", "Astro Invader", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980?, kosmokil, kamikaze, kamikaze, kamikaze,  astinvad_state, kamikaze, ROT270, "bootleg (BEM)", "Kosmo Killer", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
-GAME( 1979,  spcking2, 0,        spcking2, spcking2,  astinvad_state, spcking2, ROT270, "Konami", "Space King 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980,  spaceint, 0,        spaceint, spaceint,  astinvad_state, 0,        ROT90,  "Shoei", "Space Intruder", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980,  spaceintj,spaceint, spaceint, spaceintj, astinvad_state, 0,        ROT90,  "Shoei", "Space Intruder (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  kamikaze,  0,        kamikaze, kamikaze,  astinvad_state, init_kamikaze, ROT270, "Leijac Corporation", "Kamikaze", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  astinvad,  kamikaze, kamikaze, astinvad,  astinvad_state, init_kamikaze, ROT270, "Leijac Corporation (Stern Electronics license)", "Astro Invader", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980?, kosmokil,  kamikaze, kamikaze, kamikaze,  astinvad_state, init_kamikaze, ROT270, "bootleg (BEM)", "Kosmo Killer", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
+GAME( 1979,  spcking2,  0,        spcking2, spcking2,  astinvad_state, init_spcking2, ROT270, "Konami", "Space King 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  spaceint,  0,        spaceint, spaceint,  astinvad_state, empty_init,    ROT90,  "Shoei", "Space Intruder", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  spaceintj, spaceint, spaceint, spaceintj, astinvad_state, empty_init,    ROT90,  "Shoei", "Space Intruder (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

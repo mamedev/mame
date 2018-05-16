@@ -15,7 +15,6 @@
 #include "emu.h"
 #include "bus/cbus/pc9801_118.h"
 
-#include "machine/pic8259.h"
 #include "sound/2608intf.h"
 #include "speaker.h"
 
@@ -43,7 +42,7 @@ WRITE8_MEMBER(pc9801_118_device::opn_portb_w){ m_joy_sel = data; }
 WRITE_LINE_MEMBER(pc9801_118_device::pc9801_sound_irq)
 {
 	/* TODO: seems to die very often */
-	machine().device<pic8259_device>(":pic8259_slave")->ir4_w(state);
+	m_bus->int_w<5>(state);
 }
 
 //-------------------------------------------------

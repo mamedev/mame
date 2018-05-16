@@ -124,5 +124,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY      FULLNAME           FLAGS
-COMP( 1992, tekxp330, 0,      0,      tekxp330, tekxp330, tekxp330_state, 0,    "Tektronix", "TekXpress XP330", MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME           FLAGS
+COMP( 1992, tekxp330, 0,      0,      tekxp330, tekxp330, tekxp330_state, empty_init, "Tektronix", "TekXpress XP330", MACHINE_IS_SKELETON )

@@ -1058,13 +1058,13 @@ static const gfx_layout spyhunt_alphalayout =
 };
 
 
-static GFXDECODE_START( mcr3 )
+static GFXDECODE_START( gfx_mcr3 )
 	GFXDECODE_SCALE( "gfx1", 0, mcr_bg_layout,     0, 4, 2, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout, 0, 4 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( spyhunt )
+static GFXDECODE_START( gfx_spyhunt )
 	GFXDECODE_ENTRY( "gfx1", 0, spyhunt_charlayout,  3*16, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout,   0*16, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spyhunt_alphalayout, 4*16, 1 )
@@ -1110,7 +1110,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_mcr3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcr3)
 	MCFG_PALETTE_ADD("palette", 64)
 MACHINE_CONFIG_END
 
@@ -1170,7 +1170,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrscroll)
 	MCFG_SCREEN_SIZE(30*16, 30*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_spyhunt)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", spyhunt)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spyhunt)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+4)
 
@@ -1570,7 +1570,7 @@ void mcr3_state::mcr_common_init()
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,demoderm)
+void mcr3_state::init_demoderm()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(FUNC(mcr3_state::demoderm_ip1_r),this));
@@ -1579,14 +1579,14 @@ DRIVER_INIT_MEMBER(mcr3_state,demoderm)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,sarge)
+void mcr3_state::init_sarge()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(midway_turbo_cheap_squeak_device::write),m_turbo_cheap_squeak.target()));
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,maxrpm)
+void mcr3_state::init_maxrpm()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(FUNC(mcr3_state::maxrpm_ip1_r),this));
@@ -1601,7 +1601,7 @@ DRIVER_INIT_MEMBER(mcr3_state,maxrpm)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,rampage)
+void mcr3_state::init_rampage()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x04, read8_delegate(FUNC(mcr3_state::rampage_ip4_r),this));
@@ -1609,7 +1609,7 @@ DRIVER_INIT_MEMBER(mcr3_state,rampage)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,powerdrv)
+void mcr3_state::init_powerdrv()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(FUNC(mcr3_state::powerdrv_ip2_r),this));
@@ -1618,7 +1618,7 @@ DRIVER_INIT_MEMBER(mcr3_state,powerdrv)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,stargrds)
+void mcr3_state::init_stargrds()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(mcr3_state::stargrds_ip0_r),this));
@@ -1627,7 +1627,7 @@ DRIVER_INIT_MEMBER(mcr3_state,stargrds)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
+void mcr3_state::init_spyhunt()
 {
 	mcr_common_init();
 	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
@@ -1640,7 +1640,7 @@ DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
 
 
 
-DRIVER_INIT_MEMBER(mcr3_state,crater)
+void mcr3_state::init_crater()
 {
 	mcr_common_init();
 
@@ -1649,7 +1649,7 @@ DRIVER_INIT_MEMBER(mcr3_state,crater)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,turbotag)
+void mcr3_state::init_turbotag()
 {
 	mcr_common_init();
 	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
@@ -1675,16 +1675,16 @@ DRIVER_INIT_MEMBER(mcr3_state,turbotag)
  *************************************/
 
 /* MCR monoboard games */
-GAME( 1984, demoderm, demoderb, mono_tcs,  demoderm, mcr3_state, demoderm, ROT0,  "Bally Midway", "Demolition Derby (MCR-3 Mono Board Version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sarge,    0,        mono_tcs,  sarge,    mcr3_state, sarge,    ROT0,  "Bally Midway", "Sarge", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, maxrpm,   0,        maxrpm,    maxrpm,   mcr3_state, maxrpm,   ROT0,  "Bally Midway", "Max RPM (ver 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rampage,  0,        mono_sg,   rampage,  mcr3_state, rampage,  ROT0,  "Bally Midway", "Rampage (Rev 3, 8/27/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rampage2, rampage,  mono_sg,   rampage,  mcr3_state, rampage,  ROT0,  "Bally Midway", "Rampage (Rev 2, 8/4/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, powerdrv, 0,        mono_sg,   powerdrv, mcr3_state, powerdrv, ROT0,  "Bally Midway", "Power Drive", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, stargrds, 0,        mono_sg,   stargrds, mcr3_state, stargrds, ROT0,  "Bally Midway", "Star Guards", MACHINE_SUPPORTS_SAVE )
+GAME(  1984, demoderm, demoderb, mono_tcs,  demoderm, mcr3_state, init_demoderm, ROT0,  "Bally Midway", "Demolition Derby (MCR-3 Mono Board Version)", MACHINE_SUPPORTS_SAVE )
+GAME(  1985, sarge,    0,        mono_tcs,  sarge,    mcr3_state, init_sarge,    ROT0,  "Bally Midway", "Sarge", MACHINE_SUPPORTS_SAVE )
+GAME(  1986, maxrpm,   0,        maxrpm,    maxrpm,   mcr3_state, init_maxrpm,   ROT0,  "Bally Midway", "Max RPM (ver 2)", MACHINE_SUPPORTS_SAVE )
+GAME(  1986, rampage,  0,        mono_sg,   rampage,  mcr3_state, init_rampage,  ROT0,  "Bally Midway", "Rampage (Rev 3, 8/27/86)", MACHINE_SUPPORTS_SAVE )
+GAME(  1986, rampage2, rampage,  mono_sg,   rampage,  mcr3_state, init_rampage,  ROT0,  "Bally Midway", "Rampage (Rev 2, 8/4/86)", MACHINE_SUPPORTS_SAVE )
+GAME(  1986, powerdrv, 0,        mono_sg,   powerdrv, mcr3_state, init_powerdrv, ROT0,  "Bally Midway", "Power Drive", MACHINE_SUPPORTS_SAVE )
+GAME(  1987, stargrds, 0,        mono_sg,   stargrds, mcr3_state, init_stargrds, ROT0,  "Bally Midway", "Star Guards", MACHINE_SUPPORTS_SAVE )
 
 /* MCR scrolling games */
-GAMEL(1983, spyhunt,  0,        mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway", "Spy Hunter", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
-GAMEL(1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway (Playtronic license)", "Spy Hunter (Playtronic license)", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
-GAME( 1984, crater,   0,        mcrscroll, crater,   mcr3_state, crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", MACHINE_SUPPORTS_SAVE )
-GAMEL(1985, turbotag, 0,        mcrsc_csd, turbotag, mcr3_state, turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", MACHINE_SUPPORTS_SAVE, layout_turbotag )
+GAMEL( 1983, spyhunt,  0,        mcrsc_csd, spyhunt,  mcr3_state, init_spyhunt,  ROT90, "Bally Midway", "Spy Hunter", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
+GAMEL( 1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  mcr3_state, init_spyhunt,  ROT90, "Bally Midway (Playtronic license)", "Spy Hunter (Playtronic license)", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
+GAME(  1984, crater,   0,        mcrscroll, crater,   mcr3_state, init_crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1985, turbotag, 0,        mcrsc_csd, turbotag, mcr3_state, init_turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", MACHINE_SUPPORTS_SAVE, layout_turbotag )

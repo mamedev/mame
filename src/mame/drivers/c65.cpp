@@ -94,8 +94,8 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(c65);
-	DECLARE_DRIVER_INIT(c65);
-	DECLARE_DRIVER_INIT(c65pal);
+	void init_c65();
+	void init_c65pal();
 
 	INTERRUPT_GEN_MEMBER(vic3_vblank_irq);
 	void c65(machine_config &config);
@@ -648,7 +648,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( c65 )
+static GFXDECODE_START( gfx_c65 )
 	GFXDECODE_ENTRY( "maincpu", 0xd000, charlayout,     0, 16 ) // another identical copy is at 0x9000
 GFXDECODE_END
 
@@ -715,7 +715,7 @@ MACHINE_CONFIG_START(c65_state::c65)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK*4, 910, 0, 640, 262, 0, 200) // mods needed
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c65)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c65)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(c65_state, c65)
@@ -755,18 +755,18 @@ ROM_START( c64dx )
 	ROM_LOAD( "910429.bin", 0x0000, 0x20000, CRC(b025805c) SHA1(c3b05665684f74adbe33052a2d10170a1063ee7d) )
 ROM_END
 
-DRIVER_INIT_MEMBER(c65_state,c65)
+void c65_state::init_c65()
 {
 //  m_dma.version = 2;
 //  c65_common_driver_init();
 }
 
-DRIVER_INIT_MEMBER(c65_state,c65pal)
+void c65_state::init_c65pal()
 {
 //  m_dma.version = 1;
 //  c65_common_driver_init();
 //  m_pal = 1;
 }
 
-COMP( 1991, c65,    0,      0,      c65,    c65, c65_state, c65,    "Commodore Business Machines",  "Commodore 65 Development System (Prototype, NTSC)", MACHINE_NOT_WORKING )
-COMP( 1991, c64dx,  c65,    0,      c65,    c65, c65_state, c65pal, "Commodore Business Machines",  "Commodore 64DX Development System (Prototype, PAL, German)", MACHINE_NOT_WORKING )
+COMP( 1991, c65,   0,   0, c65, c65, c65_state, init_c65,    "Commodore Business Machines", "Commodore 65 Development System (Prototype, NTSC)",          MACHINE_NOT_WORKING )
+COMP( 1991, c64dx, c65, 0, c65, c65, c65_state, init_c65pal, "Commodore Business Machines", "Commodore 64DX Development System (Prototype, PAL, German)", MACHINE_NOT_WORKING )

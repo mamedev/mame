@@ -2347,12 +2347,12 @@ static const gfx_layout tilelayout =
 *          Graphics Decode Information           *
 *************************************************/
 
-static GFXDECODE_START( calomega )
+static GFXDECODE_START( gfx_calomega )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( sys906 )
+static GFXDECODE_START( gfx_sys906 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, tilelayout, 0, 32 )
 GFXDECODE_END
@@ -2597,7 +2597,7 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 	MCFG_SCREEN_UPDATE_DRIVER(calomega_state, screen_update_calomega)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", calomega)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_calomega)
 	MCFG_PALETTE_ADD("palette", 256) /* or 128? is the upper half of the PROMs really valid colors? */
 	MCFG_PALETTE_INIT_OWNER(calomega_state, calomega)
 
@@ -2684,7 +2684,7 @@ MACHINE_CONFIG_START(calomega_state::sys906)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, calomega_state, pia1_aout_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, calomega_state, pia1_bout_w))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", sys906)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sys906)
 
 	/* sound hardware */
 	MCFG_DEVICE_MODIFY("ay8912")
@@ -3651,25 +3651,25 @@ ROM_END
 *                  Driver Init                   *
 *************************************************/
 
-DRIVER_INIT_MEMBER(calomega_state,sys903)
+void calomega_state::init_sys903()
 {
 	save_item(NAME(m_tx_line));
 	save_item(NAME(m_s903_mux_data));
 }
 
-DRIVER_INIT_MEMBER(calomega_state,s903mod)
+void calomega_state::init_s903mod()
 {
 	save_item(NAME(m_s903_mux_data));
 }
 
-DRIVER_INIT_MEMBER(calomega_state,sys905)
+void calomega_state::init_sys905()
 {
 	save_item(NAME(m_s905_mux_data));
 }
 
-DRIVER_INIT_MEMBER(calomega_state,comg080)
+void calomega_state::init_comg080()
 {
-	DRIVER_INIT_CALL(sys903);
+	init_sys903();
 
 	/* Injecting missing Start and NMI vectors...
 	   Start = $2042;  NMI = $26f8;
@@ -3691,51 +3691,51 @@ DRIVER_INIT_MEMBER(calomega_state,comg080)
 *                  Game Drivers                  *
 *************************************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT     ROT    COMPANY                                  FULLNAME                                                    FLAGS   */
-GAME( 1981, comg074,  0,        sys903,   comg074,  calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.4 (Gaming Poker, W.Export)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1981, comg076,  0,        sys903,   comg076,  calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.6 (Arcade Poker)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1981, comg079,  0,        sys903,   comg076,  calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.9 (Arcade Poker)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1981, comg080,  0,        sys903,   arcadebj, calomega_state, comg080, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 8.0 (Arcade Black Jack)",                  MACHINE_SUPPORTS_SAVE )                          /* bad dump */
-GAME( 1981, comg094,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 9.4 (Keno)",                               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg107,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 10.7c (Big Game)",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg123,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.3 (Ticket Poker)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1982, comg125,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.5 (Bingo)",                             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg127,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.7 (Keno)",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg128,  0,        sys903,   comg128,  calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.8 (Arcade Game)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg134,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 13.4 (Nudge Bingo)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg145,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 14.5 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg157,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.7 (Double-Draw Poker)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg159,  0,        sys905,   stand905, calomega_state, sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.9 (Wild Double-Up)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg164,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.4 (Keno)",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* incomplete dump */
-GAME( 1983, comg168,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.8 (Keno)",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg172,  0,        sys905,   stand905, calomega_state, sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg176,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge Bingo)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg181,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.1 (Nudge Bingo)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg183,  0,        sys905,   stand905, calomega_state, sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.3 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg185,  0,        sys905,   stand905, calomega_state, sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.5 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg186,  0,        sys905,   stand905, calomega_state, sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.6 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg187,  0,        sys905,   stand905, calomega_state, sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.7 (Amusement Poker)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1984, comg204,  0,        sys905,   stand905, calomega_state, sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.4 (Super Blackjack)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg208,  0,        sys905,   stand905, calomega_state, sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.8 (Winner's Choice)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg227,  0,        sys905,   stand905, calomega_state, sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 22.7 (Amusement Poker, d/d)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg230,  0,        sys905,   stand905, calomega_state, sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.0 (FC Bingo (4-card))",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1984, comg236,  0,        sys905,   stand905, calomega_state, sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.6 (Hotline)",                           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg239,  0,        sys903,   gdrwpkrd, calomega_state, sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 23.9 (Gaming Draw Poker)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg240,  0,        sys903,   gdrwpkrh, calomega_state, sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 24.0 (Gaming Draw Poker, hold)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg246,  0,        sys905,   stand905, calomega_state, sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 24.6 (Hotline)",                           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg272a, 0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, amusement)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg272b, 0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, gaming)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, comg5108, 0,        sys906,   stand906, calomega_state, 0,       ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 51.08 (CEI Video Poker, Jacks or Better)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT          ROT    COMPANY                                  FULLNAME                                                    FLAGS   */
+GAME( 1981, comg074,  0,        sys903,   comg074,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.4 (Gaming Poker, W.Export)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, comg076,  0,        sys903,   comg076,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.6 (Arcade Poker)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, comg079,  0,        sys903,   comg076,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.9 (Arcade Poker)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
+GAME( 1981, comg080,  0,        sys903,   arcadebj, calomega_state, init_comg080, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 8.0 (Arcade Black Jack)",                  MACHINE_SUPPORTS_SAVE )                          /* bad dump */
+GAME( 1981, comg094,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 9.4 (Keno)",                               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg107,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 10.7c (Big Game)",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg123,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.3 (Ticket Poker)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
+GAME( 1982, comg125,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.5 (Bingo)",                             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg127,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.7 (Keno)",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg128,  0,        sys903,   comg128,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.8 (Arcade Game)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg134,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 13.4 (Nudge Bingo)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg145,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 14.5 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg157,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.7 (Double-Draw Poker)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg159,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.9 (Wild Double-Up)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg164,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.4 (Keno)",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* incomplete dump */
+GAME( 1983, comg168,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.8 (Keno)",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg172,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg176,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge Bingo)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg181,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.1 (Nudge Bingo)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg183,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.3 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg185,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.5 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg186,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.6 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg187,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.7 (Amusement Poker)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
+GAME( 1984, comg204,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.4 (Super Blackjack)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, comg208,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.8 (Winner's Choice)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, comg227,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 22.7 (Amusement Poker, d/d)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, comg230,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.0 (FC Bingo (4-card))",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
+GAME( 1984, comg236,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.6 (Hotline)",                           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comg239,  0,        sys903,   gdrwpkrd, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 23.9 (Gaming Draw Poker)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comg240,  0,        sys903,   gdrwpkrh, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 24.0 (Gaming Draw Poker, hold)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comg246,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 24.6 (Hotline)",                           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comg272a, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, amusement)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comg272b, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, gaming)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, comg5108, 0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 51.08 (CEI Video Poker, Jacks or Better)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 /************ Diagnostic PROMs ************/
-GAME( 198?, comg903d, 0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 903 Diag.PROM",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, comg905d, 0,        sys905,   stand905, calomega_state, sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, comg903d, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 903 Diag.PROM",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, comg905d, 0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 /****** Unofficial / 3rd part games *******/
-GAME( 1982, elgrande, 0,        s903mod,  elgrande, calomega_state, s903mod, ROT0, "Enter-Tech, Ltd. / Tuni Electro Service", "El Grande - 5 Card Draw (New)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jjpoker,  0,        s903mod,  jjpoker,  calomega_state, s903mod, ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 1)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jjpokerb, jjpoker,  s903mod,  jjpoker,  calomega_state, s903mod, ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 2)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ssipkr24, 0,        s903mod,  ssipkr,   calomega_state, s903mod, ROT0, "SSI",                                     "SSI Poker (v2.4)",                                        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ssipkr30, ssipkr24, s903mod,  ssipkr,   calomega_state, s903mod, ROT0, "SSI",                                     "SSI Poker (v3.0)",                                        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ssipkr40, ssipkr24, s903mod,  ssipkr,   calomega_state, s903mod, ROT0, "SSI",                                     "SSI Poker (v4.0)",                                        MACHINE_SUPPORTS_SAVE )
+GAME( 1982, elgrande, 0,        s903mod,  elgrande, calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd. / Tuni Electro Service", "El Grande - 5 Card Draw (New)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jjpoker,  0,        s903mod,  jjpoker,  calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 1)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jjpokerb, jjpoker,  s903mod,  jjpoker,  calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 2)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssipkr24, 0,        s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v2.4)",                                        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssipkr30, ssipkr24, s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v3.0)",                                        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ssipkr40, ssipkr24, s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v4.0)",                                        MACHINE_SUPPORTS_SAVE )

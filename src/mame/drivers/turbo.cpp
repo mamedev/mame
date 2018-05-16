@@ -831,7 +831,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static GFXDECODE_START( turbo )
+static GFXDECODE_START( gfx_turbo )
 	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x2_planar, 0, 64 )
 GFXDECODE_END
 
@@ -881,7 +881,7 @@ MACHINE_CONFIG_START(turbo_state::turbo)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, turbo_state, start_lamp_w))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(turbo_state,turbo)
 
@@ -921,7 +921,7 @@ MACHINE_CONFIG_START(turbo_state::subroc3d)
 	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(turbo_state,subroc3d)
 
@@ -969,7 +969,7 @@ MACHINE_CONFIG_START(turbo_state::buckrog)
 	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(turbo_state,buckrog)
 
@@ -1780,13 +1780,13 @@ void turbo_state::turbo_rom_decode()
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(turbo_state,turbo_enc)
+void turbo_state::init_turbo_enc()
 {
 	save_item(NAME(m_alt_spriteram));
 	turbo_rom_decode();
 }
 
-DRIVER_INIT_MEMBER(turbo_state,turbo_noenc)
+void turbo_state::init_turbo_noenc()
 {
 	save_item(NAME(m_alt_spriteram));
 }
@@ -1800,16 +1800,16 @@ DRIVER_INIT_MEMBER(turbo_state,turbo_noenc)
  *
  *************************************/
 
-GAMEL( 1981, turbo,    0,       turbo,     turbo,    turbo_state, turbo_noenc, ROT270,             "Sega",    "Turbo (program 1513-1515)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turboa,   turbo,   turbo,     turbo,    turbo_state, turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1262-1264)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turbob,   turbo,   turbo,     turbo,    turbo_state, turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev B)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turboc,   turbo,   turbo,     turbo,    turbo_state, turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev A)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turbod,   turbo,   turbo,     turbo,    turbo_state, turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // but still reports 1262-1264 in the test mode?
-GAMEL( 1981, turbobl,  turbo,   turbo,     turbo,    turbo_state, turbo_noenc, ROT270,             "bootleg", "Indianapolis (bootleg of Turbo)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // decrypted bootleg of a 1262-1264 set
+GAMEL( 1981, turbo,     0,       turbo,    turbo,    turbo_state, init_turbo_noenc, ROT270,             "Sega",    "Turbo (program 1513-1515)", MACHINE_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turboa,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1262-1264)", MACHINE_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turbob,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev B)", MACHINE_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turboc,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev A)", MACHINE_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turbod,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // but still reports 1262-1264 in the test mode?
+GAMEL( 1981, turbobl,   turbo,   turbo,    turbo,    turbo_state, init_turbo_noenc, ROT270,             "bootleg", "Indianapolis (bootleg of Turbo)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // decrypted bootleg of a 1262-1264 set
 
-GAMEL( 1982, subroc3d, 0,       subroc3d,  subroc3d, turbo_state, 0,           ORIENTATION_FLIP_X, "Sega",    "Subroc-3D", MACHINE_IMPERFECT_SOUND , layout_subroc3d )
+GAMEL( 1982, subroc3d,  0,       subroc3d, subroc3d, turbo_state, empty_init,       ORIENTATION_FLIP_X, "Sega",    "Subroc-3D", MACHINE_IMPERFECT_SOUND , layout_subroc3d )
 
-GAMEL( 1982, buckrog,  0,       buckroge,  buckrog,  turbo_state, 0,           ROT0,               "Sega",    "Buck Rogers: Planet of Zoom", MACHINE_IMPERFECT_SOUND , layout_buckrog )
-GAMEL( 1982, buckrogn, buckrog, buckrogu,  buckrog,  turbo_state, 0,           ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 1)", MACHINE_IMPERFECT_SOUND , layout_buckrog )
-GAMEL( 1982, buckrogn2,buckrog, buckrogu,  buckrog,  turbo_state, 0,           ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 2)", MACHINE_IMPERFECT_SOUND , layout_buckrog )
-GAMEL( 1982, zoom909,  buckrog, buckroge,  buckrog,  turbo_state, 0,           ROT0,               "Sega",    "Zoom 909", MACHINE_IMPERFECT_SOUND, layout_buckrog )
+GAMEL( 1982, buckrog,   0,       buckroge, buckrog,  turbo_state, empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom", MACHINE_IMPERFECT_SOUND , layout_buckrog )
+GAMEL( 1982, buckrogn,  buckrog, buckrogu, buckrog,  turbo_state, empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 1)", MACHINE_IMPERFECT_SOUND , layout_buckrog )
+GAMEL( 1982, buckrogn2, buckrog, buckrogu, buckrog,  turbo_state, empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 2)", MACHINE_IMPERFECT_SOUND , layout_buckrog )
+GAMEL( 1982, zoom909,   buckrog, buckroge, buckrog,  turbo_state, empty_init,       ROT0,               "Sega",    "Zoom 909", MACHINE_IMPERFECT_SOUND, layout_buckrog )

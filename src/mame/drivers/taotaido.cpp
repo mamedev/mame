@@ -340,7 +340,7 @@ static const gfx_layout layout =
 	128*8
 };
 
-static GFXDECODE_START( taotaido )
+static GFXDECODE_START( gfx_taotaido )
 	GFXDECODE_ENTRY( "gfx1", 0, layout,  0x000, 256  ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, layout,  0x300, 256  ) /* bg tiles */
 GFXDECODE_END
@@ -373,7 +373,7 @@ MACHINE_CONFIG_START(taotaido_state::taotaido)
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taotaido)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taotaido)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -478,6 +478,6 @@ ROM_START( taotaido3 )
 	ROM_LOAD( "u15.bin", 0x000000, 0x200000, CRC(e95823e9) SHA1(362583944ad4fdde4f9e29928cf34376c7ad931f) )
 ROM_END
 
-GAME( 1993, taotaido,  0,        taotaido, taotaido,  taotaido_state, 0, ROT0, "Video System Co.", "Tao Taido (2 button version)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, taotaidoa, taotaido, taotaido, taotaido6, taotaido_state, 0, ROT0, "Video System Co.", "Tao Taido (6 button version)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // maybe a prototype? has various debug features
-GAME( 1993, taotaido3, taotaido, taotaido, taotaido3, taotaido_state, 0, ROT0, "Video System Co.", "Tao Taido (2/3 button version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, taotaido,  0,        taotaido, taotaido,  taotaido_state, empty_init, ROT0, "Video System Co.", "Tao Taido (2 button version)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, taotaidoa, taotaido, taotaido, taotaido6, taotaido_state, empty_init, ROT0, "Video System Co.", "Tao Taido (6 button version)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // maybe a prototype? has various debug features
+GAME( 1993, taotaido3, taotaido, taotaido, taotaido3, taotaido_state, empty_init, ROT0, "Video System Co.", "Tao Taido (2/3 button version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

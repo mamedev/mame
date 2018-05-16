@@ -238,7 +238,7 @@ static const gfx_layout charlayout =
 	4*16
 };
 
-static GFXDECODE_START( xyonix )
+static GFXDECODE_START( gfx_xyonix )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(xyonix_state::xyonix)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xyonix_state, nmiclk_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xyonix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xyonix)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(xyonix_state, xyonix)
 
@@ -296,4 +296,4 @@ ROM_END
 
 /* GAME drivers **************************************************************/
 
-GAME( 1989, xyonix, 0, xyonix, xyonix, xyonix_state, 0, ROT0, "Philko", "Xyonix", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, xyonix, 0, xyonix, xyonix, xyonix_state, empty_init, ROT0, "Philko", "Xyonix", MACHINE_SUPPORTS_SAVE )

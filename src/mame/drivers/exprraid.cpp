@@ -455,7 +455,7 @@ static const gfx_layout tile2 =
 };
 
 
-static GFXDECODE_START( exprraid )
+static GFXDECODE_START( gfx_exprraid )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   128, 2 ) /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout,  64, 8 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tile1,          0, 4 ) /* background tiles */
@@ -513,7 +513,7 @@ MACHINE_CONFIG_START(exprraid_state::exprraid)
 	MCFG_SCREEN_UPDATE_DRIVER(exprraid_state, screen_update_exprraid)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exprraid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exprraid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
@@ -831,7 +831,7 @@ void exprraid_state::exprraid_gfx_expand()
 	}
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,wexpressb)
+void exprraid_state::init_wexpressb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -848,28 +848,28 @@ DRIVER_INIT_MEMBER(exprraid_state,wexpressb)
 	exprraid_gfx_expand();
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,exprraid)
+void exprraid_state::init_exprraid()
 {
 	exprraid_gfx_expand();
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,wexpressb2)
+void exprraid_state::init_wexpressb2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3800, 0x3800, read8_delegate(FUNC(exprraid_state::vblank_r),this));
 	exprraid_gfx_expand();
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,wexpressb3)
+void exprraid_state::init_wexpressb3()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xFFC0, 0xFFC0, read8_delegate(FUNC(exprraid_state::vblank_r),this));
 	exprraid_gfx_expand();
 }
 
 
-GAME( 1986, exprraid,  0,        exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East Corporation", "Express Raider (World, Rev 4)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, exprraidu, exprraid, exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East USA",         "Express Raider (US, rev 5)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, exprraidi, exprraid, exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East Corporation", "Express Raider (Italy)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wexpress,  exprraid, exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East Corporation", "Western Express (Japan, rev 4)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wexpressb1,exprraid, exprraid, exprraid, exprraid_state, wexpressb, ROT0, "bootleg",               "Western Express (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wexpressb2,exprraid, exprboot, exprboot, exprraid_state, wexpressb2,ROT0, "bootleg",               "Western Express (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wexpressb3,exprraid, exprboot, exprboot, exprraid_state, wexpressb3,ROT0, "bootleg",               "Western Express (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, exprraid,   0,        exprraid, exprraid, exprraid_state, init_exprraid,   ROT0, "Data East Corporation", "Express Raider (World, Rev 4)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, exprraidu,  exprraid, exprraid, exprraid, exprraid_state, init_exprraid,   ROT0, "Data East USA",         "Express Raider (US, rev 5)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, exprraidi,  exprraid, exprraid, exprraid, exprraid_state, init_exprraid,   ROT0, "Data East Corporation", "Express Raider (Italy)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wexpress,   exprraid, exprraid, exprraid, exprraid_state, init_exprraid,   ROT0, "Data East Corporation", "Western Express (Japan, rev 4)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wexpressb1, exprraid, exprraid, exprraid, exprraid_state, init_wexpressb,  ROT0, "bootleg",               "Western Express (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wexpressb2, exprraid, exprboot, exprboot, exprraid_state, init_wexpressb2, ROT0, "bootleg",               "Western Express (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wexpressb3, exprraid, exprboot, exprboot, exprraid_state, init_wexpressb3, ROT0, "bootleg",               "Western Express (bootleg set 3)", MACHINE_SUPPORTS_SAVE )

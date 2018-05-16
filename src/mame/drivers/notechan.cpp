@@ -532,5 +532,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT    COMPANY      FULLNAME      FLAGS                 LAYOUT
-GAMEL( 1995, notechan, 0,      notechan, notechan, notechan_state, 0,    ROT0, "Banpresto", "Note Chance", MACHINE_NOT_WORKING,  layout_notechan )
+//     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT   COMPANY      FULLNAME       FLAGS                 LAYOUT
+GAMEL( 1995, notechan, 0,      notechan, notechan, notechan_state, empty_init, ROT0, "Banpresto", "Note Chance", MACHINE_NOT_WORKING,  layout_notechan )

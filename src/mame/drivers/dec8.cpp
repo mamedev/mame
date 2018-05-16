@@ -1821,20 +1821,20 @@ static const gfx_layout tiles_r =
 	16*16
 };
 
-static GFXDECODE_START( cobracom )
+static GFXDECODE_START( gfx_cobracom )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_32k, 0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles,       64, 4 )
 	GFXDECODE_ENTRY( "gfx4", 0, tiles,      128, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles,      192, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( ghostb )
+static GFXDECODE_START( gfx_ghostb )
 	GFXDECODE_ENTRY( "gfx1", 0, chars_3bpp, 0,  4 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles,   256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles_r,   512, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( srdarwin )
+static GFXDECODE_START( gfx_srdarwin )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout_16k,128, 4 ) /* Only 1 used so far :/ */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, sr_sprites,    64, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, srdarwin_tiles,  0, 8 )
@@ -1843,19 +1843,19 @@ static GFXDECODE_START( srdarwin )
 	GFXDECODE_ENTRY( "gfx3", 0x30000, srdarwin_tiles,  0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( gondo )
+static GFXDECODE_START( gfx_gondo )
 	GFXDECODE_ENTRY( "gfx1", 0, chars_3bpp,  0, 16 ) /* Chars */
 	GFXDECODE_ENTRY( "gfx2", 0, tiles,   256, 32 ) /* Sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, tiles,   768, 16 ) /* Tiles */
 GFXDECODE_END
 
-static GFXDECODE_START( oscar )
+static GFXDECODE_START( gfx_oscar )
 	GFXDECODE_ENTRY( "gfx1", 0, oscar_charlayout, 256,  8 ) /* Chars */
 	GFXDECODE_ENTRY( "gfx2", 0, tiles,            0, 16 ) /* Sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, tiles,          384,  8 ) /* Tiles */
 GFXDECODE_END
 
-static GFXDECODE_START( shackled )
+static GFXDECODE_START( gfx_shackled )
 	GFXDECODE_ENTRY( "gfx1", 0, chars_3bpp,   0,  4 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles,    256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles,    768, 16 )
@@ -1978,7 +1978,7 @@ MACHINE_CONFIG_START(dec8_state::lastmisn)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_lastmisn)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shackled)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
@@ -2043,7 +2043,7 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_shackled)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shackled)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
@@ -2104,7 +2104,7 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 	MCFG_INPUT_MERGER_ALL_HIGH("nmigate")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gondo)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
@@ -2165,7 +2165,7 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 	MCFG_INPUT_MERGER_ALL_HIGH("nmigate")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gondo)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
@@ -2227,7 +2227,7 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, dec8_state, ghostb_nmi_w))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ghostb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ghostb)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,ghostb)
 
@@ -2285,7 +2285,7 @@ MACHINE_CONFIG_START(dec8_state::csilver)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("sub", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shackled)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
@@ -2349,7 +2349,7 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_oscar)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", oscar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_oscar)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
@@ -2403,7 +2403,7 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srdarwin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srdarwin)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(144)
 
@@ -2460,7 +2460,7 @@ MACHINE_CONFIG_START(dec8_state::cobracom)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cobracom)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cobracom)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(256)
 
@@ -3667,7 +3667,7 @@ ROM_END
 
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(dec8_state,dec8)
+void dec8_state::init_dec8()
 {
 	if (m_mainbank.found())
 	{
@@ -3678,43 +3678,43 @@ DRIVER_INIT_MEMBER(dec8_state,dec8)
 	m_latch = 0;
 }
 
-DRIVER_INIT_MEMBER(dec8_state,csilver)
+void dec8_state::init_csilver()
 {
 	uint8_t *RAM = memregion("audiocpu")->base();
 	m_soundbank->configure_entries(0, 2, &RAM[0], 0x4000);
-	DRIVER_INIT_CALL(dec8);
+	init_dec8();
 }
 
 
 /******************************************************************************/
 
-GAME( 1986, lastmisn,   0,        lastmisn, lastmisn,  dec8_state, dec8,    ROT270, "Data East Corporation", "Last Mission (World revision 8)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu6, lastmisn, lastmisn, lastmisn,  dec8_state, dec8,    ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  dec8_state, dec8,    ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, dec8_state, dec8,    ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, shackled,   0,        shackled, shackled,  dec8_state, dec8,    ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, breywood,   shackled, shackled, breywood,  dec8_state, dec8,    ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondo,      0,        gondo,    gondo,     dec8_state, dec8,    ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, makyosen,   gondo,    gondo,    gondo,     dec8_state, dec8,    ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, garyoret,   0,        garyoret, garyoret,  dec8_state, dec8,    ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb,     0,        ghostb,   ghostb,    dec8_state, dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  dec8_state, dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   dec8_state, dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state, dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision ?)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB, confirmed problem with the fake MCU ROM
-GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state, dec8,    ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, meikyuha,   ghostb,   meikyuh,  meikyuh,   dec8_state, dec8,    ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilver,    0,        csilver,  csilver,   dec8_state, csilver, ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  dec8_state, csilver, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  dec8_state, csilver, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state, dec8,    ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    dec8_state, dec8,    ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    dec8_state, dec8,    ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    dec8_state, dec8,    ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  dec8_state, dec8,    ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, dec8_state, dec8,    ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisn,   0,        lastmisn, lastmisn,  dec8_state, init_dec8,    ROT270, "Data East Corporation", "Last Mission (World revision 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu6, lastmisn, lastmisn, lastmisn,  dec8_state, init_dec8,    ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  dec8_state, init_dec8,    ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, dec8_state, init_dec8,    ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, shackled,   0,        shackled, shackled,  dec8_state, init_dec8,    ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, breywood,   shackled, shackled, breywood,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondo,      0,        gondo,    gondo,     dec8_state, init_dec8,    ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, makyosen,   gondo,    gondo,    gondo,     dec8_state, init_dec8,    ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, garyoret,   0,        garyoret, garyoret,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb,     0,        ghostb,   ghostb,    dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision ?)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB, confirmed problem with the fake MCU ROM
+GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, meikyuha,   ghostb,   meikyuh,  meikyuh,   dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilver,    0,        csilver,  csilver,   dec8_state, init_csilver, ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  dec8_state, init_csilver, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  dec8_state, init_csilver, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    dec8_state, init_dec8,    ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  dec8_state, init_dec8,    ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, dec8_state, init_dec8,    ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Unlike most Deco games of this period Cobra Command does not seem to have a Data East USA release.  Instead the Data East Corporation release
 // was used in the US as evidenced by boards with the EL romset bearing AAMA seal stickers (American Amusement Machine Association)
-GAME( 1988, cobracom,   0,        cobracom, cobracom,  dec8_state, dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracoma,  cobracom, cobracom, cobracom,  dec8_state, dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  dec8_state, dec8,    ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracom,   0,        cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracoma,  cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )

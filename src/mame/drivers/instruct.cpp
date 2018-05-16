@@ -437,8 +437,7 @@ MACHINE_CONFIG_START(instruct_state::instruct)
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -453,5 +452,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY      FULLNAME                   FLAGS
-COMP( 1978, instruct,  0,       0,       instruct,  instruct, instruct_state, 0,    "Signetics", "Signetics Instructor 50", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME                   FLAGS
+COMP( 1978, instruct, 0,      0,      instruct, instruct, instruct_state, empty_init, "Signetics", "Signetics Instructor 50", 0 )

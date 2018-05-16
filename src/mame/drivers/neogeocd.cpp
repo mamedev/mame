@@ -124,8 +124,8 @@ public:
 
 	uint32_t screen_update_neocd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DRIVER_INIT(neocdz);
-	DECLARE_DRIVER_INIT(neocdzj);
+	void init_neocdz();
+	void init_neocdzj();
 
 	IRQ_CALLBACK_MEMBER(neocd_int_callback);
 
@@ -1128,19 +1128,19 @@ ROM_END
 
 #define rom_neocdzj    rom_neocdz
 
-DRIVER_INIT_MEMBER(ngcd_state,neocdz)
+void ngcd_state::init_neocdz()
 {
 	NeoSystem = NEOCD_REGION_US;
 }
 
-DRIVER_INIT_MEMBER(ngcd_state,neocdzj)
+void ngcd_state::init_neocdzj()
 {
 	NeoSystem = NEOCD_REGION_JAPAN;
 }
 
 
-//    YEAR  NAME     PARENT  COMPAT MACHINE INPUT  STATE       INIT     COMPANY FULLNAME               FLAGS */
-CONS( 1996, neocdz,  0,      0,     neocd,  neocd, ngcd_state, neocdz,  "SNK",  "Neo-Geo CDZ (US)",    0 ) // the CDZ is the newer model
-CONS( 1996, neocdzj, neocdz, 0,     neocd,  neocd, ngcd_state, neocdzj, "SNK",  "Neo-Geo CDZ (Japan)", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT          COMPANY FULLNAME               FLAGS */
+CONS( 1996, neocdz,  0,      0,      neocd,   neocd,  ngcd_state,  init_neocdz,  "SNK",  "Neo-Geo CDZ (US)",    0 ) // the CDZ is the newer model
+CONS( 1996, neocdzj, neocdz, 0,      neocd,   neocd,  ngcd_state,  init_neocdzj, "SNK",  "Neo-Geo CDZ (Japan)", 0 )
 
-CONS( 1994, neocd,   neocdz, 0,     neocd,  neocd, ngcd_state, 0,       "SNK",  "Neo-Geo CD",          MACHINE_NOT_WORKING ) // older  model, ignores disc protections?
+CONS( 1994, neocd,   neocdz, 0,      neocd,   neocd,  ngcd_state,  empty_init,   "SNK",  "Neo-Geo CD",          MACHINE_NOT_WORKING ) // older  model, ignores disc protections?

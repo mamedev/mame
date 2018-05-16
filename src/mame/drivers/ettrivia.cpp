@@ -209,7 +209,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( ettrivia )
+static GFXDECODE_START( gfx_ettrivia )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 32*4, 32 )
 GFXDECODE_END
@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(ettrivia_state::ettrivia)
 	MCFG_SCREEN_UPDATE_DRIVER(ettrivia_state, screen_update_ettrivia)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ettrivia)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ettrivia)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(ettrivia_state, ettrivia)
 
@@ -473,8 +473,8 @@ ROM_START( strvmstr )
 	ROM_LOAD( "entrtn.hi3",   0x38000, 0x8000, CRC(a8cf603b) SHA1(6efa5753d8d252452b3f5be8635a28364e4d8de1) )
 ROM_END
 
-GAME( 1985, promutrv,  0,        ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 1)", 0 )
-GAME( 1985, promutrva, promutrv, ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", 0 )
-GAME( 1985, promutrvb, promutrv, ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 3)", 0 )
-GAME( 1985, promutrvc, promutrv, ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 4)", 0 )
-GAME( 1986, strvmstr,  0,        ettrivia, ettrivia, ettrivia_state, 0, ROT270, "Enerdyne Technologies Inc.", "Super Trivia Master",                       MACHINE_WRONG_COLORS )
+GAME( 1985, promutrv,  0,        ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 1)", 0 )
+GAME( 1985, promutrva, promutrv, ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", 0 )
+GAME( 1985, promutrvb, promutrv, ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 3)", 0 )
+GAME( 1985, promutrvc, promutrv, ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 4)", 0 )
+GAME( 1986, strvmstr,  0,        ettrivia, ettrivia, ettrivia_state, empty_init, ROT270, "Enerdyne Technologies Inc.", "Super Trivia Master",                       MACHINE_WRONG_COLORS )

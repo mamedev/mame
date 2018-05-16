@@ -53,7 +53,7 @@ public:
 	DECLARE_READ8_MEMBER(p2_read);
 	DECLARE_WRITE8_MEMBER(p2_write);
 	DECLARE_READ_LINE_MEMBER(t1_read);
-	DECLARE_DRIVER_INIT(odyssey2);
+	void init_odyssey2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(odyssey2);
@@ -280,7 +280,7 @@ PALETTE_INIT_MEMBER(g7400_state, g7400)
 	}
 }
 
-DRIVER_INIT_MEMBER(odyssey2_state,odyssey2)
+void odyssey2_state::init_odyssey2()
 {
 	uint8_t *gfx = memregion("gfx1")->base();
 
@@ -654,7 +654,7 @@ static const gfx_layout odyssey2_spritelayout =
 };
 
 
-static GFXDECODE_START( odyssey2 )
+static GFXDECODE_START( gfx_odyssey2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, odyssey2_graphicslayout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, odyssey2_spritelayout, 0, 2 )
 GFXDECODE_END
@@ -689,7 +689,7 @@ MACHINE_CONFIG_START(odyssey2_state::odyssey2)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
 
@@ -715,7 +715,7 @@ MACHINE_CONFIG_START(odyssey2_state::videopac)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
 
@@ -750,7 +750,7 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
@@ -791,7 +791,7 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_odyssey2)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
@@ -848,9 +848,9 @@ ROM_START (odyssey3)
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY     FULLNAME                                FLAGS */
-COMP( 1978, odyssey2, 0,        0,      odyssey2, odyssey2, odyssey2_state, odyssey2, "Magnavox", "Odyssey 2",                            0 )
-COMP( 1979, videopac, odyssey2, 0,      videopac, odyssey2, odyssey2_state, odyssey2, "Philips",  "Videopac G7000/C52",                   0 )
-COMP( 1983, g7400,    odyssey2, 0,      g7400,    odyssey2, g7400_state,    odyssey2, "Philips",  "Videopac Plus G7400",                  MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1983, jopac,    odyssey2, 0,      g7400,    odyssey2, g7400_state,    odyssey2, "Brandt",   "Jopac JO7400",                         MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1983, odyssey3, odyssey2, 0,      odyssey3, odyssey2, g7400_state,    odyssey2, "Magnavox", "Odyssey 3 Command Center (prototype)", MACHINE_IMPERFECT_GRAPHICS )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY     FULLNAME                                FLAGS */
+COMP( 1978, odyssey2, 0,        0,      odyssey2, odyssey2, odyssey2_state, init_odyssey2, "Magnavox", "Odyssey 2",                            0 )
+COMP( 1979, videopac, odyssey2, 0,      videopac, odyssey2, odyssey2_state, init_odyssey2, "Philips",  "Videopac G7000/C52",                   0 )
+COMP( 1983, g7400,    odyssey2, 0,      g7400,    odyssey2, g7400_state,    init_odyssey2, "Philips",  "Videopac Plus G7400",                  MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, jopac,    odyssey2, 0,      g7400,    odyssey2, g7400_state,    init_odyssey2, "Brandt",   "Jopac JO7400",                         MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, odyssey3, odyssey2, 0,      odyssey3, odyssey2, g7400_state,    init_odyssey2, "Magnavox", "Odyssey 3 Command Center (prototype)", MACHINE_IMPERFECT_GRAPHICS )

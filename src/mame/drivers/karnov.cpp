@@ -728,7 +728,7 @@ static const gfx_layout tiles =
 	16*16
 };
 
-static GFXDECODE_START( karnov )
+static GFXDECODE_START( gfx_karnov )
 	GFXDECODE_ENTRY( "gfx1", 0, chars,     0,  4 )  /* colors 0-31 */
 	GFXDECODE_ENTRY( "gfx2", 0, tiles,   512, 16 )  /* colors 512-767 */
 	GFXDECODE_ENTRY( "gfx3", 0, sprites, 256, 16 )  /* colors 256-511 */
@@ -831,7 +831,7 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, karnov_state, vbint_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", karnov)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
@@ -909,7 +909,7 @@ MACHINE_CONFIG_START(karnov_state::wndrplnt)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, karnov_state, vbint_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", karnov)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_karnov)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
@@ -1346,25 +1346,25 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(karnov_state,karnov)
+void karnov_state::init_karnov()
 {
 	m_microcontroller_id = KARNOV;
 	m_coin_mask = 0x07;
 }
 
-DRIVER_INIT_MEMBER(karnov_state,karnovj)
+void karnov_state::init_karnovj()
 {
 	m_microcontroller_id = KARNOVJ;
 	m_coin_mask = 0x07;
 }
 
-DRIVER_INIT_MEMBER(karnov_state,wndrplnt)
+void karnov_state::init_wndrplnt()
 {
 	m_microcontroller_id = WNDRPLNT;
 	m_coin_mask = 0x00;
 }
 
-DRIVER_INIT_MEMBER(karnov_state,chelnov)
+void karnov_state::init_chelnov()
 {
 	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
@@ -1373,7 +1373,7 @@ DRIVER_INIT_MEMBER(karnov_state,chelnov)
 	RAM[0x062a/2] = 0x4e71;  /* hangs waiting on i8751 int */
 }
 
-DRIVER_INIT_MEMBER(karnov_state,chelnovu)
+void karnov_state::init_chelnovu()
 {
 	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
@@ -1382,7 +1382,7 @@ DRIVER_INIT_MEMBER(karnov_state,chelnovu)
 	RAM[0x062a/2] = 0x4e71;  /* hangs waiting on i8751 int */
 }
 
-DRIVER_INIT_MEMBER(karnov_state,chelnovj)
+void karnov_state::init_chelnovj()
 {
 	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
@@ -1398,13 +1398,13 @@ DRIVER_INIT_MEMBER(karnov_state,chelnovj)
  *
  *************************************/
 
-GAME( 1987, karnov,      0,       karnov,     karnov,   karnov_state, karnov,   ROT0,   "Data East USA",               "Karnov (US, rev 6)",                                         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, karnova,     karnov,  karnov,     karnov,   karnov_state, karnov,   ROT0,   "Data East USA",               "Karnov (US, rev 5)",                                         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, karnovj,     karnov,  karnov,     karnov,   karnov_state, karnovj,  ROT0,   "Data East Corporation",       "Karnov (Japan)",                                             MACHINE_SUPPORTS_SAVE )
-GAME( 1987, karnovjbl,   karnov,  karnovjbl,  karnov,   karnov_state, karnovj,  ROT0,   "bootleg (K. J. Corporation)", "Karnov (Japan, bootleg with NEC D8748HD)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wndrplnt,    0,       wndrplnt,   wndrplnt, karnov_state, wndrplnt, ROT270, "Data East Corporation",       "Wonder Planet (Japan)",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnov,     0,       karnov,     chelnov,  karnov_state, chelnov,  ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (World)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovu,    chelnov, karnov,     chelnovu, karnov_state, chelnovu, ROT0,   "Data East USA",               "Chelnov - Atomic Runner (US)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovj,    chelnov, karnov,     chelnovj, karnov_state, chelnovj, ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (Japan)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovjbl,  chelnov, chelnovjbl, chelnovj, karnov_state, chelnovj, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 1)", MACHINE_SUPPORTS_SAVE ) // todo: hook up MCU instead of using simulation code
-GAME( 1988, chelnovjbla, chelnov, chelnovjbl, chelnovj, karnov_state, chelnovj, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 2)", MACHINE_SUPPORTS_SAVE ) // ^^
+GAME( 1987, karnov,      0,       karnov,     karnov,   karnov_state, init_karnov,   ROT0,   "Data East USA",               "Karnov (US, rev 6)",                                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnova,     karnov,  karnov,     karnov,   karnov_state, init_karnov,   ROT0,   "Data East USA",               "Karnov (US, rev 5)",                                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnovj,     karnov,  karnov,     karnov,   karnov_state, init_karnovj,  ROT0,   "Data East Corporation",       "Karnov (Japan)",                                             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnovjbl,   karnov,  karnovjbl,  karnov,   karnov_state, init_karnovj,  ROT0,   "bootleg (K. J. Corporation)", "Karnov (Japan, bootleg with NEC D8748HD)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wndrplnt,    0,       wndrplnt,   wndrplnt, karnov_state, init_wndrplnt, ROT270, "Data East Corporation",       "Wonder Planet (Japan)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnov,     0,       karnov,     chelnov,  karnov_state, init_chelnov,  ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (World)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovu,    chelnov, karnov,     chelnovu, karnov_state, init_chelnovu, ROT0,   "Data East USA",               "Chelnov - Atomic Runner (US)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovj,    chelnov, karnov,     chelnovj, karnov_state, init_chelnovj, ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (Japan)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovjbl,  chelnov, chelnovjbl, chelnovj, karnov_state, init_chelnovj, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 1)", MACHINE_SUPPORTS_SAVE ) // todo: hook up MCU instead of using simulation code
+GAME( 1988, chelnovjbla, chelnov, chelnovjbl, chelnovj, karnov_state, init_chelnovj, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 2)", MACHINE_SUPPORTS_SAVE ) // ^^

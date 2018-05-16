@@ -238,12 +238,12 @@ public:
 	DECLARE_WRITE8_MEMBER(tenkai_priority_w);
 	DECLARE_WRITE8_MEMBER(mjembase_priority_w);
 
-	DECLARE_DRIVER_INIT(mjelct3);
-	DECLARE_DRIVER_INIT(blktouch);
-	DECLARE_DRIVER_INIT(mjelct3a);
-	DECLARE_DRIVER_INIT(maya_common);
-	DECLARE_DRIVER_INIT(mayac);
-	DECLARE_DRIVER_INIT(maya);
+	void init_mjelct3();
+	void init_blktouch();
+	void init_mjelct3a();
+	void init_maya_common();
+	void init_mayac();
+	void init_maya();
 
 	uint32_t screen_update_hanamai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hnoridur(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

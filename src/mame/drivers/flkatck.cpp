@@ -179,7 +179,7 @@ static const gfx_layout gfxlayout =
 	32*8
 };
 
-static GFXDECODE_START( flkatck )
+static GFXDECODE_START( gfx_flkatck )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 32 )
 GFXDECODE_END
 
@@ -233,7 +233,7 @@ MACHINE_CONFIG_START(flkatck_state::flkatck)
 	MCFG_SCREEN_UPDATE_DRIVER(flkatck_state, screen_update_flkatck)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flkatck)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flkatck)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
@@ -314,6 +314,6 @@ ROM_START( flkatcka )
 	ROM_LOAD( "mask2m.11a",  0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) )
 ROM_END
 
-GAME( 1987, mx5000,  0,      flkatck, flkatck, flkatck_state, 0, ROT90, "Konami", "MX5000", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, flkatck, mx5000, flkatck, flkatck, flkatck_state, 0, ROT90, "Konami", "Flak Attack (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, flkatcka,mx5000, flkatck, flkatck, flkatck_state, 0, ROT90, "Konami", "Flak Attack (Japan, PWB 450593 sub-board)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mx5000,  0,      flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "MX5000", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, flkatck, mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, flkatcka,mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan, PWB 450593 sub-board)", MACHINE_SUPPORTS_SAVE )

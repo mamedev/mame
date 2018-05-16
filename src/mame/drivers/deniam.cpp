@@ -215,7 +215,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( deniam )
+static GFXDECODE_START( gfx_deniam )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 128 )    /* colors 0-1023 */
 												/* sprites use colors 1024-2047 */
 GFXDECODE_END
@@ -272,7 +272,7 @@ MACHINE_CONFIG_START(deniam_state::deniam16b)
 	MCFG_SCREEN_UPDATE_DRIVER(deniam_state, screen_update_deniam)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deniam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deniam)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -308,7 +308,7 @@ MACHINE_CONFIG_START(deniam_state::deniam16c)
 	MCFG_SCREEN_UPDATE_DRIVER(deniam_state, screen_update_deniam)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deniam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deniam)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -416,7 +416,7 @@ ROM_END
 
 
 
-GAME( 1996, logicpro, 0,        deniam16b, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Logic Pro (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Croquis (Germany)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1996, karianx,  0,        deniam16b, karianx,  deniam_state, karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996, logicpro, 0,        deniam16b, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Logic Pro (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Croquis (Germany)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, karianx,  0,        deniam16b, karianx,  deniam_state, init_karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)",     MACHINE_SUPPORTS_SAVE )

@@ -59,7 +59,7 @@ protected:
 		IRQ_9        =  9, // external int  7 (6e)
 		IRQ_CBUS3    = 10, // external int  8 (70)
 		IRQ_RTC      = 11, // external int  9 (72)
-		IRQ_12       = 12, // external int 10 (74) SGA?
+		IRQ_60HZ     = 12, // external int 10 (74)
 		IRQ_MOUSE    = 13, // internal int  0 (76)
 		IRQ_TIMER0   = 14, // internal int  1 (78)
 		IRQ_TIMER1   = 15, // internal int  2 (7a)
@@ -136,7 +136,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ir8_w) { set_int_line(INT_HARD_EX, IRQ_CBUS3, state); }
 	// FIXME: mc146818 inverts the normal irq state convention
 	DECLARE_WRITE_LINE_MEMBER(ir9_w) { set_int_line(INT_HARD_EX, IRQ_RTC, !state); }
-	DECLARE_WRITE_LINE_MEMBER(ir10_w) { set_int_line(INT_HARD_EX, IRQ_12, state); }
+	DECLARE_WRITE_LINE_MEMBER(ir10_w) { set_int_line(INT_HARD_EX, IRQ_60HZ, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir11_w) { set_int_line(INT_HARD_EX, IRQ_SERIAL, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir12_w) { set_int_line(INT_HARD_EX, IRQ_ETHERNET, state); }
 
@@ -195,14 +195,14 @@ public:
 		DMA_CTRL_BERR    = 0x00400000, // bus error
 		DMA_CTRL_ERR     = 0x00800000, // checked for in scsi isr
 
-		DMA_CTRL_BGR     = 0x01000000, // cleared when command complete (maybe bus grant required?)
+		DMA_CTRL_ENABLE  = 0x01000000, // transfer enabled
 		DMA_CTRL_VIRTUAL = 0x02000000, // virtual address translation required
 		DMA_CTRL_DOUBLE  = 0x04000000, // double transfer size (double or quad quad)
 
 		DMA_CTRL_WRITE   = 0x40000000, // memory to device transfer
 		DMA_CTRL_QUAD    = 0x80000000, // select quad transfer size (quad quad when combined with double)
 
-		DMA_CTRL_WMASK   = 0xfd000e00  // writable fields
+		DMA_CTRL_WMASK   = 0xfd000e00  // writable fields (quad not writable for floppy/plotter?)
 	};
 	DECLARE_READ32_MEMBER(dma_plotter_r) { return dma_r(space, offset, mem_mask, DMA_PLOTTER); }
 	DECLARE_WRITE32_MEMBER(dma_plotter_w) { dma_w(space, offset, data, mem_mask, DMA_PLOTTER); }
@@ -308,20 +308,15 @@ public:
 		MOUSE_MBUTTON = 0x00020000,
 		MOUSE_RBUTTON = 0x00040000,
 
-		MOUSE_COUNTER = 0x0000ffff,
 		MOUSE_BUTTONS = 0x00070000
 	};
 	DECLARE_READ32_MEMBER(mouse_status_r);
 	DECLARE_WRITE32_MEMBER(mouse_status_w);
-	DECLARE_INPUT_CHANGED_MEMBER(mouse_button);
-	DECLARE_INPUT_CHANGED_MEMBER(mouse_x);
-	DECLARE_INPUT_CHANGED_MEMBER(mouse_y);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
 
 	const char *m_memory_tag;
 	int m_memory_spacenum;
@@ -345,6 +340,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(timer1);
 	TIMER_CALLBACK_MEMBER(timer2) {}
 	TIMER_CALLBACK_MEMBER(timer3);
+	TIMER_CALLBACK_MEMBER(timer_60hz);
 	TIMER_CALLBACK_MEMBER(mouse_timer);
 
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) = 0;
@@ -392,15 +388,6 @@ private:
 
 	// dma state
 	static const int DMA_CHANNEL_COUNT = 3;
-	enum dma_state
-	{
-		IDLE,
-		WAIT,
-		COMMAND,
-		TRANSFER,
-		COMPLETE,
-		FINAL
-	};
 	struct dma_channel_t
 	{
 		u32 real_address;
@@ -409,7 +396,6 @@ private:
 		u32 control;
 
 		int drq_state;
-		dma_state state;
 		devcb_read8 device_r;
 		devcb_write8 device_w;
 
@@ -437,7 +423,6 @@ private:
 
 	// timers
 	u8 m_timer0_count;
-	u8 m_timer0_limit;
 	u16 m_timer1_count;
 	u32 m_timer2_count;
 	u32 m_timer2_value;
@@ -451,6 +436,7 @@ private:
 	emu_timer *m_timer1;
 	emu_timer *m_timer2;
 	emu_timer *m_timer3;
+	emu_timer *m_timer_60hz;
 
 	// bus arbitration and control
 	u16 m_arbctl;

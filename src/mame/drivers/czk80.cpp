@@ -43,7 +43,7 @@ I/O ports: These ranges are what is guessed
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"
@@ -61,7 +61,7 @@ public:
 		, m_fdc(*this, "fdc")
 	{ }
 
-	DECLARE_DRIVER_INIT(czk80);
+	void init_czk80();
 	DECLARE_MACHINE_RESET(czk80);
 	TIMER_CALLBACK_MEMBER(czk80_reset);
 	DECLARE_READ8_MEMBER(port80_r);
@@ -170,7 +170,7 @@ MACHINE_RESET_MEMBER( czk80_state, czk80 )
 	membank("bankw1")->set_entry(0); // always write to ram
 }
 
-DRIVER_INIT_MEMBER( czk80_state, czk80 )
+void czk80_state::init_czk80()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -231,5 +231,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT   COMPAT MACHINE  INPUT  CLASS        INIT   COMPANY       FULLNAME  FLAGS
-COMP( 198?, czk80,  0,       0,     czk80,   czk80, czk80_state, czk80, "<unknown>",  "CZK-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
+COMP( 198?, czk80, 0,      0,      czk80,   czk80, czk80_state, init_czk80, "<unknown>", "CZK-80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -228,7 +228,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( hexion )
+static GFXDECODE_START( gfx_hexion )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -274,7 +274,7 @@ MACHINE_CONFIG_START(hexion_state::hexion)
 	MCFG_SCREEN_UPDATE_DRIVER(hexion_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hexion)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hexion)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
@@ -352,5 +352,5 @@ ROM_START( hexionb )
 	//PAL20L10 @U31
 ROM_END
 
-GAME( 1992, hexion, 0,      hexion, hexion, hexion_state, 0, ROT0, "Konami",                     "Hexion (Japan ver JAB)",         0 )
-GAME( 1992, hexionb,hexion, hexionb,hexion, hexion_state, 0, ROT0, "bootleg (Impeuropex Corp.)", "Hexion (Asia ver AAA, bootleg)", 0 ) // we're missing an original Asia AAA
+GAME( 1992, hexion,  0,      hexion,  hexion, hexion_state, empty_init, ROT0, "Konami",                     "Hexion (Japan ver JAB)",         0 )
+GAME( 1992, hexionb, hexion, hexionb, hexion, hexion_state, empty_init, ROT0, "bootleg (Impeuropex Corp.)", "Hexion (Asia ver AAA, bootleg)", 0 ) // we're missing an original Asia AAA

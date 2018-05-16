@@ -69,10 +69,10 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint2_collision_reset2_w);
 	DECLARE_WRITE8_MEMBER(sprint2_video_ram_w);
 	DECLARE_WRITE8_MEMBER(sprint2_noise_reset_w);
-	DECLARE_DRIVER_INIT(sprint1);
-	DECLARE_DRIVER_INIT(sprint2);
-	DECLARE_DRIVER_INIT(dominos);
-	DECLARE_DRIVER_INIT(dominos4);
+	void init_sprint1();
+	void init_sprint2();
+	void init_dominos();
+	void init_dominos4();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sprint2);

@@ -2756,28 +2756,28 @@ static const gfx_layout pivotlayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( finalb )
+static GFXDECODE_START( gfx_finalb )
 	GFXDECODE_ENTRY( "gfx2", 0, finalb_tilelayout,  0, 64 ) /* sprites & playfield, 6-bit deep */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* sprites & playfield */
 GFXDECODE_END
 
-static GFXDECODE_START( taitof2 )
+static GFXDECODE_START( gfx_taitof2 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* sprites & playfield */
 GFXDECODE_END
 
-static GFXDECODE_START( pivot )
+static GFXDECODE_START( gfx_pivot )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx3", 0, pivotlayout, 0, 256 )   /* sprites & playfield */
 GFXDECODE_END
 
-static GFXDECODE_START( yuyugogo )
+static GFXDECODE_START( gfx_yuyugogo )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, yuyugogo_charlayout,  0, 256 )  /* sprites & playfield */
 GFXDECODE_END
 
-static GFXDECODE_START( thundfox )
+static GFXDECODE_START( gfx_thundfox )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* TC0100SCN #1 */
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,  0, 256 )   /* TC0100SCN #2 */
@@ -2794,7 +2794,7 @@ static const gfx_layout deadconx_charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( deadconx )
+static GFXDECODE_START( gfx_deadconx )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, deadconx_charlayout,  0, 256 )  /* sprites & playfield */
 GFXDECODE_END
@@ -2821,7 +2821,7 @@ static const gfx_layout footchmpbl_charlayout =
 	8*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( footchmpbl )
+static GFXDECODE_START( gfx_footchmpbl )
 	GFXDECODE_ENTRY( "gfx2", 0, footchmpbl_tilelayout,  0, 256 )    /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, footchmpbl_tilelayout,  0, 256 )    /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx3", 0, footchmpbl_charlayout,  0, 256 )    // gets wiped out by the dynamic decode atm
@@ -2872,7 +2872,7 @@ MACHINE_CONFIG_START(taitof2_state::taito_f2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitof2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taitof2)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -2946,7 +2946,7 @@ MACHINE_CONFIG_START(taitof2_state::finalb)
 	MCFG_DEVICE_PROGRAM_MAP(finalb_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", finalb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_finalb)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_finalb)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed))
@@ -2971,7 +2971,7 @@ MACHINE_CONFIG_START(taitof2_state::dondokod)
 	MCFG_DEVICE_PROGRAM_MAP(dondokod_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pivot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pivot)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_dondokod)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed))
@@ -3029,7 +3029,7 @@ MACHINE_CONFIG_START(taitof2_state::thundfox)
 	MCFG_DEVICE_PROGRAM_MAP(thundfox_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", thundfox)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_thundfox)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_thundfox)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_thundfox)
@@ -3067,7 +3067,7 @@ MACHINE_CONFIG_START(taitof2_state::cameltry)
 	MCFG_DEVICE_PROGRAM_MAP(cameltry_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pivot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pivot)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_dondokod)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
@@ -3095,7 +3095,7 @@ MACHINE_CONFIG_START(taitof2_state::qtorimon)
 	MCFG_DEVICE_PROGRAM_MAP(qtorimon_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", yuyugogo)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_yuyugogo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed))
 
@@ -3142,7 +3142,7 @@ MACHINE_CONFIG_START(taitof2_state::quizhq)
 	MCFG_DEVICE_PROGRAM_MAP(quizhq_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", yuyugogo)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_yuyugogo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed))
 
@@ -3264,7 +3264,7 @@ MACHINE_CONFIG_START(taitof2_state::footchmp)
 	MCFG_DEVICE_PROGRAM_MAP(footchmp_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_deadconx)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_footchmp)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
@@ -3285,7 +3285,7 @@ MACHINE_CONFIG_START(taitof2_state::footchmpbl)
 	footchmp(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", footchmpbl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_footchmpbl)
 MACHINE_CONFIG_END
 
 
@@ -3297,7 +3297,7 @@ MACHINE_CONFIG_START(taitof2_state::hthero)
 	MCFG_DEVICE_PROGRAM_MAP(footchmp_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_deadconx)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_hthero)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
@@ -3353,7 +3353,7 @@ MACHINE_CONFIG_START(taitof2_state::yuyugogo)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", yuyugogo)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_yuyugogo)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_yuyugogo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_yesnoj)
@@ -3452,7 +3452,7 @@ MACHINE_CONFIG_START(taitof2_state::pulirula)
 	MCFG_DEVICE_PROGRAM_MAP(pulirula_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pivot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pivot)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_pulirula)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
@@ -3480,7 +3480,7 @@ MACHINE_CONFIG_START(taitof2_state::metalb)
 	MCFG_DEVICE_PROGRAM_MAP(metalb_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_deadconx)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(8192)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
@@ -3533,7 +3533,7 @@ MACHINE_CONFIG_START(taitof2_state::yesnoj)
 	MCFG_DEVICE_PROGRAM_MAP(yesnoj_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", yuyugogo)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_yuyugogo)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -3560,7 +3560,7 @@ MACHINE_CONFIG_START(taitof2_state::deadconx)
 	MCFG_DEVICE_PROGRAM_MAP(deadconx_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_deadconx)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -3588,7 +3588,7 @@ MACHINE_CONFIG_START(taitof2_state::deadconxj)
 	MCFG_DEVICE_PROGRAM_MAP(deadconx_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_deadconx)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_deadconxj)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
@@ -3717,7 +3717,7 @@ MACHINE_CONFIG_START(taitof2_state::driftout)
 	MCFG_DEVICE_PROGRAM_MAP(driftout_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pivot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pivot)
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_driftout)
 	MCFG_SCREEN_MODIFY("screen")
@@ -3768,7 +3768,7 @@ MACHINE_CONFIG_START(taitof2_state::cameltrya)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pivot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pivot)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -3837,7 +3837,7 @@ MACHINE_CONFIG_START(taitof2_state::driveout)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pivot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pivot)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -5594,24 +5594,19 @@ ROM_START( driveout )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(taitof2_state,finalb)
+void taitof2_state::init_finalb()
 {
-	int i;
-	uint8_t data;
-	uint32_t offset;
 	uint8_t *gfx = memregion("gfx2")->base();
 
-	offset = 0x100000;
-	for (i = 0x180000; i < 0x200000; i++)
+	uint32_t offset = 0x100000;
+	for (int i = 0x180000; i < 0x200000; i++)
 	{
-		int d1,d2,d3,d4;
-
 		/* convert from 2bits into 4bits format */
-		data = gfx[i];
-		d1 = (data >> 0) & 3;
-		d2 = (data >> 2) & 3;
-		d3 = (data >> 4) & 3;
-		d4 = (data >> 6) & 3;
+		uint8_t data = gfx[i];
+		int d1 = (data >> 0) & 3;
+		int d2 = (data >> 2) & 3;
+		int d3 = (data >> 4) & 3;
+		int d4 = (data >> 6) & 3;
 
 		gfx[offset] = (d3 << 2) | (d4 << 6);
 		offset++;
@@ -5621,7 +5616,7 @@ DRIVER_INIT_MEMBER(taitof2_state,finalb)
 	}
 }
 
-DRIVER_INIT_MEMBER(taitof2_state,cameltry)
+void taitof2_state::init_cameltry()
 {
 	m_last[0] = 0;
 	m_last[1] = 0;
@@ -5630,7 +5625,7 @@ DRIVER_INIT_MEMBER(taitof2_state,cameltry)
 }
 
 
-DRIVER_INIT_MEMBER(taitof2_state,mjnquest)
+void taitof2_state::init_mjnquest()
 {
 	int i, len = memregion("gfx2")->bytes();
 	uint8_t *gfx = memregion("gfx2")->base();
@@ -5651,7 +5646,7 @@ DRIVER_INIT_MEMBER(taitof2_state,mjnquest)
 	save_item(NAME(m_mjnquest_input));
 }
 
-DRIVER_INIT_MEMBER(taitof2_state,driveout)
+void taitof2_state::init_driveout()
 {
 	m_driveout_sound_latch = 0;
 	m_oki_bank = 0;
@@ -5664,94 +5659,94 @@ DRIVER_INIT_MEMBER(taitof2_state,driveout)
 }
 
 
-GAME( 1988, finalb,     0,        finalb,    finalb,     taitof2_state, finalb,   ROT0,   "Taito Corporation Japan",   "Final Blow (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, finalbu,    finalb,   finalb,    finalbu,    taitof2_state, finalb,   ROT0,   "Taito America Corporation", "Final Blow (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, finalbj,    finalb,   finalb,    finalbj,    taitof2_state, finalb,   ROT0,   "Taito Corporation",         "Final Blow (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, finalb,     0,        finalb,    finalb,     taitof2_state, init_finalb,   ROT0,   "Taito Corporation Japan",   "Final Blow (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, finalbu,    finalb,   finalb,    finalbu,    taitof2_state, init_finalb,   ROT0,   "Taito America Corporation", "Final Blow (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, finalbj,    finalb,   finalb,    finalbj,    taitof2_state, init_finalb,   ROT0,   "Taito Corporation",         "Final Blow (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, dondokod,   0,        dondokod,  dondokod,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Don Doko Don (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dondokodu,  dondokod, dondokod,  dondokodu,  taitof2_state, 0,        ROT0,   "Taito America Corporation", "Don Doko Don (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dondokodj,  dondokod, dondokod,  dondokodj,  taitof2_state, 0,        ROT0,   "Taito Corporation",         "Don Doko Don (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dondokod,   0,        dondokod,  dondokod,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Don Doko Don (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dondokodu,  dondokod, dondokod,  dondokodu,  taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Don Doko Don (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dondokodj,  dondokod, dondokod,  dondokodj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Don Doko Don (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, megablst,   0,        megab,     megab,      taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Mega Blast (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, megablstu,  megablst, megab,     megabu,     taitof2_state, 0,        ROT0,   "Taito America Corporation", "Mega Blast (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, megablstj,  megablst, megab,     megabj,     taitof2_state, 0,        ROT0,   "Taito Corporation",         "Mega Blast (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, megablst,   0,        megab,     megab,      taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Mega Blast (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, megablstu,  megablst, megab,     megabu,     taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Mega Blast (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, megablstj,  megablst, megab,     megabj,     taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Mega Blast (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, thundfox,   0,        thundfox,  thundfox,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Thunder Fox (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, thundfoxu,  thundfox, thundfox,  thundfoxu,  taitof2_state, 0,        ROT0,   "Taito America Corporation", "Thunder Fox (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, thundfoxj,  thundfox, thundfox,  thundfoxj,  taitof2_state, 0,        ROT0,   "Taito Corporation",         "Thunder Fox (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, thundfox,   0,        thundfox,  thundfox,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Thunder Fox (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, thundfoxu,  thundfox, thundfox,  thundfoxu,  taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Thunder Fox (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, thundfoxj,  thundfox, thundfox,  thundfoxj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Thunder Fox (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, cameltry,   0,        cameltry,  cameltry,   taitof2_state, cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cameltryj,  cameltry, cameltry,  cameltryj,  taitof2_state, cameltry, ROT0,   "Taito Corporation",         "Cameltry (Japan, YM2610)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cameltrya,  cameltry, cameltrya, cameltry,   taitof2_state, cameltry, ROT0,   "Taito America Corporation", "Cameltry (World, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cameltryau, cameltry, cameltrya, cameltry,   taitof2_state, cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cameltry,   0,        cameltry,  cameltry,   taitof2_state, init_cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cameltryj,  cameltry, cameltry,  cameltryj,  taitof2_state, init_cameltry, ROT0,   "Taito Corporation",         "Cameltry (Japan, YM2610)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cameltrya,  cameltry, cameltrya, cameltry,   taitof2_state, init_cameltry, ROT0,   "Taito America Corporation", "Cameltry (World, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cameltryau, cameltry, cameltrya, cameltry,   taitof2_state, init_cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, qtorimon,   0,        qtorimon,  qtorimon,   taitof2_state, 0,        ROT0,   "Taito Corporation",         "Quiz Torimonochou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, qtorimon,   0,        qtorimon,  qtorimon,   taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Quiz Torimonochou (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, liquidk,    0,        liquidk,   liquidk,    taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Liquid Kids (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, liquidku,   liquidk,  liquidk,   liquidku,   taitof2_state, 0,        ROT0,   "Taito America Corporation", "Liquid Kids (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mizubaku,   liquidk,  liquidk,   mizubaku,   taitof2_state, 0,        ROT0,   "Taito Corporation",         "Mizubaku Daibouken (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, liquidk,    0,        liquidk,   liquidk,    taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Liquid Kids (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, liquidku,   liquidk,  liquidk,   liquidku,   taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Liquid Kids (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mizubaku,   liquidk,  liquidk,   mizubaku,   taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Mizubaku Daibouken (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, quizhq,     0,        quizhq,    quizhq,     taitof2_state, 0,        ROT0,   "Taito Corporation",         "Quiz H.Q. (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, quizhq,     0,        quizhq,    quizhq,     taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Quiz H.Q. (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, ssi,        0,        ssi,       ssi,        taitof2_state, 0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ssia,       ssi,      ssi,       ssi,        taitof2_state, 0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, majest12u,  ssi,      ssi,       majest12u,  taitof2_state, 0,        ROT270, "Taito America Corporation", "Majestic Twelve - The Space Invaders Part IV (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, majest12j,  ssi,      ssi,       majest12j,  taitof2_state, 0,        ROT270, "Taito Corporation",         "Majestic Twelve - The Space Invaders Part IV (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ssi,        0,        ssi,       ssi,        taitof2_state, empty_init,    ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ssia,       ssi,      ssi,       ssi,        taitof2_state, empty_init,    ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, majest12u,  ssi,      ssi,       majest12u,  taitof2_state, empty_init,    ROT270, "Taito America Corporation", "Majestic Twelve - The Space Invaders Part IV (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, majest12j,  ssi,      ssi,       majest12j,  taitof2_state, empty_init,    ROT270, "Taito Corporation",         "Majestic Twelve - The Space Invaders Part IV (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, gunfront,   0,        gunfront,  gunfront,   taitof2_state, 0,        ROT270, "Taito Corporation Japan",   "Gun & Frontier (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gunfrontj,  gunfront, gunfront,  gunfrontj,  taitof2_state, 0,        ROT270, "Taito Corporation",         "Gun Frontier (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gunfront,   0,        gunfront,  gunfront,   taitof2_state, empty_init,    ROT270, "Taito Corporation Japan",   "Gun & Frontier (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gunfrontj,  gunfront, gunfront,  gunfrontj,  taitof2_state, empty_init,    ROT270, "Taito Corporation",         "Gun Frontier (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, growl,      0,        growl,     growl,      taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Growl (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, growla,     growl,    growl,     growl,      taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Growl (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, growlu,     growl,    growl,     growlu,     taitof2_state, 0,        ROT0,   "Taito America Corporation", "Growl (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, runark,     growl,    growl,     runark,     taitof2_state, 0,        ROT0,   "Taito Corporation",         "Runark (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, growlp,     growl,    growl,     growl,      taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Growl (World, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, growl,      0,        growl,     growl,      taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Growl (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, growla,     growl,    growl,     growl,      taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Growl (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, growlu,     growl,    growl,     growlu,     taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Growl (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, runark,     growl,    growl,     runark,     taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Runark (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, growlp,     growl,    growl,     growl,      taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Growl (World, prototype)", MACHINE_SUPPORTS_SAVE )
 
 
-GAME( 1990, mjnquest,   0,        mjnquest,  mjnquest,   taitof2_state, mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjnquestb,  mjnquest, mjnquest,  mjnquest,   taitof2_state, mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (No Nudity)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjnquest,   0,        mjnquest,  mjnquest,   taitof2_state, init_mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjnquestb,  mjnquest, mjnquest,  mjnquest,   taitof2_state, init_mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (No Nudity)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, footchmp,   0,        footchmp,  footchmp,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Football Champ / Euro Football Champ (World)", MACHINE_SUPPORTS_SAVE ) // title depends on dipswitch
-GAME( 1990, hthero,     footchmp, hthero,    hthero,     taitof2_state, 0,        ROT0,   "Taito Corporation",         "Hat Trick Hero (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, footchmpbl, footchmp, footchmpbl,footchmpbl, taitof2_state, 0,        ROT0,   "bootleg",                   "Football Champ / Euro Football Champ (World) (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // very different hw register etc.
+GAME( 1990, footchmp,   0,        footchmp,  footchmp,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Football Champ / Euro Football Champ (World)", MACHINE_SUPPORTS_SAVE ) // title depends on dipswitch
+GAME( 1990, hthero,     footchmp, hthero,    hthero,     taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Hat Trick Hero (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, footchmpbl, footchmp, footchmpbl,footchmpbl, taitof2_state, empty_init,    ROT0,   "bootleg",                   "Football Champ / Euro Football Champ (World) (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // very different hw register etc.
 
-GAME( 1992, euroch92,   0,        footchmp,  footchmp,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, euroch92,   0,        footchmp,  footchmp,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (World)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, koshien,    0,        koshien,   koshien,    taitof2_state, 0,        ROT0,   "Taito Corporation",         "Ah Eikou no Koshien (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, koshien,    0,        koshien,   koshien,    taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Ah Eikou no Koshien (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, yuyugogo,   0,        yuyugogo,  yuyugogo,   taitof2_state, 0,        ROT0,   "Taito Corporation",         "Yuuyu no Quiz de GO!GO! (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, yuyugogo,   0,        yuyugogo,  yuyugogo,   taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Yuuyu no Quiz de GO!GO! (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, ninjak,     0,        ninjak,    ninjak,     taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "The Ninja Kids (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ninjaku,    ninjak,   ninjak,    ninjaku,    taitof2_state, 0,        ROT0,   "Taito America Corporation", "The Ninja Kids (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ninjakj,    ninjak,   ninjak,    ninjakj,    taitof2_state, 0,        ROT0,   "Taito Corporation",         "The Ninja Kids (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ninjak,     0,        ninjak,    ninjak,     taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "The Ninja Kids (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ninjaku,    ninjak,   ninjak,    ninjaku,    taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "The Ninja Kids (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ninjakj,    ninjak,   ninjak,    ninjakj,    taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "The Ninja Kids (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, solfigtr,   0,        solfigtr,  solfigtr,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Solitary Fighter (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, solfigtr,   0,        solfigtr,  solfigtr,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Solitary Fighter (World)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, qzquest,    0,        qzquest ,  qzquest,    taitof2_state, 0,        ROT0,   "Taito Corporation",         "Quiz Quest - Hime to Yuusha no Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, qzquest,    0,        qzquest ,  qzquest,    taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Quiz Quest - Hime to Yuusha no Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, pulirula,   0,        pulirula,  pulirula,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "PuLiRuLa (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, pulirulaj,  pulirula, pulirula,  pulirulaj,  taitof2_state, 0,        ROT0,   "Taito Corporation",         "PuLiRuLa (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pulirula,   0,        pulirula,  pulirula,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "PuLiRuLa (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pulirulaj,  pulirula, pulirula,  pulirulaj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "PuLiRuLa (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, metalb,     0,        metalb,    metalb,     taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Metal Black (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, metalbj,    metalb,   metalb,    metalbj,    taitof2_state, 0,        ROT0,   "Taito Corporation",         "Metal Black (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, metalb,     0,        metalb,    metalb,     taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Metal Black (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, metalbj,    metalb,   metalb,    metalbj,    taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Metal Black (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, qzchikyu,   0,        qzchikyu,  qzchikyu,   taitof2_state, 0,        ROT0,   "Taito Corporation",         "Quiz Chikyu Bouei Gun (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, qzchikyu,   0,        qzchikyu,  qzchikyu,   taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Quiz Chikyu Bouei Gun (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, yesnoj,     0,        yesnoj,    yesnoj,     taitof2_state, 0,        ROT0,   "Taito Corporation",         "Yes/No Sinri Tokimeki Chart", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_PRINTER )
+GAME( 1992, yesnoj,     0,        yesnoj,    yesnoj,     taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Yes/No Sinri Tokimeki Chart", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_PRINTER )
 
-GAME( 1992, deadconx,   0,        deadconx,  deadconx,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Dead Connection (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, deadconxj,  deadconx, deadconxj, deadconxj,  taitof2_state, 0,        ROT0,   "Taito Corporation",         "Dead Connection (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, deadconx,   0,        deadconx,  deadconx,   taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Dead Connection (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, deadconxj,  deadconx, deadconxj, deadconxj,  taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Dead Connection (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, dinorex,    0,        dinorex,   dinorex,    taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Dino Rex (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dinorexu,   dinorex,  dinorex,   dinorexu,   taitof2_state, 0,        ROT0,   "Taito America Corporation", "Dino Rex (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dinorexj,   dinorex,  dinorex,   dinorexj,   taitof2_state, 0,        ROT0,   "Taito Corporation",         "Dino Rex (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dinorex,    0,        dinorex,   dinorex,    taitof2_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Dino Rex (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dinorexu,   dinorex,  dinorex,   dinorexu,   taitof2_state, empty_init,    ROT0,   "Taito America Corporation", "Dino Rex (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dinorexj,   dinorex,  dinorex,   dinorexj,   taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Dino Rex (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, qjinsei,    0,        qjinsei,   qjinsei,    taitof2_state, 0,        ROT0,   "Taito Corporation",         "Quiz Jinsei Gekijoh (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, qjinsei,    0,        qjinsei,   qjinsei,    taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Quiz Jinsei Gekijoh (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, qcrayon,    0,        qcrayon,   qcrayon,    taitof2_state, 0,        ROT0,   "Taito Corporation",         "Quiz Crayon Shinchan (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, qcrayon,    0,        qcrayon,   qcrayon,    taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Quiz Crayon Shinchan (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, qcrayon2,   0,        qcrayon2,  qcrayon2,   taitof2_state, 0,        ROT0,   "Taito Corporation",         "Crayon Shinchan Orato Asobo (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, qcrayon2,   0,        qcrayon2,  qcrayon2,   taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Crayon Shinchan Orato Asobo (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, driftout,   0,        driftout,  driftout,   taitof2_state, 0,        ROT270, "Visco",                     "Drift Out (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, driftoutj,  driftout, driftout,  driftout,   taitof2_state, 0,        ROT270, "Visco",                     "Drift Out (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, driveout,   driftout, driveout,  driftout,   taitof2_state, driveout, ROT270, "bootleg",                   "Drive Out (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, driftout,   0,        driftout,  driftout,   taitof2_state, empty_init,    ROT270, "Visco",                     "Drift Out (Europe)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, driftoutj,  driftout, driftout,  driftout,   taitof2_state, empty_init,    ROT270, "Visco",                     "Drift Out (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, driveout,   driftout, driveout,  driftout,   taitof2_state, init_driveout, ROT270, "bootleg",                   "Drive Out (bootleg)", MACHINE_SUPPORTS_SAVE )

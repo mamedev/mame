@@ -202,7 +202,7 @@ void pic16c5x_device::update_internalram_ptr()
 
 
 
-#define PIC16C5x_RDOP(A)         (m_direct->read_word(A))
+#define PIC16C5x_RDOP(A)         (m_cache->read_word(A))
 #define PIC16C5x_RAM_RDMEM(A)    ((uint8_t)m_data->read_byte(A))
 #define PIC16C5x_RAM_WRMEM(A,V)  (m_data->write_byte(A,V))
 
@@ -888,7 +888,7 @@ enum
 void pic16c5x_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-1>();
+	m_cache = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
 	m_data = &space(AS_DATA);
 
 	m_read_a.resolve_safe(0);

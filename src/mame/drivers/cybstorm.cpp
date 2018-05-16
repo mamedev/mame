@@ -207,7 +207,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( cybstorm )
+static GFXDECODE_START( gfx_cybstorm )
 	GFXDECODE_ENTRY( "gfx2", 0, pflayout,     0, 16 )       /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx3", 0, molayout,  4096, 64 )       /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx1", 0, anlayout, 16384, 64 )       /* characters 8x8 */
@@ -245,7 +245,7 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x90000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cybstorm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cybstorm)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
@@ -346,9 +346,8 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cybstorm_state, cybstorm)
+void cybstorm_state::init_cybstorm()
 {
-
 }
 
 
@@ -359,4 +358,4 @@ DRIVER_INIT_MEMBER(cybstorm_state, cybstorm)
  *
  *************************************/
 
-GAME( 1993, cybstorm, 0, cybstorm, cybstorm, cybstorm_state, cybstorm, ROT0, "Atari Games", "Cyberstorm (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cybstorm, 0, cybstorm, cybstorm, cybstorm_state, init_cybstorm, ROT0, "Atari Games", "Cyberstorm (prototype)", MACHINE_SUPPORTS_SAVE )

@@ -211,25 +211,25 @@ public:
 	DECLARE_READ16_MEMBER(ics2115_word_r);
 	DECLARE_WRITE16_MEMBER(ics2115_word_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	DECLARE_DRIVER_INIT(lhbv33c);
-	DECLARE_DRIVER_INIT(drgnwrldv21j);
-	DECLARE_DRIVER_INIT(wlcc);
-	DECLARE_DRIVER_INIT(nkishusp);
-	DECLARE_DRIVER_INIT(drgnwrldv21);
-	DECLARE_DRIVER_INIT(dbc);
-	DECLARE_DRIVER_INIT(lhb);
-	DECLARE_DRIVER_INIT(drgnwrld);
-	DECLARE_DRIVER_INIT(drgnwrldv30);
-	DECLARE_DRIVER_INIT(drgnwrldv11h);
-	DECLARE_DRIVER_INIT(lhb2);
-	DECLARE_DRIVER_INIT(xymg);
-	DECLARE_DRIVER_INIT(drgnwrldv10c);
-	DECLARE_DRIVER_INIT(drgnwrldv20j);
-	DECLARE_DRIVER_INIT(drgnwrldv40k);
-	DECLARE_DRIVER_INIT(vbowl);
-	DECLARE_DRIVER_INIT(vbowlj);
-	DECLARE_DRIVER_INIT(vbowlhk);
-	DECLARE_DRIVER_INIT(ryukobou);
+	void init_lhbv33c();
+	void init_drgnwrldv21j();
+	void init_wlcc();
+	void init_nkishusp();
+	void init_drgnwrldv21();
+	void init_dbc();
+	void init_lhb();
+	void init_drgnwrld();
+	void init_drgnwrldv30();
+	void init_drgnwrldv11h();
+	void init_lhb2();
+	void init_xymg();
+	void init_drgnwrldv10c();
+	void init_drgnwrldv20j();
+	void init_drgnwrldv40k();
+	void init_vbowl();
+	void init_vbowlj();
+	void init_vbowlhk();
+	void init_ryukobou();
 	TIMER_DEVICE_CALLBACK_MEMBER(lev5_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lhb_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lev3_timer_irq_cb);
@@ -2157,7 +2157,7 @@ WRITE16_MEMBER(igs011_state::vbowlhk_igs003_w)
 ***************************************************************************/
 
 // V0400O
-DRIVER_INIT_MEMBER(igs011_state,drgnwrld)
+void igs011_state::init_drgnwrld()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2183,7 +2183,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrld)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv30)
+void igs011_state::init_drgnwrldv30()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2208,7 +2208,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv30)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21)
+void igs011_state::init_drgnwrldv21()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2237,7 +2237,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21j)
+void igs011_state::init_drgnwrldv21j()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2264,7 +2264,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21j)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv20j)
+void igs011_state::init_drgnwrldv20j()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2293,7 +2293,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv20j)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv40k)
+void igs011_state::init_drgnwrldv40k()
 {
 	//drgnwrld_type3_decrypt(); // wrong
 	drgnwrld_gfx_decrypt();
@@ -2301,7 +2301,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv40k)
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), this)); // wrong
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv11h)
+void igs011_state::init_drgnwrldv11h()
 {
 	drgnwrld_type1_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2310,7 +2310,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv11h)
 	// the protection checks are already patched out like we do!
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv10c)
+void igs011_state::init_drgnwrldv10c()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2336,7 +2336,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv10c)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,lhb)
+void igs011_state::init_lhb()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2346,7 +2346,7 @@ DRIVER_INIT_MEMBER(igs011_state,lhb)
 //  rom[0x2eef6/2]  =   0x4e75;     // 02EEF6: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
 }
 
-DRIVER_INIT_MEMBER(igs011_state,lhbv33c)
+void igs011_state::init_lhbv33c()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2356,7 +2356,7 @@ DRIVER_INIT_MEMBER(igs011_state,lhbv33c)
 //  rom[0x2e988/2]  =   0x4e75;     // 02E988: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
 }
 
-DRIVER_INIT_MEMBER(igs011_state,dbc)
+void igs011_state::init_dbc()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2386,7 +2386,7 @@ DRIVER_INIT_MEMBER(igs011_state,dbc)
 //  rom[0x19E90/2]  =   0x00ff;
 }
 
-DRIVER_INIT_MEMBER(igs011_state,ryukobou)
+void igs011_state::init_ryukobou()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2399,7 +2399,7 @@ DRIVER_INIT_MEMBER(igs011_state,ryukobou)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,xymg)
+void igs011_state::init_xymg()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2433,7 +2433,7 @@ DRIVER_INIT_MEMBER(igs011_state,xymg)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,wlcc)
+void igs011_state::init_wlcc()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2457,7 +2457,7 @@ DRIVER_INIT_MEMBER(igs011_state,wlcc)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,lhb2)
+void igs011_state::init_lhb2()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2480,7 +2480,7 @@ DRIVER_INIT_MEMBER(igs011_state,lhb2)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,vbowl)
+void igs011_state::init_vbowl()
 {
 	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2500,7 +2500,7 @@ DRIVER_INIT_MEMBER(igs011_state,vbowl)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,vbowlj)
+void igs011_state::init_vbowlj()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2518,7 +2518,7 @@ DRIVER_INIT_MEMBER(igs011_state,vbowlj)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,vbowlhk)
+void igs011_state::init_vbowlhk()
 {
 	vbowlhk_decrypt();
 	vbowl_gfx_decrypt();
@@ -2527,7 +2527,7 @@ DRIVER_INIT_MEMBER(igs011_state,vbowlhk)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,nkishusp)
+void igs011_state::init_nkishusp()
 {
 	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -4156,13 +4156,13 @@ static const gfx_layout layout_16x16x1 =
 	16*16*1
 };
 
-static GFXDECODE_START( igs011 )
+static GFXDECODE_START( gfx_igs011 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x4,   0, 0x80 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4, 0, 0x80 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,   0, 0x08 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8, 0, 0x08 )
 GFXDECODE_END
-static GFXDECODE_START( igs011_hi )
+static GFXDECODE_START( gfx_igs011_hi )
 	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x4,   0, 0x80 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4, 0, 0x80 )
 	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,   0, 0x08 )
@@ -4186,7 +4186,7 @@ MACHINE_CONFIG_START(igs011_state::igs011_base)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x800)
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011)
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs011)
 
 
 	/* sound hardware */
@@ -4280,7 +4280,7 @@ MACHINE_CONFIG_START(igs011_state::lhb2)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev5_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs011_hi)
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
@@ -4297,7 +4297,7 @@ MACHINE_CONFIG_START(igs011_state::nkishusp)
 
 	// VSync 60.0052Hz, HSync 15.620kHz
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs011_hi)
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
@@ -4321,7 +4321,7 @@ MACHINE_CONFIG_START(igs011_state::vbowl)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs011_state, screen_vblank_vbowl))
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
+//  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs011_hi)
 
 	MCFG_DEVICE_REMOVE("oki")
 	MCFG_ICS2115_ADD("ics", 0)
@@ -5038,22 +5038,22 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, drgnwrld,     0,        drgnwrld,        drgnwrld,  igs011_state, drgnwrld,     ROT0, "IGS",                     "Dragon World (World, V040O)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv40k, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, drgnwrldv40k, ROT0, "IGS",                     "Dragon World (Korea, V040K)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld,        drgnwrld,  igs011_state, drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv21,  drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv21j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V021J)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv20j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, drgnwrldv20j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V020J)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv11h, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv11h, ROT0, "IGS",                     "Dongfang Zhi Zhu (Hong Kong, V011H)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv10c, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, drgnwrldv10c, ROT0, "IGS",                     "Zhongguo Long (China, V010C)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1995, lhb,          0,        lhb,             lhb,       igs011_state, lhb,          ROT0, "IGS",                     "Long Hu Bang (China, V035C)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, lhbv33c,      lhb,      lhb,             lhb,       igs011_state, lhbv33c,      ROT0, "IGS",                     "Long Hu Bang (China, V033C)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dbc,          lhb,      lhb,             lhb,       igs011_state, dbc,          ROT0, "IGS",                     "Da Ban Cheng (Hong Kong, V027H)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ryukobou,     lhb,      lhb,             lhb,       igs011_state, ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1996, lhb2,         0,        lhb2,            lhb2,      igs011_state, lhb2,         ROT0, "IGS",                     "Long Hu Bang II (Hong Kong, V185H)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xymg,         0,        xymg,            xymg,      igs011_state, xymg,         ROT0, "IGS",                     "Xingyun Man Guan (China, V651C)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1996, wlcc,         xymg,     wlcc,            wlcc,      igs011_state, wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1996, vbowl,        0,        vbowl,           vbowl,     igs011_state, vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vbowlj,       vbowl,    vbowl,           vbowlj,    igs011_state, vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vbowlhk,      vbowl,    vbowlhk,         vbowl,     igs011_state, vbowlhk,      ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Hong Kong, V101HJS)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, nkishusp,     lhb2,     nkishusp,        nkishusp,  igs011_state, nkishusp,     ROT0, "IGS / Alta",              "Mahjong Nenrikishu SP (Japan, V250J)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, drgnwrld,     0,        drgnwrld,        drgnwrld,  igs011_state, init_drgnwrld,     ROT0, "IGS",                     "Dragon World (World, V040O)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv40k, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dragon World (Korea, V040K)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld,        drgnwrld,  igs011_state, init_drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21,  drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, init_drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv21j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V021J)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv20j, drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv20j, ROT0, "IGS / Alta",              "Zhongguo Long (Japan, V020J)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv11h, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv11h, ROT0, "IGS",                     "Dongfang Zhi Zhu (Hong Kong, V011H)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv10c, drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv10c, ROT0, "IGS",                     "Zhongguo Long (China, V010C)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1995, lhb,          0,        lhb,             lhb,       igs011_state, init_lhb,          ROT0, "IGS",                     "Long Hu Bang (China, V035C)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, lhbv33c,      lhb,      lhb,             lhb,       igs011_state, init_lhbv33c,      ROT0, "IGS",                     "Long Hu Bang (China, V033C)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dbc,          lhb,      lhb,             lhb,       igs011_state, init_dbc,          ROT0, "IGS",                     "Da Ban Cheng (Hong Kong, V027H)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ryukobou,     lhb,      lhb,             lhb,       igs011_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1996, lhb2,         0,        lhb2,            lhb2,      igs011_state, init_lhb2,         ROT0, "IGS",                     "Long Hu Bang II (Hong Kong, V185H)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xymg,         0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Man Guan (China, V651C)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1996, wlcc,         xymg,     wlcc,            wlcc,      igs011_state, init_wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1996, vbowl,        0,        vbowl,           vbowl,     igs011_state, init_vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vbowlj,       vbowl,    vbowl,           vbowlj,    igs011_state, init_vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vbowlhk,      vbowl,    vbowlhk,         vbowl,     igs011_state, init_vbowlhk,      ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Hong Kong, V101HJS)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, nkishusp,     lhb2,     nkishusp,        nkishusp,  igs011_state, init_nkishusp,     ROT0, "IGS / Alta",              "Mahjong Nenrikishu SP (Japan, V250J)", MACHINE_SUPPORTS_SAVE )

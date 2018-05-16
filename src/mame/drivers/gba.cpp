@@ -1469,5 +1469,5 @@ ROM_START( gba )
 ROM_END
 
 
-//   YEAR  NAME PARENT COMPAT MACHINE INPUT  STATE      INIT  COMPANY     FULLNAME            FLAGS
-CONS(2001, gba, 0,     0,     gbadv,  gbadv, gba_state, 0,    "Nintendo", "Game Boy Advance", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+//   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME            FLAGS
+CONS(2001, gba,  0,      0,      gbadv,   gbadv, gba_state, empty_init, "Nintendo", "Game Boy Advance", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

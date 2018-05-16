@@ -54,7 +54,7 @@
 };
 
 #define GFXDECODEINFO(NUM,ENTRIES) \
-static GFXDECODE_START( NUM )\
+static GFXDECODE_START( gfx_##NUM )\
 	GFXDECODE_ENTRY( "gfx1", 0x0000000, tilelayout16_##NUM,0,   ENTRIES )                       \
 GFXDECODE_END
 
@@ -195,7 +195,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0080000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0080000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -626,7 +626,7 @@ MACHINE_CONFIG_START(gaelco2_state::play2000)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0200000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0200000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -731,7 +731,7 @@ MACHINE_CONFIG_START(bang_state::bang)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0200000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0200000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -969,7 +969,7 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0400000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0400000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -1264,7 +1264,7 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0400000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0400000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -1581,7 +1581,7 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0400000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0400000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -1624,7 +1624,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0080000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0080000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
@@ -1860,7 +1860,7 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0200000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0200000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -2184,31 +2184,31 @@ ROM_END
 
 
 
-GAME( 1994, aligator,   0,       alighunt_d5002fp, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (World, protected)", 0 )
-GAME( 1994, aligators,  aligator,alighunt_d5002fp, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (Spain, protected)", 0 )
-GAME( 1994, aligatorun, aligator,alighunt,         alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 1)", 0 )
-GAME( 1994, aligatoruna,aligator,alighunt,         alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 2)", 0 ) // strange version, starts on space stages, but clearly a recompile not a trivial hack of the above, show version maybe?
+GAME( 1994, aligator,    0,         alighunt_d5002fp, alighunt, gaelco2_state, init_alighunt, ROT0, "Gaelco", "Alligator Hunt (World, protected)", 0 )
+GAME( 1994, aligators,   aligator,  alighunt_d5002fp, alighunt, gaelco2_state, init_alighunt, ROT0, "Gaelco", "Alligator Hunt (Spain, protected)", 0 )
+GAME( 1994, aligatorun,  aligator,  alighunt,         alighunt, gaelco2_state, init_alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 1)", 0 )
+GAME( 1994, aligatoruna, aligator,  alighunt,         alighunt, gaelco2_state, init_alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 2)", 0 ) // strange version, starts on space stages, but clearly a recompile not a trivial hack of the above, show version maybe?
 
-GAME( 1995, touchgo,  0,        touchgo_d5002fp,   touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (World)", MACHINE_IMPERFECT_SOUND )
-GAME( 1995, touchgon, touchgo,  touchgo_d5002fp,   touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_IMPERFECT_SOUND )
-GAME( 1995, touchgoe, touchgo,  touchgo_d5002fp,   touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)",  MACHINE_IMPERFECT_SOUND )
-GAME( 1995, touchgok, touchgo,  touchgo,           touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
+GAME( 1995, touchgo,     0,         touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,  ROT0, "Gaelco", "Touch & Go (World)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, touchgon,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,  ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, touchgoe,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state, init_touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)",  MACHINE_IMPERFECT_SOUND )
+GAME( 1995, touchgok,    touchgo,   touchgo,          touchgo,  gaelco2_state, init_touchgo,  ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
 
-GAME( 1995, wrally2,  0,        wrally2,           wrally2,  wrally2_state, wrally2,  ROT0, "Gaelco", "World Rally 2: Twin Racing (mask ROM version)", 0 )
-GAME( 1995, wrally2a, wrally2,  wrally2,           wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing (EPROM version)", 0 )
+GAME( 1995, wrally2,     0,         wrally2,          wrally2,  wrally2_state, init_wrally2,  ROT0, "Gaelco", "World Rally 2: Twin Racing (mask ROM version)", 0 )
+GAME( 1995, wrally2a,    wrally2,   wrally2,          wrally2,  wrally2_state, empty_init,    ROT0, "Gaelco", "World Rally 2: Twin Racing (EPROM version)", 0 )
 
 // All sets identify as Version 1.0, but are clearly different revisions
-GAME( 1996, maniacsq,  0,        maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", 0 )
-GAME( 1996, maniacsqa, maniacsq, maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum CF2D)", 0 )
-GAME( 1996, maniacsqu, maniacsq, maniacsq,         maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum BB73)", 0 )
-GAME( 1996, maniacsqs, maniacsq, maniacsqs,        snowboar, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum 66B1, 960419/1 PCB)", 0 ) // Official version on Snow Board Championship PCB, doesn't use the protection
+GAME( 1996, maniacsq,    0,         maniacsq_d5002fp, maniacsq, gaelco2_state, empty_init,    ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", 0 )
+GAME( 1996, maniacsqa,   maniacsq,  maniacsq_d5002fp, maniacsq, gaelco2_state, empty_init,    ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum CF2D)", 0 )
+GAME( 1996, maniacsqu,   maniacsq,  maniacsq,         maniacsq, gaelco2_state, empty_init,    ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum BB73)", 0 )
+GAME( 1996, maniacsqs,   maniacsq,  maniacsqs,        snowboar, gaelco2_state, empty_init,    ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum 66B1, 960419/1 PCB)", 0 ) // Official version on Snow Board Championship PCB, doesn't use the protection
 
-GAME( 1996, snowboar, 0,        snowboar, snowboar, gaelco2_state, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", 0 )
-GAME( 1996, snowboara,snowboar, snowboar, snowboar, gaelco2_state, snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", 0 )
+GAME( 1996, snowboar,    0,         snowboar,         snowboar, gaelco2_state, empty_init,    ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", 0 )
+GAME( 1996, snowboara,   snowboar,  snowboar,         snowboar, gaelco2_state, init_snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", 0 )
 
-GAME( 1998, bang,     0,        bang,     bang,     bang_state,    bang,     ROT0, "Gaelco", "Bang!", 0 )
-GAME( 1998, bangj,    bang,     bang,     bang,     bang_state,    bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
+GAME( 1998, bang,        0,         bang,             bang,     bang_state,    init_bang,     ROT0, "Gaelco", "Bang!", 0 )
+GAME( 1998, bangj,       bang,      bang,             bang,     bang_state,    init_bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
 
 // 2-in-1 gambling game, appears to be cloned Gaelco hardware complete with DS5002FP, or possibly manufactured by Gaelco for Nova Desitec but without any Gaelco branding.
-GAME( 1999, play2000,   0,        play2000, play2000, gaelco2_state, 0,        ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0) (Italy)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1999, play2000a,  play2000, play2000, play2000, gaelco2_state, 0,        ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.01) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // bad dump
+GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state, empty_init,    ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0) (Italy)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1999, play2000a,   play2000,  play2000,         play2000, gaelco2_state, empty_init,    ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.01) (Italy)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // bad dump

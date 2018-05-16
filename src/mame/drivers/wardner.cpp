@@ -150,7 +150,7 @@ public:
 	required_device<address_map_bank_device> m_membank;
 
 	DECLARE_WRITE8_MEMBER(wardner_bank_w);
-	DECLARE_DRIVER_INIT(wardner);
+	void init_wardner();
 
 	void wardner(machine_config &config);
 	void DSP_io_map(address_map &map);
@@ -355,7 +355,7 @@ static const gfx_layout tilelayout =
 };
 
 
-static GFXDECODE_START( wardner )
+static GFXDECODE_START( gfx_wardner )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   1536, 32 )  /* colors 1536-1791 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,   1280, 16 )  /* colors 1280-1535 */
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,   1024, 16 )  /* colors 1024-1079 */
@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, wardner_state, wardner_vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wardner)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wardner)
 	MCFG_PALETTE_ADD("palette", 1792)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -608,6 +608,6 @@ ROM_START( wardnerj )
 ROM_END
 
 
-GAME( 1987, wardner,  0,       wardner, wardner,  wardner_state, 0, ROT0, "Toaplan / Taito Corporation Japan",   "Wardner (World)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pyros,    wardner, wardner, pyros,    wardner_state, 0, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wardnerj, wardner, wardner, wardnerj, wardner_state, 0, ROT0, "Toaplan / Taito Corporation",         "Wardner no Mori (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardner,  0,       wardner, wardner,  wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation Japan",   "Wardner (World)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pyros,    wardner, wardner, pyros,    wardner_state, empty_init, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wardnerj, wardner, wardner, wardnerj, wardner_state, empty_init, ROT0, "Toaplan / Taito Corporation",         "Wardner no Mori (Japan)", MACHINE_SUPPORTS_SAVE )

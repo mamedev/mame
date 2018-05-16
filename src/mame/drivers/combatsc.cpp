@@ -624,12 +624,12 @@ static const gfx_layout sprite_layout =
 	8*8*4
 };
 
-static GFXDECODE_START( combatsc )
+static GFXDECODE_START( gfx_combatsc )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, gfxlayout, 0, 8*16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, gfxlayout, 0, 8*16 )
 GFXDECODE_END
 
-static GFXDECODE_START( combatscb )
+static GFXDECODE_START( gfx_combatscb )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tile_layout,   0, 8*16 )
 	GFXDECODE_ENTRY( "gfx1", 0x40000, tile_layout,   0, 8*16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, sprite_layout, 0, 8*16 )
@@ -722,7 +722,7 @@ MACHINE_CONFIG_START(combatsc_state::combatsc)
 	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatsc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", combatsc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_combatsc)
 	MCFG_PALETTE_ADD("palette", 8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -773,7 +773,7 @@ MACHINE_CONFIG_START(combatsc_state::combatscb)
 	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatscb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", combatscb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_combatscb)
 	MCFG_PALETTE_ADD("palette", 8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -991,7 +991,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(combatsc_state,combatsc)
+void combatsc_state::init_combatsc()
 {
 	/* joystick instead of trackball */
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x0404, 0x0404, "IN1");
@@ -1004,9 +1004,9 @@ DRIVER_INIT_MEMBER(combatsc_state,combatsc)
  *
  *************************************/
 
-GAME( 1988, combatsc,  0,        combatsc,  combatsc,  combatsc_state, combatsc,  ROT0, "Konami",  "Combat School (joystick)",        0 )
-GAME( 1987, combatsct, combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Combat School (trackball)",       MACHINE_NOT_WORKING )
-GAME( 1987, combatscj, combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Combat School (Japan trackball)", MACHINE_NOT_WORKING )
-GAME( 1987, bootcamp,  combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Boot Camp (set 1)",               MACHINE_NOT_WORKING )
-GAME( 1987, bootcampa, combatsc, combatsc,  combatsct, combatsc_state, 0,         ROT0, "Konami",  "Boot Camp (set 2)",               MACHINE_NOT_WORKING )
-GAME( 1988, combatscb, combatsc, combatscb, combatscb, combatsc_state, 0,         ROT0, "bootleg", "Combat School (bootleg)",         MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, combatsc,  0,        combatsc,  combatsc,  combatsc_state, init_combatsc, ROT0, "Konami",  "Combat School (joystick)",        0 )
+GAME( 1987, combatsct, combatsc, combatsc,  combatsct, combatsc_state, empty_init,    ROT0, "Konami",  "Combat School (trackball)",       MACHINE_NOT_WORKING )
+GAME( 1987, combatscj, combatsc, combatsc,  combatsct, combatsc_state, empty_init,    ROT0, "Konami",  "Combat School (Japan trackball)", MACHINE_NOT_WORKING )
+GAME( 1987, bootcamp,  combatsc, combatsc,  combatsct, combatsc_state, empty_init,    ROT0, "Konami",  "Boot Camp (set 1)",               MACHINE_NOT_WORKING )
+GAME( 1987, bootcampa, combatsc, combatsc,  combatsct, combatsc_state, empty_init,    ROT0, "Konami",  "Boot Camp (set 2)",               MACHINE_NOT_WORKING )
+GAME( 1988, combatscb, combatsc, combatscb, combatscb, combatsc_state, empty_init,    ROT0, "bootleg", "Combat School (bootleg)",         MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )

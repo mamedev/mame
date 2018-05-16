@@ -712,7 +712,7 @@ static const gfx_layout px8_charlayout =
     GFXDECODE( px8 )
 -------------------------------------------------*/
 
-static GFXDECODE_START( px8 )
+static GFXDECODE_START( gfx_px8 )
 	GFXDECODE_ENTRY( SED1320_TAG, 0x0000, px8_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -774,14 +774,13 @@ MACHINE_CONFIG_START(px8_state::px8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 63)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", px8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_px8)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(px8_state, px8)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(0, "mono", 0.25);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px8_cart")
@@ -835,5 +834,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE      INIT    COMPANY     FULLNAME    FLAGS */
-COMP( 1984, px8,    0,      0,      px8,    px8,   px8_state, 0,      "Epson",    "PX-8",     MACHINE_NOT_WORKING )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS */
+COMP( 1984, px8,  0,      0,      px8,     px8,   px8_state, empty_init, "Epson", "PX-8",   MACHINE_NOT_WORKING )

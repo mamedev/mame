@@ -207,7 +207,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( shisen )
+static GFXDECODE_START( gfx_shisen )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,  0, 16 )
 GFXDECODE_END
 
@@ -237,7 +237,7 @@ MACHINE_CONFIG_START(shisen_state::shisen)
 	MCFG_SCREEN_UPDATE_DRIVER(shisen_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shisen)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shisen)
 	MCFG_PALETTE_ADD("palette", 256)
 
 
@@ -443,7 +443,7 @@ ROM_START( matchit )
 	/* no samples on this board */
 ROM_END
 
-GAME( 1989, matchit,  0,         shisen,   matchit, shisen_state,  0, ROT0, "Tamtex",  "Match It",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1989, shisen,   matchit,   shisen,   shisen,  shisen_state,  0, ROT0, "Tamtex",  "Shisensho - Joshiryo-Hen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sichuan2, matchit,   shisen,   shisen,  shisen_state,  0, ROT0, "hack",    "Sichuan II (hack, set 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sichuan2a,matchit,   shisen,   shisen,  shisen_state,  0, ROT0, "hack",    "Sichuan II (hack, set 2)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, matchit,  0,         shisen,   matchit, shisen_state, empty_init, ROT0, "Tamtex",  "Match It",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, shisen,   matchit,   shisen,   shisen,  shisen_state, empty_init, ROT0, "Tamtex",  "Shisensho - Joshiryo-Hen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sichuan2, matchit,   shisen,   shisen,  shisen_state, empty_init, ROT0, "hack",    "Sichuan II (hack, set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sichuan2a,matchit,   shisen,   shisen,  shisen_state, empty_init, ROT0, "hack",    "Sichuan II (hack, set 2)",         MACHINE_SUPPORTS_SAVE )

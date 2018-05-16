@@ -541,7 +541,7 @@ static const gfx_layout bw12_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( bw12 )
+static GFXDECODE_START( gfx_bw12 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bw12_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -561,7 +561,7 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bw12)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bw12)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL(16'000'000)/8)
@@ -680,6 +680,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE         INIT    COMPANY               FULLNAME        FLAGS */
-COMP( 1984, bw12,   0,      0,      bw12,   bw12, bw12_state,   0,      "Bondwell Holding",   "Bondwell 12",  MACHINE_SUPPORTS_SAVE )
-COMP( 1984, bw14,   bw12,   0,      bw14,   bw12, bw12_state,   0,      "Bondwell Holding",   "Bondwell 14",  MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME       FLAGS */
+COMP( 1984, bw12, 0,      0,      bw12,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell 12", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, bw14, bw12,   0,      bw14,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell 14", MACHINE_SUPPORTS_SAVE )

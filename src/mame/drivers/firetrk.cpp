@@ -825,7 +825,7 @@ static const gfx_layout firetrk_trailer_layout =
 };
 
 
-static GFXDECODE_START( firetrk )
+static GFXDECODE_START( gfx_firetrk )
 	GFXDECODE_ENTRY( "gfx1", 0, firetrk_text_layout, 26, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, firetrk_tile_layout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, firetrk_tile_layout, 16, 3 )
@@ -835,7 +835,7 @@ static GFXDECODE_START( firetrk )
 GFXDECODE_END
 
 
-static GFXDECODE_START( superbug )
+static GFXDECODE_START( gfx_superbug )
 	GFXDECODE_ENTRY( "gfx1", 0, superbug_text_layout, 26, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, superbug_tile_layout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, superbug_tile_layout, 16, 3 )
@@ -844,7 +844,7 @@ static GFXDECODE_START( superbug )
 GFXDECODE_END
 
 
-static GFXDECODE_START( montecar )
+static GFXDECODE_START( gfx_montecar )
 	GFXDECODE_ENTRY( "gfx1", 0, montecar_text_layout, 44, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, firetrk_tile_layout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, firetrk_tile_layout, 16, 4 )
@@ -873,7 +873,7 @@ MACHINE_CONFIG_START(firetrk_state::firetrk)
 	MCFG_PALETTE_ADD("palette", 28)
 	MCFG_PALETTE_INIT_OWNER(firetrk_state, firetrk)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firetrk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firetrk)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -895,7 +895,7 @@ MACHINE_CONFIG_START(firetrk_state::superbug)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_superbug)
 
 	MCFG_VIDEO_START_OVERRIDE(firetrk_state,superbug)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", superbug)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_superbug)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(28)
@@ -919,7 +919,7 @@ MACHINE_CONFIG_START(firetrk_state::montecar)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_montecar)
 
 	MCFG_VIDEO_START_OVERRIDE(firetrk_state,montecar)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", montecar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_montecar)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(46)
@@ -1007,6 +1007,6 @@ ROM_START( montecar )
 ROM_END
 
 
-GAMEL(1977, superbug, 0, superbug, superbug, firetrk_state, 0, ROT270, "Atari (Kee Games)", "Super Bug", 0, layout_superbug )
-GAME( 1978, firetrk,  0, firetrk,  firetrk,  firetrk_state, 0, ROT270, "Atari", "Fire Truck / Smokey Joe", 0 )
-GAME( 1979, montecar, 0, montecar, montecar, firetrk_state, 0, ROT270, "Atari", "Monte Carlo", 0 )
+GAMEL( 1977, superbug, 0, superbug, superbug, firetrk_state, empty_init, ROT270, "Atari (Kee Games)", "Super Bug", 0, layout_superbug )
+GAME(  1978, firetrk,  0, firetrk,  firetrk,  firetrk_state, empty_init, ROT270, "Atari", "Fire Truck / Smokey Joe", 0 )
+GAME(  1979, montecar, 0, montecar, montecar, firetrk_state, empty_init, ROT270, "Atari", "Monte Carlo", 0 )

@@ -332,7 +332,7 @@ static const gfx_layout tiles8x8_layout =
 	32*8
 };
 
-static GFXDECODE_START( ppmast93 )
+static GFXDECODE_START( gfx_ppmast93 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -390,7 +390,7 @@ MACHINE_CONFIG_START(ppmast93_state::ppmast93)
 	MCFG_SCREEN_UPDATE_DRIVER(ppmast93_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ppmast93)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppmast93)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 
@@ -424,4 +424,4 @@ ROM_START( ppmast93 )
 	ROM_LOAD( "prom1.ug26", 0x200, 0x100, CRC(d979c64e) SHA1(172c9579013d58e35a5b4f732e360811ac36295e) )
 ROM_END
 
-GAME( 1993, ppmast93, 0, ppmast93, ppmast93, ppmast93_state, 0, ROT0, "Electronic Devices S.R.L.", "Ping Pong Masters '93", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ppmast93, 0, ppmast93, ppmast93, ppmast93_state, empty_init, ROT0, "Electronic Devices S.R.L.", "Ping Pong Masters '93", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

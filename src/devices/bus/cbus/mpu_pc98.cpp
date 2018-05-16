@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "mpu_pc98.h"
-#include "machine/pic8259.h"
 
 #define MPU_CORE_TAG "mpu401"
 

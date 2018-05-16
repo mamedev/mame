@@ -334,7 +334,7 @@ static const gfx_layout motion_layout =
 };
 
 
-static GFXDECODE_START( skydiver )
+static GFXDECODE_START( gfx_skydiver )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, motion_layout, 0, 4 )
 GFXDECODE_END
@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(skydiver_state::skydiver)
 	MCFG_SCREEN_UPDATE_DRIVER(skydiver_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skydiver)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skydiver)
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(colortable_source))
 	MCFG_PALETTE_INIT_OWNER(skydiver_state, skydiver)
 
@@ -434,4 +434,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL(1978, skydiver, 0, skydiver, skydiver, skydiver_state, 0, ROT0, "Atari", "Sky Diver", MACHINE_SUPPORTS_SAVE, layout_skydiver )
+GAMEL(1978, skydiver, 0, skydiver, skydiver, skydiver_state, empty_init, ROT0, "Atari", "Sky Diver", MACHINE_SUPPORTS_SAVE, layout_skydiver )

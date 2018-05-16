@@ -136,7 +136,7 @@ static const gfx_layout intvkbd_charlayout =
 	8 * 8
 };
 
-static GFXDECODE_START( intvkbd )
+static GFXDECODE_START( gfx_intvkbd )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, intvkbd_charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -551,7 +551,7 @@ MACHINE_CONFIG_START(intv_state::intvkbd)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", intvkbd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_intvkbd)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
 
@@ -642,14 +642,14 @@ ROM_START(intvkbd) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 an
 	ROM_LOAD( "0370.u74", 0x20, 0x20, CRC(19da5096) SHA1(76af50e4fd29649fc4837120c245321a8fc84cd3))
 ROM_END
 
-DRIVER_INIT_MEMBER(intv_state,intv)
+void intv_state::init_intv()
 {
 	m_stic->set_x_scale(INTV_X_SCALE);
 	m_stic->set_y_scale(INTV_Y_SCALE);
 	m_is_keybd = 0;
 }
 
-DRIVER_INIT_MEMBER(intv_state,intvkbd)
+void intv_state::init_intvkbd()
 {
 	m_stic->set_x_scale(INTVKBD_X_SCALE);
 	m_stic->set_y_scale(INTVKBD_Y_SCALE);
@@ -663,12 +663,12 @@ DRIVER_INIT_MEMBER(intv_state,intvkbd)
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT        COMPANY   FULLNAME */
-CONS( 1979, intv,       0,      0,      intv,       0,       intv_state,    intv,       "Mattel", "Intellivision", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, intvsrs,    intv,   0,      intv,       0,       intv_state,    intv,       "Sears",  "Super Video Arcade", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, intvkbd,    intv,   0,      intvkbd,    intvkbd, intv_state,    intvkbd,    "Mattel", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-CONS( 1982, intv2,      intv,   0,      intv2,      0,       intv_state,    intv,       "Mattel", "Intellivision II", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT          COMPANY   FULLNAME */
+CONS( 1979, intv,     0,      0,      intv,     0,       intv_state, init_intv,    "Mattel", "Intellivision", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, intvsrs,  intv,   0,      intv,     0,       intv_state, init_intv,    "Sears",  "Super Video Arcade", MACHINE_SUPPORTS_SAVE )
+COMP( 1981, intvkbd,  intv,   0,      intvkbd,  intvkbd, intv_state, init_intvkbd, "Mattel", "Intellivision Keyboard Component (Unreleased)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1982, intv2,    intv,   0,      intv2,    0,       intv_state, init_intv,    "Mattel", "Intellivision II", MACHINE_SUPPORTS_SAVE )
 
 // made up, user friendlier machines with pre-mounted passthu expansions
-COMP( 1982, intvoice,   intv,   0,      intvoice,   0,       intv_state,    intv,       "Mattel", "Intellivision w/IntelliVoice expansion", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, intvecs,    intv,   0,      intvecs,    0,       intv_state,    intv,       "Mattel", "Intellivision w/Entertainment Computer System + Intellivoice expansions", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, intvoice, intv,   0,      intvoice, 0,       intv_state, init_intv,    "Mattel", "Intellivision w/IntelliVoice expansion", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, intvecs,  intv,   0,      intvecs,  0,       intv_state, init_intv,    "Mattel", "Intellivision w/Entertainment Computer System + Intellivoice expansions", MACHINE_SUPPORTS_SAVE )

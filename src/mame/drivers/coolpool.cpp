@@ -90,7 +90,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_state::coolpool_scanline)
 {
 	uint16_t *vram = &m_vram_base[(params->rowaddr << 8) & 0x1ff00];
 	uint32_t *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = m_tlc34076->get_pens();
+	const pen_t *pens = m_tlc34076->pens();
 	int coladdr = params->coladdr;
 	int x;
 
@@ -1062,41 +1062,36 @@ void coolpool_state::register_state_save()
 
 
 
-DRIVER_INIT_MEMBER(coolpool_state,amerdart)
+void coolpool_state::init_amerdart()
 {
 	m_lastresult = 0xffff;
 
 	register_state_save();
 }
 
-DRIVER_INIT_MEMBER(coolpool_state,coolpool)
+void coolpool_state::init_coolpool()
 {
 	register_state_save();
 }
 
 
-DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
+void coolpool_state::init_9ballsht()
 {
-	int a, len;
-	uint16_t *rom;
-
 	/* decrypt the main program ROMs */
-	rom = (uint16_t *)memregion("maincpu")->base();
-	len = memregion("maincpu")->bytes();
-	for (a = 0;a < len/2;a++)
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+	for (int a = 0; a < len/2; a++)
 	{
-		int hi,lo,nhi,nlo;
+		int hi = rom[a] >> 8;
+		int lo = rom[a] & 0xff;
 
-		hi = rom[a] >> 8;
-		lo = rom[a] & 0xff;
-
-		nhi = bitswap<8>(hi,5,2,0,7,6,4,3,1) ^ 0x29;
+		int nhi = bitswap<8>(hi,5,2,0,7,6,4,3,1) ^ 0x29;
 		if (hi & 0x01) nhi ^= 0x03;
 		if (hi & 0x10) nhi ^= 0xc1;
 		if (hi & 0x20) nhi ^= 0x40;
 		if (hi & 0x40) nhi ^= 0x12;
 
-		nlo = bitswap<8>(lo,5,3,4,6,7,1,2,0) ^ 0x80;
+		int nlo = bitswap<8>(lo,5,3,4,6,7,1,2,0) ^ 0x80;
 		if ((lo & 0x02) && (lo & 0x04)) nlo ^= 0x01;
 		if (lo & 0x04) nlo ^= 0x0c;
 		if (lo & 0x08) nlo ^= 0x10;
@@ -1107,7 +1102,7 @@ DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
 	/* decrypt the sub data ROMs */
 	rom = (uint16_t *)memregion("dspdata")->base();
 	len = memregion("dspdata")->bytes();
-	for (a = 1;a < len/2;a+=4)
+	for (int a = 1; a < len/2; a += 4)
 	{
 		/* just swap bits 1 and 2 of the address */
 		uint16_t tmp = rom[a];
@@ -1126,11 +1121,11 @@ DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
  *
  *************************************/
 
-GAME( 1989, amerdart,  0,        amerdart,  amerdart, coolpool_state, amerdart, ROT0, "Ameri",                               "AmeriDarts (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, amerdart2, amerdart, amerdart,  amerdart, coolpool_state, amerdart, ROT0, "Ameri",                               "AmeriDarts (set 2)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, amerdart3, amerdart, amerdart,  amerdart, coolpool_state, amerdart, ROT0, "Ameri",                               "AmeriDarts (set 3)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1992, coolpool,  0,        coolpool,  coolpool, coolpool_state, coolpool, ROT0, "Catalina",                            "Cool Pool",                    0 )
-GAME( 1993, 9ballsht,  0,        _9ballsht, 9ballsht, coolpool_state, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 1)",      0 )
-GAME( 1993, 9ballsht2, 9ballsht, _9ballsht, 9ballsht, coolpool_state, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 2)",      0 )
-GAME( 1993, 9ballsht3, 9ballsht, _9ballsht, 9ballsht, coolpool_state, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 3)",      0 )
-GAME( 1993, 9ballshtc, 9ballsht, _9ballsht, 9ballsht, coolpool_state, 9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout Championship", 0 )
+GAME( 1989, amerdart,  0,        amerdart,  amerdart, coolpool_state, init_amerdart, ROT0, "Ameri",                               "AmeriDarts (set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, amerdart2, amerdart, amerdart,  amerdart, coolpool_state, init_amerdart, ROT0, "Ameri",                               "AmeriDarts (set 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, amerdart3, amerdart, amerdart,  amerdart, coolpool_state, init_amerdart, ROT0, "Ameri",                               "AmeriDarts (set 3)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, coolpool,  0,        coolpool,  coolpool, coolpool_state, init_coolpool, ROT0, "Catalina",                            "Cool Pool",                    0 )
+GAME( 1993, 9ballsht,  0,        _9ballsht, 9ballsht, coolpool_state, init_9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 1)",      0 )
+GAME( 1993, 9ballsht2, 9ballsht, _9ballsht, 9ballsht, coolpool_state, init_9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 2)",      0 )
+GAME( 1993, 9ballsht3, 9ballsht, _9ballsht, 9ballsht, coolpool_state, init_9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout (set 3)",      0 )
+GAME( 1993, 9ballshtc, 9ballsht, _9ballsht, 9ballsht, coolpool_state, init_9ballsht, ROT0, "E-Scape EnterMedia (Bundra license)", "9-Ball Shootout Championship", 0 )

@@ -737,8 +737,8 @@ Version 4.3 E
 
 */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE       INIT  COMPANY                            FULLNAME                            FLAGS
-CONS( 1994, psj,    0,      0,      psj,        0,     psx1_state, 0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 1995, pse,    psj,    0,      pse,        0,     psx1_state, 0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Europe)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 1995, psu,    psj,    0,      psu,        0,     psx1_state, 0,    "Sony Computer Entertainment Inc", "Sony PlayStation (USA)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 1995, psa,    psj,    0,      psj,        0,     psx1_state, 0,    "Sony Computer Entertainment Inc", "Sony PlayStation (Asia-Pacific)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                            FULLNAME                            FLAGS
+CONS( 1994, psj,  0,      0,      psj,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 1995, pse,  psj,    0,      pse,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Europe)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 1995, psu,  psj,    0,      psu,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (USA)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 1995, psa,  psj,    0,      psj,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Asia-Pacific)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

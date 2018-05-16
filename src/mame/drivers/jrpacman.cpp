@@ -116,7 +116,7 @@ public:
 		: pacman_state(mconfig, type, tag) { }
 	DECLARE_WRITE8_MEMBER(jrpacman_interrupt_vector_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_DRIVER_INIT(jrpacman);
+	void init_jrpacman();
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void jrpacman(machine_config &config);
 	void main_map(address_map &map);
@@ -256,7 +256,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( jrpacman )
+static GFXDECODE_START( gfx_jrpacman )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0x2000, spritelayout, 0, 128 )
 GFXDECODE_END
@@ -307,7 +307,7 @@ MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jrpacman_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jrpacman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jrpacman)
 	MCFG_PALETTE_ADD("palette", 128*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(jrpacman_state,pacman)
@@ -381,7 +381,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(jrpacman_state,jrpacman)
+void jrpacman_state::init_jrpacman()
 {
 	/* The encryption PALs garble bits 0, 2 and 7 of the ROMs. The encryption */
 	/* scheme is complex (basically it's a state machine) and can only be */
@@ -419,10 +419,8 @@ DRIVER_INIT_MEMBER(jrpacman_state,jrpacman)
 	};
 
 	uint8_t *RAM = memregion("maincpu")->base();
-	int i, j, A;
-
-	for (i = A = 0; table[i].count; i++)
-		for (j = 0; j < table[i].count; j++)
+	for (int i = 0, A = 0; table[i].count; i++)
+		for (int j = 0; j < table[i].count; j++)
 			RAM[A++] ^= table[i].value;
 }
 
@@ -434,5 +432,5 @@ DRIVER_INIT_MEMBER(jrpacman_state,jrpacman)
  *
  *************************************/
 
-GAME( 1983, jrpacman,  0,        jrpacman, jrpacman, jrpacman_state, jrpacman, ROT90, "Bally Midway", "Jr. Pac-Man (11/9/83)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jrpacmanf, jrpacman, jrpacman, jrpacman, jrpacman_state, jrpacman, ROT90, "hack", "Jr. Pac-Man (speedup hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jrpacman,  0,        jrpacman, jrpacman, jrpacman_state, init_jrpacman, ROT90, "Bally Midway", "Jr. Pac-Man (11/9/83)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jrpacmanf, jrpacman, jrpacman, jrpacman, jrpacman_state, init_jrpacman, ROT90, "hack", "Jr. Pac-Man (speedup hack)", MACHINE_SUPPORTS_SAVE )

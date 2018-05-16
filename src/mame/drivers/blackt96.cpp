@@ -383,7 +383,7 @@ static const gfx_layout blackt96_text_layout =
 	16*16
 };
 
-static GFXDECODE_START( blackt96 )
+static GFXDECODE_START( gfx_blackt96 )
 	GFXDECODE_ENTRY( "gfx1", 0, blackt96_layout,      0, 8  )
 	GFXDECODE_ENTRY( "gfx2", 0, blackt962_layout,     0, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, blackt96_text_layout, 0, 16 )
@@ -488,7 +488,7 @@ MACHINE_CONFIG_START(blackt96_state::blackt96)
 	MCFG_PIC16C5x_READ_C_CB(READ8(*this, blackt96_state, blackt96_soundio_port_c_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_c_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blackt96)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blackt96)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -555,4 +555,4 @@ ROM_START( blackt96 )
 ROM_END
 
 // I'm not really sure this needs MACHINE_IS_INCOMPLETE just because there are some original game bugs, it's quite typical of this type of Korean release
-GAME( 1996, blackt96,    0,        blackt96,    blackt96, blackt96_state,    0, ROT0,  "D.G.R.M.", "Black Touch '96", MACHINE_IS_INCOMPLETE )
+GAME( 1996, blackt96, 0, blackt96, blackt96, blackt96_state, empty_init, ROT0, "D.G.R.M.", "Black Touch '96", MACHINE_IS_INCOMPLETE )

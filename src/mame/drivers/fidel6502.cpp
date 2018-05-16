@@ -573,21 +573,21 @@ public:
 	DECLARE_WRITE8_MEMBER(fdesdis_control_w);
 	DECLARE_WRITE8_MEMBER(fdesdis_lcd_w);
 	DECLARE_READ8_MEMBER(fdesdis_input_r);
-	DECLARE_DRIVER_INIT(fdesdis);
+	void init_fdesdis();
 	void fdesdis_map(address_map &map);
 	void fdes2000d(machine_config &config);
 	void fdes2100d(machine_config &config);
 
 	// Phantom
 	DECLARE_MACHINE_RESET(fphantom);
-	DECLARE_DRIVER_INIT(fphantom);
+	void init_fphantom();
 	void fphantom_map(address_map &map);
 	void fphantom(machine_config &config);
 
 	// Chesster
 	DECLARE_WRITE8_MEMBER(chesster_control_w);
 	DECLARE_WRITE8_MEMBER(kishon_control_w);
-	DECLARE_DRIVER_INIT(chesster);
+	void init_chesster();
 	void chesster_map(address_map &map);
 	void kishon_map(address_map &map);
 	void chesster(machine_config &config);
@@ -1085,7 +1085,7 @@ READ8_MEMBER(fidel6502_state::fdesdis_input_r)
 	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
 }
 
-DRIVER_INIT_MEMBER(fidel6502_state, fdesdis)
+void fidel6502_state::init_fdesdis()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("user1")->base(), 0x4000);
 }
@@ -1104,7 +1104,7 @@ MACHINE_RESET_MEMBER(fidel6502_state, fphantom)
 	membank("bank1")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(fidel6502_state, fphantom)
+void fidel6502_state::init_fphantom()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("user1")->base(), 0x4000);
 }
@@ -1146,7 +1146,7 @@ WRITE8_MEMBER(fidel6502_state::kishon_control_w)
 	membank("bank1")->set_entry(bank);
 }
 
-DRIVER_INIT_MEMBER(fidel6502_state, chesster)
+void fidel6502_state::init_chesster()
 {
 	membank("bank1")->configure_entries(0, memregion("user1")->bytes() / 0x4000, memregion("user1")->base(), 0x4000);
 }
@@ -2639,68 +2639,68 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME        PARENT   CMP MACHINE    INPUT      STATE            INIT      COMPANY, FULLNAME, FLAGS
-CONS( 1981, reversic,   0,        0, rsc,       rsc,       fidel6502_state, 0,        "Fidelity Electronics", "Reversi Sensory Challenger (green version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME        PARENT   CMP MACHINE    INPUT      STATE            INIT           COMPANY                 FULLNAME                                      FLAGS
+CONS( 1981, reversic,   0,        0, rsc,       rsc,       fidel6502_state, empty_init,    "Fidelity Electronics", "Reversi Sensory Challenger (green version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1981, csc,        0,        0, csc,       csc,       fidel6502_state, 0,        "Fidelity Electronics", "Champion Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1981, cscsp,      csc,      0, csc,       cscsp,     fidel6502_state, 0,        "Fidelity Electronics", "Champion Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1981, cscg,       csc,      0, csc,       cscg,      fidel6502_state, 0,        "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1981, cscfr,      csc,      0, csc,       cscfr,     fidel6502_state, 0,        "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, csc,        0,        0, csc,       csc,       fidel6502_state, empty_init,    "Fidelity Electronics", "Champion Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, cscsp,      csc,      0, csc,       cscsp,     fidel6502_state, empty_init,    "Fidelity Electronics", "Champion Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, cscg,       csc,      0, csc,       cscg,      fidel6502_state, empty_init,    "Fidelity Electronics", "Champion Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1981, cscfr,      csc,      0, csc,       cscfr,     fidel6502_state, empty_init,    "Fidelity Electronics", "Champion Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1983, super9cc,   0,        0, su9,       su9,       fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, super9ccsp, super9cc, 0, su9,       su9sp,     fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, super9ccg,  super9cc, 0, su9,       su9g,      fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, super9ccfr, super9cc, 0, su9,       su9fr,     fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, super9cc,   0,        0, su9,       su9,       fidel6502_state, empty_init,    "Fidelity Electronics", "Super 9 Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, super9ccsp, super9cc, 0, su9,       su9sp,     fidel6502_state, empty_init,    "Fidelity Electronics", "Super 9 Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, super9ccg,  super9cc, 0, su9,       su9g,      fidel6502_state, empty_init,    "Fidelity Electronics", "Super 9 Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, super9ccfr, super9cc, 0, su9,       su9fr,     fidel6502_state, empty_init,    "Fidelity Electronics", "Super 9 Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1983, feasbu,     0,        0, eas,       eas,       fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, feasbusp,   feasbu,   0, eas,       eassp,     fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, feasbug,    feasbu,   0, eas,       easg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, feasbufr,   feasbu,   0, eas,       easfr,     fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1984, feasgla,    feasbu,   0, eas,       eas,       fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1984, feasglasp,  feasbu,   0, eas,       eassp,     fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1984, feasglag,   feasbu,   0, eas,       easg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1984, feasglafr,  feasbu,   0, eas,       easfr,     fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, feasbu,     0,        0, eas,       eas,       fidel6502_state, empty_init,    "Fidelity Electronics", "Elite A/S Challenger (Budapest program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, feasbusp,   feasbu,   0, eas,       eassp,     fidel6502_state, empty_init,    "Fidelity Electronics", "Elite A/S Challenger (Budapest program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, feasbug,    feasbu,   0, eas,       easg,      fidel6502_state, empty_init,    "Fidelity Electronics", "Elite A/S Challenger (Budapest program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, feasbufr,   feasbu,   0, eas,       easfr,     fidel6502_state, empty_init,    "Fidelity Electronics", "Elite A/S Challenger (Budapest program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1984, feasgla,    feasbu,   0, eas,       eas,       fidel6502_state, empty_init,    "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1984, feasglasp,  feasbu,   0, eas,       eassp,     fidel6502_state, empty_init,    "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1984, feasglag,   feasbu,   0, eas,       easg,      fidel6502_state, empty_init,    "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1984, feasglafr,  feasbu,   0, eas,       easfr,     fidel6502_state, empty_init,    "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1982, fpres,      0,        0, pc,        eas,       fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (original program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1982, fpressp,    fpres,    0, pc,        eassp,     fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (original program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1982, fpresg,     fpres,    0, pc,        easg,      fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (original program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1982, fpresfr,    fpres,    0, pc,        easfr,     fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (original program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, fpresbu,    fpres,    0, pc,        eas,       fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (Budapest program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, fpresbusp,  fpres,    0, pc,        eassp,     fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (Budapest program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, fpresbug,   fpres,    0, pc,        easg,      fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (Budapest program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, fpresbufr,  fpres,    0, pc,        easfr,     fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (Budapest program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1982, fpres,      0,        0, pc,        eas,       fidel6502_state, empty_init,    "Fidelity Electronics", "Prestige Challenger (original program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1982, fpressp,    fpres,    0, pc,        eassp,     fidel6502_state, empty_init,    "Fidelity Electronics", "Prestige Challenger (original program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1982, fpresg,     fpres,    0, pc,        easg,      fidel6502_state, empty_init,    "Fidelity Electronics", "Prestige Challenger (original program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1982, fpresfr,    fpres,    0, pc,        easfr,     fidel6502_state, empty_init,    "Fidelity Electronics", "Prestige Challenger (original program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fpresbu,    fpres,    0, pc,        eas,       fidel6502_state, empty_init,    "Fidelity Electronics", "Prestige Challenger (Budapest program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fpresbusp,  fpres,    0, pc,        eassp,     fidel6502_state, empty_init,    "Fidelity Electronics", "Prestige Challenger (Budapest program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fpresbug,   fpres,    0, pc,        easg,      fidel6502_state, empty_init,    "Fidelity Electronics", "Prestige Challenger (Budapest program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fpresbufr,  fpres,    0, pc,        easfr,     fidel6502_state, empty_init,    "Fidelity Electronics", "Prestige Challenger (Budapest program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1986, feag2100,   0,        0, eag,       eag,       fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, feag2100sp, feag2100, 0, eag,       eagsp,     fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, feag2100g,  feag2100, 0, eag,       eagg,      fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, feag2100fr, feag2100, 0, eag,       eagfr,     fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, feag2100,   0,        0, eag,       eag,       fidel6502_state, empty_init,    "Fidelity Electronics", "Elite Avant Garde 2100 (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, feag2100sp, feag2100, 0, eag,       eagsp,     fidel6502_state, empty_init,    "Fidelity Electronics", "Elite Avant Garde 2100 (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, feag2100g,  feag2100, 0, eag,       eagg,      fidel6502_state, empty_init,    "Fidelity Electronics", "Elite Avant Garde 2100 (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, feag2100fr, feag2100, 0, eag,       eagfr,     fidel6502_state, empty_init,    "Fidelity Electronics", "Elite Avant Garde 2100 (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1982, fscc9,      0,        0, sc9d,      sc9,       fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // aka version "B"
-CONS( 1982, fscc9b,     fscc9,    0, sc9b,      sc9,       fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1982, fscc9c,     fscc9,    0, sc9c,      sc9c,      fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1983, fscc9ps,    fscc9,    0, playmatic, playmatic, fidel6502_state, 0,        "Fidelity Electronics", "Sensory 9 Playmatic 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // Fidelity West Germany
+CONS( 1982, fscc9,      0,        0, sc9d,      sc9,       fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // aka version "B"
+CONS( 1982, fscc9b,     fscc9,    0, sc9b,      sc9,       fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1982, fscc9c,     fscc9,    0, sc9c,      sc9c,      fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 9 (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fscc9ps,    fscc9,    0, playmatic, playmatic, fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory 9 Playmatic 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // Fidelity West Germany
 
-CONS( 1984, fscc12,     0,        0, sc12,      sc12,      fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 12", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, fscc12b,    fscc12,   0, sc12b,     sc12b,     fidel6502_state, 0,        "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, fscc12,     0,        0, sc12,      sc12,      fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 12", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, fscc12b,    fscc12,   0, sc12b,     sc12b,     fidel6502_state, empty_init,    "Fidelity Electronics", "Sensory Chess Challenger 12-B", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
 
-CONS( 1987, fexcel,     0,        0, fexcelb,   fexcelb,   fidel6502_state, 0,        "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, fexcelv,    fexcel,   0, fexcelv,   fexcelv,   fidel6502_state, 0,        "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1987, fexceld,    fexcel,   0, fexceld,   fexcelb,   fidel6502_state, 0,        "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1985, fexcel12,   fexcel,   0, fexcel,    fexcel,    fidel6502_state, 0,        "Fidelity Electronics", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // 1st version of The Excellence
-CONS( 1985, fexcel124,  fexcel,   0, fexcel4,   fexcel,    fidel6502_state, 0,        "Fidelity Electronics", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1985, fexcela,    fexcel,   0, fexcel,    fexcel,    fidel6502_state, 0,        "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fexcel,     0,        0, fexcelb,   fexcelb,   fidel6502_state, empty_init,    "Fidelity Electronics", "The Excellence (model 6080B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fexcelv,    fexcel,   0, fexcelv,   fexcelv,   fidel6502_state, empty_init,    "Fidelity Electronics", "Voice Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fexceld,    fexcel,   0, fexceld,   fexcelb,   fidel6502_state, empty_init,    "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1985, fexcel12,   fexcel,   0, fexcel,    fexcel,    fidel6502_state, empty_init,    "Fidelity Electronics", "The Excellence (model EP12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // 1st version of The Excellence
+CONS( 1985, fexcel124,  fexcel,   0, fexcel4,   fexcel,    fidel6502_state, empty_init,    "Fidelity Electronics", "The Excellence (model EP12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1985, fexcela,    fexcel,   0, fexcel,    fexcel,    fidel6502_state, empty_init,    "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1986, fexcelp,    0,        0, fexcelp,   fexcel,    fidel6502_state, 0,        "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, fexcelpb,   fexcelp,  0, fexcelp,   fexcel,    fidel6502_state, 0,        "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1986, granits,    fexcelp,  0, granits,   fexcel,    fidel6502_state, 0,        "hack (RCS)", "Granit 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fdes2000,   fexcelp,  0, fdes2000,  fdes,      fidel6502_state, 0,        "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // Excellence series hardware
-CONS( 1988, fdes2100,   fexcelp,  0, fdes2100,  fdes,      fidel6502_state, 0,        "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // "
+CONS( 1986, fexcelp,    0,        0, fexcelp,   fexcel,    fidel6502_state, empty_init,    "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, fexcelpb,   fexcelp,  0, fexcelp,   fexcel,    fidel6502_state, empty_init,    "Fidelity Electronics", "The Par Excellence (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1986, granits,    fexcelp,  0, granits,   fexcel,    fidel6502_state, empty_init,    "hack (RCS)", "Granit 'S'", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fdes2000,   fexcelp,  0, fdes2000,  fdes,      fidel6502_state, empty_init,    "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // Excellence series hardware
+CONS( 1988, fdes2100,   fexcelp,  0, fdes2100,  fdes,      fidel6502_state, empty_init,    "Fidelity Electronics", "Designer 2100", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // "
 
-CONS( 1988, fdes2100d,  0,        0, fdes2100d, fdesdis,   fidel6502_state, fdesdis,  "Fidelity Electronics", "Designer 2100 Display (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1988, fdes2000d,  fdes2100d,0, fdes2000d, fdesdis,   fidel6502_state, fdesdis,  "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fdes2100d,  0,        0, fdes2100d, fdesdis,   fidel6502_state, init_fdesdis,  "Fidelity Electronics", "Designer 2100 Display (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1988, fdes2000d,  fdes2100d,0, fdes2000d, fdesdis,   fidel6502_state, init_fdesdis,  "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1988, fphantom,   0,        0, fphantom,  fphantom,  fidel6502_state, fphantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+CONS( 1988, fphantom,   0,        0, fphantom,  fphantom,  fidel6502_state, init_fphantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
-CONS( 1990, chesster,   0,        0, chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger (V1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1990, chesstera,  chesster, 0, chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
-CONS( 1991, kishon,     chesster, 0, kishon,    chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Kishon Chesster", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, chesster,   0,        0, chesster,  chesster,  fidel6502_state, init_chesster, "Fidelity Electronics", "Chesster Challenger (V1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1990, chesstera,  chesster, 0, chesster,  chesster,  fidel6502_state, init_chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1991, kishon,     chesster, 0, kishon,    chesster,  fidel6502_state, init_chesster, "Fidelity Electronics", "Kishon Chesster", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

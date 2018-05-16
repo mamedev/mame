@@ -432,7 +432,7 @@ static const gfx_layout layout_16x16x4 =
 	16*16*4
 };
 
-static GFXDECODE_START( galaxi )
+static GFXDECODE_START( gfx_galaxi )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, layout_16x16x4, 0, 0x400/0x10 )
 	GFXDECODE_ENTRY( "gfx1", 0x80000, layout_8x8x4,   0, 0x400/0x10 )
 GFXDECODE_END
@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(galaxi_state::galaxi)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxi_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxi)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -595,7 +595,7 @@ ROM_END
                                Game Drivers
 ***************************************************************************/
 
-//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE         INIT  ROT   COMPANY   FULLNAME                        FLAGS                   LAYOUT
-GAMEL( 2000, galaxi,   0,      galaxi,   galaxi,   galaxi_state, 0,    ROT0, "B.R.L.", "Galaxi (v2.0)",                MACHINE_SUPPORTS_SAVE,  layout_galaxi )
-GAMEL( 2000, magjoker, 0,      magjoker, magjoker, galaxi_state, 0,    ROT0, "B.R.L.", "Magic Joker (v1.25.10.2000)",  MACHINE_SUPPORTS_SAVE,  layout_galaxi )
-GAMEL( 2001, lastfour, 0,      lastfour, magjoker, galaxi_state, 0,    ROT0, "B.R.L.", "Last Four (09:12 16/01/2001)", MACHINE_SUPPORTS_SAVE,  layout_galaxi )
+//     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS         INIT        ROT   COMPANY   FULLNAME                        FLAGS                   LAYOUT
+GAMEL( 2000, galaxi,   0,      galaxi,   galaxi,   galaxi_state, empty_init, ROT0, "B.R.L.", "Galaxi (v2.0)",                MACHINE_SUPPORTS_SAVE,  layout_galaxi )
+GAMEL( 2000, magjoker, 0,      magjoker, magjoker, galaxi_state, empty_init, ROT0, "B.R.L.", "Magic Joker (v1.25.10.2000)",  MACHINE_SUPPORTS_SAVE,  layout_galaxi )
+GAMEL( 2001, lastfour, 0,      lastfour, magjoker, galaxi_state, empty_init, ROT0, "B.R.L.", "Last Four (09:12 16/01/2001)", MACHINE_SUPPORTS_SAVE,  layout_galaxi )

@@ -22,7 +22,7 @@
 #include "speaker.h"
 
 
-static GFXDECODE_START( galeb )
+static GFXDECODE_START( gfx_galeb )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galeb_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -178,7 +178,7 @@ MACHINE_CONFIG_START(galeb_state::galeb)
 	MCFG_SCREEN_UPDATE_DRIVER(galeb_state, screen_update_galeb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galeb )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galeb )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
@@ -205,5 +205,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE         INIT  COMPANY         FULLNAME   FLAGS
-COMP( 1981, galeb, 0,      0,      galeb,   galeb, galeb_state,  0,    "PEL Varazdin", "Galeb",   0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY         FULLNAME  FLAGS
+COMP( 1981, galeb, 0,      0,      galeb,   galeb, galeb_state, empty_init, "PEL Varazdin", "Galeb",  0 )

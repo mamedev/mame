@@ -845,5 +845,5 @@ ROM_START( clcd )
 ROM_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY                        FULLNAME           FLAGS */
-COMP( 1985, clcd,   0,      0,       clcd,      clcd,  clcd_state,  0,     "Commodore Business Machines", "LCD (Prototype)", 0 )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                        FULLNAME           FLAGS */
+COMP( 1985, clcd, 0,      0,      clcd,    clcd,  clcd_state, empty_init, "Commodore Business Machines", "LCD (Prototype)", 0 )

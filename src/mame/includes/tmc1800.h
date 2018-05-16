@@ -74,7 +74,7 @@ public:
 
 	/* keyboard state */
 	int m_keylatch;         /* key latch */
-	DECLARE_DRIVER_INIT(tmc1800);
+	void init_tmc1800();
 
 	void tmc1800(machine_config &config);
 	void tmc1800_video(machine_config &config);

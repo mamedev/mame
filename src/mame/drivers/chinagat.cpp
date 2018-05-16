@@ -94,7 +94,7 @@ public:
 		m_adpcm(*this, "adpcm") { };
 
 	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);
-	DECLARE_DRIVER_INIT(chinagat);
+	void init_chinagat();
 	DECLARE_MACHINE_START(chinagat);
 	DECLARE_MACHINE_RESET(chinagat);
 	DECLARE_VIDEO_START(chinagat);
@@ -512,7 +512,7 @@ static const gfx_layout tilelayout =
 	64*8 /* every char takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( chinagat )
+static GFXDECODE_START( gfx_chinagat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0,16 )    /*  8x8  chars */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 128, 8 )    /* 16x16 sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 256, 8 )    /* 16x16 background tiles */
@@ -581,7 +581,7 @@ MACHINE_CONFIG_START(chinagat_state::chinagat)
 	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinagat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinagat)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -635,7 +635,7 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub1)
 	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinagat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinagat)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -682,7 +682,7 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub2)
 	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinagat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinagat)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -919,7 +919,7 @@ ROM_START( saiyugoub2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(chinagat_state,chinagat)
+void chinagat_state::init_chinagat()
 {
 	uint8_t *MAIN = memregion("maincpu")->base();
 	uint8_t *SUB = memregion("sub")->base();
@@ -932,8 +932,8 @@ DRIVER_INIT_MEMBER(chinagat_state,chinagat)
 }
 
 
-//  ( YEAR  NAME        PARENT    MACHINE     INPUT     STATE           INIT      MONITOR COMPANY    FULLNAME     FLAGS ) */
-GAME( 1988, chinagat,   0,        chinagat,   chinagat, chinagat_state, chinagat, ROT0,   "Technos Japan (Taito / Romstar license)", "China Gate (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, saiyugou,   chinagat, chinagat,   chinagat, chinagat_state, chinagat, ROT0,   "Technos Japan", "Sai Yu Gou Ma Roku (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, saiyugoub1, chinagat, saiyugoub1, chinagat, chinagat_state, chinagat, ROT0,   "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, saiyugoub2, chinagat, saiyugoub2, chinagat, chinagat_state, chinagat, ROT0,   "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 2)", MACHINE_SUPPORTS_SAVE )
+//  ( YEAR  NAME        PARENT    MACHINE     INPUT     STATE           INIT           MONITOR COMPANY    FULLNAME     FLAGS ) */
+GAME( 1988, chinagat,   0,        chinagat,   chinagat, chinagat_state, init_chinagat, ROT0,   "Technos Japan (Taito / Romstar license)", "China Gate (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, saiyugou,   chinagat, chinagat,   chinagat, chinagat_state, init_chinagat, ROT0,   "Technos Japan", "Sai Yu Gou Ma Roku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, saiyugoub1, chinagat, saiyugoub1, chinagat, chinagat_state, init_chinagat, ROT0,   "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, saiyugoub2, chinagat, saiyugoub2, chinagat, chinagat_state, init_chinagat, ROT0,   "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 2)", MACHINE_SUPPORTS_SAVE )

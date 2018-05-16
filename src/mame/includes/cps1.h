@@ -279,32 +279,32 @@ public:
 	DECLARE_WRITE16_MEMBER(sf2m1_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2m3_layer_w);
 	DECLARE_READ16_MEMBER(dinohunt_sound_r);
-	DECLARE_DRIVER_INIT(sf2rb);
-	DECLARE_DRIVER_INIT(sf2rb2);
-	DECLARE_DRIVER_INIT(sf2thndr);
-	DECLARE_DRIVER_INIT(dinohunt);
-	DECLARE_DRIVER_INIT(sf2hack);
-	DECLARE_DRIVER_INIT(slammast);
-	DECLARE_DRIVER_INIT(pang3b);
-	DECLARE_DRIVER_INIT(pang3);
-	DECLARE_DRIVER_INIT(sf2ee);
-	DECLARE_DRIVER_INIT(sf2m8);
-	DECLARE_DRIVER_INIT(cps1);
-	DECLARE_DRIVER_INIT(dino);
-	DECLARE_DRIVER_INIT(punisher);
-	DECLARE_DRIVER_INIT(wof);
-	DECLARE_DRIVER_INIT(ganbare);
-	DECLARE_DRIVER_INIT(cps2_video);
-	DECLARE_DRIVER_INIT(cps2);
-	DECLARE_DRIVER_INIT(cps2nc);
-	DECLARE_DRIVER_INIT(cps2crypt);
-	DECLARE_DRIVER_INIT(ssf2tb);
-	DECLARE_DRIVER_INIT(pzloop2);
-	DECLARE_DRIVER_INIT(singbrd);
-	DECLARE_DRIVER_INIT(gigaman2);
-	DECLARE_DRIVER_INIT(ecofghtr);
-	DECLARE_DRIVER_INIT(sf2dongb);
-	DECLARE_DRIVER_INIT(sf2ceblp);
+	void init_sf2rb();
+	void init_sf2rb2();
+	void init_sf2thndr();
+	void init_dinohunt();
+	void init_sf2hack();
+	void init_slammast();
+	void init_pang3b();
+	void init_pang3();
+	void init_sf2ee();
+	void init_sf2m8();
+	void init_cps1();
+	void init_dino();
+	void init_punisher();
+	void init_wof();
+	void init_ganbare();
+	void init_cps2_video();
+	void init_cps2();
+	void init_cps2nc();
+	void init_cps2crypt();
+	void init_ssf2tb();
+	void init_pzloop2();
+	void init_singbrd();
+	void init_gigaman2();
+	void init_ecofghtr();
+	void init_sf2dongb();
+	void init_sf2ceblp();
 	TILEMAP_MAPPER_MEMBER(tilemap0_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap1_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap2_scan);
@@ -332,19 +332,19 @@ public:
 	void kabuki_setup(void (*decode)(uint8_t *src, uint8_t *dst));
 
 	/* fcrash handlers */
-	DECLARE_DRIVER_INIT(kodb);
-	DECLARE_DRIVER_INIT(cawingbl);
-	DECLARE_DRIVER_INIT(dinopic);
-	DECLARE_DRIVER_INIT(knightsb);
-	DECLARE_DRIVER_INIT(punipic);
-	DECLARE_DRIVER_INIT(punipic3);
-	DECLARE_DRIVER_INIT(sf2m1);
-	DECLARE_DRIVER_INIT(sf2mdt);
-	DECLARE_DRIVER_INIT(sf2mdta);
-	DECLARE_DRIVER_INIT(sf2mdtb);
-	DECLARE_DRIVER_INIT(sf2b);
-	DECLARE_DRIVER_INIT(slampic);
-	DECLARE_DRIVER_INIT(wofabl);
+	void init_kodb();
+	void init_cawingbl();
+	void init_dinopic();
+	void init_knightsb();
+	void init_punipic();
+	void init_punipic3();
+	void init_sf2m1();
+	void init_sf2mdt();
+	void init_sf2mdta();
+	void init_sf2mdtb();
+	void init_sf2b();
+	void init_slampic();
+	void init_wofabl();
 	DECLARE_MACHINE_START(fcrash);
 	DECLARE_MACHINE_RESET(fcrash);
 	DECLARE_MACHINE_START(cawingbl);
@@ -467,7 +467,7 @@ public:
 
 /*----------- defined in drivers/cps1.c -----------*/
 
-GFXDECODE_EXTERN( cps1 );
+extern gfx_decode_entry const gfx_cps1[];
 
 INPUT_PORTS_EXTERN( dino );
 INPUT_PORTS_EXTERN( knights );
@@ -477,4 +477,4 @@ INPUT_PORTS_EXTERN( slammast );
 INPUT_PORTS_EXTERN( varth );
 
 
-#endif
+#endif // MAME_INCLUDES_CPS1_H

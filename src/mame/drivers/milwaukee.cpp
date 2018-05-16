@@ -86,4 +86,4 @@ ROM_START( mc1200 )
 	ROM_LOAD( "2758.u14", 0x0800, 0x0400, CRC(b20e2345) SHA1(da498cc0c746897a85d6f2d1a5bd70a726c1e4ef) ) // big white sticker, but nothing on it
 ROM_END
 
-COMP( 1980, mc1200, 0, 0, milwaukee, milwaukee, milwaukee_state, 0, "Milwaukee Computers", "MC-1200", MACHINE_IS_SKELETON )
+COMP( 1980, mc1200, 0, 0, milwaukee, milwaukee, milwaukee_state, empty_init, "Milwaukee Computers", "MC-1200", MACHINE_IS_SKELETON )

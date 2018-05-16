@@ -425,7 +425,7 @@ READ8_MEMBER(m72_state::snd_cpu_sample_r)
 	return m_mcu_sample_latch;
 }
 
-DRIVER_INIT_MEMBER(m72_state,m72_8751)
+void m72_state::init_m72_8751()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	address_space &io = m_maincpu->space(AS_IO);
@@ -787,26 +787,26 @@ void m72_state::install_protection_handler(const uint8_t *code,const uint8_t *cr
 	save_pointer(NAME(m_protection_ram.get()), 0x1000/2);
 }
 
-DRIVER_INIT_MEMBER(m72_state,bchopper)
+void m72_state::init_bchopper()
 {
 	install_protection_handler(bchopper_code,bchopper_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(m72_state,nspirit)
+void m72_state::init_nspirit()
 {
 	install_protection_handler(nspirit_code,nspirit_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::nspirit_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,imgfight)
+void m72_state::init_imgfight()
 {
 	install_protection_handler(imgfight_code,imgfightj_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::imgfight_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,loht)
+void m72_state::init_loht()
 {
 	install_protection_handler(loht_code,loht_crc);
 
@@ -817,25 +817,25 @@ DRIVER_INIT_MEMBER(m72_state,loht)
 }
 
 
-DRIVER_INIT_MEMBER(m72_state,dbreedm72)
+void m72_state::init_dbreedm72()
 {
 	install_protection_handler(dbreedm72_code,dbreedm72_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dbreedm72_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,airduelm72)
+void m72_state::init_airduelm72()
 {
 	install_protection_handler(airduelm72_code,airduelm72_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::airduelm72_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,dkgenm72)
+void m72_state::init_dkgenm72()
 {
 	install_protection_handler(dkgenm72_code,dkgenm72_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dkgenm72_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,gallop)
+void m72_state::init_gallop()
 {
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::gallop_sample_trigger_w),this));
 }
@@ -1836,18 +1836,18 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( m72 )
+static GFXDECODE_START( gfx_m72 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,    0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,    256, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( rtype2 )
+static GFXDECODE_START( gfx_rtype2 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     256, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( majtitle )
+static GFXDECODE_START( gfx_majtitle )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     256, 16 )
 	GFXDECODE_ENTRY( "sprites2", 0, spritelayout,     0, 16 )
@@ -1894,7 +1894,7 @@ MACHINE_CONFIG_START(m72_state::m72_base)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m72)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m72)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2019,7 +2019,7 @@ MACHINE_CONFIG_START(m72_state::rtype2)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rtype2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2064,7 +2064,7 @@ MACHINE_CONFIG_START(m72_state::cosmccop)
 	// upd71059c isn't needed beacuse the V35 has its own IRQ controller
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rtype2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2109,7 +2109,7 @@ MACHINE_CONFIG_START(m72_state::m82)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", majtitle)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_majtitle)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2152,7 +2152,7 @@ MACHINE_CONFIG_START(m72_state::poundfor)
 	MCFG_UPD4701_PORTY("TRACK1_Y")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rtype2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3817,72 +3817,72 @@ ROM_END
 
 /* M72 */
 
-GAME( 1987, rtype,       0,        rtype,       rtype,    m72_state,     0,           ROT0,   "Irem", "R-Type (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rtypej,      rtype,    rtype,       rtype,    m72_state,     0,           ROT0,   "Irem", "R-Type (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rtypejp,     rtype,    rtype,       rtypep,   m72_state,     0,           ROT0,   "Irem", "R-Type (Japan prototype)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rtypeu,      rtype,    rtype,       rtype,    m72_state,     0,           ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rtypeb,      rtype,    rtype,       rtype,    m72_state,     0,           ROT0,   "bootleg", "R-Type (World bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rtype,       0,        rtype,        rtype,        m72_state, empty_init,      ROT0,   "Irem", "R-Type (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rtypej,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "Irem", "R-Type (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rtypejp,     rtype,    rtype,        rtypep,       m72_state, empty_init,      ROT0,   "Irem", "R-Type (Japan prototype)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rtypeu,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rtypeb,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "bootleg", "R-Type (World bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, bchopper,    0,        m72,         bchopper, m72_state,     bchopper,    ROT0,   "Irem", "Battle Chopper", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mrheli,      bchopper, m72_8751,    bchopper, m72_state,     m72_8751,    ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bchopper,    0,        m72,          bchopper,     m72_state, init_bchopper,   ROT0,   "Irem", "Battle Chopper", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mrheli,      bchopper, m72_8751,     bchopper,     m72_state, init_m72_8751,   ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, nspirit,     0,        m72,         nspirit,  m72_state,     nspirit,     ROT0,   "Irem", "Ninja Spirit", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )                 // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
-GAME( 1988, nspiritj,    nspirit,  m72_8751,    nspirit,  m72_state,     m72_8751,    ROT0,   "Irem", "Saigo no Nindou (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // waits for japan warning screen, works with our mcu dump, corrupt warning screen due to priority / mixing errors (Japan Version)
+GAME( 1988, nspirit,     0,        m72,          nspirit,      m72_state, init_nspirit,    ROT0,   "Irem", "Ninja Spirit", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )                 // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
+GAME( 1988, nspiritj,    nspirit,  m72_8751,     nspirit,      m72_state, init_m72_8751,   ROT0,   "Irem", "Saigo no Nindou (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // waits for japan warning screen, works with our mcu dump, corrupt warning screen due to priority / mixing errors (Japan Version)
 
-GAME( 1988, imgfight,    0,        m72,         imgfight, m72_state,     imgfight,    ROT270, "Irem", "Image Fight (World, revision A)", MACHINE_SUPPORTS_SAVE )             // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
-GAME( 1988, imgfightj,   imgfight, m72_8751,    imgfight, m72_state,     m72_8751,    ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )                         // waits for japan warning screen, works with our mcu dump, can't actually see warning screen due to priority / mixing errors, check tilemap viewer (Japan Version)
+GAME( 1988, imgfight,    0,        m72,          imgfight,     m72_state, init_imgfight,   ROT270, "Irem", "Image Fight (World, revision A)", MACHINE_SUPPORTS_SAVE )             // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
+GAME( 1988, imgfightj,   imgfight, m72_8751,     imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )                         // waits for japan warning screen, works with our mcu dump, can't actually see warning screen due to priority / mixing errors, check tilemap viewer (Japan Version)
 
-GAME( 1989, loht,        0,        m72,         loht,     m72_state,     loht,        ROT0,   "Irem", "Legend of Hero Tonma", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )         // fails rom check if used with Japan MCU rom (World version?)
-GAME( 1989, lohtj,       loht,     m72_8751,    loht,     m72_state,     m72_8751,    ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // waits for japan warning screen, works with our mcu dump (Japan Version)
-GAME( 1989, lohtb2,      loht,     m72_8751,    loht,     m72_state,     m72_8751,    ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
+GAME( 1989, loht,        0,        m72,          loht,         m72_state, init_loht,       ROT0,   "Irem", "Legend of Hero Tonma", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )         // fails rom check if used with Japan MCU rom (World version?)
+GAME( 1989, lohtj,       loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // waits for japan warning screen, works with our mcu dump (Japan Version)
+GAME( 1989, lohtb2,      loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
 
-GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl,xmultipl, m72_state,     m72_8751,    ROT0,   "Irem", "X Multiply (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl, xmultipl,     m72_state, init_m72_8751,   ROT0,   "Irem", "X Multiply (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, dbreedm72,   dbreed,   m72_dbreed,  dbreed,   m72_state,     dbreedm72,   ROT0,   "Irem", "Dragon Breed (M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // probably Japan version
+GAME( 1989, dbreedm72,   dbreed,   m72_dbreed,   dbreed,       m72_state, init_dbreedm72,  ROT0,   "Irem", "Dragon Breed (M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // probably Japan version
 
-GAME( 1991, gallop,      cosmccop, m72,         gallop,   m72_state,     gallop,      ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gallop,      cosmccop, m72,          gallop,       m72_state, init_gallop,     ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, airduelm72,  airduel,  m72,         airduel,  m72_state,     airduelm72,  ROT270, "Irem", "Air Duel (Japan, M72)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, airduelm72,  airduel,  m72,          airduel,      m72_state, init_airduelm72, ROT270, "Irem", "Air Duel (Japan, M72)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, dkgensanm72, hharry,   m72,         hharry,   m72_state,     dkgenm72,    ROT0,   "Irem", "Daiku no Gensan (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dkgensanm72, hharry,   m72,          hharry,       m72_state, init_dkgenm72,   ROT0,   "Irem", "Daiku no Gensan (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 /* M81 */
-GAME( 1989, xmultipl,    0,        m81_xmultipl,m81_xmultipl,m72_state,0,         ROT0,   "Irem", "X Multiply (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbreed,      0,        m81_dbreed,  m81_dbreed,m72_state,0,           ROT0,   "Irem", "Dragon Breed (M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hharry,      0,        m81_hharry,  m81_hharry,m72_state,0,           ROT0,   "Irem", "Hammerin' Harry (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, xmultipl,    0,        m81_xmultipl, m81_xmultipl, m72_state, empty_init,      ROT0,   "Irem", "X Multiply (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbreed,      0,        m81_dbreed,   m81_dbreed,   m72_state, empty_init,      ROT0,   "Irem", "Dragon Breed (M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharry,      0,        m81_hharry,   m81_hharry,   m72_state, empty_init,      ROT0,   "Irem", "Hammerin' Harry (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 /* M82 */
-GAME( 1990, majtitle,    0,        m82,         rtype2,   m72_state,     0,           ROT0,   "Irem", "Major Title (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M82-A-A + M82-B-A
-GAME( 1990, majtitlej,   majtitle, m82,         rtype2,   m72_state,     0,           ROT0,   "Irem", "Major Title (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
+GAME( 1990, majtitle,    0,        m82,          rtype2,       m72_state, empty_init,      ROT0,   "Irem", "Major Title (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M82-A-A + M82-B-A
+GAME( 1990, majtitlej,   majtitle, m82,          rtype2,       m72_state, empty_init,      ROT0,   "Irem", "Major Title (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
-GAME( 1990, airduel,     0,        m82,         airduel,  m72_state,     0,           ROT270, "Irem", "Air Duel (World, M82-A-A + M82-B-A)", MACHINE_SUPPORTS_SAVE ) // Major Title conversion
+GAME( 1990, airduel,     0,        m82,          airduel,      m72_state, empty_init,      ROT270, "Irem", "Air Duel (World, M82-A-A + M82-B-A)", MACHINE_SUPPORTS_SAVE ) // Major Title conversion
 
-GAME( 1990, dkgensanm82, hharry,   hharryu,     hharry,   m72_state,     0,           ROT0,   "Irem", "Daiku no Gensan (Japan, M82)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dkgensanm82, hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M82)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2009, rtypem82b,   rtype,    m82,         rtype,    m72_state,     0,           ROT0,   "bootleg", "R-Type (Japan, bootleg Major Title conversion, M82)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // unofficial conversion of Major Title, extensive wiremods, made in 2009 by Paul Swan
+GAME( 2009, rtypem82b,   rtype,    m82,          rtype,        m72_state, empty_init,      ROT0,   "bootleg", "R-Type (Japan, bootleg Major Title conversion, M82)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // unofficial conversion of Major Title, extensive wiremods, made in 2009 by Paul Swan
 
-GAME( 1997, rtype2m82b,  rtype2,   m82,         rtype2,   m72_state,     0,           ROT0,   "bootleg", "R-Type II (Japan, bootleg Major Title conversion, M82)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // made in 1997 by Chris Hardy
+GAME( 1997, rtype2m82b,  rtype2,   m82,          rtype2,       m72_state, empty_init,      ROT0,   "bootleg", "R-Type II (Japan, bootleg Major Title conversion, M82)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // made in 1997 by Chris Hardy
 
 /* M84 */
 
-GAME( 1990, hharryu,     hharry,   hharryu,     hharry,   m72_state,     0,           ROT0,   "Irem America", "Hammerin' Harry (US, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dkgensan,    hharry,   hharryu,     hharry,   m72_state,     0,           ROT0,   "Irem", "Daiku no Gensan (Japan, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharryu,     hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem America", "Hammerin' Harry (US, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dkgensan,    hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, rtype2,      0,        rtype2,      rtype2,   m72_state,     0,           ROT0,   "Irem", "R-Type II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, rtype2j,     rtype2,   rtype2,      rtype2,   m72_state,     0,           ROT0,   "Irem", "R-Type II (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, rtype2jc,    rtype2,   rtype2,      rtype2,   m72_state,     0,           ROT0,   "Irem", "R-Type II (Japan, revision C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rtype2,      0,        rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rtype2j,     rtype2,   rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rtype2jc,    rtype2,   rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II (Japan, revision C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, cosmccop,    0,        cosmccop,    gallop,   m72_state,     0,           ROT0,   "Irem", "Cosmic Cop (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, cosmccop,    0,        cosmccop,     gallop,       m72_state, empty_init,      ROT0,   "Irem", "Cosmic Cop (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, ltswords,    0,        kengo,       kengo,    m72_state,     0,           ROT0,   "Irem", "Lightning Swords", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, kengo,       ltswords, kengo,       kengo,    m72_state,     0,           ROT0,   "Irem", "Ken-Go (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, kengoa,      ltswords, kengo,       kengo,    m72_state,     0,           ROT0,   "Irem", "Ken-Go (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // has 'for use in Japan' message, above set doesn't
+GAME( 1991, ltswords,    0,        kengo,        kengo,        m72_state, empty_init,      ROT0,   "Irem", "Lightning Swords", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, kengo,       ltswords, kengo,        kengo,        m72_state, empty_init,      ROT0,   "Irem", "Ken-Go (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, kengoa,      ltswords, kengo,        kengo,        m72_state, empty_init,      ROT0,   "Irem", "Ken-Go (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // has 'for use in Japan' message, above set doesn't
 
 /* M85 */
 
-GAME( 1990, poundfor,    0,        poundfor,    poundfor, m72_state,     0,           ROT270, "Irem", "Pound for Pound (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // M85-A-B / M85-B
-GAME( 1990, poundforj,   poundfor, poundfor,    poundfor, m72_state,     0,           ROT270, "Irem", "Pound for Pound (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // ^
-GAME( 1990, poundforu,   poundfor, poundfor,    poundfor, m72_state,     0,           ROT270, "Irem America", "Pound for Pound (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
+GAME( 1990, poundfor,    0,        poundfor,     poundfor,     m72_state, empty_init,      ROT270, "Irem", "Pound for Pound (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // M85-A-B / M85-B
+GAME( 1990, poundforj,   poundfor, poundfor,     poundfor,     m72_state, empty_init,      ROT270, "Irem", "Pound for Pound (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // ^
+GAME( 1990, poundforu,   poundfor, poundfor,     poundfor,     m72_state, empty_init,      ROT270, "Irem America", "Pound for Pound (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
 /* bootlegs, unique hw */
-GAME( 1989, lohtb,       loht,     m72,         loht,     m72_state,     0,           ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lohtb,       loht,     m72,          loht,         m72_state, empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

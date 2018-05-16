@@ -58,7 +58,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_DRIVER_INIT(metlfrzr);
+	void init_metlfrzr();
 	DECLARE_WRITE8_MEMBER(output_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	uint8_t m_fg_tilebank;
@@ -343,7 +343,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START(metlfrzr)
+static GFXDECODE_START(gfx_metlfrzr)
 	GFXDECODE_ENTRY("gfx1", 0, tile_layout, 0x100, 16)
 	GFXDECODE_ENTRY("gfx2", 0, tile_layout, 0x100, 16)
 	GFXDECODE_ENTRY("gfx3", 0, sprite_layout, 0, 16)
@@ -376,7 +376,7 @@ MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256*2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", metlfrzr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_metlfrzr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -434,7 +434,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
+void metlfrzr_state::init_metlfrzr()
 {
 	// same as cshooter.cpp
 	uint8_t *rom = memregion("maincpu")->base();
@@ -467,4 +467,4 @@ DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
 
 
 
-GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu Kaihatsu", "Metal Freezer (Japan)", MACHINE_NO_COCKTAIL )
+GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state, init_metlfrzr, ROT270, "Seibu Kaihatsu", "Metal Freezer (Japan)", MACHINE_NO_COCKTAIL )

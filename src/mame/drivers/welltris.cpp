@@ -649,13 +649,13 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( welltris )
+static GFXDECODE_START( gfx_welltris )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   16* 0, 4*16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*96, 2*16 )
 GFXDECODE_END
 
 
-DRIVER_INIT_MEMBER(welltris_state,welltris)
+void welltris_state::init_welltris()
 {
 #if WELLTRIS_4P_HACK
 	/* A Hack which shows 4 player mode in code which is disabled */
@@ -690,7 +690,7 @@ MACHINE_CONFIG_START(welltris_state::welltris)
 	MCFG_SCREEN_UPDATE_DRIVER(welltris_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", welltris)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_welltris)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -811,6 +811,6 @@ ROM_END
 
 
 
-GAME( 1991, welltris,  0,        welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (World?, 2 players)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, welltrisj, welltris, welltris, welltris, welltris_state, welltris, ROT0,   "Video System Co.", "Welltris (Japan, 2 players)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, quiz18k,   0,        quiz18k,  quiz18k,  welltris_state, 0,        ROT0,   "EIM",              "Miyasu Nonki no Quiz 18-Kin",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, welltris,  0,        welltris, welltris, welltris_state, init_welltris, ROT0,   "Video System Co.", "Welltris (World?, 2 players)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, welltrisj, welltris, welltris, welltris, welltris_state, init_welltris, ROT0,   "Video System Co.", "Welltris (Japan, 2 players)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, quiz18k,   0,        quiz18k,  quiz18k,  welltris_state, empty_init,   ROT0,   "EIM",              "Miyasu Nonki no Quiz 18-Kin",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

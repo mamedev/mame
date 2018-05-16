@@ -274,8 +274,7 @@ MACHINE_CONFIG_START(acrnsys1_state::acrnsys1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	MCFG_DEVICE_ADD("b1", INS8154, 0)
@@ -303,5 +302,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     STATE           INIT  COMPANY  FULLNAME          FLAGS
-COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, acrnsys1_state, 0,    "Acorn", "Acorn System 1", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME          FLAGS
+COMP( 1978, acrnsys1, 0,      0,      acrnsys1, acrnsys1, acrnsys1_state, empty_init, "Acorn", "Acorn System 1", MACHINE_SUPPORTS_SAVE )

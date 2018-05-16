@@ -315,7 +315,7 @@ static const gfx_layout raiden_spritelayout =
 	1024
 };
 
-static GFXDECODE_START( raiden )
+static GFXDECODE_START( gfx_raiden )
 	GFXDECODE_ENTRY( "gfx1", 0, raiden_charlayout,   768, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, raiden_spritelayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, raiden_spritelayout, 256, 16 )
@@ -361,7 +361,7 @@ MACHINE_CONFIG_START(raiden_state::raiden)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, raiden_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -481,6 +481,10 @@ ROM_START( raiden ) /* from a board with 2 daughter cards, no official board #s?
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
+	ROM_REGION( 0x2000, "plds", 0 ) // 2x Altera EP910PC-40 (read protected)
+	ROM_LOAD( "rd003b.u0168", 0x0000, 0x0884, NO_DUMP )
+	ROM_LOAD( "rd006b.u0365", 0x1000, 0x0884, NO_DUMP )
+
 	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
 	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
 	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
@@ -517,6 +521,10 @@ ROM_START( raidena )
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x2000, "plds", 0 ) // 2x Altera EP910PC-40 (read protected)
+	ROM_LOAD( "rd003b.u0168", 0x0000, 0x0884, NO_DUMP )
+	ROM_LOAD( "rd006b.u0365", 0x1000, 0x0884, NO_DUMP )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
 	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
@@ -555,6 +563,10 @@ ROM_START( raident )
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
+	ROM_REGION( 0x2000, "plds", 0 ) // 2x Altera EP910PC-40 (read protected)
+	ROM_LOAD( "rd003b.u0168", 0x0000, 0x0884, NO_DUMP )
+	ROM_LOAD( "rd006b.u0365", 0x1000, 0x0884, NO_DUMP )
+
 	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
 	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
 	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
@@ -592,6 +604,10 @@ ROM_START( raidenu )
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
+	ROM_REGION( 0x2000, "plds", 0 ) // 2x Altera EP910PC-40 (read protected)
+	ROM_LOAD( "rd003b.u0168", 0x0000, 0x0884, NO_DUMP )
+	ROM_LOAD( "rd006b.u0365", 0x1000, 0x0884, NO_DUMP )
+
 	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
 	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
 	ROM_LOAD( "rd012.u094", 0x0100, 0x0100, NO_DUMP )
@@ -628,6 +644,10 @@ ROM_START( raidenk ) /* Same board as above. Not sure why the sound CPU would be
 
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+
+	ROM_REGION( 0x2000, "plds", 0 ) // 2x Altera EP910PC-40 (read protected)
+	ROM_LOAD( "rd003b.u0168", 0x0000, 0x0884, NO_DUMP )
+	ROM_LOAD( "rd006b.u0365", 0x1000, 0x0884, NO_DUMP )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // N82S135N bipolar PROMs
 	ROM_LOAD( "rd010.u087", 0x0000, 0x0100, NO_DUMP )
@@ -712,9 +732,8 @@ ROM_START( raidenb )/* Different hardware, Main & Sub CPU code not encrypted. */
 	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
-	ROM_REGION( 0x2000, "plds", 0 )
-	ROM_LOAD( "ep910pc-1.bin", 0x0000, 0x0884, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "ep910pc-2.bin", 0x1000, 0x0884, NO_DUMP ) /* PAL is read protected */
+	ROM_REGION( 0x0100, "proms", 0 ) // N82S135N bipolar PROM
+	ROM_LOAD( "jj3010.u0116", 0x0000, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( raidenua )/* Different hardware, Main, Sub & sound CPU code not encrypted. */
@@ -787,7 +806,7 @@ void raiden_state::common_decrypt()
 }
 
 
-DRIVER_INIT_MEMBER(raiden_state,raiden)
+void raiden_state::init_raiden()
 {
 	common_decrypt();
 }
@@ -796,20 +815,20 @@ DRIVER_INIT_MEMBER(raiden_state,raiden)
 /***************************************************************************/
 
 /* Same PCB, differ by region byte(s) */
-GAME( 1990, raiden,   0,      raidene,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu", "Raiden (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, raidena,  raiden, raidene,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu", "Raiden (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, raidenu,  raiden, raidene,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, raident,  raiden, raidene,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu (Liang HWA Electronics license)", "Raiden (Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raiden,   0,      raidene,  raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu", "Raiden (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidena,  raiden, raidene,  raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu", "Raiden (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenu,  raiden, raidene,  raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raident,  raiden, raidene,  raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu (Liang HWA Electronics license)", "Raiden (Taiwan)", MACHINE_SUPPORTS_SAVE )
 
 /* Same as above, but the sound CPU code is not encrypted */
-GAME( 1990, raidenk,  raiden, raiden,   raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu (IBL Corporation license)", "Raiden (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenk,  raiden, raiden,   raiden, raiden_state,  init_raiden,  ROT270, "Seibu Kaihatsu (IBL Corporation license)", "Raiden (Korea)", MACHINE_SUPPORTS_SAVE )
 
 /* Bootleg of the Korean release */
 /* real hw has heavy slow downs, sometimes making the game borderline unplayable (https://www.youtube.com/watch?v=_FF4N9mBxao) */
-GAME( 1990, raidenkb, raiden, raidenkb, raiden, raiden_state,  raiden,  ROT270, "bootleg", "Raiden (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenkb, raiden, raidenkb, raiden, raiden_state,  init_raiden,  ROT270, "bootleg", "Raiden (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* Alternate hardware; SEI8904 + SEI9008 PCBs. Main & Sub CPU code not encrypted */
-GAME( 1990, raidenua, raiden, raidenu,  raiden, raiden_state,  0,       ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenua, raiden, raidenu,  raiden, raiden_state,  empty_init,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* Alternate hardware. Main, Sub & Sound CPU code not encrypted. It also sports Seibu custom CRTC. */
-GAME( 1990, raidenb,  raiden, raidenb,  raiden, raiden_state,  0,       ROT270, "Seibu Kaihatsu", "Raiden (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenb,  raiden, raidenb,  raiden, raiden_state,  empty_init,   ROT270, "Seibu Kaihatsu", "Raiden (set 3)", MACHINE_SUPPORTS_SAVE )

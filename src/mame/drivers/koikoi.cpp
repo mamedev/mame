@@ -321,7 +321,7 @@ static const gfx_layout tilelayout =
 };
 
 
-static GFXDECODE_START( koikoi )
+static GFXDECODE_START( gfx_koikoi )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,      0, 32 )
 GFXDECODE_END
 
@@ -370,7 +370,7 @@ MACHINE_CONFIG_START(koikoi_state::koikoi)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", koikoi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_koikoi)
 	MCFG_PALETTE_ADD("palette", 8*32)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(koikoi_state, koikoi)
@@ -437,4 +437,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, koikoi,   0,      koikoi, koikoi, koikoi_state, 0, ROT270, "Kiwako", "Koi Koi Part 2", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, koikoi, 0, koikoi, koikoi, koikoi_state, empty_init, ROT270, "Kiwako", "Koi Koi Part 2", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

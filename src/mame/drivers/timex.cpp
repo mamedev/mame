@@ -682,7 +682,7 @@ static const gfx_layout ts2068_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( ts2068 )
+static GFXDECODE_START( gfx_ts2068 )
 	GFXDECODE_ENTRY( "maincpu", 0x13d00, ts2068_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -704,7 +704,7 @@ MACHINE_CONFIG_START(spectrum_state::ts2068)
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_ts2068)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, spectrum_state, screen_vblank_timex))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", ts2068)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ts2068)
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, ts2068 )
 
@@ -781,7 +781,7 @@ ROM_START(uk2086)
 	ROM_LOAD("ts2068_x.rom",0x14000,0x2000, CRC(ae16233a) SHA1(7e265a2c1f621ed365ea23bdcafdedbc79c1299c))
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT     STATE           INIT  COMPANY               FULLNAME             FLAGS
-COMP( 1984, tc2048,   spectrum, 0,      tc2048,  spectrum, spectrum_state, 0,    "Timex of Portugal",  "TC-2048" ,          0 )
-COMP( 1983, ts2068,   spectrum, 0,      ts2068,  spectrum, spectrum_state, 0,    "Timex Sinclair",     "TS-2068" ,          0 )
-COMP( 1986, uk2086,   spectrum, 0,      uk2086,  spectrum, spectrum_state, 0,    "Unipolbrit",         "UK-2086 ver. 1.2" , 0 )
+//    YEAR  NAME    PARENT    COMPAT  MACHINE  INPUT     CLASS           INIT        COMPANY              FULLNAME             FLAGS
+COMP( 1984, tc2048, spectrum, 0,      tc2048,  spectrum, spectrum_state, empty_init, "Timex of Portugal", "TC-2048" ,          0 )
+COMP( 1983, ts2068, spectrum, 0,      ts2068,  spectrum, spectrum_state, empty_init, "Timex Sinclair",    "TS-2068" ,          0 )
+COMP( 1986, uk2086, spectrum, 0,      uk2086,  spectrum, spectrum_state, empty_init, "Unipolbrit",        "UK-2086 ver. 1.2" , 0 )

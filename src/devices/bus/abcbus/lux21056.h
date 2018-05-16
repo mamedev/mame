@@ -14,7 +14,7 @@
 #include "abcbus.h"
 #include "bus/scsi/scsi.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80dma.h"
 
 

@@ -803,7 +803,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( bublbobl )
+static GFXDECODE_START( gfx_bublbobl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -826,9 +826,12 @@ MACHINE_RESET_MEMBER(bublbobl_state,common) // things common on both tokio and b
 	m_soundnmi->in_w<0>(0); // clear sound NMI stuff
 	m_soundnmi->in_w<1>(0);
 	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); // if a subcpu nmi is active (extremely remote chance), it is cleared
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE); // maincpu is reset
-	m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE); // subcpu is reset
-	common_sreset(PULSE_LINE); // /SRESET is pulsed
+	if (!m_sreset_old)
+	{
+		// /SRESET is pulsed
+		common_sreset(ASSERT_LINE);
+		common_sreset(CLEAR_LINE);
+	}
 }
 
 
@@ -874,7 +877,7 @@ MACHINE_CONFIG_START(bublbobl_state::tokio)
 	MCFG_SCREEN_UPDATE_DRIVER(bublbobl_state, screen_update_bublbobl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bublbobl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bublbobl)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -987,7 +990,7 @@ MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
 	MCFG_SCREEN_UPDATE_DRIVER(bublbobl_state, screen_update_bublbobl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bublbobl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bublbobl)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -2012,23 +2015,22 @@ void bublbobl_state::configure_banks(  )
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,common)
+void bublbobl_state::init_common()
 {
 	configure_banks();
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,dland)
+void bublbobl_state::init_dland()
 {
 	// rearrange gfx to original format
-	int i;
 	uint8_t* src = memregion("gfx1")->base();
-	for (i = 0; i < 0x40000; i++)
+	for (int i = 0; i < 0x40000; i++)
 		src[i] = bitswap<8>(src[i],7,6,5,4,0,1,2,3);
 
-	for (i = 0x40000; i < 0x80000; i++)
+	for (int i = 0x40000; i < 0x80000; i++)
 		src[i] = bitswap<8>(src[i],7,4,5,6,3,0,1,2);
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 }
 
 
@@ -2037,32 +2039,32 @@ DRIVER_INIT_MEMBER(bublbobl_state,dland)
  *  Game driver(s)
  *
  *************************************/
-//    YEAR  NAME        PARENT    MACHINE   INPUT       STATE           INIT    ROT    COMPANY     FULLNAME      FLAGS
-GAME( 1986, tokio,      0,        tokio,    tokio,      bublbobl_state, common, ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (newer)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokioo,     tokio,    tokio,    tokio,      bublbobl_state, common, ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (older)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokiou,     tokio,    tokio,    tokio,      bublbobl_state, common, ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokiob,     tokio,    tokiob,   tokio_base, bublbobl_state, common, ROT90, "bootleg",                                     "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT    MACHINE    INPUT       STATE           INIT         ROT    COMPANY     FULLNAME      FLAGS
+GAME( 1986, tokio,      0,        tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (newer)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokioo,     tokio,    tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (older)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokiou,     tokio,    tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokiob,     tokio,    tokiob,    tokio_base, bublbobl_state, init_common, ROT90, "bootleg",                                     "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, bublboblp,  bublbobl, bublboblp, bublboblp, bublbobl_state, common, ROT0,  "Taito Corporation",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bublbobl,   0,        bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bublbobl1,  bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bublboblr,  bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 5.1)",    MACHINE_SUPPORTS_SAVE ) // newest release, with mode select
-GAME( 1986, bublboblr1, bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 1.0)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublboblp,  bublbobl, bublboblp, bublboblp,  bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublbobl,   0,        bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublbobl1,  bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublboblr,  bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 5.1)",    MACHINE_SUPPORTS_SAVE ) // newest release, with mode select
+GAME( 1986, bublboblr1, bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 1.0)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, boblbobl,   bublbobl, boblbobl, boblbobl,   bublbobl_state, common, ROT0,  "bootleg",         "Bobble Bobble (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobl,  bublbobl, boblbobl, sboblbobl,  bublbobl_state, common, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobla, bublbobl, boblbobl, boblbobl,   bublbobl_state, common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 2)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblboblb, bublbobl, boblbobl, sboblboblb, bublbobl_state, common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 3)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobld, bublbobl, boblbobl, sboblboblb, bublbobl_state, common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 4)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblboblc, bublbobl, boblbobl, sboblboblb, bublbobl_state, common, ROT0,  "bootleg",         "Super Bubble Bobble (bootleg)",            MACHINE_SUPPORTS_SAVE ) // the title screen on this one isn't hacked
-GAME( 1986, bub68705,   bublbobl, bub68705, bublbobl,   bub68705_state, common, ROT0,  "bootleg",         "Bubble Bobble (bootleg with 68705)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, boblbobl,   bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_common, ROT0,  "bootleg",         "Bobble Bobble (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblbobl,  bublbobl, boblbobl,  sboblbobl,  bublbobl_state, init_common, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblbobla, bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboblb, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 3)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblbobld, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 4)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboblc, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bubble Bobble (bootleg)",            MACHINE_SUPPORTS_SAVE ) // the title screen on this one isn't hacked
+GAME( 1986, bub68705,   bublbobl, bub68705,  bublbobl,   bub68705_state, init_common, ROT0,  "bootleg",         "Bubble Bobble (bootleg with 68705)",       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, dland,      bublbobl, boblbobl, dland,      bublbobl_state, dland,  ROT0,  "bootleg", "Dream Land / Super Dream Land (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, dland,      bublbobl, boblbobl,  dland,      bublbobl_state, init_dland,  ROT0,  "bootleg", "Dream Land / Super Dream Land (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2013, bbredux,    bublbobl, boblbobl, boblbobl,   bublbobl_state, common, ROT0,  "bootleg (Punji)",  "Bubble Bobble ('bootleg redux' hack for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE ) // for use on non-MCU bootleg boards (Bobble Bobble etc.) has more faithful simulation of the protection device (JAN-04-2015 release)
-GAME( 2013, bublboblb,  bublbobl, boblbobl, boblcave,   bublbobl_state, common, ROT0,  "bootleg (Aladar)", "Bubble Bobble (for Bobble Bobble PCB)",                      MACHINE_SUPPORTS_SAVE ) // alt bootleg/hack to restore proper MCU behavior to bootleg boards
+GAME( 2013, bbredux,    bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_common, ROT0,  "bootleg (Punji)",  "Bubble Bobble ('bootleg redux' hack for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE ) // for use on non-MCU bootleg boards (Bobble Bobble etc.) has more faithful simulation of the protection device (JAN-04-2015 release)
+GAME( 2013, bublboblb,  bublbobl, boblbobl,  boblcave,   bublbobl_state, init_common, ROT0,  "bootleg (Aladar)", "Bubble Bobble (for Bobble Bobble PCB)",                      MACHINE_SUPPORTS_SAVE ) // alt bootleg/hack to restore proper MCU behavior to bootleg boards
 
-GAME( 2013, bublcave,   bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2",                         MACHINE_SUPPORTS_SAVE )
-GAME( 2013, boblcave,   bublbobl, boblbobl, boblcave,   bublbobl_state, common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2 (for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 2012, bublcave11, bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.1",                         MACHINE_SUPPORTS_SAVE )
-GAME( 2012, bublcave10, bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.0",                         MACHINE_SUPPORTS_SAVE )
+GAME( 2013, bublcave,   bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2",                         MACHINE_SUPPORTS_SAVE )
+GAME( 2013, boblcave,   bublbobl, boblbobl,  boblcave,   bublbobl_state, init_common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2 (for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, bublcave11, bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.1",                         MACHINE_SUPPORTS_SAVE )
+GAME( 2012, bublcave10, bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.0",                         MACHINE_SUPPORTS_SAVE )

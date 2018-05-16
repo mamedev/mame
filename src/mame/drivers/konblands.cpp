@@ -241,7 +241,7 @@ static const gfx_layout charlayout =
 	8*8*4
 };
 
-static GFXDECODE_START( konblands )
+static GFXDECODE_START( gfx_konblands )
 	GFXDECODE_ENTRY( "gfx", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(konblands_state::konblands)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", konblands)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_konblands)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(konblands_state, konblands)
@@ -348,5 +348,5 @@ ROM_START( kbadlandsh )
 ROM_END
 
 
-GAME( 1984, kbadlands,  0,           konblands,  konblands, konblands_state,  0,       ROT0, "Konami",      "Badlands (Konami, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1984, kbadlandsh, kbadlands,   konblandsh, konblands, konblands_state,  0,       ROT0, "Konami",      "Badlands (Konami, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1984, kbadlands,  0,         konblands,  konblands, konblands_state, empty_init, ROT0, "Konami",      "Badlands (Konami, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1984, kbadlandsh, kbadlands, konblandsh, konblands, konblands_state, empty_init, ROT0, "Konami",      "Badlands (Konami, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

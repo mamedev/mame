@@ -134,7 +134,7 @@ public:
 	DECLARE_READ8_MEMBER( p3_read );
 	DECLARE_WRITE8_MEMBER( p3_write );
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
-	DECLARE_DRIVER_INIT(applix);
+	void init_applix();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint8_t m_video_latch;
 	uint8_t m_pa;
@@ -878,8 +878,7 @@ MACHINE_CONFIG_START(applix_state::applix)
 	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(30'000'000) / 16) // MC6545 @ 1.875 MHz
@@ -948,7 +947,7 @@ ROM_START( applix )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(applix_state, applix)
+void applix_state::init_applix()
 {
 	uint8_t *RAM = memregion("subcpu")->base();
 	membank("bank1")->configure_entries(0, 2, &RAM[0x8000], 0x8000);
@@ -957,8 +956,8 @@ DRIVER_INIT_MEMBER(applix_state, applix)
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY           FULLNAME       FLAGS
-COMP( 1986, applix, 0,       0,     applix, applix, applix_state, applix, "Applix Pty Ltd", "Applix 1616", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY           FULLNAME       FLAGS
+COMP( 1986, applix, 0,      0,      applix,  applix, applix_state, init_applix, "Applix Pty Ltd", "Applix 1616", 0 )
 
 
 

@@ -191,7 +191,7 @@ static const gfx_layout tilelayout8 =
 	16*8
 };
 
-static GFXDECODE_START( compgolf )
+static GFXDECODE_START( gfx_compgolf )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayoutbg, 0, 0x20 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout8,  0, 0x10 )
@@ -240,7 +240,7 @@ MACHINE_CONFIG_START(compgolf_state::compgolf)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(compgolf_state, compgolf)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", compgolf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_compgolf)
 
 
 	SPEAKER(config, "mono").front_center();
@@ -332,7 +332,7 @@ void compgolf_state::compgolf_expand_bg()
 	}
 }
 
-DRIVER_INIT_MEMBER(compgolf_state,compgolf)
+void compgolf_state::init_compgolf()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("user1")->base(), 0x4000);
 	compgolf_expand_bg();
@@ -345,5 +345,5 @@ DRIVER_INIT_MEMBER(compgolf_state,compgolf)
  *
  *************************************/
 
-GAME( 1986, compgolf, 0,        compgolf, compgolf, compgolf_state, compgolf, ROT0, "Data East", "Competition Golf Final Round (revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, compgolfo,compgolf, compgolf, compgolf, compgolf_state, compgolf, ROT0, "Data East", "Competition Golf Final Round (Japan, old version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, compgolf,  0,        compgolf, compgolf, compgolf_state, init_compgolf, ROT0, "Data East", "Competition Golf Final Round (revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, compgolfo, compgolf, compgolf, compgolf, compgolf_state, init_compgolf, ROT0, "Data East", "Competition Golf Final Round (Japan, old version)", MACHINE_SUPPORTS_SAVE )

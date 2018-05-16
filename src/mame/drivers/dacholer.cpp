@@ -559,13 +559,13 @@ static const gfx_layout spritelayout =
 	16*16*4
 };
 
-static GFXDECODE_START( dacholer )
+static GFXDECODE_START( gfx_dacholer )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0x10, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x10, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( itaten )
+static GFXDECODE_START( gfx_itaten )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0x00, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x10, 1 )
@@ -682,7 +682,7 @@ MACHINE_CONFIG_START(dacholer_state::dacholer)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(dacholer_state, dacholer)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dacholer)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dacholer)
 
 
 	/* sound hardware */
@@ -716,7 +716,7 @@ MACHINE_CONFIG_START(dacholer_state::itaten)
 	MCFG_DEVICE_IO_MAP(itaten_snd_io_map)
 	MCFG_DEVICE_VBLANK_INT_REMOVE()
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", itaten)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_itaten)
 
 	MCFG_DEVICE_REMOVE("msm")
 MACHINE_CONFIG_END
@@ -858,6 +858,6 @@ ROM_START( itaten )
 ROM_END
 
 
-GAME( 1983, dacholer, 0, dacholer, dacholer, dacholer_state, 0, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, kickboy,  0, dacholer, kickboy,  dacholer_state, 0, ROT0, "Nichibutsu",         "Kick Boy",               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, itaten,   0, itaten,   itaten,   dacholer_state, 0, ROT0, "Nichibutsu / Alice", "Itazura Tenshi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dacholer, 0, dacholer, dacholer, dacholer_state, empty_init, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, kickboy,  0, dacholer, kickboy,  dacholer_state, empty_init, ROT0, "Nichibutsu",         "Kick Boy",               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, itaten,   0, itaten,   itaten,   dacholer_state, empty_init, ROT0, "Nichibutsu / Alice", "Itazura Tenshi (Japan)", MACHINE_SUPPORTS_SAVE )

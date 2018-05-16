@@ -486,8 +486,7 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spc1000_state, porta_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	MCFG_DEVICE_ADD("ext1", SPC1000_EXP_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(spc1000_exp, nullptr, false)
@@ -526,5 +525,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS           INIT  COMPANY    FULLNAME    FLAGS
-COMP( 1982, spc1000,  0,      0,       spc1000,   spc1000, spc1000_state,  0,    "Samsung", "SPC-1000", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME    FLAGS
+COMP( 1982, spc1000, 0,      0,      spc1000, spc1000, spc1000_state, empty_init, "Samsung", "SPC-1000", 0 )

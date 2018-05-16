@@ -415,7 +415,7 @@ void captaven_state::captaven_map(address_map &map)
 void fghthist_state::fghthist_map(address_map &map)
 {
 	map.unmap_value_high();
-//  map(0x000000, 0x001fff) AM_ROM AM_WRITE(pf1_data_w) // wtf??
+//  map(0x000000, 0x001fff).rom().w(this, FUNC(fghthist_state::pf1_data_w)); // wtf??
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x11ffff).ram();
 	map(0x120020, 0x120021).r(this, FUNC(fghthist_state::fghthist_in0_r));
@@ -650,8 +650,8 @@ void deco32_state::h6280_sound_map(address_map &map)
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).w("audiocpu", FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w("audiocpu", FUNC(h6280_device::irq_status_w));
+	map(0x1fec00, 0x1fec01).rw("audiocpu", FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw("audiocpu", FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 void deco32_state::h6280_sound_custom_latch_map(address_map &map)
@@ -1168,7 +1168,7 @@ READ32_MEMBER( captaven_state::_71_r )
 	return 0xffffffff;
 }
 
-DRIVER_INIT_MEMBER( captaven_state, captaven )
+void captaven_state::init_captaven()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco56_decrypt_gfx(machine(), "gfx2");
@@ -1214,7 +1214,7 @@ void dragngun_state::dragngun_init_common()
 //  process_dvi_data(this,memregion("dvi")->base(),0xB80000, 0x1000000);
 }
 
-DRIVER_INIT_MEMBER( dragngun_state, dragngun )
+void dragngun_state::init_dragngun()
 {
 	dragngun_init_common();
 
@@ -1222,7 +1222,7 @@ DRIVER_INIT_MEMBER( dragngun_state, dragngun )
 	ROM[0x1b32c/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
-DRIVER_INIT_MEMBER( dragngun_state, dragngunj )
+void dragngun_state::init_dragngunj()
 {
 	dragngun_init_common();
 
@@ -1230,13 +1230,13 @@ DRIVER_INIT_MEMBER( dragngun_state, dragngunj )
 	ROM[0x1a1b4/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
-DRIVER_INIT_MEMBER( fghthist_state, fghthist )
+void fghthist_state::init_fghthist()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
 }
 
-DRIVER_INIT_MEMBER( dragngun_state, lockload )
+void dragngun_state::init_lockload()
 {
 //  uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 
@@ -1251,7 +1251,7 @@ DRIVER_INIT_MEMBER( dragngun_state, lockload )
 	save_item(NAME(m_oki2_bank));
 }
 
-DRIVER_INIT_MEMBER( nslasher_state, tattass )
+void nslasher_state::init_tattass()
 {
 	uint8_t *RAM = memregion("gfx1")->base();
 	std::vector<uint8_t> tmp(0x80000);
@@ -1278,7 +1278,7 @@ DRIVER_INIT_MEMBER( nslasher_state, tattass )
 	save_item(NAME(m_byteAddr));
 }
 
-DRIVER_INIT_MEMBER( nslasher_state, nslasher )
+void nslasher_state::init_nslasher()
 {
 	uint8_t *RAM = memregion("gfx1")->base();
 	std::vector<uint8_t> tmp(0x80000);
@@ -1736,8 +1736,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8    /* every char takes 8 consecutive bytes */
 };
 
@@ -1747,10 +1747,8 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 16, 0, 24, 8 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP8(16*8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*4) },
 	128*8
 };
 
@@ -1760,10 +1758,8 @@ static const gfx_layout spritelayout_5bpp =
 	RGN_FRAC(1,2),
 	5,
 	{ RGN_FRAC(1,2), 16, 0, 24, 8 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP8(16*8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*4) },
 	128*8
 };
 
@@ -1773,10 +1769,8 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
@@ -1786,10 +1780,8 @@ static const gfx_layout tilelayout_8bpp =
 	RGN_FRAC(1,4),
 	8,
 	{ RGN_FRAC(3,4)+8, RGN_FRAC(3,4)+0, RGN_FRAC(2,4)+8, RGN_FRAC(2,4)+0, RGN_FRAC(1,4)+8, RGN_FRAC(1,4)+0, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
@@ -1799,11 +1791,8 @@ static const gfx_layout spritelayout_5bpp_alt =
 	RGN_FRAC(1,5),
 	5,
 	{ 0x800000*8, 0x600000*8, 0x400000*8, 0x200000*8, 0 },
-	{
-		16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-		0,1,2,3,4,5,6,7
-	},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	32*8
 };
 
@@ -1815,8 +1804,7 @@ static const gfx_layout spritelayout4 =
 	{0,1,2,3},
 	{3*8,2*8,1*8,0*8,7*8,6*8,5*8,4*8,
 		11*8,10*8,9*8,8*8,15*8,14*8,13*8,12*8},
-	{0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,
-		8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
+	{ STEP16(0,16*8) },
 	16*16*8
 };
 
@@ -1828,26 +1816,25 @@ static const gfx_layout spritelayout5 =
 	{4,5,6,7},
 	{3*8,2*8,1*8,0*8,7*8,6*8,5*8,4*8,
 		11*8,10*8,9*8,8*8,15*8,14*8,13*8,12*8},
-	{0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,
-		8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
+	{ STEP16(0,16*8) },
 	16*16*8
 };
 
-static GFXDECODE_START( captaven )
+static GFXDECODE_START( gfx_captaven )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 128 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 128 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_8bpp,          0, 128 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,        0, 32 )    /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( fghthist )
+static GFXDECODE_START( gfx_fghthist )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0,  128 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0,  128 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0,  128 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,     1024, 128 )   /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( dragngun )
+static GFXDECODE_START( gfx_dragngun )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 64 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        0, 64 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_8bpp,      0, 8 )   /* Tiles 16x16 */
@@ -1855,7 +1842,7 @@ static GFXDECODE_START( dragngun )
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout5,       0, 32 )    /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( tattass )
+static GFXDECODE_START( gfx_tattass )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,            0, 128 ) /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,            0, 128 ) /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,            0, 128 ) /* Tiles 16x16 */
@@ -1863,7 +1850,7 @@ static GFXDECODE_START( tattass )
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,          1024+256, 32 )   /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( nslasher )
+static GFXDECODE_START( gfx_nslasher )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 128 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 128 )   /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0, 128 )   /* Tiles 16x16 */
@@ -1897,7 +1884,7 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	MCFG_SCREEN_UPDATE_DRIVER(captaven_state, screen_update_captaven)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", captaven)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_captaven)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
@@ -1978,7 +1965,7 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(fghthist_state, screen_update_fghthist)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fghthist)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fghthist)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
@@ -2147,7 +2134,7 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_DEVICE_ADD("spritegen_zoom", DECO_ZOOMSPR, 0)
 	MCFG_DECO_ZOOMSPR_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dragngun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(dragngun_state,dragngun)
@@ -2245,7 +2232,7 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dragngun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(dragngun_state, dragngun)
@@ -2370,7 +2357,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "deco_ace", tattass)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "deco_ace", gfx_tattass)
 
 	MCFG_DECO104_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
@@ -2449,7 +2436,7 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "deco_ace", nslasher)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "deco_ace", gfx_nslasher)
 
 	MCFG_VIDEO_START_OVERRIDE(nslasher_state, nslasher)
 
@@ -3957,44 +3944,44 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT    MACHINE    INPUT     CLASS           INIT       ROT   COMPANY                  FULLNAME                                              FLAGS
-GAME( 1991, captaven,   0,        captaven,  captaven, captaven_state, captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (Asia Rev 1.4)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1991, captavena,  captaven, captaven,  captaven, captaven_state, captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (Asia Rev 1.0)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1991, captavene,  captaven, captaven,  captaven, captaven_state, captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (UK Rev 1.4)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1991, captavenu,  captaven, captaven,  captaven, captaven_state, captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.9)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1991, captavenuu, captaven, captaven,  captaven, captaven_state, captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.6)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1991, captavenua, captaven, captaven,  captaven, captaven_state, captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.4)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1991, captavenj,  captaven, captaven,  captaven, captaven_state, captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (Japan Rev 0.2)",   MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT    MACHINE    INPUT     CLASS           INIT            ROT   COMPANY                  FULLNAME                                              FLAGS
+GAME( 1991, captaven,   0,        captaven,  captaven, captaven_state, init_captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (Asia Rev 1.4)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, captavena,  captaven, captaven,  captaven, captaven_state, init_captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (Asia Rev 1.0)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, captavene,  captaven, captaven,  captaven, captaven_state, init_captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (UK Rev 1.4)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, captavenu,  captaven, captaven,  captaven, captaven_state, init_captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.9)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, captavenuu, captaven, captaven,  captaven, captaven_state, init_captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.6)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, captavenua, captaven, captaven,  captaven, captaven_state, init_captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.4)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, captavenj,  captaven, captaven,  captaven, captaven_state, init_captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (Japan Rev 0.2)",   MACHINE_SUPPORTS_SAVE )
 
 // DE-0396-0 PCB sets (Z80 for sound)
-GAME( 1993, fghthistu,  fghthist, fghthistu, fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-09, DE-0396-0 PCB)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistu,  fghthist, fghthistu, fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-09, DE-0396-0 PCB)",    MACHINE_SUPPORTS_SAVE )
 // DE-0395-1 PCB sets (HuC6280 for sound)
-GAME( 1993, fghthist,   0       , fghthsta,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-09, DE-0395-1 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, fghthistua, fghthist, fghthsta,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-06, DE-0395-1 PCB)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1993, fghthistub, fghthist, fghthsta,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-05, DE-0395-1 PCB)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1993, fghthistj,  fghthist, fghthsta,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-07, DE-0395-1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthist,   0,        fghthsta,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-09, DE-0395-1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistua, fghthist, fghthsta,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-06, DE-0395-1 PCB)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistub, fghthist, fghthsta,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-05, DE-0395-1 PCB)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistj,  fghthist, fghthsta,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-07, DE-0395-1 PCB)", MACHINE_SUPPORTS_SAVE )
 // DE-0380-2 PCB sets (HuC6280 for sound)
-GAME( 1993, fghthista,  fghthist, fghthist,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-07, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, fghthistb,  fghthist, fghthist,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-05, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, fghthistuc, fghthist, fghthist,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-03, DE-0380-2 PCB)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1993, fghthistja, fghthist, fghthist,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-05, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthista,  fghthist, fghthist,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-07, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistb,  fghthist, fghthist,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-05, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistuc, fghthist, fghthist,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-03, DE-0380-2 PCB)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistja, fghthist, fghthist,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-05, DE-0380-2 PCB)", MACHINE_SUPPORTS_SAVE )
 // DE-0380-1 PCB sets (HuC6280 for sound)
-GAME( 1993, fghthistjb, fghthist, fghthist,  fghthist, fghthist_state, fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-04, DE-0380-1 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, fghthistjb, fghthist, fghthist,  fghthist, fghthist_state, init_fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-04, DE-0380-1 PCB)", MACHINE_SUPPORTS_SAVE )
 
 // DE-0397-0 PCB sets (Z80 for sound)
-GAME( 1994, nslasher,   0,        nslasher,  nslasher, nslasher_state, nslasher,  ROT0, "Data East Corporation", "Night Slashers (Korea Rev 1.3, DE-0397-0 PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nslasherj,  nslasher, nslasher,  nslasher, nslasher_state, nslasher,  ROT0, "Data East Corporation", "Night Slashers (Japan Rev 1.2, DE-0397-0 PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nslashers,  nslasher, nslasher,  nslasher, nslasher_state, nslasher,  ROT0, "Data East Corporation", "Night Slashers (Over Sea Rev 1.2, DE-0397-0 PCB)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nslasher,   0,        nslasher,  nslasher, nslasher_state, init_nslasher,  ROT0, "Data East Corporation", "Night Slashers (Korea Rev 1.3, DE-0397-0 PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nslasherj,  nslasher, nslasher,  nslasher, nslasher_state, init_nslasher,  ROT0, "Data East Corporation", "Night Slashers (Japan Rev 1.2, DE-0397-0 PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nslashers,  nslasher, nslasher,  nslasher, nslasher_state, init_nslasher,  ROT0, "Data East Corporation", "Night Slashers (Over Sea Rev 1.2, DE-0397-0 PCB)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 // DE-0395-1 PCB sets (HuC6280 for sound)
-GAME( 1994, nslasheru,  nslasher, nslasheru, nslasher, nslasher_state, nslasher,  ROT0, "Data East Corporation", "Night Slashers (US Rev 1.2, DE-0395-1 PCB)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nslasheru,  nslasher, nslasheru, nslasher, nslasher_state, init_nslasher,  ROT0, "Data East Corporation", "Night Slashers (US Rev 1.2, DE-0395-1 PCB)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, tattass,    0,        tattass,   tattass,  nslasher_state, tattass,   ROT0, "Data East Pinball",     "Tattoo Assassins (US prototype)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, tattassa,   tattass,  tattass,   tattass,  nslasher_state, tattass,   ROT0, "Data East Pinball",     "Tattoo Assassins (Asia prototype)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, tattass,    0,        tattass,   tattass,  nslasher_state, init_tattass,   ROT0, "Data East Pinball",     "Tattoo Assassins (US prototype)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, tattassa,   tattass,  tattass,   tattass,  nslasher_state, init_tattass,   ROT0, "Data East Pinball",     "Tattoo Assassins (Asia prototype)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Dragon Gun / Locked 'n Loaded have very different sprite hardware
-GAME( 1993, dragngun,   0,        dragngun,  dragngun, dragngun_state, dragngun,  ROT0, "Data East Corporation", "Dragon Gun (US)",                                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI3 Bankswitching aren't verified
-GAME( 1993, dragngunj,  dragngun, dragngun,  dragngun, dragngun_state, dragngunj, ROT0, "Data East Corporation", "Dragon Gun (Japan)",                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ""
+GAME( 1993, dragngun,   0,        dragngun,  dragngun, dragngun_state, init_dragngun,  ROT0, "Data East Corporation", "Dragon Gun (US)",                                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI3 Bankswitching aren't verified
+GAME( 1993, dragngunj,  dragngun, dragngun,  dragngun, dragngun_state, init_dragngunj, ROT0, "Data East Corporation", "Dragon Gun (Japan)",                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ""
 
-GAME( 1994, lockload,   0,        lockload,  lockload, dragngun_state, lockload,  ROT0, "Data East Corporation", "Locked 'n Loaded (World)",                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunhard,    lockload, lockload,  lockload, dragngun_state, lockload,  ROT0, "Data East Corporation", "Gun Hard (Japan)",                                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lockloadu,  lockload, lockloadu, lockload, dragngun_state, lockload,  ROT0, "Data East Corporation", "Locked 'n Loaded (US, Dragon Gun conversion)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lockload,   0,        lockload,  lockload, dragngun_state, init_lockload,  ROT0, "Data East Corporation", "Locked 'n Loaded (World)",                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunhard,    lockload, lockload,  lockload, dragngun_state, init_lockload,  ROT0, "Data East Corporation", "Gun Hard (Japan)",                                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lockloadu,  lockload, lockloadu, lockload, dragngun_state, init_lockload,  ROT0, "Data East Corporation", "Locked 'n Loaded (US, Dragon Gun conversion)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

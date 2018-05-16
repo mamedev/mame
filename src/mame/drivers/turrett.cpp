@@ -416,4 +416,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 2001, turrett, 0, turrett, turrett, turrett_state, 0, ROT0, "Dell Electronics (Namco license)", "Turret Tower", 0 )
+GAME( 2001, turrett, 0, turrett, turrett, turrett_state, empty_init, ROT0, "Dell Electronics (Namco license)", "Turret Tower", 0 )

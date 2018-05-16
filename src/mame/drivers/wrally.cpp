@@ -260,7 +260,7 @@ static const gfx_layout wrally_tilelayout16 =
 	64*8
 };
 
-static GFXDECODE_START( wrally )
+static GFXDECODE_START( gfx_wrally )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, wrally_tilelayout16, 0, 64*8 )
 GFXDECODE_END
 
@@ -283,7 +283,7 @@ MACHINE_CONFIG_START(wrally_state::wrally)
 	MCFG_SCREEN_UPDATE_DRIVER(wrally_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wrally)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wrally)
 	MCFG_PALETTE_ADD("palette", 1024*8)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
@@ -431,7 +431,7 @@ ROM_START( wrallyat ) /* Board Marked 930217, Atari License */
 ROM_END
 
 
-GAME( 1993, wrally,   0,      wrally, wrally, wrally_state, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 0E56)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
-GAME( 1993, wrallya,  wrally, wrally, wrally, wrally_state, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 3873)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
-GAME( 1993, wrallyb,  wrally, wrally, wrally, wrally_state, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wrallyat, wrally, wrally, wrally, wrally_state, 0, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrally,   0,      wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 0E56)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
+GAME( 1993, wrallya,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 3873)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
+GAME( 1993, wrallyb,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrallyat, wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)", MACHINE_SUPPORTS_SAVE )

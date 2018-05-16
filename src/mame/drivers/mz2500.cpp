@@ -1571,7 +1571,7 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F10") PORT_CODE(KEYCODE_F10)
 	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("8 (PAD)") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("9 (PAD)") PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(", (PAD)") //PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT(0x10,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(", (PAD)") PORT_CODE(KEYCODE_COMMA_PAD)
 	PORT_BIT(0x20,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME(". (PAD)") PORT_CODE(KEYCODE_DEL_PAD)
 	PORT_BIT(0x40,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("+ (PAD)") PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT(0x80,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("- (PAD)") PORT_CODE(KEYCODE_MINUS_PAD)
@@ -1856,7 +1856,7 @@ static const gfx_layout mz2500_16_layout =
 };
 
 /* these are just for viewer sake, actually they aren't used in drawing routines */
-static GFXDECODE_START( mz2500 )
+static GFXDECODE_START( gfx_mz2500 )
 	GFXDECODE_ENTRY("kanji", 0, mz2500_cg_layout, 0, 256)
 	GFXDECODE_ENTRY("kanji", 0x4400, mz2500_8_layout, 0, 256)
 	GFXDECODE_ENTRY("kanji", 0, mz2500_16_layout, 0, 256)
@@ -2136,7 +2136,7 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(mz2500_state, mz2500)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz2500)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz2500)
 
 
 	SPEAKER(config, "mono").front_center();
@@ -2207,5 +2207,5 @@ ROM_END
 
 /* Driver */
 
-COMP( 1985, mz2500,   0,             0,      mz2500,   mz2500, mz2500_state,        0,      "Sharp",     "MZ-2500", MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1985, mz2520,   mz2500,        0,      mz2500,   mz2500, mz2500_state,        0,      "Sharp",     "MZ-2520", MACHINE_IMPERFECT_GRAPHICS ) // looks a stripped down version of the regular MZ-2500, with only two floppies drives and no cassette interface
+COMP( 1985, mz2500, 0,      0, mz2500, mz2500, mz2500_state, empty_init, "Sharp", "MZ-2500", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1985, mz2520, mz2500, 0, mz2500, mz2500, mz2500_state, empty_init, "Sharp", "MZ-2520", MACHINE_IMPERFECT_GRAPHICS ) // looks a stripped down version of the regular MZ-2500, with only two floppies drives and no cassette interface

@@ -33,10 +33,10 @@ TODO: Emulated sound
 
  so despite the fact that 'gotya' might look like its a bootleg of thehand,
  its more likely just a prototype / alternate version, its hard to tell
- 
+
  ----
 According to Andrew Welburn:
- 
+
 'The Hand' is the original game, GAT licensed it for US manufacture.
 It wasn't a runaway seller, they didn't make many, but they had to
 change certain aspect of the game to 'localise' it and re-badge it as
@@ -155,7 +155,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every char takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( gotya )
+static GFXDECODE_START( gfx_gotya )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 16 )
 GFXDECODE_END
@@ -227,7 +227,7 @@ MACHINE_CONFIG_START(gotya_state::gotya)
 	MCFG_SCREEN_UPDATE_DRIVER(gotya_state, screen_update_gotya)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gotya)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gotya)
 	MCFG_PALETTE_ADD("palette", 16*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gotya_state, gotya)
@@ -303,5 +303,5 @@ ROM_START( gotya )
 	ROM_LOAD( "gb-07.bin",  0x7000, 0x1000, CRC(92a9f8bf) SHA1(9231cd86f24f1e6a585c3a919add50c1f8e42a4c) )
 ROM_END
 
-GAME( 1981, thehand, 0,       gotya, gotya, gotya_state, 0, ROT270, "T.I.C.",      "The Hand",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, gotya,   thehand, gotya, gotya, gotya_state, 0, ROT270, "Game-A-Tron", "Got-Ya (12/24/1981)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, thehand, 0,       gotya, gotya, gotya_state, empty_init, ROT270, "T.I.C.",      "The Hand",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, gotya,   thehand, gotya, gotya, gotya_state, empty_init, ROT270, "Game-A-Tron", "Got-Ya (12/24/1981)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

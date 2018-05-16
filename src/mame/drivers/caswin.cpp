@@ -301,7 +301,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( vvillage )
+static GFXDECODE_START( gfx_vvillage )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -350,7 +350,7 @@ MACHINE_CONFIG_START(caswin_state::vvillage)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vvillage)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vvillage)
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(caswin_state, caswin)
 
@@ -427,7 +427,7 @@ ROM_START( rcasinoo )
 	ROM_LOAD( "prom1.e8",  0x0020, 0x0020, CRC(2b5c7826) SHA1(c0de392aebd6982e5846c12aeb2e871358be60d7) ) /* MB7051 */
 ROM_END
 
-GAME( 1984, rcasino,  0,       vvillage, vvillage, caswin_state, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-2)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, rcasino1, rcasino, vvillage, vvillage, caswin_state, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Larger Board)",  MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, rcasinoo, rcasino, vvillage, vvillage, caswin_state, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Smaller Board)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1985, caswin,   rcasino, vvillage, vvillage, caswin_state, 0, ROT270, "Aristocrat",       "Casino Winner",                               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasino,  0,       vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-2)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasino1, rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Larger Board)",  MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasinoo, rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Smaller Board)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, caswin,   rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Aristocrat",       "Casino Winner",                               MACHINE_IMPERFECT_GRAPHICS )

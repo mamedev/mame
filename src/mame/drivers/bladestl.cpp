@@ -270,7 +270,7 @@ static const gfx_layout spritelayout =
 	32*8            /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( bladestl )
+static GFXDECODE_START( gfx_bladestl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0,  2 ) /* colors 00..31 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 32, 16 ) /* colors 32..47 but using lookup table */
 GFXDECODE_END
@@ -325,7 +325,7 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	MCFG_SCREEN_UPDATE_DRIVER(bladestl_state, screen_update_bladestl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD(m_gfxdecode, "palette", bladestl)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_bladestl)
 	MCFG_PALETTE_ADD("palette", 32 + 16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -448,6 +448,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, bladestl,  0,        bladestl, bladestl_joy,   bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version T, Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bladestll, bladestl, bladestl, bladestl_track, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version L, Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bladestle, bladestl, bladestl, bladestl_track, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version E, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestl,  0,        bladestl, bladestl_joy,   bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version T, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestll, bladestl, bladestl, bladestl_track, bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version L, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestle, bladestl, bladestl, bladestl_track, bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version E, Trackball)", MACHINE_SUPPORTS_SAVE )

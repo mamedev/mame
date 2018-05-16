@@ -201,7 +201,7 @@ static const gfx_layout spritelayout =
 	8*8*8
 };
 
-static GFXDECODE_START( ikki )
+static GFXDECODE_START( gfx_ikki )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout,   512, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0,   64 )
 GFXDECODE_END
@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(ikki_state::ikki)
 	MCFG_SCREEN_UPDATE_DRIVER(ikki_state, screen_update_ikki)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ikki)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ikki)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+1)
 	MCFG_PALETTE_INIT_OWNER(ikki_state, ikki)
@@ -358,5 +358,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, ikki,   0,    ikki, ikki, ikki_state, 0, ROT0, "Sun Electronics", "Ikki (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1985, farmer, ikki, ikki, ikki, ikki_state, 0, ROT0, "Sun Electronics", "Farmers Rebellion", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ikki,   0,    ikki, ikki, ikki_state, empty_init, ROT0, "Sun Electronics", "Ikki (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, farmer, ikki, ikki, ikki, ikki_state, empty_init, ROT0, "Sun Electronics", "Farmers Rebellion", MACHINE_SUPPORTS_SAVE )

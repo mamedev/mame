@@ -17,7 +17,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
@@ -369,5 +369,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE       INIT     COMPANY                FULLNAME       FLAGS
-COMP( 198?, mc8020, 0,      0,       mc8020,    mc8020, mc8020_state, 0,    "VEB Elektronik Gera", "MC-80.21/22", MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                FULLNAME       FLAGS
+COMP( 198?, mc8020, 0,      0,      mc8020,  mc8020, mc8020_state, empty_init, "VEB Elektronik Gera", "MC-80.21/22", MACHINE_NO_SOUND )

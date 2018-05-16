@@ -853,5 +853,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY     FULLNAME  FLAGS
-COMP( 1984, squale, 0,      0,      squale,  squale, squale_state, 0,    "Apollo 7", "Squale", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY     FULLNAME  FLAGS
+COMP( 1984, squale, 0,      0,      squale,  squale, squale_state, empty_init, "Apollo 7", "Squale", 0 )

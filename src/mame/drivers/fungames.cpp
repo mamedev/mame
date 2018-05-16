@@ -135,5 +135,5 @@ ROM_START( take5 )
 ROM_END
 
 
-GAME( 1976, biplane4,  0, fungames, 0, fungames_state,  0, ROT0, "Fun Games", "Biplane 4 [TTL]", MACHINE_IS_SKELETON )
-GAME( 1975, take5,     0, fungames, 0, fungames_state,  0, ROT0, "Fun Games", "Take 5 [TTL]",    MACHINE_IS_SKELETON )
+GAME( 1976, biplane4, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Biplane 4 [TTL]", MACHINE_IS_SKELETON )
+GAME( 1975, take5,    0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Take 5 [TTL]",    MACHINE_IS_SKELETON )

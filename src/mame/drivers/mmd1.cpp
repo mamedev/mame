@@ -171,7 +171,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mmd2_digit_w);
 	DECLARE_WRITE8_MEMBER(mmd2_status_callback);
 	DECLARE_WRITE_LINE_MEMBER(mmd2_inte_callback);
-	DECLARE_DRIVER_INIT(mmd2);
+	void init_mmd2();
 	DECLARE_MACHINE_RESET(mmd1);
 	DECLARE_MACHINE_RESET(mmd2);
 	void mmd1(machine_config &config);
@@ -458,7 +458,7 @@ MACHINE_RESET_MEMBER(mmd1_state,mmd2)
 	membank("bank8")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(mmd1_state,mmd2)
+void mmd1_state::init_mmd2()
 {
 /*
 We preset all banks here, so that bankswitching will incur no speed penalty.
@@ -542,6 +542,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY                FULLNAME  FLAGS
-COMP( 1976, mmd1,  0,      0,      mmd1,    mmd1,  mmd1_state, 0,    "E&L Instruments Inc", "MMD-1",  MACHINE_NO_SOUND_HW )
-COMP( 1976, mmd2,  mmd1,   0,      mmd2,    mmd2,  mmd1_state, mmd2, "E&L Instruments Inc", "MMD-2",  MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                FULLNAME  FLAGS
+COMP( 1976, mmd1,  0,      0,      mmd1,    mmd1,  mmd1_state, empty_init, "E&L Instruments Inc", "MMD-1",  MACHINE_NO_SOUND_HW )
+COMP( 1976, mmd2,  mmd1,   0,      mmd2,    mmd2,  mmd1_state, init_mmd2,  "E&L Instruments Inc", "MMD-2",  MACHINE_NO_SOUND_HW )

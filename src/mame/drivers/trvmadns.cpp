@@ -300,7 +300,7 @@ static const gfx_layout charlayout =
 	8*16
 };
 
-static GFXDECODE_START( trvmadns )
+static GFXDECODE_START( gfx_trvmadns )
 	GFXDECODE_ENTRY( nullptr, 0x6000, charlayout, 0, 4 ) // doesn't matter where we point this, all the tiles are decoded while the game runs
 GFXDECODE_END
 
@@ -400,7 +400,7 @@ MACHINE_CONFIG_START(trvmadns_state::trvmadns)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trvmadns)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trvmadns)
 	MCFG_PALETTE_ADD("palette", 16)
 
 
@@ -468,5 +468,5 @@ ROM_START( trvmadnsa )
 	// empty space, for 3 roms (each one max 0x8000 bytes long)
 ROM_END
 
-GAME( 1985, trvmadns,         0, trvmadns, trvmadns, trvmadns_state, 0, ROT0, "Thunderhead Inc.", "Trivia Madness - Series A Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
-GAME( 1985, trvmadnsa, trvmadns, trvmadns, trvmadns, trvmadns_state, 0, ROT0, "Thunderhead Inc.", "Trivia Madness - Series B Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 1985, trvmadns,         0, trvmadns, trvmadns, trvmadns_state, empty_init, ROT0, "Thunderhead Inc.", "Trivia Madness - Series A Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 1985, trvmadnsa, trvmadns, trvmadns, trvmadns, trvmadns_state, empty_init, ROT0, "Thunderhead Inc.", "Trivia Madness - Series B Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )

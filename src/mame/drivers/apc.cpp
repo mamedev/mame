@@ -147,7 +147,7 @@ public:
 	DECLARE_READ8_MEMBER(apc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(apc_dma_write_byte);
 
-	DECLARE_DRIVER_INIT(apc);
+	void init_apc();
 
 	int m_dack;
 	uint8_t m_dma_offset[4];
@@ -784,7 +784,7 @@ static const gfx_layout charset_pcg =
 };
 #endif
 
-static GFXDECODE_START( apc )
+static GFXDECODE_START( gfx_apc )
 	GFXDECODE_ENTRY( "gfx", 0x0000, charset_8x16, 0, 128 )
 	GFXDECODE_ENTRY( "gfx", 0x0800, charset_8x16, 0, 128 )
 	GFXDECODE_ENTRY( "gfx", 0x1000, charset_8x16, 0, 128 )
@@ -976,7 +976,7 @@ MACHINE_CONFIG_START(apc_state::apc)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apc)
 
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 3579545) // unk clock
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
@@ -1013,9 +1013,9 @@ ROM_START( apc )
 	ROM_REGION( 0x2000, "aux_pcg", ROMREGION_ERASE00 )
 ROM_END
 
-DRIVER_INIT_MEMBER(apc_state,apc)
+void apc_state::init_apc()
 {
 	// ...
 }
 
-COMP( 1982, apc,  0,   0, apc,  apc, apc_state,  apc,      "NEC",      "APC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, apc, 0, 0, apc, apc, apc_state, init_apc, "NEC", "APC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

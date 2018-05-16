@@ -284,7 +284,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( irobot )
+static GFXDECODE_START( gfx_irobot )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 64, 16 )
 GFXDECODE_END
 
@@ -316,7 +316,7 @@ MACHINE_CONFIG_START(irobot_state::irobot)
 	MCFG_SCREEN_UPDATE_DRIVER(irobot_state, screen_update_irobot)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", irobot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_irobot)
 	MCFG_PALETTE_ADD("palette", 64 + 32)    /* 64 for polygons, 32 for text */
 	MCFG_PALETTE_INIT_OWNER(irobot_state, irobot)
 
@@ -399,4 +399,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, irobot, 0, irobot, irobot, irobot_state, irobot, ROT0, "Atari", "I, Robot", 0 )
+GAME( 1983, irobot, 0, irobot, irobot, irobot_state, init_irobot, ROT0, "Atari", "I, Robot", 0 )

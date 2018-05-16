@@ -62,12 +62,10 @@ Notes:
                                 Hard Head
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(suna8_state,hardhead)
+void suna8_state::init_hardhead()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
-
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 		static const uint8_t swaptable[8] =
 		{
@@ -84,7 +82,7 @@ DRIVER_INIT_MEMBER(suna8_state,hardhead)
 }
 
 /* Non encrypted bootleg */
-DRIVER_INIT_MEMBER(suna8_state,hardhedb)
+void suna8_state::init_hardhedb()
 {
 	m_bank0d->set_base(memregion("maincpu")->base() + 0x48000);
 	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -138,7 +136,7 @@ uint8_t *suna8_state::brickzn_decrypt()
 	return decrypt;
 }
 
-DRIVER_INIT_MEMBER(suna8_state, brickzn_common)
+void suna8_state::init_brickzn_common()
 {
 	m_decrypt = brickzn_decrypt();
 
@@ -152,9 +150,9 @@ DRIVER_INIT_MEMBER(suna8_state, brickzn_common)
 	m_bank1d->configure_entries(16, 16, m_decrypt + 0x10000, 0x4000);
 }
 
-DRIVER_INIT_MEMBER(suna8_state,brickzn)
+void suna8_state::init_brickzn()
 {
-	DRIVER_INIT_CALL(brickzn_common);
+	init_brickzn_common();
 
 	// !!!!!! PATCHES !!!!!!
 	// To do: ROM banking should be disabled here
@@ -170,9 +168,9 @@ DRIVER_INIT_MEMBER(suna8_state,brickzn)
 	m_decrypt[0x25A4] = 0x00; // HALT -> NOP
 }
 
-DRIVER_INIT_MEMBER(suna8_state,brickznv5)
+void suna8_state::init_brickznv5()
 {
-	DRIVER_INIT_CALL(brickzn_common);
+	init_brickzn_common();
 
 	// !!!!!! PATCHES !!!!!!
 	// To do: ROM banking should be disabled here
@@ -188,9 +186,9 @@ DRIVER_INIT_MEMBER(suna8_state,brickznv5)
 	m_decrypt[0x2593] = 0x00; // HALT -> NOP
 }
 
-DRIVER_INIT_MEMBER(suna8_state,brickznv4)
+void suna8_state::init_brickznv4()
 {
-	DRIVER_INIT_CALL(brickzn_common);
+	init_brickzn_common();
 
 	// !!!!!! PATCHES !!!!!!
 	// To do: ROM banking should be disabled here
@@ -206,7 +204,7 @@ DRIVER_INIT_MEMBER(suna8_state,brickznv4)
 	m_decrypt[0x256c] = 0x00; // HALT -> NOP
 }
 
-DRIVER_INIT_MEMBER(suna8_state,brickzn11)
+void suna8_state::init_brickzn11()
 {
 	m_bank1->configure_entries(0, 16*2, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
@@ -216,19 +214,17 @@ DRIVER_INIT_MEMBER(suna8_state,brickzn11)
                                 Hard Head 2
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(suna8_state,hardhea2)
+void suna8_state::init_hardhea2()
 {
-	uint8_t   *RAM    =   memregion("maincpu")->base();
-	size_t  size    =   memregion("maincpu")->bytes();
-	uint8_t   *decrypt =  auto_alloc_array(machine(), uint8_t, size);
-	uint8_t x;
-	int i;
+	uint8_t *RAM = memregion("maincpu")->base();
+	size_t  size = memregion("maincpu")->bytes();
+	uint8_t *decrypt = auto_alloc_array(machine(), uint8_t, size);
 
 	m_bank0d->set_base(decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
-	for (i = 0x00000; i < 0x50000; i++)
+	for (int i = 0x00000; i < 0x50000; i++)
 	{
 /*
 0x1000 to scramble:
@@ -261,7 +257,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 	}
 
 	/* Opcodes */
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 		static const uint8_t swaptable[32] =
 		{
@@ -275,7 +271,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 		};
 		int table = (i & 1) | ((i & 0x400) >> 9) | ((i & 0x7000) >> 10);
 
-		x = RAM[i];
+		uint8_t x = RAM[i];
 
 		x = bitswap<8>(x, 7,6,5,3,4,2,1,0) ^ 0x41 ^ xortable[table];
 		if (swaptable[table])
@@ -285,7 +281,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 	}
 
 	/* Data */
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 		static const uint8_t swaptable[8] = { 1,1,0,1,0,1,1,0 };
 
@@ -297,7 +293,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 	membank("bank2")->configure_entries(0, 2, auto_alloc_array(machine(), uint8_t, 0x2000 * 2), 0x2000);
 }
 
-DRIVER_INIT_MEMBER(suna8_state, hardhea2b)
+void suna8_state::init_hardhea2b()
 {
 	// no address scramble?
 	// code/data split in first ROM?
@@ -310,19 +306,17 @@ DRIVER_INIT_MEMBER(suna8_state, hardhea2b)
                                 Star Fighter
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(suna8_state,starfigh)
+void suna8_state::init_starfigh()
 {
-	uint8_t   *RAM    =   memregion("maincpu")->base();
-	size_t  size    =   memregion("maincpu")->bytes();
-	uint8_t   *decrypt =  auto_alloc_array(machine(), uint8_t, size);
-	uint8_t x;
-	int i;
+	uint8_t *RAM = memregion("maincpu")->base();
+	size_t  size = memregion("maincpu")->bytes();
+	uint8_t *decrypt = auto_alloc_array(machine(), uint8_t, size);
 
 	m_bank0d->set_base(decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
-	for (i = 0; i < 0x50000; i++)
+	for (int i = 0; i < 0x50000; i++)
 	{
 		static const uint8_t swaptable[0x50] =
 		{
@@ -341,7 +335,7 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 	}
 
 	/* Opcodes */
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 		static const uint8_t swaptable[32] =
 		{
@@ -355,7 +349,7 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 		};
 		int table = (i & 0x7c00) >> 10;
 
-		x = RAM[i];
+		uint8_t x = RAM[i];
 
 		x = bitswap<8>(x, 5,6,7,3,4,2,1,0) ^ 0x45 ^ xortable[table];
 		if (swaptable[table])
@@ -365,7 +359,7 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 	}
 
 	/* Data */
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 		static const uint8_t swaptable[8] = { 1,1,0,1,0,1,1,0 };
 
@@ -395,19 +389,17 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
                                 Spark Man
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(suna8_state,sparkman)
+void suna8_state::init_sparkman()
 {
-	uint8_t   *RAM    =   memregion("maincpu")->base();
-	size_t  size    =   memregion("maincpu")->bytes();
-	uint8_t   *decrypt =  auto_alloc_array(machine(), uint8_t, size);
-	uint8_t x;
-	int i;
+	uint8_t *RAM = memregion("maincpu")->base();
+	size_t  size = memregion("maincpu")->bytes();
+	uint8_t *decrypt = auto_alloc_array(machine(), uint8_t, size);
 
 	m_bank0d->set_base(decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
-	for (i = 0; i < 0x50000; i++)
+	for (int i = 0; i < 0x50000; i++)
 	{
 		static const uint8_t swaptable[0x50] =
 		{
@@ -426,7 +418,7 @@ DRIVER_INIT_MEMBER(suna8_state,sparkman)
 	}
 
 	/* Opcodes */
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 		static const uint8_t swaptable[32] =
 		{
@@ -440,7 +432,7 @@ DRIVER_INIT_MEMBER(suna8_state,sparkman)
 		};
 		int table = (i & 0x7c00) >> 10;
 
-		x = RAM[i];
+		uint8_t x = RAM[i];
 
 		x = bitswap<8>(x, 5,6,7,3,4,2,1,0) ^ 0x44 ^ xortable[table];
 		if (swaptable[table])
@@ -450,7 +442,7 @@ DRIVER_INIT_MEMBER(suna8_state,sparkman)
 	}
 
 	/* Data */
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 		static const uint8_t swaptable[8] = { 1,1,1,0,1,1,0,1 };
 
@@ -1855,11 +1847,11 @@ static const gfx_layout layout_8x8x4 =
 	8*8*2
 };
 
-static GFXDECODE_START( suna8 )
+static GFXDECODE_START( gfx_suna8 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4, 0, 16*2 ) // [0] Sprites (brickzn has 2 palette RAMs)
 GFXDECODE_END
 
-static GFXDECODE_START( suna8_x2 )
+static GFXDECODE_START( gfx_suna8_x2 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4, 0, 16*2 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4, 0, 16*2 ) // [1] Sprites (sparkman has 2 sprite "chips")
 GFXDECODE_END
@@ -1907,7 +1899,7 @@ MACHINE_CONFIG_START(suna8_state::hardhead)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna8)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -1966,7 +1958,7 @@ MACHINE_CONFIG_START(suna8_state::rranger)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna8)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -2035,7 +2027,7 @@ MACHINE_CONFIG_START(suna8_state::brickzn11)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna8)
 	MCFG_PALETTE_ADD("palette", 256 * 2)    // 2 x Palette RAM
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -2149,7 +2141,7 @@ MACHINE_CONFIG_START(suna8_state::starfigh)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna8)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -2203,7 +2195,7 @@ MACHINE_CONFIG_START(suna8_state::sparkman)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna8_x2)    // 2 sprite "chips"
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna8_x2)    // 2 sprite "chips"
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -3061,33 +3053,33 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(suna8_state,suna8)
+void suna8_state::init_suna8()
 {
 	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-GAME( 1988, sranger,   0,        rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA",                       "Super Ranger (v2.0)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, rranger,   sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, rrangerb,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "bootleg",                    "Rough Ranger (v2.0, bootleg)",       MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, srangero,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA",                       "Super Ranger (older)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, srangern,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA (NOVA license)",        "Super Ranger (older, NOVA license)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, srangerw,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA (WDK license)",         "Super Ranger (older, WDK license)",  MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, srangerb,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "bootleg (NYWA)",             "Super Ranger (older, bootleg)",      MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, sranger,   0,        rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "SunA",                       "Super Ranger (v2.0)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, rranger,   sranger,  rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, rrangerb,  sranger,  rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "bootleg",                    "Rough Ranger (v2.0, bootleg)",       MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, srangero,  sranger,  rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "SunA",                       "Super Ranger (older)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, srangern,  sranger,  rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "SunA (NOVA license)",        "Super Ranger (older, NOVA license)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, srangerw,  sranger,  rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "SunA (WDK license)",         "Super Ranger (older, WDK license)",  MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, srangerb,  sranger,  rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "bootleg (NYWA)",             "Super Ranger (older, bootleg)",      MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1988, hardhead,  0,        hardhead, hardhead, suna8_state, hardhead,  ROT0,  "SunA",                       "Hard Head",                   0 )
-GAME( 1988, hardheadb, hardhead, hardhead, hardhead, suna8_state, hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 1)",  0 )
-GAME( 1988, hardheadb2,hardhead, hardhead, hardhead, suna8_state, hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 2)",  MACHINE_NOT_WORKING )
-GAME( 1988, pop_hh,    hardhead, hardhead, hardhead, suna8_state, hardhedb,  ROT0,  "bootleg",                    "Popper (Hard Head bootleg)",  0 )
+GAME( 1988, hardhead,  0,        hardhead, hardhead, suna8_state, init_hardhead,  ROT0,  "SunA",                       "Hard Head",                   0 )
+GAME( 1988, hardheadb, hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 1)",  0 )
+GAME( 1988, hardheadb2,hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 2)",  MACHINE_NOT_WORKING )
+GAME( 1988, pop_hh,    hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Popper (Hard Head bootleg)",  0 )
 
-GAME( 1989, sparkman,  0,        sparkman, sparkman, suna8_state, sparkman,  ROT0,  "SunA",                       "Spark Man (v2.0, set 1)",     0 )
-GAME( 1989, sparkmana, sparkman, sparkman, sparkman, suna8_state, sparkman,  ROT0,  "SunA",                       "Spark Man (v2.0, set 2)",     0 )
+GAME( 1989, sparkman,  0,        sparkman, sparkman, suna8_state, init_sparkman,  ROT0,  "SunA",                       "Spark Man (v2.0, set 1)",     0 )
+GAME( 1989, sparkmana, sparkman, sparkman, sparkman, suna8_state, init_sparkman,  ROT0,  "SunA",                       "Spark Man (v2.0, set 2)",     0 )
 
-GAME( 1990, starfigh,  0,        starfigh, starfigh, suna8_state, starfigh,  ROT90, "SunA",                       "Star Fighter (v1)",           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, starfigh,  0,        starfigh, starfigh, suna8_state, init_starfigh,  ROT90, "SunA",                       "Star Fighter (v1)",           MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1991, hardhea2,  0,        hardhea2, hardhea2, suna8_state, hardhea2,  ROT0,  "SunA",                       "Hard Head 2 (v2.0)",          0 )
-GAME( 1991, hardhea2b, hardhea2, hardhea2b,hardhea2, suna8_state, hardhea2b, ROT0,  "bootleg",                    "Hard Head 2 (v2.0, bootleg)", MACHINE_NOT_WORKING )
+GAME( 1991, hardhea2,  0,        hardhea2, hardhea2, suna8_state, init_hardhea2,  ROT0,  "SunA",                       "Hard Head 2 (v2.0)",          0 )
+GAME( 1991, hardhea2b, hardhea2, hardhea2b,hardhea2, suna8_state, init_hardhea2b, ROT0,  "bootleg",                    "Hard Head 2 (v2.0, bootleg)", MACHINE_NOT_WORKING )
 
-GAME( 1992, brickzn,   0,        brickzn,  brickznv6,suna8_state, brickzn,   ROT90, "SunA",                       "Brick Zone (v6.0, Joystick)", 0 )
-GAME( 1992, brickznv5, brickzn,  brickzn,  brickzn,  suna8_state, brickznv5, ROT90, "SunA",                       "Brick Zone (v5.0, Joystick)", 0 )
-GAME( 1992, brickznv4, brickzn,  brickzn,  brickzn,  suna8_state, brickznv4, ROT90, "SunA",                       "Brick Zone (v4.0, Spinner)",  0 )
-GAME( 1992, brickzn11, brickzn,  brickzn11,brickzn,  suna8_state, brickzn11, ROT90, "SunA",                       "Brick Zone (v1.1, Spinner)",  0 )
+GAME( 1992, brickzn,   0,        brickzn,  brickznv6,suna8_state, init_brickzn,   ROT90, "SunA",                       "Brick Zone (v6.0, Joystick)", 0 )
+GAME( 1992, brickznv5, brickzn,  brickzn,  brickzn,  suna8_state, init_brickznv5, ROT90, "SunA",                       "Brick Zone (v5.0, Joystick)", 0 )
+GAME( 1992, brickznv4, brickzn,  brickzn,  brickzn,  suna8_state, init_brickznv4, ROT90, "SunA",                       "Brick Zone (v4.0, Spinner)",  0 )
+GAME( 1992, brickzn11, brickzn,  brickzn11,brickzn,  suna8_state, init_brickzn11, ROT90, "SunA",                       "Brick Zone (v1.1, Spinner)",  0 )

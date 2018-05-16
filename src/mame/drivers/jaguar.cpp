@@ -568,23 +568,32 @@ WRITE32_MEMBER(jaguar_state::eeprom_w)
 	if (m_eeprom_bit_count != 9)        /* kill extra bit at end of address */
 	{
 		m_eeprom->di_write(data >> 31);
-		m_eeprom->clk_write(PULSE_LINE);
+		m_eeprom->clk_write(0);
+		m_eeprom->clk_write(1);
 	}
 }
 
 READ32_MEMBER(jaguar_state::eeprom_clk)
 {
-	m_eeprom->clk_write(PULSE_LINE); /* get next bit when reading */
+	if (!machine().side_effects_disabled())
+	{
+		m_eeprom->clk_write(0);
+		m_eeprom->clk_write(1); /* get next bit when reading */
+	}
 	return 0;
 }
 
 READ32_MEMBER(jaguar_state::eeprom_cs)
 {
-	m_eeprom->cs_write(CLEAR_LINE);   /* must do at end of an operation */
-	m_eeprom->cs_write(ASSERT_LINE);        /* enable chip for next operation */
-	m_eeprom->di_write(1);           /* write a start bit */
-	m_eeprom->clk_write(PULSE_LINE);
-	m_eeprom_bit_count = 0;
+	if (!machine().side_effects_disabled())
+	{
+		m_eeprom->cs_write(CLEAR_LINE);   /* must do at end of an operation */
+		m_eeprom->cs_write(ASSERT_LINE);        /* enable chip for next operation */
+		m_eeprom->di_write(1);           /* write a start bit */
+		m_eeprom->clk_write(0);
+		m_eeprom->clk_write(1);
+		m_eeprom_bit_count = 0;
+	}
 	return 0;
 }
 
@@ -1987,37 +1996,37 @@ void jaguar_state::fix_endian( uint32_t addr, uint32_t size )
 	}
 }
 
-DRIVER_INIT_MEMBER(jaguar_state,jaguar)
+void jaguar_state::init_jaguar()
 {
 	m_hacks_enabled = false;
 	save_item(NAME(m_joystick_data));
 	cart_start();
 	m_is_jagcd = false;
 
-	for (int i=0;i<0x20000/4;i++) // the cd bios is bigger.. check
+	for (int i = 0; i < 0x20000 / 4; i++) // the cd bios is bigger.. check
 	{
 		m_rom_base[i] = ((m_rom_base[i] & 0xffff0000)>>16) | ((m_rom_base[i] & 0x0000ffff)<<16);
 	}
 
-	for (int i=0;i<0x1000/4;i++)
+	for (int i = 0; i < 0x1000 / 4; i++)
 	{
 		m_wave_rom[i] = ((m_wave_rom[i] & 0xffff0000)>>16) | ((m_wave_rom[i] & 0x0000ffff)<<16);
 	}
 }
 
-DRIVER_INIT_MEMBER(jaguar_state,jaguarcd)
+void jaguar_state::init_jaguarcd()
 {
 	m_hacks_enabled = false;
 	save_item(NAME(m_joystick_data));
 //  cart_start();
 	m_is_jagcd = true;
 
-	for (int i=0;i<0x20000/4;i++) // the cd bios is bigger.. check
+	for (int i = 0; i < 0x20000 / 4; i++) // the cd bios is bigger.. check
 	{
 		m_rom_base[i] = ((m_rom_base[i] & 0xffff0000)>>16) | ((m_rom_base[i] & 0x0000ffff)<<16);
 	}
 
-	for (int i=0;i<0x1000/4;i++)
+	for (int i = 0; i < 0x1000 / 4; i++)
 	{
 		m_wave_rom[i] = ((m_wave_rom[i] & 0xffff0000)>>16) | ((m_wave_rom[i] & 0x0000ffff)<<16);
 	}
@@ -2619,7 +2628,7 @@ void jaguar_state::cojag_common_init(uint16_t gpu_jump_offs, uint16_t spin_pc)
 }
 
 
-DRIVER_INIT_MEMBER(jaguar_state,area51a)
+void jaguar_state::init_area51a()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x5c4, 0x5a0);
@@ -2632,7 +2641,7 @@ DRIVER_INIT_MEMBER(jaguar_state,area51a)
 }
 
 
-DRIVER_INIT_MEMBER(jaguar_state,area51)
+void jaguar_state::init_area51()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x0c0, 0x09e);
@@ -2644,7 +2653,7 @@ DRIVER_INIT_MEMBER(jaguar_state,area51)
 #endif
 }
 
-DRIVER_INIT_MEMBER(jaguar_state,maxforce)
+void jaguar_state::init_maxforce()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x0c0, 0x09e);
@@ -2661,7 +2670,7 @@ DRIVER_INIT_MEMBER(jaguar_state,maxforce)
 }
 
 
-DRIVER_INIT_MEMBER(jaguar_state,area51mx)
+void jaguar_state::init_area51mx()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x0c0, 0x09e);
@@ -2677,7 +2686,7 @@ DRIVER_INIT_MEMBER(jaguar_state,area51mx)
 }
 
 
-DRIVER_INIT_MEMBER(jaguar_state,a51mxr3k)
+void jaguar_state::init_a51mxr3k()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x0c0, 0x09e);
@@ -2694,7 +2703,7 @@ DRIVER_INIT_MEMBER(jaguar_state,a51mxr3k)
 }
 
 
-DRIVER_INIT_MEMBER(jaguar_state,fishfren)
+void jaguar_state::init_fishfren()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x578, 0x554);
@@ -2724,14 +2733,14 @@ void jaguar_state::init_freeze_common(offs_t main_speedup_addr)
 #endif
 }
 
-DRIVER_INIT_MEMBER(jaguar_state,freezeat) { m_hacks_enabled = true; init_freeze_common(0x1001a9f4); }
-DRIVER_INIT_MEMBER(jaguar_state,freezeat2) { m_hacks_enabled = true; init_freeze_common(0x1001a8c4); }
-DRIVER_INIT_MEMBER(jaguar_state,freezeat3) { m_hacks_enabled = true; init_freeze_common(0x1001a134); }
-DRIVER_INIT_MEMBER(jaguar_state,freezeat4) { m_hacks_enabled = true; init_freeze_common(0x1001a134); }
-DRIVER_INIT_MEMBER(jaguar_state,freezeat5) { m_hacks_enabled = true; init_freeze_common(0x10019b34); }
-DRIVER_INIT_MEMBER(jaguar_state,freezeat6) { m_hacks_enabled = true; init_freeze_common(0x10019684); }
+void jaguar_state::init_freezeat()  { m_hacks_enabled = true; init_freeze_common(0x1001a9f4); }
+void jaguar_state::init_freezeat2() { m_hacks_enabled = true; init_freeze_common(0x1001a8c4); }
+void jaguar_state::init_freezeat3() { m_hacks_enabled = true; init_freeze_common(0x1001a134); }
+void jaguar_state::init_freezeat4() { m_hacks_enabled = true; init_freeze_common(0x1001a134); }
+void jaguar_state::init_freezeat5() { m_hacks_enabled = true; init_freeze_common(0x10019b34); }
+void jaguar_state::init_freezeat6() { m_hacks_enabled = true; init_freeze_common(0x10019684); }
 
-DRIVER_INIT_MEMBER(jaguar_state,vcircle)
+void jaguar_state::init_vcircle()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x5c0, 0x5a0);
@@ -2753,27 +2762,27 @@ DRIVER_INIT_MEMBER(jaguar_state,vcircle)
  *
  *************************************/
 
-/*    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT                   INIT      COMPANY    FULLNAME */
-CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar_state, jaguar,   "Atari",   "Jaguar",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-CONS( 1995,  jaguarcd, jaguar,   0,      jaguarcd, jaguar,   jaguar_state, jaguarcd, "Atari",   "Jaguar CD", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+/*    YEAR   NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS         INIT           COMPANY    FULLNAME */
+CONS( 1993,  jaguar,    0,        0,      jaguar,   jaguar,   jaguar_state, init_jaguar,   "Atari",   "Jaguar",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 1995,  jaguarcd,  jaguar,   0,      jaguarcd, jaguar,   jaguar_state, init_jaguarcd, "Atari",   "Jaguar CD", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-/*    YEAR   NAME      PARENT    MACHINE        INPUT                   INIT             COMPANY        FULLNAME */
-GAME( 1996, area51,    0,        cojagr3k,      area51,   jaguar_state, area51,    ROT0, "Atari Games", "Area 51 (R3000)", 0 )
-GAME( 1995, area51t,   area51,   cojag68k,      area51,   jaguar_state, area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Oct 17, 1996)", 0 )
-GAME( 1995, area51ta,  area51,   cojag68k,      area51,   jaguar_state, area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Nov 27, 1995)", 0 )
-GAME( 1995, area51a,   area51,   cojag68k,      area51,   jaguar_state, area51a,   ROT0, "Atari Games", "Area 51 (Atari Games license, Oct 25, 1995)", 0 )
-GAME( 1995, fishfren,  0,        cojagr3k_rom,  fishfren, jaguar_state, fishfren,  ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 )
-GAME( 1996, freezeat,  0,        cojagr3k_rom,  freezeat, jaguar_state, freezeat,  ROT0, "Atari Games", "Freeze (Atari) (prototype, English voice, 96/10/25)", 0 )
-GAME( 1996, freezeatjp,freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat,  ROT0, "Atari Games", "Freeze (Atari) (prototype, Japanese voice, 96/10/25)", 0 )
-GAME( 1996, freezeat2, freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat2, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/18)", 0 )
-GAME( 1996, freezeat3, freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat3, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/07)", 0 )
-GAME( 1996, freezeat4, freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat4, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/03)", 0 )
-GAME( 1996, freezeat5, freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat5, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/20, AMOA-96)", 0 )
-GAME( 1996, freezeat6, freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat6, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/07, Jamma-96)", 0 )
-GAME( 1996, maxforce,  0,        cojagr3k,      area51,   jaguar_state, maxforce,  ROT0, "Atari Games", "Maximum Force v1.05", 0 )
-GAME( 1996, maxf_102,  maxforce, cojagr3k,      area51,   jaguar_state, maxforce,  ROT0, "Atari Games", "Maximum Force v1.02", 0 )
-GAME( 1996, maxf_ng,   maxforce, cojagr3k,      area51,   jaguar_state, maxforce,  ROT0, "Atari Games", "Maximum Force (No Gore version)", 0 )
-GAME( 1998, area51mx,  0,        cojag68k,      area51,   jaguar_state, area51mx,  ROT0, "Atari Games", "Area 51 / Maximum Force Duo v2.0", 0 )
-GAME( 1998, a51mxr3k,  area51mx, cojagr3k,      area51,   jaguar_state, a51mxr3k,  ROT0, "Atari Games", "Area 51 / Maximum Force Duo (R3000, 2/10/98)", 0 )
-GAME( 1998, a51mxr3ka, area51mx, cojagr3k,      area51,   jaguar_state, a51mxr3k,  ROT0, "Atari Games", "Area 51 / Maximum Force Duo (R3000, 2/02/98)", 0 )
-GAME( 1996, vcircle,   0,        cojagr3k,      vcircle,  jaguar_state, vcircle,   ROT0, "Atari Games", "Vicious Circle (prototype)", 0 )
+/*    YEAR   NAME       PARENT    MACHINE       INPUT     CLASS         INIT            ROT   COMPANY        FULLNAME */
+GAME( 1996, area51,     0,        cojagr3k,     area51,   jaguar_state, init_area51,    ROT0, "Atari Games", "Area 51 (R3000)", 0 )
+GAME( 1995, area51t,    area51,   cojag68k,     area51,   jaguar_state, init_area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Oct 17, 1996)", 0 )
+GAME( 1995, area51ta,   area51,   cojag68k,     area51,   jaguar_state, init_area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Nov 27, 1995)", 0 )
+GAME( 1995, area51a,    area51,   cojag68k,     area51,   jaguar_state, init_area51a,   ROT0, "Atari Games", "Area 51 (Atari Games license, Oct 25, 1995)", 0 )
+GAME( 1995, fishfren,   0,        cojagr3k_rom, fishfren, jaguar_state, init_fishfren,  ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 )
+GAME( 1996, freezeat,   0,        cojagr3k_rom, freezeat, jaguar_state, init_freezeat,  ROT0, "Atari Games", "Freeze (Atari) (prototype, English voice, 96/10/25)", 0 )
+GAME( 1996, freezeatjp, freezeat, cojagr3k_rom, freezeat, jaguar_state, init_freezeat,  ROT0, "Atari Games", "Freeze (Atari) (prototype, Japanese voice, 96/10/25)", 0 )
+GAME( 1996, freezeat2,  freezeat, cojagr3k_rom, freezeat, jaguar_state, init_freezeat2, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/18)", 0 )
+GAME( 1996, freezeat3,  freezeat, cojagr3k_rom, freezeat, jaguar_state, init_freezeat3, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/07)", 0 )
+GAME( 1996, freezeat4,  freezeat, cojagr3k_rom, freezeat, jaguar_state, init_freezeat4, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/03)", 0 )
+GAME( 1996, freezeat5,  freezeat, cojagr3k_rom, freezeat, jaguar_state, init_freezeat5, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/20, AMOA-96)", 0 )
+GAME( 1996, freezeat6,  freezeat, cojagr3k_rom, freezeat, jaguar_state, init_freezeat6, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/07, Jamma-96)", 0 )
+GAME( 1996, maxforce,   0,        cojagr3k,     area51,   jaguar_state, init_maxforce,  ROT0, "Atari Games", "Maximum Force v1.05", 0 )
+GAME( 1996, maxf_102,   maxforce, cojagr3k,     area51,   jaguar_state, init_maxforce,  ROT0, "Atari Games", "Maximum Force v1.02", 0 )
+GAME( 1996, maxf_ng,    maxforce, cojagr3k,     area51,   jaguar_state, init_maxforce,  ROT0, "Atari Games", "Maximum Force (No Gore version)", 0 )
+GAME( 1998, area51mx,   0,        cojag68k,     area51,   jaguar_state, init_area51mx,  ROT0, "Atari Games", "Area 51 / Maximum Force Duo v2.0", 0 )
+GAME( 1998, a51mxr3k,   area51mx, cojagr3k,     area51,   jaguar_state, init_a51mxr3k,  ROT0, "Atari Games", "Area 51 / Maximum Force Duo (R3000, 2/10/98)", 0 )
+GAME( 1998, a51mxr3ka,  area51mx, cojagr3k,     area51,   jaguar_state, init_a51mxr3k,  ROT0, "Atari Games", "Area 51 / Maximum Force Duo (R3000, 2/02/98)", 0 )
+GAME( 1996, vcircle,    0,        cojagr3k,     vcircle,  jaguar_state, init_vcircle,   ROT0, "Atari Games", "Vicious Circle (prototype)", 0 )

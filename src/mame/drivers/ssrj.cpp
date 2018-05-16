@@ -136,7 +136,7 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( ssrj )
+static GFXDECODE_START( gfx_ssrj )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
 GFXDECODE_END
 
@@ -157,7 +157,7 @@ MACHINE_CONFIG_START(ssrj_state::ssrj)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ssrj_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssrj)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ssrj)
 	MCFG_PALETTE_ADD("palette", 128)
 	MCFG_PALETTE_INIT_OWNER(ssrj_state, ssrj)
 
@@ -191,4 +191,4 @@ ROM_START( ssrj )
 
 ROM_END
 
-GAME( 1985, ssrj,  0,       ssrj,  ssrj, ssrj_state,  0, ROT90, "Taito Corporation", "Super Speed Race Junior (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ssrj,  0,       ssrj,  ssrj, ssrj_state, empty_init, ROT90, "Taito Corporation", "Super Speed Race Junior (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

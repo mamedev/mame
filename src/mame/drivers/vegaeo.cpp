@@ -47,7 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
-	DECLARE_DRIVER_INIT(vegaeo);
+	void init_vegaeo();
 	DECLARE_VIDEO_START(vega);
 
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -286,7 +286,7 @@ ROM_START( crazywar )
 	ROM_LOAD( "qs1001a.u86",  0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
-DRIVER_INIT_MEMBER(vegaeo_state,vegaeo)
+void vegaeo_state::init_vegaeo()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
@@ -295,4 +295,4 @@ DRIVER_INIT_MEMBER(vegaeo_state,vegaeo)
 	init_speedup();
 }
 
-GAME( 2002, crazywar, 0, vega, crazywar, vegaeo_state, vegaeo, ROT0, "Eolith", "Crazy War", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, crazywar, 0, vega, crazywar, vegaeo_state, init_vegaeo, ROT0, "Eolith", "Crazy War", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -99,7 +99,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cdrom_data_w);
 	DECLARE_WRITE8_MEMBER(cdrom_ctrl_w);
 	DECLARE_READ8_MEMBER(cdrom_data_r);
-	DECLARE_DRIVER_INIT(cops);
+	void init_cops();
 	int m_irq;
 
 	uint8_t m_lcd_addr_l, m_lcd_addr_h;
@@ -909,7 +909,7 @@ void cops_state::machine_reset()
 }
 
 
-DRIVER_INIT_MEMBER(cops_state,cops)
+void cops_state::init_cops()
 {
 	//The hardware is designed and programmed to use multiple system ROM banks, but for some reason it's hardwired to bank 2.
 	//For documentation's sake, here's the init
@@ -1029,6 +1029,6 @@ ROM_START( revlatns )
 ROM_END
 
 
-GAMEL( 1994, cops,      0,   cops,      cops,      cops_state, cops,       ROT0, "Atari Games",                     "Cops (USA)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1994, copsuk,    cops,cops,      cops,      cops_state, cops,       ROT0, "Nova Productions / Deith Leisure","Cops (UK)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1994, revlatns,  0,   revlatns,  revlatns,  cops_state, cops,       ROT0, "Nova Productions",                "Revelations",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1994, cops,     0,    cops,     cops,     cops_state, init_cops, ROT0, "Atari Games",                      "Cops (USA)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1994, copsuk,   cops, cops,     cops,     cops_state, init_cops, ROT0, "Nova Productions / Deith Leisure", "Cops (UK)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1994, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions",                 "Revelations", MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )

@@ -50,7 +50,7 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(tape_headpos_r);
 	DECLARE_INPUT_CHANGED_MEMBER(category_select);
-	DECLARE_DRIVER_INIT(quizshow);
+	void init_quizshow();
 	void quizshow(machine_config &config);
 
 protected:
@@ -363,7 +363,7 @@ static const gfx_layout tile_layout =
 	8*16
 };
 
-static GFXDECODE_START( quizshow )
+static GFXDECODE_START( gfx_quizshow )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 4 )
 GFXDECODE_END
 
@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(quizshow_state::quizshow)
 	MCFG_SCREEN_UPDATE_DRIVER(quizshow_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizshow)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quizshow)
 	MCFG_PALETTE_ADD("palette", 8*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(2)
 	MCFG_PALETTE_INIT_OWNER(quizshow_state, quizshow)
@@ -441,17 +441,15 @@ ROM_START( quizshow )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(quizshow_state,quizshow)
+void quizshow_state::init_quizshow()
 {
 	uint8_t *gfxdata = memregion("user1")->base();
 	uint8_t *dest = memregion("gfx1")->base();
 
-	int tile, line;
-
 	// convert gfx data to 8*16(actually 8*12), and 2bpp for masking inverted colors
-	for (tile = 0; tile < 0x40; tile++)
+	for (int tile = 0; tile < 0x40; tile++)
 	{
-		for (line = 2; line < 14; line ++)
+		for (int line = 2; line < 14; line ++)
 		{
 			dest[tile << 4 | line] = 0;
 			dest[tile << 4 | line | 0x400] = 0;
@@ -463,4 +461,4 @@ DRIVER_INIT_MEMBER(quizshow_state,quizshow)
 }
 
 
-GAMEL( 1976, quizshow, 0, quizshow, quizshow, quizshow_state, quizshow, ROT0, "Atari (Kee Games)", "Quiz Show", MACHINE_NOT_WORKING, layout_quizshow )
+GAMEL( 1976, quizshow, 0, quizshow, quizshow, quizshow_state, init_quizshow, ROT0, "Atari (Kee Games)", "Quiz Show", MACHINE_NOT_WORKING, layout_quizshow )

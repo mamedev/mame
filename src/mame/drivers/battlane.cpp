@@ -246,7 +246,7 @@ static const gfx_layout tilelayout2 =
 };
 
 
-static GFXDECODE_START( battlane )
+static GFXDECODE_START( gfx_battlane )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0, 2 )   /* colors 0x00-0x0f */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   32, 4 )   /* colors 0x20-0x3f */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2,  32, 4 )   /* colors 0x20-0x3f */
@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(battlane_state::battlane)
 	MCFG_SCREEN_UPDATE_DRIVER(battlane_state, screen_update_battlane)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", battlane)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_battlane)
 	MCFG_PALETTE_ADD("palette", 64)
 
 
@@ -403,6 +403,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, battlane,  0,        battlane, battlane, battlane_state, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, battlane2, battlane, battlane, battlane, battlane_state, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, battlane3, battlane, battlane, battlane, battlane_state, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, battlane,  0,        battlane, battlane, battlane_state, empty_init, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, battlane2, battlane, battlane, battlane, battlane_state, empty_init, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, battlane3, battlane, battlane, battlane, battlane_state, empty_init, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 3)", MACHINE_SUPPORTS_SAVE )

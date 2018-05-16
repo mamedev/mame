@@ -59,7 +59,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_DRIVER_INIT(kov3hd);
+	void init_kov3hd();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -162,14 +162,14 @@ ROM_START( kov3hd101 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(pgm3_state,kov3hd)
+void pgm3_state::init_kov3hd()
 {
 }
 
 
 // all dumped sets might be China region, unless region info comes from elsewhere
-GAME( 2011, kov3hd,     0,      pgm3,    pgm3, pgm3_state,     kov3hd,       ROT0, "IGS", "Knights of Valour 3 HD (M-105CN 13-07-04 18:54:01)", MACHINE_IS_SKELETON )
-GAME( 2011, kov3hd104,  kov3hd, pgm3,    pgm3, pgm3_state,     kov3hd,       ROT0, "IGS", "Knights of Valour 3 HD (V104)", MACHINE_IS_SKELETON )
-GAME( 2011, kov3hd103,  kov3hd, pgm3,    pgm3, pgm3_state,     kov3hd,       ROT0, "IGS", "Knights of Valour 3 HD (V103)", MACHINE_IS_SKELETON )
-GAME( 2011, kov3hd102,  kov3hd, pgm3,    pgm3, pgm3_state,     kov3hd,       ROT0, "IGS", "Knights of Valour 3 HD (V102)", MACHINE_IS_SKELETON )
-GAME( 2011, kov3hd101,  kov3hd, pgm3,    pgm3, pgm3_state,     kov3hd,       ROT0, "IGS", "Knights of Valour 3 HD (V101)", MACHINE_IS_SKELETON )
+GAME( 2011, kov3hd,     0,      pgm3,    pgm3, pgm3_state, init_kov3hd, ROT0, "IGS", "Knights of Valour 3 HD (M-105CN 13-07-04 18:54:01)", MACHINE_IS_SKELETON )
+GAME( 2011, kov3hd104,  kov3hd, pgm3,    pgm3, pgm3_state, init_kov3hd, ROT0, "IGS", "Knights of Valour 3 HD (V104)", MACHINE_IS_SKELETON )
+GAME( 2011, kov3hd103,  kov3hd, pgm3,    pgm3, pgm3_state, init_kov3hd, ROT0, "IGS", "Knights of Valour 3 HD (V103)", MACHINE_IS_SKELETON )
+GAME( 2011, kov3hd102,  kov3hd, pgm3,    pgm3, pgm3_state, init_kov3hd, ROT0, "IGS", "Knights of Valour 3 HD (V102)", MACHINE_IS_SKELETON )
+GAME( 2011, kov3hd101,  kov3hd, pgm3,    pgm3, pgm3_state, init_kov3hd, ROT0, "IGS", "Knights of Valour 3 HD (V101)", MACHINE_IS_SKELETON )

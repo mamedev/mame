@@ -18,7 +18,7 @@
 #include "includes/cchasm.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6840ptm.h"
 #include "machine/z80ctc.h"
@@ -266,5 +266,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cchasm,  0,      cchasm, cchasm, cchasm_state, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, cchasm1, cchasm, cchasm, cchasm, cchasm_state, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cchasm,  0,      cchasm, cchasm, cchasm_state, empty_init, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cchasm1, cchasm, cchasm, cchasm, cchasm_state, empty_init, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 2)", MACHINE_SUPPORTS_SAVE )

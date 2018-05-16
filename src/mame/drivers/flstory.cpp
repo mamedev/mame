@@ -689,7 +689,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( flstory )
+static GFXDECODE_START( gfx_flstory )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )
 GFXDECODE_END
@@ -762,7 +762,7 @@ MACHINE_CONFIG_START(flstory_state::flstory)
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_flstory)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flstory)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flstory)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -831,7 +831,7 @@ MACHINE_CONFIG_START(flstory_state::onna34ro)
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_flstory)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flstory)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flstory)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -911,7 +911,7 @@ MACHINE_CONFIG_START(flstory_state::victnine)
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_victnine)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flstory)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flstory)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -984,7 +984,7 @@ MACHINE_CONFIG_START(flstory_state::rumba)
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_rumba)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flstory)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flstory)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -1318,9 +1318,9 @@ ROM_START( rumba )
 ROM_END
 
 
-GAME( 1985, flstory,   0,        flstory,      flstory,  flstory_state, 0, ROT180, "Taito", "The FairyLand Story",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, flstoryj,  flstory,  flstory,      flstory,  flstory_state, 0, ROT180, "Taito", "The FairyLand Story (Japan)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, onna34ro,  0,        onna34ro_mcu, onna34ro, flstory_state, 0, ROT0,   "Taito", "Onna Sanshirou - Typhoon Gal",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, onna34roa, onna34ro, onna34ro,     onna34ro, flstory_state, 0, ROT0,   "Taito", "Onna Sanshirou - Typhoon Gal (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, victnine,  0,        victnine,     victnine, flstory_state, 0, ROT0,   "Taito", "Victorious Nine",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // MCU still simulated
-GAME( 1984, rumba,     0,        rumba,        rumba,    flstory_state, 0, ROT270, "Taito", "Rumba Lumber",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, flstory,   0,        flstory,      flstory,  flstory_state, empty_init, ROT180, "Taito", "The FairyLand Story",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, flstoryj,  flstory,  flstory,      flstory,  flstory_state, empty_init, ROT180, "Taito", "The FairyLand Story (Japan)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, onna34ro,  0,        onna34ro_mcu, onna34ro, flstory_state, empty_init, ROT0,   "Taito", "Onna Sanshirou - Typhoon Gal",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, onna34roa, onna34ro, onna34ro,     onna34ro, flstory_state, empty_init, ROT0,   "Taito", "Onna Sanshirou - Typhoon Gal (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, victnine,  0,        victnine,     victnine, flstory_state, empty_init, ROT0,   "Taito", "Victorious Nine",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // MCU still simulated
+GAME( 1984, rumba,     0,        rumba,        rumba,    flstory_state, empty_init, ROT270, "Taito", "Rumba Lumber",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

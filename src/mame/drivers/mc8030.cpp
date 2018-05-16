@@ -19,7 +19,7 @@ The asp ctc needs at least 2 triggers. The purpose of the zve pio is unknown.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "screen.h"
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
@@ -289,5 +289,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE       INIT    COMPANY                FULLNAME       FLAGS
-COMP( 198?, mc8030, 0,      0,       mc8030,    mc8030, mc8030_state, 0,    "VEB Elektronik Gera", "MC-80.30/31", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | ORIENTATION_FLIP_X )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                FULLNAME       FLAGS
+COMP( 198?, mc8030, 0,      0,      mc8030,  mc8030, mc8030_state, empty_init, "VEB Elektronik Gera", "MC-80.30/31", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | ORIENTATION_FLIP_X )

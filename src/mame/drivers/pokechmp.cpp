@@ -201,7 +201,7 @@ static const gfx_layout pokechmp_spritelayout =
 };
 
 
-static GFXDECODE_START( pokechmp )
+static GFXDECODE_START( gfx_pokechmp )
 	GFXDECODE_ENTRY( "bgs", 0x00000, pokechmp_charlayout,   0x100, 4 ) /* chars */
 	GFXDECODE_ENTRY( "sprites", 0x00000, pokechmp_spritelayout,   0,  32 ) /* sprites */
 GFXDECODE_END
@@ -246,7 +246,7 @@ MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, pokechmp_state, sound_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pokechmp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pokechmp)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 	MCFG_DEVICE_ADDRESS_MAP(0, pokechmp_oki_map)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(pokechmp_state,pokechmp)
+void pokechmp_state::init_pokechmp()
 {
 	// default sound rom bank
 	membank("bank3")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
@@ -357,6 +357,6 @@ ROM_START(billlist)
 	ROM_LOAD("billiard_list.x", 0x00000, 0x80000, CRC(b54806ed) SHA1(c6e1485c263ebd9102ff1e8c09b4c4ca5f63c3da) )
 ROM_END
 
-GAME( 1995, pokechmp, 0,        pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 1)", 0 )
-GAME( 1995, pokechmpa,pokechmp, pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 2)", 0 )
-GAME( 1995, billlist, pokechmp, pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Billard List", 0)
+GAME( 1995, pokechmp, 0,        pokechmp, pokechmp, pokechmp_state, init_pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 1)", 0 )
+GAME( 1995, pokechmpa,pokechmp, pokechmp, pokechmp, pokechmp_state, init_pokechmp, ROT0, "D.G.R.M.", "Poke Champ (set 2)", 0 )
+GAME( 1995, billlist, pokechmp, pokechmp, pokechmp, pokechmp_state, init_pokechmp, ROT0, "D.G.R.M.", "Billard List", 0)

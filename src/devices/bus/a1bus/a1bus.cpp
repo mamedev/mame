@@ -187,6 +187,8 @@ void device_a1bus_card_interface::interface_validity_check(validity_checker &val
 
 void device_a1bus_card_interface::interface_pre_start()
 {
+	device_slot_card_interface::interface_pre_start();
+
 	if (!m_a1bus)
 	{
 		m_a1bus = m_a1bus_finder;

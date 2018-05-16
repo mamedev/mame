@@ -38,6 +38,7 @@
 #ifndef MAME_MACHINE_68561MPCC_H
 #define MAME_MACHINE_68561MPCC_H
 
+#include "diserial.h"
 
 /* Variant ADD macros - use the right one to enable the right feature set! */
 #define MCFG_MPCC68560_ADD(_tag, _clock, _rx, _tx) \

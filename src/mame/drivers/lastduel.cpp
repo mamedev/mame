@@ -436,14 +436,14 @@ static const gfx_layout madgear_tile2 =
 	64*16
 };
 
-static GFXDECODE_START( lastduel )
+static GFXDECODE_START( gfx_lastduel )
 	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )  /* colors 0x200-0x2ff */
 	GFXDECODE_ENTRY( "gfx2", 0, text_layout,   0x300, 16 )  /* colors 0x300-0x33f */
 	GFXDECODE_ENTRY( "gfx3", 0, madgear_tile,  0x000, 16 )  /* colors 0x000-0x0ff */
 	GFXDECODE_ENTRY( "gfx4", 0, madgear_tile,  0x100, 16 )  /* colors 0x100-0x1ff */
 GFXDECODE_END
 
-static GFXDECODE_START( madgear )
+static GFXDECODE_START( gfx_madgear )
 	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )  /* colors 0x200-0x2ff */
 	GFXDECODE_ENTRY( "gfx2", 0, text_layout,   0x300, 16 )  /* colors 0x300-0x33f */
 	GFXDECODE_ENTRY( "gfx3", 0, madgear_tile,  0x000, 16 )  /* colors 0x000-0x0ff */
@@ -513,7 +513,7 @@ MACHINE_CONFIG_START(lastduel_state::lastduel)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastduel)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastduel)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,lastduel)
@@ -558,7 +558,7 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", madgear)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_madgear)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,madgear)
@@ -897,16 +897,16 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1988, lastduel,  0,        lastduel, lastduel, lastduel_state, 0, ROT270, "Capcom",  "Last Duel (US New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, lastduelo, lastduel, lastduel, lastduel, lastduel_state, 0, ROT270, "Capcom",  "Last Duel (US Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, lastduelj, lastduel, lastduel, lastduel, lastduel_state, 0, ROT270, "Capcom",  "Last Duel (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, lastduelb, lastduel, lastduel, lastduel, lastduel_state, 0, ROT270, "bootleg", "Last Duel (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lastduel,  0,        lastduel, lastduel, lastduel_state, empty_init, ROT270, "Capcom",  "Last Duel (US New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lastduelo, lastduel, lastduel, lastduel, lastduel_state, empty_init, ROT270, "Capcom",  "Last Duel (US Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lastduelj, lastduel, lastduel, lastduel, lastduel_state, empty_init, ROT270, "Capcom",  "Last Duel (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lastduelb, lastduel, lastduel, lastduel, lastduel_state, empty_init, ROT270, "bootleg", "Last Duel (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // are both Mad Gear and Led Storm really US sets, both have a (c) Capcom USA, but so do several World sets from Capcom during this era, including Led Storm Rally 2011.  None of these display a region warning, 2011 does.
 // the region warning text is however still present in the ROM (albeit unused) and does appear to indicate both are US sets, so it's possible the title was revised to avoid confusion with the older Led Storm Rally 2011.
-GAME( 1989, madgear,   0,        madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Mad Gear (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, madgearj,  madgear,  madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Mad Gear (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ledstorm,  madgear,  madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Led Storm (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, madgear,   0,        madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Mad Gear (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, madgearj,  madgear,  madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Mad Gear (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ledstorm,  madgear,  madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm (US)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, leds2011,  0,        madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, leds2011u, leds2011, madgear,  madgear, lastduel_state,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011,  0,        madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leds2011u, leds2011, madgear,  madgear,  lastduel_state, empty_init, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", MACHINE_SUPPORTS_SAVE )

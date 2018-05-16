@@ -415,7 +415,7 @@ static const gfx_layout splayout =
 };
 
 
-static GFXDECODE_START( rpunch )
+static GFXDECODE_START( gfx_rpunch )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout, 256, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, splayout,   0, 16*4 )
@@ -444,7 +444,7 @@ static const gfx_layout bootleg_sprite_layout =
 	32*32*2,
 };
 
-static GFXDECODE_START( svolleybl )
+static GFXDECODE_START( gfx_svolleybl )
 	GFXDECODE_ENTRY( "gfx1", 0, bootleg_tile_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, bootleg_tile_layout,   256, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, bootleg_sprite_layout,   0, 16*4 )
@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rpunch)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rpunch)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -531,7 +531,7 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", svolleybl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_svolleybl)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -793,13 +793,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(rpunch_state,rabiolep)
+void rpunch_state::init_rabiolep()
 {
 	m_sprite_palette = 0x300;
 }
 
 
-DRIVER_INIT_MEMBER(rpunch_state,svolley)
+void rpunch_state::init_svolley()
 {
 	/* the main differences between Super Volleyball and Rabbit Punch are */
 	/* the lack of direct-mapped bitmap and a different palette base for sprites */
@@ -815,12 +815,12 @@ DRIVER_INIT_MEMBER(rpunch_state,svolley)
  *
  *************************************/
 
-GAME( 1987, rabiolep,  0,        rpunch,    rabiolep, rpunch_state, rabiolep, ROT0, "V-System Co.",                              "Rabio Lepus (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1987, rpunch,    rabiolep, rpunch,    rpunch,   rpunch_state, rabiolep, ROT0, "V-System Co. (Bally/Midway/Sente license)", "Rabbit Punch (US)",        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, svolley,   0,        svolley,   svolley,  rpunch_state, svolley,  ROT0, "V-System Co.",                              "Super Volleyball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, svolleyk,  svolley,  svolley,   svolley,  rpunch_state, svolley,  ROT0, "V-System Co.",                              "Super Volleyball (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, svolleyu,  svolley,  svolley,   svolley,  rpunch_state, svolley,  ROT0, "V-System Co. (Data East license)",          "Super Volleyball (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1987, rabiolep,  0,        rpunch,    rabiolep, rpunch_state, init_rabiolep, ROT0, "V-System Co.",                              "Rabio Lepus (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1987, rpunch,    rabiolep, rpunch,    rpunch,   rpunch_state, init_rabiolep, ROT0, "V-System Co. (Bally/Midway/Sente license)", "Rabbit Punch (US)",        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolley,   0,        svolley,   svolley,  rpunch_state, init_svolley,  ROT0, "V-System Co.",                              "Super Volleyball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolleyk,  svolley,  svolley,   svolley,  rpunch_state, init_svolley,  ROT0, "V-System Co.",                              "Super Volleyball (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolleyu,  svolley,  svolley,   svolley,  rpunch_state, init_svolley,  ROT0, "V-System Co. (Data East license)",          "Super Volleyball (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 // video registers are changed, and there's some kind of RAM at 090xxx, possible a different sprite scheme for the bootleg (even if the original is intact)
 // the sound system seems to be ripped from the later Power Spikes (see aerofgt.c)
-GAME( 1991, svolleybl, svolley,  svolleybl, svolley,  rpunch_state, svolley,  ROT0, "bootleg",  "Super Volleyball (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL ) // aka 1991 Spikes?
+GAME( 1991, svolleybl, svolley,  svolleybl, svolley,  rpunch_state, init_svolley,  ROT0, "bootleg",  "Super Volleyball (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL ) // aka 1991 Spikes?

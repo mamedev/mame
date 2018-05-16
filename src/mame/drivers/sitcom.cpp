@@ -410,6 +410,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT  COMPAT  MACHINE     INPUT      STATE               INIT  COMPANY                            FULLNAME        FLAGS */
-COMP( 2002, sitcom,    0,      0,      sitcom,     sitcom,    sitcom_state,       0,    "San Bergmans & Izabella Malcolm", "SITCOM",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
-COMP( 2002, sitcomtmr, sitcom, 0,      sitcomtmr,  sitcomtmr, sitcom_timer_state, 0,    "San Bergmans & Izabella Malcolm", "SITCOM Timer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS               INIT        COMPANY                            FULLNAME        FLAGS */
+COMP( 2002, sitcom,    0,      0,      sitcom,    sitcom,    sitcom_state,       empty_init, "San Bergmans & Izabella Malcolm", "SITCOM",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+COMP( 2002, sitcomtmr, sitcom, 0,      sitcomtmr, sitcomtmr, sitcom_timer_state, empty_init, "San Bergmans & Izabella Malcolm", "SITCOM Timer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

@@ -184,8 +184,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cshooter_c500_w);
 	DECLARE_WRITE8_MEMBER(cshooter_c700_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_DRIVER_INIT(cshootere);
-	DECLARE_DRIVER_INIT(cshooter);
+	void init_cshootere();
+	void init_cshooter();
 	DECLARE_MACHINE_RESET(cshooter);
 	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
 	void airraid(machine_config &config);
@@ -588,12 +588,12 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(airraid_state, cshooter)
+void airraid_state::init_cshooter()
 {
 	membank("bank1")->configure_entries(0, 4, memregion("maindata")->base(), 0x4000);
 }
 
-DRIVER_INIT_MEMBER(airraid_state,cshootere)
+void airraid_state::init_cshootere()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -622,11 +622,11 @@ DRIVER_INIT_MEMBER(airraid_state,cshootere)
 			rom[A] = bitswap<8>(rom[A],7,6,1,4,3,2,5,0);
 	}
 
-	DRIVER_INIT_CALL(cshooter);
+	init_cshooter();
 
 }
 
 // There's also an undumped International Games version
-GAME( 1987, cshooter,  airraid,   airraid_crypt, airraid, airraid_state, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (Single PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, airraid,   0,         airraid_crypt, airraid, airraid_state, cshootere, ROT270, "Seibu Kaihatsu",                  "Air Raid (Single PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1987, cshooter, airraid, airraid_crypt, airraid, airraid_state, init_cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (Single PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, airraid,  0,       airraid_crypt, airraid, airraid_state, init_cshootere, ROT270, "Seibu Kaihatsu",                  "Air Raid (Single PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 

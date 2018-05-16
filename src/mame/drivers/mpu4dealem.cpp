@@ -56,7 +56,7 @@ static const gfx_layout dealemcharlayout =
 };
 
 
-static GFXDECODE_START( dealem )
+static GFXDECODE_START( gfx_dealem )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dealemcharlayout, 0, 32 )
 GFXDECODE_END
 
@@ -222,7 +222,7 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	MCFG_SCREEN_UPDATE_DRIVER(mpu4dealem_state, screen_update_dealem)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dealem)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dealem)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(mpu4dealem_state,dealem)
@@ -383,4 +383,4 @@ and reel assembly with this kit and a supplied monitor. This explains why the ca
 The original Deal 'Em ran on Summit Coin hardware, and was made by someone else.
 Two further different releases were made, running on the Barcrest MPU4 Video, rather than this one. These are Deal 'Em Again and Deal 'Em 2000*/
 
-GAME(  1987,v4dealem,   0,          dealem,     dealem, mpu4dealem_state,      0,          ROT0, "Zenitone","Deal 'Em (MPU4 Conversion Kit, v7.0)",MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, v4dealem, 0, dealem, dealem, mpu4dealem_state, empty_init, ROT0, "Zenitone","Deal 'Em (MPU4 Conversion Kit, v7.0)",MACHINE_IMPERFECT_GRAPHICS )

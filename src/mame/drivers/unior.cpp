@@ -245,7 +245,7 @@ static const gfx_layout unior_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( unior )
+static GFXDECODE_START( gfx_unior )
 	GFXDECODE_ENTRY( "chargen", 0x0000, unior_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -390,7 +390,7 @@ MACHINE_CONFIG_START(unior_state::unior)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unior)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unior)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(unior_state,unior)
 
@@ -451,5 +451,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT    COMPAT   MACHINE    INPUT  CLASS          INIT  COMPANY      FULLNAME  FLAGS */
-COMP( 19??, unior,  radio86,  0,       unior,     unior, unior_state,   0,    "<unknown>", "Unior",  MACHINE_NOT_WORKING )
+/*    YEAR  NAME   PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS */
+COMP( 19??, unior, radio86, 0,      unior,   unior, unior_state, empty_init, "<unknown>", "Unior",  MACHINE_NOT_WORKING )

@@ -184,8 +184,8 @@ public:
 
 	DECLARE_MACHINE_START(pipedrm);
 	DECLARE_MACHINE_RESET(pipedrm);
-	DECLARE_DRIVER_INIT(pipedrm);
-	DECLARE_DRIVER_INIT(hatris);
+	void init_pipedrm();
+	void init_hatris();
 	DECLARE_WRITE8_MEMBER( pipedrm_bankswitch_w );
 	DECLARE_WRITE8_MEMBER( sound_bankswitch_w );
 	DECLARE_READ8_MEMBER( pending_command_r );
@@ -529,14 +529,14 @@ static const gfx_layout splayout =
 };
 
 
-static GFXDECODE_START( pipedrm )
+static GFXDECODE_START( gfx_pipedrm )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, splayout, 1024, 32 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( hatris )
+static GFXDECODE_START( gfx_hatris )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,    0, 128 )
 GFXDECODE_END
@@ -600,7 +600,7 @@ MACHINE_CONFIG_START(pipedrm_state::pipedrm)
 	MCFG_SCREEN_UPDATE_DRIVER(pipedrm_state, screen_update_pipedrm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pipedrm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pipedrm)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -655,7 +655,7 @@ MACHINE_CONFIG_START(pipedrm_state::hatris)
 	MCFG_SCREEN_UPDATE_DRIVER(pipedrm_state, screen_update_fromance)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hatris)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hatris)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -880,7 +880,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(pipedrm_state,pipedrm)
+void pipedrm_state::init_pipedrm()
 {
 	const memory_share *share = memshare("palette");
 	/* sprite RAM lives at the end of palette RAM */
@@ -889,7 +889,7 @@ DRIVER_INIT_MEMBER(pipedrm_state,pipedrm)
 }
 
 
-DRIVER_INIT_MEMBER(pipedrm_state,hatris)
+void pipedrm_state::init_hatris()
 {
 	m_maincpu->space(AS_IO).install_write_handler(0x21, 0x21, write8_delegate(FUNC(pipedrm_state::fromance_gfxreg_w),this));
 }
@@ -902,9 +902,9 @@ DRIVER_INIT_MEMBER(pipedrm_state,hatris)
  *
  *************************************/
 
-GAME( 1990, pipedrm,  0,       pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (World)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pipedrmu, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (US)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pipedrmj, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (Japan)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pipedrmt, pipedrm, pipedrm, pipedrm, pipedrm_state, pipedrm, ROT0, "Video System Co.", "Pipe Dream (Taiwan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hatris,   0,       hatris,  hatris,  pipedrm_state, hatris,  ROT0, "Video System Co.", "Hatris (US)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hatrisj,  hatris,  hatris,  hatris,  pipedrm_state, hatris,  ROT0, "Video System Co.", "Hatris (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrm,  0,       pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (World)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrmu, pipedrm, pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (US)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrmj, pipedrm, pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pipedrmt, pipedrm, pipedrm, pipedrm, pipedrm_state, init_pipedrm, ROT0, "Video System Co.", "Pipe Dream (Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hatris,   0,       hatris,  hatris,  pipedrm_state, init_hatris,  ROT0, "Video System Co.", "Hatris (US)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hatrisj,  hatris,  hatris,  hatris,  pipedrm_state, init_hatris,  ROT0, "Video System Co.", "Hatris (Japan)",      MACHINE_SUPPORTS_SAVE )

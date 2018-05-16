@@ -317,7 +317,7 @@ static const gfx_layout spritelayout =
 	8*8*2*4
 };
 
-static GFXDECODE_START( homerun )
+static GFXDECODE_START( gfx_homerun )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 )
 GFXDECODE_END
@@ -372,7 +372,7 @@ MACHINE_CONFIG_START(homerun_state::dynashot)
 	MCFG_SCREEN_UPDATE_DRIVER(homerun_state, screen_update_homerun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homerun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homerun)
 	MCFG_PALETTE_ADD("palette", 16*4)
 
 	/* sound hardware */
@@ -472,8 +472,8 @@ ROM_START( ganjaja )
 ROM_END
 
 
-//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT   ROT    COMPANY   FULLNAME                                                            FLAGS
-GAME( 1988, nhomerun, 0,        homerun,  homerun,  homerun_state, 0,     ROT0, "Jaleco", "NEW Moero!! Pro Yakyuu Homerun Kyousou",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // same as below but harder?
-GAME( 1988, homerun,  nhomerun, homerun,  homerun,  homerun_state, 0,     ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, dynashot, 0,        dynashot, dynashot, homerun_state, 0,     ROT0, "Jaleco", "Dynamic Shoot Kyousou",                                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ganjaja,  0,        ganjaja,  ganjaja,  homerun_state, 0,     ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT        ROT    COMPANY   FULLNAME                                                            FLAGS
+GAME( 1988, nhomerun, 0,        homerun,  homerun,  homerun_state, empty_init, ROT0, "Jaleco", "NEW Moero!! Pro Yakyuu Homerun Kyousou",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // same as below but harder?
+GAME( 1988, homerun,  nhomerun, homerun,  homerun,  homerun_state, empty_init, ROT0, "Jaleco", "Moero!! Pro Yakyuu Homerun Kyousou",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, dynashot, 0,        dynashot, dynashot, homerun_state, empty_init, ROT0, "Jaleco", "Dynamic Shoot Kyousou",                                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ganjaja,  0,        ganjaja,  ganjaja,  homerun_state, empty_init, ROT0, "Jaleco", "Ganbare Jajamaru Saisho wa Goo / Ganbare Jajamaru Hop Step & Jump", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

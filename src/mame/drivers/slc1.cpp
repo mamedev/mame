@@ -299,5 +299,5 @@ ROM_START(slc1)
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT  STATE          INIT  COMPANY                   FULLNAME */
-COMP( 1989, slc1,     0,      0,      slc1,       slc1,  slc1_state,    0,    "Dr. Dieter Scheuschner", "SLC-1" , 0 )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                   FULLNAME */
+COMP( 1989, slc1, 0,      0,      slc1,    slc1,  slc1_state, empty_init, "Dr. Dieter Scheuschner", "SLC-1" , 0 )

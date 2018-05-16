@@ -278,7 +278,7 @@ static const gfx_layout osborne1_charlayout =
 	8                   // every char takes 16 x 1 bytes
 };
 
-static GFXDECODE_START( osborne1 )
+static GFXDECODE_START( gfx_osborne1 )
 	GFXDECODE_ENTRY("chargen", 0x0000, osborne1_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(osborne1_state::osborne1)
 	MCFG_SCREEN_UPDATE_DRIVER(osborne1_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, 1024, 0, 104*8, 260, 0, 24*10)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD(m_gfxdecode, "palette", osborne1)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_osborne1)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	SPEAKER(config, "mono").front_center();
@@ -398,6 +398,6 @@ ROM_START( osborne1nv )
 	ROM_LOAD( "character_generator_6-29-84.14", 0x0000, 0x800, CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
 ROM_END
 
-//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS              INIT        COMPANY          FULLNAME                   FLAGS
-COMP( 1981, osborne1,   0,        0,      osborne1,   osborne1,   osborne1_state,    osborne1,   "Osborne",       "Osborne-1",               MACHINE_SUPPORTS_SAVE )
-COMP( 1984, osborne1nv, osborne1, 0,      osborne1nv, osborne1nv, osborne1nv_state,  osborne1,   "Osborne/Nuevo", "Osborne-1 (Nuevo Video)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS             INIT           COMPANY          FULLNAME                   FLAGS
+COMP( 1981, osborne1,   0,        0,      osborne1,   osborne1,   osborne1_state,   init_osborne1, "Osborne",       "Osborne-1",               MACHINE_SUPPORTS_SAVE )
+COMP( 1984, osborne1nv, osborne1, 0,      osborne1nv, osborne1nv, osborne1nv_state, init_osborne1, "Osborne/Nuevo", "Osborne-1 (Nuevo Video)", MACHINE_SUPPORTS_SAVE )

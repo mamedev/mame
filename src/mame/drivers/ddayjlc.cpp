@@ -97,7 +97,7 @@ public:
 	DECLARE_WRITE8_MEMBER(i8257_CH0_w);
 	DECLARE_WRITE8_MEMBER(i8257_LMSR_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
-	DECLARE_DRIVER_INIT(ddayjlc);
+	void init_ddayjlc();
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	DECLARE_PALETTE_INIT(ddayjlc);
@@ -514,7 +514,7 @@ static const gfx_layout spritelayout =
 	16*16,
 };
 
-static GFXDECODE_START( ddayjlc )
+static GFXDECODE_START( gfx_ddayjlc )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0x000, 16 ) // upper 16 colors are unused
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0x200,  1 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0x100, 16 )
@@ -617,7 +617,7 @@ MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddayjlc_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddayjlc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddayjlc)
 	MCFG_PALETTE_ADD("palette", 0x200+4)
 	MCFG_PALETTE_INIT_OWNER(ddayjlc_state, ddayjlc)
 
@@ -715,7 +715,7 @@ ROM_START( ddayjlca )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
+void ddayjlc_state::init_ddayjlc()
 {
 #define repack(n)\
 		dst[newadr+0+n] = src[oldaddr+0+n];\
@@ -752,16 +752,14 @@ DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
 		dst[newadr+31+n] = src[oldaddr+7+0x2008+n];
 
 	{
-		uint32_t oldaddr, newadr, length,j;
-		uint8_t *src, *dst;
 		std::vector<uint8_t> temp(0x10000);
-		src = &temp[0];
-		dst = memregion("gfx1")->base();
-		length = memregion("gfx1")->bytes();
+		uint8_t *src = &temp[0];
+		uint8_t *dst = memregion("gfx1")->base();
+		uint32_t length = memregion("gfx1")->bytes();
 		memcpy(src, dst, length);
-		newadr = 0;
-		oldaddr = 0;
-		for (j = 0; j < length / 2; j += 32)
+		uint32_t newadr = 0;
+		uint32_t oldaddr = 0;
+		for (uint32_t j = 0; j < length / 2; j += 32)
 		{
 			repack(0);
 			repack(0x4000)
@@ -774,5 +772,5 @@ DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
 	membank("bank1")->set_entry(0);
 }
 
-GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc_state, ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ddayjlca, ddayjlc, ddayjlc, ddayjlc, ddayjlc_state, ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc_state, init_ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ddayjlca, ddayjlc, ddayjlc, ddayjlc, ddayjlc_state, init_ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

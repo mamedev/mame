@@ -294,7 +294,7 @@ static const gfx_layout bglayout =
 	128*8
 };
 
-static GFXDECODE_START( dbz )
+static GFXDECODE_START( gfx_dbz )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout, 0, 512 )
 	GFXDECODE_ENTRY( "gfx4", 0, bglayout, 0, 512 )
 GFXDECODE_END
@@ -348,7 +348,7 @@ MACHINE_CONFIG_START(dbz_state::dbz)
 	MCFG_SCREEN_UPDATE_DRIVER(dbz_state, screen_update_dbz)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dbz)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dbz)
 
 	MCFG_PALETTE_ADD("palette", 0x4000/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
@@ -502,11 +502,9 @@ ROM_START( dbz2 )
 	ROM_LOAD( "pcm.7c", 0x000000, 0x40000, CRC(b58c884a) SHA1(0e2a7267e9dff29c9af25558081ec9d56629bc43) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dbz_state,dbz)
+void dbz_state::init_dbz()
 {
-	uint16_t *ROM;
-
-	ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// to avoid crash during loop at 0x00076e after D4 > 0x80 (reading tiles region out of bounds)
 	ROM[0x76c/2] = 0x007f;    /* 0x00ff */
@@ -535,11 +533,9 @@ DRIVER_INIT_MEMBER(dbz_state,dbz)
 	ROM[0x810/2] = 0x4e71;    /* 0x005e */
 }
 
-DRIVER_INIT_MEMBER(dbz_state,dbza)
+void dbz_state::init_dbza()
 {
-	uint16_t *ROM;
-
-	ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// nop out dbz1's mask rom test
 	// tile ROM test
@@ -558,11 +554,9 @@ DRIVER_INIT_MEMBER(dbz_state,dbza)
 	ROM[0x990/2] = 0x4e71;    /* 0x0010 */
 }
 
-DRIVER_INIT_MEMBER(dbz_state,dbz2)
+void dbz_state::init_dbz2()
 {
-	uint16_t *ROM;
-
-	ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// to avoid crash during loop at 0x000a4a after D4 > 0x80 (reading tiles region out of bounds)
 	ROM[0xa48/2] = 0x007f;    /* 0x00ff */
@@ -595,6 +589,6 @@ DRIVER_INIT_MEMBER(dbz_state,dbz2)
 	ROM[0xae8/2] = 0x4e71;    /* 0x005e */
 }
 
-GAME( 1993, dbz,  0,   dbz, dbz,  dbz_state, dbz,  ROT0, "Banpresto", "Dragon Ball Z (rev B)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
-GAME( 1993, dbza, dbz, dbz, dbza, dbz_state, dbza, ROT0, "Banpresto", "Dragon Ball Z (rev A)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dbz2, 0,   dbz, dbz2, dbz_state, dbz2, ROT0, "Banpresto", "Dragon Ball Z 2 - Super Battle", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
+GAME( 1993, dbz,  0,   dbz, dbz,  dbz_state, init_dbz,  ROT0, "Banpresto", "Dragon Ball Z (rev B)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
+GAME( 1993, dbza, dbz, dbz, dbza, dbz_state, init_dbza, ROT0, "Banpresto", "Dragon Ball Z (rev A)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dbz2, 0,   dbz, dbz2, dbz_state, init_dbz2, ROT0, "Banpresto", "Dragon Ball Z 2 - Super Battle", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test

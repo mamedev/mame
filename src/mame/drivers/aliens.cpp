@@ -482,10 +482,10 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1990, aliens,   0,      aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (World set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliens2,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (World set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliens3,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (World set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensu,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (US)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensj,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensj2, aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensa,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (Asia)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliens,   0,      aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (World set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliens2,  aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (World set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliens3,  aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (World set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensu,  aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (US)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensj,  aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensj2, aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensa,  aliens, aliens, aliens, aliens_state, empty_init, ROT0, "Konami", "Aliens (Asia)",        MACHINE_SUPPORTS_SAVE )

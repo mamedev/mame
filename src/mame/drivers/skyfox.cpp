@@ -191,7 +191,7 @@ static const gfx_layout layout_8x8x8 =
 	8*8*8
 };
 
-static GFXDECODE_START( skyfox )
+static GFXDECODE_START( gfx_skyfox )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8, 0, 1 ) // [0] Sprites
 GFXDECODE_END
 
@@ -241,7 +241,7 @@ MACHINE_CONFIG_START(skyfox_state::skyfox)
 	MCFG_SCREEN_UPDATE_DRIVER(skyfox_state, screen_update_skyfox)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skyfox)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skyfox)
 	MCFG_PALETTE_ADD("palette", 256+256) /* 256 static colors (+256 for the background??) */
 	MCFG_PALETTE_INIT_OWNER(skyfox_state, skyfox)
 
@@ -401,7 +401,7 @@ ROM_END
 
 
 /* Untangle the graphics: cut each 32x32x8 tile in 16 8x8x8 tiles */
-DRIVER_INIT_MEMBER(skyfox_state,skyfox)
+void skyfox_state::init_skyfox()
 {
 	uint8_t *rom = memregion("gfx1")->base();
 	uint8_t *end = rom + memregion("gfx1")->bytes();
@@ -418,6 +418,6 @@ DRIVER_INIT_MEMBER(skyfox_state,skyfox)
 }
 
 
-GAME( 1987, skyfox,    0,      skyfox, skyfox, skyfox_state, skyfox, ROT90, "Jaleco (Nichibutsu USA license)", "Sky Fox", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exerizer,  skyfox, skyfox, skyfox, skyfox_state, skyfox, ROT90, "Jaleco", "Exerizer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exerizerb, skyfox, skyfox, skyfox, skyfox_state, skyfox, ROT90, "bootleg", "Exerizer (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, skyfox,    0,      skyfox, skyfox, skyfox_state, init_skyfox, ROT90, "Jaleco (Nichibutsu USA license)", "Sky Fox", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exerizer,  skyfox, skyfox, skyfox, skyfox_state, init_skyfox, ROT90, "Jaleco", "Exerizer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exerizerb, skyfox, skyfox, skyfox, skyfox_state, init_skyfox, ROT90, "bootleg", "Exerizer (bootleg)", MACHINE_SUPPORTS_SAVE )

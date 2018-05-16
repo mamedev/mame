@@ -279,8 +279,7 @@ MACHINE_CONFIG_START(c80_state::c80)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED )
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -297,5 +296,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  CLASS       INIT  COMPANY           FULLNAME  FLAGS */
-COMP( 1986, c80,    0,      0,      c80,    c80,   c80_state,  0,    "Joachim Czepa", "C-80",    MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY          FULLNAME  FLAGS */
+COMP( 1986, c80,  0,      0,      c80,     c80,   c80_state, empty_init, "Joachim Czepa", "C-80",   MACHINE_SUPPORTS_SAVE )

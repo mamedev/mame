@@ -2,7 +2,6 @@
 // copyright-holders:Bryan McPhail
 #include "emu.h"
 #include "includes/tatsumi.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 
 
@@ -260,7 +259,7 @@ WRITE8_MEMBER(cyclwarr_state::cyclwarr_control_w)
 
 READ16_MEMBER(tatsumi_state::tatsumi_v30_68000_r)
 {
-	const uint16_t* rom=(uint16_t*)memregion("sub")->base();
+	const uint16_t* rom=(uint16_t*)m_subregion->base();
 
 //logerror("%s:68000_r(%04X),cw=%04X\n", m_maincpu->pc(), offset*2, m_control_word);
 	/* Read from 68k RAM */
@@ -269,7 +268,7 @@ READ16_MEMBER(tatsumi_state::tatsumi_v30_68000_r)
 		// hack to make roundup 5 boot
 		if (m_maincpu->pc()==0xec575)
 		{
-			uint8_t *dst = memregion("maincpu")->base();
+			uint8_t *dst = m_mainregion->base();
 			dst[BYTE_XOR_LE(0xec57a)]=0x46;
 			dst[BYTE_XOR_LE(0xec57b)]=0x46;
 
@@ -304,7 +303,7 @@ WRITE16_MEMBER(tatsumi_state::tatsumi_v30_68000_w)
 // self-test in Tatsumi games.  Needs fixed, but hack it here for now.
 READ8_MEMBER(tatsumi_state::tatsumi_hack_ym2151_r)
 {
-	int r=machine().device<ym2151_device>("ymsnd")->status_r(space,0);
+	int r=m_ym2151->status_r(space,0);
 
 	if (m_audiocpu->pc()==0x2aca || m_audiocpu->pc()==0x29fe
 		|| m_audiocpu->pc()==0xf9721

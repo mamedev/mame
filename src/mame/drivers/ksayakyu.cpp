@@ -233,7 +233,7 @@ static const gfx_layout spritelayout =
 	8*8*4
 };
 
-static GFXDECODE_START( ksayakyu )
+static GFXDECODE_START( gfx_ksayakyu )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout2,  0x80, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 16 )
@@ -281,7 +281,7 @@ MACHINE_CONFIG_START(ksayakyu_state::ksayakyu)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ksayakyu)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ksayakyu)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(ksayakyu_state, ksayakyu)
 
@@ -341,4 +341,4 @@ ROM_START( ksayakyu )
 	ROM_LOAD( "9f.bin", 0x0000, 0x0100, CRC(ff71b27f) SHA1(6aad2bd2be997595a05ddb81d24df8fe1435910b) )
 ROM_END
 
-GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, ksayakyu_state, 0, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, ksayakyu_state, empty_init, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu", MACHINE_SUPPORTS_SAVE )

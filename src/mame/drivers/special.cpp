@@ -384,12 +384,11 @@ MACHINE_CONFIG_START(special_state::special)
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.0625);
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
@@ -506,12 +505,11 @@ MACHINE_CONFIG_START(special_state::erik)
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.0625);
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -607,11 +605,11 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME        PARENT    COMPAT   MACHINE    INPUT     CLASS             INIT       COMPANY      FULLNAME                    FLAGS
-COMP( 1985, special,    0,        0,       special,   special,  special_state,    special,   "<unknown>", "Specialist",               0 )
-COMP( 1985, specialm,   special,  0,       specialm,  special,  special_state,    special,   "<unknown>", "Specialist M",             0 )
-COMP( 1985, pioner,     special,  0,       special,   special,  special_state,    special,   "<unknown>", "Pioner",                   MACHINE_NOT_WORKING )
-COMP( 1985, specialp,   special,  0,       specialp,  specialp, special_state,    special,   "<unknown>", "Specialist + hires graph", MACHINE_NOT_WORKING )
-COMP( 1985, lik,        special,  0,       special,   lik,      special_state,    special,   "<unknown>", "Lik",                      0 )
-COMP( 1985, specimx,    special,  0,       specimx,   specimx,  special_state,    0,         "<unknown>", "Specialist MX",            0 )
-COMP( 1994, erik,       special,  0,       erik,      special,  special_state,    erik,      "<unknown>", "Erik",                     0 )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT          COMPANY      FULLNAME                    FLAGS
+COMP( 1985, special,  0,       0,      special,  special,  special_state, init_special, "<unknown>", "Specialist",               0 )
+COMP( 1985, specialm, special, 0,      specialm, special,  special_state, init_special, "<unknown>", "Specialist M",             0 )
+COMP( 1985, pioner,   special, 0,      special,  special,  special_state, init_special, "<unknown>", "Pioner",                   MACHINE_NOT_WORKING )
+COMP( 1985, specialp, special, 0,      specialp, specialp, special_state, init_special, "<unknown>", "Specialist + hires graph", MACHINE_NOT_WORKING )
+COMP( 1985, lik,      special, 0,      special,  lik,      special_state, init_special, "<unknown>", "Lik",                      0 )
+COMP( 1985, specimx,  special, 0,      specimx,  specimx,  special_state, empty_init,   "<unknown>", "Specialist MX",            0 )
+COMP( 1994, erik,     special, 0,      erik,     special,  special_state, init_erik,    "<unknown>", "Erik",                     0 )

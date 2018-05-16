@@ -220,7 +220,7 @@ static const gfx_layout cbasebal_spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( cbasebal )
+static GFXDECODE_START( gfx_cbasebal )
 	GFXDECODE_ENTRY( "gfx1", 0, cbasebal_textlayout,   256,  8 ) /* colors 256- 287 */
 	GFXDECODE_ENTRY( "gfx2", 0, cbasebal_tilelayout,   768, 16 ) /* colors 768-1023 */
 	GFXDECODE_ENTRY( "gfx3", 0, cbasebal_spritelayout, 512,  8 ) /* colors 512- 639 */
@@ -282,7 +282,7 @@ MACHINE_CONFIG_START(cbasebal_state::cbasebal)
 	MCFG_SCREEN_UPDATE_DRIVER(cbasebal_state, screen_update_cbasebal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cbasebal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cbasebal)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
@@ -339,7 +339,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cbasebal_state,cbasebal)
+void cbasebal_state::init_cbasebal()
 {
 	uint8_t *src = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -357,4 +357,4 @@ DRIVER_INIT_MEMBER(cbasebal_state,cbasebal)
  *
  *************************************/
 
-GAME( 1989, cbasebal, 0, cbasebal, cbasebal, cbasebal_state, cbasebal, ROT0, "Capcom", "Capcom Baseball (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cbasebal, 0, cbasebal, cbasebal, cbasebal_state, init_cbasebal, ROT0, "Capcom", "Capcom Baseball (Japan)", MACHINE_SUPPORTS_SAVE )

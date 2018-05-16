@@ -699,7 +699,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( nycaptor )
+static GFXDECODE_START( gfx_nycaptor )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )//16 colors
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )//palette 2, 16 colors
 GFXDECODE_END
@@ -761,7 +761,7 @@ MACHINE_CONFIG_START(nycaptor_state::nycaptor)
 	MCFG_SCREEN_UPDATE_DRIVER(nycaptor_state, screen_update_nycaptor)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nycaptor)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nycaptor)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -836,7 +836,7 @@ MACHINE_CONFIG_START(nycaptor_state::cyclshtg)
 	MCFG_SCREEN_UPDATE_DRIVER(nycaptor_state, screen_update_nycaptor)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nycaptor)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nycaptor)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -906,7 +906,7 @@ MACHINE_CONFIG_START(nycaptor_state::bronx)
 	MCFG_SCREEN_UPDATE_DRIVER(nycaptor_state, screen_update_nycaptor)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nycaptor)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nycaptor)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -1279,40 +1279,38 @@ ROM_START( colt )
 	ROM_LOAD( "a50_14",   0x1c000, 0x4000, CRC(24b2f1bf) SHA1(4757aec2e4b99ce33d993ce1e19ee46a4eb76e86) )
 ROM_END
 
-DRIVER_INIT_MEMBER(nycaptor_state,nycaptor)
+void nycaptor_state::init_nycaptor()
 {
 	m_gametype = 0;
 }
 
-DRIVER_INIT_MEMBER(nycaptor_state,cyclshtg)
+void nycaptor_state::init_cyclshtg()
 {
 	m_gametype = 1;
 }
 
-DRIVER_INIT_MEMBER(nycaptor_state,bronx)
+void nycaptor_state::init_bronx()
 {
-	int i;
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (i = 0; i < 0x20000; i++)
+	for (int i = 0; i < 0x20000; i++)
 		rom[i] = bitswap<8>(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
 
 	m_gametype = 1;
 }
 
-DRIVER_INIT_MEMBER(nycaptor_state,colt)
+void nycaptor_state::init_colt()
 {
-	int i;
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (i = 0; i < 0x20000; i++)
+	for (int i = 0; i < 0x20000; i++)
 		rom[i] = bitswap<8>(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
 
 	m_gametype = 2;
 }
 
-GAME( 1985, nycaptor, 0,        nycaptor, nycaptor, nycaptor_state, nycaptor, ROT0,  "Taito",   "N.Y. Captor",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, cyclshtg, 0,        cyclshtg, cyclshtg, nycaptor_state, cyclshtg, ROT90, "Taito",   "Cycle Shooting", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nycaptor, 0,        nycaptor, nycaptor, nycaptor_state, init_nycaptor, ROT0,  "Taito",   "N.Y. Captor",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, cyclshtg, 0,        cyclshtg, cyclshtg, nycaptor_state, init_cyclshtg, ROT90, "Taito",   "Cycle Shooting", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 /* bootlegs */
-GAME( 1986, bronx,    cyclshtg, bronx,    bronx,    nycaptor_state, bronx,    ROT90, "bootleg", "Bronx",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, colt,     nycaptor, bronx,    colt,     nycaptor_state, colt,     ROT0,  "bootleg", "Colt",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bronx,    cyclshtg, bronx,    bronx,    nycaptor_state, init_bronx,    ROT90, "bootleg", "Bronx",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, colt,     nycaptor, bronx,    colt,     nycaptor_state, init_colt,     ROT0,  "bootleg", "Colt",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

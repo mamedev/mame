@@ -543,7 +543,7 @@ static const gfx_layout balllayout =
 };
 
 
-static GFXDECODE_START( sbrkout )
+static GFXDECODE_START( gfx_sbrkout )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, balllayout, 0, 1 )
 GFXDECODE_END
@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(sbrkout_state::sbrkout)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbrkout)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbrkout)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 384, 0, 256, 262, 0, 224)
@@ -695,7 +695,7 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1978, sbrkout,   0,       sbrkout,   sbrkout,   sbrkout_state,   0, ROT270, "Atari", "Super Breakout (rev 04)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkout3,  sbrkout, sbrkout,   sbrkout,   sbrkout_state,   0, ROT270, "Atari", "Super Breakout (rev 03)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkoutc,  sbrkout, sbrkout,   sbrkoutc,  sbrkout_state,   0, ROT270, "Atari", "Super Breakout (Canyon and Vertical Breakout, prototype)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkoutct, sbrkout, sbrkoutct, sbrkoutct, sbrkoutct_state, 0, ROT270, "Atari", "Super Breakout (Cocktail, prototype)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkout,   0,       sbrkout,   sbrkout,   sbrkout_state,   empty_init, ROT270, "Atari", "Super Breakout (rev 04)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkout3,  sbrkout, sbrkout,   sbrkout,   sbrkout_state,   empty_init, ROT270, "Atari", "Super Breakout (rev 03)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkoutc,  sbrkout, sbrkout,   sbrkoutc,  sbrkout_state,   empty_init, ROT270, "Atari", "Super Breakout (Canyon and Vertical Breakout, prototype)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkoutct, sbrkout, sbrkoutct, sbrkoutct, sbrkoutct_state, empty_init, ROT270, "Atari", "Super Breakout (Cocktail, prototype)", MACHINE_SUPPORTS_SAVE, layout_sbrkout )

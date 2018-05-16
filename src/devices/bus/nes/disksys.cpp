@@ -21,7 +21,6 @@
 
 #include "emu.h"
 #include "disksys.h"
-#include "cpu/m6502/m6502.h"
 #include "imagedev/flopdrv.h"
 #include "formats/nes_dsk.h"
 
@@ -117,7 +116,7 @@ void nes_disksys_device::device_start()
 	m_disk->floppy_install_unload_proc(nes_disksys_device::unload_proc);
 
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_fds_motor_on));
 	save_item(NAME(m_fds_door_closed));
@@ -206,7 +205,7 @@ READ8_MEMBER(nes_disksys_device::read_m)
 void nes_disksys_device::hblank_irq(int scanline, int vblank, int blanked)
 {
 	if (m_irq_transfer)
-		m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+		hold_irq_line();
 }
 
 WRITE8_MEMBER(nes_disksys_device::write_ex)
@@ -372,7 +371,7 @@ void nes_disksys_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			m_irq_count--;
 			if (!m_irq_count)
 			{
-				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				hold_irq_line();
 				m_irq_enable = 0;
 				m_fds_status0 |= 0x01;
 				m_irq_count_latch = 0;  // used in Kaettekita Mario Bros

@@ -127,7 +127,7 @@ MC6845_UPDATE_ROW( comx_clm_device::crtc_update_row )
 //  GFXDECODE( comx_clm )
 //-------------------------------------------------
 
-static GFXDECODE_START( comx_clm )
+static GFXDECODE_START( gfx_comx_clm )
 	GFXDECODE_ENTRY(MC6845_TAG, 0x0000, gfx_8x8x1, 0, 1)
 GFXDECODE_END
 
@@ -144,7 +144,7 @@ MACHINE_CONFIG_START(comx_clm_device::device_add_mconfig)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", comx_clm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_comx_clm)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, MC6845_SCREEN_TAG, XTAL(14'318'181)/7)

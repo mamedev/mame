@@ -39,7 +39,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(jeutel);
+	void init_jeutel();
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(ppi0a_w);
@@ -192,7 +192,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( jeutel_state::timer_a )
 		m_cpu2->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-DRIVER_INIT_MEMBER( jeutel_state, jeutel )
+void jeutel_state::init_jeutel()
 {
 }
 
@@ -280,5 +280,5 @@ ROM_START(olympic)
 ROM_END
 
 
-GAME(1983,  leking,   0,  jeutel,  jeutel, jeutel_state,  jeutel,  ROT0, "Jeutel", "Le King",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1984,  olympic,  0,  jeutel,  jeutel, jeutel_state,  jeutel,  ROT0, "Jeutel", "Olympic Games", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1983, leking,  0, jeutel, jeutel, jeutel_state, init_jeutel, ROT0, "Jeutel", "Le King",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1984, olympic, 0, jeutel, jeutel, jeutel_state, init_jeutel, ROT0, "Jeutel", "Olympic Games", MACHINE_IS_SKELETON_MECHANICAL)

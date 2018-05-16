@@ -861,7 +861,7 @@ static const gfx_layout hd44780_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( pc2000 )
+static GFXDECODE_START( gfx_pc2000 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, hd44780_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -896,7 +896,7 @@ MACHINE_CONFIG_START(pc2000_state::pc2000)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc2000_state, pc2000)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc2000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc2000)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_HD44780_ADD("hd44780")
@@ -1090,21 +1090,21 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT  COMPANY                    FULLNAME                                  FLAGS
-COMP( 1988, pc1000,   0,      0,      pc1000,   pc1000,  pc1000_state,  0,    "Video Technology",        "PreComputer 1000",                       MACHINE_NOT_WORKING )
-COMP( 1988, misterx,  0,      0,      misterx,  pc1000,  pc1000_state,  0,    "Video Technology / Yeno", "MisterX",                                MACHINE_NOT_WORKING )
-COMP( 1988, ordisava, 0,      0,      pc1000,   pc1000,  pc1000_state,  0,    "Video Technology",        "Ordisavant (France)",                    MACHINE_NOT_WORKING )
-COMP( 1993, pc2000,   0,      0,      pc2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "PreComputer 2000",                       MACHINE_NOT_WORKING )
-COMP( 1993, gl2000,   0,      0,      gl2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "Genius Leader 2000",                     MACHINE_NOT_WORKING )
-COMP( 1994, gl2000c,  gl2000, 0,      gl2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "Genius Leader 2000 Compact",             MACHINE_NOT_WORKING )
-COMP( 1995, gl2000p,  gl2000, 0,      gl2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "Genius Leader 2000 Plus",                MACHINE_NOT_WORKING )
-COMP( 1996, gl3000s,  0,      0,      gl3000s,  gl3000s, gl3000s_state, 0,    "Video Technology",        "Genius Leader 3000S (Germany)",          MACHINE_NOT_WORKING )
-COMP( 1994, gl4000,   0,      0,      gl4000,   pc2000,  gl4004_state,  0,    "Video Technology",        "Genius Leader 4000 Quadro (Germany)",    MACHINE_NOT_WORKING )
-COMP( 1996, gl4004,   0,      0,      gl4000,   pc2000,  gl4004_state,  0,    "Video Technology",        "Genius Leader 4004 Quadro L (Germany)",  MACHINE_NOT_WORKING )
-COMP( 1997, gl5000,   0,      0,      pc2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "Genius Leader 5000 (Germany)",           MACHINE_IS_SKELETON )
-COMP( 1997, gl5005x,  0,      0,      pc2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "Genius Leader 5005X (Germany)",          MACHINE_IS_SKELETON )
-COMP( 1997, glpn,     0,      0,      gl4000,   pc2000,  gl4004_state,  0,    "Video Technology",        "Genius Leader Power Notebook (Germany)", MACHINE_IS_SKELETON )
-COMP( 1998, gmtt ,    0,      0,      gl4000,   pc2000,  gl4004_state,  0,    "Video Technology",        "Genius Master Table Top (Germany)",      MACHINE_IS_SKELETON )
-COMP( 2001, gbs5505x, 0,      0,      pc2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "Genius BrainStation 5505X (Germany)",    MACHINE_IS_SKELETON )
-COMP( 1993, gln,      0,      0,      pc2000,   pc2000,  pc2000_state,  0,    "Video Technology",        "Genius Leader Notebook",                 MACHINE_IS_SKELETON )
-COMP( 1999, lexipcm,  0,      0,      pc2000,   pc2000,  pc2000_state,  0,    "Lexibook",                "LexiPC Mega 2000 (Germany)",             MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS         INIT        COMPANY                    FULLNAME                                  FLAGS
+COMP( 1988, pc1000,   0,      0,      pc1000,   pc1000,  pc1000_state, empty_init, "Video Technology",        "PreComputer 1000",                       MACHINE_NOT_WORKING )
+COMP( 1988, misterx,  0,      0,      misterx,  pc1000,  pc1000_state, empty_init, "Video Technology / Yeno", "MisterX",                                MACHINE_NOT_WORKING )
+COMP( 1988, ordisava, 0,      0,      pc1000,   pc1000,  pc1000_state, empty_init, "Video Technology",        "Ordisavant (France)",                    MACHINE_NOT_WORKING )
+COMP( 1993, pc2000,   0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "PreComputer 2000",                       MACHINE_NOT_WORKING )
+COMP( 1993, gl2000,   0,      0,      gl2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 2000",                     MACHINE_NOT_WORKING )
+COMP( 1994, gl2000c,  gl2000, 0,      gl2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 2000 Compact",             MACHINE_NOT_WORKING )
+COMP( 1995, gl2000p,  gl2000, 0,      gl2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 2000 Plus",                MACHINE_NOT_WORKING )
+COMP( 1996, gl3000s,  0,      0,      gl3000s,  gl3000s, gl3000s_state,empty_init, "Video Technology",        "Genius Leader 3000S (Germany)",          MACHINE_NOT_WORKING )
+COMP( 1994, gl4000,   0,      0,      gl4000,   pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader 4000 Quadro (Germany)",    MACHINE_NOT_WORKING )
+COMP( 1996, gl4004,   0,      0,      gl4000,   pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader 4004 Quadro L (Germany)",  MACHINE_NOT_WORKING )
+COMP( 1997, gl5000,   0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 5000 (Germany)",           MACHINE_IS_SKELETON )
+COMP( 1997, gl5005x,  0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 5005X (Germany)",          MACHINE_IS_SKELETON )
+COMP( 1997, glpn,     0,      0,      gl4000,   pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader Power Notebook (Germany)", MACHINE_IS_SKELETON )
+COMP( 1998, gmtt ,    0,      0,      gl4000,   pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Master Table Top (Germany)",      MACHINE_IS_SKELETON )
+COMP( 2001, gbs5505x, 0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius BrainStation 5505X (Germany)",    MACHINE_IS_SKELETON )
+COMP( 1993, gln,      0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader Notebook",                 MACHINE_IS_SKELETON )
+COMP( 1999, lexipcm,  0,      0,      pc2000,   pc2000,  pc2000_state, empty_init, "Lexibook",                "LexiPC Mega 2000 (Germany)",             MACHINE_IS_SKELETON )

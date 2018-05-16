@@ -776,12 +776,12 @@ static const gfx_layout layout_8x8x4 =
 	8*8*4
 };
 
-static GFXDECODE_START( suna16 )
+static GFXDECODE_START( gfx_suna16 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4, 0, 16*2 ) // [0] Sprites
 GFXDECODE_END
 
 // Two sprites chips
-static GFXDECODE_START( bestbest )
+static GFXDECODE_START( gfx_bestbest )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4, 0, 256*8/16 ) // [0] Sprites (Chip 1)
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4, 0, 256*8/16 ) // [1] Sprites (Chip 2)
 GFXDECODE_END
@@ -843,7 +843,7 @@ MACHINE_CONFIG_START(suna16_state::bssoccer)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
@@ -906,7 +906,7 @@ MACHINE_CONFIG_START(suna16_state::uballoon)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
@@ -963,7 +963,7 @@ MACHINE_CONFIG_START(suna16_state::sunaq)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
@@ -1023,7 +1023,7 @@ MACHINE_CONFIG_START(suna16_state::bestbest)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_bestbest)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bestbest)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bestbest)
 	MCFG_PALETTE_ADD("palette", 256*8)
 
 
@@ -1386,8 +1386,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1994, bestbest,  0,        bestbest, bestbest, suna16_state, 0, ROT0, "SunA",                 "Best Of Best",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1994, sunaq,     0,        sunaq,    sunaq,    suna16_state, 0, ROT0, "SunA",                 "SunA Quiz 6000 Academy (940620-6)",  MACHINE_SUPPORTS_SAVE )   // Date/Version on-screen is 940620-6, but in the program rom it's  1994,6,30  K.H.T  V6.00
-GAME( 1996, bssoccer,  0,        bssoccer, bssoccer, suna16_state, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0031 PCB)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bssoccera, bssoccer, bssoccer, bssoccer, suna16_state, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0032A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, uballoon,  0,        uballoon, uballoon, suna16_state, 0, ROT0, "SunA (Unico license)", "Ultra Balloon",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bestbest,  0,        bestbest, bestbest, suna16_state, empty_init, ROT0, "SunA",                 "Best Of Best",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, sunaq,     0,        sunaq,    sunaq,    suna16_state, empty_init, ROT0, "SunA",                 "SunA Quiz 6000 Academy (940620-6)",  MACHINE_SUPPORTS_SAVE )   // Date/Version on-screen is 940620-6, but in the program rom it's  1994,6,30  K.H.T  V6.00
+GAME( 1996, bssoccer,  0,        bssoccer, bssoccer, suna16_state, empty_init, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0031 PCB)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bssoccera, bssoccer, bssoccer, bssoccer, suna16_state, empty_init, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0032A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, uballoon,  0,        uballoon, uballoon, suna16_state, empty_init, ROT0, "SunA (Unico license)", "Ultra Balloon",                      MACHINE_SUPPORTS_SAVE )

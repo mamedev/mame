@@ -1404,6 +1404,6 @@ ROM_END
  *
  *************************************/
 
-/*    YEAR  NAME       PARENT  COMPAT MACHINE    INPUT STATE                INIT  COMPANY     FULLNAME                                      FLAGS */
-CONS( 1989, snes,      0,      0,     snes,      snes, snes_console_state,  0,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 1991, snespal,   snes,   0,     snespal,   snes, snes_console_state,  0,    "Nintendo", "Super Nintendo Entertainment System (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS               INIT        COMPANY     FULLNAME                                      FLAGS */
+CONS( 1989, snes,    0,      0,      snes,    snes,  snes_console_state, empty_init, "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1991, snespal, snes,   0,      snespal, snes,  snes_console_state, empty_init, "Nintendo", "Super Nintendo Entertainment System (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

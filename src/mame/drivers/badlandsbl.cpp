@@ -194,7 +194,7 @@ static const gfx_layout badlands_molayout =
 	64*8
 };
 
-static GFXDECODE_START( badlandsb )
+static GFXDECODE_START( gfx_badlandsb )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout_bootleg,    0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, badlands_molayout,  128, 8 )
 GFXDECODE_END
@@ -236,7 +236,7 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", badlandsb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_badlandsb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)
@@ -331,5 +331,5 @@ ROM_END
 
 
 
-GAME( 1989, badlandsb, badlands, badlandsb, badlandsb, badlandsbl_state, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", MACHINE_NOT_WORKING )
-GAME( 1989, badlandsb2,badlands, badlandsb, badlandsb, badlandsbl_state, 0, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", MACHINE_NOT_WORKING )
+GAME( 1989, badlandsb,  badlands, badlandsb, badlandsb, badlandsbl_state, empty_init, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg)", MACHINE_NOT_WORKING )
+GAME( 1989, badlandsb2, badlands, badlandsb, badlandsb, badlandsbl_state, empty_init, ROT0, "bootleg (Playmark)", "Bad Lands (bootleg, alternate)", MACHINE_NOT_WORKING )

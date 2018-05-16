@@ -167,7 +167,7 @@ static const gfx_layout jonos_charlayout =
 	8*8                    /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( jonos )
+static GFXDECODE_START( gfx_jonos )
 	GFXDECODE_ENTRY( "chargen", 0x0000, jonos_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -186,7 +186,7 @@ MACHINE_CONFIG_START(jonos_state::jonos)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 287)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jonos)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jonos)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
@@ -208,5 +208,5 @@ ROM_END
 
 /* Driver */
 
-//   YEAR   NAME    PARENT  COMPAT   MACHINE  INPUT  CLASS        INIT     COMPANY  FULLNAME  FLAGS
-COMP( 198?, jonos,  0,      0,       jonos,   jonos, jonos_state, 0,       "Jonos", "Escort", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR   NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
+COMP( 198?, jonos, 0,      0,      jonos,   jonos, jonos_state, empty_init, "Jonos", "Escort", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

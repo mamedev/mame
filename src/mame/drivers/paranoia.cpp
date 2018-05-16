@@ -193,7 +193,7 @@ MACHINE_CONFIG_START(paranoia_state::paranoia)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_common_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260:palette")
+	MCFG_SCREEN_PALETTE("huc6260")
 
 	MCFG_DEVICE_ADD( "huc6260", HUC6260, PCE_MAIN_CLOCK )
 	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6270", huc6270_device, next_pixel))
@@ -227,4 +227,4 @@ ROM_START(paranoia)
 	ROM_LOAD( "4.352", 0x18000, 0x8000, CRC(11297fed) SHA1(17a294e65ba1c4806307602dee4c7c627ad1fcfd) )
 ROM_END
 
-GAME( 1990, paranoia, 0, paranoia, paranoia, paranoia_state, pce_common, ROT0, "Naxat Soft", "Paranoia", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, paranoia, 0, paranoia, paranoia, paranoia_state, init_pce_common, ROT0, "Naxat Soft", "Paranoia", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

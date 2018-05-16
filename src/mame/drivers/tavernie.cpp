@@ -301,8 +301,7 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -394,6 +393,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT    CLASS           INIT  COMPANY         FULLNAME                      FLAGS
-COMP( 1982, cpu09,  0,      0,       cpu09,   cpu09,   tavernie_state, 0,    "C. Tavernier", "CPU09",                      MACHINE_NOT_WORKING )
-COMP( 1983, ivg09,  cpu09,  0,       ivg09,   ivg09,   tavernie_state, 0,    "C. Tavernier", "CPU09 with IVG09 and IFD09", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT        COMPANY         FULLNAME                      FLAGS
+COMP( 1982, cpu09, 0,      0,      cpu09,   cpu09, tavernie_state, empty_init, "C. Tavernier", "CPU09",                      MACHINE_NOT_WORKING )
+COMP( 1983, ivg09, cpu09,  0,      ivg09,   ivg09, tavernie_state, empty_init, "C. Tavernier", "CPU09 with IVG09 and IFD09", MACHINE_NOT_WORKING )

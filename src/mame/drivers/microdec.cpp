@@ -52,7 +52,7 @@ public:
 	DECLARE_READ8_MEMBER(portf7_r);
 	DECLARE_WRITE8_MEMBER(portf7_w);
 	DECLARE_WRITE8_MEMBER(portf8_w);
-	DECLARE_DRIVER_INIT(microdec);
+	void init_microdec();
 
 	void microdec(machine_config &config);
 	void microdec_io(address_map &map);
@@ -178,7 +178,7 @@ static void microdec_floppies(device_slot_interface &device)
 	device.option_add("525hd", FLOPPY_525_HD);
 }
 
-DRIVER_INIT_MEMBER( microdec_state, microdec )
+void microdec_state::init_microdec()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -258,6 +258,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT     CLASS           INIT       COMPANY           FULLNAME               FLAGS
-COMP( 1982, md2,    0,      0,       microdec,  microdec, microdec_state, microdec,  "Morrow Designs", "Micro Decision MD-2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1982, md3,    md2,    0,       microdec,  microdec, microdec_state, microdec,  "Morrow Designs", "Micro Decision MD-3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY           FULLNAME               FLAGS
+COMP( 1982, md2,  0,      0,      microdec, microdec, microdec_state, init_microdec, "Morrow Designs", "Micro Decision MD-2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1982, md3,  md2,    0,      microdec, microdec, microdec_state, init_microdec, "Morrow Designs", "Micro Decision MD-3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

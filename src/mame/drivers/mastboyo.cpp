@@ -160,7 +160,7 @@ static const gfx_layout tiles8x8_layout =
 	32*8
 };
 
-static GFXDECODE_START( mastboyo )
+static GFXDECODE_START( gfx_mastboyo )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -202,7 +202,7 @@ MACHINE_CONFIG_START(mastboyo_state::mastboyo)
 	MCFG_SCREEN_UPDATE_DRIVER(mastboyo_state, screen_update_mastboyo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mastboyo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastboyo)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(mastboyo_state, mastboyo)
@@ -239,4 +239,4 @@ ROM_START( mastboyo )
 	ROM_LOAD( "masterboy-1987-82s129-l-ic40.bin", 0x000, 0x100, CRC(4d061216) SHA1(1abf9320da75a3fd23c6bdbcc4088d18e133c4e5) )
 ROM_END
 
-GAME( 1987, mastboyo,  0,    mastboyo, mastboyo,  mastboyo_state, 0, ROT0, "Gaelco (Covielsa license)", "Master Boy (1987, Z80 hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mastboyo, 0, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)", "Master Boy (1987, Z80 hardware)", MACHINE_SUPPORTS_SAVE )

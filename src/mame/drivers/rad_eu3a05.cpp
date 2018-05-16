@@ -1125,7 +1125,7 @@ static const gfx_layout texture_helper_4bpp_layout =
 	texlayout_yoffset_4bpp
 };
 
-static GFXDECODE_START( radicasi_fake )
+static GFXDECODE_START( gfx_radicasi_fake )
 	GFXDECODE_ENTRY( "maincpu", 0, helper_4bpp_8_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "maincpu", 0, texture_helper_4bpp_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper_8bpp_8_layout,  0x0, 1  )
@@ -1171,7 +1171,7 @@ MACHINE_CONFIG_START(radica_eu3a05_state::radicasi)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", radicasi_fake)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_radicasi_fake)
 
 	MCFG_DEVICE_ADD("gpio", RADICA6502_GPIO, 0)
 	MCFG_RADICA6502_GPIO_READ_PORT0_CB(IOPORT("IN0"))
@@ -1200,5 +1200,5 @@ ROM_START( rad_sinv )
 	ROM_RELOAD(0x300000, 0x100000)
 ROM_END
 
-CONS( 2004, rad_sinv,  0,   0,  radicasi,  rad_sinv, radica_eu3a05_state, 0, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
-CONS( 2004, rad_tetr,  0,   0,  radicasi,  rad_tetr, radica_eu3a05_state, 0, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
+CONS( 2004, rad_sinv, 0, 0, radicasi, rad_sinv, radica_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
+CONS( 2004, rad_tetr, 0, 0, radicasi, rad_tetr, radica_eu3a05_state, empty_init, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"

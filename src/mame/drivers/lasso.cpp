@@ -450,18 +450,18 @@ static const gfx_layout pinbo_spritelayout =
 };
 
 
-static GFXDECODE_START( lasso )
+static GFXDECODE_START( gfx_lasso )
 	GFXDECODE_ENTRY( "gfx1", 0, lasso_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, lasso_spritelayout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( wwjgtin )
+static GFXDECODE_START( gfx_wwjgtin )
 	GFXDECODE_ENTRY( "gfx1", 0, lasso_charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, lasso_spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, wwjgtin_tracklayout, 4*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( pinbo )
+static GFXDECODE_START( gfx_pinbo )
 	GFXDECODE_ENTRY( "gfx1", 0, pinbo_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, pinbo_spritelayout, 0, 16 )
 GFXDECODE_END
@@ -512,7 +512,7 @@ MACHINE_CONFIG_START(lasso_state::base)
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_lasso)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lasso)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lasso)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -572,7 +572,7 @@ MACHINE_CONFIG_START(lasso_state::wwjgtin)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_wwjgtin)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", wwjgtin) // Has 1 additional layer
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wwjgtin) // Has 1 additional layer
 
 	MCFG_PALETTE_ADD("palette", 0x40 + 16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(64)
@@ -598,7 +598,7 @@ MACHINE_CONFIG_START(lasso_state::pinbo)
 	MCFG_DEVICE_IO_MAP(pinbo_audio_io_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pinbo)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pinbo)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,pinbo)
@@ -884,10 +884,10 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1982, lasso,    0,       lasso,    lasso,    lasso_state,  0, ROT90, "SNK",              "Lasso",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, chameleo, 0,       chameleo, chameleo, lasso_state,  0, ROT0,  "Jaleco",           "Chameleon",               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wwjgtin,  0,       wwjgtin,  wwjgtin,  lasso_state,  0, ROT0,  "Jaleco / Casio",   "Wai Wai Jockey Gate-In!", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, photof,   wwjgtin, wwjgtin,  wwjgtin,  lasso_state,  0, ROT0,  "Jaleco / Casio",   "Photo Finish (bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, pinbo,    0,       pinbo,    pinbo,    lasso_state,  0, ROT90, "Jaleco",           "Pinbo (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1984, pinboa,   pinbo,   pinbo,    pinboa,   lasso_state,  0, ROT90, "Jaleco",           "Pinbo (set 2)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pinbos,   pinbo,   pinbo,    pinboa,   lasso_state,  0, ROT90, "bootleg (Strike)", "Pinbo (bootleg)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, lasso,    0,       lasso,    lasso,    lasso_state, empty_init, ROT90, "SNK",              "Lasso",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, chameleo, 0,       chameleo, chameleo, lasso_state, empty_init, ROT0,  "Jaleco",           "Chameleon",               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wwjgtin,  0,       wwjgtin,  wwjgtin,  lasso_state, empty_init, ROT0,  "Jaleco / Casio",   "Wai Wai Jockey Gate-In!", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, photof,   wwjgtin, wwjgtin,  wwjgtin,  lasso_state, empty_init, ROT0,  "Jaleco / Casio",   "Photo Finish (bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pinbo,    0,       pinbo,    pinbo,    lasso_state, empty_init, ROT90, "Jaleco",           "Pinbo (set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pinboa,   pinbo,   pinbo,    pinboa,   lasso_state, empty_init, ROT90, "Jaleco",           "Pinbo (set 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pinbos,   pinbo,   pinbo,    pinboa,   lasso_state, empty_init, ROT90, "bootleg (Strike)", "Pinbo (bootleg)",         MACHINE_SUPPORTS_SAVE )

@@ -184,8 +184,7 @@ MACHINE_CONFIG_START(bk_state::bk0010)
 
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
@@ -236,8 +235,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE      INIT    COMPANY        FULLNAME        FLAGS */
-COMP( 1985, bk0010,     0,       0, bk0010,     bk0010, bk_state,  0,      "Elektronika", "BK 0010",      0)
-COMP( 1986, bk001001,   bk0010,  0, bk0010,     bk0010, bk_state,  0,      "Elektronika", "BK 0010-01",   0)
-COMP( 1986, bk0010fd,   bk0010,  0, bk0010fd,   bk0010, bk_state,  0,      "Elektronika", "BK 0010 FDD",  MACHINE_NOT_WORKING)
-COMP( 1986, bk0011m,    bk0010,  0, bk0010fd,   bk0010, bk_state,  0,      "Elektronika", "BK 0011M",     MACHINE_NOT_WORKING)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS     INIT        COMPANY        FULLNAME       FLAGS */
+COMP( 1985, bk0010,   0,      0,      bk0010,   bk0010, bk_state, empty_init, "Elektronika", "BK 0010",     0)
+COMP( 1986, bk001001, bk0010, 0,      bk0010,   bk0010, bk_state, empty_init, "Elektronika", "BK 0010-01",  0)
+COMP( 1986, bk0010fd, bk0010, 0,      bk0010fd, bk0010, bk_state, empty_init, "Elektronika", "BK 0010 FDD", MACHINE_NOT_WORKING)
+COMP( 1986, bk0011m,  bk0010, 0,      bk0010fd, bk0010, bk_state, empty_init, "Elektronika", "BK 0011M",    MACHINE_NOT_WORKING)

@@ -339,4 +339,4 @@ ROM_START( kzaurus )
 	ROM_LOAD( "540-a01-2f.bin", 0x000000, 0x080000, CRC(391c6ee6) SHA1(a345934687a8abf818350d0597843a1159395fc0) )
 ROM_END
 
-GAME( 1995, kzaurus,    0, kzaurus, kzaurus,  konmedal68k_state, 0, ROT0, "Konami", "Pittanko Zaurus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, kzaurus, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

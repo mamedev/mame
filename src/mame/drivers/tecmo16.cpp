@@ -351,7 +351,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( tecmo16 )
+static GFXDECODE_START( gfx_tecmo16 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   1*16*16, 16   )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0, 0x1000 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0, 0x1000   )
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tecmo16_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tecmo16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tecmo16)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -633,7 +633,7 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, tecmo16_state, 0, ROT90, "Tecmo", "Final Star Force (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, tecmo16_state, 0, ROT90, "Tecmo", "Final Star Force (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, riot,      0,        riot,     riot,     tecmo16_state, 0, ROT0,  "NMK",   "Riot",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ginkun,    0,        ginkun,   ginkun,   tecmo16_state, 0, ROT0,  "Tecmo", "Ganbare Ginkun",           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, riot,      0,        riot,     riot,     tecmo16_state, empty_init, ROT0,  "NMK",   "Riot",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ginkun,    0,        ginkun,   ginkun,   tecmo16_state, empty_init, ROT0,  "Tecmo", "Ganbare Ginkun",           MACHINE_SUPPORTS_SAVE )

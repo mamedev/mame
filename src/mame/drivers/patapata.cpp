@@ -273,7 +273,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( patapata )
+static GFXDECODE_START( gfx_patapata )
 	GFXDECODE_ENTRY( "tilesa", 0, tilelayout, 0x000, 16 )
 	GFXDECODE_ENTRY( "tilesb", 0, tilelayout, 0x100, 16 )
 GFXDECODE_END
@@ -291,7 +291,7 @@ MACHINE_CONFIG_START(patapata_state::patapata)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", patapata_state,  irq4_line_hold) // 1 + 4 valid? (4 main VBL)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", patapata_state, scanline, "screen", 0, 1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", patapata)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_patapata)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -345,4 +345,4 @@ ROM_START( patapata )
 ROM_END
 
 // cabinet shows Atlus logo, though there's no copyright on the title screen and PCB is NTC / NMK
-GAME( 1993, patapata, 0, patapata, patapata, patapata_state, 0, ROT0,  "Atlus", "Pata Pata Panic", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, patapata, 0, patapata, patapata, patapata_state, empty_init, ROT0,  "Atlus", "Pata Pata Panic", MACHINE_SUPPORTS_SAVE )

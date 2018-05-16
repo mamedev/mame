@@ -285,6 +285,6 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT    ROT   COMPANY   FULLNAME         FLAGS
-GAME( 199?, manohman, 0,      manohman, manohman, manohman_state, 0,      ROT0, "Merkur", "Mann, oh-Mann", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
-GAME( 1990, backgamn, 0,      manohman, manohman, manohman_state, 0,      ROT0, "Merkur", "Backgammon",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY   FULLNAME         FLAGS
+GAME( 199?, manohman, 0,      manohman, manohman, manohman_state, empty_init, ROT0, "Merkur", "Mann, oh-Mann", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAME( 1990, backgamn, 0,      manohman, manohman, manohman_state, empty_init, ROT0, "Merkur", "Backgammon",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )

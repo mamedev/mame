@@ -134,10 +134,8 @@ MACHINE_CONFIG_START(kc_state::kc85_3)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc_state, kc, "kcc", 2)
@@ -218,10 +216,8 @@ MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc_state, kc, "kcc", 2)
@@ -323,8 +319,8 @@ ROM_START(kc85_5)
 	ROMX_LOAD( "caos43e.855", 0x2000, 0x2000, CRC(b66fc6c3) SHA1(521ac2fbded4148220f8af2d5a5ab99634364079), ROM_BIOS(2))
 ROM_END
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT  STATE         INIT  COMPANY                FULLNAME           FLAGS
-COMP( 1987, kc85_2,   0,       0,      kc85_3,  kc85,  kc_state,     0,    "VEB Mikroelektronik", "HC900 / KC 85/2", MACHINE_NOT_WORKING)
-COMP( 1987, kc85_3,   kc85_2,  0,      kc85_3,  kc85,  kc_state,     0,    "VEB Mikroelektronik", "KC 85/3",         MACHINE_NOT_WORKING)
-COMP( 1989, kc85_4,   kc85_2,  0,      kc85_4,  kc85,  kc85_4_state, 0,    "VEB Mikroelektronik", "KC 85/4",         MACHINE_NOT_WORKING)
-COMP( 1989, kc85_5,   kc85_2,  0,      kc85_5,  kc85,  kc85_4_state, 0,    "VEB Mikroelektronik", "KC 85/5",         MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY                FULLNAME           wFLAGS
+COMP( 1987, kc85_2, 0,      0,      kc85_3,  kc85,  kc_state,     empty_init, "VEB Mikroelektronik", "HC900 / KC 85/2", MACHINE_NOT_WORKING)
+COMP( 1987, kc85_3, kc85_2, 0,      kc85_3,  kc85,  kc_state,     empty_init, "VEB Mikroelektronik", "KC 85/3",         MACHINE_NOT_WORKING)
+COMP( 1989, kc85_4, kc85_2, 0,      kc85_4,  kc85,  kc85_4_state, empty_init, "VEB Mikroelektronik", "KC 85/4",         MACHINE_NOT_WORKING)
+COMP( 1989, kc85_5, kc85_2, 0,      kc85_5,  kc85,  kc85_4_state, empty_init, "VEB Mikroelektronik", "KC 85/5",         MACHINE_NOT_WORKING)

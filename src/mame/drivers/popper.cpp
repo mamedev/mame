@@ -414,7 +414,7 @@ static const gfx_layout spritelayout =
 	16*2*8
 };
 
-static GFXDECODE_START( popper )
+static GFXDECODE_START( gfx_popper )
 	GFXDECODE_ENTRY("tiles",   0, layer0_charlayout, 0, 32)
 	GFXDECODE_ENTRY("tiles",   0, layer1_charlayout, 0, 16)
 	GFXDECODE_ENTRY("sprites", 0, spritelayout,      0, 16)
@@ -548,7 +548,7 @@ MACHINE_CONFIG_START(popper_state::popper)
 	MCFG_SCREEN_UPDATE_DRIVER(popper_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popper)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popper)
 
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(popper_state, popper)
@@ -594,5 +594,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT  ROTATION  COMPANY  FULLNAME  FLAGS
-GAME( 1983, popper, 0,      popper,  popper, popper_state, 0,    ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY  FULLNAME  FLAGS
+GAME( 1983, popper, 0,      popper,  popper, popper_state, empty_init, ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )

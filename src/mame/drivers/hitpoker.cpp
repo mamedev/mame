@@ -86,7 +86,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hitpoker_pic_w);
 	DECLARE_WRITE_LINE_MEMBER(hitpoker_irq);
 	DECLARE_READ8_MEMBER(irq_clear_r);
-	DECLARE_DRIVER_INIT(hitpoker);
+	void init_hitpoker();
 	virtual void video_start() override;
 	uint32_t screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -453,7 +453,7 @@ static const gfx_layout hitpoker_layout_8bpp =
 	8*32
 };
 
-static GFXDECODE_START( hitpoker )
+static GFXDECODE_START( gfx_hitpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout_4bpp,   0, 0x100  )
 	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout_8bpp,   0, 8  )
 GFXDECODE_END
@@ -480,7 +480,7 @@ MACHINE_CONFIG_START(hitpoker_state::hitpoker)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hitpoker_state, hitpoker_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hitpoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hitpoker)
 	MCFG_PALETTE_ADD("palette", 0x800)
 
 	SPEAKER(config, "mono").front_center();
@@ -491,7 +491,7 @@ MACHINE_CONFIG_START(hitpoker_state::hitpoker)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(hitpoker_state,hitpoker)
+void hitpoker_state::init_hitpoker()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -520,4 +520,4 @@ ROM_START( hitpoker )
 	ROM_LOAD16_BYTE( "u45.bin",         0x80000, 0x40000, CRC(e65b3e52) SHA1(c0c1a360a4a1823bf71c0a4105ff41f4102862e8) ) //  the first part of these 2 is almost empty as the standard gfx are 4bpp
 ROM_END
 
-GAME( 1997, hitpoker,  0,    hitpoker, hitpoker, hitpoker_state,  hitpoker, ROT0, "Accept Ltd.", "Hit Poker (Bulgaria)", MACHINE_NOT_WORKING )
+GAME( 1997, hitpoker, 0, hitpoker, hitpoker, hitpoker_state, init_hitpoker, ROT0, "Accept Ltd.", "Hit Poker (Bulgaria)", MACHINE_NOT_WORKING )

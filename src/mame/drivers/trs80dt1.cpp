@@ -281,7 +281,7 @@ const gfx_layout trs80dt1_charlayout =
 	8*16                /* space between characters */
 };
 
-static GFXDECODE_START( trs80dt1 )
+static GFXDECODE_START( gfx_trs80dt1 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, trs80dt1_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(trs80dt1_state::trs80dt1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(40*12, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*12-1, 0, 16*16-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trs80dt1 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trs80dt1 )
 
 	MCFG_DEVICE_ADD("crtc", I8275, 12480000 / 8)
 	MCFG_I8275_CHARACTER_WIDTH(8)
@@ -354,4 +354,4 @@ ROM_START( trs80dt1 )
 	ROM_LOAD( "8045716.u8",   0x0000, 0x0800, CRC(e2c5e59b) SHA1(0d571888d5f9fea4e565486ea8d3af8998ca46b1) )
 ROM_END
 
-COMP( 1989, trs80dt1, 0, 0, trs80dt1, trs80dt1, trs80dt1_state, 0, "Radio Shack", "TRS-80 DT-1", MACHINE_NOT_WORKING )
+COMP( 1989, trs80dt1, 0, 0, trs80dt1, trs80dt1, trs80dt1_state, empty_init, "Radio Shack", "TRS-80 DT-1", MACHINE_NOT_WORKING )

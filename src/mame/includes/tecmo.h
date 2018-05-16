@@ -61,10 +61,10 @@ public:
 	DECLARE_WRITE8_MEMBER(adpcm_vol_w);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
-	DECLARE_DRIVER_INIT(silkworm);
-	DECLARE_DRIVER_INIT(rygar);
-	DECLARE_DRIVER_INIT(backfirt);
-	DECLARE_DRIVER_INIT(gemini);
+	void init_silkworm();
+	void init_rygar();
+	void init_backfirt();
+	void init_gemini();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

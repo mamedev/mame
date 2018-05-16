@@ -302,7 +302,7 @@ static const gfx_layout spritelayout8 =
 	32*8
 };
 
-static GFXDECODE_START( jackal )
+static GFXDECODE_START( gfx_jackal )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,        0,  1 )    // colors 256-511 without lookup
 	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout,  0x100, 16 )    // colors   0- 15 with lookup
 	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout8, 0x100, 16 )    // to handle 8x8 sprites
@@ -380,7 +380,7 @@ MACHINE_CONFIG_START(jackal_state::jackal)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jackal_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jackal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jackal)
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x200)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -574,9 +574,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, jackal,   0,      jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Jackal (World, 8-way Joystick)",               0 )
-GAME( 1986, jackalr,  jackal, jackal, jackalr, jackal_state, 0, ROT90, "Konami",  "Jackal (World, Rotary Joystick)",              0 )
-GAME( 1986, topgunr,  jackal, jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)",              0 )
-GAME( 1986, jackalj,  jackal, jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", 0 )
-GAME( 1986, jackalbl, jackal, jackal, jackalr, jackal_state, 0, ROT90, "bootleg", "Jackal (bootleg, Rotary Joystick)",            0 )
-GAME( 1986, topgunbl, jackal, jackal, jackalr, jackal_state, 0, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)",        0 )
+GAME( 1986, jackal,   0,      jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Jackal (World, 8-way Joystick)",               0 )
+GAME( 1986, jackalr,  jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "Konami",  "Jackal (World, Rotary Joystick)",              0 )
+GAME( 1986, topgunr,  jackal, jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)",              0 )
+GAME( 1986, jackalj,  jackal, jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", 0 )
+GAME( 1986, jackalbl, jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "bootleg", "Jackal (bootleg, Rotary Joystick)",            0 )
+GAME( 1986, topgunbl, jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)",        0 )

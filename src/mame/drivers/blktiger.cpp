@@ -252,7 +252,7 @@ static const gfx_layout spritelayout =
 	32*16
 };
 
-static GFXDECODE_START( blktiger )
+static GFXDECODE_START( gfx_blktiger )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x300, 32 )   /* colors 0x300-0x37f */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x000, 16 )   /* colors 0x000-0x0ff */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x200,  8 )   /* colors 0x200-0x27f */
@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(blktiger_state::blktiger)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blktiger)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blktiger)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
@@ -595,7 +595,7 @@ ROM_START( blktigerb3 )
 	ROM_LOAD( "bd04.11l",  0x0300, 0x0100, CRC(e5490b68) SHA1(40f9f92efe7dd97b49144aec02eb509834056915) )
 ROM_END
 
-DRIVER_INIT_MEMBER(blktiger_state,blktigerb3)
+void blktiger_state::init_blktigerb3()
 {
 	uint8_t *src = memregion("audiocpu")->base();
 	int len = 0x8000;
@@ -603,20 +603,18 @@ DRIVER_INIT_MEMBER(blktiger_state,blktigerb3)
 
 	for (int i = 0; i < len; i++)
 	{
-		int addr;
-
-		addr = bitswap<16>(i, 15,14,13,12,11,10,9,8, 3,4,5,6, 7,2,1,0);
+		int addr = bitswap<16>(i, 15,14,13,12,11,10,9,8, 3,4,5,6, 7,2,1,0);
 		buffer[i] = src[addr];
 
 	}
 
 	memcpy(src, &buffer[0], len);
 }
-GAME( 1987, blktiger,   0,        blktiger,   blktiger, blktiger_state, 0, ROT0, "Capcom",  "Black Tiger",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blktigera,  blktiger, blktiger,   blktiger, blktiger_state, 0, ROT0, "Capcom",  "Black Tiger (older)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blktigerb1, blktiger, blktigerbl, blktiger, blktiger_state, 0, ROT0, "bootleg", "Black Tiger (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blktigerb2, blktiger, blktigerbl, blktiger, blktiger_state, 0, ROT0, "bootleg", "Black Tiger (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blkdrgon,   blktiger, blktiger,   blktiger, blktiger_state, 0, ROT0, "Capcom",  "Black Dragon (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blkdrgonb,  blktiger, blktigerbl, blktiger, blktiger_state, 0, ROT0, "bootleg", "Black Dragon (bootleg)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktiger,   0,        blktiger,   blktiger, blktiger_state, empty_init,      ROT0, "Capcom",  "Black Tiger",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktigera,  blktiger, blktiger,   blktiger, blktiger_state, empty_init,      ROT0, "Capcom",  "Black Tiger (older)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktigerb1, blktiger, blktigerbl, blktiger, blktiger_state, empty_init,      ROT0, "bootleg", "Black Tiger (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktigerb2, blktiger, blktigerbl, blktiger, blktiger_state, empty_init,      ROT0, "bootleg", "Black Tiger (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blkdrgon,   blktiger, blktiger,   blktiger, blktiger_state, empty_init,      ROT0, "Capcom",  "Black Dragon (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blkdrgonb,  blktiger, blktigerbl, blktiger, blktiger_state, empty_init,      ROT0, "bootleg", "Black Dragon (bootleg)",      MACHINE_SUPPORTS_SAVE )
 // this board has Capcom markings (boards 87118-A-X1 / 87118-B-X1, but no MCU, a mix of bootleg Black Tiger and Black Dragon roms, and an address swapped sound rom? is the latter an alternative security measure?
-GAME( 1987, blktigerb3, blktiger, blktigerbl, blktiger, blktiger_state, blktigerb3, ROT0, "bootleg", "Black Tiger / Black Dragon (mixed bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktigerb3, blktiger, blktigerbl, blktiger, blktiger_state, init_blktigerb3, ROT0, "bootleg", "Black Tiger / Black Dragon (mixed bootleg?)", MACHINE_SUPPORTS_SAVE )

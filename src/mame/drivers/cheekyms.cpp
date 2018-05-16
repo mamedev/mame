@@ -103,7 +103,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( cheekyms )
+static GFXDECODE_START( gfx_cheekyms )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 0x20 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x80, 0x10 )
 GFXDECODE_END
@@ -139,7 +139,7 @@ MACHINE_CONFIG_START(cheekyms_state::cheekyms)
 	MCFG_SCREEN_UPDATE_DRIVER(cheekyms_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cheekyms)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cheekyms)
 	MCFG_PALETTE_ADD("palette", 0xc0)
 	MCFG_PALETTE_INIT_OWNER(cheekyms_state, cheekyms)
 
@@ -200,4 +200,4 @@ ROM_END
 
 
 
-GAME( 1980, cheekyms, 0, cheekyms, cheekyms, cheekyms_state, 0, ROT270, "Universal", "Cheeky Mouse", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cheekyms, 0, cheekyms, cheekyms, cheekyms_state, empty_init, ROT270, "Universal", "Cheeky Mouse", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

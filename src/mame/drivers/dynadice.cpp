@@ -65,7 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(dynadice_videoram_w);
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
-	DECLARE_DRIVER_INIT(dynadice);
+	void init_dynadice();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -209,7 +209,7 @@ static const gfx_layout charlayout2 =
 };
 
 
-static GFXDECODE_START( dynadice )
+static GFXDECODE_START( gfx_dynadice )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 1 ) /* 1bpp */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,  0, 1 ) /* 3bpp */
 GFXDECODE_END
@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(dynadice_state::dynadice)
 	MCFG_SCREEN_UPDATE_DRIVER(dynadice_state, screen_update_dynadice)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dynadice)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dynadice)
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
 	SPEAKER(config, "mono").front_center();
@@ -300,9 +300,8 @@ ROM_START( dynadice )
 	ROM_LOAD( "dy_5.bin",     0x0000, 0x0800, CRC(e4799462) SHA1(5cd0f003572540522d72706bc5a8fa6588553031) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dynadice_state,dynadice)
+void dynadice_state::init_dynadice()
 {
-	int i, j;
 	uint8_t *usr1 = memregion("user1")->base();
 	uint8_t *cpu2 = memregion("audiocpu")->base();
 	uint8_t *gfx1 = memregion("gfx1")->base();
@@ -311,9 +310,9 @@ DRIVER_INIT_MEMBER(dynadice_state,dynadice)
 	cpu2[0x0b] = 0x23;  /* bug in game code  Dec HL -> Inc HL*/
 
 	/* 1bpp tiles -> 3bpp tiles (dy_5.bin  contains bg/fg color data for each tile line) */
-	for (i = 0; i < 0x800; i++)
-		for (j = 0; j < 8; j++)
+	for (int i = 0; i < 0x800; i++)
+		for (int j = 0; j < 8; j++)
 			gfx2[(i << 3) + j] = (gfx1[i] & (0x80 >> j)) ? (usr1[i] & 7) : (usr1[i] >> 4);
 }
 
-GAME( 19??, dynadice, 0, dynadice, dynadice, dynadice_state, dynadice, ROT90, "<unknown>", "Dynamic Dice", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, dynadice, 0, dynadice, dynadice, dynadice_state, init_dynadice, ROT90, "<unknown>", "Dynamic Dice", MACHINE_SUPPORTS_SAVE )

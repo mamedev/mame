@@ -558,7 +558,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( firetrap )
+static GFXDECODE_START( gfx_firetrap )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 16 )    /* colors 0x00-0x3f */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0x80,  4 )    /* colors 0x80-0xbf */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0xc0,  4 )    /* colors 0xc0-0xff */
@@ -641,7 +641,7 @@ MACHINE_CONFIG_START(firetrap_state::firetrap)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firetrap)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firetrap)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(firetrap_state, firetrap)
 
@@ -686,7 +686,7 @@ MACHINE_CONFIG_START(firetrap_state::firetrapbl)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firetrap)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firetrap)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(firetrap_state, firetrap)
 
@@ -972,7 +972,7 @@ ROM_END
 
 
 
-GAME( 1986, firetrap,   0,        firetrap,   firetrap,   firetrap_state, 0, ROT90, "Wood Place Inc. (Data East USA license)", "Fire Trap (US, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, firetrapa,  firetrap, firetrap,   firetrap,   firetrap_state, 0, ROT90, "Wood Place Inc. (Data East USA license)", "Fire Trap (US, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, firetrapj,  firetrap, firetrap,   firetrapj,  firetrap_state, 0, ROT90, "Wood Place Inc.", "Fire Trap (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, firetrapbl, firetrap, firetrapbl, firetrapbl, firetrap_state, 0, ROT90, "bootleg", "Fire Trap (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrap,   0,        firetrap,   firetrap,   firetrap_state, empty_init, ROT90, "Wood Place Inc. (Data East USA license)", "Fire Trap (US, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrapa,  firetrap, firetrap,   firetrap,   firetrap_state, empty_init, ROT90, "Wood Place Inc. (Data East USA license)", "Fire Trap (US, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrapj,  firetrap, firetrap,   firetrapj,  firetrap_state, empty_init, ROT90, "Wood Place Inc.", "Fire Trap (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrapbl, firetrap, firetrapbl, firetrapbl, firetrap_state, empty_init, ROT90, "bootleg", "Fire Trap (Japan bootleg)", MACHINE_SUPPORTS_SAVE )

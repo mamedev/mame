@@ -7,7 +7,7 @@
 
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/m68000/m68000.h"
 #include "bus/centronics/ctronics.h"

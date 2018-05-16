@@ -61,8 +61,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mz800_ramaddr_w);
 	DECLARE_WRITE8_MEMBER(mz800_palette_w);
 	DECLARE_WRITE8_MEMBER(mz800_cgram_w);
-	DECLARE_DRIVER_INIT(mz800);
-	DECLARE_DRIVER_INIT(mz700);
+	void init_mz800();
+	void init_mz700();
 	DECLARE_MACHINE_RESET(mz700);
 	DECLARE_MACHINE_RESET(mz800);
 	virtual void machine_start() override;

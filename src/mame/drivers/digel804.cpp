@@ -771,6 +771,6 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY                 FULLNAME                        FLAGS
-COMP( 1985, digel804, 0,        0,      digel804, digel804, digel804_state, 0,    "Digelec, Inc",         "Digelec 804 EPROM Programmer", MACHINE_NOT_WORKING )
-COMP( 1982, ep804,    digel804, 0,      ep804,    digel804, ep804_state,    0,    "Wavetek/Digelec, Inc", "EP804 EPROM Programmer",       MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME                        FLAGS
+COMP( 1985, digel804, 0,        0,      digel804, digel804, digel804_state, empty_init, "Digelec, Inc",         "Digelec 804 EPROM Programmer", MACHINE_NOT_WORKING )
+COMP( 1982, ep804,    digel804, 0,      ep804,    digel804, ep804_state,    empty_init, "Wavetek/Digelec, Inc", "EP804 EPROM Programmer",       MACHINE_NOT_WORKING )

@@ -332,7 +332,7 @@ public:
 	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
 
 	TIMER_CALLBACK_MEMBER(sound_irq);
-	DECLARE_DRIVER_INIT(nwktr);
+	void init_nwktr();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -917,7 +917,7 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-DRIVER_INIT_MEMBER(nwktr_state, nwktr)
+void nwktr_state::init_nwktr()
 {
 	machine().device<konppc_device>("konppc")->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 	machine().device<konppc_device>("konppc")->set_cgboard_texture_bank(0, "bank6", memregion("user5")->base());
@@ -1073,9 +1073,9 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam (JAC)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, racingj2,   racingj, nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, racingj2j,  racingj, nwktr,   nwktr, nwktr_state, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr_state, nwktr, ROT0, "Konami", "Thrill Drive (JAE)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, thrilldb,   thrilld, thrilld, nwktr, nwktr_state, nwktr, ROT0, "Konami", "Thrill Drive (JAB)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, thrilldae,  thrilld, thrilld, nwktr, nwktr_state, nwktr, ROT0, "Konami", "Thrill Drive (EAA)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam (JAC)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1998, racingj2,   racingj, nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1998, racingj2j,  racingj, nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (JAE)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldb,   thrilld, thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (JAB)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, thrilldae,  thrilld, thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (EAA)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

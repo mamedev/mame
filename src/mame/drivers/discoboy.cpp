@@ -101,7 +101,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rambank2_w);
 	DECLARE_READ8_MEMBER(port_06_r);
 	DECLARE_WRITE8_MEMBER(yunsung8_sound_bankswitch_w);
-	DECLARE_DRIVER_INIT(discoboy);
+	void init_discoboy();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -423,7 +423,7 @@ static const gfx_layout tiles8x8_layout2 =
 	8*8
 };
 
-static GFXDECODE_START( discoboy )
+static GFXDECODE_START( gfx_discoboy )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x000, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout2, 0x000, 128 )
 GFXDECODE_END
@@ -479,7 +479,7 @@ MACHINE_CONFIG_START(discoboy_state::discoboy)
 	MCFG_SCREEN_UPDATE_DRIVER(discoboy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", discoboy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_discoboy)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 
@@ -558,7 +558,7 @@ ROM_START( discoboyp ) // all ROMs had PROMAT stickers but copyright in the game
 	ROM_LOAD( "discob.u49",   0x190000, 0x40000, CRC(9f884db4) SHA1(fd916b0ac54961bbd9b3f23d3ee5d35d747cbf17) )
 ROM_END
 
-DRIVER_INIT_MEMBER(discoboy_state,discoboy)
+void discoboy_state::init_discoboy()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t *AUDIO = memregion("audiocpu")->base();
@@ -576,5 +576,5 @@ DRIVER_INIT_MEMBER(discoboy_state,discoboy)
 }
 
 
-GAME( 1993, discoboy,  0,           discoboy, discoboy, discoboy_state, discoboy, ROT270, "Soft Art Co.", "Disco Boy",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, discoboyp, discoboy,    discoboy, discoboy, discoboy_state, discoboy, ROT270, "Soft Art Co.", "Disco Boy (Promat license?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, discoboy,  0,        discoboy, discoboy, discoboy_state, init_discoboy, ROT270, "Soft Art Co.", "Disco Boy",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, discoboyp, discoboy, discoboy, discoboy, discoboy_state, init_discoboy, ROT270, "Soft Art Co.", "Disco Boy (Promat license?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

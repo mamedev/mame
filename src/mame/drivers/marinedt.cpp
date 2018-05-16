@@ -568,7 +568,7 @@ static const gfx_layout objlayout =
 	32*32*2
 };
 
-static GFXDECODE_START( marinedt )
+static GFXDECODE_START( gfx_marinedt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, objlayout,     48, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, objlayout,     32, 4 )
@@ -640,7 +640,7 @@ MACHINE_CONFIG_START(marinedt_state::marinedt)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 328, 0, 256, 263, 32, 256) // template to get ~60 fps
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", marinedt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marinedt)
 
 	MCFG_PALETTE_ADD("palette", 64+64)
 	MCFG_PALETTE_INIT_OWNER(marinedt_state, marinedt)
@@ -686,4 +686,4 @@ ROM_START( marinedt )
 	ROM_LOAD( "mg17.bpr", 0x0060, 0x0020, CRC(13261a02) SHA1(050edd18e4f79d19d5206f55f329340432fd4099) ) // sea bitmap colors
 ROM_END
 
-GAME( 1981, marinedt,  0,   marinedt,  marinedt, marinedt_state,  0,       ROT270, "Taito",      "Marine Date", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )
+GAME( 1981, marinedt, 0, marinedt, marinedt, marinedt_state, empty_init, ROT270, "Taito", "Marine Date", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND )

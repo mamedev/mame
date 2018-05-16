@@ -467,7 +467,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( fuuki32 )
+static GFXDECODE_START( gfx_fuuki32 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x400*2, 0x40 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8, 0x400*0, 0x40 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8, 0x400*1, 0x40 ) // [2] Layer 2
@@ -549,7 +549,7 @@ MACHINE_CONFIG_START(fuuki32_state::fuuki32)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fuuki32_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fuuki32)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fuuki32)
 	MCFG_PALETTE_ADD("palette", 0x4000 / 2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -706,7 +706,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1998, asurabld,   0,        fuuki32, asurabld, fuuki32_state, 0, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, asurabld,  0,        fuuki32, asurabld, fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, asurabus,   0,        fuuki32, asurabus, fuuki32_state, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, asurabusa,  asurabus, fuuki32, asurabusa,fuuki32_state, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan) (ARCADIA review build)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has pause function on P1 button 4
+GAME( 2000, asurabus,  0,        fuuki32, asurabus, fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, asurabusa, asurabus, fuuki32, asurabusa,fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan) (ARCADIA review build)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has pause function on P1 button 4

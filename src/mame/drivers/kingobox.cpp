@@ -374,7 +374,7 @@ static const gfx_layout tilelayout =
 	16*8
 };
 
-static GFXDECODE_START( kingobox )
+static GFXDECODE_START( gfx_kingobox )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   256,  8 )   /* characters */
 	GFXDECODE_ENTRY( "gfx1", 0x01000, charlayout,   256,  8 )   /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout,   0, 32 )   /* sprites */
@@ -444,7 +444,7 @@ static const gfx_layout rk_bglayout =
 };
 
 
-static GFXDECODE_START( rk )
+static GFXDECODE_START( gfx_rk )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, rk_charlayout1,  256,  8 )    /* characters */
 	GFXDECODE_ENTRY( "gfx1", 0x00000, rk_charlayout2,  256,  8 )    /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, rk_spritelayout,   0, 32 )    /* sprites */
@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(kingofb_state::kingofb)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("nmigate", input_merger_device, in_w<0>))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kingobox)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kingobox)
 	MCFG_PALETTE_ADD("palette", 256+8*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+8)
 	MCFG_PALETTE_INIT_OWNER(kingofb_state,kingofb)
@@ -558,7 +558,7 @@ MACHINE_CONFIG_START(kingofb_state::ringking)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("nmigate", input_merger_device, in_w<0>))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rk)
 	MCFG_PALETTE_ADD("palette", 256+8*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+8)
 	MCFG_PALETTE_INIT_OWNER(kingofb_state,ringking)
@@ -837,30 +837,28 @@ ROM_START( ringking3 )
 	ROM_LOAD( "82s129.1a",    0x0200, 0x0100, CRC(d345cbb3) SHA1(6318022ebbbe59d4c0a207801fffed1167b98a66) )    /* blue component */
 ROM_END
 
-DRIVER_INIT_MEMBER(kingofb_state,ringking3)
+void kingofb_state::init_ringking3()
 {
-	int i;
 	uint8_t *RAM = memregion("proms")->base();
 
 	/* expand the first color PROM to look like the kingofb ones... */
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 		RAM[i] = RAM[i + 0x100] >> 4;
 	m_palette->update();
 }
 
-DRIVER_INIT_MEMBER(kingofb_state,ringkingw)
+void kingofb_state::init_ringkingw()
 {
-	int i,j,k;
 	uint8_t *PROMS = memregion("proms")->base();
 	uint8_t *USER1 = memregion("user1")->base();
 
 	/* change the PROMs encode in a simple format to use kingofb decode */
-	for(i = 0, j = 0; j < 0x40; i++, j++)
+	for (int i = 0, j = 0; j < 0x40; i++, j++)
 	{
 		if((i & 0xf) == 8)
 			i += 8;
 
-		for(k = 0; k <= 3; k++)
+		for (int k = 0; k <= 3; k++)
 		{
 			PROMS[j + 0x000 + 0x40 * k] = USER1[i + 0x000 + 0x100 * k]; /* R */
 			PROMS[j + 0x100 + 0x40 * k] = USER1[i + 0x400 + 0x100 * k]; /* G */
@@ -871,9 +869,9 @@ DRIVER_INIT_MEMBER(kingofb_state,ringkingw)
 }
 
 
-GAME( 1985, kingofb,   0,       kingofb,  kingofb,  kingofb_state, 0,         ROT90, "Wood Place Inc.", "King of Boxer (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, kingofbj,  kingofb, kingofb,  kingofb,  kingofb_state, 0,         ROT90, "Wood Place Inc.", "King of Boxer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringkingw, kingofb, kingofb,  kingofb,  kingofb_state, ringkingw, ROT90, "Wood Place Inc.", "Ring King (US, Wood Place Inc.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking,  kingofb, ringking, ringking, kingofb_state, 0,         ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking2, kingofb, ringking, ringking, kingofb_state, 0,         ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking3, kingofb, kingofb,  kingofb,  kingofb_state, ringking3, ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kingofb,   0,       kingofb,  kingofb,  kingofb_state, empty_init,     ROT90, "Wood Place Inc.", "King of Boxer (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kingofbj,  kingofb, kingofb,  kingofb,  kingofb_state, empty_init,     ROT90, "Wood Place Inc.", "King of Boxer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringkingw, kingofb, kingofb,  kingofb,  kingofb_state, init_ringkingw, ROT90, "Wood Place Inc.", "Ring King (US, Wood Place Inc.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking,  kingofb, ringking, ringking, kingofb_state, empty_init,     ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking2, kingofb, ringking, ringking, kingofb_state, empty_init,     ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking3, kingofb, kingofb,  kingofb,  kingofb_state, init_ringking3, ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 3)", MACHINE_SUPPORTS_SAVE )

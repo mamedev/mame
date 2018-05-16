@@ -8,7 +8,7 @@
 #include "bus/scsi/sa1403d.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "cpu/i86/i86.h"
 #include "machine/com8116.h"
 #include "machine/ram.h"

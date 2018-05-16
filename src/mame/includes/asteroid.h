@@ -57,8 +57,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(cocktail_inv_w);
 
-	DECLARE_DRIVER_INIT(asterock);
-	DECLARE_DRIVER_INIT(asteroidb);
+	void init_asterock();
+	void init_asteroidb();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

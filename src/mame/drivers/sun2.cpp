@@ -311,14 +311,14 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 				{
 					if ((tmp >= (0x7f0000>>1)) && (tmp <= (0x7f07ff>>1)))
 					{
-						return m_rom_ptr[offset & 0x7fff];
+						return m_rom_ptr[offset & 0x3fff];
 					}
 				}
 				else    // Multibus has EPROM at 0x000000
 				{
 					if (tmp <= (0x7ff>>1))
 					{
-						return m_rom_ptr[offset & 0x7fff];
+						return m_rom_ptr[offset & 0x3fff];
 					}
 				}
 
@@ -757,6 +757,7 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( sun2_120 ) // ROMs are located on the '501-1007' PCB at locations B11 and B10
 	ROM_REGION16_BE( 0x10000, "bootprom", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("revr")
 	ROM_SYSTEM_BIOS( 0, "rev10f", "Bootrom Rev 1.0F")
 	ROMX_LOAD( "1.0f.b11", 0x0000, 0x8000, CRC(8fb0050a) SHA1(399cdb894b2a66d847d76d8a5d266906fb1d3430), ROM_SKIP(1) | ROM_BIOS(1)) // actual rom stickers had fallen off
 	ROMX_LOAD( "1.0f.b10", 0x0001, 0x8000, CRC(70de816d) SHA1(67e980497f463dbc529f64ec5f3e0046b3901b7e), ROM_SKIP(1) | ROM_BIOS(1)) // "
@@ -785,6 +786,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT  STATE       INIT  COMPANY             FULLNAME     FLAGS
-COMP( 1984, sun2_50,  0,      0,      sun2vme,   sun2,  sun2_state, 0,    "Sun Microsystems", "Sun 2/50",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1984, sun2_120, 0,      0,      sun2mbus,  sun2,  sun2_state, 0,    "Sun Microsystems", "Sun 2/120", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS       INIT        COMPANY             FULLNAME     FLAGS
+COMP( 1984, sun2_50,  0,      0,      sun2vme,  sun2,  sun2_state, empty_init, "Sun Microsystems", "Sun 2/50",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1984, sun2_120, 0,      0,      sun2mbus, sun2,  sun2_state, empty_init, "Sun Microsystems", "Sun 2/120", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

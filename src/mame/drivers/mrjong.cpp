@@ -173,7 +173,7 @@ static const gfx_layout spritelayout =
 	32*8                /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( mrjong )
+static GFXDECODE_START( gfx_mrjong )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,      0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout,    0, 32 )
 GFXDECODE_END
@@ -202,7 +202,7 @@ MACHINE_CONFIG_START(mrjong_state::mrjong)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrjong)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrjong)
 	MCFG_PALETTE_ADD("palette", 4*32)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(mrjong_state, mrjong)
@@ -278,6 +278,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mrjong,   0,      mrjong, mrjong, mrjong_state, 0, ROT90, "Kiwako",               "Mr. Jong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, crazyblk, mrjong, mrjong, mrjong, mrjong_state, 0, ROT90, "Kiwako (ECI license)", "Crazy Blocks",     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, blkbustr, mrjong, mrjong, mrjong, mrjong_state, 0, ROT90, "Kiwako (ECI license)", "BlockBuster",      MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mrjong,   0,      mrjong, mrjong, mrjong_state, empty_init, ROT90, "Kiwako",               "Mr. Jong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, crazyblk, mrjong, mrjong, mrjong, mrjong_state, empty_init, ROT90, "Kiwako (ECI license)", "Crazy Blocks",     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, blkbustr, mrjong, mrjong, mrjong, mrjong_state, empty_init, ROT90, "Kiwako (ECI license)", "BlockBuster",      MACHINE_SUPPORTS_SAVE )

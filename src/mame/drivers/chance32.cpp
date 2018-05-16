@@ -434,7 +434,7 @@ static const gfx_layout tiles8x8_layout =
 	128*8
 };
 
-static GFXDECODE_START( chance32 )
+static GFXDECODE_START( gfx_chance32 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 8 )
 GFXDECODE_END
@@ -471,7 +471,7 @@ MACHINE_CONFIG_START(chance32_state::chance32)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chance32)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chance32)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
@@ -522,5 +522,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY                FULLNAME             FLAGS  LAYOUT */
-GAMEL( 19??, chance32, 0,      chance32, chance32, chance32_state, 0,    ROT0, "PAL System Co, Ltd.", "Chance Thirty Two", 0,     layout_chance32 )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT   COMPANY                FULLNAME             FLAGS  LAYOUT */
+GAMEL( 19??, chance32, 0,      chance32, chance32, chance32_state, empty_init, ROT0, "PAL System Co, Ltd.", "Chance Thirty Two", 0,     layout_chance32 )

@@ -406,8 +406,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
 	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
-	DECLARE_DRIVER_INIT(coolridr);
-	DECLARE_DRIVER_INIT(aquastge);
+	void init_coolridr();
+	void init_aquastge();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -3002,7 +3002,7 @@ void coolridr_state::system_h1_sound_map(address_map &map)
 
 
 
-static GFXDECODE_START( coolridr )
+static GFXDECODE_START( gfx_coolridr )
 //  GFXDECODE_ENTRY( nullptr, 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
@@ -3289,7 +3289,7 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	MCFG_315_5649_AN5_CB(IOPORT("AN5"))
 	MCFG_315_5649_AN6_CB(IOPORT("AN6"))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", coolridr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_coolridr)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -3479,7 +3479,7 @@ READ32_MEMBER(coolridr_state::aquastge_hack_r)
 }
 
 
-DRIVER_INIT_MEMBER(coolridr_state,coolridr)
+void coolridr_state::init_coolridr()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), this));
 
@@ -3495,12 +3495,9 @@ DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 	m_maincpu->sh2drc_add_fastram(0x20000000, 0x201fffff, 1, &m_rom[0]);
 }
 
-DRIVER_INIT_MEMBER(coolridr_state, aquastge)
+void coolridr_state::init_aquastge()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60c3fd8, 0x60c3fdb, read32_delegate(FUNC(coolridr_state::aquastge_hack_r), this));
-
-
-
 
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_subcpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
@@ -3508,5 +3505,5 @@ DRIVER_INIT_MEMBER(coolridr_state, aquastge)
 	m_colbase = 0;
 }
 
-GAME ( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders", MACHINE_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)
-GAMEL( 1995, aquastge,    0, aquastge,    aquastge, coolridr_state,    aquastge, ROT0,  "Sega", "Aqua Stage",  MACHINE_NOT_WORKING, layout_aquastge)
+GAME(  1995, coolridr, 0, coolridr, coolridr, coolridr_state, init_coolridr, ROT0, "Sega", "Cool Riders", MACHINE_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)
+GAMEL( 1995, aquastge, 0, aquastge, aquastge, coolridr_state, init_aquastge, ROT0, "Sega", "Aqua Stage",  MACHINE_NOT_WORKING, layout_aquastge)

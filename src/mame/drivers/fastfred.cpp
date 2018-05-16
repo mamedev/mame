@@ -603,17 +603,17 @@ static const gfx_layout imago_char_1bpp =
 	8*8
 };
 
-static GFXDECODE_START( fastfred )
+static GFXDECODE_START( gfx_fastfred )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( jumpcoas )
+static GFXDECODE_START( gfx_jumpcoas )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( imago )
+static GFXDECODE_START( gfx_imago )
 	GFXDECODE_ENTRY( "gfx1", 0,      charlayout,          0, 32 )
 	GFXDECODE_ENTRY( nullptr,   0xb800, imago_spritelayout,  0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0,      charlayout,          0, 32 )
@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(fastfred_state::fastfred)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fastfred_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fastfred)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fastfred)
 
 	MCFG_PALETTE_ADD("palette", 32*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
@@ -692,7 +692,7 @@ MACHINE_CONFIG_START(fastfred_state::jumpcoas)
 	MCFG_DEVICE_REMOVE("audiocpu")
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", jumpcoas)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_jumpcoas)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("soundlatch")
@@ -716,7 +716,7 @@ MACHINE_CONFIG_START(fastfred_state::imago)
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256+64+2) /* 256 for characters, 64 for the stars and 2 for the web */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", imago)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_imago)
 
 	MCFG_VIDEO_START_OVERRIDE(fastfred_state,imago)
 	MCFG_SCREEN_MODIFY("screen")
@@ -1014,40 +1014,40 @@ ROM_START( imagoa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(fastfred_state,flyboy)
+void fastfred_state::init_flyboy()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc085, 0xc099, read8_delegate(FUNC(fastfred_state::flyboy_custom1_io_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc8fb, 0xc900, read8_delegate(FUNC(fastfred_state::flyboy_custom2_io_r),this));
 	m_hardware_type = 1;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,flyboyb)
+void fastfred_state::init_flyboyb()
 {
 	m_hardware_type = 1;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,fastfred)
+void fastfred_state::init_fastfred()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::fastfred_custom_io_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 1;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,jumpcoas)
+void fastfred_state::init_jumpcoas()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 0;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,boggy84b)
+void fastfred_state::init_boggy84b()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 2;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,boggy84)
+void fastfred_state::init_boggy84()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::boggy84_custom_io_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
@@ -1055,18 +1055,18 @@ DRIVER_INIT_MEMBER(fastfred_state,boggy84)
 }
 
 
-DRIVER_INIT_MEMBER(fastfred_state,imago)
+void fastfred_state::init_imago()
 {
 	m_hardware_type = 3;
 }
 
-GAME( 1982, flyboy,   0,        fastfred, flyboy,   fastfred_state, flyboy,   ROT90, "Kaneko", "Fly-Boy", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, flyboyb,  flyboy,   fastfred, flyboy,   fastfred_state, flyboyb,  ROT90, "bootleg", "Fly-Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, fastfred, flyboy,   fastfred, fastfred, fastfred_state, fastfred, ROT90, "Kaneko (Atari license)", "Fast Freddie", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jumpcoas, 0,        jumpcoas, jumpcoas, fastfred_state, jumpcoas, ROT90, "Kaneko", "Jump Coaster", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jumpcoast,jumpcoas, jumpcoas, jumpcoas, fastfred_state, jumpcoas, ROT90, "Kaneko (Taito license)", "Jump Coaster (Taito)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, boggy84,  0,        jumpcoas, boggy84,  fastfred_state, boggy84,  ROT90, "Kaneko", "Boggy '84", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, boggy84b, boggy84,  jumpcoas, boggy84,  fastfred_state, boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, redrobin, 0,        fastfred, redrobin, fastfred_state, flyboyb,  ROT90, "Elettronolo", "Red Robin", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, imago,    0,        imago,    imago,    fastfred_state, imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
-GAME( 1983, imagoa,   imago,    imago,    imagoa,   fastfred_state, imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )
+GAME( 1982, flyboy,    0,        fastfred, flyboy,   fastfred_state, init_flyboy,   ROT90, "Kaneko", "Fly-Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, flyboyb,   flyboy,   fastfred, flyboy,   fastfred_state, init_flyboyb,  ROT90, "bootleg", "Fly-Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, fastfred,  flyboy,   fastfred, fastfred, fastfred_state, init_fastfred, ROT90, "Kaneko (Atari license)", "Fast Freddie", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jumpcoas,  0,        jumpcoas, jumpcoas, fastfred_state, init_jumpcoas, ROT90, "Kaneko", "Jump Coaster", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jumpcoast, jumpcoas, jumpcoas, jumpcoas, fastfred_state, init_jumpcoas, ROT90, "Kaneko (Taito license)", "Jump Coaster (Taito)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boggy84,   0,        jumpcoas, boggy84,  fastfred_state, init_boggy84,  ROT90, "Kaneko", "Boggy '84", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boggy84b,  boggy84,  jumpcoas, boggy84,  fastfred_state, init_boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, redrobin,  0,        fastfred, redrobin, fastfred_state, init_flyboyb,  ROT90, "Elettronolo", "Red Robin", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, imago,     0,        imago,    imago,    fastfred_state, init_imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
+GAME( 1983, imagoa,    imago,    imago,    imagoa,   fastfred_state, init_imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )

@@ -651,6 +651,6 @@ ROM_START(ti99_232)
 	ROM_LOAD("rom4000b.u2b", 0x10000, 0x2000, CRC(34dd52ed) SHA1(e01892b1b110d7d592a7e7f1f39f9f46ea0818db))
 ROM_END
 
-//      YEAR    NAME        PARENT     COMPAT  MACHINE  INPUT   STATE          INIT        COMPANY              FULLNAME                               FLAGS
-COMP(   1983,   ti99_224,   0,         0,      ti99_224,  ti99_2, ti99_2_state,  0,  "Texas Instruments", "TI-99/2 BASIC Computer (24 KiB ROM)" , MACHINE_NO_SOUND_HW )
-COMP(   1983,   ti99_232,   ti99_224,  0,      ti99_232,  ti99_2, ti99_2_state,  0,  "Texas Instruments", "TI-99/2 BASIC Computer (32 KiB ROM)" , MACHINE_NO_SOUND_HW )
+//      YEAR    NAME      PARENT    COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY              FULLNAME                               FLAGS
+COMP(   1983,   ti99_224, 0,        0,      ti99_224, ti99_2, ti99_2_state, empty_init, "Texas Instruments", "TI-99/2 BASIC Computer (24 KiB ROM)" , MACHINE_NO_SOUND_HW )
+COMP(   1983,   ti99_232, ti99_224, 0,      ti99_232, ti99_2, ti99_2_state, empty_init, "Texas Instruments", "TI-99/2 BASIC Computer (32 KiB ROM)" , MACHINE_NO_SOUND_HW )

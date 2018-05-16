@@ -506,7 +506,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_a_w);
 	DECLARE_WRITE8_MEMBER(lamps_b_w);
 	DECLARE_WRITE8_MEMBER(pulses_w);
-	DECLARE_DRIVER_INIT(majorpkr);
+	void init_majorpkr();
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	virtual void video_start() override;
@@ -984,7 +984,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( majorpkr )
+static GFXDECODE_START( gfx_majorpkr )
 	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout, 8*256, 8 )
 	GFXDECODE_ENTRY( "fg_gfx", 0, tilelayout, 0, 8 )
 GFXDECODE_END
@@ -1023,7 +1023,7 @@ MACHINE_CONFIG_START(majorpkr_state::majorpkr)
 	MCFG_SCREEN_UPDATE_DRIVER(majorpkr_state, screen_update_majorpkr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", majorpkr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_majorpkr)
 
 	MCFG_PALETTE_ADD("palette", 0x100 * 16)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
@@ -1181,9 +1181,9 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(majorpkr_state, majorpkr)
+void majorpkr_state::init_majorpkr()
 {
-	uint8_t * ROM = (uint8_t *)memregion("maincpu")->base();
+	uint8_t *ROM = (uint8_t *)memregion("maincpu")->base();
 	m_rom_bank->configure_entries(0, 4, &ROM[0xe000], 0x800);
 }
 
@@ -1192,9 +1192,9 @@ DRIVER_INIT_MEMBER(majorpkr_state, majorpkr)
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY                             FULLNAME                                         FLAGS  LAYOUT */
-GAMEL( 1994, majorpkr,  0,        majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System",                       "Major Poker (set 1, v2.0)",                      0,     layout_majorpkr )
-GAMEL( 1994, majorpkra, majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 2, Micro Manufacturing intro)", 0,     layout_majorpkr )
-GAMEL( 1994, majorpkrb, majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 3, Micro Manufacturing intro)", 0,     layout_majorpkr )
-GAMEL( 1994, majorpkrc, majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 4, Micro Manufacturing intro)", 0,     layout_majorpkr )
-GAMEL( 1994, luckypkr,  majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "bootleg",                          "Lucky Poker (bootleg/hack of Major Poker)",      0,     layout_majorpkr )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT           ROT   COMPANY                             FULLNAME                                          FLAGS  LAYOUT */
+GAMEL( 1994, majorpkr,  0,        majorpkr, majorpkr, majorpkr_state, init_majorpkr, ROT0, "PAL System",                       "Major Poker (set 1, v2.0)",                      0,     layout_majorpkr )
+GAMEL( 1994, majorpkra, majorpkr, majorpkr, majorpkr, majorpkr_state, init_majorpkr, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 2, Micro Manufacturing intro)", 0,     layout_majorpkr )
+GAMEL( 1994, majorpkrb, majorpkr, majorpkr, majorpkr, majorpkr_state, init_majorpkr, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 3, Micro Manufacturing intro)", 0,     layout_majorpkr )
+GAMEL( 1994, majorpkrc, majorpkr, majorpkr, majorpkr, majorpkr_state, init_majorpkr, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 4, Micro Manufacturing intro)", 0,     layout_majorpkr )
+GAMEL( 1994, luckypkr,  majorpkr, majorpkr, majorpkr, majorpkr_state, init_majorpkr, ROT0, "bootleg",                          "Lucky Poker (bootleg/hack of Major Poker)",      0,     layout_majorpkr )

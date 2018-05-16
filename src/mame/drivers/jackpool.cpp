@@ -40,7 +40,7 @@ public:
 
 	DECLARE_READ8_MEMBER(jackpool_io_r);
 	DECLARE_WRITE_LINE_MEMBER(map_vreg_w);
-	DECLARE_DRIVER_INIT(jackpool);
+	void init_jackpool();
 	virtual void video_start() override;
 	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
@@ -214,7 +214,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( jackpool )
+static GFXDECODE_START( gfx_jackpool )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x000, 0x20  ) /* sprites */
 GFXDECODE_END
 
@@ -231,7 +231,7 @@ MACHINE_CONFIG_START(jackpool_state::jackpool)
 	MCFG_DEVICE_PROGRAM_MAP(jackpool_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jackpool_state, jackpool_interrupt)  // ?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jackpool)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jackpool)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -291,7 +291,7 @@ ROM_START( jackpool )
 	ROM_LOAD( "jpc7", 0xc0000, 0x40000,  CRC(b1d40623) SHA1(fb76ae6b53474bd4bee19dbce9537da0f2b63ff4) )
 ROM_END
 
-DRIVER_INIT_MEMBER(jackpool_state,jackpool)
+void jackpool_state::init_jackpool()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -299,4 +299,4 @@ DRIVER_INIT_MEMBER(jackpool_state,jackpool)
 	rom[0x9040/2] = 0x6602;
 }
 
-GAME( 1997, jackpool, 0, jackpool, jackpool, jackpool_state, jackpool, ROT0, "Electronic Projects", "Jackpot Cards / Jackpot Pool (Italy)",MACHINE_NOT_WORKING )
+GAME( 1997, jackpool, 0, jackpool, jackpool, jackpool_state, init_jackpool, ROT0, "Electronic Projects", "Jackpot Cards / Jackpot Pool (Italy)",MACHINE_NOT_WORKING )

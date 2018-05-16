@@ -139,7 +139,7 @@ private:
 	int  m_immediate_pri;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
 
 	int m_icount;
 

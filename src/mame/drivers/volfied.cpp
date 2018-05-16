@@ -201,7 +201,7 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-static GFXDECODE_START( volfied )
+static GFXDECODE_START( gfx_volfied )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 4096, 256 )
 GFXDECODE_END
 
@@ -269,7 +269,7 @@ MACHINE_CONFIG_START(volfied_state::volfied)
 	MCFG_SCREEN_UPDATE_DRIVER(volfied_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", volfied)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_volfied)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -492,9 +492,9 @@ ROM_START( volfiedjo )
 ROM_END
 
 
-GAME( 1989, volfied,   0,       volfied, volfied,  volfied_state, 0, ROT270, "Taito Corporation Japan",   "Volfied (World, revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, volfiedu,  volfied, volfied, volfiedu, volfied_state, 0, ROT270, "Taito America Corporation", "Volfied (US, revision 1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, volfiedj,  volfied, volfied, volfiedj, volfied_state, 0, ROT270, "Taito Corporation",         "Volfied (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, volfiedo,  volfied, volfied, volfiedj, volfied_state, 0, ROT270, "Taito Corporation Japan",   "Volfied (World)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1989, volfieduo, volfied, volfied, volfiedj, volfied_state, 0, ROT270, "Taito America Corporation", "Volfied (US)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1989, volfiedjo, volfied, volfied, volfiedj, volfied_state, 0, ROT270, "Taito Corporation",         "Volfied (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfied,   0,       volfied, volfied,  volfied_state, empty_init, ROT270, "Taito Corporation Japan",   "Volfied (World, revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfiedu,  volfied, volfied, volfiedu, volfied_state, empty_init, ROT270, "Taito America Corporation", "Volfied (US, revision 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfiedj,  volfied, volfied, volfiedj, volfied_state, empty_init, ROT270, "Taito Corporation",         "Volfied (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfiedo,  volfied, volfied, volfiedj, volfied_state, empty_init, ROT270, "Taito Corporation Japan",   "Volfied (World)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfieduo, volfied, volfied, volfiedj, volfied_state, empty_init, ROT270, "Taito America Corporation", "Volfied (US)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, volfiedjo, volfied, volfied, volfiedj, volfied_state, empty_init, ROT270, "Taito Corporation",         "Volfied (Japan)",             MACHINE_SUPPORTS_SAVE )

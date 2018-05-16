@@ -852,7 +852,7 @@ static const gfx_layout bglayout =
 };
 
 
-static GFXDECODE_START( fromance )
+static GFXDECODE_START( gfx_fromance )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,   0, 128 )
 GFXDECODE_END
@@ -925,7 +925,7 @@ MACHINE_CONFIG_START(fromance_state::nekkyoku)
 	MCFG_SCREEN_UPDATE_DRIVER(fromance_state, screen_update_fromance)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 14318180 / 2) // clock not verified
@@ -971,7 +971,7 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 	MCFG_SCREEN_UPDATE_DRIVER(fromance_state, screen_update_fromance)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
@@ -1017,7 +1017,7 @@ MACHINE_CONFIG_START(fromance_state::fromance)
 	MCFG_SCREEN_UPDATE_DRIVER(fromance_state, screen_update_fromance)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
@@ -1257,11 +1257,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, fromance_state, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, idolmj,    0,       idolmj,   idolmj,   fromance_state, 0, ROT0, "System Service",   "Idol-Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjnatsu,   0,       fromance, mjnatsu,  fromance_state, 0, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, natsuiro,  mjnatsu, fromance, mjnatsu,  fromance_state, 0, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mfunclub,  0,       fromance, mjnatsu,  fromance_state, 0, ROT0, "Video System Co.", "Mahjong Fun Club - Idol Saizensen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, daiyogen,  0,       fromance, daiyogen, fromance_state, 0, ROT0, "Video System Co.", "Mahjong Daiyogen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, nmsengen,  0,       fromance, nmsengen, fromance_state, 0, ROT0, "Video System Co.", "Nekketsu Mahjong Sengen! AFTER 5 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, fromance,  0,       fromance, fromance, fromance_state, 0, ROT0, "Video System Co.", "Idol-Mahjong Final Romance (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nekkyoku, 0,       nekkyoku, nekkyoku, fromance_state, empty_init, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, idolmj,   0,       idolmj,   idolmj,   fromance_state, empty_init, ROT0, "System Service",   "Idol-Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjnatsu,  0,       fromance, mjnatsu,  fromance_state, empty_init, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, natsuiro, mjnatsu, fromance, mjnatsu,  fromance_state, empty_init, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mfunclub, 0,       fromance, mjnatsu,  fromance_state, empty_init, ROT0, "Video System Co.", "Mahjong Fun Club - Idol Saizensen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, daiyogen, 0,       fromance, daiyogen, fromance_state, empty_init, ROT0, "Video System Co.", "Mahjong Daiyogen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, nmsengen, 0,       fromance, nmsengen, fromance_state, empty_init, ROT0, "Video System Co.", "Nekketsu Mahjong Sengen! AFTER 5 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, fromance, 0,       fromance, fromance, fromance_state, empty_init, ROT0, "Video System Co.", "Idol-Mahjong Final Romance (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -553,7 +553,7 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( docastle )
+static GFXDECODE_START( gfx_docastle )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     0, 32*2 )
 GFXDECODE_END
@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	MCFG_SCREEN_UPDATE_DRIVER(docastle_state, screen_update_docastle)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", docastle)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_docastle)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(docastle_state, docastle)
 
@@ -1122,18 +1122,18 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1983, docastle,  0,        docastle, docastle, docastle_state, 0, ROT270, "Universal", "Mr. Do's Castle (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, docastle2, docastle, docastle, docastle, docastle_state, 0, ROT270, "Universal", "Mr. Do's Castle (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, docastleo, docastle, docastle, docastle, docastle_state, 0, ROT270, "Universal", "Mr. Do's Castle (older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, douni,     docastle, docastle, docastle, docastle_state, 0, ROT270, "Universal", "Mr. Do vs. Unicorns", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dorunrun,  0,        dorunrun, dorunrun, docastle_state, 0, ROT0,   "Universal", "Do! Run Run (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dorunrun2, dorunrun, dorunrun, dorunrun, docastle_state, 0, ROT0,   "Universal", "Do! Run Run (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dorunrunc, dorunrun, docastle, dorunrun, docastle_state, 0, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dorunrunca,dorunrun, docastle, dorunrun, docastle_state, 0, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, spiero,    dorunrun, dorunrun, dorunrun, docastle_state, 0, ROT0,   "Universal", "Super Pierrot (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dowild,    0,        dorunrun, dowild,   docastle_state, 0, ROT0,   "Universal", "Mr. Do's Wild Ride", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jjack,     0,        dorunrun, jjack,    docastle_state, 0, ROT270, "Universal", "Jumping Jack", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kickridr,  0,        dorunrun, kickridr, docastle_state, 0, ROT0,   "Universal", "Kick Rider", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, idsoccer,  0,        idsoccer, idsoccer, docastle_state, 0, ROT0,   "Universal", "Indoor Soccer (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1985, idsoccera, idsoccer, idsoccer, idsoccer, docastle_state, 0, ROT0,   "Universal", "Indoor Soccer (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, asoccer,   idsoccer, idsoccer, idsoccer, docastle_state, 0, ROT0,   "Universal", "American Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, docastle,   0,        docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, docastle2,  docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, docastleo,  docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, douni,      docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do vs. Unicorns", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dorunrun,   0,        dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dorunrun2,  dorunrun, dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dorunrunc,  dorunrun, docastle, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dorunrunca, dorunrun, docastle, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spiero,     dorunrun, dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Super Pierrot (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dowild,     0,        dorunrun, dowild,   docastle_state, empty_init, ROT0,   "Universal", "Mr. Do's Wild Ride", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jjack,      0,        dorunrun, jjack,    docastle_state, empty_init, ROT270, "Universal", "Jumping Jack", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kickridr,   0,        dorunrun, kickridr, docastle_state, empty_init, ROT0,   "Universal", "Kick Rider", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, idsoccer,   0,        idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1985, idsoccera,  idsoccer, idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, asoccer,    idsoccer, idsoccer, idsoccer, docastle_state, empty_init, ROT0,   "Universal", "American Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )

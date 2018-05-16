@@ -104,7 +104,7 @@ public:
 	DECLARE_READ16_MEMBER(mem_r);
 	DECLARE_WRITE16_MEMBER(mem_w);
 
-	DECLARE_DRIVER_INIT(vt240);
+	void init_vt240();
 	virtual void machine_reset() override;
 	UPD7220_DISPLAY_PIXELS_MEMBER(hgdc_draw);
 	void irq_encoder(int irq, int state);
@@ -639,7 +639,7 @@ static const gfx_layout vt240_chars_8x10 =
 	8*10
 };
 
-static GFXDECODE_START( vt240 )
+static GFXDECODE_START( gfx_vt240 )
 	GFXDECODE_ENTRY( "charcpu", 0x338*10-3, vt240_chars_8x10, 0, 8 )
 GFXDECODE_END
 
@@ -673,7 +673,7 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'097'280), 1024, 0, 800, 629, 0, 480)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vt240)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vt240)
 
 	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(16'097'280) / 16) // actually /8?
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
@@ -784,8 +784,8 @@ ROM_START( vt240 )
 	ROM_LOAD( "x2212", 0x000, 0x100, CRC(31c90c64) SHA1(21a0f1d4eec1ced04b85923151783bf23d18bfbd) )
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT          CLASS   INIT    COMPANY                      FULLNAME       FLAGS */
-COMP( 1983, vt240,  0,      0,       vt240,    vt240, vt240_state,   0,  "Digital Equipment Corporation", "VT240", MACHINE_IMPERFECT_GRAPHICS )
-//COMP( 1983, vt241,  0,      0,       vt220,     vt220, vt240_state,   0,  "Digital Equipment Corporation", "VT241", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                          FULLNAME  FLAGS */
+COMP( 1983, vt240,  0,      0,      vt240,   vt240, vt240_state, empty_init, "Digital Equipment Corporation", "VT240",  MACHINE_IMPERFECT_GRAPHICS )
+//COMP( 1983, vt241,  0,      0,      vt220,   vt220, vt240_state, empty_init, "Digital Equipment Corporation", "VT241",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 // NOTE: the only difference between VT240 and VT241 is the latter comes with a VR241 Color monitor, while the former comes with a mono display; the ROMs and operation are identical.
-COMP( 1983, mc7105, 0,      0,       mc7105,    vt240, vt240_state,   0,  "Elektronika",                  "MC7105", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, mc7105, 0,      0,      mc7105,  vt240, vt240_state, empty_init, "Elektronika",                   "MC7105", MACHINE_IMPERFECT_GRAPHICS )

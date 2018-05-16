@@ -204,7 +204,7 @@ public:
 
 	/* kenseim */
 	DECLARE_WRITE16_MEMBER(cps1_kensei_w);
-	DECLARE_DRIVER_INIT(kenseim);
+	void init_kenseim();
 
 	// certain
 
@@ -690,11 +690,11 @@ ROM_START( kenseim )
 	ROM_LOAD( "kensei_mogura_ver1.0.u2", 0x00000, 0x08000, CRC(725cfcfc) SHA1(5a4c6e6efe2ddb38bec3218e55a746ea0146209f) )
 ROM_END
 
-DRIVER_INIT_MEMBER(kenseim_state,kenseim)
+void kenseim_state::init_kenseim()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16_delegate(FUNC(kenseim_state::cps1_kensei_w),this));
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 
 	m_led_serial_data = 0;
 	m_led_clock = 0;
@@ -704,4 +704,4 @@ DRIVER_INIT_MEMBER(kenseim_state,kenseim)
 
 // 1994.04.18 is from extra PCB rom, Siguma or Sigma? (Siguma is in the ROM)
 // the CPS1 board roms contain "M O G U R A   9 2 0 9 2 4" strings suggesting that part of the code was developed earlier
-GAMEL( 1994, kenseim,       0,        kenseim, kenseim,      kenseim_state,   kenseim,     ROT0,   "Capcom / Togo / Sigma", "Ken Sei Mogura: Street Fighter II (Japan 940418, Ver 1.00)", MACHINE_CLICKABLE_ARTWORK, layout_kenseim )
+GAMEL( 1994, kenseim, 0, kenseim, kenseim, kenseim_state, init_kenseim, ROT0, "Capcom / Togo / Sigma", "Ken Sei Mogura: Street Fighter II (Japan 940418, Ver 1.00)", MACHINE_CLICKABLE_ARTWORK, layout_kenseim )

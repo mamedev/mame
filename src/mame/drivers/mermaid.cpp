@@ -349,7 +349,7 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( mermaid )
+static GFXDECODE_START( gfx_mermaid )
 	GFXDECODE_ENTRY( "gfx1", 0, foreground_charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,              0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, background_charlayout,  4*16, 2  )
@@ -450,7 +450,7 @@ MACHINE_CONFIG_START(mermaid_state::mermaid)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mermaid_state, screen_vblank_mermaid))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mermaid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mermaid)
 	MCFG_PALETTE_ADD("palette", 4*16+2*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(64+1)
 	MCFG_PALETTE_INIT_OWNER(mermaid_state, mermaid)
@@ -595,6 +595,6 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1982, mermaid,  0,        mermaid,  mermaid, mermaid_state,  0, ROT0, "Sanritsu / Rock-Ola", "Mermaid",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn, mermaid_state,  0, ROT0, "Sanritsu / Esco",     "Yachtsman", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1982, rougien,  0,        rougien,  rougien, mermaid_state,  0, ROT0, "Sanritsu",            "Rougien",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1982, mermaid,  0,        mermaid,  mermaid, mermaid_state, empty_init, ROT0, "Sanritsu / Rock-Ola", "Mermaid",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn, mermaid_state, empty_init, ROT0, "Sanritsu / Esco",     "Yachtsman", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, rougien,  0,        rougien,  rougien, mermaid_state, empty_init, ROT0, "Sanritsu",            "Rougien",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

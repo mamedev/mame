@@ -491,13 +491,13 @@ static const gfx_layout spritemasklayout =
 };
 
 
-static GFXDECODE_START( atarifb )
+static GFXDECODE_START( gfx_atarifb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0x00, 0x01 ) /* offset into colors, # of colors */
 	GFXDECODE_ENTRY( "gfx2", 0, fieldlayout, 0x02, 0x01 ) /* offset into colors, # of colors */
 GFXDECODE_END
 
 
-static GFXDECODE_START( soccer )
+static GFXDECODE_START( gfx_soccer )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,         0x00, 0x01 ) /* offset into colors, # of colors */
 	GFXDECODE_ENTRY( "gfx3", 0x0400, soccer_fieldlayout, 0x06, 0x01 ) /* offset into colors, # of colors */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout,       0x02, 0x02 ) /* offset into colors, # of colors */
@@ -572,7 +572,7 @@ MACHINE_CONFIG_START(atarifb_state::atarifb)
 	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_atarifb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarifb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarifb)
 	MCFG_PALETTE_ADD("palette", 12)
 	MCFG_PALETTE_INIT_OWNER(atarifb_state, atarifb)
 
@@ -621,7 +621,7 @@ MACHINE_CONFIG_START(atarifb_state::soccer)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_soccer)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", soccer)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_soccer)
 MACHINE_CONFIG_END
 
 
@@ -795,10 +795,10 @@ ROM_END
  *************************************/
 
 /*     YEAR  NAME      PARENT   MACHINE   INPUT */
-GAMEL( 1978, atarifb,  0,       atarifb,  atarifb,  atarifb_state, 0, ROT0, "Atari", "Atari Football (revision 2)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
-GAMEL( 1978, atarifb1, atarifb, atarifb,  atarifb,  atarifb_state, 0, ROT0, "Atari", "Atari Football (revision 1)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
-GAMEL( 1978, atarifb2, atarifb, atarifb,  atarifb,  atarifb_state, 0, ROT0, "Atari", "Atari Football II", MACHINE_SUPPORTS_SAVE, layout_atarifb )
-GAMEL( 1979, atarifb4, atarifb, atarifb4, atarifb4, atarifb_state, 0, ROT0, "Atari", "Atari Football (4 players)", MACHINE_SUPPORTS_SAVE, layout_atarifb4 )
-GAMEL( 1979, abaseb,   0,       abaseb,   abaseb,   atarifb_state, 0, ROT0, "Atari", "Atari Baseball (set 1)", MACHINE_SUPPORTS_SAVE, layout_abaseb )
-GAMEL( 1979, abaseb2,  abaseb,  abaseb,   abaseb,   atarifb_state, 0, ROT0, "Atari", "Atari Baseball (set 2)", MACHINE_SUPPORTS_SAVE, layout_abaseb )
-GAME ( 1980, soccer,   0,       soccer,   soccer,   atarifb_state, 0, ROT0, "Atari", "Atari Soccer", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1978, atarifb,  0,       atarifb,  atarifb,  atarifb_state, empty_init, ROT0, "Atari", "Atari Football (revision 2)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1978, atarifb1, atarifb, atarifb,  atarifb,  atarifb_state, empty_init, ROT0, "Atari", "Atari Football (revision 1)", MACHINE_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1978, atarifb2, atarifb, atarifb,  atarifb,  atarifb_state, empty_init, ROT0, "Atari", "Atari Football II", MACHINE_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1979, atarifb4, atarifb, atarifb4, atarifb4, atarifb_state, empty_init, ROT0, "Atari", "Atari Football (4 players)", MACHINE_SUPPORTS_SAVE, layout_atarifb4 )
+GAMEL( 1979, abaseb,   0,       abaseb,   abaseb,   atarifb_state, empty_init, ROT0, "Atari", "Atari Baseball (set 1)", MACHINE_SUPPORTS_SAVE, layout_abaseb )
+GAMEL( 1979, abaseb2,  abaseb,  abaseb,   abaseb,   atarifb_state, empty_init, ROT0, "Atari", "Atari Baseball (set 2)", MACHINE_SUPPORTS_SAVE, layout_abaseb )
+GAME(  1980, soccer,   0,       soccer,   soccer,   atarifb_state, empty_init, ROT0, "Atari", "Atari Soccer", MACHINE_SUPPORTS_SAVE )

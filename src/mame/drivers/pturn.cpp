@@ -134,7 +134,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	DECLARE_DRIVER_INIT(pturn);
+	void init_pturn();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -409,7 +409,7 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( pturn )
+static GFXDECODE_START( gfx_pturn )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0x000, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x000, 32 )
@@ -540,7 +540,7 @@ MACHINE_CONFIG_START(pturn_state::pturn)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pturn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pturn)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -591,7 +591,7 @@ ROM_START( pturn )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(pturn_state,pturn)
+void pturn_state::init_pturn()
 {
 	/*
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0dd, 0xc0dd, read8_delegate(FUNC(pturn_state::protection_r), this));
@@ -599,4 +599,4 @@ DRIVER_INIT_MEMBER(pturn_state,pturn)
 	*/
 }
 
-GAME( 1984, pturn,  0, pturn,  pturn, pturn_state,  pturn, ROT90,   "Jaleco", "Parallel Turn",  MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pturn,  0, pturn,  pturn, pturn_state, init_pturn, ROT90, "Jaleco", "Parallel Turn",  MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

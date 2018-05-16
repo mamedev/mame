@@ -187,7 +187,11 @@ void renegade_state::machine_start()
 
 READ8_MEMBER(renegade_state::mcu_reset_r)
 {
-	m_mcu->reset_w(PULSE_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		m_mcu->reset_w(ASSERT_LINE);
+		m_mcu->reset_w(CLEAR_LINE);
+	}
 	return 0;
 }
 
@@ -420,7 +424,7 @@ static const gfx_layout tileslayout4 =
 	64*8 /* offset to next tile */
 };
 
-static GFXDECODE_START( renegade )
+static GFXDECODE_START( gfx_renegade )
 	/* 8x8 text, 8 colors */
 	GFXDECODE_ENTRY( "chars", 0x00000, charlayout,   0, 4 ) /* colors   0- 32 */
 
@@ -487,7 +491,7 @@ MACHINE_CONFIG_START(renegade_state::renegade)
 	MCFG_SCREEN_UPDATE_DRIVER(renegade_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", renegade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_renegade)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -681,7 +685,7 @@ ROM_END
 
 
 
-GAME( 1986, renegade,  0,        renegade,  renegade, renegade_state, 0, ROT0, "Technos Japan (Taito America license)", "Renegade (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, renegadeb, renegade, kuniokunb, renegade, renegade_state, 0, ROT0, "bootleg", "Renegade (US bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kuniokun,  renegade, renegade,  renegade, renegade_state, 0, ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, renegade_state, 0, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, renegade,  0,        renegade,  renegade, renegade_state, empty_init, ROT0, "Technos Japan (Taito America license)", "Renegade (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, renegadeb, renegade, kuniokunb, renegade, renegade_state, empty_init, ROT0, "bootleg", "Renegade (US bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kuniokun,  renegade, renegade,  renegade, renegade_state, empty_init, ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, renegade_state, empty_init, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", MACHINE_SUPPORTS_SAVE )

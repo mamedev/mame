@@ -337,7 +337,7 @@ static const gfx_layout tiles8x8_layout2 =
 	8*8,
 };
 
-static GFXDECODE_START( dmndrby )
+static GFXDECODE_START( gfx_dmndrby )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 32*16, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout2, 0, 8)
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16_layout, 16*16, 32 )
@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(dmndrby_state::dderby)
 	MCFG_SCREEN_UPDATE_DRIVER(dmndrby_state, screen_update_dderby)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dmndrby)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dmndrby)
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x20)
 	MCFG_PALETTE_INIT_OWNER(dmndrby_state, dmndrby)
@@ -663,6 +663,6 @@ ROM_START( dmndrbya )
 ROM_END
 
 
-//    YEAR, NAME,     PARENT,  MACHINE, INPUT,   STATE,         INIT, MONITOR, COMPANY,       FULLNAME                    FLAGS
-GAME( 1994, dmndrby,  0,       dderby,  dderby,  dmndrby_state, 0,    ROT0,    "Electrocoin", "Diamond Derby (Newer)",    MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING ) // hack?
-GAME( 1986, dmndrbya, dmndrby, dderby,  dderbya, dmndrby_state, 0,    ROT0,    "Electrocoin", "Diamond Derby (Original)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING )
+//    YEAR, NAME,     PARENT,  MACHINE, INPUT,   STATE,         INIT,       MONITOR, COMPANY,       FULLNAME                    FLAGS
+GAME( 1994, dmndrby,  0,       dderby,  dderby,  dmndrby_state, empty_init, ROT0,    "Electrocoin", "Diamond Derby (Newer)",    MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING ) // hack?
+GAME( 1986, dmndrbya, dmndrby, dderby,  dderbya, dmndrby_state, empty_init, ROT0,    "Electrocoin", "Diamond Derby (Original)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING )

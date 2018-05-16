@@ -89,7 +89,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sgi_ip2_stkbase_w);
 	DECLARE_READ16_MEMBER(sgi_ip2_stklmt_r);
 	DECLARE_WRITE16_MEMBER(sgi_ip2_stklmt_w);
-	DECLARE_DRIVER_INIT(sgi_ip2);
+	void init_sgi_ip2();
 	DECLARE_WRITE_LINE_MEMBER(duarta_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
 	required_device<cpu_device> m_maincpu;
@@ -488,7 +488,7 @@ static INPUT_PORTS_START( sgi_ip2 )
 
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(sgi_ip2_state,sgi_ip2)
+void sgi_ip2_state::init_sgi_ip2()
 {
 	uint32_t *src = (uint32_t*)(memregion("maincpu")->base());
 	uint32_t *dst = m_mainram;
@@ -510,5 +510,5 @@ ROM_START( sgi_ip2 )
 	ROM_LOAD( "sgi-ip2-u93.ip2.2-008.od",  0x10000, 0x8000, CRC(bf967590) SHA1(1aac48e4f5531a25c5482f64de5cd3c7a9931f11) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE  INPUT    STATE           INIT     COMPANY                 FULLNAME           FLAGS
-COMP( 1985, sgi_ip2,  0,        0,        sgi_ip2, sgi_ip2, sgi_ip2_state,  sgi_ip2, "Silicon Graphics Inc", "IRIS 3130 (IP2)", MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY                 FULLNAME           FLAGS
+COMP( 1985, sgi_ip2, 0,      0,      sgi_ip2, sgi_ip2, sgi_ip2_state, init_sgi_ip2, "Silicon Graphics Inc", "IRIS 3130 (IP2)", MACHINE_NOT_WORKING )

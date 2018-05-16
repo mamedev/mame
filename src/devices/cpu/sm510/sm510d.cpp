@@ -14,6 +14,7 @@
 
 const char *const sm510_common_disassembler::s_mnemonics[] =
 {
+	// SM510
 	"?", "",
 	"LB", "LBL", "SBM", "EXBLA", "INCB", "DECB",
 	"ATPL", "RTN0", "RTN1", "TL", "TML", "TM", "T",
@@ -25,22 +26,29 @@ const char *const sm510_common_disassembler::s_mnemonics[] =
 	"PRE", "SME", "RME", "TMEL",
 	"SKIP", "CEND", "IDIV", "DR", "DTA", "CLKLO", "CLKHI",
 
-	//
+	// SM500
 	"COMCB", "RTN", "RTNS", "SSR", "TR", "TRS", "RBM",
 	"ADDC", "PDTW", "TW", "DTW",
 	"ATS", "EXKSA", "EXKFA",
 	"RMF", "SMF", "COMCN",
 	"TA", "TM", "TG",
 
-	//
+	// SM530
+	"SABM", "SABL", "EXBL",
+	"TG", "TBA",
+	"KETA", "ATF", "SDS", "RDS",
+	"INIS",
+
+	// SM590
 	"NOP", "CCTRL", "INBL", "DEBL", "XBLA", "ADCS", "TR",
-	//
+	// "
 	"TAX", "LBLX", "MTR", "STR", "INBM", "DEBM", "RTA", "BLTA", "EXAX", "TBA", "ADS", "ADC", "LBMX", "TLS"
 };
 
 // number of bits per opcode parameter, 8 or larger means 2-byte opcode
 const u8 sm510_common_disassembler::s_bits[] =
 {
+	// SM510
 	0, 8,
 	4, 8, 0, 0, 0, 0,
 	0, 0, 0, 4+8, 2+8, 6, 6,
@@ -52,21 +60,28 @@ const u8 sm510_common_disassembler::s_bits[] =
 	8, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0,
 
-	//
+	// SM500
 	0, 0, 0, 4, 6, 6, 0,
 	0, 0, 0, 0,
 	0, 0, 0,
 	0, 0, 0,
 	0, 2, 0,
 
-	//
+	// SM530
+	0, 0, 0,
+	2, 0,
+	0, 0, 0, 0,
+	0,
+
+	// SM590
 	0, 0, 0, 0, 0, 0, 7,
-	//
+	// "
 	4, 4, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 2, 2+8
 };
 
 const u32 sm510_common_disassembler::s_flags[] =
 {
+	// SM510
 	0, 0,
 	0, 0, 0, 0, 0, 0,
 	0, STEP_OUT, STEP_OUT, 0, STEP_OVER, STEP_OVER, 0,
@@ -78,16 +93,22 @@ const u32 sm510_common_disassembler::s_flags[] =
 	0, 0, 0, 0,
 	0, STEP_OVER, 0, 0, 0, 0, 0,
 
-	//
+	// SM500
 	0, STEP_OUT, STEP_OUT, 0, 0, STEP_OVER, 0,
 	0, 0, 0, 0,
 	0, 0, 0,
 	0, 0, 0,
 	0, 0, 0,
 
-	//
+	// SM530
+	0, 0, 0,
+	0, 0,
+	0, 0, 0, 0,
+	0,
+
+	// SM590
 	0, 0, 0, 0, 0, 0, STEP_OVER,
-	//
+	// "
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, STEP_OVER
 };
 
@@ -150,7 +171,7 @@ offs_t sm510_common_disassembler::common_disasm(const u8 *lut_mnemonic, const u8
 		}
 	}
 
-	return len | s_flags[instr] |SUPPORTED;
+	return len | s_flags[instr] | SUPPORTED;
 }
 
 
@@ -312,6 +333,38 @@ offs_t sm5a_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 }
 
 
+// SM530 disasm
+
+const u8 sm530_disassembler::sm530_mnemonic[0x100] =
+{
+/*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
+	mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  // 0 - note: $00 has synonym SKIP
+	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 1
+	mLDA,  mLDA,  mLDA,  mLDA,  mEXC,  mEXC,  mEXC,  mEXC,  mEXCI, mEXCI, mEXCI, mEXCI, mEXCD, mEXCD, mEXCD, mEXCD, // 2
+	mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   // 3
+
+	mRM,   mRM,   mRM,   mRM,   mSM,   mSM,   mSM,   mSM,   mTM2,  mTM2,  mTM2,  mTM2,  mINCB, mDECB, mRDS,  mSDS,  // 4
+	mKTA,  mKETA, mDTA,  mCOMA, mADD,  mADDC, mRC,   mSC,   mTABL, mTAM,  mEXBL, mTC,   mATS,  mATF,  mATBP, 0,     // 5
+	mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mTL,   mRTN,  mRTNS, mATPL, mLBL,  mTG2,  mTG2,  mTG2,  mTG2,  // 6
+	mIDIV, mINIS, mSABM, mSABL, mCEND, mTMEL, mRME,  mSME,  mPRE,  mTBA,  0,     0,     0,     0,     0,     0,     // 7
+
+	mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   // 8
+	mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   // 9
+	mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   // A
+	mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   mTR,   // B
+
+	mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  // C
+	mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  // D
+	mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  // E
+	mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS,  mTRS   // F
+};
+
+offs_t sm530_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	return common_disasm(sm530_mnemonic, nullptr, stream, pc, opcodes, params, 6);
+}
+
+
 // SM590 disasm
 
 const u8 sm590_disassembler::sm590_mnemonic[0x100] =
@@ -324,7 +377,7 @@ const u8 sm590_disassembler::sm590_mnemonic[0x100] =
 
 	mLDA,  mEXC,  mEXCI, mEXCD, mCOMA, mTAM,  mATR,  mMTR,  mRC,   mSC,   mSTR,  mCCTRL,mRTN,  mRTNS, 0,     0,     // 4
 	mINBM, mDEBM, mINBL, mDEBL, mTC,   mRTA,  mBLTA, mXBLA, 0,     0,     0,     0,     mATX,  mEXAX, 0,     0,     // 5
-	mTMI,  mTMI,  mTMI,  mTMI,  mTBA,  mTBA,  mTBA,  mTBA,  mRM,   mRM,   mRM,   mRM,   mSM,   mSM,   mSM,   mSM,   // 6
+	mTMI,  mTMI,  mTMI,  mTMI,  mTBA2, mTBA2, mTBA2, mTBA2, mRM,   mRM,   mRM,   mRM,   mSM,   mSM,   mSM,   mSM,   // 6
 	mADD,  mADS,  mADC,  mADCS, mLBMX, mLBMX, mLBMX, mLBMX, mTL,   mTL,   mTL,   mTL,   mTLS,  mTLS,  mTLS,  mTLS,  // 7
 
 	mTR7,  mTR7,  mTR7,  mTR7,  mTR7,  mTR7,  mTR7,  mTR7,  mTR7,  mTR7,  mTR7,  mTR7,  mTR7,  mTR7,  mTR7,  mTR7,  // 8
@@ -344,25 +397,8 @@ offs_t sm590_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 	return common_disasm(sm590_mnemonic, nullptr, stream, pc, opcodes, params, 7);
 }
 
-u32 sm510_common_disassembler::opcode_alignment() const
-{
-	return 1;
-}
 
-u32 sm510_common_disassembler::interface_flags() const
-{
-	return NONLINEAR_PC|PAGED2LEVEL;
-}
-
-u32 sm510_common_disassembler::page_address_bits() const
-{
-	return 6;
-}
-
-u32 sm510_common_disassembler::page2_address_bits() const
-{
-	return 4;
-}
+// Sarayan's little helpers
 
 offs_t sm510_common_disassembler::pc_linear_to_real(offs_t pc) const
 {
@@ -384,16 +420,6 @@ offs_t sm510_common_disassembler::pc_real_to_linear(offs_t pc) const
 		0x02, 0x22, 0x32, 0x0e, 0x1c, 0x14, 0x25, 0x08, 0x03, 0x0f, 0x1d, 0x09, 0x04, 0x0a, 0x05, 0x3f,
 	};
 	return (pc & ~0x3f) | r2l[pc & 0x3f];
-}
-
-u32 sm590_disassembler::page_address_bits() const
-{
-	return 7;
-}
-
-u32 sm590_disassembler::page2_address_bits() const
-{
-	return 2;
 }
 
 offs_t sm590_disassembler::pc_linear_to_real(offs_t pc) const
@@ -425,4 +451,3 @@ offs_t sm590_disassembler::pc_real_to_linear(offs_t pc) const
 	};
 	return (pc & ~0x7f) | r2l[pc & 0x7f];
 }
-

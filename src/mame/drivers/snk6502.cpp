@@ -755,17 +755,17 @@ static const gfx_layout charlayout_memory =
 };
 
 
-static GFXDECODE_START( sasuke )
+static GFXDECODE_START( gfx_sasuke )
 	GFXDECODE_ENTRY( nullptr,           0x1000, swapcharlayout,      0, 4 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, swapcharlayout,    4*4, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( satansat )
+static GFXDECODE_START( gfx_satansat )
 	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 4 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        4*4, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( vanguard )
+static GFXDECODE_START( gfx_vanguard )
 	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 8 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        8*4, 8 )
 GFXDECODE_END
@@ -852,7 +852,7 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sasuke)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sasuke)
 	MCFG_PALETTE_ADD("palette", 32)
 
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,satansat)
@@ -937,7 +937,7 @@ MACHINE_CONFIG_START(snk6502_state::satansat)
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,satansat)
 
 	// video hardware
-	MCFG_GFXDECODE_MODIFY("gfxdecode", satansat)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_satansat)
 
 	// sound hardware
 	MCFG_DEVICE_MODIFY("samples")
@@ -986,7 +986,7 @@ MACHINE_CONFIG_START(snk6502_state::vanguard)
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vanguard)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vanguard)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,snk6502)
@@ -1707,24 +1707,24 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, sasuke,      0,        sasuke,   sasuke,   snk6502_state, 0, ROT90, "SNK", "Sasuke vs. Commander", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, satansat,    0,        satansat, satansat, snk6502_state, 0, ROT90, "SNK", "Satan of Saturn (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, satansata,   satansat, satansat, satansat, snk6502_state, 0, ROT90, "SNK", "Satan of Saturn (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, zarzon,      satansat, satansat, satansat, snk6502_state, 0, ROT90, "SNK (Taito America license)", "Zarzon", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, satansatind, satansat, satansat, satansat, snk6502_state, 0, ROT90, "bootleg (Inder S.A.)", "Satan of Saturn (Inder S.A., bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguard,    0,        vanguard, vanguard, snk6502_state, 0, ROT90, "SNK", "Vanguard (SNK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguardc,   vanguard, vanguard, vanguard, snk6502_state, 0, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguardj,   vanguard, vanguard, vanguard, snk6502_state, 0, ROT90, "SNK", "Vanguard (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fantasyu,    0,        fantasy,  fantasyu, snk6502_state, 0, ROT90, "SNK (Rock-Ola license)", "Fantasy (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, fantasyg,    fantasyu, fantasy,  fantasy,  snk6502_state, 0, ROT90, "SNK", "Fantasy (Germany, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
-GAME( 1981, fantasyg2,   fantasyu, fantasy,  fantasy,  snk6502_state, 0, ROT90, "SNK", "Fantasy (Germany, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
-GAME( 1981, fantasyj,    fantasyu, fantasy,  fantasyu, snk6502_state, 0, ROT90, "SNK", "Fantasy (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pballoon,    0,        pballoon, pballoon, snk6502_state, 0, ROT90, "SNK", "Pioneer Balloon", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pballoonr,   pballoon, pballoon, pballoon, snk6502_state, 0, ROT90, "SNK (Rock-Ola license)", "Pioneer Balloon (Rock-Ola license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibbler,     0,        nibbler,  nibbler,  snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 9)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibblera,    nibbler,  nibbler,  nibbler,  snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 9, alternate set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibbler8,    nibbler,  nibbler,  nibbler8, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 8)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibbler7,    nibbler,  nibbler,  nibbler8, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 7)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibbler6,    nibbler,  nibbler,  nibbler6, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibblerp,    nibbler,  nibbler,  nibbler6, snk6502_state, 0, ROT90, "Rock-Ola", "Nibbler (Pioneer Balloon conversion - rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nibblero,    nibbler,  nibbler,  nibbler8, snk6502_state, 0, ROT90, "Rock-Ola (Olympia license)", "Nibbler (Olympia - rev 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, sasuke,      0,        sasuke,   sasuke,   snk6502_state, empty_init, ROT90, "SNK", "Sasuke vs. Commander", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, satansat,    0,        satansat, satansat, snk6502_state, empty_init, ROT90, "SNK", "Satan of Saturn (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, satansata,   satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK", "Satan of Saturn (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, zarzon,      satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK (Taito America license)", "Zarzon", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, satansatind, satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "bootleg (Inder S.A.)", "Satan of Saturn (Inder S.A., bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguard,    0,        vanguard, vanguard, snk6502_state, empty_init, ROT90, "SNK", "Vanguard (SNK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguardc,   vanguard, vanguard, vanguard, snk6502_state, empty_init, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguardj,   vanguard, vanguard, vanguard, snk6502_state, empty_init, ROT90, "SNK", "Vanguard (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fantasyu,    0,        fantasy,  fantasyu, snk6502_state, empty_init, ROT90, "SNK (Rock-Ola license)", "Fantasy (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fantasyg,    fantasyu, fantasy,  fantasy,  snk6502_state, empty_init, ROT90, "SNK", "Fantasy (Germany, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
+GAME( 1981, fantasyg2,   fantasyu, fantasy,  fantasy,  snk6502_state, empty_init, ROT90, "SNK", "Fantasy (Germany, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
+GAME( 1981, fantasyj,    fantasyu, fantasy,  fantasyu, snk6502_state, empty_init, ROT90, "SNK", "Fantasy (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pballoon,    0,        pballoon, pballoon, snk6502_state, empty_init, ROT90, "SNK", "Pioneer Balloon", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pballoonr,   pballoon, pballoon, pballoon, snk6502_state, empty_init, ROT90, "SNK (Rock-Ola license)", "Pioneer Balloon (Rock-Ola license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibbler,     0,        nibbler,  nibbler,  snk6502_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibblera,    nibbler,  nibbler,  nibbler,  snk6502_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9, alternate set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibbler8,    nibbler,  nibbler,  nibbler8, snk6502_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibbler7,    nibbler,  nibbler,  nibbler8, snk6502_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibbler6,    nibbler,  nibbler,  nibbler6, snk6502_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibblerp,    nibbler,  nibbler,  nibbler6, snk6502_state, empty_init, ROT90, "Rock-Ola", "Nibbler (Pioneer Balloon conversion - rev 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nibblero,    nibbler,  nibbler,  nibbler8, snk6502_state, empty_init, ROT90, "Rock-Ola (Olympia license)", "Nibbler (Olympia - rev 8)", MACHINE_SUPPORTS_SAVE )

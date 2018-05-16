@@ -587,13 +587,13 @@ static const gfx_layout bg3232_charlayout =
 	32*32,
 };
 
-static GFXDECODE_START( kickgoal )
+static GFXDECODE_START( gfx_kickgoal )
 	GFXDECODE_ENTRY( "gfx1", 0, fg88_charlayout,    0x000, 0x40 )
 	GFXDECODE_ENTRY( "gfx1", 0, bg1616_charlayout,  0x000, 0x40 )
 	GFXDECODE_ENTRY( "gfx1", 0, bg3232_charlayout,  0x000, 0x40 )
 GFXDECODE_END
 
-static GFXDECODE_START( actionhw )
+static GFXDECODE_START( gfx_actionhw )
 	GFXDECODE_ENTRY( "gfx1", 0, fg88_alt_charlayout,    0x000, 0x40 )
 	GFXDECODE_ENTRY( "gfx1", 0, bg1616_charlayout,      0x000, 0x40 )
 GFXDECODE_END
@@ -657,7 +657,7 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kickgoal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kickgoal)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -696,7 +696,7 @@ MACHINE_CONFIG_START(kickgoal_state::actionhw)
 	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", actionhw)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_actionhw)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -786,7 +786,7 @@ ROM_END
 
 /* GAME drivers **************************************************************/
 
-DRIVER_INIT_MEMBER(kickgoal_state,kickgoal)
+void kickgoal_state::init_kickgoal()
 {
 #if 0 /* we should find a real fix instead  */
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
@@ -797,7 +797,7 @@ DRIVER_INIT_MEMBER(kickgoal_state,kickgoal)
 }
 
 
-GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Kick Goal (set 1)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, kickgoala, kickgoal, kickgoal, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Kick Goal (set 2)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 1)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, kickgoala, kickgoal, kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 2)",        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, actionhw, 0, actionhw, kickgoal, kickgoal_state, kickgoal, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, actionhw,  0,        actionhw, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Action Hollywood", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

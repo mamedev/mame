@@ -52,7 +52,7 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_DRIVER_INIT(pesadelo);
+	void init_pesadelo();
 	void pesadelo(machine_config &config);
 
 protected:
@@ -148,7 +148,7 @@ MACHINE_CONFIG_START(forte2_state::pesadelo)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(forte2_state,pesadelo)
+void forte2_state::init_pesadelo()
 {
 	uint8_t *mem = memregion("maincpu")->base();
 	int memsize = memregion("maincpu")->bytes();
@@ -160,8 +160,8 @@ DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 	}
 
 	// address line swap
-	std::vector<uint8_t> buf(memsize);
-	memcpy(&buf[0], mem, memsize);
+	std::vector<uint8_t> buf(&mem[0], &mem[memsize]);
+
 	for (int i = 0; i < memsize; i++)
 	{
 		mem[bitswap<16>(i,11,9,8,13,14,15,12,7,6,5,4,3,2,1,0,10)] = buf[i];
@@ -173,4 +173,4 @@ ROM_START( pesadelo )
 	ROM_LOAD( "epr2764.15", 0x00000, 0x10000, CRC(1ae2f724) SHA1(12880dd7ad82acf04861843fb9d4f0f926d18f6b) )
 ROM_END
 
-GAME( 1989, pesadelo, 0, pesadelo, pesadelo, forte2_state, pesadelo, ROT0, "bootleg (Forte II Games) / Konami", "Pesadelo (bootleg of Knightmare on MSX)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pesadelo, 0, pesadelo, pesadelo, forte2_state, init_pesadelo, ROT0, "bootleg (Forte II Games) / Konami", "Pesadelo (bootleg of Knightmare on MSX)", MACHINE_SUPPORTS_SAVE )

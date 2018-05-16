@@ -427,7 +427,7 @@ static const gfx_layout badlands_molayout =
 	64*8
 };
 
-static GFXDECODE_START( badlands )
+static GFXDECODE_START( gfx_badlands )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout,           0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, badlands_molayout,  128, 8 )
 GFXDECODE_END
@@ -460,7 +460,7 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", badlands)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_badlands)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)
@@ -536,7 +536,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(badlands_state,badlands)
+void badlands_state::init_badlands()
 {
 	/* initialize the audio system */
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x01000);
@@ -550,4 +550,4 @@ DRIVER_INIT_MEMBER(badlands_state,badlands)
  *
  *************************************/
 
-GAME( 1989, badlands, 0, badlands, badlands, badlands_state, badlands, ROT0, "Atari Games", "Bad Lands", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, badlands, 0, badlands, badlands, badlands_state, init_badlands, ROT0, "Atari Games", "Bad Lands", MACHINE_SUPPORTS_SAVE )

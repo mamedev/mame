@@ -686,7 +686,7 @@ static const gfx_layout hazl1500_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( hazl1500 )
+static GFXDECODE_START( gfx_hazl1500 )
 	GFXDECODE_ENTRY( CHAR_EPROM_TAG, 0x0000, hazl1500_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -711,7 +711,7 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 		SCREEN_VTOTAL, 0, SCREEN_VTOTAL);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hazl1500)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hazl1500)
 
 	MCFG_DEVICE_ADD(BAUDGEN_TAG, COM8116, XTAL(5'068'800))
 	MCFG_COM8116_FR_HANDLER(WRITELINE("uart", ay51013_device, write_tcp))
@@ -793,5 +793,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     CLASS           INIT    COMPANY                     FULLNAME            FLAGS
-COMP( 1977, hazl1500, 0,        0,       hazl1500, hazl1500, hazl1500_state, 0,      "Hazeltine Corporation",    "Hazeltine 1500",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                  FULLNAME          FLAGS
+COMP( 1977, hazl1500, 0,      0,      hazl1500, hazl1500, hazl1500_state, empty_init, "Hazeltine Corporation", "Hazeltine 1500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

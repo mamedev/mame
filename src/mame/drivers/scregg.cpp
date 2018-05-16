@@ -69,7 +69,7 @@ public:
 	DECLARE_WRITE8_MEMBER(scregg_irqack_w);
 	DECLARE_READ8_MEMBER(scregg_irqack_r);
 
-	DECLARE_DRIVER_INIT(rockduck);
+	void init_rockduck();
 	DECLARE_MACHINE_START(scregg);
 	DECLARE_MACHINE_RESET(scregg);
 	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
@@ -238,7 +238,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( scregg )
+static GFXDECODE_START( gfx_scregg )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 1 )     /* char set #1 */
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,        0, 1 )     /* sprites */
 GFXDECODE_END
@@ -280,7 +280,7 @@ MACHINE_CONFIG_START(scregg_state::dommy)
 	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scregg)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scregg)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_PALETTE_INIT_OWNER(scregg_state,btime)
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(scregg_state::scregg)
 	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scregg)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scregg)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_PALETTE_INIT_OWNER(scregg_state,btime)
@@ -417,13 +417,12 @@ ROM_START( rockduck )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(scregg_state,rockduck)
+void scregg_state::init_rockduck()
 {
 	// rd2.rdh and rd1.rdj are bitswapped, but not rd3.rdg .. are they really from the same board?
-	int x;
-	uint8_t *src = memregion( "gfx1" )->base();
+	uint8_t *src = memregion("gfx1")->base();
 
-	for (x = 0x2000; x < 0x6000; x++)
+	for (int x = 0x2000; x < 0x6000; x++)
 	{
 		src[x] = bitswap<8>(src[x],2,0,3,6,1,4,7,5);
 
@@ -431,7 +430,7 @@ DRIVER_INIT_MEMBER(scregg_state,rockduck)
 }
 
 
-GAME( 1983, dommy,    0,        dommy,  scregg,   scregg_state,  0,        ROT270, "Technos Japan", "Dommy", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, scregg,   0,        scregg, scregg,   scregg_state,  0,        ROT270, "Technos Japan", "Scrambled Egg", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, eggs,     scregg,   scregg, scregg,   scregg_state,  0,        ROT270, "Technos Japan (Universal USA license)", "Eggs (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rockduck, 0,        scregg, rockduck, scregg_state,  rockduck, ROT270, "Datel SAS", "Rock Duck (prototype?)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dommy,    0,        dommy,  scregg,   scregg_state, empty_init,    ROT270, "Technos Japan", "Dommy", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, scregg,   0,        scregg, scregg,   scregg_state, empty_init,    ROT270, "Technos Japan", "Scrambled Egg", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, eggs,     scregg,   scregg, scregg,   scregg_state, empty_init,    ROT270, "Technos Japan (Universal USA license)", "Eggs (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rockduck, 0,        scregg, rockduck, scregg_state, init_rockduck, ROT270, "Datel SAS", "Rock Duck (prototype?)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

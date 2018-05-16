@@ -26,7 +26,7 @@ What there is of the schematic shows no sign of a daisy chain or associated inte
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/wd_fdc.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "machine/z80ctc.h"
@@ -46,7 +46,7 @@ public:
 		, m_floppy0(*this, "fdc:0")
 	{ }
 
-	DECLARE_DRIVER_INIT(dmax8000);
+	void init_dmax8000();
 	DECLARE_MACHINE_RESET(dmax8000);
 	DECLARE_WRITE8_MEMBER(port0c_w);
 	DECLARE_WRITE8_MEMBER(port0d_w);
@@ -134,7 +134,7 @@ MACHINE_RESET_MEMBER( dmax8000_state, dmax8000 )
 	m_maincpu->set_input_line_vector(0, 0xee); // fdc vector
 }
 
-DRIVER_INIT_MEMBER( dmax8000_state, dmax8000 )
+void dmax8000_state::init_dmax8000()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -210,5 +210,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT     CLAS            INIT      COMPANY    FULLNAME        FLAGS
-COMP( 1981, dmax8000,  0,       0,      dmax8000,   dmax8000, dmax8000_state, dmax8000, "Datamax", "Datamax 8000", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY    FULLNAME        FLAGS
+COMP( 1981, dmax8000, 0,      0,      dmax8000, dmax8000, dmax8000_state, init_dmax8000, "Datamax", "Datamax 8000", MACHINE_NOT_WORKING )

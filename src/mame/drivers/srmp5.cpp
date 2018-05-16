@@ -119,7 +119,7 @@ public:
 	DECLARE_READ8_MEMBER(cmd2_r);
 	DECLARE_READ8_MEMBER(cmd_stat8_r);
 	virtual void machine_start() override;
-	DECLARE_DRIVER_INIT(srmp5);
+	void init_srmp5();
 	uint32_t screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 
@@ -557,7 +557,7 @@ static const gfx_layout tile_16x16x8_layout =
 };
 #endif
 
-static GFXDECODE_START( srmp5 )
+static GFXDECODE_START( gfx_srmp5 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x8x8_layout,  0x0, 0x800  )
 	//GFXDECODE_ENTRY( "gfx1", 0, tile_16x16x8_layout, 0x0, 0x800  )
 GFXDECODE_END
@@ -589,7 +589,7 @@ MACHINE_CONFIG_START(srmp5_state::srmp5)
 	MCFG_PALETTE_MEMBITS(16)
 
 #ifdef DEBUG_CHAR
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srmp5 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srmp5)
 #endif
 
 MACHINE_CONFIG_END
@@ -619,7 +619,7 @@ ROM_START( srmp5 )
 #endif
 ROM_END
 
-DRIVER_INIT_MEMBER(srmp5_state,srmp5)
+void srmp5_state::init_srmp5()
 {
 	m_soundcpu->set_st0016_game_flag(9);
 
@@ -630,4 +630,4 @@ DRIVER_INIT_MEMBER(srmp5_state,srmp5)
 #endif
 }
 
-GAME( 1994, srmp5,  0,    srmp5,    srmp5, srmp5_state,    srmp5,    ROT0, "Seta",  "Super Real Mahjong P5", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, srmp5, 0, srmp5, srmp5, srmp5_state, init_srmp5, ROT0, "Seta", "Super Real Mahjong P5", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -513,7 +513,7 @@ static const gfx_layout h19_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( h19 )
+static GFXDECODE_START( gfx_h19 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, h19_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -532,7 +532,7 @@ MACHINE_CONFIG_START(h19_state::h19)
 
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", h19)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_h19)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MC6845_CLOCK)
@@ -620,12 +620,12 @@ ROM_START( ultra19 )
 ROM_END
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE       INIT   COMPANY      FULLNAME                         FLAGS
-COMP( 1979, h19,     0,      0,      h19,     h19,   h19_state,  0,     "Heath Inc", "Heathkit H-19",                 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY      FULLNAME                         FLAGS
+COMP( 1979, h19,     0,      0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19",                 0 )
 //Super-19 ROM - ATG Systems, Inc - Adv in Sextant Issue 4, Winter 1983. With the magazine lead-time, likely released late 1982.
-COMP( 1982, super19, h19,    0,      h19,     h19,   h19_state,  0,     "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", 0 )
+COMP( 1982, super19, h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", 0 )
 // Watzman ROM - HUG p/n 885-1121, announced in REMark Issue 33, Oct. 1982
-COMP( 1982, watz19,  h19,    0,      h19,     h19,   h19_state,  0,     "Heath Inc", "Heathkit H-19 w/ Watzman ROM",  0 )
+COMP( 1982, watz19,  h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19 w/ Watzman ROM",  0 )
 // ULTRA ROM - Software Wizardry, Inc., (c) 1983 William G. Parrott, III
-COMP( 1983, ultra19, h19,    0,      h19,     h19,   h19_state,  0,     "Heath Inc", "Heathkit H-19 w/ ULTRA ROM",    0 )
+COMP( 1983, ultra19, h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19 w/ ULTRA ROM",    0 )
 

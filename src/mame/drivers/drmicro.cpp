@@ -211,7 +211,7 @@ static const gfx_layout charlayout8 =
 	8*8*1
 };
 
-static GFXDECODE_START( drmicro )
+static GFXDECODE_START( gfx_drmicro )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout4,     0, 64 ) /* tiles */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout8,   256, 32 ) /* tiles */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout4,   0, 64 ) /* sprites */
@@ -260,7 +260,7 @@ MACHINE_CONFIG_START(drmicro_state::drmicro)
 	MCFG_SCREEN_UPDATE_DRIVER(drmicro_state, screen_update_drmicro)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drmicro)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drmicro)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(drmicro_state, drmicro)
@@ -324,4 +324,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, drmicro, 0, drmicro, drmicro, drmicro_state, 0, ROT270, "Sanritsu", "Dr. Micro", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, drmicro, 0, drmicro, drmicro, drmicro_state, empty_init, ROT270, "Sanritsu", "Dr. Micro", MACHINE_SUPPORTS_SAVE )

@@ -320,5 +320,5 @@ ROM_START( tmc2000e )
 	ROM_LOAD( "4", 0xd800, 0x0800, NO_DUMP )
 ROM_END
 
-//    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     STATE           INIT  COMPANY        FULLNAME        STATE
-COMP( 1980, tmc2000e, 0,       0,       tmc2000e, tmc2000e, tmc2000e_state, 0,    "Telercas Oy", "Telmac 2000E", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY        FULLNAME        STATE
+COMP( 1980, tmc2000e, 0,      0,      tmc2000e, tmc2000e, tmc2000e_state, empty_init, "Telercas Oy", "Telmac 2000E", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

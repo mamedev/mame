@@ -373,7 +373,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( mexico86 )
+static GFXDECODE_START( gfx_mexico86 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 GFXDECODE_END
 
@@ -456,7 +456,7 @@ MACHINE_CONFIG_START(mexico86_state::mexico86)
 	MCFG_SCREEN_UPDATE_DRIVER(mexico86_state, screen_update_mexico86)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mexico86)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mexico86)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
@@ -702,9 +702,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, kikikai,  0,        kikikai,  kikikai,  mexico86_state, 0, ROT90, "Taito Corporation",  "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1986, knightb,  kikikai,  knightb,  kikikai,  mexico86_state, 0, ROT90, "bootleg",            "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kicknrun, 0,        mexico86, mexico86, mexico86_state, 0, ROT0,  "Taito Corporation",  "Kick and Run (World)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, kicknrunu,kicknrun, mexico86, mexico86, mexico86_state, 0, ROT0,  "Taito America Corp", "Kick and Run (US)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86, kicknrun, mexico86, mexico86, mexico86_state, 0, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mexico86a,kicknrun, mexico86, mexico86, mexico86_state, 0, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kikikai,  0,        kikikai,  kikikai,  mexico86_state, empty_init, ROT90, "Taito Corporation",  "KiKi KaiKai",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1986, knightb,  kikikai,  knightb,  kikikai,  mexico86_state, empty_init, ROT90, "bootleg",            "Knight Boy",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrun, 0,        mexico86, mexico86, mexico86_state, empty_init, ROT0,  "Taito Corporation",  "Kick and Run (World)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, kicknrunu,kicknrun, mexico86, mexico86, mexico86_state, empty_init, ROT0,  "Taito America Corp", "Kick and Run (US)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86, kicknrun, mexico86, mexico86, mexico86_state, empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mexico86a,kicknrun, mexico86, mexico86, mexico86_state, empty_init, ROT0,  "bootleg",            "Mexico 86 (bootleg of Kick and Run) (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

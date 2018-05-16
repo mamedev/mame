@@ -701,7 +701,7 @@ ROM_END
  *************************************/
 
 /* this is a newer version with just one bug fix */
-GAME( 1981, spiders,  0,       spiders, spiders, spiders_state, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1981, spiders2, spiders, spiders, spiders, spiders_state, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1981, spiders3, spiders, spiders, spiders, spiders_state, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1981, spinner,  spiders, spiders, spiders, spiders_state, 0, ROT270, "bootleg",                 "Spinner", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, spiders,  0,       spiders, spiders, spiders_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Spiders (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, spiders2, spiders, spiders, spiders, spiders_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Spiders (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, spiders3, spiders, spiders, spiders, spiders_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Spiders (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, spinner,  spiders, spiders, spiders, spiders_state, empty_init, ROT270, "bootleg",                 "Spinner", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

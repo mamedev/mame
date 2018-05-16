@@ -99,9 +99,9 @@ public:
 	virtual void machine_reset() override;
 
 	void init_banks();
-	DECLARE_DRIVER_INIT(getstarb1);
-	DECLARE_DRIVER_INIT(slapfigh);
-	DECLARE_DRIVER_INIT(getstarb2);
+	void init_getstarb1();
+	void init_slapfigh();
+	void init_getstarb2();
 
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);

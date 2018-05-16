@@ -862,7 +862,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( trackfld )
+static GFXDECODE_START( gfx_trackfld )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
 GFXDECODE_END
@@ -937,7 +937,7 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, trackfld_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trackfld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trackfld)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(trackfld_state,trackfld)
@@ -1013,7 +1013,7 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, trackfld_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trackfld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trackfld)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(trackfld_state,trackfld)
@@ -1647,21 +1647,20 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(trackfld_state,trackfld)
+void trackfld_state::init_trackfld()
 {
 }
 
-DRIVER_INIT_MEMBER(trackfld_state, trackfldnz)
+void trackfld_state::init_trackfldnz()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	int i;
 
 	/* decrypt program rom */
-	for (i = 0x6000; i < 0x10000; i++)
+	for (int i = 0x6000; i < 0x10000; i++)
 		ROM[i] = bitswap<8>(ROM[i], 6, 7, 5, 4, 3, 2, 1, 0);
 }
 
-DRIVER_INIT_MEMBER(trackfld_state,atlantol)
+void trackfld_state::init_atlantol()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint8_t *rom = memregion("maincpu")->base();
@@ -1682,19 +1681,18 @@ DRIVER_INIT_MEMBER(trackfld_state,atlantol)
 	membank("bank13")->set_base(&rom[0x4000]);
 }
 
-DRIVER_INIT_MEMBER(trackfld_state,mastkin)
+void trackfld_state::init_mastkin()
 {
 	uint8_t *prom = memregion("proms")->base();
-	int i;
 
 	/* build a fake palette so the screen won't be all black */
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
 		prom[i] = i * 4;
 	}
 
 	/* build a fake lookup table since we don't have the color PROMs */
-	for (i = 0; i < 0x0200; i++)
+	for (int i = 0; i < 0x0200; i++)
 	{
 		if ((i & 0x0f) == 0)
 			prom[i + 0x20] = 0;
@@ -1704,40 +1702,39 @@ DRIVER_INIT_MEMBER(trackfld_state,mastkin)
 	m_palette->update();
 }
 
-DRIVER_INIT_MEMBER(trackfld_state,wizzquiz)
+void trackfld_state::init_wizzquiz()
 {
 	uint8_t *ROM = memregion("maincpu")->base() + 0xe000;
-	int i;
 
 	/* decrypt program rom */
-	for (i = 0; i < 0x2000; i++)
+	for (int i = 0; i < 0x2000; i++)
 		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	ROM = memregion("user1")->base();
 
 	/* decrypt questions roms */
-	for (i = 0; i < 0x40000; i++)
+	for (int i = 0; i < 0x40000; i++)
 		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	membank("bank1")->configure_entries(0, 8, ROM, 0x8000);
 }
 
 
-GAME( 1983, trackfld,   0,        trackfld,  trackfld, trackfld_state, trackfld,   ROT0,  "Konami",                               "Track & Field",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1983, trackfldc,  trackfld, trackfld,  trackfld, trackfld_state, trackfld,   ROT0,  "Konami (Centuri license)",             "Track & Field (Centuri)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1983, trackfldu,  trackfld, trackfldu, trackfld, trackfld_state, trackfld,   ROT0,  "Konami (Centuri license)",             "Track & Field (Centuri, unencrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hyprolym,   trackfld, trackfld,  trackfld, trackfld_state, trackfld,   ROT0,  "Konami",                               "Hyper Olympic",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hyprolymb,  trackfld, hyprolyb,  trackfld, trackfld_state, trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hyprolymba, trackfld, hyprolyb,  trackfld, trackfld_state, trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hipoly,     trackfld, hyprolyb,  trackfld, trackfld_state, trackfld,   ROT0,  "bootleg",                              "Hipoly (bootleg of Hyper Olympic)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, atlantol,   trackfld, atlantol,  atlantol, trackfld_state, atlantol,   ROT0,  "bootleg",                              "Atlant Olimpic",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1982, trackfldnz, trackfld, trackfld,  trackfld, trackfld_state, trackfldnz, ROT0,  "bootleg? (Goldberg Enterprizes Inc.)", "Track & Field (NZ bootleg?)",          MACHINE_SUPPORTS_SAVE) // bootleg of the Centuri version
+GAME( 1983, trackfld,   0,        trackfld,  trackfld, trackfld_state, init_trackfld,   ROT0,  "Konami",                               "Track & Field",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, trackfldc,  trackfld, trackfld,  trackfld, trackfld_state, init_trackfld,   ROT0,  "Konami (Centuri license)",             "Track & Field (Centuri)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1983, trackfldu,  trackfld, trackfldu, trackfld, trackfld_state, init_trackfld,   ROT0,  "Konami (Centuri license)",             "Track & Field (Centuri, unencrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hyprolym,   trackfld, trackfld,  trackfld, trackfld_state, init_trackfld,   ROT0,  "Konami",                               "Hyper Olympic",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hyprolymb,  trackfld, hyprolyb,  trackfld, trackfld_state, init_trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hyprolymba, trackfld, hyprolyb,  trackfld, trackfld_state, init_trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hipoly,     trackfld, hyprolyb,  trackfld, trackfld_state, init_trackfld,   ROT0,  "bootleg",                              "Hipoly (bootleg of Hyper Olympic)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, atlantol,   trackfld, atlantol,  atlantol, trackfld_state, init_atlantol,   ROT0,  "bootleg",                              "Atlant Olimpic",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, trackfldnz, trackfld, trackfld,  trackfld, trackfld_state, init_trackfldnz, ROT0,  "bootleg? (Goldberg Enterprizes Inc.)", "Track & Field (NZ bootleg?)",          MACHINE_SUPPORTS_SAVE) // bootleg of the Centuri version
 
-GAME( 1988, mastkin,    0,        mastkin,   mastkin,  trackfld_state, mastkin,    ROT0,  "Du Tech",                              "The Masters of Kin", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mastkin,    0,        mastkin,   mastkin,  trackfld_state, init_mastkin,    ROT0,  "Du Tech",                              "The Masters of Kin", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, wizzquiz,   0,        wizzquiz,  wizzquiz, trackfld_state, wizzquiz,   ROT0,  "Zilec-Zenitone (Konami license)",      "Wizz Quiz (Konami version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, wizzquiza,  wizzquiz, wizzquiz,  wizzquiz, trackfld_state, wizzquiz,   ROT0,  "Zilec-Zenitone",                       "Wizz Quiz (version 4)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wizzquiz,   0,        wizzquiz,  wizzquiz, trackfld_state, init_wizzquiz,   ROT0,  "Zilec-Zenitone (Konami license)",      "Wizz Quiz (Konami version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wizzquiza,  wizzquiz, wizzquiz,  wizzquiz, trackfld_state, init_wizzquiz,   ROT0,  "Zilec-Zenitone",                       "Wizz Quiz (version 4)",      MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, reaktor,    0,        reaktor,   reaktor,  trackfld_state, 0,          ROT90, "Zilec",                                "Reaktor (Track & Field conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, reaktor,    0,        reaktor,   reaktor,  trackfld_state, empty_init,      ROT90, "Zilec",                                "Reaktor (Track & Field conversion)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, yieartf,    yiear,    yieartf,   yieartf,  trackfld_state, 0,          ROT0,  "Konami",                               "Yie Ar Kung-Fu (GX361 conversion)", MACHINE_SUPPORTS_SAVE ) // the conversion looks of bootleg quality, but the code is clearly a very different revision to either original hardware set...
+GAME( 1985, yieartf,    yiear,    yieartf,   yieartf,  trackfld_state, empty_init,      ROT0,  "Konami",                               "Yie Ar Kung-Fu (GX361 conversion)", MACHINE_SUPPORTS_SAVE ) // the conversion looks of bootleg quality, but the code is clearly a very different revision to either original hardware set...

@@ -164,7 +164,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( suprloco )
+static GFXDECODE_START( gfx_suprloco )
 	/* sprites use colors 256-511 + 512-767 */
 	GFXDECODE_ENTRY( "gfx1", 0x6000, charlayout, 0, 16 )
 GFXDECODE_END
@@ -198,7 +198,7 @@ MACHINE_CONFIG_START(suprloco_state::suprloco)
 	MCFG_SCREEN_UPDATE_DRIVER(suprloco_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprloco)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprloco)
 	MCFG_PALETTE_ADD("palette", 512+256)
 	MCFG_PALETTE_INIT_OWNER(suprloco_state, suprloco)
 
@@ -277,30 +277,26 @@ ROM_START( suprlocoo )
 	ROM_LOAD( "pr-5221.7",       0x0600, 0x0020, CRC(89ba674f) SHA1(17c87840c8011968675a5a6f55966467df02364b) ) /* unknown */
 ROM_END
 
-DRIVER_INIT_MEMBER(suprloco_state,suprloco)
+void suprloco_state::init_suprloco()
 {
 	/* convert graphics to 4bpp from 3bpp */
+	uint8_t *source = memregion("gfx1")->base();
+	uint8_t *dest   = source + 0x6000;
+	uint8_t *lookup = memregion("proms")->base() + 0x0200;
 
-	int i, j, k, color_source, color_dest;
-	uint8_t *source, *dest, *lookup;
-
-	source = memregion("gfx1")->base();
-	dest   = source + 0x6000;
-	lookup = memregion("proms")->base() + 0x0200;
-
-	for (i = 0; i < 0x80; i++, lookup += 8)
+	for (int i = 0; i < 0x80; i++, lookup += 8)
 	{
-		for (j = 0; j < 0x40; j++, source++, dest++)
+		for (int j = 0; j < 0x40; j++, source++, dest++)
 		{
 			dest[0] = dest[0x2000] = dest[0x4000] = dest[0x6000] = 0;
 
-			for (k = 0; k < 8; k++)
+			for (int k = 0; k < 8; k++)
 			{
-				color_source = (((source[0x0000] >> k) & 0x01) << 2) |
-								(((source[0x2000] >> k) & 0x01) << 1) |
-								(((source[0x4000] >> k) & 0x01) << 0);
+				const int color_source = (((source[0x0000] >> k) & 0x01) << 2) |
+										 (((source[0x2000] >> k) & 0x01) << 1) |
+										 (((source[0x4000] >> k) & 0x01) << 0);
 
-				color_dest = lookup[color_source];
+				const int color_dest = lookup[color_source];
 
 				dest[0x0000] |= (((color_dest >> 3) & 0x01) << k);
 				dest[0x2000] |= (((color_dest >> 2) & 0x01) << k);
@@ -312,7 +308,5 @@ DRIVER_INIT_MEMBER(suprloco_state,suprloco)
 
 }
 
-
-
-GAME( 1982, suprloco,         0, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive (Rev.A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, suprlocoo, suprloco, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, suprloco,         0, suprloco, suprloco, suprloco_state, init_suprloco, ROT0, "Sega", "Super Locomotive (Rev.A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, suprlocoo, suprloco, suprloco, suprloco, suprloco_state, init_suprloco, ROT0, "Sega", "Super Locomotive",         MACHINE_SUPPORTS_SAVE )

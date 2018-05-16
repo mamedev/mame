@@ -96,7 +96,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	DECLARE_DRIVER_INIT(feversoc);
+	void init_feversoc();
 	void feversoc(machine_config &config);
 
 private:
@@ -228,7 +228,7 @@ static const gfx_layout spi_spritelayout =
 };
 
 
-static GFXDECODE_START( feversoc )
+static GFXDECODE_START( gfx_feversoc )
 	GFXDECODE_ENTRY( "gfx1", 0, spi_spritelayout,   0, 0x40 )
 GFXDECODE_END
 
@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(feversoc_state::feversoc)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, feversoc_state, feversoc_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", feversoc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_feversoc)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -341,7 +341,7 @@ ROM_START( feversoc )
 	ROM_LOAD( "pcm.u0743", 0x00000, 0x80000, CRC(20b0c0e3) SHA1(dcf2f620a8fe695688057dbaf5c431a32a832440) )
 ROM_END
 
-DRIVER_INIT_MEMBER(feversoc_state,feversoc)
+void feversoc_state::init_feversoc()
 {
 	uint32_t *rom = (uint32_t *)memregion("maincpu")->base();
 
@@ -355,4 +355,4 @@ DRIVER_INIT_MEMBER(feversoc_state,feversoc)
 	m_maincpu->sh2drc_add_fastram(0x0203e000, 0x0203ffff, 0, &m_spriteram[0]);
 }
 
-GAME( 2004, feversoc,  0,       feversoc,  feversoc, feversoc_state,  feversoc, ROT0, "Seibu Kaihatsu", "Fever Soccer", 0 )
+GAME( 2004, feversoc, 0, feversoc, feversoc, feversoc_state, init_feversoc, ROT0, "Seibu Kaihatsu", "Fever Soccer", 0 )

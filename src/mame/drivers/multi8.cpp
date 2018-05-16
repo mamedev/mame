@@ -504,7 +504,7 @@ static const gfx_layout multi8_kanjilayout =
 	16*16
 };
 
-static GFXDECODE_START( multi8 )
+static GFXDECODE_START( gfx_multi8 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, multi8_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "kanji",   0x0000, multi8_kanjilayout, 0, 1 )
 GFXDECODE_END
@@ -579,7 +579,7 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", multi8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_multi8)
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
@@ -638,5 +638,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT   COMPANY       FULLNAME                FLAGS
-COMP( 1983, multi8, 0,      0,       multi8,    multi8, multi8_state,  0,     "Mitsubishi", "Multi 8 (Mitsubishi)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY       FULLNAME                FLAGS
+COMP( 1983, multi8, 0,      0,      multi8,  multi8, multi8_state, empty_init, "Mitsubishi", "Multi 8 (Mitsubishi)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

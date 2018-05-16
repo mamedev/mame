@@ -1052,7 +1052,7 @@ static const gfx_layout spritelayout =
 	64*64
 };
 
-static GFXDECODE_START( namcos86 )
+static GFXDECODE_START( gfx_namcos86 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   2048*0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   2048*0, 256 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 2048*1, 128 )
@@ -1087,7 +1087,7 @@ MACHINE_CONFIG_START(namcos86_state::hopmappy)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos86_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos86)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos86)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(namcos86_state, namcos86)
 
@@ -1684,30 +1684,26 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(namcos86_state,namco86)
+void namcos86_state::init_namco86()
 {
-	int size;
-	uint8_t *gfx;
-
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
-	gfx = memregion("gfx1")->base();
-	size = memregion("gfx1")->bytes() * 2 / 3;
+	uint8_t *gfx = memregion("gfx1")->base();
+	int size = memregion("gfx1")->bytes() * 2 / 3;
 
 	{
-		std::vector<uint8_t> buffer( size );
+		std::vector<uint8_t> buffer(size);
 		uint8_t *dest1 = gfx;
-		uint8_t *dest2 = gfx + ( size / 2 );
+		uint8_t *dest2 = gfx + (size / 2);
 		uint8_t *mono = gfx + size;
-		int i;
 
-		memcpy( &buffer[0], gfx, size );
+		memcpy(&buffer[0], gfx, size);
 
-		for ( i = 0; i < size; i += 2 )
+		for (int i = 0; i < size; i += 2)
 		{
 			uint8_t data1 = buffer[i];
 			uint8_t data2 = buffer[i+1];
-			*dest1++ = ( data1 << 4 ) | ( data2 & 0xf );
-			*dest2++ = ( data1 & 0xf0 ) | ( data2 >> 4 );
+			*dest1++ = (data1 << 4) | (data2 & 0xf);
+			*dest2++ = (data1 & 0xf0) | (data2 >> 4);
 
 			*mono ^= 0xff; mono++;
 		}
@@ -1717,20 +1713,19 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 	size = memregion("gfx2")->bytes() * 2 / 3;
 
 	{
-		std::vector<uint8_t> buffer( size );
+		std::vector<uint8_t> buffer(size);
 		uint8_t *dest1 = gfx;
-		uint8_t *dest2 = gfx + ( size / 2 );
+		uint8_t *dest2 = gfx + (size / 2);
 		uint8_t *mono = gfx + size;
-		int i;
 
-		memcpy( &buffer[0], gfx, size );
+		memcpy(&buffer[0], gfx, size);
 
-		for ( i = 0; i < size; i += 2 )
+		for (int i = 0; i < size; i += 2)
 		{
 			uint8_t data1 = buffer[i];
 			uint8_t data2 = buffer[i+1];
-			*dest1++ = ( data1 << 4 ) | ( data2 & 0xf );
-			*dest2++ = ( data1 & 0xf0 ) | ( data2 >> 4 );
+			*dest1++ = (data1 << 4) | (data2 & 0xf);
+			*dest2++ = (data1 & 0xf0) | (data2 >> 4);
 
 			*mono ^= 0xff; mono++;
 		}
@@ -1739,19 +1734,19 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 
 
 
-GAME( 1986, skykiddx, 0,        hopmappy, skykiddx,  namcos86_state, namco86, ROT180, "Namco",   "Sky Kid Deluxe (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, skykiddxo,skykiddx, hopmappy, skykiddx,  namcos86_state, namco86, ROT180, "Namco",   "Sky Kid Deluxe (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, skykiddx, 0,        hopmappy, skykiddx,  namcos86_state, init_namco86, ROT180, "Namco",   "Sky Kid Deluxe (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, skykiddxo,skykiddx, hopmappy, skykiddx,  namcos86_state, init_namco86, ROT180, "Namco",   "Sky Kid Deluxe (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, hopmappy, 0,        hopmappy, hopmappy,  namcos86_state, namco86, ROT0,   "Namco",   "Hopping Mappy", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, hopmappy, 0,        hopmappy, hopmappy,  namcos86_state, init_namco86, ROT0,   "Namco",   "Hopping Mappy", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, roishtar, 0,        roishtar, roishtar,  namcos86_state, namco86, ROT0,   "Namco",   "The Return of Ishtar", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, roishtar, 0,        roishtar, roishtar,  namcos86_state, init_namco86, ROT0,   "Namco",   "The Return of Ishtar", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, genpeitd, 0,        genpeitd, genpeitd,  namcos86_state, namco86, ROT0,   "Namco",   "Genpei ToumaDen", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, genpeitd, 0,        genpeitd, genpeitd,  namcos86_state, init_namco86, ROT0,   "Namco",   "Genpei ToumaDen", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, rthunder, 0,        rthunder, rthunder,  namcos86_state, namco86, ROT0,   "Namco",   "Rolling Thunder (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rthundera,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "bootleg", "Rolling Thunder (rev 3, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rthunder2,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco",   "Rolling Thunder (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rthunder1,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco",   "Rolling Thunder (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rthunder0,rthunder, rthunder, rthunder1, namcos86_state, namco86, ROT0,   "Namco",   "Rolling Thunder (oldest)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthunder, 0,        rthunder, rthunder,  namcos86_state, init_namco86, ROT0,   "Namco",   "Rolling Thunder (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthundera,rthunder, rthunder, rthunder1, namcos86_state, init_namco86, ROT0,   "bootleg", "Rolling Thunder (rev 3, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthunder2,rthunder, rthunder, rthunder1, namcos86_state, init_namco86, ROT0,   "Namco",   "Rolling Thunder (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthunder1,rthunder, rthunder, rthunder1, namcos86_state, init_namco86, ROT0,   "Namco",   "Rolling Thunder (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rthunder0,rthunder, rthunder, rthunder1, namcos86_state, init_namco86, ROT0,   "Namco",   "Rolling Thunder (oldest)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, wndrmomo, 0,        wndrmomo, wndrmomo,  namcos86_state, namco86, ROT0,   "Namco",   "Wonder Momo", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wndrmomo, 0,        wndrmomo, wndrmomo,  namcos86_state, init_namco86, ROT0,   "Namco",   "Wonder Momo", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

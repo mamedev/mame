@@ -845,7 +845,7 @@ MACHINE_CONFIG_START(vic20_state::ntsc)
 	// basic machine hardware
 	MCFG_DEVICE_ADD(M6502_TAG, M6502, MOS6560_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(vic20_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, MOS6560_CLOCK)
 	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vic20_state, via1_pa_r))
@@ -893,7 +893,7 @@ MACHINE_CONFIG_START(vic20_state::pal)
 	// basic machine hardware
 	MCFG_DEVICE_ADD(M6502_TAG, M6502, MOS6561_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(vic20_mem)
-	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, MOS6561_CLOCK)
 	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vic20_state, via1_pa_r))
@@ -1012,8 +1012,8 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       STATE         INIT        COMPANY                             FULLNAME                    FLAGS
-COMP( 1980, vic1001,    0,          0,      ntsc,       vic1001,    vic20_state,  0,          "Commodore Business Machines",      "VIC-1001 (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, vic20,      vic1001,    0,      ntsc,       vic20,      vic20_state,  0,          "Commodore Business Machines",      "VIC-20 (NTSC)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, vic20p,     vic1001,    0,      pal,        vic20,      vic20_state,  0,          "Commodore Business Machines",      "VIC-20 / VC-20 (PAL)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, vic20_se,   vic1001,    0,      pal,        vic20s,     vic20_state,  0,          "Commodore Business Machines",      "VIC-20 (Sweden/Finland)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY                        FULLNAME                   FLAGS
+COMP( 1980, vic1001,  0,       0,      ntsc,    vic1001, vic20_state, empty_init, "Commodore Business Machines", "VIC-1001 (Japan)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, vic20,    vic1001, 0,      ntsc,    vic20,   vic20_state, empty_init, "Commodore Business Machines", "VIC-20 (NTSC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, vic20p,   vic1001, 0,      pal,     vic20,   vic20_state, empty_init, "Commodore Business Machines", "VIC-20 / VC-20 (PAL)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, vic20_se, vic1001, 0,      pal,     vic20s,  vic20_state, empty_init, "Commodore Business Machines", "VIC-20 (Sweden/Finland)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

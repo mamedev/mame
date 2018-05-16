@@ -205,7 +205,7 @@ public:
 	DECLARE_WRITE32_MEMBER(cmd2_word_w);
 	DECLARE_READ32_MEMBER(cmd_stat_word_r);
 
-	DECLARE_DRIVER_INIT(jclub2o);
+	void init_jclub2o();
 
 	void jclub2o(machine_config &config);
 	void jclub2o_map(address_map &map);
@@ -245,7 +245,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DRIVER_INIT(darkhors);
+	void init_darkhors();
 	DECLARE_VIDEO_START(darkhors);
 
 	void darkhors(machine_config &config);
@@ -1105,7 +1105,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*2
 };
 
-static GFXDECODE_START( darkhors )
+static GFXDECODE_START( gfx_darkhors )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0, 0x10000/64 ) // color codes should be doubled
 GFXDECODE_END
 
@@ -1228,7 +1228,7 @@ MACHINE_CONFIG_START(darkhors_state::darkhors)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darkhors)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darkhors)
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state, darkhors)
 
 	// layout
@@ -1506,12 +1506,12 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(jclub2o_state,jclub2o)
+void jclub2o_state::init_jclub2o()
 {
 	m_soundbank->configure_entries(0, 32, memregion("soundcpu")->base(), 0x4000);
 }
 
-DRIVER_INIT_MEMBER(darkhors_state,darkhors)
+void darkhors_state::init_darkhors()
 {
 	// the dumped eeprom bytes are in a different order to how MAME expects them to be!?
 	// (offset 0x00, 0x40, 0x01, 0x41, 0x02, 0x42 ..... )
@@ -1531,16 +1531,16 @@ DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 
 
 // Older hardware (ST-0020 + ST-0016)
-GAME( 1994, jclub2v100, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.00, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, jclub2v101, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.01, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jclub2v110, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.10X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, jclub2v112, 0,          jclub2o,  jclub2v112, jclub2o_state,  jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.12X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, jclub2v203, jclub2v112, jclub2o,  jclub2v112, jclub2o_state,  jclub2o,  ROT0, "Seta",    "Jockey Club II (v2.03X RC, older hardware, prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, jclub2v100, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.00, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, jclub2v101, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.01, older hardware)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, jclub2v110, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.10X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, jclub2v112, 0,          jclub2o,  jclub2v112, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.12X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, jclub2v203, jclub2v112, jclub2o,  jclub2v112, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v2.03X RC, older hardware, prototype)", MACHINE_IMPERFECT_GRAPHICS )
 // Newer hardware (ST-0032)
-GAME( 1996, jclub2v200, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.00, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1996, jclub2v201, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.01X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1997, jclub2v204, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.04, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1997, jclub2v205, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.05, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, jclub2v220, jclub2v112, jclub2,   jclub2v112, jclub2_state,   0,        ROT0, "Seta",    "Jockey Club II (v2.20X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1996, jclub2v200, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.00, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1996, jclub2v201, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.01X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1997, jclub2v204, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.04, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1997, jclub2v205, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.05, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1998, jclub2v220, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.20X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 // Bootleg hardware
-GAME( 2001, darkhors,   jclub2v112, darkhors, darkhors,   darkhors_state, darkhors, ROT0, "bootleg", "Dark Horse (USA v4.00, bootleg of Jockey Club II)",     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, darkhors,   jclub2v112, darkhors, darkhors,   darkhors_state, init_darkhors, ROT0, "bootleg", "Dark Horse (USA v4.00, bootleg of Jockey Club II)",     MACHINE_IMPERFECT_GRAPHICS )

@@ -297,7 +297,7 @@ static const gfx_layout sprite_layout2 =
 	256
 };
 
-static GFXDECODE_START( mnchmobl )
+static GFXDECODE_START( gfx_mnchmobl )
 	GFXDECODE_ENTRY( "gfx1", 0,      char_layout,      0,  4 )  /* colors   0- 63 */
 	GFXDECODE_ENTRY( "gfx2", 0x1000, tile_layout,     64,  4 )  /* colors  64-127 */
 	GFXDECODE_ENTRY( "gfx3", 0,      sprite_layout1, 128, 16 )  /* colors 128-255 */
@@ -347,7 +347,7 @@ MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, munchmo_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mnchmobl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mnchmobl)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(munchmo_state, munchmo)
 
@@ -437,5 +437,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, munchmo_state, 0, ROT270, "SNK",                   "Joyful Road (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, munchmo_state, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, munchmo_state, empty_init, ROT270, "SNK",                   "Joyful Road (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, munchmo_state, empty_init, ROT270, "SNK (Centuri license)", "Munch Mobile (US)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

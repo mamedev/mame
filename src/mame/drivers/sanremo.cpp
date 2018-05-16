@@ -344,7 +344,7 @@ static const gfx_layout tilelayout =
 *           Graphics Decode Information           *
 **************************************************/
 
-static GFXDECODE_START( sanremo )
+static GFXDECODE_START( gfx_sanremo )
 	GFXDECODE_ENTRY( "gfx",  0,   tilelayout, 0, 1 )
 GFXDECODE_END
 
@@ -380,7 +380,7 @@ MACHINE_CONFIG_START(sanremo_state::sanremo)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sanremo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sanremo)
 	MCFG_PALETTE_ADD("palette", 0x10)
 	MCFG_PALETTE_INIT_OWNER(sanremo_state, sanremo)
 
@@ -420,5 +420,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//     YEAR  NAME     PARENT  MACHINE  INPUT    STATE          INIT   ROT   COMPANY           FULLNAME       FLAGS                    LAYOUT
-GAMEL( 1996, number1, 0,      sanremo, number1, sanremo_state, 0,     ROT0, "San Remo Games", "Number One",  MACHINE_SUPPORTS_SAVE,   layout_sanremo )
+//     YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        ROT   COMPANY           FULLNAME       FLAGS                    LAYOUT
+GAMEL( 1996, number1, 0,      sanremo, number1, sanremo_state, empty_init, ROT0, "San Remo Games", "Number One",  MACHINE_SUPPORTS_SAVE,   layout_sanremo )

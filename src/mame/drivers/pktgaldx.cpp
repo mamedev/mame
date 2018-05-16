@@ -303,7 +303,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( pktgaldx )
+static GFXDECODE_START( gfx_pktgaldx )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0, 32 )    /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0, 32 )    /* Tiles (16x16) */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 32 )    /* Sprites (16x16) */
@@ -321,7 +321,7 @@ static const gfx_layout bootleg_spritelayout =
 	16*64
 };
 
-static GFXDECODE_START( bootleg )
+static GFXDECODE_START( gfx_bootleg )
 	GFXDECODE_ENTRY( "gfx1", 0, bootleg_spritelayout,     0, 64 )
 GFXDECODE_END
 
@@ -356,7 +356,7 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pktgaldx)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pktgaldx)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -417,7 +417,7 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldb)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bootleg)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bootleg)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -492,12 +492,12 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(pktgaldx_state,pktgaldx)
+void pktgaldx_state::init_pktgaldx()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x42ba, 0x00, 0x00);
 }
 
-GAME( 1992, pktgaldx,  0,        pktgaldx, pktgaldx, pktgaldx_state, pktgaldx,  ROT0, "Data East Corporation", "Pocket Gal Deluxe (Euro v3.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, pktgaldxj, pktgaldx, pktgaldx, pktgaldx, pktgaldx_state, pktgaldx,  ROT0, "Data East Corporation (Nihon System license)", "Pocket Gal Deluxe (Japan v3.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, pktgaldxb, pktgaldx, pktgaldb, pktgaldx, pktgaldx_state, 0,         ROT0, "bootleg",               "Pocket Gal Deluxe (Euro v3.00, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pktgaldx,  0,        pktgaldx, pktgaldx, pktgaldx_state, init_pktgaldx, ROT0, "Data East Corporation", "Pocket Gal Deluxe (Euro v3.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, pktgaldxj, pktgaldx, pktgaldx, pktgaldx, pktgaldx_state, init_pktgaldx, ROT0, "Data East Corporation (Nihon System license)", "Pocket Gal Deluxe (Japan v3.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pktgaldxb, pktgaldx, pktgaldb, pktgaldx, pktgaldx_state, empty_init,    ROT0, "bootleg",               "Pocket Gal Deluxe (Euro v3.00, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

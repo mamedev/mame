@@ -567,7 +567,7 @@ static const gfx_layout igt_gameking_layout =
 };
 
 
-static GFXDECODE_START( igt_gameking )
+static GFXDECODE_START( gfx_igt_gameking )
 	GFXDECODE_ENTRY( "cg", 0, igt_gameking_layout,   0x0, 1  )
 GFXDECODE_END
 
@@ -621,7 +621,7 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("quart1", sc28c94_device, rx_d_w))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igt_gameking)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igt_gameking)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -905,14 +905,14 @@ ROM_START( gkkey )
 	ROM_REGION( 0x200000, "snd", ROMREGION_ERASEFF )
 ROM_END
 
-GAME( 1994, ms3,       0,            igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Multistar 3",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1994, ms72c,     0,            igt_ms72c,    igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Multistar 7 2c",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt4,    0,            igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (v4.x)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt4ms,  gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (v4.x, MS)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt43,   gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (v4.3)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt43n,  gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (v4.3, NJ)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigtez,   gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (EZ Pay, v4.0)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigtezms, gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (EZ Pay, v4.0, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt5p,   gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (Triple-Five Play)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, igtsc,     0,            igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Super Cherry",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // SIMM dumps are bad.
-GAME( 2003, gkkey,     0,            igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (Set Chips)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // only 2 are good dumps
+GAME( 1994, ms3,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 3",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, ms72c,     0,      igt_ms72c,    igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 7 2c",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt4,    0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt4ms,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x, MS)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt43,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt43n,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3, NJ)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigtez,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigtezms, gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt5p,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Triple-Five Play)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, igtsc,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Super Cherry",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // SIMM dumps are bad.
+GAME( 2003, gkkey,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Set Chips)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // only 2 are good dumps

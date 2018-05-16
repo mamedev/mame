@@ -561,7 +561,7 @@ static const gfx_layout elwro800_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( elwro800 )
+static GFXDECODE_START( gfx_elwro800 )
 	GFXDECODE_ENTRY( "maincpu", 0x3c00, elwro800_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -589,7 +589,7 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(elwro800_state, spectrum )
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", elwro800)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_elwro800)
 
 	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum )
 
@@ -614,10 +614,8 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(tzx_cassette_formats)
@@ -660,5 +658,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT     STATE           INIT  COMPANY   FULLNAME       FLAGS
-COMP( 1986, elwro800,  0,      0,      elwro800,  elwro800, elwro800_state, 0,    "Elwro",  "800 Junior",  0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME      FLAGS
+COMP( 1986, elwro800, 0,      0,      elwro800, elwro800, elwro800_state, empty_init, "Elwro", "800 Junior", 0 )

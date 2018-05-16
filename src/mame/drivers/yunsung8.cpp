@@ -293,7 +293,7 @@ static const gfx_layout layout_8x8x8 =
 	8*8*8/4
 };
 
-static GFXDECODE_START( yunsung8 )
+static GFXDECODE_START( gfx_yunsung8 )
 	GFXDECODE_ENTRY( "bgfx", 0, layout_8x8x8, 0, 0x08 ) // [0] Tiles (Background)
 	GFXDECODE_ENTRY( "text", 0, layout_8x8x4, 0,    0x40 ) // [1] Tiles (Text)
 GFXDECODE_END
@@ -358,7 +358,7 @@ MACHINE_CONFIG_START(yunsung8_state::yunsung8)
 	MCFG_SCREEN_UPDATE_DRIVER(yunsung8_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yunsung8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yunsung8)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -601,8 +601,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995,  cannball,  0,        yunsung8, cannball, yunsung8_state, 0, ROT0,   "Yun Sung / Soft Vision",    "Cannon Ball (Yun Sung, horizontal)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  cannballv, cannball, yunsung8, cannbalv, yunsung8_state, 0, ROT270, "Yun Sung / J&K Production", "Cannon Ball (Yun Sung, vertical)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  magix,     0,        yunsung8, magix,    yunsung8_state, 0, ROT0,   "Yun Sung",                  "Magix / Rock",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  magixb,    magix,    yunsung8, magix,    yunsung8_state, 0, ROT0,   "Yun Sung",                  "Magix / Rock (no copyright message)", MACHINE_SUPPORTS_SAVE ) // was marked as bootleg, but has been seen on original PCBs
-GAME( 1994?, rocktris,  0,        yunsung8, rocktris, yunsung8_state, 0, ROT0,   "Yun Sung",                  "Rock Tris",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  cannball,  0,        yunsung8, cannball, yunsung8_state, empty_init, ROT0,   "Yun Sung / Soft Vision",    "Cannon Ball (Yun Sung, horizontal)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  cannballv, cannball, yunsung8, cannbalv, yunsung8_state, empty_init, ROT270, "Yun Sung / J&K Production", "Cannon Ball (Yun Sung, vertical)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  magix,     0,        yunsung8, magix,    yunsung8_state, empty_init, ROT0,   "Yun Sung",                  "Magix / Rock",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  magixb,    magix,    yunsung8, magix,    yunsung8_state, empty_init, ROT0,   "Yun Sung",                  "Magix / Rock (no copyright message)", MACHINE_SUPPORTS_SAVE ) // was marked as bootleg, but has been seen on original PCBs
+GAME( 1994?, rocktris,  0,        yunsung8, rocktris, yunsung8_state, empty_init, ROT0,   "Yun Sung",                  "Rock Tris",                           MACHINE_SUPPORTS_SAVE )

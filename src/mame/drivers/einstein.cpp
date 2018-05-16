@@ -12,8 +12,8 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "cpu/z80/z80daisy_generic.h"
+#include "machine/z80daisy.h"
+#include "machine/z80daisy_generic.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/einstein/pipe/pipe.h"
 #include "bus/einstein/userport/userport.h"
@@ -714,6 +714,6 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY   FULLNAME          FLAGS
-COMP( 1984, einstein, 0,      0,      einstein, einstein, einstein_state, 0,    "Tatung", "Einstein TC-01", 0 )
-COMP( 1986, einst256, 0,      0,      einstein, einstein, einstein_state, 0,    "Tatung", "Einstein 256",   MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME          FLAGS
+COMP( 1984, einstein, 0,      0,      einstein, einstein, einstein_state, empty_init, "Tatung", "Einstein TC-01", 0 )
+COMP( 1986, einst256, 0,      0,      einstein, einstein, einstein_state, empty_init, "Tatung", "Einstein 256",   MACHINE_NOT_WORKING )

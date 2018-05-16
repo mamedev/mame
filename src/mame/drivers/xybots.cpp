@@ -160,7 +160,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( xybots )
+static GFXDECODE_START( gfx_xybots )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,    512, 16 ) /* playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,    256, 48 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, anlayout,        0, 64 ) /* characters 8x8 */
@@ -188,7 +188,7 @@ MACHINE_CONFIG_START(xybots_state::xybots)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xybots)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xybots)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
@@ -384,7 +384,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(xybots_state,xybots)
+void xybots_state::init_xybots()
 {
 	m_h256 = 0x0400;
 	slapstic_configure(*m_maincpu, 0x008000, 0, memregion("maincpu")->base() + 0x8000);
@@ -398,8 +398,8 @@ DRIVER_INIT_MEMBER(xybots_state,xybots)
  *
  *************************************/
 
-GAME( 1987, xybots,  0,      xybots, xybots, xybots_state, xybots, ROT0, "Atari Games", "Xybots (rev 2)", 0 )
-GAME( 1987, xybotsg, xybots, xybots, xybots, xybots_state, xybots, ROT0, "Atari Games", "Xybots (German, rev 3)", 0 )
-GAME( 1987, xybotsf, xybots, xybots, xybots, xybots_state, xybots, ROT0, "Atari Games", "Xybots (French, rev 3)", 0 )
-GAME( 1987, xybots1, xybots, xybots, xybots, xybots_state, xybots, ROT0, "Atari Games", "Xybots (rev 1)", 0 )
-GAME( 1987, xybots0, xybots, xybots, xybots, xybots_state, xybots, ROT0, "Atari Games", "Xybots (rev 0)", 0 )
+GAME( 1987, xybots,  0,      xybots, xybots, xybots_state, init_xybots, ROT0, "Atari Games", "Xybots (rev 2)", 0 )
+GAME( 1987, xybotsg, xybots, xybots, xybots, xybots_state, init_xybots, ROT0, "Atari Games", "Xybots (German, rev 3)", 0 )
+GAME( 1987, xybotsf, xybots, xybots, xybots, xybots_state, init_xybots, ROT0, "Atari Games", "Xybots (French, rev 3)", 0 )
+GAME( 1987, xybots1, xybots, xybots, xybots, xybots_state, init_xybots, ROT0, "Atari Games", "Xybots (rev 1)", 0 )
+GAME( 1987, xybots0, xybots, xybots, xybots, xybots_state, init_xybots, ROT0, "Atari Games", "Xybots (rev 0)", 0 )

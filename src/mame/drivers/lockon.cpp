@@ -349,7 +349,7 @@ static const gfx_layout char_layout =
 	8*8
 };
 
-static GFXDECODE_START( lockon )
+static GFXDECODE_START( gfx_lockon )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout,  0, 128 )
 GFXDECODE_END
 
@@ -500,7 +500,7 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lockon_state, screen_vblank_lockon))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lockon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lockon)
 	MCFG_PALETTE_ADD("palette", 1024 + 2048)
 	MCFG_PALETTE_INIT_OWNER(lockon_state, lockon)
 
@@ -766,5 +766,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, lockon,  0,      lockon,  lockon,  lockon_state, 0, ROT0, "Tatsumi", "Lock-On (rev. E)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lockonc, lockon, lockon,  lockone, lockon_state, 0, ROT0, "Tatsumi", "Lock-On (rev. C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lockon,  0,      lockon, lockon,  lockon_state, empty_init, ROT0, "Tatsumi", "Lock-On (rev. E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lockonc, lockon, lockon, lockone, lockon_state, empty_init, ROT0, "Tatsumi", "Lock-On (rev. C)", MACHINE_SUPPORTS_SAVE )

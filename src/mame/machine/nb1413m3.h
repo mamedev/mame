@@ -161,6 +161,7 @@ public:
 	DECLARE_WRITE8_MEMBER( outcoin_w );
 	DECLARE_WRITE8_MEMBER( vcrctrl_w );
 
+	required_device<cpu_device> m_maincpu;
 	const char * m_sndromrgntag;
 	int m_sndrombank1;
 	int m_sndrombank2;

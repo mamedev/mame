@@ -57,7 +57,7 @@ public:
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	DECLARE_DRIVER_INIT(taitowlf);
+	void init_taitowlf();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	#if !ENABLE_VGA
@@ -406,7 +406,7 @@ MACHINE_CONFIG_START(taitowlf_state::taitowlf)
 	#endif
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(taitowlf_state,taitowlf)
+void taitowlf_state::init_taitowlf()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
 
@@ -458,4 +458,4 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(1997, pf2012, 0,   taitowlf, pc_keyboard, taitowlf_state, taitowlf,    ROT0,   "Taito",  "Psychic Force 2012", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1997, pf2012, 0,   taitowlf, pc_keyboard, taitowlf_state, init_taitowlf, ROT0, "Taito",  "Psychic Force 2012", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

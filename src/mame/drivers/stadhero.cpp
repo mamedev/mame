@@ -193,7 +193,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( stadhero )
+static GFXDECODE_START( gfx_stadhero )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tile_3bpp,    512, 16 ) /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 256, 16 ) /* Sprites 16x16 */
@@ -220,7 +220,7 @@ MACHINE_CONFIG_START(stadhero_state::stadhero)
 	MCFG_SCREEN_UPDATE_DRIVER(stadhero_state, screen_update_stadhero)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stadhero)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stadhero)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -290,4 +290,4 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1988, stadhero, 0, stadhero, stadhero, stadhero_state, 0, ROT0, "Data East Corporation", "Stadium Hero (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, stadhero, 0, stadhero, stadhero, stadhero_state, empty_init, ROT0, "Data East Corporation", "Stadium Hero (Japan)", MACHINE_SUPPORTS_SAVE )

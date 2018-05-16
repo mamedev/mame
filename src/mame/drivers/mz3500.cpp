@@ -743,7 +743,7 @@ static const gfx_layout charlayout_8x16 =
 	8*16
 };
 
-static GFXDECODE_START( mz3500 )
+static GFXDECODE_START( gfx_mz3500 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_8x8,     0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0008, charlayout_8x8,     0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, charlayout_8x16,     0, 1 )
@@ -856,7 +856,7 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz3500)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz3500)
 
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
@@ -885,4 +885,4 @@ ROM_START( mz3500 )
 	ROM_LOAD( "mz-3500_cg-rom_2-b_m5l2764k.bin", 0x000000, 0x002000, CRC(29f2f80a) SHA1(64b307cd9de5a3327e3ec9f3d0d6b3485706f436) )
 ROM_END
 
-COMP( 198?, mz3500,  0,   0,   mz3500,  mz3500, mz3500_state,  0,  "Sharp",      "MZ-3500", MACHINE_IS_SKELETON )
+COMP( 198?, mz3500, 0, 0, mz3500, mz3500, mz3500_state, empty_init, "Sharp", "MZ-3500", MACHINE_IS_SKELETON )

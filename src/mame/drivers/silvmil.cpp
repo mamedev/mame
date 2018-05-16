@@ -123,7 +123,7 @@ public:
 	}
 
 
-	DECLARE_DRIVER_INIT(silvmil);
+	void init_silvmil();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
@@ -369,7 +369,7 @@ static const gfx_layout tlayout =
 };
 
 
-static GFXDECODE_START( silvmil )
+static GFXDECODE_START( gfx_silvmil )
 	GFXDECODE_ENTRY( "gfx2", 0, tlayout,       0, 64 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx1", 0, tlayout,       0, 64 )  /* Sprites 16x16 */
 GFXDECODE_END
@@ -424,7 +424,7 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", silvmil)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_silvmil)
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
@@ -597,11 +597,11 @@ void silvmil_state::tumblepb_gfx1_rearrange()
 	}
 }
 
-DRIVER_INIT_MEMBER(silvmil_state,silvmil)
+void silvmil_state::init_silvmil()
 {
 	tumblepb_gfx1_rearrange();
 }
 
-GAME( 1995, silvmil,    0,        silvmil,   silvmil,   silvmil_state, silvmil, ROT270, "Para", "Silver Millennium", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, puzzlove,   0,        puzzlove,  puzzlove,  silvmil_state, silvmil, ROT0,   "Para", "PuzzLove", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, puzzlovek,  puzzlove, puzzlovek, puzzlovek, silvmil_state, silvmil, ROT0,   "Para", "PuzzLove (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, silvmil,    0,        silvmil,   silvmil,   silvmil_state, init_silvmil, ROT270, "Para", "Silver Millennium", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, puzzlove,   0,        puzzlove,  puzzlove,  silvmil_state, init_silvmil, ROT0,   "Para", "PuzzLove", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, puzzlovek,  puzzlove, puzzlovek, puzzlovek, silvmil_state, init_silvmil, ROT0,   "Para", "PuzzLove (Korea)", MACHINE_SUPPORTS_SAVE )

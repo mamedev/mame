@@ -270,7 +270,7 @@ static const gfx_layout spritelayout =
 	4*16*8
 };
 
-static GFXDECODE_START( funkybee )
+static GFXDECODE_START( gfx_funkybee )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 16, 4 )
@@ -310,7 +310,7 @@ MACHINE_CONFIG_START(funkybee_state::funkybee)
 	MCFG_SCREEN_UPDATE_DRIVER(funkybee_state, screen_update_funkybee)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funkybee)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funkybee)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(funkybee_state, funkybee)
 
@@ -428,7 +428,7 @@ ROM_START( skylancre )
 	ROM_LOAD( "18s030.1a",     0x0000, 0x0020, CRC(e645bacb) SHA1(5f4c299c4cf165fd229731c0e5799a34892bf28e) )
 ROM_END
 
-GAME( 1982, funkybee,  0,        funkybee, funkybee,  funkybee_state, 0, ROT90, "Orca",                           "Funky Bee",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1982, funkybeeb, funkybee, funkybee, funkybeeb, funkybee_state, 0, ROT90, "bootleg",                        "Funky Bee (bootleg, harder)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1983, skylancr,  0,        funkybee, skylancr,  funkybee_state, 0, ROT90, "Orca",                           "Sky Lancer",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1983, skylancre, skylancr, funkybee, skylancre, funkybee_state, 0, ROT90, "Orca (Esco Trading Co license)", "Sky Lancer (Esco Trading Co license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, funkybee,  0,        funkybee, funkybee,  funkybee_state, empty_init, ROT90, "Orca",                           "Funky Bee",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1982, funkybeeb, funkybee, funkybee, funkybeeb, funkybee_state, empty_init, ROT90, "bootleg",                        "Funky Bee (bootleg, harder)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, skylancr,  0,        funkybee, skylancr,  funkybee_state, empty_init, ROT90, "Orca",                           "Sky Lancer",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, skylancre, skylancr, funkybee, skylancre, funkybee_state, empty_init, ROT90, "Orca (Esco Trading Co license)", "Sky Lancer (Esco Trading Co license)", MACHINE_SUPPORTS_SAVE )

@@ -587,7 +587,7 @@ static const gfx_layout charlayout =
 	32*8
 };
 
-static GFXDECODE_START( othunder )
+static GFXDECODE_START( gfx_othunder )
 	GFXDECODE_ENTRY( "gfx2", 0, tile16x8_layout, 0, 256 )   /* sprite parts */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 256 )   /* sprites & playfield */
 GFXDECODE_END
@@ -641,7 +641,7 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, othunder_state, vblank_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", othunder)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_othunder)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
@@ -912,9 +912,9 @@ ROM_START( othunderjsc ) // SC stands for Shopping Center. It was put in a small
 	ROM_LOAD16_WORD( "93c46_eeprom-othunder.ic86", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
-GAME( 1988, othunder,    0,        othunder, othunder, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othundero,   othunder, othunder, othunder, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderu,   othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderuo,  othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderj,   othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderjsc, othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunder,    0,        othunder, othunder, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othundero,   othunder, othunder, othunder, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderu,   othunder, othunder, othundu,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderuo,  othunder, othunder, othundu,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderj,   othunder, othunder, othundrj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderjsc, othunder, othunder, othundrj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",    MACHINE_SUPPORTS_SAVE )

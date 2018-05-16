@@ -397,7 +397,7 @@ static const gfx_layout charlayout_2bpp =
 	8*8
 };
 
-static GFXDECODE_START( ron )
+static GFXDECODE_START( gfx_ron )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_1bpp,     0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout_2bpp,     4, 1 )
 GFXDECODE_END
@@ -506,7 +506,7 @@ MACHINE_CONFIG_START(ron_state::ron)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ron_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ron)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ron)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	//MCFG_PALETTE_ADD("palette", 512)
@@ -558,4 +558,4 @@ ROM_START( ron2 )
 	ROM_LOAD( "82s129_4.2m",  0x100, 0x100, CRC(f3c05d59) SHA1(bd48963aa9f2bedaa0c1fd031d7c93089161d1d9) )
 ROM_END
 
-GAME( 1981, ron2,  0,   ron,  ron, ron_state,  0,       ROT270, "Sanritsu",      "Ron II Mah-Jongg", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS )
+GAME( 1981, ron2,  0,   ron,  ron, ron_state, empty_init, ROT270, "Sanritsu", "Ron II Mah-Jongg", MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS )

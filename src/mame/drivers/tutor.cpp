@@ -760,8 +760,7 @@ MACHINE_CONFIG_START(tutor_state::tutor)
 	MCFG_DEVICE_ADD("sn76489a", SN76489A, 3579545)   /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, tutor_state, write_centronics_busy))
@@ -806,7 +805,7 @@ ROM_START(pyuutajr)
 	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(2ca37e62) SHA1(eebdc5c37d3b532edd5e5ca65eb785269ebd1ac0))      /* system ROM */
 ROM_END
 
-//   YEAR    NAME      PARENT      COMPAT  MACHINE     INPUT     STATE          INIT    COMPANY   FULLNAME           FLAGS
-COMP(1983?,  tutor,    0,          0,      tutor,      tutor,    tutor_state,   0,      "Tomy",   "Tomy Tutor" ,     0)
-COMP(1982,   pyuuta,   tutor,      0,      tutor,      tutor,    tutor_state,   0,      "Tomy",   "Tomy Pyuuta" ,    0)
-COMP(1983,   pyuutajr, tutor,      0,      pyuutajr,   pyuutajr, tutor_state,   0,      "Tomy",   "Tomy Pyuuta Jr.", 0)
+//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS        INIT        COMPANY   FULLNAME           FLAGS
+COMP( 1983?, tutor,    0,      0,      tutor,    tutor,    tutor_state, empty_init, "Tomy",   "Tomy Tutor" ,     0)
+COMP( 1982,  pyuuta,   tutor,  0,      tutor,    tutor,    tutor_state, empty_init, "Tomy",   "Tomy Pyuuta" ,    0)
+COMP( 1983,  pyuutajr, tutor,  0,      pyuutajr, pyuutajr, tutor_state, empty_init, "Tomy",   "Tomy Pyuuta Jr.", 0)

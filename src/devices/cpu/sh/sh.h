@@ -110,7 +110,6 @@ public:
 		, m_interrupt(nullptr)
 		, m_nocode(nullptr)
 		, m_out_of_cycles(nullptr)
-		, m_xor(0)
 	{ }
 
 	// Data that needs to be stored close to the generated DRC code
@@ -168,6 +167,9 @@ public:
 	virtual void WB(offs_t A, uint8_t V) = 0;
 	virtual void WW(offs_t A, uint16_t V) = 0;
 	virtual void WL(offs_t A, uint32_t V) = 0;
+
+	virtual void set_frt_input(int state) = 0;
+	void pulse_frt_input() { set_frt_input(ASSERT_LINE); set_frt_input(CLEAR_LINE); }
 
 protected:
 	// compilation boundaries -- how far back/forward does the analysis extend?
@@ -373,7 +375,8 @@ public:
 
 	void sh2drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 
-	direct_read_data<0> *m_direct;
+	std::function<u16 (offs_t)> m_pr16;
+	std::function<const void * (offs_t)> m_prptr;
 	address_space *m_program;
 
 	std::unique_ptr<drcuml_state>      m_drcuml;                 /* DRC UML generator state */
@@ -438,7 +441,6 @@ public:
 	int m_cpu_type;
 	uint32_t m_am;
 	bool m_isdrc;
-	int m_xor;
 
 	void sh2drc_set_options(uint32_t options);
 	void sh2drc_add_pcflush(offs_t address);

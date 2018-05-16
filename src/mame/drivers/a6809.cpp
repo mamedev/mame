@@ -240,8 +240,7 @@ MACHINE_CONFIG_START(a6809_state::a6809)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4)
@@ -274,5 +273,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR   NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1980, a6809,  0,      0,       a6809,     a6809, a6809_state,     0,     "Acorn",  "System 3 (6809 CPU)", 0 )
+/*    YEAR   NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME               FLAGS */
+COMP( 1980, a6809, 0,      0,      a6809,   a6809, a6809_state, empty_init, "Acorn", "System 3 (6809 CPU)", 0 )

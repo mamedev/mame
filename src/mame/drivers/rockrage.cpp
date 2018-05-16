@@ -223,7 +223,7 @@ static const gfx_layout spritelayout =
 	32*8            /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( rockrage )
+static GFXDECODE_START( gfx_rockrage )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 32 )  /* colors 00..31, using 2 lookup tables */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 512, 16 )  /* colors 32..47, using lookup table */
 GFXDECODE_END
@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 	MCFG_K007420_CALLBACK_OWNER(rockrage_state, rockrage_sprite_callback)
 	MCFG_K007420_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rockrage)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rockrage)
 	MCFG_PALETTE_ADD("palette", 16*16*3)
 	MCFG_PALETTE_INDIRECT_ENTRIES(64)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -395,6 +395,6 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1986, rockrage,  0,        rockrage, rockrage, rockrage_state, 0,   ROT0,   "Konami", "Rock'n Rage (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rockragea, rockrage, rockrage, rockrage, rockrage_state, 0,   ROT0,   "Konami", "Rock'n Rage (prototype?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rockragej, rockrage, rockrage, rockrage, rockrage_state, 0,   ROT0,   "Konami", "Koi no Hotrock (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockrage,  0,        rockrage, rockrage, rockrage_state, empty_init, ROT0, "Konami", "Rock'n Rage (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockragea, rockrage, rockrage, rockrage, rockrage_state, empty_init, ROT0, "Konami", "Rock'n Rage (prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rockragej, rockrage, rockrage, rockrage, rockrage_state, empty_init, ROT0, "Konami", "Koi no Hotrock (Japan)", MACHINE_SUPPORTS_SAVE )

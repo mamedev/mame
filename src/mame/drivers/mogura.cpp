@@ -199,7 +199,7 @@ static const gfx_layout tiles8x8_layout =
 	16*8
 };
 
-static GFXDECODE_START( mogura )
+static GFXDECODE_START( gfx_mogura )
 	GFXDECODE_ENTRY( nullptr, 0, tiles8x8_layout, 0, 8 )
 GFXDECODE_END
 
@@ -224,7 +224,7 @@ MACHINE_CONFIG_START(mogura_state::mogura)
 	MCFG_SCREEN_UPDATE_DRIVER(mogura_state, screen_update_mogura)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mogura)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mogura)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(mogura_state, mogura)
 
@@ -247,4 +247,4 @@ ROM_START( mogura )
 	ROM_LOAD( "gx141.7j", 0x00, 0x20,  CRC(b21c5d5f) SHA1(6913c840dd69a7d4687f4c4cbe3ff12300f62bc2) )
 ROM_END
 
-GAME( 1991, mogura, 0, mogura, mogura, mogura_state, 0, ROT0, "Konami", "Mogura Desse (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mogura, 0, mogura, mogura, mogura_state, empty_init, ROT0, "Konami", "Mogura Desse (Japan)", MACHINE_SUPPORTS_SAVE )

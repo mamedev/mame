@@ -298,7 +298,7 @@ static const gfx_layout tile_layout =
 };
 
 
-static GFXDECODE_START( mole )
+static GFXDECODE_START( gfx_mole )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tile_layout, 0x00, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x3000, tile_layout, 0x00, 1 )
 GFXDECODE_END
@@ -336,7 +336,7 @@ MACHINE_CONFIG_START(mole_state::mole)
 	MCFG_SCREEN_UPDATE_DRIVER(mole_state, screen_update_mole)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mole)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mole)
 	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
@@ -375,4 +375,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, mole, 0, mole, mole, mole_state, 0, ROT0, "Yachiyo Electronics, Ltd.", "Mole Attack", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mole, 0, mole, mole, mole_state, empty_init, ROT0, "Yachiyo Electronics, Ltd.", "Mole Attack", MACHINE_SUPPORTS_SAVE )

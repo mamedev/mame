@@ -16,7 +16,7 @@ Atari Triple Hunt Driver
 
 
 
-DRIVER_INIT_MEMBER(triplhnt_state,triplhnt)
+void triplhnt_state::init_triplhnt()
 {
 	machine().device<nvram_device>("nvram")->set_base(m_cmos, sizeof(m_cmos));
 }
@@ -270,7 +270,7 @@ static const gfx_layout triplhnt_tile_layout =
 };
 
 
-static GFXDECODE_START( triplhnt )
+static GFXDECODE_START( gfx_triplhnt )
 	GFXDECODE_ENTRY( "gfx1", 0, triplhnt_small_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, triplhnt_large_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, triplhnt_tile_layout, 4, 2 )
@@ -321,7 +321,7 @@ MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 	MCFG_SCREEN_UPDATE_DRIVER(triplhnt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", triplhnt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triplhnt)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(triplhnt_state, triplhnt)
 
@@ -359,4 +359,4 @@ ROM_START( triplhnt )
 ROM_END
 
 
-GAME( 1977, triplhnt, 0, triplhnt, triplhnt, triplhnt_state, triplhnt, 0, "Atari", "Triple Hunt", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, triplhnt, 0, triplhnt, triplhnt, triplhnt_state, init_triplhnt, 0, "Atari", "Triple Hunt", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

@@ -585,7 +585,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT  CLASS       INIT  ROTATION  COMPANY  FULLNAME                FLAGS
-GAME( 1986, guab,     0,      guab,    guab,  guab_state, 0,    ROT0,     "JPM",   "Give us a Break",      0 )
-GAME( 1986, crisscrs, 0,      guab,    guab,  guab_state, 0,    ROT0,     "JPM",   "Criss Cross (Sweden)", MACHINE_NOT_WORKING )
-GAME( 1988, tenup,    0,      guab,    tenup, guab_state, 0,    ROT0,     "JPM",   "Ten Up",               0 )
+//    YEAR  NAME      PARENT  MACHINE  INPUT  CLASS       INIT        ROTATION  COMPANY  FULLNAME                FLAGS
+GAME( 1986, guab,     0,      guab,    guab,  guab_state, empty_init, ROT0,     "JPM",   "Give us a Break",      0 )
+GAME( 1986, crisscrs, 0,      guab,    guab,  guab_state, empty_init, ROT0,     "JPM",   "Criss Cross (Sweden)", MACHINE_NOT_WORKING )
+GAME( 1988, tenup,    0,      guab,    tenup, guab_state, empty_init, ROT0,     "JPM",   "Ten Up",               0 )

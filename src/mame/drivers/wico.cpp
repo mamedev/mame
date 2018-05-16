@@ -474,4 +474,4 @@ ROM_END
 / Big Top  (1977)
 /-------------------------------------------------------------------*/
 
-GAME(1984,  aftor,  0,  wico,  wico, wico_state,  0,  ROT0,  "Wico", "Af-Tor", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1984,  aftor,  0,  wico,  wico, wico_state, empty_init, ROT0,  "Wico", "Af-Tor", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

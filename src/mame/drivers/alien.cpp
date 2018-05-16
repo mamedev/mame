@@ -18,7 +18,7 @@
 
    Known undumped games:
     - Donkey Kong: Jungle Fever (c) 2005 Capcom / Nintendo / Namco
-    - Donkey Kong: Banana Kingdom (c) 2006 Capcom / Nintendo / Namco
+    - Donkey Kong: Banana Kingdom (satellite unit) (c) 2007 Capcom / Nintendo / Namco
 
 ***********************************************************************************/
 
@@ -145,6 +145,26 @@ ROM_START( pingu )
 	DISK_IMAGE( "pingu", 0, SHA1(9163fb1d4dd96ef4417cad458f2270bf7bd58f01) )
 ROM_END
 
+// Host unit board, GPUs and YMZ770B not populated.
+// there is known to exists Satellite unit board (with GPUs and SPU populated), currently not dumped.
+ROM_START( dkbanana )
+	ROM_REGION( 0x800000, "maincpu", 0 ) // BIOS code
+	ROM_LOAD32_WORD( "dnk_m04.ic30", 0x000000, 0x400000, CRC(a294f17c) SHA1(7e0f865342f63f93a9a31ad7e6d3b70c59f3fa1b) )
+	ROM_LOAD32_WORD( "dnk_m05.ic33", 0x000002, 0x400000, CRC(22f5db87) SHA1(bdca65d39e94d88979218c8c586c6f20bb00e5ce) )
 
-GAME( 2005, alien,  0,      alien, alien, alien_state, 0, ROT0, "Capcom", "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2006, pingu,  0,      alien, alien, alien_state, 0, ROT0, "Pygos Group / Capcom", "Pingu's Ice Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+	ROM_REGION( 0x800100, "ymz770b", 0 ) //sound samples flash rom
+	ROM_LOAD( "29lj064.ic10", 0x000000, 0x800100, CRC(67cec133) SHA1(1412287fe977eb422a3cca6a0da1523859c2562e) )
+
+	ROM_REGION( 0x8000, "nvram", ROMREGION_ERASEFF) //timekeeper device
+	ROM_LOAD( "m48t35y.ic26", 0x000000, 0x008000, CRC(a708bbeb) SHA1(ec96decbc7e63d700b844704dafde14513eea20e) )
+
+	// contain host.abs and sate.abs ELF executables and game assets
+	// high likely same card was used in both Host and Satellite units
+	DISK_REGION( "card" ) //compact flash
+	DISK_IMAGE( "dkbanana", 0, SHA1(c6b50486f2a6382a7eb36167712342212f87c189) )
+ROM_END
+
+
+GAME( 2005, alien,    0, alien, alien, alien_state, empty_init, ROT0, "Capcom",               "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, pingu,    0, alien, alien, alien_state, empty_init, ROT0, "Pygos Group / Capcom", "Pingu's Ice Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, dkbanana, 0, alien, alien, alien_state, empty_init, ROT0, "Capcom",               "Donkey Kong Banana Kingdom (host)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

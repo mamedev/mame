@@ -89,7 +89,7 @@ public:
 	required_shared_ptr<uint8_t> m_tile_control_ram;
 	DECLARE_READ8_MEMBER(ldp_read);
 	DECLARE_WRITE8_MEMBER(ldp_write);
-	DECLARE_DRIVER_INIT(lgp);
+	void init_lgp();
 	virtual void machine_start() override;
 	uint32_t screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_lgp);
@@ -346,7 +346,7 @@ static const gfx_layout lgp_gfx_layout_16x32 =
 	32*128
 };
 
-static GFXDECODE_START( lgp )
+static GFXDECODE_START( gfx_lgp )
 	GFXDECODE_ENTRY("gfx1", 0, lgp_gfx_layout, 0x0, 0x100)
 	GFXDECODE_ENTRY("gfx4", 0, lgp_gfx_layout_16x32, 0x0, 0x100)
 GFXDECODE_END
@@ -430,7 +430,7 @@ MACHINE_CONFIG_START(lgp_state::lgp)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(lgp_state,lgp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lgp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lgp)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -615,10 +615,10 @@ ROM_START( lgpalt )
 	DISK_IMAGE_READONLY( "lgp", 0, NO_DUMP )
 ROM_END
 
-DRIVER_INIT_MEMBER(lgp_state,lgp)
+void lgp_state::init_lgp()
 {
 }
 
-/*    YEAR  NAME PARENT   MACHINE INPUT STATE       INIT MONITOR  COMPANY   FULLNAME                         FLAGS) */
-GAME( 1983, lgp, 0,       lgp,    lgp,  lgp_state,  lgp, ROT0,    "Taito",  "Laser Grand Prix",              MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-GAME( 1983, lgpalt, lgp,  lgp,    lgp,  lgp_state,  lgp, ROT0,    "Taito",  "Laser Grand Prix (alternate)",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+/*    YEAR  NAME PARENT   MACHINE INPUT STATE      INIT      MONITOR  COMPANY   FULLNAME                         FLAGS) */
+GAME( 1983, lgp, 0,       lgp,    lgp,  lgp_state, init_lgp, ROT0,    "Taito",  "Laser Grand Prix",              MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME( 1983, lgpalt, lgp,  lgp,    lgp,  lgp_state, init_lgp, ROT0,    "Taito",  "Laser Grand Prix (alternate)",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

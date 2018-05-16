@@ -84,7 +84,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	DECLARE_DRIVER_INIT(suprgolf);
+	void init_suprgolf();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -480,7 +480,7 @@ static const gfx_layout gfxlayout =
 	8*8*4
 };
 
-static GFXDECODE_START( suprgolf )
+static GFXDECODE_START( gfx_suprgolf )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 0x80 )
 GFXDECODE_END
 
@@ -520,7 +520,7 @@ MACHINE_CONFIG_START(suprgolf_state::suprgolf)
 	MCFG_SCREEN_UPDATE_DRIVER(suprgolf_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprgolf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprgolf)
 	MCFG_PALETTE_ADD("palette", 0x800)
 
 	/* sound hardware */
@@ -669,7 +669,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(suprgolf_state,suprgolf)
+void suprgolf_state::init_suprgolf()
 {
 	uint8_t *ROM = memregion("user2")->base();
 
@@ -678,6 +678,6 @@ DRIVER_INIT_MEMBER(suprgolf_state,suprgolf)
 	ROM[0x6d72+(0x4000*3)-0x4000] = 0x20; //patch ROM check
 }
 
-GAME( 1989, suprgolf,  0,         suprgolf,  suprgolf, suprgolf_state, 0,        ROT0, "Nasco", "Super Crowns Golf (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, suprgolfj, suprgolf,  suprgolf,  suprgolf, suprgolf_state, suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, albatross, suprgolf,  suprgolf,  suprgolf, suprgolf_state, 0,        ROT0, "Nasco", "Albatross (US Prototype?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL| MACHINE_SUPPORTS_SAVE )
+GAME( 1989, suprgolf,  0,         suprgolf,  suprgolf, suprgolf_state, empty_init,    ROT0, "Nasco", "Super Crowns Golf (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, suprgolfj, suprgolf,  suprgolf,  suprgolf, suprgolf_state, init_suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, albatross, suprgolf,  suprgolf,  suprgolf, suprgolf_state, empty_init,    ROT0, "Nasco", "Albatross (US Prototype?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL| MACHINE_SUPPORTS_SAVE )

@@ -621,15 +621,15 @@ static const gfx_layout charlayout =
 #endif
 
 
-static GFXDECODE_START( syvalion )
+static GFXDECODE_START( gfx_syvalion )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0,     32 )
 GFXDECODE_END
 
-static GFXDECODE_START( recordbr )
+static GFXDECODE_START( gfx_recordbr )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0,     32 )
 GFXDECODE_END
 
-static GFXDECODE_START( dleague )
+static GFXDECODE_START( gfx_dleague )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0,     32 )
 GFXDECODE_END
 
@@ -674,7 +674,7 @@ MACHINE_CONFIG_START(taitoh_state::syvalion)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_syvalion)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", syvalion)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_syvalion)
 	MCFG_PALETTE_ADD("palette", 33*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -730,7 +730,7 @@ MACHINE_CONFIG_START(taitoh_state::recordbr)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_recordbr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", recordbr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_recordbr)
 	MCFG_PALETTE_ADD("palette", 32*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -795,7 +795,7 @@ MACHINE_CONFIG_START(taitoh_state::dleague)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_dleague)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dleague)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dleague)
 	MCFG_PALETTE_ADD("palette", 33*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1134,13 +1134,13 @@ ROM_START( dleaguej )
 ROM_END
 
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE         INIT  MONITOR  COMPANY                      FULLNAME                                 FLAGS
-GAME( 1988, syvalion,  0,        syvalion, syvalion,  taitoh_state, 0,    ROT0,    "Taito Corporation",         "Syvalion (Japan)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1988, syvalionp, syvalion, syvalion, syvalionp, taitoh_state, 0,    ROT0,    "Taito Corporation",         "Syvalion (World, prototype)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, syvalionu, syvalion, syvalion, syvalion,  taitoh_state, 0,    ROT0,    "Taito America Corporation", "Syvalion (US, PS2 Taito Legends 2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, syvalionw, syvalion, syvalion, syvalion,  taitoh_state, 0,    ROT0,    "Taito Corporation Japan",   "Syvalion (World, PS2 Taito Legends 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, recordbr,  0,        recordbr, recordbr,  taitoh_state, 0,    ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gogold,    recordbr, recordbr, gogold,    taitoh_state, 0,    ROT0,    "Taito Corporation",         "Go For The Gold (Japan)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tetristh,  tetris,   tetristh, tetristh,  taitoh_state, 0,    ROT0,    "Sega",                      "Tetris (Japan, Taito H-System)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dleague,   0,        dleague,  dleague,   taitoh_state, 0,    ROT0,    "Taito America Corporation", "Dynamite League (US)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dleaguej,  dleague,  dleague,  dleaguej,  taitoh_state, 0,    ROT0,    "Taito Corporation",         "Dynamite League (Japan)",               MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE         INIT        MONITOR  COMPANY                      FULLNAME                                 FLAGS
+GAME( 1988, syvalion,  0,        syvalion, syvalion,  taitoh_state, empty_init, ROT0,    "Taito Corporation",         "Syvalion (Japan)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, syvalionp, syvalion, syvalion, syvalionp, taitoh_state, empty_init, ROT0,    "Taito Corporation",         "Syvalion (World, prototype)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, syvalionu, syvalion, syvalion, syvalion,  taitoh_state, empty_init, ROT0,    "Taito America Corporation", "Syvalion (US, PS2 Taito Legends 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, syvalionw, syvalion, syvalion, syvalion,  taitoh_state, empty_init, ROT0,    "Taito Corporation Japan",   "Syvalion (World, PS2 Taito Legends 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, recordbr,  0,        recordbr, recordbr,  taitoh_state, empty_init, ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gogold,    recordbr, recordbr, gogold,    taitoh_state, empty_init, ROT0,    "Taito Corporation",         "Go For The Gold (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetristh,  tetris,   tetristh, tetristh,  taitoh_state, empty_init, ROT0,    "Sega",                      "Tetris (Japan, Taito H-System)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dleague,   0,        dleague,  dleague,   taitoh_state, empty_init, ROT0,    "Taito America Corporation", "Dynamite League (US)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dleaguej,  dleague,  dleague,  dleaguej,  taitoh_state, empty_init, ROT0,    "Taito Corporation",         "Dynamite League (Japan)",               MACHINE_SUPPORTS_SAVE )

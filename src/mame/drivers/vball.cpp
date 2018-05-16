@@ -390,7 +390,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( vb )
+static GFXDECODE_START( gfx_vb )
 	GFXDECODE_ENTRY( "fg_tiles", 0, charlayout,     0, 8 )  /* 8x8 chars */
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 128, 8 )  /* 16x16 sprites */
 GFXDECODE_END
@@ -413,7 +413,7 @@ MACHINE_CONFIG_START(vball_state::vball)
 	MCFG_SCREEN_UPDATE_DRIVER(vball_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vb)
 	MCFG_PALETTE_ADD("palette", 256)
 
 
@@ -561,7 +561,7 @@ ROM_START( vball2pjb ) /* bootleg of the Japan set with unmoddified program rom 
 ROM_END
 
 
-GAME( 1988, vball,    0,     vball,    vball,    vball_state, 0, ROT0, "Technos Japan", "U.S. Championship V'ball (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vball2pj, vball, vball,    vball2pj, vball_state, 0, ROT0, "Technos Japan", "U.S. Championship V'ball (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vballb,   vball, vball,    vball,    vball_state, 0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of US set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vball2pjb,vball, vball,    vball,    vball_state, 0, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of Japan set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vball,    0,     vball,    vball,    vball_state, empty_init, ROT0, "Technos Japan", "U.S. Championship V'ball (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vball2pj, vball, vball,    vball2pj, vball_state, empty_init, ROT0, "Technos Japan", "U.S. Championship V'ball (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vballb,   vball, vball,    vball,    vball_state, empty_init, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of US set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vball2pjb,vball, vball,    vball,    vball_state, empty_init, ROT0, "bootleg", "U.S. Championship V'ball (bootleg of Japan set)", MACHINE_SUPPORTS_SAVE )

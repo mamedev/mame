@@ -750,7 +750,7 @@ static const gfx_layout layout_8x32 =
 	32*32
 };
 
-static GFXDECODE_START( dunhuang )
+static GFXDECODE_START( gfx_dunhuang )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x32, 0, 16 )
 GFXDECODE_END
@@ -823,7 +823,7 @@ MACHINE_CONFIG_START(dunhuang_state::dunhuang)
 	MCFG_SCREEN_UPDATE_DRIVER(dunhuang_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dunhuang)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dunhuang)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
@@ -864,4 +864,4 @@ ROM_START( dunhuang )
 	ROM_LOAD( "rom6.u1", 0x00000, 0x20000, CRC(31cfdc29) SHA1(725249eae9227eadf05418b799e0da0254bb2f51) )
 ROM_END
 
-GAME( 1995, dunhuang, 0, dunhuang, dunhuang, dunhuang_state, 0, ROT0, "Spirit", "Mahjong Dunhuang", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dunhuang, 0, dunhuang, dunhuang, dunhuang_state, empty_init, ROT0, "Spirit", "Mahjong Dunhuang", MACHINE_SUPPORTS_SAVE )

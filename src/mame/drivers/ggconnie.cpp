@@ -277,7 +277,7 @@ MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/3, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( ggconnie_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260:palette")
+	MCFG_SCREEN_PALETTE("huc6260")
 
 	MCFG_DEVICE_ADD("huc6260", HUC6260, PCE_MAIN_CLOCK/3)
 	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6202", huc6202_device, next_pixel))
@@ -344,5 +344,5 @@ ROM_START(smf)
 	ROM_LOAD( "gal16v8b.u8", 0x400, 0x117, NO_DUMP )
 ROM_END
 
-GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1997, smf,      0, ggconnie, smf, ggconnie_state, pce_common, ROT0, "Eighting", "Super Medal Fighters (Japan 970228)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, init_pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, smf,      0, ggconnie, smf,      ggconnie_state, init_pce_common, ROT0, "Eighting", "Super Medal Fighters (Japan 970228)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

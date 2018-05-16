@@ -332,7 +332,7 @@ static const gfx_layout tilelayout3 =
 };
 #endif
 
-static GFXDECODE_START( iqblock )
+static GFXDECODE_START( gfx_iqblock )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout1, 0, 16 )    /* only odd color codes are used */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2, 0,  4 )    /* only color codes 0 and 3 used */
 GFXDECODE_END
@@ -362,7 +362,7 @@ MACHINE_CONFIG_START(iqblock_state::iqblock)
 	MCFG_SCREEN_UPDATE_DRIVER(iqblock_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", iqblock)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_iqblock)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -478,13 +478,11 @@ ROM_START( grndtour )
 	ROM_LOAD( "grand5.u24",        0x4000, 0x4000, CRC(f896efb2) SHA1(8dc8546e363b4ff80983e3b8e2a19ebb7ff30c7b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(iqblock_state,iqblock)
+void iqblock_state::init_iqblock()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
-
 	/* decrypt the program ROM */
-	for (i = 0;i < 0xf000;i++)
+	for (int i = 0; i < 0xf000; i++)
 	{
 		if ((i & 0x0282) != 0x0282) rom[i] ^= 0x01;
 		if ((i & 0x0940) == 0x0940) rom[i] ^= 0x02;
@@ -495,13 +493,11 @@ DRIVER_INIT_MEMBER(iqblock_state,iqblock)
 	m_video_type=1;
 }
 
-DRIVER_INIT_MEMBER(iqblock_state,grndtour)
+void iqblock_state::init_grndtour()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
-
 	/* decrypt the program ROM */
-	for (i = 0;i < 0xf000;i++)
+	for (int i = 0; i < 0xf000; i++)
 	{
 		if ((i & 0x0282) != 0x0282) rom[i] ^= 0x01;
 		if ((i & 0x0940) == 0x0940) rom[i] ^= 0x02;
@@ -514,5 +510,5 @@ DRIVER_INIT_MEMBER(iqblock_state,grndtour)
 
 
 
-GAME( 1993, iqblock,  0, iqblock,  iqblock, iqblock_state, iqblock,  ROT0, "IGS", "IQ-Block (V100U)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1993, grndtour, 0, iqblock,  grndtour,iqblock_state, grndtour, ROT0, "IGS", "Grand Tour (V100U)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, iqblock,  0, iqblock, iqblock,  iqblock_state, init_iqblock,  ROT0, "IGS", "IQ-Block (V100U)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1993, grndtour, 0, iqblock, grndtour, iqblock_state, init_grndtour, ROT0, "IGS", "Grand Tour (V100U)", MACHINE_SUPPORTS_SAVE )

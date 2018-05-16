@@ -824,10 +824,8 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -885,10 +883,8 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)   /* one two-level buzzer */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);   /* one two-level buzzer */
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -1050,6 +1046,6 @@ static INPUT_PORTS_START(tm990_189)
 	PORT_BIT( 0x3ff, 0x1aa,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0xd2,0x282 ) PORT_PLAYER(2) PORT_REVERSE
 INPUT_PORTS_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT      STATE           INIT  COMPANY              FULLNAME                                                                FLAGS
-COMP( 1978, 990189,   0,        0,      tm990_189,   tm990_189, tm990189_state, 0,    "Texas Instruments", "TM 990/189 University Board microcomputer",                            0 )
-COMP( 1980, 990189v,  990189,   0,      tm990_189_v, tm990_189, tm990189_state, 0,    "Texas Instruments", "TM 990/189 University Board microcomputer with Video Board Interface", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE      INPUT      CLASS           INIT        COMPANY              FULLNAME                                                                FLAGS
+COMP( 1978, 990189,  0,      0,      tm990_189,   tm990_189, tm990189_state, empty_init, "Texas Instruments", "TM 990/189 University Board microcomputer",                            0 )
+COMP( 1980, 990189v, 990189, 0,      tm990_189_v, tm990_189, tm990189_state, empty_init, "Texas Instruments", "TM 990/189 University Board microcomputer with Video Board Interface", 0 )

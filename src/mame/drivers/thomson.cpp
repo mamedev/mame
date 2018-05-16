@@ -768,9 +768,9 @@ MACHINE_CONFIG_START(thomson_state::t9000)
 MACHINE_CONFIG_END
 
 
-COMP ( 1982, to7, 0, 0, to7, to7, thomson_state, 0,  "Thomson", "TO7", 0 )
+COMP( 1982, to7, 0, 0, to7, to7, thomson_state, empty_init, "Thomson", "TO7", 0 )
 
-COMP ( 1980, t9000, to7, 0, t9000, t9000, thomson_state,  0, "Thomson", "T9000", 0 )
+COMP( 1980, t9000, to7, 0, t9000, t9000, thomson_state, empty_init, "Thomson", "T9000", 0 )
 
 
 /***************************** TO7/70 *********************************
@@ -960,9 +960,9 @@ MACHINE_CONFIG_START(thomson_state::to770a)
 	MCFG_SOFTWARE_LIST_ADD("t770a_cart_list","to770a_cart")
 MACHINE_CONFIG_END
 
-COMP ( 1984, to770, 0, 0, to770, to770, thomson_state, 0, "Thomson", "TO7/70", 0 )
+COMP( 1984, to770, 0, 0, to770, to770, thomson_state, empty_init, "Thomson", "TO7/70", 0 )
 
-COMP ( 1984, to770a, to770, 0, to770a, to770a, thomson_state, 0, "Thomson", "TO7/70 (Arabic)", 0 )
+COMP( 1984, to770a, to770, 0, to770a, to770a, thomson_state, empty_init, "Thomson", "TO7/70 (Arabic)", 0 )
 
 
 /************************* MO5 / MO5E *********************************
@@ -1171,9 +1171,9 @@ MACHINE_CONFIG_START(thomson_state::mo5e)
 MACHINE_CONFIG_END
 
 
-COMP ( 1984, mo5, 0, 0, mo5, mo5, thomson_state, 0, "Thomson", "MO5", 0 )
+COMP( 1984, mo5, 0, 0, mo5, mo5, thomson_state, empty_init, "Thomson", "MO5", 0 )
 
-COMP ( 1986, mo5e, mo5, 0, mo5e, mo5e, thomson_state, 0, "Thomson", "MO5E", 0 )
+COMP( 1986, mo5e, mo5, 0, mo5e, mo5e, thomson_state, empty_init, "Thomson", "MO5E", 0 )
 
 
 /********************************* TO9 *******************************
@@ -1512,7 +1512,7 @@ MACHINE_CONFIG_START(thomson_state::to9)
 MACHINE_CONFIG_END
 
 
-COMP ( 1985, to9, 0, 0, to9, to9, thomson_state, 0, "Thomson", "TO9", MACHINE_IMPERFECT_COLORS )
+COMP( 1985, to9, 0, 0, to9, to9, thomson_state, empty_init, "Thomson", "TO9", MACHINE_IMPERFECT_COLORS )
 
 
 /******************************** TO8 ********************************
@@ -1750,9 +1750,9 @@ MACHINE_CONFIG_START(thomson_state::to8d)
 MACHINE_CONFIG_END
 
 
-COMP ( 1986, to8, 0, 0, to8, to8, thomson_state, 0, "Thomson", "TO8", 0 )
+COMP( 1986, to8, 0, 0, to8, to8, thomson_state, empty_init, "Thomson", "TO8", 0 )
 
-COMP ( 1987, to8d, to8, 0, to8d, to8d, thomson_state, 0, "Thomson", "TO8D", 0 )
+COMP( 1987, to8d, to8, 0, to8d, to8d, thomson_state, empty_init, "Thomson", "TO8D", 0 )
 
 
 /******************************** TO9+ *******************************
@@ -1911,7 +1911,7 @@ MACHINE_CONFIG_START(thomson_state::to9p)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_qd_list", "to7_qd")
 MACHINE_CONFIG_END
 
-COMP ( 1986, to9p, 0, 0, to9p, to9p, thomson_state, 0, "Thomson", "TO9+", 0 )
+COMP( 1986, to9p, 0, 0, to9p, to9p, thomson_state, empty_init, "Thomson", "TO9+", 0 )
 
 
 
@@ -2292,9 +2292,9 @@ MACHINE_CONFIG_START(thomson_state::pro128)
 	MCFG_SOFTWARE_LIST_ADD("p128_flop_list","pro128_flop")
 MACHINE_CONFIG_END
 
-COMP ( 1986, mo6, 0, 0, mo6, mo6, thomson_state, 0, "Thomson", "MO6", 0 )
+COMP( 1986, mo6, 0, 0, mo6, mo6, thomson_state, empty_init, "Thomson", "MO6", 0 )
 
-COMP ( 1986, pro128, mo6, 0, pro128, pro128, thomson_state, 0, "Olivetti / Thomson", "Prodest PC 128", 0 )
+COMP( 1986, pro128, mo6, 0, pro128, pro128, thomson_state, empty_init, "Olivetti / Thomson", "Prodest PC 128", 0 )
 
 
 
@@ -2548,4 +2548,4 @@ MACHINE_CONFIG_START(thomson_state::mo5nr)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_qd_list","mo5_qd")
 MACHINE_CONFIG_END
 
-COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, thomson_state, 0, "Thomson", "MO5 NR", 0 )
+COMP( 1986, mo5nr, 0, 0, mo5nr, mo5nr, thomson_state, empty_init, "Thomson", "MO5 NR", 0 )

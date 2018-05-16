@@ -591,7 +591,7 @@ static const gfx_layout charlayout =
 	10*8                    /* every char takes 10 bytes */
 };
 
-static GFXDECODE_START( lazercmd )
+static GFXDECODE_START( gfx_lazercmd )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -647,7 +647,7 @@ MACHINE_CONFIG_START(lazercmd_state::lazercmd)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lazercmd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lazercmd)
 	MCFG_PALETTE_ADD("palette", 5)
 	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
@@ -686,7 +686,7 @@ MACHINE_CONFIG_START(lazercmd_state::medlanes)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lazercmd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lazercmd)
 	MCFG_PALETTE_ADD("palette", 5)
 	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
@@ -721,7 +721,7 @@ MACHINE_CONFIG_START(lazercmd_state::bbonk)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lazercmd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lazercmd)
 	MCFG_PALETTE_ADD("palette", 5)
 	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
@@ -783,9 +783,8 @@ ROM_START( bbonk )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(lazercmd_state,lazercmd)
+void lazercmd_state::init_lazercmd()
 {
-	int i, y;
 	uint8_t *gfx = memregion("gfx1")->base();
 
 /******************************************************************
@@ -796,12 +795,12 @@ DRIVER_INIT_MEMBER(lazercmd_state,lazercmd)
  * character generator only contains 8 rows, so we expand the
  * font to 8x10.
  ******************************************************************/
-	for (i = 0; i < 0x40; i++)
+	for (int i = 0; i < 0x40; i++)
 	{
 		uint8_t *d = &gfx[0 * 64 * 10 + i * VERT_CHR];
 		uint8_t *s = &gfx[4 * 64 * 10 + i * VERT_FNT];
 
-		for (y = 0; y < VERT_CHR; y++)
+		for (int y = 0; y < VERT_CHR; y++)
 		{
 			d[0 * 64 * 10] = (y < VERT_FNT) ? *s++ : 0xff;
 			d[1 * 64 * 10] = (y == VERT_CHR - 1) ? 0 : *d;
@@ -814,6 +813,6 @@ DRIVER_INIT_MEMBER(lazercmd_state,lazercmd)
 
 
 
-GAMEL( 1976, lazercmd, 0, lazercmd, lazercmd, lazercmd_state, lazercmd, ROT0, "Meadows Games, Inc.", "Lazer Command", MACHINE_SUPPORTS_SAVE, layout_lazercmd )
-GAMEL( 1977, medlanes, 0, medlanes, medlanes, lazercmd_state, lazercmd, ROT0, "Meadows Games, Inc.", "Meadows Lanes", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_medlanes )
-GAME ( 1976, bbonk,    0, bbonk,    bbonk,    lazercmd_state, lazercmd, ROT0, "Meadows Games, Inc.", "Bigfoot Bonkers", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1976, lazercmd, 0, lazercmd, lazercmd, lazercmd_state, init_lazercmd, ROT0, "Meadows Games, Inc.", "Lazer Command", MACHINE_SUPPORTS_SAVE, layout_lazercmd )
+GAMEL( 1977, medlanes, 0, medlanes, medlanes, lazercmd_state, init_lazercmd, ROT0, "Meadows Games, Inc.", "Meadows Lanes", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_medlanes )
+GAME(  1976, bbonk,    0, bbonk,    bbonk,    lazercmd_state, init_lazercmd, ROT0, "Meadows Games, Inc.", "Bigfoot Bonkers", MACHINE_SUPPORTS_SAVE )

@@ -254,7 +254,7 @@ static const gfx_layout hyperspt_spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( hyperspt )
+static GFXDECODE_START( gfx_hyperspt )
 	GFXDECODE_ENTRY( "gfx1", 0, hyperspt_spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, hyperspt_charlayout,    16*16, 16 )
 GFXDECODE_END
@@ -284,7 +284,7 @@ static const gfx_layout roadf_spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( roadf )
+static GFXDECODE_START( gfx_roadf )
 	GFXDECODE_ENTRY( "gfx1", 0, roadf_spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, roadf_charlayout,    16*16, 16 )
 GFXDECODE_END
@@ -327,7 +327,7 @@ MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hyperspt_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hyperspt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hyperspt)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(hyperspt_state, hyperspt)
@@ -400,7 +400,7 @@ MACHINE_CONFIG_START(hyperspt_state::roadf)
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(roadf_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", roadf)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_roadf)
 	MCFG_VIDEO_START_OVERRIDE(hyperspt_state,roadf)
 
 	MCFG_DEVICE_MODIFY("audiocpu")
@@ -625,9 +625,9 @@ ROM_START( roadf3 ) // This hack was found on an original GX330 (Hyper Sports) P
 	ROM_LOAD( "82s129.a9",  0x0120, 0x0100, CRC(5b3b5f2a) SHA1(e83556fba6d50ad20dff6e19bd300ba0c30cc6e2) ) // identical to a09_c29.bin
 ROM_END
 
-GAME( 1984, hyperspt,  0,        hyperspt,  hyperspt, hyperspt_state, 0, ROT0,  "Konami (Centuri license)", "Hyper Sports", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, hypersptb, hyperspt, hypersptb, hyperspt, hyperspt_state, 0, ROT0,  "bootleg", "Hyper Sports (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has ADPCM vis MSM5205 instead of VLM
-GAME( 1984, hpolym84,  hyperspt, hyperspt,  hyperspt, hyperspt_state, 0, ROT0,  "Konami",  "Hyper Olympic '84", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, roadf,     0,        roadf,     roadf,    hyperspt_state, 0, ROT90, "Konami",  "Road Fighter (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, roadf2,    roadf,    roadf,     roadf,    hyperspt_state, 0, ROT90, "Konami",  "Road Fighter (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, roadf3,    roadf,    roadf,     roadf,    hyperspt_state, 0, ROT90, "hack",    "Road Fighter (set 3, conversion hack on Hyper Sports PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hyperspt,  0,        hyperspt,  hyperspt, hyperspt_state, empty_init, ROT0,  "Konami (Centuri license)", "Hyper Sports", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hypersptb, hyperspt, hypersptb, hyperspt, hyperspt_state, empty_init, ROT0,  "bootleg", "Hyper Sports (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has ADPCM vis MSM5205 instead of VLM
+GAME( 1984, hpolym84,  hyperspt, hyperspt,  hyperspt, hyperspt_state, empty_init, ROT0,  "Konami",  "Hyper Olympic '84", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadf,     0,        roadf,     roadf,    hyperspt_state, empty_init, ROT90, "Konami",  "Road Fighter (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadf2,    roadf,    roadf,     roadf,    hyperspt_state, empty_init, ROT90, "Konami",  "Road Fighter (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadf3,    roadf,    roadf,     roadf,    hyperspt_state, empty_init, ROT90, "hack",    "Road Fighter (set 3, conversion hack on Hyper Sports PCB)", MACHINE_SUPPORTS_SAVE )

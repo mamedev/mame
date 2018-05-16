@@ -353,7 +353,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( sidepckt )
+static GFXDECODE_START( gfx_sidepckt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   128,  4 ) /* colors 128-159 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 ) /* colors   0-127 */
 GFXDECODE_END
@@ -388,7 +388,7 @@ MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sidepckt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sidepckt)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(sidepckt_state, sidepckt)
 
@@ -495,7 +495,7 @@ ROM_START( sidepcktb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(sidepckt_state,sidepckt)
+void sidepckt_state::init_sidepckt()
 {
 	m_prot_table[0] = sidepckt_prot_table_1;
 	m_prot_table[1] = sidepckt_prot_table_2;
@@ -509,7 +509,7 @@ DRIVER_INIT_MEMBER(sidepckt_state,sidepckt)
 	save_item(NAME(m_scroll_y));
 }
 
-DRIVER_INIT_MEMBER(sidepckt_state,sidepcktj)
+void sidepckt_state::init_sidepcktj()
 {
 	m_prot_table[0] = sidepcktj_prot_table_1;
 	m_prot_table[1] = sidepcktj_prot_table_2;
@@ -524,6 +524,6 @@ DRIVER_INIT_MEMBER(sidepckt_state,sidepcktj)
 }
 
 
-GAME( 1986, sidepckt,  0,        sidepckt,  sidepckt,  sidepckt_state, sidepckt,  ROT0, "Data East Corporation", "Side Pocket (World)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidepcktj, sidepckt, sidepckt,  sidepcktj, sidepckt_state, sidepcktj, ROT0, "Data East Corporation", "Side Pocket (Japan)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidepcktb, sidepckt, sidepcktb, sidepcktb, sidepckt_state, 0,         ROT0, "bootleg",               "Side Pocket (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepckt,  0,        sidepckt,  sidepckt,  sidepckt_state, init_sidepckt,  ROT0, "Data East Corporation", "Side Pocket (World)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepcktj, sidepckt, sidepckt,  sidepcktj, sidepckt_state, init_sidepcktj, ROT0, "Data East Corporation", "Side Pocket (Japan)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepcktb, sidepckt, sidepcktb, sidepcktb, sidepckt_state, empty_init,     ROT0, "bootleg",               "Side Pocket (bootleg)", MACHINE_SUPPORTS_SAVE )

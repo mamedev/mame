@@ -34,8 +34,8 @@ public:
 
 	uint32_t screen_update_cupidon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DRIVER_INIT(cupidon);
-	DECLARE_DRIVER_INIT(funnyfm);
+	void init_cupidon();
+	void init_funnyfm();
 
 	DECLARE_READ32_MEMBER( cupidon_return_ffffffff )
 	{
@@ -167,22 +167,22 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(cupidon_state,cupidon)
+void cupidon_state::init_cupidon()
 {
 }
 
-DRIVER_INIT_MEMBER(cupidon_state,funnyfm)
+void cupidon_state::init_funnyfm()
 {
 }
 
 /* (c) date is from string in ROM, revision date is noted next to sets - Spellings are as found in ROM */
-GAME( 2004, tsarevna,   0,         cupidon, cupidon, cupidon_state, cupidon, ROT0, "Kupidon", "Tsarevna (v1.29)",         MACHINE_IS_SKELETON ) // 12 Oct 2005
-GAME( 2004, tsarevnaa,  tsarevna,  cupidon, cupidon, cupidon_state, cupidon, ROT0, "Kupidon", "Tsarevna (v1.31)",         MACHINE_IS_SKELETON ) // 17 Jan 2007
+GAME( 2004, tsarevna,  0,        cupidon, cupidon, cupidon_state, init_cupidon, ROT0, "Kupidon", "Tsarevna (v1.29)",         MACHINE_IS_SKELETON ) // 12 Oct 2005
+GAME( 2004, tsarevnaa, tsarevna, cupidon, cupidon, cupidon_state, init_cupidon, ROT0, "Kupidon", "Tsarevna (v1.31)",         MACHINE_IS_SKELETON ) // 17 Jan 2007
 
-GAME( 2004, gangrose,   0,         cupidon, cupidon, cupidon_state, cupidon, ROT0, "Kupidon", "Gangster's Roses (v4.70)", MACHINE_IS_SKELETON ) // 01 Sep 2004
+GAME( 2004, gangrose,  0,        cupidon, cupidon, cupidon_state, init_cupidon, ROT0, "Kupidon", "Gangster's Roses (v4.70)", MACHINE_IS_SKELETON ) // 01 Sep 2004
 
-GAME( 2004, funnyfm,    0,         cupidon, cupidon, cupidon_state, funnyfm, ROT0, "Kupidon", "Funny Farm (v1.17)",       MACHINE_IS_SKELETON ) // 02 Mar 2005
-GAME( 2004, funnyfma,   funnyfm,   cupidon, cupidon, cupidon_state, cupidon, ROT0, "Kupidon", "Funny Farm (v1.26)",       MACHINE_IS_SKELETON ) // 08 Aug 2005
-GAME( 2004, funnyfmb,   funnyfm,   cupidon, cupidon, cupidon_state, cupidon, ROT0, "Kupidon", "Funny Farm (v1.30)",       MACHINE_IS_SKELETON ) // 16 May 2006
+GAME( 2004, funnyfm,   0,        cupidon, cupidon, cupidon_state, init_funnyfm, ROT0, "Kupidon", "Funny Farm (v1.17)",       MACHINE_IS_SKELETON ) // 02 Mar 2005
+GAME( 2004, funnyfma,  funnyfm,  cupidon, cupidon, cupidon_state, init_cupidon, ROT0, "Kupidon", "Funny Farm (v1.26)",       MACHINE_IS_SKELETON ) // 08 Aug 2005
+GAME( 2004, funnyfmb,  funnyfm,  cupidon, cupidon, cupidon_state, init_cupidon, ROT0, "Kupidon", "Funny Farm (v1.30)",       MACHINE_IS_SKELETON ) // 16 May 2006
 
-GAME( 2005, cashtrn,    0,         cupidon, cupidon, cupidon_state, cupidon, ROT0, "Kupidon", "Cash Train (v1.10)",       MACHINE_IS_SKELETON ) // 09 Jan 2006
+GAME( 2005, cashtrn,   0,        cupidon, cupidon, cupidon_state, init_cupidon, ROT0, "Kupidon", "Cash Train (v1.10)",       MACHINE_IS_SKELETON ) // 09 Jan 2006

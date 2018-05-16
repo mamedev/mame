@@ -170,7 +170,7 @@ static const gfx_layout gfxlayout =
 	32*8
 };
 
-static GFXDECODE_START( fastlane )
+static GFXDECODE_START( gfx_fastlane )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 64*16 )
 GFXDECODE_END
 
@@ -217,7 +217,7 @@ MACHINE_CONFIG_START(fastlane_state::fastlane)
 	MCFG_SCREEN_UPDATE_DRIVER(fastlane_state, screen_update_fastlane)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fastlane)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fastlane)
 	MCFG_PALETTE_ADD("palette", 1024*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -267,4 +267,4 @@ ROM_START( fastlane )
 ROM_END
 
 
-GAME( 1987, fastlane, 0, fastlane, fastlane, fastlane_state, 0, ROT90, "Konami", "Fast Lane", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, fastlane, 0, fastlane, fastlane, fastlane_state, empty_init, ROT90, "Konami", "Fast Lane", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

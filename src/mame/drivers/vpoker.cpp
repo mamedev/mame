@@ -621,7 +621,7 @@ static const gfx_layout charlayout =
 	16*16
 };
 
-static GFXDECODE_START( vpoker )
+static GFXDECODE_START( gfx_vpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -647,7 +647,7 @@ MACHINE_CONFIG_START(vpoker_state::vpoker)
 	MCFG_SCREEN_UPDATE_DRIVER(vpoker_state, screen_update_vpoker)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vpoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vpoker)
 
 	MCFG_PALETTE_ADD_3BIT_GBR("palette")
 
@@ -705,6 +705,6 @@ ROM_START( 5acespkr )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT     STATE         INIT  ROT   COMPANY               FULLNAME                   FLAGS
-GAME( 198?, vpoker,   0,      vpoker,  vpoker,   vpoker_state, 0,    ROT0, "Videotronics, Inc.", "Videotronics Draw Poker", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, vpoker_state, 0,    ROT0, "<unknown>",          "5-Aces Poker",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  MACHINE  INPUT     STATE         INIT        ROT   COMPANY               FULLNAME                   FLAGS
+GAME( 198?, vpoker,   0,      vpoker,  vpoker,   vpoker_state, empty_init, ROT0, "Videotronics, Inc.", "Videotronics Draw Poker", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, vpoker_state, empty_init, ROT0, "<unknown>",          "5-Aces Poker",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

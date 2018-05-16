@@ -245,7 +245,7 @@ public:
 	DECLARE_WRITE8_MEMBER(strobe_w);
 	DECLARE_WRITE8_MEMBER(lamp_data_w);
 	DECLARE_READ8_MEMBER(kbd_r);
-	DECLARE_DRIVER_INIT(screenpl);
+	void init_screenpl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -1251,32 +1251,32 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(maygayv1_state,screenpl)
+void maygayv1_state::init_screenpl()
 {
 	m_p1 = m_p3 = 0xff;
 }
 
 #define GAME_FLAGS MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK
 
-GAME( 1991, screenpl, 0,        maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 4.0)",               GAME_FLAGS )
-GAME( 1991, screenp1, screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, set 1)",               GAME_FLAGS )
-GAME( 1991, screenp1a,screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, set 2)",               GAME_FLAGS )
-GAME( 1991, screenp2, screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, Isle of Man, set 1)",  GAME_FLAGS )
-GAME( 1991, screenp2a,screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, Isle of Man, set 2)",  GAME_FLAGS )
-GAME( 1991, screenp3, screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, SA5-082)",  GAME_FLAGS )
-GAME( 1991, screenp3a,screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, SA5-083)",  GAME_FLAGS )
-GAME( 1991, screenp4 ,screenpl, maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. ?.?)",  GAME_FLAGS )
+GAME( 1991, screenpl,  0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 4.0)",               GAME_FLAGS )
+GAME( 1991, screenp1,  screenpl,  maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, set 1)",               GAME_FLAGS )
+GAME( 1991, screenp1a, screenpl,  maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, set 2)",               GAME_FLAGS )
+GAME( 1991, screenp2,  screenpl,  maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, Isle of Man, set 1)",  GAME_FLAGS )
+GAME( 1991, screenp2a, screenpl,  maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. 1.9, Isle of Man, set 2)",  GAME_FLAGS )
+GAME( 1991, screenp3,  screenpl,  maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, SA5-082)",  GAME_FLAGS )
+GAME( 1991, screenp3a, screenpl,  maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, SA5-083)",  GAME_FLAGS )
+GAME( 1991, screenp4,  screenpl,  maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Screen Play (Maygay, MV1 Video, ver. ?.?)",  GAME_FLAGS )
 
 // incomplete sets
-GAME( 199?, mv1bon  , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Believe It Or Not (Maygay, MV1 Video)",  GAME_FLAGS )
-GAME( 199?, mv1cpc  , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
-GAME( 199?, mv1cpca , mv1cpc    ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
-GAME( 199?, mv1cpcb , mv1cpc    ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 3)",  GAME_FLAGS )
-GAME( 199?, mv1cwq  , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Crossword Quiz (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
-GAME( 199?, mv1cwqa , mv1cwq    ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Crossword Quiz (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
-GAME( 199?, mv1guac , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Give Us A Clue (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
-GAME( 199?, mv1guaca, mv1guac   ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "Give Us A Clue (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
-GAME( 199?, mv1sfx  , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT90, "Maygay", "Special Effects (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
-GAME( 199?, mv1sfxa , mv1sfx    ,maygayv1, screenpl, maygayv1_state, screenpl, ROT90, "Maygay", "Special Effects (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
-GAME( 199?, mv1sfx2 , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT90, "Maygay", "Special Effects V2 (Maygay, MV1 Video)",  GAME_FLAGS )
-GAME( 199?, mv1wc   , 0         ,maygayv1, screenpl, maygayv1_state, screenpl, ROT0, "Maygay", "World Cup (Maygay, MV1 Video)",  GAME_FLAGS )
+GAME( 199?, mv1bon,    0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Believe It Or Not (Maygay, MV1 Video)",  GAME_FLAGS )
+GAME( 199?, mv1cpc,    0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
+GAME( 199?, mv1cpca,   mv1cpc,    maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
+GAME( 199?, mv1cpcb,   mv1cpc,    maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Caesar's Palace Club (Maygay, MV1 Video, set 3)",  GAME_FLAGS )
+GAME( 199?, mv1cwq,    0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Crossword Quiz (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
+GAME( 199?, mv1cwqa,   mv1cwq,    maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Crossword Quiz (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
+GAME( 199?, mv1guac,   0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Give Us A Clue (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
+GAME( 199?, mv1guaca,  mv1guac,   maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "Give Us A Clue (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
+GAME( 199?, mv1sfx,    0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT90, "Maygay", "Special Effects (Maygay, MV1 Video, set 1)",  GAME_FLAGS )
+GAME( 199?, mv1sfxa,   mv1sfx,    maygayv1, screenpl, maygayv1_state, init_screenpl, ROT90, "Maygay", "Special Effects (Maygay, MV1 Video, set 2)",  GAME_FLAGS )
+GAME( 199?, mv1sfx2,   0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT90, "Maygay", "Special Effects V2 (Maygay, MV1 Video)",  GAME_FLAGS )
+GAME( 199?, mv1wc,     0,         maygayv1, screenpl, maygayv1_state, init_screenpl, ROT0, "Maygay", "World Cup (Maygay, MV1 Video)",  GAME_FLAGS )

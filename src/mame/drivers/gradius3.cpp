@@ -513,7 +513,7 @@ ROM_END
 
 
 
-GAME( 1989, gradius3,   0,        gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (World, program code R)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3j,  gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Japan, program code S)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3js, gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Japan, program code S, split)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3a,  gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Asia)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3,   0,        gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (World, program code R)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3j,  gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (Japan, program code S)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3js, gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (Japan, program code S, split)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3a,  gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (Asia)",                         MACHINE_SUPPORTS_SAVE )

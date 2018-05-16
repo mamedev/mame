@@ -76,7 +76,7 @@ public:
 	tilemap_t *m_tilemap;
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_num_w);
 	DECLARE_WRITE8_MEMBER(ltcasino_tile_atr_w);
-	DECLARE_DRIVER_INIT(mv4in1);
+	void init_mv4in1();
 	TILE_GET_INFO_MEMBER(get_ltcasino_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ltcasino);
@@ -110,7 +110,7 @@ TILE_GET_INFO_MEMBER(ltcasino_state::get_ltcasino_tile_info)
 	int tileno, colour;
 
 	tileno = m_tile_num_ram[tile_index];
-	// TODO: wtf +1 on attribute offset otherwise glitches occurs on left side of objects? 
+	// TODO: wtf +1 on attribute offset otherwise glitches occurs on left side of objects?
 	colour = m_tile_atr_ram[(tile_index+1) & 0x7ff];
 
 	tileno += (colour & 0x80) << 1;
@@ -703,7 +703,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static GFXDECODE_START( ltcasino )
+static GFXDECODE_START( gfx_ltcasino )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 64 )
 GFXDECODE_END
 
@@ -723,7 +723,7 @@ MACHINE_CONFIG_START(ltcasino_state::ltcasino)
 	MCFG_SCREEN_UPDATE_DRIVER(ltcasino_state, screen_update_ltcasino)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ltcasino)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ltcasino)
 	MCFG_PALETTE_ADD("palette", 2*64)
 	MCFG_PALETTE_INIT_OWNER(ltcasino_state, ltcasino)
 
@@ -776,16 +776,15 @@ ROM_START( mv4in1 )
 	ROM_LOAD( "a.ic19",   0x0000, 0x1000, CRC(a25c125e) SHA1(e0ba83ccddbd82a2bf52585ae0accb9192cbb00e) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ltcasino_state,mv4in1)
+void ltcasino_state::init_mv4in1()
 {
-	int i;
 	uint8_t *rom = memregion("maincpu")->base();
-	for(i=0;i<0x10000;i++)
+	for (int i = 0; i < 0x10000; i++)
 		rom[i]=bitswap<8>(rom[i],7,6,5,4,3,1,2,0);
 }
 
 
 
-GAME( 1982, ltcasino, 0,         ltcasino, ltcasino, ltcasino_state, 0,      ROT0, "Digital Controls Inc.",           "Little Casino (older)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, mv4in1,   ltcasino,  ltcasino, mv4in1,   ltcasino_state, mv4in1, ROT0, "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1",       MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, ltcasinn, 0,         ltcasino, ltcasinn, ltcasino_state, 0,      ROT0, "Digital Controls Inc.",           "Little Casino (newer)", MACHINE_NOT_WORKING )
+GAME( 1982, ltcasino, 0,        ltcasino, ltcasino, ltcasino_state, empty_init,  ROT0, "Digital Controls Inc.",           "Little Casino (older)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, mv4in1,   ltcasino, ltcasino, mv4in1,   ltcasino_state, init_mv4in1, ROT0, "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1",       MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, ltcasinn, 0,        ltcasino, ltcasinn, ltcasino_state, empty_init,  ROT0, "Digital Controls Inc.",           "Little Casino (newer)", MACHINE_NOT_WORKING )

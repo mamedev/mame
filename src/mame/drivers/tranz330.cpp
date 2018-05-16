@@ -194,5 +194,5 @@ ROM_START( tranz330 )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT   COMPANY      FULLNAME        FLAGS
-COMP( 1985, tranz330, 0,      0,      tranz330, tranz330, tranz330_state,  0,     "VeriFone",  "Tranz 330",    MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME        FLAGS
+COMP( 1985, tranz330, 0,      0,      tranz330, tranz330, tranz330_state, empty_init, "VeriFone",  "Tranz 330",    MACHINE_CLICKABLE_ARTWORK )

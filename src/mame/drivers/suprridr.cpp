@@ -308,7 +308,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( suprridr )
+static GFXDECODE_START( gfx_suprridr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   32, 2 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 64, 2 )
@@ -344,7 +344,7 @@ MACHINE_CONFIG_START(suprridr_state::suprridr)
 	MCFG_SCREEN_UPDATE_DRIVER(suprridr_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprridr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprridr)
 	MCFG_PALETTE_ADD("palette", 96)
 	MCFG_PALETTE_INIT_OWNER(suprridr_state, suprridr)
 
@@ -415,4 +415,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, suprridr, 0, suprridr, suprridr, suprridr_state, 0, ROT90, "Taito Corporation (Venture Line license)", "Super Rider", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, suprridr, 0, suprridr, suprridr, suprridr_state, empty_init, ROT90, "Taito Corporation (Venture Line license)", "Super Rider", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

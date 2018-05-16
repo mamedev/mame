@@ -81,7 +81,7 @@ MACHINE_CONFIG_START(tvboy_state::tvboyii)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6507, MASTER_CLOCK_PAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(tvboy_mem)
-	MCFG_M6502_DISABLE_DIRECT()
+	MCFG_M6502_DISABLE_CACHE()
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
@@ -154,6 +154,6 @@ ROM_START( stvboy )
 ROM_END
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE        INIT  COMPANY    FULLNAME
-CONS( 199?, tvboyii, 0,      0,      tvboyii, tvboyii, tvboy_state, 0,    "Systema", "TV Boy II (PAL)" ,    MACHINE_SUPPORTS_SAVE )
-CONS( 1995, stvboy,  0,      0,      tvboyii, tvboyii, tvboy_state, 0,    "Akor",    "Super TV Boy (PAL)" , MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY    FULLNAME
+CONS( 199?, tvboyii, 0,      0,      tvboyii, tvboyii, tvboy_state, empty_init, "Systema", "TV Boy II (PAL)" ,    MACHINE_SUPPORTS_SAVE )
+CONS( 1995, stvboy,  0,      0,      tvboyii, tvboyii, tvboy_state, empty_init, "Akor",    "Super TV Boy (PAL)" , MACHINE_SUPPORTS_SAVE )

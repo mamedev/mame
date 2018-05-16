@@ -463,7 +463,7 @@ static const gfx_layout tiles16x8x2_layout =
 };
 
 
-static GFXDECODE_START( stuntair )
+static GFXDECODE_START( gfx_stuntair )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x100, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x2_layout, 0xe0, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x8x2_layout, 0xe0, 8 )
@@ -548,7 +548,7 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, stuntair_state, stuntair_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stuntair)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stuntair)
 	MCFG_PALETTE_ADD("palette", 0x100+2)
 
 	MCFG_PALETTE_INIT_OWNER(stuntair_state, stuntair)
@@ -604,4 +604,4 @@ ROM_START( stuntair )
 ROM_END
 
 
-GAME( 1983, stuntair,  0,    stuntair, stuntair, stuntair_state,  0, ROT90, "Nuova Videotron", "Stunt Air",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, stuntair,  0,    stuntair, stuntair, stuntair_state, empty_init, ROT90, "Nuova Videotron", "Stunt Air",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

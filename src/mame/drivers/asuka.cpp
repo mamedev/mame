@@ -779,7 +779,7 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-static GFXDECODE_START( asuka )
+static GFXDECODE_START( gfx_asuka )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0, 256 )   /* OBJ */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )   /* SCR */
 GFXDECODE_END
@@ -870,7 +870,7 @@ MACHINE_CONFIG_START(asuka_state::bonzeadv)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
@@ -932,7 +932,7 @@ MACHINE_CONFIG_START(asuka_state::asuka)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
@@ -1007,7 +1007,7 @@ MACHINE_CONFIG_START(asuka_state::cadash)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
@@ -1071,7 +1071,7 @@ MACHINE_CONFIG_START(asuka_state::mofflott)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
 	MCFG_PALETTE_ADD("palette", 4096)   /* only Mofflott uses full palette space */
 
 	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
@@ -1142,7 +1142,7 @@ MACHINE_CONFIG_START(asuka_state::eto)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, asuka_state, screen_vblank_asuka))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
@@ -1748,36 +1748,36 @@ ROM_START( eto )
 	ROM_LOAD( "eto-5.ic27", 0x00000, 0x10000, CRC(b3689da0) SHA1(812d2e0a794403df9f0a5035784f14cd070ea080) ) /* banked */
 ROM_END
 
-DRIVER_INIT_MEMBER(asuka_state, cadash)
+void asuka_state::init_cadash()
 {
 	m_cadash_int5_timer = timer_alloc(TIMER_CADASH_INTERRUPT5);
 }
 
-GAME( 1988, bonzeadv,  0,        bonzeadv, bonzeadv, asuka_state, 0,      ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bonzeadvo, bonzeadv, bonzeadv, bonzeadv, asuka_state, 0,      ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bonzeadvu, bonzeadv, bonzeadv, jigkmgri, asuka_state, 0,      ROT0,   "Taito America Corporation", "Bonze Adventure (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, jigkmgri,  bonzeadv, bonzeadv, jigkmgri, asuka_state, 0,      ROT0,   "Taito Corporation",         "Jigoku Meguri (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bonzeadvp, bonzeadv, bonzeadv, jigkmgri, asuka_state, 0,      ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadv,  0,        bonzeadv, bonzeadv, asuka_state, empty_init,  ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvo, bonzeadv, bonzeadv, bonzeadv, asuka_state, empty_init,  ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, Older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvu, bonzeadv, bonzeadv, jigkmgri, asuka_state, empty_init,  ROT0,   "Taito America Corporation", "Bonze Adventure (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jigkmgri,  bonzeadv, bonzeadv, jigkmgri, asuka_state, empty_init,  ROT0,   "Taito Corporation",         "Jigoku Meguri (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvp, bonzeadv, bonzeadv, jigkmgri, asuka_state, empty_init,  ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, asuka,     0,        asuka,    asuka,    asuka_state, 0,      ROT270, "Taito Corporation",         "Asuka & Asuka (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, asukaj,    asuka,    asuka,    asuka,    asuka_state, 0,      ROT270, "Taito Corporation",         "Asuka & Asuka (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, asuka,     0,        asuka,    asuka,    asuka_state, empty_init,  ROT270, "Taito Corporation",         "Asuka & Asuka (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, asukaj,    asuka,    asuka,    asuka,    asuka_state, empty_init,  ROT270, "Taito Corporation",         "Asuka & Asuka (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, mofflott,  0,        mofflott, mofflott, asuka_state, 0,      ROT270, "Taito Corporation",         "Maze of Flott (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mofflott,  0,        mofflott, mofflott, asuka_state, empty_init,  ROT270, "Taito Corporation",         "Maze of Flott (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, cadash,    0,        cadash,   cadash,   asuka_state, cadash, ROT0,   "Taito Corporation Japan",   "Cadash (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashj,   cadash,   cadash,   cadashj,  asuka_state, cadash, ROT0,   "Taito Corporation",         "Cadash (Japan, version 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashj1,  cadash,   cadash,   cadashj,  asuka_state, cadash, ROT0,   "Taito Corporation",         "Cadash (Japan, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashjo,  cadash,   cadash,   cadashj,  asuka_state, cadash, ROT0,   "Taito Corporation",         "Cadash (Japan, oldest version)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashu,   cadash,   cadash,   cadashu,  asuka_state, cadash, ROT0,   "Taito America Corporation", "Cadash (US, version 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashi,   cadash,   cadash,   cadash,   asuka_state, cadash, ROT0,   "Taito Corporation Japan",   "Cadash (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashf,   cadash,   cadash,   cadash,   asuka_state, cadash, ROT0,   "Taito Corporation Japan",   "Cadash (France)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashg,   cadash,   cadash,   cadash,   asuka_state, cadash, ROT0,   "Taito Corporation Japan",   "Cadash (Germany, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashp,   cadash,   cadash,   cadashj,  asuka_state, cadash, ROT0,   "Taito Corporation Japan",   "Cadash (World, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN)
-GAME( 1989, cadashs,   cadash,   cadash,   cadash,   asuka_state, cadash, ROT0,   "Taito Corporation Japan",   "Cadash (Spain, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadash,    0,        cadash,   cadash,   asuka_state, init_cadash, ROT0,   "Taito Corporation Japan",   "Cadash (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashj,   cadash,   cadash,   cadashj,  asuka_state, init_cadash, ROT0,   "Taito Corporation",         "Cadash (Japan, version 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashj1,  cadash,   cadash,   cadashj,  asuka_state, init_cadash, ROT0,   "Taito Corporation",         "Cadash (Japan, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashjo,  cadash,   cadash,   cadashj,  asuka_state, init_cadash, ROT0,   "Taito Corporation",         "Cadash (Japan, oldest version)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashu,   cadash,   cadash,   cadashu,  asuka_state, init_cadash, ROT0,   "Taito America Corporation", "Cadash (US, version 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashi,   cadash,   cadash,   cadash,   asuka_state, init_cadash, ROT0,   "Taito Corporation Japan",   "Cadash (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashf,   cadash,   cadash,   cadash,   asuka_state, init_cadash, ROT0,   "Taito Corporation Japan",   "Cadash (France)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashg,   cadash,   cadash,   cadash,   asuka_state, init_cadash, ROT0,   "Taito Corporation Japan",   "Cadash (Germany, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashp,   cadash,   cadash,   cadashj,  asuka_state, init_cadash, ROT0,   "Taito Corporation Japan",   "Cadash (World, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN)
+GAME( 1989, cadashs,   cadash,   cadash,   cadash,   asuka_state, init_cadash, ROT0,   "Taito Corporation Japan",   "Cadash (Spain, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
 
-GAME( 1992, galmedes,  0,        asuka,    galmedes, asuka_state, 0,      ROT270, "Visco",                     "Galmedes (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, galmedes,  0,        asuka,    galmedes, asuka_state, empty_init,  ROT270, "Visco",                     "Galmedes (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, earthjkr,  0,        asuka,    earthjkr, asuka_state, 0,      ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, earthjkrp, earthjkr, asuka,    earthjkr, asuka_state, 0,      ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkr,  0,        asuka,    earthjkr, asuka_state, empty_init,  ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkrp, earthjkr, asuka,    earthjkr, asuka_state, empty_init,  ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, eto,       0,        eto,      eto,      asuka_state, 0,      ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, eto,       0,        eto,      eto,      asuka_state, empty_init,  ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )

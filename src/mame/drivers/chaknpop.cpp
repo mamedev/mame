@@ -338,7 +338,7 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( chaknpop )
+static GFXDECODE_START( gfx_chaknpop )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0,  8 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   32, 8 )
 GFXDECODE_END
@@ -381,7 +381,7 @@ MACHINE_CONFIG_START(chaknpop_state::chaknpop)
 	MCFG_SCREEN_UPDATE_DRIVER(chaknpop_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chaknpop)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chaknpop)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(chaknpop_state, chaknpop)
 
@@ -431,5 +431,5 @@ ROM_START( chaknpop )
 ROM_END
 
 
-//  ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      MONITOR  COMPANY              FULLNAME       FLAGS )
-GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, chaknpop_state, 0,        ROT0,    "Taito Corporation", "Chack'n Pop", MACHINE_SUPPORTS_SAVE )
+//  ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY              FULLNAME       FLAGS )
+GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, chaknpop_state, empty_init, ROT0,    "Taito Corporation", "Chack'n Pop", MACHINE_SUPPORTS_SAVE )

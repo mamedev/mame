@@ -226,7 +226,7 @@ static const gfx_layout spritelayout =
 	32*32    /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( rollrace )
+static GFXDECODE_START( gfx_rollrace )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,    0,  32 ) /* foreground */
 	GFXDECODE_ENTRY( "gfx1", 0x0800, charlayout,    0,  32 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, charlayout,    0,  32 )
@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(rollrace_state::rollrace)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rollrace_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rollrace)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rollrace)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(rollrace_state, rollrace)
 
@@ -457,6 +457,6 @@ ROM_START( rollace2 )
 ROM_END
 
 
-GAME( 1983, fightrol, 0,        rollrace, rollrace, rollrace_state, 0, ROT270, "Kaneko (Taito license)",    "Fighting Roller",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rollace,  fightrol, rollrace, rollrace, rollrace_state, 0, ROT270, "Kaneko (Williams license)", "Roller Aces (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rollace2, fightrol, rollace2, rollrace, rollrace_state, 0, ROT90,  "Kaneko (Williams license)", "Roller Aces (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, fightrol, 0,        rollrace, rollrace, rollrace_state, empty_init, ROT270, "Kaneko (Taito license)",    "Fighting Roller",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rollace,  fightrol, rollrace, rollrace, rollrace_state, empty_init, ROT270, "Kaneko (Williams license)", "Roller Aces (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rollace2, fightrol, rollace2, rollrace, rollrace_state, empty_init, ROT90,  "Kaneko (Williams license)", "Roller Aces (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

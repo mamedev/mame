@@ -187,7 +187,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( shaolins )
+static GFXDECODE_START( gfx_shaolins )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 16*8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*8*16, 16*8 )
 GFXDECODE_END
@@ -210,7 +210,7 @@ MACHINE_CONFIG_START(shaolins_state::shaolins)
 	MCFG_SCREEN_UPDATE_DRIVER(shaolins_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shaolins)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shaolins)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(shaolins_state, shaolins)
@@ -344,7 +344,7 @@ ROM_START( shaolinb )
 ROM_END
 
 
-/*    YEAR, NAME,     PARENT, MACHINE,  INPUT,    STATE,          INIT, MONITOR, COMPANY,  FULLNAME,                  FLAGS */
-GAME( 1985, kicker,   0,      shaolins, shaolins, shaolins_state, 0,    ROT90,  "Konami",  "Kicker",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shaolins, kicker, shaolins, shaolins, shaolins_state, 0,    ROT90,  "Konami",  "Shao-lin's Road (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shaolinb, kicker, shaolins, shaolins, shaolins_state, 0,    ROT90,  "Konami",  "Shao-lin's Road (set 2)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR, NAME,     PARENT, MACHINE,  INPUT,    STATE,          INIT,       MONITOR, COMPANY,  FULLNAME,                  FLAGS */
+GAME( 1985, kicker,   0,      shaolins, shaolins, shaolins_state, empty_init, ROT90,   "Konami",  "Kicker",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shaolins, kicker, shaolins, shaolins, shaolins_state, empty_init, ROT90,   "Konami",  "Shao-lin's Road (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shaolinb, kicker, shaolins, shaolins, shaolins_state, empty_init, ROT90,   "Konami",  "Shao-lin's Road (set 2)", MACHINE_SUPPORTS_SAVE )

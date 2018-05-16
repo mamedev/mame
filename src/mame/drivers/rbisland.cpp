@@ -591,7 +591,7 @@ static const gfx_layout spritelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( rbisland )
+static GFXDECODE_START( gfx_rbisland )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, spritelayout, 0, 0x80 )  /* OBJ 16x16 */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout,   0, 0x80 )  /* SCR 8x8 */
 GFXDECODE_END
@@ -619,7 +619,7 @@ static const gfx_layout jumping_spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( jumping )
+static GFXDECODE_START( gfx_jumping )
 	GFXDECODE_ENTRY( "gfx2", 0, jumping_spritelayout, 0, 0x80 ) /* OBJ 16x16 */
 	GFXDECODE_ENTRY( "gfx1", 0, jumping_tilelayout,   0, 0x80 ) /* SCR 8x8 */
 GFXDECODE_END
@@ -683,7 +683,7 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_rainbow)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rbisland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rbisland)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -733,7 +733,7 @@ MACHINE_CONFIG_START(rbisland_state::jumping)
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_jumping)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jumping)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jumping)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -987,25 +987,25 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(rbisland_state,rbisland)
+void rbisland_state::init_rbisland()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(rbisland_state,jumping)
+void rbisland_state::init_jumping()
 {
 	m_jumping_latch = 0;
 	save_item(NAME(m_jumping_latch));
 }
 
 
-GAME( 1987, rbisland,  0,        rbisland, rbisland, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (new version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rbislando, rbisland, rbisland, rbisland, rbisland_state, rbisland,  ROT0, "Taito Corporation", "Rainbow Islands (old version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rbisland,  0,        rbisland, rbisland, rbisland_state, init_rbisland, ROT0, "Taito Corporation", "Rainbow Islands (new version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rbislando, rbisland, rbisland, rbisland, rbisland_state, init_rbisland, ROT0, "Taito Corporation", "Rainbow Islands (old version)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, jumping,   rbisland, jumping,  jumping,  rbisland_state, jumping,   ROT0, "bootleg",           "Jumping (set 1)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, jumpinga,  rbisland, jumping,  jumping,  rbisland_state, jumping,   ROT0, "bootleg (Seyutu)",  "Jumping (set 2)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, jumpingi,  rbisland, jumpingi, jumping,  rbisland_state, jumping,   ROT0, "bootleg (Seyutu)",  "Jumping (set 3, Imnoe PCB)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, jumping,   rbisland, jumping,  jumping,  rbisland_state, init_jumping,  ROT0, "bootleg",           "Jumping (set 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jumpinga,  rbisland, jumping,  jumping,  rbisland_state, init_jumping,  ROT0, "bootleg (Seyutu)",  "Jumping (set 2)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jumpingi,  rbisland, jumpingi, jumping,  rbisland_state, init_jumping,  ROT0, "bootleg (Seyutu)",  "Jumping (set 3, Imnoe PCB)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, rbislande, 0,         rbisland, rbisland, rbisland_state, rbisland, ROT0, "Taito Corporation", "Rainbow Islands - Extra Version", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rbislande, 0,        rbisland, rbisland, rbisland_state, init_rbisland, ROT0, "Taito Corporation", "Rainbow Islands - Extra Version", MACHINE_SUPPORTS_SAVE )
 

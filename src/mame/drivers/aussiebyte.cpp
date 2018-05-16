@@ -341,7 +341,7 @@ static const gfx_layout crt8002_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( crt8002 )
+static GFXDECODE_START( gfx_crt8002 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, crt8002_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -508,7 +508,7 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crt8002)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crt8002)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -633,5 +633,5 @@ ROM_START(aussieby)
 	ROM_REGION(0x00800, "aram", ROMREGION_ERASEFF) // attribute ram, 2k static
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT        CLASS             INIT        COMPANY         FULLNAME           FLAGS
-COMP( 1984, aussieby,     0,        0,  aussiebyte, aussiebyte,  aussiebyte_state, 0,          "SME Systems",  "Aussie Byte II" , MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY        FULLNAME          FLAGS
+COMP( 1984, aussieby, 0,      0,      aussiebyte, aussiebyte, aussiebyte_state, empty_init, "SME Systems", "Aussie Byte II", MACHINE_IMPERFECT_GRAPHICS )

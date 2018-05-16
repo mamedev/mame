@@ -549,7 +549,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*2
 };
 
-static GFXDECODE_START( unico )
+static GFXDECODE_START( gfx_unico )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x0, 0x20 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8, 0x0, 0x20 ) // [1] Layers
 GFXDECODE_END
@@ -585,7 +585,7 @@ MACHINE_CONFIG_START(unico_state::burglarx)
 	MCFG_SCREEN_UPDATE_DRIVER(unico_state, screen_update_unico)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unico)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	/* sound hardware */
@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(zeropnt_state::zeropnt)
 	MCFG_SCREEN_UPDATE_DRIVER(zeropnt_state, screen_update_unico)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unico)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	/* sound hardware */
@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(zeropnt2_state::zeropnt2)
 	MCFG_SCREEN_UPDATE_DRIVER(zeropnt2_state, screen_update_unico)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_unico)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	/* sound hardware */
@@ -1035,8 +1035,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, burglarx, 0,       burglarx, burglarx, unico_state,    0, ROT0, "Unico", "Burglar X" ,         0 )
-GAME( 1998, zeropnt,  0,       zeropnt,  zeropnt,  zeropnt_state,  0, ROT0, "Unico", "Zero Point (set 1)", 0 )
-GAME( 1998, zeropnta, zeropnt, zeropnt,  zeropnt,  zeropnt_state,  0, ROT0, "Unico", "Zero Point (set 2)", 0 )
-GAME( 1998, zeropntj, zeropnt, zeropnt,  zeropnt,  zeropnt_state,  0, ROT0, "Unico", "Zero Point (Japan)", 0 )
-GAME( 1999, zeropnt2, 0,       zeropnt2, zeropnt2, zeropnt2_state, 0, ROT0, "Unico", "Zero Point 2",       0 )
+GAME( 1997, burglarx, 0,       burglarx, burglarx, unico_state,    empty_init, ROT0, "Unico", "Burglar X" ,         0 )
+GAME( 1998, zeropnt,  0,       zeropnt,  zeropnt,  zeropnt_state,  empty_init, ROT0, "Unico", "Zero Point (set 1)", 0 )
+GAME( 1998, zeropnta, zeropnt, zeropnt,  zeropnt,  zeropnt_state,  empty_init, ROT0, "Unico", "Zero Point (set 2)", 0 )
+GAME( 1998, zeropntj, zeropnt, zeropnt,  zeropnt,  zeropnt_state,  empty_init, ROT0, "Unico", "Zero Point (Japan)", 0 )
+GAME( 1999, zeropnt2, 0,       zeropnt2, zeropnt2, zeropnt2_state, empty_init, ROT0, "Unico", "Zero Point 2",       0 )

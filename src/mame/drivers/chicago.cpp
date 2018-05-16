@@ -139,4 +139,4 @@ ROM_START( dmodrbcc )
 ROM_END
 
 
-GAME( 1976, dmodrbcc,  0, chicago, 0, chicago_state,  0, ROT0, "Chicago Coin", "Demolition Derby [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, dmodrbcc, 0, chicago, 0, chicago_state, empty_init, ROT0, "Chicago Coin", "Demolition Derby [TTL]", MACHINE_IS_SKELETON )

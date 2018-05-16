@@ -279,13 +279,13 @@ static const gfx_layout maniach_tilelayout =
 	32*8    /* every tile takes 16 consecutive bytes */
 };
 
-static GFXDECODE_START( matmania )
+static GFXDECODE_START( gfx_matmania )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,              0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,            4*8, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, matmania_spritelayout, 8*8, 2 )
 GFXDECODE_END
 
-static GFXDECODE_START( maniach )
+static GFXDECODE_START( gfx_maniach )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,             0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, maniach_tilelayout,   4*8, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, maniach_spritelayout, 8*8, 2 )
@@ -321,7 +321,7 @@ MACHINE_CONFIG_START(matmania_state::matmania)
 	MCFG_SCREEN_UPDATE_DRIVER(matmania_state, screen_update_matmania)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", matmania)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_matmania)
 	MCFG_PALETTE_ADD("palette", 64+16)
 	MCFG_PALETTE_INIT_OWNER(matmania_state, matmania)
 
@@ -365,7 +365,7 @@ MACHINE_CONFIG_START(matmania_state::maniach)
 	MCFG_SCREEN_UPDATE_DRIVER(matmania_state, screen_update_maniach)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", maniach)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_maniach)
 	MCFG_PALETTE_ADD("palette", 64+16)
 	MCFG_PALETTE_INIT_OWNER(matmania_state, matmania)
 
@@ -618,7 +618,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, matmania, 0,        matmania, matmania, matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mat Mania",               MACHINE_SUPPORTS_SAVE )
-GAME( 1985, excthour, matmania, matmania, maniach,  matmania_state, 0, ROT270, "Technos Japan (Taito license)",         "Exciting Hour",           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, maniach,  0,        maniach,  maniach,  matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, maniach2, maniach,  maniach,  maniach,  matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", MACHINE_SUPPORTS_SAVE ) // earlier version?
+GAME( 1985, matmania, 0,        matmania, matmania, matmania_state, empty_init, ROT270, "Technos Japan (Taito America license)", "Mat Mania",               MACHINE_SUPPORTS_SAVE )
+GAME( 1985, excthour, matmania, matmania, maniach,  matmania_state, empty_init, ROT270, "Technos Japan (Taito license)",         "Exciting Hour",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, maniach,  0,        maniach,  maniach,  matmania_state, empty_init, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, maniach2, maniach,  maniach,  maniach,  matmania_state, empty_init, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", MACHINE_SUPPORTS_SAVE ) // earlier version?

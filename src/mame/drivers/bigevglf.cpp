@@ -344,7 +344,7 @@ static const gfx_layout gfxlayout =
 	8*8
 };
 
-static GFXDECODE_START( bigevglf )
+static GFXDECODE_START( gfx_bigevglf )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0x20*16, 16 )
 GFXDECODE_END
 
@@ -418,7 +418,7 @@ MACHINE_CONFIG_START(bigevglf_state::bigevglf)
 	MCFG_SCREEN_UPDATE_DRIVER(bigevglf_state, screen_update_bigevglf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigevglf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigevglf)
 	MCFG_PALETTE_ADD("palette", 0x800)
 
 	/* sound hardware */
@@ -514,11 +514,11 @@ ROM_START( bigevglfj )
 	ROM_LOAD( "a67-15",   0x18000, 0x8000, CRC(1d261428) SHA1(0f3e6d83a8a462436fa414de4e1e4306db869d3e))
 ROM_END
 
-DRIVER_INIT_MEMBER(bigevglf_state,bigevglf)
+void bigevglf_state::init_bigevglf()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0xff, &ROM[0x10000], 0x800);
 }
 
-GAME( 1986, bigevglf,  0,        bigevglf, bigevglf,  bigevglf_state, bigevglf, ROT270, "Taito America Corporation", "Big Event Golf (US)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bigevglfj, bigevglf, bigevglf, bigevglfj, bigevglf_state, bigevglf, ROT270, "Taito Corporation",         "Big Event Golf (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bigevglf,  0,        bigevglf, bigevglf,  bigevglf_state, init_bigevglf, ROT270, "Taito America Corporation", "Big Event Golf (US)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bigevglfj, bigevglf, bigevglf, bigevglfj, bigevglf_state, init_bigevglf, ROT270, "Taito Corporation",         "Big Event Golf (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

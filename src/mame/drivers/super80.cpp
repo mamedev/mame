@@ -616,25 +616,25 @@ static const gfx_layout super80v_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( super80 )
+static GFXDECODE_START( gfx_super80 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, super80_charlayout, 16, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( super80d )
+static GFXDECODE_START( gfx_super80d )
 	GFXDECODE_ENTRY( "chargen", 0x0000, super80d_charlayout, 16, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( super80e )
+static GFXDECODE_START( gfx_super80e )
 	GFXDECODE_ENTRY( "chargen", 0x0000, super80e_charlayout, 16, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( super80m )
+static GFXDECODE_START( gfx_super80m )
 	GFXDECODE_ENTRY( "chargen", 0x0000, super80e_charlayout, 2, 6 )
 	GFXDECODE_ENTRY( "chargen", 0x1000, super80d_charlayout, 2, 6 )
 GFXDECODE_END
 
 /* This will show the 128 characters in the ROM + whatever happens to be in the PCG */
-static GFXDECODE_START( super80v )
+static GFXDECODE_START( gfx_super80v )
 	GFXDECODE_ENTRY( "maincpu", 0xf000, super80v_charlayout, 2, 6 )
 GFXDECODE_END
 
@@ -727,16 +727,14 @@ MACHINE_CONFIG_START(super80_state::super80)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super80)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_super80)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )
 	MCFG_VIDEO_START_OVERRIDE(super80_state,super80)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(relay_sample_names)
@@ -768,7 +766,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(super80_state::super80d)
 	super80(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", super80d)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_super80d)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80d)
 MACHINE_CONFIG_END
@@ -777,7 +775,7 @@ MACHINE_CONFIG_START(super80_state::super80e)
 	super80(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(super80e_io)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", super80e)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_super80e)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80e)
 MACHINE_CONFIG_END
@@ -787,7 +785,7 @@ MACHINE_CONFIG_START(super80_state::super80m)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(super80m_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", super80m)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_super80m)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80m)
@@ -822,15 +820,13 @@ MACHINE_CONFIG_START(super80_state::super80v)
 	MCFG_MC6845_CHAR_WIDTH(SUPER80V_DOTS)
 	MCFG_MC6845_UPDATE_ROW_CB(super80_state, crtc_update_row)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super80v)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_super80v)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(relay_sample_names)
@@ -994,10 +990,10 @@ ROM_START( super80v )
 	ROM_REGION( 0x1000, "colorram", ROMREGION_ERASEFF )
 ROM_END
 
-/*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     CLASS           INIT      COMPANY       FULLNAME */
-COMP( 1981, super80,  0,       0,   super80,  super80,  super80_state,  super80, "Dick Smith Electronics", "Super-80 (V1.2)" , 0)
-COMP( 1981, super80d, super80, 0,   super80d, super80d, super80_state,  super80, "Dick Smith Electronics", "Super-80 (V2.2)" , 0)
-COMP( 1981, super80e, super80, 0,   super80e, super80d, super80_state,  super80, "Dick Smith Electronics", "Super-80 (El Graphix 4)" , MACHINE_UNOFFICIAL)
-COMP( 1981, super80m, super80, 0,   super80m, super80m, super80_state,  super80, "Dick Smith Electronics", "Super-80 (with colour)" , MACHINE_UNOFFICIAL)
-COMP( 1981, super80r, super80, 0,   super80r, super80r, super80_state,  super80, "Dick Smith Electronics", "Super-80 (with VDUEB)" , MACHINE_UNOFFICIAL)
-COMP( 1981, super80v, super80, 0,   super80v, super80v, super80_state,  super80, "Dick Smith Electronics", "Super-80 (with enhanced VDUEB)" , MACHINE_UNOFFICIAL)
+/*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     CLASS          INIT          COMPANY                   FULLNAME */
+COMP( 1981, super80,  0,       0,   super80,  super80,  super80_state, init_super80, "Dick Smith Electronics", "Super-80 (V1.2)" , 0)
+COMP( 1981, super80d, super80, 0,   super80d, super80d, super80_state, init_super80, "Dick Smith Electronics", "Super-80 (V2.2)" , 0)
+COMP( 1981, super80e, super80, 0,   super80e, super80d, super80_state, init_super80, "Dick Smith Electronics", "Super-80 (El Graphix 4)" , MACHINE_UNOFFICIAL)
+COMP( 1981, super80m, super80, 0,   super80m, super80m, super80_state, init_super80, "Dick Smith Electronics", "Super-80 (with colour)" , MACHINE_UNOFFICIAL)
+COMP( 1981, super80r, super80, 0,   super80r, super80r, super80_state, init_super80, "Dick Smith Electronics", "Super-80 (with VDUEB)" , MACHINE_UNOFFICIAL)
+COMP( 1981, super80v, super80, 0,   super80v, super80v, super80_state, init_super80, "Dick Smith Electronics", "Super-80 (with enhanced VDUEB)" , MACHINE_UNOFFICIAL)

@@ -3608,7 +3608,7 @@ static const gfx_layout bigspritelayout_4bpp =
 
 /*********************************************************************/
 
-static GFXDECODE_START( marvins )
+static GFXDECODE_START( gfx_marvins )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,   0x180, 0x080>>4 )
 	GFXDECODE_ENTRY( "fg_tiles",   0, charlayout_4bpp,   0x080, 0x080>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, charlayout_4bpp,   0x100, 0x080>>4 )
@@ -3616,14 +3616,14 @@ static GFXDECODE_START( marvins )
 	/* colors 0x200-0x3ff contain shadows */
 GFXDECODE_END
 
-static GFXDECODE_START( tnk3 )
+static GFXDECODE_START( gfx_tnk3 )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,   0x180, 0x080>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, charlayout_4bpp,   0x080, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp, 0x000, 0x080>>3 )
 	/* colors 0x200-0x3ff contain shadows */
 GFXDECODE_END
 
-static GFXDECODE_START( ikari )
+static GFXDECODE_START( gfx_ikari )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x180, 0x080>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x100, 0x080>>4 )
 	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp,    0x000, 0x080>>3 )
@@ -3631,14 +3631,14 @@ static GFXDECODE_START( ikari )
 	/* colors 0x200-0x3ff contain shadows */
 GFXDECODE_END
 
-static GFXDECODE_START( gwar )
+static GFXDECODE_START( gfx_gwar )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x000, 0x100>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x300, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_4bpp,    0x100, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp32_tiles", 0, bigspritelayout_4bpp, 0x200, 0x100>>4 )
 GFXDECODE_END
 
-static GFXDECODE_START( tdfever )
+static GFXDECODE_START( gfx_tdfever )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x000, 0x100>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x200, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp32_tiles", 0, bigspritelayout_4bpp, 0x100, 0x100>>4 )
@@ -3673,7 +3673,7 @@ MACHINE_CONFIG_START(snk_state::marvins)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_marvins)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", marvins)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marvins)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -3747,7 +3747,7 @@ MACHINE_CONFIG_START(snk_state::jcross)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tnk3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tnk3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tnk3)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -3830,7 +3830,7 @@ MACHINE_CONFIG_START(snk_state::tnk3)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tnk3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tnk3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tnk3)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -3926,7 +3926,7 @@ MACHINE_CONFIG_START(snk_state::ikari)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_ikari)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ikari)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ikari)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -3987,7 +3987,7 @@ MACHINE_CONFIG_START(snk_state::bermudat)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_gwar)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gwar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gwar)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,gwar)
 
@@ -4089,7 +4089,7 @@ MACHINE_CONFIG_START(snk_state::tdfever)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tdfever)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tdfever)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tdfever)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -6574,7 +6574,7 @@ ROM_END
 
 /***********************************************************************/
 
-DRIVER_INIT_MEMBER(snk_state,countryc)
+void snk_state::init_countryc()
 {
 	// replace coin counter with trackball select
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc300, 0xc300, write8_delegate(FUNC(snk_state::countryc_trackball_w),this));
@@ -6582,60 +6582,60 @@ DRIVER_INIT_MEMBER(snk_state,countryc)
 
 
 
-GAME( 1983, marvins,   0,        marvins,   marvins,   snk_state, 0,        ROT270, "SNK",     "Marvin's Maze", 0 )
-GAME( 1984, vangrd2,   0,        vangrd2,   vangrd2,   snk_state, 0,        ROT270, "SNK",     "Vanguard II", 0 )
-GAME( 1984, madcrash,  0,        vangrd2,   madcrash,  snk_state, 0,        ROT0,   "SNK",     "Mad Crasher", 0 )
-GAME( 1984, madcrush,  madcrash, madcrush,  madcrash,  snk_state, 0,        ROT0,   "SNK",     "Mad Crusher (Japan)", 0 )
+GAME( 1983, marvins,   0,        marvins,   marvins,   snk_state, empty_init, ROT270, "SNK",     "Marvin's Maze", 0 )
+GAME( 1984, vangrd2,   0,        vangrd2,   vangrd2,   snk_state, empty_init, ROT270, "SNK",     "Vanguard II", 0 )
+GAME( 1984, madcrash,  0,        vangrd2,   madcrash,  snk_state, empty_init, ROT0,   "SNK",     "Mad Crasher", 0 )
+GAME( 1984, madcrush,  madcrash, madcrush,  madcrash,  snk_state, empty_init, ROT0,   "SNK",     "Mad Crusher (Japan)", 0 )
 
-GAME( 1984, jcross,    0,        jcross,    jcross,    snk_state, 0,        ROT270, "SNK",     "Jumping Cross (set 1)", 0 )
-GAME( 1984, jcrossa,   jcross,   jcross,    jcross,    snk_state, 0,        ROT270, "SNK",     "Jumping Cross (set 2)", 0 )
-GAME( 1984, sgladiat,  0,        sgladiat,  sgladiat,  snk_state, 0,        ROT0,   "SNK",     "Gladiator 1984", 0 )
-GAME( 1985, hal21,     0,        hal21,     hal21,     snk_state, 0,        ROT270, "SNK",     "HAL21", 0 )
-GAME( 1985, hal21j,    hal21,    hal21,     hal21,     snk_state, 0,        ROT270, "SNK",     "HAL21 (Japan)", 0 )
+GAME( 1984, jcross,    0,        jcross,    jcross,    snk_state, empty_init, ROT270, "SNK",     "Jumping Cross (set 1)", 0 )
+GAME( 1984, jcrossa,   jcross,   jcross,    jcross,    snk_state, empty_init, ROT270, "SNK",     "Jumping Cross (set 2)", 0 )
+GAME( 1984, sgladiat,  0,        sgladiat,  sgladiat,  snk_state, empty_init, ROT0,   "SNK",     "Gladiator 1984", 0 )
+GAME( 1985, hal21,     0,        hal21,     hal21,     snk_state, empty_init, ROT270, "SNK",     "HAL21", 0 )
+GAME( 1985, hal21j,    hal21,    hal21,     hal21,     snk_state, empty_init, ROT270, "SNK",     "HAL21 (Japan)", 0 )
 
-GAME( 1985, aso,       0,        aso,       aso,       snk_state, 0,        ROT270, "SNK",     "ASO - Armored Scrum Object", 0 )
-GAME( 1985, alphamis,  aso,      aso,       alphamis,  snk_state, 0,        ROT270, "SNK",     "Alpha Mission", 0 )
-GAME( 1985, arian,     aso,      aso,       alphamis,  snk_state, 0,        ROT270, "SNK",     "Arian Mission", 0 )
-GAME( 1985, tnk3,      0,        tnk3,      tnk3,      snk_state, 0,        ROT270, "SNK",     "T.N.K III (US)", 0 )
-GAME( 1985, tnk3j,     tnk3,     tnk3,      tnk3,      snk_state, 0,        ROT270, "SNK",     "T.A.N.K (Japan)", 0 )
-GAME( 1986, athena,    0,        athena,    athena,    snk_state, 0,        ROT0,   "SNK",     "Athena", 0 )
-GAME( 1986, athenab,   athena,   athena,    athena,    snk_state, 0,        ROT0,   "SNK",     "Athena (bootleg)", 0 ) // is this really a bootleg?
-GAME( 1987, sathena,   athena,   athena,    athena,    snk_state, 0,        ROT0,   "bootleg", "Super Athena (bootleg)", 0 )
-GAME( 1988, fitegolf,  0,        fitegolf,  fitegolf,  snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (World?)", 0 )
-GAME( 1988, fitegolfu, fitegolf, fitegolf,  fitegolfu, snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US)", 0 )
-GAME( 1988, fitegolf2, fitegolf, fitegolf2, fitegolfu, snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US, Ver 2)", 0 )
-GAME( 1988, countryc,  0,        fitegolf,  countryc,  snk_state, countryc, ROT0,   "SNK",     "Country Club", 0 )
+GAME( 1985, aso,       0,        aso,       aso,       snk_state, empty_init, ROT270, "SNK",     "ASO - Armored Scrum Object", 0 )
+GAME( 1985, alphamis,  aso,      aso,       alphamis,  snk_state, empty_init, ROT270, "SNK",     "Alpha Mission", 0 )
+GAME( 1985, arian,     aso,      aso,       alphamis,  snk_state, empty_init, ROT270, "SNK",     "Arian Mission", 0 )
+GAME( 1985, tnk3,      0,        tnk3,      tnk3,      snk_state, empty_init, ROT270, "SNK",     "T.N.K III (US)", 0 )
+GAME( 1985, tnk3j,     tnk3,     tnk3,      tnk3,      snk_state, empty_init, ROT270, "SNK",     "T.A.N.K (Japan)", 0 )
+GAME( 1986, athena,    0,        athena,    athena,    snk_state, empty_init, ROT0,   "SNK",     "Athena", 0 )
+GAME( 1986, athenab,   athena,   athena,    athena,    snk_state, empty_init, ROT0,   "SNK",     "Athena (bootleg)", 0 ) // is this really a bootleg?
+GAME( 1987, sathena,   athena,   athena,    athena,    snk_state, empty_init, ROT0,   "bootleg", "Super Athena (bootleg)", 0 )
+GAME( 1988, fitegolf,  0,        fitegolf,  fitegolf,  snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (World?)", 0 )
+GAME( 1988, fitegolfu, fitegolf, fitegolf,  fitegolfu, snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US)", 0 )
+GAME( 1988, fitegolf2, fitegolf, fitegolf2, fitegolfu, snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US, Ver 2)", 0 )
+GAME( 1988, countryc,  0,        fitegolf,  countryc,  snk_state, init_countryc,ROT0, "SNK",     "Country Club", 0 )
 
-GAME( 1986, ikari,     0,        ikari,     ikari,     snk_state, 0,        ROT270, "SNK",     "Ikari Warriors (US JAMMA)", 0 ) // distributed by Tradewest(?)
-GAME( 1986, ikaria,    ikari,    ikari,     ikaria,    snk_state, 0,        ROT270, "SNK",     "Ikari Warriors (US)", 0 ) // distributed by Tradewest(?)
-GAME( 1986, ikarinc,   ikari,    ikari,     ikarinc,   snk_state, 0,        ROT270, "SNK",     "Ikari Warriors (US No Continues)", 0 ) // distributed by Tradewest(?)
-GAME( 1986, ikarijp,   ikari,    ikari,     ikarinc,   snk_state, 0,        ROT270, "SNK",     "Ikari (Japan No Continues)", 0 )
-GAME( 1986, ikarijpb,  ikari,    ikari,     ikarijpb,  snk_state, 0,        ROT270, "bootleg", "Ikari (Joystick hack bootleg)", 0 )
-GAME( 1986, ikariram,  ikari,    ikari,     ikarijpb,  snk_state, 0,        ROT270, "bootleg", "Rambo 3 (bootleg of Ikari, Joystick hack)", 0 )
-GAME( 1986, victroad,  0,        victroad,  victroad,  snk_state, 0,        ROT270, "SNK",     "Victory Road", 0 )
-GAME( 1986, dogosoke,  victroad, victroad,  victroad,  snk_state, 0,        ROT270, "SNK",     "Dogou Souken", 0 )
-GAME( 1986, dogosokb,  victroad, victroad,  dogosokb,  snk_state, 0,        ROT270, "bootleg", "Dogou Souken (Joystick hack bootleg)", 0 )
+GAME( 1986, ikari,     0,        ikari,     ikari,     snk_state, empty_init, ROT270, "SNK",     "Ikari Warriors (US JAMMA)", 0 ) // distributed by Tradewest(?)
+GAME( 1986, ikaria,    ikari,    ikari,     ikaria,    snk_state, empty_init, ROT270, "SNK",     "Ikari Warriors (US)", 0 ) // distributed by Tradewest(?)
+GAME( 1986, ikarinc,   ikari,    ikari,     ikarinc,   snk_state, empty_init, ROT270, "SNK",     "Ikari Warriors (US No Continues)", 0 ) // distributed by Tradewest(?)
+GAME( 1986, ikarijp,   ikari,    ikari,     ikarinc,   snk_state, empty_init, ROT270, "SNK",     "Ikari (Japan No Continues)", 0 )
+GAME( 1986, ikarijpb,  ikari,    ikari,     ikarijpb,  snk_state, empty_init, ROT270, "bootleg", "Ikari (Joystick hack bootleg)", 0 )
+GAME( 1986, ikariram,  ikari,    ikari,     ikarijpb,  snk_state, empty_init, ROT270, "bootleg", "Rambo 3 (bootleg of Ikari, Joystick hack)", 0 )
+GAME( 1986, victroad,  0,        victroad,  victroad,  snk_state, empty_init, ROT270, "SNK",     "Victory Road", 0 )
+GAME( 1986, dogosoke,  victroad, victroad,  victroad,  snk_state, empty_init, ROT270, "SNK",     "Dogou Souken", 0 )
+GAME( 1986, dogosokb,  victroad, victroad,  dogosokb,  snk_state, empty_init, ROT270, "bootleg", "Dogou Souken (Joystick hack bootleg)", 0 )
 
-GAME( 1987, bermudat,  0,        bermudat,  bermudat,  snk_state, 0,        ROT270, "SNK",     "Bermuda Triangle (World?)", 0 )
-GAME( 1987, bermudatj, bermudat, bermudat,  bermudat,  snk_state, 0,        ROT270, "SNK",     "Bermuda Triangle (Japan)", 0 )
-GAME( 1987, worldwar,  0,        bermudat,  worldwar,  snk_state, 0,        ROT270, "SNK",     "World Wars (World?)", 0 )
-GAME( 1987, bermudata, worldwar, bermudat,  bermudaa,  snk_state, 0,        ROT270, "SNK",     "Bermuda Triangle (World Wars) (US)", 0 )
-GAME( 1987, psychos,   0,        psychos,   psychos,   snk_state, 0,        ROT0,   "SNK",     "Psycho Soldier (US)", 0 )
-GAME( 1987, psychosj,  psychos,  psychos,   psychos,   snk_state, 0,        ROT0,   "SNK",     "Psycho Soldier (Japan)", 0 )
-GAME( 1987, gwar,      0,        gwar,      gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (US)", 0 )
-GAME( 1987, gwarj,     gwar,     gwar,      gwar,      snk_state, 0,        ROT270, "SNK",     "Guevara (Japan)", 0 )
-GAME( 1987, gwara,     gwar,     gwara,     gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (Version 1, set 1)", 0 )
-GAME( 1987, gwarab,    gwar,     gwara,     gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (Version 1, set 2)", 0 )
-GAME( 1987, gwarb,     gwar,     gwar,      gwarb,     snk_state, 0,        ROT270, "bootleg", "Guerrilla War (Joystick hack bootleg)", 0 )
-GAME( 1988, chopper,   0,        chopper1,  chopper,   snk_state, 0,        ROT270, "SNK",     "Chopper I (US set 1)", 0 )
-GAME( 1988, choppera,  chopper,  choppera,  choppera,  snk_state, 0,        ROT270, "SNK",     "Chopper I (US set 2)", 0 )
-GAME( 1988, chopperb,  chopper,  chopper1,  chopper,   snk_state, 0,        ROT270, "SNK",     "Chopper I (US set 3)", 0 )
-GAME( 1988, legofair,  chopper,  chopper1,  chopper,   snk_state, 0,        ROT270, "SNK",     "Koukuu Kihei Monogatari - The Legend of Air Cavalry (Japan)", 0 )
+GAME( 1987, bermudat,  0,        bermudat,  bermudat,  snk_state, empty_init, ROT270, "SNK",     "Bermuda Triangle (World?)", 0 )
+GAME( 1987, bermudatj, bermudat, bermudat,  bermudat,  snk_state, empty_init, ROT270, "SNK",     "Bermuda Triangle (Japan)", 0 )
+GAME( 1987, worldwar,  0,        bermudat,  worldwar,  snk_state, empty_init, ROT270, "SNK",     "World Wars (World?)", 0 )
+GAME( 1987, bermudata, worldwar, bermudat,  bermudaa,  snk_state, empty_init, ROT270, "SNK",     "Bermuda Triangle (World Wars) (US)", 0 )
+GAME( 1987, psychos,   0,        psychos,   psychos,   snk_state, empty_init, ROT0,   "SNK",     "Psycho Soldier (US)", 0 )
+GAME( 1987, psychosj,  psychos,  psychos,   psychos,   snk_state, empty_init, ROT0,   "SNK",     "Psycho Soldier (Japan)", 0 )
+GAME( 1987, gwar,      0,        gwar,      gwar,      snk_state, empty_init, ROT270, "SNK",     "Guerrilla War (US)", 0 )
+GAME( 1987, gwarj,     gwar,     gwar,      gwar,      snk_state, empty_init, ROT270, "SNK",     "Guevara (Japan)", 0 )
+GAME( 1987, gwara,     gwar,     gwara,     gwar,      snk_state, empty_init, ROT270, "SNK",     "Guerrilla War (Version 1, set 1)", 0 )
+GAME( 1987, gwarab,    gwar,     gwara,     gwar,      snk_state, empty_init, ROT270, "SNK",     "Guerrilla War (Version 1, set 2)", 0 )
+GAME( 1987, gwarb,     gwar,     gwar,      gwarb,     snk_state, empty_init, ROT270, "bootleg", "Guerrilla War (Joystick hack bootleg)", 0 )
+GAME( 1988, chopper,   0,        chopper1,  chopper,   snk_state, empty_init, ROT270, "SNK",     "Chopper I (US set 1)", 0 )
+GAME( 1988, choppera,  chopper,  choppera,  choppera,  snk_state, empty_init, ROT270, "SNK",     "Chopper I (US set 2)", 0 )
+GAME( 1988, chopperb,  chopper,  chopper1,  chopper,   snk_state, empty_init, ROT270, "SNK",     "Chopper I (US set 3)", 0 )
+GAME( 1988, legofair,  chopper,  chopper1,  chopper,   snk_state, empty_init, ROT270, "SNK",     "Koukuu Kihei Monogatari - The Legend of Air Cavalry (Japan)", 0 )
 
-GAME( 1987, tdfever,   0,        tdfever,   tdfever,   snk_state, 0,        ROT90,  "SNK",     "TouchDown Fever (US)", 0 )
-GAME( 1987, tdfeverj,  tdfever,  tdfever,   tdfever,   snk_state, 0,        ROT90,  "SNK",     "TouchDown Fever (Japan)", 0 )
-GAME( 1988, tdfever2,  tdfever,  tdfever2,  tdfever,   snk_state, 0,        ROT90,  "SNK",     "TouchDown Fever 2", 0 ) /* upgrade kit for Touchdown Fever */
-GAME( 1988, fsoccer,   0,        tdfever2,  fsoccer,   snk_state, 0,        ROT0,   "SNK",     "Fighting Soccer (version 4)", 0 )
-GAME( 1988, fsoccerj,  fsoccer,  tdfever2,  fsoccer,   snk_state, 0,        ROT0,   "SNK",     "Fighting Soccer (Japan)", 0 )
-GAME( 1988, fsoccerb,  fsoccer,  tdfever2,  fsoccerb,  snk_state, 0,        ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg)", 0 )
-GAME( 1988, fsoccerba, fsoccer,  tdfever2,  fsoccerb,  snk_state, 0,        ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg, alt)", 0 )
+GAME( 1987, tdfever,   0,        tdfever,   tdfever,   snk_state, empty_init, ROT90,  "SNK",     "TouchDown Fever (US)", 0 )
+GAME( 1987, tdfeverj,  tdfever,  tdfever,   tdfever,   snk_state, empty_init, ROT90,  "SNK",     "TouchDown Fever (Japan)", 0 )
+GAME( 1988, tdfever2,  tdfever,  tdfever2,  tdfever,   snk_state, empty_init, ROT90,  "SNK",     "TouchDown Fever 2", 0 ) /* upgrade kit for Touchdown Fever */
+GAME( 1988, fsoccer,   0,        tdfever2,  fsoccer,   snk_state, empty_init, ROT0,   "SNK",     "Fighting Soccer (version 4)", 0 )
+GAME( 1988, fsoccerj,  fsoccer,  tdfever2,  fsoccer,   snk_state, empty_init, ROT0,   "SNK",     "Fighting Soccer (Japan)", 0 )
+GAME( 1988, fsoccerb,  fsoccer,  tdfever2,  fsoccerb,  snk_state, empty_init, ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg)", 0 )
+GAME( 1988, fsoccerba, fsoccer,  tdfever2,  fsoccerb,  snk_state, empty_init, ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg, alt)", 0 )

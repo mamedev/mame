@@ -707,13 +707,13 @@ static const gfx_layout spritelayout =
 	128*8   /* every char takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( psychic5 )
+static GFXDECODE_START( gfx_psychic5 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,   32*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( bombsa )
+static GFXDECODE_START( gfx_bombsa )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 32*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0*16,  16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,   16*16, 16 )
@@ -747,7 +747,7 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240) // was 53.8 Hz before, assume same as Bombs Away
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_psychic5)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psychic5)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psychic5)
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
@@ -801,7 +801,7 @@ MACHINE_CONFIG_START(psychic5_state::bombsa)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240) /* Guru says : VSync - 54Hz . HSync - 15.25kHz */
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_bombsa)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bombsa)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bombsa)
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,bombsa)
@@ -980,6 +980,6 @@ ROM_START( bombsa )
 ROM_END
 
 
-GAME( 1987, psychic5,  0,        psychic5, psychic5, psychic5_state, 0, ROT270, "Jaleco / NMK", "Psychic 5 (World)", MACHINE_SUPPORTS_SAVE ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
-GAME( 1987, psychic5j, psychic5, psychic5, psychic5, psychic5_state, 0, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bombsa,    0,        bombsa,   bombsa,   psychic5_state, 0, ROT270, "Jaleco", "Bombs Away (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, psychic5,  0,        psychic5, psychic5, psychic5_state, empty_init, ROT270, "Jaleco / NMK", "Psychic 5 (World)", MACHINE_SUPPORTS_SAVE ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
+GAME( 1987, psychic5j, psychic5, psychic5, psychic5, psychic5_state, empty_init, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bombsa,    0,        bombsa,   bombsa,   psychic5_state, empty_init, ROT270, "Jaleco", "Bombs Away (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )

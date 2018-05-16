@@ -366,6 +366,7 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 	MCFG_YGV608_PALETTE("palette")
 	MCFG_YGV608_VBLANK_HANDLER(WRITELINE(*this, namcond1_state, vblank_irq_w))
 	MCFG_YGV608_RASTER_HANDLER(WRITELINE(*this, namcond1_state, raster_irq_w))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -513,9 +514,9 @@ ROM_START( abcheck )
 	ROM_LOAD( "npg1624lc.u4", 0x020000, 0x200000, CRC(7e00254f) SHA1(b0fa8f979e8322d71f842de5358ae2a2e36386f7) )
 ROM_END
 
-GAME( 1995, ncv1,      0, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ncv1j,  ncv1, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.03)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ncv2,      0, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, namcond1_state, 0, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, abcheck,   0, abcheck,  abcheck,  namcond1_state, 0, ROT0,  "Namco", "Abnormal Check", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ncv1,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ncv1j,  ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.1 (Japan, v1.03)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ncv2,      0, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, namcond1_state, empty_init, ROT90, "Namco", "Namco Classic Collection Vol.2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, abcheck,   0, abcheck,  abcheck,  namcond1_state, empty_init, ROT0,  "Namco", "Abnormal Check", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )

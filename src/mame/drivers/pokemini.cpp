@@ -1802,4 +1802,4 @@ ROM_START( pokemini )
 ROM_END
 
 
-CONS( 2001, pokemini, 0, 0, pokemini, pokemini, pokemini_state, 0, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )
+CONS( 2001, pokemini, 0, 0, pokemini, pokemini, pokemini_state, empty_init, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )

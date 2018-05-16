@@ -563,7 +563,7 @@ static const gfx_layout tilelayout =
 	256*8   /* every tile takes 256 consecutive bytes */
 };
 
-static GFXDECODE_START( sidearms )
+static GFXDECODE_START( gfx_sidearms )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   768, 64 ) /* colors 768-1023 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0, 32 ) /* colors   0-511 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 512, 16 ) /* colors 512-767 */
@@ -592,7 +592,7 @@ static const gfx_layout turtship_tilelayout =
 	256*8   /* every tile takes 256 consecutive bytes */
 };
 
-static GFXDECODE_START( turtship )
+static GFXDECODE_START( gfx_turtship )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          768, 64 )  /* colors 768-1023 */
 	GFXDECODE_ENTRY( "gfx2", 0, turtship_tilelayout,   0, 32 )  /* colors   0-511 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,        512, 16 )  /* colors 512-767 */
@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(sidearms_state::sidearms)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sidearms)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sidearms)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
@@ -672,7 +672,7 @@ MACHINE_CONFIG_START(sidearms_state::turtship)
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turtship)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turtship)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
@@ -724,7 +724,7 @@ MACHINE_CONFIG_START(sidearms_state::whizz)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turtship)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turtship)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
@@ -1219,41 +1219,41 @@ ROM_START( whizz )  /* Whizz Philko 1989. Original pcb. Boardnumber: 01-90 / Ser
 	ROM_LOAD( "t-7.y8",    0x0000, 0x8000, CRC(a8b5f750) SHA1(94eb7af3cb8bee87ce3d31260e3bde062ebbc8f0) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sidearms_state,sidearms)
+void sidearms_state::init_sidearms()
 {
 	m_gameid = 0;
 }
 
-DRIVER_INIT_MEMBER(sidearms_state,turtship)
+void sidearms_state::init_turtship()
 {
 	m_gameid = 1;
 }
 
-DRIVER_INIT_MEMBER(sidearms_state,dyger)
+void sidearms_state::init_dyger()
 {
 	m_gameid = 2;
 }
 
-DRIVER_INIT_MEMBER(sidearms_state,whizz)
+void sidearms_state::init_whizz()
 {
 	m_gameid = 3;
 }
 
 // date string is at 0xaa2 in 'rom 03' it does not appear to be displayed
 
-GAME( 1986, sidearms,   0,        sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (World, 861129)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidearmsu,  sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861202)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidearmsur1,sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861128)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidearmsj,  sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (Japan, 861128)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidearms,   0,        sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (World, 861129)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidearmsu,  sidearms, sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861202)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidearmsur1,sidearms, sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861128)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidearmsj,  sidearms, sidearms, sidearms, sidearms_state, init_sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (Japan, 861128)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, turtship, 0,        turtship, turtship, sidearms_state, turtship, ROT0,   "Philko (Sharp Image license)",   "Turtle Ship (North America)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, turtshipj,turtship, turtship, turtship, sidearms_state, turtship, ROT0,   "Philko (Pacific Games license)", "Turtle Ship (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, turtshipk,turtship, turtship, turtship, sidearms_state, turtship, ROT0,   "Philko",                         "Turtle Ship (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, turtshipko,turtship, turtship, turtship, sidearms_state, turtship, ROT0,   "Philko",                         "Turtle Ship (Korea, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, turtshipkn, turtship, turtship, turtship, sidearms_state, turtship, ROT0,   "Philko",                       "Turtle Ship (Korea, 88/9)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, turtship,   0,        turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko (Sharp Image license)",   "Turtle Ship (North America)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, turtshipj,  turtship, turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko (Pacific Games license)", "Turtle Ship (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, turtshipk,  turtship, turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko",                         "Turtle Ship (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, turtshipko, turtship, turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko",                         "Turtle Ship (Korea, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, turtshipkn, turtship, turtship, turtship, sidearms_state, init_turtship, ROT0,   "Philko",                       "Turtle Ship (Korea, 88/9)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, dyger,    0,        turtship, dyger, sidearms_state,    dyger,    ROT270, "Philko", "Dyger (Korea set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dygera,   dyger,    turtship, dyger, sidearms_state,    dyger,    ROT270, "Philko", "Dyger (Korea set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyger,      0,        turtship, dyger,    sidearms_state, init_dyger,    ROT270, "Philko", "Dyger (Korea set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dygera,     dyger,    turtship, dyger,    sidearms_state, init_dyger,    ROT270, "Philko", "Dyger (Korea set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, twinfalc, 0,        whizz,    whizz, sidearms_state,    whizz,    ROT0,   "Philko (Poara Enterprises license)", "Twin Falcons", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, whizz,    twinfalc, whizz,    whizz, sidearms_state,    whizz,    ROT0,   "Philko",                             "Whizz", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twinfalc,   0,        whizz,    whizz,    sidearms_state, init_whizz,    ROT0,   "Philko (Poara Enterprises license)", "Twin Falcons", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, whizz,      twinfalc, whizz,    whizz,    sidearms_state, init_whizz,    ROT0,   "Philko",                             "Whizz", MACHINE_SUPPORTS_SAVE )

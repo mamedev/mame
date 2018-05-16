@@ -275,9 +275,11 @@ CUSTOM_INPUT_MEMBER(xain_state::mcu_status_r)
 
 READ8_MEMBER(xain_state::mcu_comm_reset_r)
 {
-	if (m_mcu)
-		m_mcu->reset_w(PULSE_LINE);
-
+	if (m_mcu.found() && !machine().side_effects_disabled())
+	{
+		m_mcu->reset_w(ASSERT_LINE);
+		m_mcu->reset_w(CLEAR_LINE);
+	}
 	return 0xff;
 }
 
@@ -434,7 +436,7 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static GFXDECODE_START( xain )
+static GFXDECODE_START( gfx_xain )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )    /* 8x8 text */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 256, 8 )    /* 16x16 Background */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 384, 8 )    /* 16x16 Background */
@@ -475,7 +477,7 @@ MACHINE_CONFIG_START(xain_state::xsleena)
 	MCFG_SCREEN_UPDATE_DRIVER(xain_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xain)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xain)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -780,8 +782,8 @@ ROM_START( xsleenaba )
 ROM_END
 
 
-GAME( 1986, xsleena,   0,       xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan (Taito license)",            "Xain'd Sleena (World)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, xsleenaj,  xsleena, xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan",                            "Xain'd Sleena (Japan)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, solrwarr,  xsleena, xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan (Taito / Memetron license)", "Solar-Warrior (US)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1986, xsleenab,  xsleena, xsleenab, xsleena, xain_state, 0, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1987, xsleenaba, xsleena, xsleenab, xsleena, xain_state, 0, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg, bugfixed)", MACHINE_SUPPORTS_SAVE ) // newer bootleg, fixes some of the issues with the other one
+GAME( 1986, xsleena,   0,       xsleena,  xsleena, xain_state, empty_init, ROT0, "Technos Japan (Taito license)",            "Xain'd Sleena (World)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, xsleenaj,  xsleena, xsleena,  xsleena, xain_state, empty_init, ROT0, "Technos Japan",                            "Xain'd Sleena (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, solrwarr,  xsleena, xsleena,  xsleena, xain_state, empty_init, ROT0, "Technos Japan (Taito / Memetron license)", "Solar-Warrior (US)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, xsleenab,  xsleena, xsleenab, xsleena, xain_state, empty_init, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1987, xsleenaba, xsleena, xsleenab, xsleena, xain_state, empty_init, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg, bugfixed)", MACHINE_SUPPORTS_SAVE ) // newer bootleg, fixes some of the issues with the other one

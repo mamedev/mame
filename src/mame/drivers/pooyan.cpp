@@ -174,7 +174,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( pooyan )
+static GFXDECODE_START( gfx_pooyan )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 )
 GFXDECODE_END
@@ -219,7 +219,7 @@ MACHINE_CONFIG_START(pooyan_state::pooyan)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pooyan_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pooyan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pooyan)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pooyan_state, pooyan)
@@ -320,6 +320,6 @@ ROM_END
  *************************************/
 
 //    YEAR, NAME,    PARENT, MACHINE,INPUT,  INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1982, pooyan,  0,      pooyan, pooyan, pooyan_state, 0,   ROT90,  "Konami", "Pooyan", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pooyans, pooyan, pooyan, pooyan, pooyan_state, 0,   ROT90,  "Konami (Stern Electronics license)", "Pooyan (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pootan,  pooyan, pooyan, pooyan, pooyan_state, 0,   ROT90,  "bootleg", "Pootan", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pooyan,  0,      pooyan, pooyan, pooyan_state, empty_init, ROT90,  "Konami", "Pooyan", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pooyans, pooyan, pooyan, pooyan, pooyan_state, empty_init, ROT90,  "Konami (Stern Electronics license)", "Pooyan (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pootan,  pooyan, pooyan, pooyan, pooyan_state, empty_init, ROT90,  "bootleg", "Pootan", MACHINE_SUPPORTS_SAVE )

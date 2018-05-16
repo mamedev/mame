@@ -1300,7 +1300,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segag80v_state,elim2)
+void segag80v_state::init_elim2()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1313,7 +1313,7 @@ DRIVER_INIT_MEMBER(segag80v_state,elim2)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,elim4)
+void segag80v_state::init_elim4()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1330,7 +1330,7 @@ DRIVER_INIT_MEMBER(segag80v_state,elim4)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,spacfury)
+void segag80v_state::init_spacfury()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1345,7 +1345,7 @@ DRIVER_INIT_MEMBER(segag80v_state,spacfury)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,zektor)
+void segag80v_state::init_zektor()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	ay8912_device *ay8912 = machine().device<ay8912_device>("aysnd");
@@ -1366,7 +1366,7 @@ DRIVER_INIT_MEMBER(segag80v_state,zektor)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,tacscan)
+void segag80v_state::init_tacscan()
 {
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
@@ -1385,7 +1385,7 @@ DRIVER_INIT_MEMBER(segag80v_state,tacscan)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,startrek)
+void segag80v_state::init_startrek()
 {
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
@@ -1414,15 +1414,15 @@ DRIVER_INIT_MEMBER(segag80v_state,startrek)
  *
  *************************************/
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE           INIT,     MONITOR,                     COMPANY,   FULLNAME,FLAGS
-GAME( 1981, elim2,     0,        elim2,    elim2,    segag80v_state, elim2,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, set 1)",     MACHINE_IMPERFECT_SOUND )
-GAME( 1981, elim2a,    elim2,    elim2,    elim2,    segag80v_state, elim2,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, set 2)",     MACHINE_IMPERFECT_SOUND )
-GAME( 1981, elim2c,    elim2,    elim2,    elim2c,   segag80v_state, elim2,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, cocktail)",  MACHINE_IMPERFECT_SOUND )
-GAME( 1981, elim4,     elim2,    elim2,    elim4,    segag80v_state, elim4,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (4 Players)",            MACHINE_IMPERFECT_SOUND )
-GAME( 1981, elim4p,    elim2,    elim2,    elim4,    segag80v_state, elim4,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (4 Players, prototype)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, spacfury,  0,        spacfury, spacfury, segag80v_state, spacfury, ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision C)",           MACHINE_IMPERFECT_SOUND )
-GAME( 1981, spacfurya, spacfury, spacfury, spacfury, segag80v_state, spacfury, ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision A)",           MACHINE_IMPERFECT_SOUND )
-GAME( 1981, spacfuryb, spacfury, spacfury, spacfury, segag80v_state, spacfury, ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision B)",           MACHINE_IMPERFECT_SOUND )
-GAME( 1982, zektor,    0,        zektor,   zektor,   segag80v_state, zektor,   ORIENTATION_FLIP_Y,          "Sega",    "Zektor (revision B)",               MACHINE_IMPERFECT_SOUND )
-GAME( 1982, tacscan,   0,        tacscan,  tacscan,  segag80v_state, tacscan,  ORIENTATION_FLIP_X ^ ROT270, "Sega",    "Tac/Scan",                          MACHINE_IMPERFECT_SOUND )
-GAME( 1982, startrek,  0,        startrek, startrek, segag80v_state, startrek, ORIENTATION_FLIP_Y,          "Sega",    "Star Trek",                         MACHINE_IMPERFECT_SOUND )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE           INIT,          MONITOR,                     COMPANY,   FULLNAME,FLAGS
+GAME( 1981, elim2,     0,        elim2,    elim2,    segag80v_state, init_elim2,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, set 1)",     MACHINE_IMPERFECT_SOUND )
+GAME( 1981, elim2a,    elim2,    elim2,    elim2,    segag80v_state, init_elim2,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, set 2)",     MACHINE_IMPERFECT_SOUND )
+GAME( 1981, elim2c,    elim2,    elim2,    elim2c,   segag80v_state, init_elim2,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, cocktail)",  MACHINE_IMPERFECT_SOUND )
+GAME( 1981, elim4,     elim2,    elim2,    elim4,    segag80v_state, init_elim4,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (4 Players)",            MACHINE_IMPERFECT_SOUND )
+GAME( 1981, elim4p,    elim2,    elim2,    elim4,    segag80v_state, init_elim4,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (4 Players, prototype)", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, spacfury,  0,        spacfury, spacfury, segag80v_state, init_spacfury, ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision C)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1981, spacfurya, spacfury, spacfury, spacfury, segag80v_state, init_spacfury, ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision A)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1981, spacfuryb, spacfury, spacfury, spacfury, segag80v_state, init_spacfury, ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision B)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1982, zektor,    0,        zektor,   zektor,   segag80v_state, init_zektor,   ORIENTATION_FLIP_Y,          "Sega",    "Zektor (revision B)",               MACHINE_IMPERFECT_SOUND )
+GAME( 1982, tacscan,   0,        tacscan,  tacscan,  segag80v_state, init_tacscan,  ORIENTATION_FLIP_X ^ ROT270, "Sega",    "Tac/Scan",                          MACHINE_IMPERFECT_SOUND )
+GAME( 1982, startrek,  0,        startrek, startrek, segag80v_state, init_startrek, ORIENTATION_FLIP_Y,          "Sega",    "Star Trek",                         MACHINE_IMPERFECT_SOUND )

@@ -1714,7 +1714,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static GFXDECODE_START( mcr )
+static GFXDECODE_START( gfx_mcr )
 	GFXDECODE_SCALE( "gfx1", 0, mcr_bg_layout,     0, 4, 2, 2 ) /* colors 0-15, 2x2 */
 	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout, 0, 4 )       /* colors 16-31 */
 GFXDECODE_END
@@ -1777,7 +1777,7 @@ MACHINE_CONFIG_START(mcr_state::mcr_90009)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr_state, screen_update_mcr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcr)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
 
@@ -2812,7 +2812,7 @@ void mcr_state::mcr_init(int cpuboard, int vidboard, int ssioboard)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,solarfox)
+void mcr_state::init_solarfox()
 {
 	mcr_init(90009, 91399, 90908);
 	m_mcr12_sprite_xoffs = 16;
@@ -2822,7 +2822,7 @@ DRIVER_INIT_MEMBER(mcr_state,solarfox)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,kick)
+void mcr_state::init_kick()
 {
 	mcr_init(90009, 91399, 90908);
 	m_mcr12_sprite_xoffs_flip = 16;
@@ -2831,7 +2831,7 @@ DRIVER_INIT_MEMBER(mcr_state,kick)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_dpoker_state,dpoker)
+void mcr_dpoker_state::init_dpoker()
 {
 	mcr_init(90009, 91399, 90908);
 	m_mcr12_sprite_xoffs_flip = 16;
@@ -2859,13 +2859,13 @@ DRIVER_INIT_MEMBER(mcr_dpoker_state,dpoker)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,mcr_90010)
+void mcr_state::init_mcr_90010()
 {
 	mcr_init(90010, 91399, 90913);
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,wacko)
+void mcr_state::init_wacko()
 {
 	mcr_init(90010, 91399, 90913);
 
@@ -2875,7 +2875,7 @@ DRIVER_INIT_MEMBER(mcr_state,wacko)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,twotiger)
+void mcr_state::init_twotiger()
 {
 	mcr_init(90010, 91399, 90913);
 
@@ -2884,7 +2884,7 @@ DRIVER_INIT_MEMBER(mcr_state,twotiger)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,kroozr)
+void mcr_state::init_kroozr()
 {
 	mcr_init(90010, 91399, 91483);
 
@@ -2893,7 +2893,7 @@ DRIVER_INIT_MEMBER(mcr_state,kroozr)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,journey)
+void mcr_state::init_journey()
 {
 	mcr_init(91475, 91464, 90913);
 
@@ -2901,13 +2901,13 @@ DRIVER_INIT_MEMBER(mcr_state,journey)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,mcr_91490)
+void mcr_state::init_mcr_91490()
 {
 	mcr_init(91490, 91464, 90913);
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,dotrone)
+void mcr_state::init_dotrone()
 {
 	mcr_init(91490, 91464, 91657);
 
@@ -2915,7 +2915,7 @@ DRIVER_INIT_MEMBER(mcr_state,dotrone)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_nflfoot_state,nflfoot)
+void mcr_nflfoot_state::init_nflfoot()
 {
 	mcr_init(91490, 91464, 91657);
 
@@ -2927,7 +2927,7 @@ DRIVER_INIT_MEMBER(mcr_nflfoot_state,nflfoot)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,demoderb)
+void mcr_state::init_demoderb()
 {
 	mcr_init(91490, 91464, 90913);
 
@@ -2948,49 +2948,49 @@ DRIVER_INIT_MEMBER(mcr_state,demoderb)
  *************************************/
 
 /* 90009 CPU board + 91399 video gen + 90908 sound I/O */
-GAME( 1981, solarfox, 0,        mcr_90009,     solarfox, mcr_state,          solarfox,  ROT90 ^ ORIENTATION_FLIP_Y, "Bally Midway", "Solar Fox (upright)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, kick,     0,        mcr_90009,     kick,     mcr_state,          kick,      ORIENTATION_SWAP_XY,        "Midway", "Kick (upright)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, kickman,  kick,     mcr_90009,     kick,     mcr_state,          kick,      ORIENTATION_SWAP_XY,        "Midway", "Kickman (upright)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, kickc,    kick,     mcr_90009,     kickc,    mcr_state,          kick,      ROT90,                      "Midway", "Kick (cocktail)", MACHINE_SUPPORTS_SAVE )
-GAMEL(1985, dpoker,   0,        mcr_90009_dp,  dpoker,   mcr_dpoker_state,   dpoker,    ROT0,                       "Bally",  "Draw Poker (Bally, 03-20)", MACHINE_SUPPORTS_SAVE, layout_dpoker )
+GAME(  1981, solarfox,  0,        mcr_90009,     solarfox,  mcr_state,         init_solarfox,  ROT90 ^ ORIENTATION_FLIP_Y, "Bally Midway", "Solar Fox (upright)", MACHINE_SUPPORTS_SAVE )
+GAME(  1981, kick,      0,        mcr_90009,     kick,      mcr_state,         init_kick,      ORIENTATION_SWAP_XY, "Midway", "Kick (upright)", MACHINE_SUPPORTS_SAVE )
+GAME(  1981, kickman,   kick,     mcr_90009,     kick,      mcr_state,         init_kick,      ORIENTATION_SWAP_XY, "Midway", "Kickman (upright)", MACHINE_SUPPORTS_SAVE )
+GAME(  1981, kickc,     kick,     mcr_90009,     kickc,     mcr_state,         init_kick,      ROT90, "Midway", "Kick (cocktail)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1985, dpoker,    0,        mcr_90009_dp,  dpoker,    mcr_dpoker_state,  init_dpoker,    ROT0,  "Bally",  "Draw Poker (Bally, 03-20)", MACHINE_SUPPORTS_SAVE, layout_dpoker )
 
 /* 90010 CPU board + 91399 video gen + 90913 sound I/O */
-GAME( 1981, shollow,  0,        mcr_90010,     shollow, mcr_state,  mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, shollow2, shollow,  mcr_90010,     shollow, mcr_state,  mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, tron,     0,        mcr_90010,     tron, mcr_state,     mcr_90010, ROT90, "Bally Midway", "Tron (8/9)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, tron2,    tron,     mcr_90010,     tron, mcr_state,     mcr_90010, ROT90, "Bally Midway", "Tron (6/25)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, tron3,    tron,     mcr_90010,     tron3, mcr_state,    mcr_90010, ROT90, "Bally Midway", "Tron (6/17)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1982, tron4,    tron,     mcr_90010,     tron3, mcr_state,    mcr_90010, ROT90, "Bally Midway", "Tron (6/15)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1982, tronger,  tron,     mcr_90010,     tron3, mcr_state,    mcr_90010, ROT90, "Bally Midway", "Tron (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1982, domino,   0,        mcr_90010,     domino, mcr_state,   mcr_90010, ROT0,  "Bally Midway", "Domino Man", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, wacko,    0,        mcr_90010,     wacko, mcr_state,    wacko,     ROT0,  "Bally Midway", "Wacko", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, twotigerc,twotiger, mcr_90010,     twotigrc, mcr_state, mcr_90010, ROT0,  "Bally Midway", "Two Tigers (Tron conversion)", MACHINE_SUPPORTS_SAVE )
+GAME(  1981, shollow,   0,        mcr_90010,     shollow,   mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME(  1981, shollow2,  shollow,  mcr_90010,     shollow,   mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME(  1982, tron,      0,        mcr_90010,     tron,      mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (8/9)", MACHINE_SUPPORTS_SAVE )
+GAME(  1982, tron2,     tron,     mcr_90010,     tron,      mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (6/25)", MACHINE_SUPPORTS_SAVE )
+GAME(  1982, tron3,     tron,     mcr_90010,     tron3,     mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (6/17)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME(  1982, tron4,     tron,     mcr_90010,     tron3,     mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (6/15)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME(  1982, tronger,   tron,     mcr_90010,     tron3,     mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME(  1982, domino,    0,        mcr_90010,     domino,    mcr_state,         init_mcr_90010, ROT0,  "Bally Midway", "Domino Man", MACHINE_SUPPORTS_SAVE )
+GAME(  1982, wacko,     0,        mcr_90010,     wacko,     mcr_state,         init_wacko,     ROT0,  "Bally Midway", "Wacko", MACHINE_SUPPORTS_SAVE )
+GAME(  1984, twotigerc, twotiger, mcr_90010,     twotigrc,  mcr_state,         init_mcr_90010, ROT0,  "Bally Midway", "Two Tigers (Tron conversion)", MACHINE_SUPPORTS_SAVE )
 
 /* hacked 90010 CPU board + 91399 video gen + 90913 sound I/O + 8-track interface */
-GAME( 1984, twotiger, 0,        mcr_90010_tt,  twotiger, mcr_state, twotiger,  ROT0,  "Bally Midway", "Two Tigers (dedicated)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1984, twotiger,  0,        mcr_90010_tt,  twotiger,  mcr_state,         init_twotiger,  ROT0,  "Bally Midway", "Two Tigers (dedicated)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* 90010 CPU board + 91399 video gen + 91483 sound I/O */
-GAME( 1982, kroozr,   0,        mcr_90010,     kroozr, mcr_state,   kroozr,    ROT0,  "Bally Midway", "Kozmik Kroozr", MACHINE_SUPPORTS_SAVE )
+GAME(  1982, kroozr,    0,        mcr_90010,     kroozr,    mcr_state,         init_kroozr,    ROT0,  "Bally Midway", "Kozmik Kroozr", MACHINE_SUPPORTS_SAVE )
 
 /* 91475 CPU board + 91464 video gen + 90913 sound I/O + cassette interface */
-GAME( 1983, journey,  0,        mcr_91475,     journey, mcr_state,  journey,   ROT90, "Bally Midway", "Journey", MACHINE_SUPPORTS_SAVE )
+GAME(  1983, journey,   0,        mcr_91475,     journey,   mcr_state,         init_journey,   ROT90, "Bally Midway", "Journey", MACHINE_SUPPORTS_SAVE )
 
 /* 91490 CPU board + 91464 video gen + 90913 sound I/O */
-GAME( 1983, tapper,   0,        mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 1/27/84)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - Newest version */
-GAME( 1983, tappera,  tapper,   mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 12/9/83)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - The oldest set? */
-GAME( 1983, tapperb,  tapper,   mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, Date Unknown)", MACHINE_SUPPORTS_SAVE ) /* First release at 12/7/83? or in between the other two? */
-GAME( 1983, sutapper, tapper,   mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Suntory)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, rbtapper, tapper,   mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Root Beer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, timber,   0,        mcr_91490,     timber, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Timber", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, dotron,   0,        mcr_91490,     dotron, mcr_state,   mcr_91490, ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Upright)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, dotrona,  dotron,   mcr_91490,     dotron, mcr_state,   mcr_91490, ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Upright alternate)", MACHINE_SUPPORTS_SAVE )
+GAME(  1983, tapper,    0,        mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 1/27/84)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - Newest version */
+GAME(  1983, tappera,   tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 12/9/83)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - The oldest set? */
+GAME(  1983, tapperb,   tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, Date Unknown)", MACHINE_SUPPORTS_SAVE ) /* First release at 12/7/83? or in between the other two? */
+GAME(  1983, sutapper,  tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Suntory)", MACHINE_SUPPORTS_SAVE )
+GAME(  1984, rbtapper,  tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Root Beer)", MACHINE_SUPPORTS_SAVE )
+GAME(  1984, timber,    0,        mcr_91490,     timber,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Timber", MACHINE_SUPPORTS_SAVE )
+GAME(  1983, dotron,    0,        mcr_91490,     dotron,    mcr_state,         init_mcr_91490, ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Upright)", MACHINE_SUPPORTS_SAVE )
+GAME(  1983, dotrona,   dotron,   mcr_91490,     dotron,    mcr_state,         init_mcr_91490, ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Upright alternate)", MACHINE_SUPPORTS_SAVE )
 
 /* 91490 CPU board + 91464 video gen + 91657 sound I/O + Squawk n' Talk */
-GAME( 1983, dotrone,  dotron,   mcr_91490_snt, dotrone, mcr_state,  dotrone,   ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Environmental)", MACHINE_SUPPORTS_SAVE )
+GAME(  1983, dotrone,   dotron,   mcr_91490_snt, dotrone,   mcr_state,         init_dotrone,   ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Environmental)", MACHINE_SUPPORTS_SAVE )
 
 /* 91490 CPU board + 91464 video gen + 91657 sound I/O + Squawk n' Talk + IPU laserdisk interface */
-GAME( 1983, nflfoot,  0,        mcr_91490_ipu, nflfoot, mcr_nflfoot_state,  nflfoot,   ROT0,  "Bally Midway", "NFL Football", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME(  1983, nflfoot,   0,        mcr_91490_ipu, nflfoot,   mcr_nflfoot_state, init_nflfoot,   ROT0,  "Bally Midway", "NFL Football", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 /* 91490 CPU board + 91464 video gen + 90913 sound I/O + Turbo Cheap Squeak */
-GAME( 1984, demoderb, 0,        mcr_91490_tcs, demoderb, mcr_state, demoderb,  ROT0,  "Bally Midway", "Demolition Derby", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, demoderbc,demoderb, mcr_91490_tcs, demoderbc,mcr_state, demoderb,  ROT0,  "Bally Midway", "Demolition Derby (cocktail)", MACHINE_SUPPORTS_SAVE )
+GAME(  1984, demoderb,  0,        mcr_91490_tcs, demoderb,  mcr_state,         init_demoderb,  ROT0,  "Bally Midway", "Demolition Derby", MACHINE_SUPPORTS_SAVE )
+GAME(  1984, demoderbc, demoderb, mcr_91490_tcs, demoderbc, mcr_state,         init_demoderb,  ROT0,  "Bally Midway", "Demolition Derby (cocktail)", MACHINE_SUPPORTS_SAVE )

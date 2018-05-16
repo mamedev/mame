@@ -44,32 +44,32 @@ class dmv_state : public driver_device
 {
 public:
 	dmv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_screen(*this, "screen"),
-			m_hgdc(*this, "upd7220"),
-			m_dmac(*this, "dma8237"),
-			m_pit(*this, "pit8253"),
-			m_fdc(*this, "i8272"),
-			m_floppy0(*this, "i8272:0"),
-			m_floppy1(*this, "i8272:1"),
-			m_keyboard(*this, "keyboard"),
-			m_speaker(*this, "speaker"),
-			m_video_ram(*this, "video_ram"),
-			m_palette(*this, "palette"),
-			m_ram(*this, "ram"),
-			m_bootrom(*this, "boot"),
-			m_chargen(*this, "chargen"),
-			m_slot1(*this, "slot1"),
-			m_slot2(*this, "slot2"),
-			m_slot2a(*this, "slot2a"),
-			m_slot3(*this, "slot3"),
-			m_slot4(*this, "slot4"),
-			m_slot5(*this, "slot5"),
-			m_slot6(*this, "slot6"),
-			m_slot7(*this, "slot7"),
-			m_slot7a(*this, "slot7a")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_hgdc(*this, "upd7220")
+		, m_dmac(*this, "dma8237")
+		, m_pit(*this, "pit8253")
+		, m_fdc(*this, "i8272")
+		, m_floppy0(*this, "i8272:0")
+		, m_floppy1(*this, "i8272:1")
+		, m_keyboard(*this, "keyboard")
+		, m_speaker(*this, "speaker")
+		, m_video_ram(*this, "video_ram")
+		, m_palette(*this, "palette")
+		, m_ram(*this, "ram")
+		, m_bootrom(*this, "boot")
+		, m_chargen(*this, "chargen")
+		, m_slot1(*this, "slot1")
+		, m_slot2(*this, "slot2")
+		, m_slot2a(*this, "slot2a")
+		, m_slot3(*this, "slot3")
+		, m_slot4(*this, "slot4")
+		, m_slot5(*this, "slot5")
+		, m_slot6(*this, "slot6")
+		, m_slot7(*this, "slot7")
+		, m_slot7a(*this, "slot7a")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -663,7 +663,7 @@ static const gfx_layout dmv_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( dmv )
+static GFXDECODE_START( gfx_dmv )
 	GFXDECODE_ENTRY("chargen", 0x0000, dmv_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -788,7 +788,7 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dmv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dmv)
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 	MCFG_DEFAULT_LAYOUT(layout_dmv)
 
@@ -906,5 +906,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  STATE      INIT   COMPANY  FULLNAME             FLAGS
-COMP( 1984, dmv,    0,      0,       dmv,     dmv,   dmv_state, 0,     "NCR",   "Decision Mate V",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME           FLAGS
+COMP( 1984, dmv,  0,      0,      dmv,     dmv,   dmv_state, empty_init, "NCR",   "Decision Mate V", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

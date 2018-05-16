@@ -283,7 +283,7 @@ static const gfx_layout motion_layout =
 };
 
 
-static GFXDECODE_START( ultratnk )
+static GFXDECODE_START( gfx_ultratnk )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1, 0, 5 )
 	GFXDECODE_ENTRY( "gfx2", 0, motion_layout, 0, 5 )
 GFXDECODE_END
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(ultratnk_state::ultratnk)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ultratnk_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ultratnk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ultratnk)
 	MCFG_PALETTE_ADD("palette", 10)
 	MCFG_PALETTE_INDIRECT_ENTRIES(4)
 	MCFG_PALETTE_INIT_OWNER(ultratnk_state, ultratnk)
@@ -351,4 +351,4 @@ ROM_START( ultratnk )
 ROM_END
 
 
-GAME( 1978, ultratnk, 0, ultratnk, ultratnk, ultratnk_state, 0, 0, "Atari (Kee Games)", "Ultra Tank", MACHINE_SUPPORTS_SAVE )
+GAME( 1978, ultratnk, 0, ultratnk, ultratnk, ultratnk_state, empty_init, ROT0, "Atari (Kee Games)", "Ultra Tank", MACHINE_SUPPORTS_SAVE )

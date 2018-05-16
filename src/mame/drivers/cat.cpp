@@ -290,7 +290,7 @@ public:
 	DECLARE_MACHINE_START(cat);
 	DECLARE_MACHINE_RESET(cat);
 	DECLARE_VIDEO_START(cat);
-	DECLARE_DRIVER_INIT(cat);
+	void init_cat();
 
 	uint32_t screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -365,16 +365,15 @@ protected:
 
 // TODO: this init doesn't actually work yet! please fix me!
 /*
-DRIVER_INIT_MEMBER( cat_state,cat )
+void cat_state::init_cat()
 {
     uint8_t *svrom = memregion("svrom")->base();
-    int i;
     // fill svrom with the correct 2e80 pattern except where svrom1 sits
     // first half
-    for (i = 0; i < 0x20000; i+=2)
+    for (int i = 0; i < 0x20000; i+=2)
         svrom[i] = 0x2E;
     // second half
-    for (i = 0x20000; i < 0x40000; i+=2)
+    for (int i = 0x20000; i < 0x40000; i+=2)
     {
         svrom[i] = 0x2E;
         svrom[i+1] = 0x80;
@@ -1178,5 +1177,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT    DEVICE         INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1987, cat,  0,      0,       cat,       cat,     cat_state,     0,       "Canon",  "Cat",         MACHINE_NOT_WORKING)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS */
+COMP( 1987, cat,  0,      0,      cat,     cat,   cat_state, empty_init, "Canon", "Cat",    MACHINE_NOT_WORKING)

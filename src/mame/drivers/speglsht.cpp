@@ -143,7 +143,7 @@ public:
 	DECLARE_WRITE32_MEMBER(cop_w);
 	DECLARE_READ32_MEMBER(cop_r);
 	DECLARE_READ32_MEMBER(irq_ack_clear);
-	DECLARE_DRIVER_INIT(speglsht);
+	void init_speglsht();
 	DECLARE_MACHINE_RESET(speglsht);
 	virtual void machine_start() override;
 	DECLARE_VIDEO_START(speglsht);
@@ -352,7 +352,7 @@ static INPUT_PORTS_START( speglsht )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
-static GFXDECODE_START( speglsht )
+static GFXDECODE_START( gfx_speglsht )
 GFXDECODE_END
 
 
@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(speglsht_state::speglsht)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 239-8)
 	MCFG_SCREEN_UPDATE_DRIVER(speglsht_state, screen_update_speglsht)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speglsht)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speglsht)
 	MCFG_PALETTE_ADD("palette", 16*16*4+1)
 
 	MCFG_VIDEO_START_OVERRIDE(speglsht_state,speglsht)
@@ -455,10 +455,10 @@ ROM_START( speglsht )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(speglsht_state,speglsht)
+void speglsht_state::init_speglsht()
 {
 	m_maincpu->set_st0016_game_flag(3);
 }
 
 
-GAME( 1994, speglsht, 0, speglsht, speglsht, speglsht_state, speglsht, ROT0, "Seta",  "Super Eagle Shot", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, speglsht, 0, speglsht, speglsht, speglsht_state, init_speglsht, ROT0, "Seta",  "Super Eagle Shot", MACHINE_IMPERFECT_GRAPHICS )

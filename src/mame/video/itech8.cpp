@@ -579,7 +579,7 @@ uint32_t itech8_state::screen_update_2layer(screen_device &screen, bitmap_rgb32 
 {
 	uint32_t page_offset;
 	int x, y;
-	const rgb_t *pens = m_tlc34076->get_pens();
+	const pen_t *pens = m_tlc34076->pens();
 
 	/* first get the current display state */
 	m_tms34061->get_display_state();
@@ -662,7 +662,7 @@ uint32_t itech8_state::screen_update_2page(screen_device &screen, bitmap_rgb32 &
 {
 	uint32_t page_offset;
 	int x, y;
-	const rgb_t *pens = m_tlc34076->get_pens();
+	const pen_t *pens = m_tlc34076->pens();
 
 	/* first get the current display state */
 	m_tms34061->get_display_state();
@@ -693,7 +693,7 @@ uint32_t itech8_state::screen_update_2page_large(screen_device &screen, bitmap_r
 {
 	uint32_t page_offset;
 	int x, y;
-	const rgb_t *pens = m_tlc34076->get_pens();
+	const pen_t *pens = m_tlc34076->pens();
 
 	/* first get the current display state */
 	m_tms34061->get_display_state();

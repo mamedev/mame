@@ -271,7 +271,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( megazone )
+static GFXDECODE_START( gfx_megazone )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
 GFXDECODE_END
@@ -334,7 +334,7 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, megazone_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megazone)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_megazone)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(megazone_state, megazone)
@@ -565,9 +565,9 @@ ROM_END
 
 
 
-GAME( 1983, megazone, 0,         megazone, megazone, megazone_state, 0, ROT90, "Konami",                               "Mega Zone (program code L)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazonej, megazone, megazone, megazone, megazone_state, 0, ROT90, "Konami (Interlogic / Kosuka license)", "Mega Zone (program code J)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazonei, megazone, megazone, megazone, megazone_state, 0, ROT90, "Konami",                               "Mega Zone (program code I)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazoneh, megazone, megazone, megazone, megazone_state, 0, ROT90, "Konami (Kosuka license)",              "Mega Zone (program code H)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazonea, megazone, megazone, megazone, megazone_state, 0, ROT90, "Konami (Interlogic / Kosuka license)", "Mega Zone (unknown program code 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazoneb, megazone, megazone, megazona, megazone_state, 0, ROT90, "Konami",                               "Mega Zone (unknown program code 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazone, 0,         megazone, megazone, megazone_state, empty_init, ROT90, "Konami",                               "Mega Zone (program code L)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazonej, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami (Interlogic / Kosuka license)", "Mega Zone (program code J)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazonei, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami",                               "Mega Zone (program code I)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazoneh, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami (Kosuka license)",              "Mega Zone (program code H)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazonea, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami (Interlogic / Kosuka license)", "Mega Zone (unknown program code 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazoneb, megazone, megazone, megazona, megazone_state, empty_init, ROT90, "Konami",                               "Mega Zone (unknown program code 2)", MACHINE_SUPPORTS_SAVE )

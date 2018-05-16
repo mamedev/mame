@@ -1577,29 +1577,29 @@ static const gfx_layout layout_16x16x8 =
 static GFXLAYOUT_RAW( spritelayout, 256, 256, 256*8, 256*256*8 )
 
 
-static GFXDECODE_START( tetrisp2 )
+static GFXDECODE_START( gfx_tetrisp2 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0x0000, 0x10 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8, 0x1000, 0x10 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8, 0x2000, 0x10 ) // [2] Rotation
 	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,   0x6000, 0x10 ) // [3] Foreground
 GFXDECODE_END
 
-static GFXDECODE_START( rocknms_sub )
+static GFXDECODE_START( gfx_rocknms_sub )
 	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,   0x0000, 0x10 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx6", 0, layout_16x16x8, 0x1000, 0x10 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx7", 0, layout_16x16x8, 0x2000, 0x10 ) // [2] Rotation
 	GFXDECODE_ENTRY( "gfx8", 0, layout_8x8x8,   0x6000, 0x10 ) // [3] Foreground
 GFXDECODE_END
 
-static GFXDECODE_START( vj_lscreen )
+static GFXDECODE_START( gfx_vj_lscreen )
 	GFXDECODE_ENTRY( "sprites_left", 0, spritelayout, 0x0000, 0x80 ) // [0] Sprites (left screen, vertical in stepping stage)
 GFXDECODE_END
 
-static GFXDECODE_START( vj_mscreen )
+static GFXDECODE_START( gfx_vj_mscreen )
 	GFXDECODE_ENTRY( "sprites_mid", 0, spritelayout, 0x0000, 0x80 ) // [0] Sprites (mid screen, horizontal)
 GFXDECODE_END
 
-static GFXDECODE_START( vj_rscreen )
+static GFXDECODE_START( gfx_vj_rscreen )
 	GFXDECODE_ENTRY( "sprites_right", 0, spritelayout, 0x0000, 0x80 ) // [0] Sprites (right screens, vertical in stepping stage)
 GFXDECODE_END
 
@@ -1648,25 +1648,25 @@ void tetrisp2_state::init_rockn_timer()
 	save_item(NAME(m_rocknms_sub2main));
 }
 
-DRIVER_INIT_MEMBER(tetrisp2_state,rockn)
+void tetrisp2_state::init_rockn()
 {
 	init_rockn_timer();
 	m_rockn_protectdata = 1;
 }
 
-DRIVER_INIT_MEMBER(tetrisp2_state,rockn1)
+void tetrisp2_state::init_rockn1()
 {
 	init_rockn_timer();
 	m_rockn_protectdata = 1;
 }
 
-DRIVER_INIT_MEMBER(tetrisp2_state,rockn2)
+void tetrisp2_state::init_rockn2()
 {
 	init_rockn_timer();
 	m_rockn_protectdata = 2;
 }
 
-DRIVER_INIT_MEMBER(tetrisp2_state,rocknms)
+void tetrisp2_state::init_rocknms()
 {
 	init_rockn_timer();
 
@@ -1679,13 +1679,13 @@ DRIVER_INIT_MEMBER(tetrisp2_state,rocknms)
 
 }
 
-DRIVER_INIT_MEMBER(tetrisp2_state,rockn3)
+void tetrisp2_state::init_rockn3()
 {
 	init_rockn_timer();
 	m_rockn_protectdata = 4;
 }
 
-DRIVER_INIT_MEMBER(stepstag_state,stepstag)
+void stepstag_state::init_stepstag()
 {
 	init_rockn_timer();        // used
 	m_rockn_protectdata = 1;    // unused?
@@ -1713,7 +1713,7 @@ MACHINE_CONFIG_START(tetrisp2_state::tetrisp2)
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_tetrisp2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tetrisp2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,tetrisp2)
@@ -1748,7 +1748,7 @@ MACHINE_CONFIG_START(tetrisp2_state::nndmseal)
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_tetrisp2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tetrisp2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,nndmseal)  // bg layer offset
@@ -1781,7 +1781,7 @@ MACHINE_CONFIG_START(tetrisp2_state::rockn)
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_rockntread)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tetrisp2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
@@ -1816,7 +1816,7 @@ MACHINE_CONFIG_START(tetrisp2_state::rockn2)
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_rockntread)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tetrisp2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
@@ -1848,10 +1848,10 @@ MACHINE_CONFIG_START(tetrisp2_state::rocknms)
 
 	/* video hardware */
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tetrisp2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_GFXDECODE_ADD("sub_gfxdecode", "sub_palette", rocknms_sub)
+	MCFG_DEVICE_ADD("sub_gfxdecode", GFXDECODE, "sub_palette", gfx_rocknms_sub)
 	MCFG_PALETTE_ADD("sub_palette", 0x8000)
 
 	MCFG_DEFAULT_LAYOUT(layout_rocknms)
@@ -1922,16 +1922,16 @@ MACHINE_CONFIG_START(stepstag_state::stepstag)
 	MCFG_SCREEN_PALETTE("rpalette")
 
 	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tetrisp2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode_l", "lpalette", vj_lscreen)
+	MCFG_DEVICE_ADD("gfxdecode_l", GFXDECODE, "lpalette", gfx_vj_lscreen)
 	MCFG_PALETTE_ADD("lpalette", 0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode_m", "mpalette", vj_mscreen)
+	MCFG_DEVICE_ADD("gfxdecode_m", GFXDECODE, "mpalette", gfx_vj_mscreen)
 	MCFG_PALETTE_ADD("mpalette", 0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode_r", "rpalette", vj_rscreen)
+	MCFG_DEVICE_ADD("gfxdecode_r", GFXDECODE, "rpalette", gfx_vj_rscreen)
 	MCFG_PALETTE_ADD("rpalette", 0x8000)
 
 	MCFG_DEFAULT_LAYOUT(layout_stepstag)
@@ -1995,16 +1995,16 @@ MACHINE_CONFIG_START(stepstag_state::vjdash)    // 4 Screens
 	MCFG_SCREEN_PALETTE("rpalette")
 
 	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tetrisp2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tetrisp2)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode_l", "lpalette", vj_lscreen)
+	MCFG_DEVICE_ADD("gfxdecode_l", GFXDECODE, "lpalette", gfx_vj_lscreen)
 	MCFG_PALETTE_ADD("lpalette", 0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode_m", "mpalette", vj_mscreen)
+	MCFG_DEVICE_ADD("gfxdecode_m", GFXDECODE, "mpalette", gfx_vj_mscreen)
 	MCFG_PALETTE_ADD("mpalette", 0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode_r", "rpalette", vj_rscreen)
+	MCFG_DEVICE_ADD("gfxdecode_r", GFXDECODE, "rpalette", gfx_vj_rscreen)
 	MCFG_PALETTE_ADD("rpalette", 0x8000)
 
 	MCFG_DEFAULT_LAYOUT(layout_vjdash)
@@ -2813,24 +2813,24 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,     STATE,          INIT,     MONITOR, COMPANY,                       FULLNAME,                               FLAGS
-GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  tetrisp2_state, 0,        ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, 0,        ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, 0,        ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",          MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, nndmseal,  0,        nndmseal, nndmseal,  tetrisp2_state, rockn,    ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1997, nndmseala, nndmseal, nndmseal, nndmseal,  tetrisp2_state, rockn,    ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver.)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseal,  0,        nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseala, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver.)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-GAME( 1999, rockn,     0,        rockn,    rockn,     tetrisp2_state, rockn,    ROT270, "Jaleco",         "Rock'n Tread (Japan)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rockna,    rockn,    rockn,    rockn,     tetrisp2_state, rockn1,   ROT270, "Jaleco",         "Rock'n Tread (Japan, alternate)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rockn2,    0,        rockn2,   rockn,     tetrisp2_state, rockn2,   ROT270, "Jaleco",         "Rock'n Tread 2 (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rocknms,   0,        rocknms,  rocknms,   tetrisp2_state, rocknms,  ROT0,   "Jaleco",         "Rock'n MegaSession (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, rockn3,    0,        rockn2,   rockn,     tetrisp2_state, rockn3,   ROT270, "Jaleco",         "Rock'n 3 (Japan)",                MACHINE_SUPPORTS_SAVE )
-GAME( 2000, rockn4,    0,        rockn2,   rockn,     tetrisp2_state, rockn3,   ROT270, "Jaleco / PCCWJ", "Rock'n 4 (Japan, prototype)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockn,     0,        rockn,    rockn,     tetrisp2_state, init_rockn,   ROT270, "Jaleco",         "Rock'n Tread (Japan)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockna,    rockn,    rockn,    rockn,     tetrisp2_state, init_rockn1,  ROT270, "Jaleco",         "Rock'n Tread (Japan, alternate)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rockn2,    0,        rockn2,   rockn,     tetrisp2_state, init_rockn2,  ROT270, "Jaleco",         "Rock'n Tread 2 (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rocknms,   0,        rocknms,  rocknms,   tetrisp2_state, init_rocknms, ROT0,   "Jaleco",         "Rock'n MegaSession (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, rockn3,    0,        rockn2,   rockn,     tetrisp2_state, init_rockn3,  ROT270, "Jaleco",         "Rock'n 3 (Japan)",                MACHINE_SUPPORTS_SAVE )
+GAME( 2000, rockn4,    0,        rockn2,   rockn,     tetrisp2_state, init_rockn3,  ROT270, "Jaleco / PCCWJ", "Rock'n 4 (Japan, prototype)",     MACHINE_SUPPORTS_SAVE )
 
 // Undumped:
 // - Stepping Stage <- the original Game
 // - Stepping Stage 2 Supreme
 // Dumped (partly):
-GAME( 1999, vjdash,    0,        vjdash,   vjdash,    stepstag_state, stepstag, ROT0,   "Jaleco",         "VJ Visual & Music Slap",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-GAME( 1999, stepstag,  0,        stepstag, stepstag,  stepstag_state, stepstag, ROT0,   "Jaleco",         "Stepping Stage Special",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-GAME( 1999, step3,     0,        stepstag, stepstag,  stepstag_state, stepstag, ROT0,   "Jaleco",         "Stepping 3 Superior",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME( 1999, vjdash,    0,        vjdash,   vjdash,    stepstag_state, init_stepstag, ROT0,   "Jaleco",         "VJ Visual & Music Slap",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME( 1999, stepstag,  0,        stepstag, stepstag,  stepstag_state, init_stepstag, ROT0,   "Jaleco",         "Stepping Stage Special",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME( 1999, step3,     0,        stepstag, stepstag,  stepstag_state, init_stepstag, ROT0,   "Jaleco",         "Stepping 3 Superior",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

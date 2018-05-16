@@ -182,7 +182,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( ssozumo )
+static GFXDECODE_START( gfx_ssozumo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   4*8, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 8*8, 2 )
@@ -216,7 +216,7 @@ MACHINE_CONFIG_START(ssozumo_state::ssozumo)
 	MCFG_SCREEN_UPDATE_DRIVER(ssozumo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssozumo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ssozumo)
 	MCFG_PALETTE_ADD("palette", 64 + 16)
 	MCFG_PALETTE_INIT_OWNER(ssozumo_state, ssozumo)
 
@@ -296,4 +296,4 @@ ROM_END
 
 
 
-GAME( 1984, ssozumo, 0, ssozumo, ssozumo, ssozumo_state, 0, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ssozumo, 0, ssozumo, ssozumo, ssozumo_state, empty_init, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", MACHINE_SUPPORTS_SAVE )
