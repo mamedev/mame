@@ -462,19 +462,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(lastduel_state::madgear_timer_cb)
 	m_maincpu->set_input_line(6, HOLD_LINE); /* Controls */
 }
 
-void lastduel_state::machine_start_lastduel()
+MACHINE_START_MEMBER(lastduel_state,lastduel)
 {
 	save_item(NAME(m_tilemap_priority));
 	save_item(NAME(m_scroll));
 }
 
-void lastduel_state::machine_start_madgear()
+MACHINE_START_MEMBER(lastduel_state,madgear)
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
-	machine_start_lastduel();
+	MACHINE_START_CALL_MEMBER(lastduel);
 }
 
 void lastduel_state::machine_reset()
@@ -498,7 +498,7 @@ MACHINE_CONFIG_START(lastduel_state::lastduel)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_lastduel, this));
+	MCFG_MACHINE_START_OVERRIDE(lastduel_state,lastduel)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -516,7 +516,7 @@ MACHINE_CONFIG_START(lastduel_state::lastduel)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastduel)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_lastduel, this));
+	MCFG_VIDEO_START_OVERRIDE(lastduel_state,lastduel)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -543,7 +543,7 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(madgear_sound_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_madgear, this));
+	MCFG_MACHINE_START_OVERRIDE(lastduel_state,madgear)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -561,7 +561,7 @@ MACHINE_CONFIG_START(lastduel_state::madgear)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_madgear)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_madgear, this));
+	MCFG_VIDEO_START_OVERRIDE(lastduel_state,madgear)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

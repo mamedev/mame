@@ -34,18 +34,18 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
-	void machine_reset_mikrosha();
+	DECLARE_MACHINE_RESET(mikrosha);
 
 	void mikrosha(machine_config &config);
 	void mikrosha_io(address_map &map);
 	void mikrosha_mem(address_map &map);
 };
 
-void mikrosha_state::machine_reset_mikrosha()
+MACHINE_RESET_MEMBER(mikrosha_state,mikrosha)
 {
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x8000+m_cart->get_rom_size()-1, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
-	machine_reset_radio86();
+	MACHINE_RESET_CALL_MEMBER(radio86);
 }
 
 /* Address maps */
@@ -211,7 +211,7 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	MCFG_DEVICE_PROGRAM_MAP(mikrosha_mem)
 	MCFG_DEVICE_IO_MAP(mikrosha_io)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mikrosha, this));
+	MCFG_MACHINE_RESET_OVERRIDE(mikrosha_state, mikrosha)
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))

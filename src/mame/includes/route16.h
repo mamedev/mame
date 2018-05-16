@@ -28,8 +28,8 @@ public:
 	DECLARE_READ8_MEMBER(speakres_in3_r);
 	DECLARE_WRITE8_MEMBER(speakres_out2_w);
 	DECLARE_WRITE8_MEMBER(stratvox_sn76477_w);
-	void machine_start_speakres() ATTR_COLD;
-	void machine_start_ttmahjng() ATTR_COLD;
+	DECLARE_MACHINE_START(speakres);
+	DECLARE_MACHINE_START(ttmahjng);
 	void init_route16();
 
 	uint32_t screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

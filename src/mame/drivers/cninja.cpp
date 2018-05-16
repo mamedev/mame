@@ -785,12 +785,12 @@ DECOSPR_PRIORITY_CB_MEMBER(cninja_state::pri_callback)
 	return 0;
 }
 
-void cninja_state::machine_start_robocop2()
+MACHINE_START_MEMBER(cninja_state,robocop2)
 {
 	save_item(NAME(m_priority));
 }
 
-void cninja_state::machine_reset_robocop2()
+MACHINE_RESET_MEMBER(cninja_state,robocop2)
 {
 	m_priority = 0;
 }
@@ -907,7 +907,7 @@ MACHINE_CONFIG_START(cninja_state::stoneage)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_stoneage, this));
+	MCFG_VIDEO_START_OVERRIDE(cninja_state,stoneage)
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
@@ -1162,8 +1162,8 @@ MACHINE_CONFIG_START(cninja_state::robocop2)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_robocop2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_robocop2, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_robocop2, this));
+	MCFG_MACHINE_START_OVERRIDE(cninja_state,robocop2)
+	MCFG_MACHINE_RESET_OVERRIDE(cninja_state,robocop2)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_robocop2)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -1254,9 +1254,9 @@ MACHINE_CONFIG_START(cninja_state::mutantf)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248) // same as robocop2? verify this from real pcb
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_mutantf)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_robocop2, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_robocop2, this));
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mutantf, this));
+	MCFG_MACHINE_START_OVERRIDE(cninja_state,robocop2)
+	MCFG_MACHINE_RESET_OVERRIDE(cninja_state,robocop2)
+	MCFG_VIDEO_START_OVERRIDE(cninja_state,mutantf)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mutantf)
 	MCFG_PALETTE_ADD("palette", 2048)

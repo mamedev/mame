@@ -110,7 +110,7 @@ MACHINE_CONFIG_START(if800_state::if800)
 	MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT(black_and_white)
 
-//  set_video_start_cb(config, driver_callback_delegate(&video_start_if800, this));
+//  MCFG_VIDEO_START_OVERRIDE(if800_state,if800)
 MACHINE_CONFIG_END
 
 /* ROM definition */

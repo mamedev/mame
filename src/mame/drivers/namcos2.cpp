@@ -1710,8 +1710,8 @@ MACHINE_CONFIG_START(namcos2_state::base)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000)) /* CPU slices per frame */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcos2, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos2, this));
+	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
@@ -1794,8 +1794,8 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_gollygho, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos2, this));
+	MCFG_MACHINE_START_OVERRIDE(namcos2_state,gollygho)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
@@ -1848,8 +1848,8 @@ MACHINE_CONFIG_START(namcos2_state::finallap)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcos2, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos2, this));
+	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
@@ -1870,7 +1870,7 @@ MACHINE_CONFIG_START(namcos2_state::finallap)
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_finallap, this));
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, finallap)
 
 	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
 	MCFG_GFX_PALETTE("palette")
@@ -1907,8 +1907,8 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcos2, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos2, this));
+	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
@@ -1929,7 +1929,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_sgunner, this));
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1968,8 +1968,8 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcos2, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sgunner2, this));
+	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,sgunner2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
@@ -1990,7 +1990,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_sgunner, this));
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -2024,8 +2024,8 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcos2, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos2, this));
+	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
@@ -2046,7 +2046,7 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_luckywld, this));
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, luckywld)
 
 	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
 	MCFG_GFX_PALETTE("palette")
@@ -2083,8 +2083,8 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcos2, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos2, this));
+	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
@@ -2105,7 +2105,7 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_metlhawk, this));
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, metlhawk)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -114,7 +114,7 @@ void docastle_state::video_start()
 	video_start_common(0x00ff);
 }
 
-void docastle_state::video_start_dorunrun()
+VIDEO_START_MEMBER(docastle_state,dorunrun)
 {
 	video_start_common(0xff00);
 }

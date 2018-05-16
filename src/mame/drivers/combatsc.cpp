@@ -643,7 +643,7 @@ GFXDECODE_END
  *
  *************************************/
 
-void combatsc_state::machine_start_combatsc()
+MACHINE_START_MEMBER(combatsc_state,combatsc)
 {
 	uint8_t *MEM = memregion("maincpu")->base() + 0x38000;
 
@@ -665,9 +665,9 @@ void combatsc_state::machine_start_combatsc()
 	save_item(NAME(m_sign));
 }
 
-void combatsc_state::machine_start_combatscb()
+MACHINE_START_MEMBER(combatsc_state,combatscb)
 {
-	machine_start_combatsc();
+	MACHINE_START_CALL_MEMBER( combatsc );
 	membank("bl_abank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
 }
 
@@ -708,7 +708,7 @@ MACHINE_CONFIG_START(combatsc_state::combatsc)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_combatsc, this));
+	MCFG_MACHINE_START_OVERRIDE(combatsc_state,combatsc)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -728,7 +728,7 @@ MACHINE_CONFIG_START(combatsc_state::combatsc)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatsc)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_combatsc, this));
+	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatsc)
 
 	MCFG_K007121_ADD("k007121_1")
 	MCFG_K007121_PALETTE("palette")
@@ -762,7 +762,7 @@ MACHINE_CONFIG_START(combatsc_state::combatscb)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_combatscb, this));
+	MCFG_MACHINE_START_OVERRIDE(combatsc_state,combatscb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -779,7 +779,7 @@ MACHINE_CONFIG_START(combatsc_state::combatscb)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatscb)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_combatscb, this));
+	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatscb)
 
 	SPEAKER(config, "mono").front_center();
 

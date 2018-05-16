@@ -360,7 +360,7 @@ void namcos21_state::draw_quad(int sx[4], int sy[4], int zcode[4], int color)
 	rendertri(&c, &d, &a, color, depthcueenable);
 }
 
-void namcos21_state::video_start_namcos21()
+VIDEO_START_MEMBER(namcos21_state,namcos21)
 {
 	if( m_gametype == NAMCOS21_WINRUN91 )
 	{

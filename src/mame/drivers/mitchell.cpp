@@ -1120,7 +1120,7 @@ GFXDECODE_END
  *
  *************************************/
 
-void mitchell_state::machine_start_mitchell()
+MACHINE_START_MEMBER(mitchell_state,mitchell)
 {
 	save_item(NAME(m_dial_selected));
 	save_item(NAME(m_keymatrix));
@@ -1138,7 +1138,7 @@ void mitchell_state::machine_start_mitchell()
 	}
 }
 
-void mitchell_state::machine_reset_mitchell()
+MACHINE_RESET_MEMBER(mitchell_state,mitchell)
 {
 	m_sample_select = false;
 	m_dial_selected = 0;
@@ -1169,8 +1169,8 @@ MACHINE_CONFIG_START(mitchell_state::mgakuen)
 	MCFG_DEVICE_IO_MAP(mitchell_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mitchell, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mitchell, this));
+	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
+	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -1188,7 +1188,7 @@ MACHINE_CONFIG_START(mitchell_state::mgakuen)
 	MCFG_PALETTE_ADD("palette", 1024)   /* less colors than the others */
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pang, this));
+	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1210,8 +1210,8 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mitchell, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mitchell, this));
+	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
+	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -1229,7 +1229,7 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pang, this));
+	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1330,8 +1330,8 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	MCFG_DEVICE_ADD("audiocpu", Z80,6000000)        /* 6 MHz? */
 	MCFG_DEVICE_PROGRAM_MAP(mstworld_sound_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mitchell, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mitchell, this));
+	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
+	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1347,7 +1347,7 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pang, this));
+	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1384,7 +1384,7 @@ MACHINE_CONFIG_START(mitchell_state::marukin)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pang, this));
+	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1439,7 +1439,7 @@ MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pang, this));
+	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

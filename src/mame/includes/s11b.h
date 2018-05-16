@@ -27,7 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
 	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
 
-	void machine_reset_s11b();
+	DECLARE_MACHINE_RESET(s11b);
 	void init_s11b();
 	void init_s11b_invert();
 

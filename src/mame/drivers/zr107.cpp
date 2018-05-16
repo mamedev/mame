@@ -252,8 +252,8 @@ public:
 	void init_common();
 	void init_zr107();
 	void init_jetwave();
-	void video_start_zr107()   ATTR_COLD;
-	void video_start_jetwave() ATTR_COLD;
+	DECLARE_VIDEO_START(zr107);
+	DECLARE_VIDEO_START(jetwave);
 	uint32_t screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(zr107_vblank);
@@ -277,7 +277,7 @@ protected:
 
 
 
-void zr107_state::video_start_jetwave()
+VIDEO_START_MEMBER(zr107_state,jetwave)
 {
 }
 
@@ -317,7 +317,7 @@ K056832_CB_MEMBER(zr107_state::tile_callback)
 	*color += layer * 0x40;
 }
 
-void zr107_state::video_start_zr107()
+VIDEO_START_MEMBER(zr107_state,zr107)
 {
 	m_k056832->set_layer_offs(0, -29, -27);
 	m_k056832->set_layer_offs(1, -29, -27);
@@ -804,7 +804,7 @@ MACHINE_CONFIG_START(zr107_state::zr107)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_zr107, this));
+	MCFG_VIDEO_START_OVERRIDE(zr107_state,zr107)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(zr107_state, tile_callback)
@@ -876,7 +876,7 @@ MACHINE_CONFIG_START(zr107_state::jetwave)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_jetwave, this));
+	MCFG_VIDEO_START_OVERRIDE(zr107_state,jetwave)
 
 	MCFG_DEVICE_ADD("k001604", K001604, 0)
 	MCFG_K001604_LAYER_SIZE(0)

@@ -68,8 +68,8 @@ public:
 	DECLARE_WRITE8_MEMBER(unk_w);
 
 	// machine
-	void machine_start_thedealr() ATTR_COLD;
-	void machine_reset_thedealr();
+	DECLARE_MACHINE_START(thedealr);
+	DECLARE_MACHINE_RESET(thedealr);
 	TIMER_DEVICE_CALLBACK_MEMBER(thedealr_interrupt);
 
 	// video
@@ -135,7 +135,7 @@ void thedealr_state::iox_reset()
 	m_iox_coins     =   0x00;
 }
 
-void thedealr_state::machine_reset_thedealr()
+MACHINE_RESET_MEMBER(thedealr_state,thedealr)
 {
 	iox_reset();
 }
@@ -506,7 +506,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-void thedealr_state::machine_start_thedealr()
+MACHINE_START_MEMBER(thedealr_state,thedealr)
 {
 	save_item(NAME(m_iox_status));
 	save_item(NAME(m_iox_ret));
@@ -546,8 +546,8 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_thedealr, this));
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_thedealr, this));
+	MCFG_MACHINE_RESET_OVERRIDE(thedealr_state,thedealr)
+	MCFG_MACHINE_START_OVERRIDE(thedealr_state,thedealr)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

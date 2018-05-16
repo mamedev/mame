@@ -284,7 +284,7 @@ MACHINE_CONFIG_START(md_boot_state::puckpkmn)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(puckpkmn_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_md_bootleg, this));
+	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 

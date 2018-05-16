@@ -281,8 +281,8 @@ public:
 	void init_haekaka();
 	void init_gocowboy();
 
-	void machine_reset_sigmab98();
-	void machine_reset_sammymdl();
+	DECLARE_MACHINE_RESET(sigmab98);
+	DECLARE_MACHINE_RESET(sammymdl);
 
 	virtual void video_start() override;
 	uint32_t screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -347,7 +347,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lufykzku_c8_w);
 	DECLARE_WRITE8_MEMBER(lufykzku_watchdog_w);
 
-	void machine_reset_lufykzku();
+	DECLARE_MACHINE_RESET(lufykzku);
 	void init_lufykzku();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_irq);
@@ -2819,7 +2819,7 @@ INPUT_PORTS_END
                              Sigma B-98 Games
 ***************************************************************************/
 
-void sigmab98_state::machine_reset_sigmab98()
+MACHINE_RESET_MEMBER(sigmab98_state,sigmab98)
 {
 	m_rombank = 0;
 	membank("rombank")->set_entry(0);
@@ -2839,7 +2839,7 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	MCFG_DEVICE_IO_MAP(gegege_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sigmab98_state,  sigmab98_vblank_interrupt)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sigmab98, this));
+	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sigmab98)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -2899,7 +2899,7 @@ MACHINE_CONFIG_END
                            Banpresto Medal Games
 ***************************************************************************/
 
-void lufykzku_state::machine_reset_lufykzku()
+MACHINE_RESET_MEMBER(lufykzku_state,lufykzku)
 {
 	m_rombank = 0;
 	membank("romrambank")->set_entry(0);
@@ -2923,7 +2923,7 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	MCFG_DEVICE_IO_MAP(lufykzku_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lufykzku_state, lufykzku_irq, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_lufykzku, this));
+	MCFG_MACHINE_RESET_OVERRIDE(lufykzku_state, lufykzku)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")   // battery backed RAM
 	// No EEPROM
@@ -2969,7 +2969,7 @@ MACHINE_CONFIG_END
                              Sammy Medal Games
 ***************************************************************************/
 
-void sigmab98_state::machine_reset_sammymdl()
+MACHINE_RESET_MEMBER(sigmab98_state,sammymdl)
 {
 	m_maincpu->set_state_int(Z80_PC, 0x400);  // code starts at 400 ??? (000 = cart header)
 }
@@ -2994,7 +2994,7 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	MCFG_DEVICE_IO_MAP( animalc_io )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymdl_irq, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sammymdl, this));
+	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")   // battery backed RAM
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")

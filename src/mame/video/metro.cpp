@@ -49,14 +49,14 @@ TILEMAP_MAPPER_MEMBER(metro_state::tilemap_scan_gstrik2)
 	return val;
 }
 
-void metro_state::video_start_blzntrnd()
+VIDEO_START_MEMBER(metro_state,blzntrnd)
 {
 	m_k053936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 512);
 
 	m_screen->register_screen_bitmap(m_vdp_bitmap);
 }
 
-void metro_state::video_start_gstrik2()
+VIDEO_START_MEMBER(metro_state,gstrik2)
 {
 	m_k053936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_gstrik2_get_tile_info),this), tilemap_mapper_delegate(FUNC(metro_state::tilemap_scan_gstrik2),this), 16, 16, 128, 256);
 

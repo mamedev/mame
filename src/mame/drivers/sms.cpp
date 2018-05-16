@@ -494,8 +494,8 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(sms_state::sms_base)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sms, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sms, this));
+	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
+	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
 
 	/* basic machine hardware */
 	SPEAKER(config, "mono").front_center();
@@ -612,8 +612,8 @@ MACHINE_CONFIG_START(sms_state::sms1_ntsc)
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_sms1, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_sms1, this));
+	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
+	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
@@ -726,8 +726,8 @@ MACHINE_CONFIG_START(sms_state::sms1_pal)
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_sms1, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_sms1, this));
+	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
+	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
@@ -793,8 +793,8 @@ MACHINE_CONFIG_START(sms_state::sms1_paln)
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_sms1, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_sms1, this));
+	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
+	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
@@ -862,8 +862,8 @@ MACHINE_CONFIG_START(sms_state::sms1_br)
 
 	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_sms1, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_sms1, this));
+	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
+	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
@@ -949,16 +949,16 @@ MACHINE_CONFIG_START(sms_state::gamegear)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sms, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sms, this));
+	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
+	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_GG_RAW_PARAMS(MASTER_CLOCK_GG/6)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_gamegear)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gamegear, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_gamegear, this));
+	MCFG_VIDEO_START_OVERRIDE(sms_state,gamegear)
+	MCFG_VIDEO_RESET_OVERRIDE(sms_state,gamegear)
 
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5378, 0)
 	MCFG_SEGA315_5378_SET_SCREEN("screen")

@@ -245,15 +245,15 @@ public:
 	void init_m4andyfh();
 	void init_m4andyge();
 	void init_m4apachg();
-	void machine_start_mod2()        ATTR_COLD;
-	void machine_reset_mpu4();
-	void machine_start_mpu4yam()     ATTR_COLD;
-	void machine_start_mpu4oki()     ATTR_COLD;
-	void machine_start_mpu4oki_alt() ATTR_COLD;
-	void machine_start_mod4oki_5r()  ATTR_COLD;
-	void machine_start_mod2_alt()    ATTR_COLD;
-	void machine_start_mpu4bwb()     ATTR_COLD;
-	void machine_start_mpu4cry()     ATTR_COLD;
+	DECLARE_MACHINE_START(mod2);
+	DECLARE_MACHINE_RESET(mpu4);
+	DECLARE_MACHINE_START(mpu4yam);
+	DECLARE_MACHINE_START(mpu4oki);
+	DECLARE_MACHINE_START(mpu4oki_alt);
+	DECLARE_MACHINE_START(mod4oki_5r);
+	DECLARE_MACHINE_START(mod2_alt);
+	DECLARE_MACHINE_START(mpu4bwb);
+	DECLARE_MACHINE_START(mpu4cry);
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	void bwboki(machine_config &config);

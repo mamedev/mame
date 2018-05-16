@@ -104,11 +104,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info1_bootleg);
 	TILE_GET_INFO_MEMBER(get_text_info_bootleg);
 	virtual void machine_reset() override;
-	void machine_start_combatsc()  ATTR_COLD;
-	void video_start_combatsc()    ATTR_COLD;
+	DECLARE_MACHINE_START(combatsc);
+	DECLARE_VIDEO_START(combatsc);
 	DECLARE_PALETTE_INIT(combatsc);
-	void machine_start_combatscb() ATTR_COLD;
-	void video_start_combatscb()   ATTR_COLD;
+	DECLARE_MACHINE_START(combatscb);
+	DECLARE_VIDEO_START(combatscb);
 	DECLARE_PALETTE_INIT(combatscb);
 	uint32_t screen_update_combatsc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_combatscb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

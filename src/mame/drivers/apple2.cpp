@@ -1486,7 +1486,7 @@ MACHINE_CONFIG_END
 #if 0
 static MACHINE_CONFIG_START( laba2p )
 	apple2p(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_laba2p, this));
+	MCFG_MACHINE_START_OVERRIDE(napple2_state,laba2p)
 
 	MCFG_DEVICE_REMOVE("sl0")
 	MCFG_DEVICE_REMOVE("sl3")

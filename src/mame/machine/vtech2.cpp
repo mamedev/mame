@@ -100,13 +100,13 @@ void vtech2_state::machine_reset()
 	laser_machine_init(0x00f, 3);
 }
 
-void vtech2_state::machine_reset_laser500()
+MACHINE_RESET_MEMBER(vtech2_state,laser500)
 {
 	/* banks 0 to 2, and 4-7 only, optional ROM extension */
 	laser_machine_init(0x0f7, 7);
 }
 
-void vtech2_state::machine_reset_laser700()
+MACHINE_RESET_MEMBER(vtech2_state,laser700)
 {
 	/* all banks except #3 */
 	laser_machine_init(0xff7, 7);

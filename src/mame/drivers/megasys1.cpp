@@ -136,16 +136,16 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 #define OKI4_SOUND_CLOCK    XTAL(4'000'000)
 
 
-void megasys1_state::machine_reset_megasys1()
+MACHINE_RESET_MEMBER(megasys1_state,megasys1)
 {
 	m_ignore_oki_status = 1;    /* ignore oki status due 'protection' */
 	m_ip_latched = 0x0006; /* reset protection - some games expect this initial read without sending anything */
 	m_mcu_hs = 0;
 }
 
-void megasys1_state::machine_reset_megasys1_hachoo()
+MACHINE_RESET_MEMBER(megasys1_state,megasys1_hachoo)
 {
-	machine_reset_megasys1();
+	MACHINE_RESET_CALL_MEMBER(megasys1);
 	m_ignore_oki_status = 0;    /* strangely hachoo need real oki status */
 }
 
@@ -1693,7 +1693,7 @@ MACHINE_CONFIG_START(megasys1_state::system_A)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120000))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_megasys1, this));
+	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1709,7 +1709,7 @@ MACHINE_CONFIG_START(megasys1_state::system_A)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_megasys1, this));
+	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*1)
@@ -1738,7 +1738,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megasys1_state::system_A_hachoo)
 	system_A(config);
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_megasys1_hachoo, this));
+	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1_hachoo)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megasys1_state::system_A_iganinju)
@@ -1797,7 +1797,7 @@ MACHINE_CONFIG_START(megasys1_state::system_Bbl)
 	MCFG_DEVICE_PROGRAM_MAP(megasys1B_edfbl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1B_scanline, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_megasys1, this));
+	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1814,7 +1814,7 @@ MACHINE_CONFIG_START(megasys1_state::system_Bbl)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_megasys1, this));
+	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*1)
@@ -1878,7 +1878,7 @@ MACHINE_CONFIG_START(megasys1_state::system_D)
 	MCFG_DEVICE_PROGRAM_MAP(megasys1D_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", megasys1_state,  megasys1D_irq)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_megasys1, this));
+	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1894,7 +1894,7 @@ MACHINE_CONFIG_START(megasys1_state::system_D)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_megasys1, this));
+	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*1)
@@ -1945,7 +1945,7 @@ MACHINE_CONFIG_START(megasys1_state::system_Z)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_megasys1, this));
+	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
 	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*2)

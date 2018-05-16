@@ -669,7 +669,7 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_twincobr, this));
+	MCFG_MACHINE_RESET_OVERRIDE(twincobr_state,twincobr)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, twincobr_state, int_enable_w))
@@ -706,7 +706,7 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	MCFG_PALETTE_ADD("palette", 1792)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan0, this));
+	MCFG_VIDEO_START_OVERRIDE(twincobr_state,toaplan0)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -140,12 +140,12 @@ public:
 	void init_hiimpact();
 	void init_mkyturbo();
 	void init_term2la2();
-	void machine_reset_midyunit();
-	void video_start_midzunit()      ATTR_COLD;
-	void video_start_midyunit_4bit() ATTR_COLD;
-	void video_start_midyunit_6bit() ATTR_COLD;
-	void video_start_mkyawdim()      ATTR_COLD;
-	void video_start_common()        ATTR_COLD;
+	DECLARE_MACHINE_RESET(midyunit);
+	DECLARE_VIDEO_START(midzunit);
+	DECLARE_VIDEO_START(midyunit_4bit);
+	DECLARE_VIDEO_START(midyunit_6bit);
+	DECLARE_VIDEO_START(mkyawdim);
+	DECLARE_VIDEO_START(common);
 	TIMER_CALLBACK_MEMBER(dma_callback);
 	TIMER_CALLBACK_MEMBER(autoerase_line);
 

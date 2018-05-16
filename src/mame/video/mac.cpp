@@ -74,7 +74,7 @@ PALETTE_INIT_MEMBER(mac_state,macgsc)
 	palette.set_pen_color(3, 0x00, 0x00, 0x00);
 }
 
-void mac_state::video_start_mac()
+VIDEO_START_MEMBER(mac_state,mac)
 {
 }
 
@@ -213,18 +213,18 @@ uint32_t mac_state::screen_update_macpb160(screen_device &screen, bitmap_ind16 &
 
 // IIci/IIsi RAM-Based Video (RBV) and children: V8, Eagle, Spice, VASP, Sonora
 
-void mac_state::video_start_macrbv()
+VIDEO_START_MEMBER(mac_state,macrbv)
 {
 }
 
-void mac_state::video_reset_maceagle()
+VIDEO_RESET_MEMBER(mac_state,maceagle)
 {
 	m_rbv_montype = 32;
 	m_rbv_palette[0xfe] = 0xffffff;
 	m_rbv_palette[0xff] = 0;
 }
 
-void mac_state::video_reset_macrbv()
+VIDEO_RESET_MEMBER(mac_state,macrbv)
 {
 	rectangle visarea;
 	int htotal, vtotal;
@@ -282,7 +282,7 @@ void mac_state::video_reset_macrbv()
 	target->set_view(view);
 }
 
-void mac_state::video_reset_macsonora()
+VIDEO_RESET_MEMBER(mac_state,macsonora)
 {
 	rectangle visarea;
 	int htotal, vtotal;
@@ -339,7 +339,7 @@ void mac_state::video_reset_macsonora()
 	target->set_view(view);
 }
 
-void mac_state::video_start_macsonora()
+VIDEO_START_MEMBER(mac_state,macsonora)
 {
 	memset(m_rbv_regs, 0, sizeof(m_rbv_regs));
 
@@ -359,7 +359,7 @@ void mac_state::video_start_macsonora()
 	m_rbv_type = RBV_TYPE_SONORA;
 }
 
-void mac_state::video_start_macv8()
+VIDEO_START_MEMBER(mac_state,macv8)
 {
 	memset(m_rbv_regs, 0, sizeof(m_rbv_regs));
 
@@ -885,7 +885,7 @@ TIMER_CALLBACK_MEMBER(mac_state::dafb_cursor_tick)
 	m_cursor_timer->adjust(m_screen->time_until_pos(m_cursor_line, 0), 0);
 }
 
-void mac_state::video_start_macdafb()
+VIDEO_START_MEMBER(mac_state,macdafb)
 {
 	m_vbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::dafb_vbl_tick),this));
 	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::dafb_cursor_tick),this));
@@ -894,7 +894,7 @@ void mac_state::video_start_macdafb()
 	m_cursor_timer->adjust(attotime::never);
 }
 
-void mac_state::video_reset_macdafb()
+VIDEO_RESET_MEMBER(mac_state,macdafb)
 {
 	m_rbv_count = 0;
 	m_rbv_clutoffs = 0;

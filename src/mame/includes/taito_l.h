@@ -64,9 +64,9 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	template<int Offset> TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	void machine_start_taito_l() ATTR_COLD;
-	void video_start_taito_l()   ATTR_COLD;
-	void machine_reset_taito_l();
+	DECLARE_MACHINE_START(taito_l);
+	DECLARE_VIDEO_START(taito_l);
+	DECLARE_MACHINE_RESET(taito_l);
 	u32 screen_update_taitol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_taitol);
 	TIMER_DEVICE_CALLBACK_MEMBER(vbl_interrupt);
@@ -207,10 +207,10 @@ public:
 
 	void init_plottinga();
 
-	void machine_reset_plotting();
-	void machine_reset_puzznic();
-	void machine_reset_palamed();
-	void machine_reset_cachat();
+	DECLARE_MACHINE_RESET(plotting);
+	DECLARE_MACHINE_RESET(puzznic);
+	DECLARE_MACHINE_RESET(palamed);
+	DECLARE_MACHINE_RESET(cachat);
 
 	void palamed(machine_config &config);
 	void plotting(machine_config &config);
@@ -241,7 +241,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(bankg_w);
 
-	void machine_start_horshoes();
+	DECLARE_MACHINE_RESET(horshoes);
 	void horshoes(machine_config &config);
 	void horshoes_map(address_map &map);
 };

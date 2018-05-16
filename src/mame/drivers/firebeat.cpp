@@ -216,9 +216,9 @@ public:
 	void init_ppd();
 	void init_kbm();
 	void init_ppp();
-	void machine_start_firebeat() ATTR_COLD;
-	void machine_reset_firebeat();
-	void video_start_firebeat() ATTR_COLD;
+	DECLARE_MACHINE_START(firebeat);
+	DECLARE_MACHINE_RESET(firebeat);
+	DECLARE_VIDEO_START(firebeat);
 	uint32_t screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(firebeat_interrupt);
@@ -281,7 +281,7 @@ public:
 
 
 
-void firebeat_state::video_start_firebeat()
+VIDEO_START_MEMBER(firebeat_state,firebeat)
 {
 }
 
@@ -924,7 +924,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(firebeat_state::spu_timer_callback)
 
 /*****************************************************************************/
 
-void firebeat_state::machine_start_firebeat()
+MACHINE_START_MEMBER(firebeat_state,firebeat)
 {
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
@@ -1150,7 +1150,7 @@ WRITE_LINE_MEMBER(firebeat_state::gcu1_interrupt)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
-void firebeat_state::machine_reset_firebeat()
+MACHINE_RESET_MEMBER(firebeat_state,firebeat)
 {
 	m_layer = 0;
 }
@@ -1179,8 +1179,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	MCFG_DEVICE_PROGRAM_MAP(firebeat_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", firebeat_state,  firebeat_interrupt)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_firebeat, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_firebeat, this));
+	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
+	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
 
 	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
 
@@ -1208,7 +1208,7 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	MCFG_SCREEN_UPDATE_DRIVER(firebeat_state, screen_update_firebeat_0)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_firebeat, this));
+	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1237,8 +1237,8 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	MCFG_DEVICE_PROGRAM_MAP(firebeat2_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", firebeat_state,  firebeat_interrupt)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_firebeat, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_firebeat, this));
+	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
+	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
 
 	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
 
@@ -1277,7 +1277,7 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	MCFG_SCREEN_UPDATE_DRIVER(firebeat_state, screen_update_firebeat_1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_firebeat, this));
+	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -219,23 +219,23 @@ public:
 		m_type1_map = nullptr;
 	}
 
-	void machine_reset_ctsttape();
-	void machine_reset_chwy();
-	void machine_reset_cdsteljn();
-	void machine_reset_cterrani();
-	void machine_reset_castfant();
-	void machine_reset_csuperas();
-	void machine_reset_cmanhat();
-	void machine_reset_clocknch();
-	void machine_reset_cprogolf();
-	void machine_reset_cprogolfj();
-	void machine_reset_cluckypo();
-	void machine_reset_ctisland();
-	void machine_reset_ctisland3();
-	void machine_reset_cexplore();
-	void machine_reset_cocean1a(); /* 10 */
-	void machine_reset_cfboy0a1(); /* 12 */
-	void machine_reset_clocknchj(); /* 11 */
+	DECLARE_MACHINE_RESET(ctsttape);
+	DECLARE_MACHINE_RESET(chwy);
+	DECLARE_MACHINE_RESET(cdsteljn);
+	DECLARE_MACHINE_RESET(cterrani);
+	DECLARE_MACHINE_RESET(castfant);
+	DECLARE_MACHINE_RESET(csuperas);
+	DECLARE_MACHINE_RESET(cmanhat);
+	DECLARE_MACHINE_RESET(clocknch);
+	DECLARE_MACHINE_RESET(cprogolf);
+	DECLARE_MACHINE_RESET(cprogolfj);
+	DECLARE_MACHINE_RESET(cluckypo);
+	DECLARE_MACHINE_RESET(ctisland);
+	DECLARE_MACHINE_RESET(ctisland3);
+	DECLARE_MACHINE_RESET(cexplore);
+	DECLARE_MACHINE_RESET(cocean1a); /* 10 */
+	DECLARE_MACHINE_RESET(cfboy0a1); /* 12 */
+	DECLARE_MACHINE_RESET(clocknchj); /* 11 */
 
 	void cprogolfj(machine_config &config);
 	void cfboy0a1(machine_config &config);
@@ -303,20 +303,20 @@ public:
 	{
 	}
 
-	void machine_reset_cfishing();
-	void machine_reset_cbtime();
-	void machine_reset_cburnrub();
-	void machine_reset_cgraplop();
-	void machine_reset_cgraplop2();
-	void machine_reset_clapapa();
-	void machine_reset_cskater();
-	void machine_reset_cprobowl();
-	void machine_reset_cnightst();
-	void machine_reset_cpsoccer();
-	void machine_reset_csdtenis();
-	void machine_reset_czeroize();
-	void machine_reset_cppicf();
-	void machine_reset_cfghtice();
+	DECLARE_MACHINE_RESET(cfishing);
+	DECLARE_MACHINE_RESET(cbtime);
+	DECLARE_MACHINE_RESET(cburnrub);
+	DECLARE_MACHINE_RESET(cgraplop);
+	DECLARE_MACHINE_RESET(cgraplop2);
+	DECLARE_MACHINE_RESET(clapapa);
+	DECLARE_MACHINE_RESET(cskater);
+	DECLARE_MACHINE_RESET(cprobowl);
+	DECLARE_MACHINE_RESET(cnightst);
+	DECLARE_MACHINE_RESET(cpsoccer);
+	DECLARE_MACHINE_RESET(csdtenis);
+	DECLARE_MACHINE_RESET(czeroize);
+	DECLARE_MACHINE_RESET(cppicf);
+	DECLARE_MACHINE_RESET(cfghtice);
 
 	void csdtenis(machine_config &config);
 	void cburnrub(machine_config &config);

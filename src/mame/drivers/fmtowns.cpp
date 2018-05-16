@@ -2767,7 +2767,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_DEVICE_IO_MAP(towns_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
-	//set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_towns, this));
+	//MCFG_MACHINE_RESET_OVERRIDE(towns_state,towns)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2865,7 +2865,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_UPD71071_DMA_WRITE_0_CB(WRITE16(*this, towns_state, towns_fdc_dma_w))
 	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(*this, towns_state, towns_scsi_dma_w))
 
-	//set_video_start_cb(config, driver_callback_delegate(&video_start_towns, this));
+	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
 
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, towns_state, towns_rxrdy_irq))

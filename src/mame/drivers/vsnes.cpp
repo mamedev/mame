@@ -1707,8 +1707,8 @@ MACHINE_CONFIG_START(vsnes_state::vsnes)
 	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(vsnes_cpu1_map)
 								/* some carts also trigger IRQs */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_vsnes, this));
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_vsnes, this));
+	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
+	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen1", RASTER)
@@ -1775,8 +1775,8 @@ MACHINE_CONFIG_START(vsnes_state::vsdual)
 	MCFG_DEVICE_ADD("sub", N2A03, NTSC_APU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(vsnes_cpu2_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_vsdual, this));
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_vsdual, this));
+	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsdual)
+	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -1821,8 +1821,8 @@ MACHINE_CONFIG_START(vsnes_state::vsnes_bootleg)
 	MCFG_DEVICE_ADD("maincpu", M6502,XTAL(16'000'000)/4) // 4mhz? seems too high but flickers badly otherwise, issue elsewhere?
 	MCFG_DEVICE_PROGRAM_MAP(vsnes_cpu1_bootleg_map)
 								/* some carts also trigger IRQs */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_vsnes, this));
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_vsnes, this));
+	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
+	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
 
 	MCFG_DEVICE_ADD("sub", Z80,XTAL(16'000'000)/4)         /* ? MHz */ // Z8400APS-Z80CPU
 	MCFG_DEVICE_PROGRAM_MAP(vsnes_bootleg_z80_map)

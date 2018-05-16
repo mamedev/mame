@@ -384,15 +384,15 @@ INTERRUPT_GEN_MEMBER(kchamp_state::sound_int)
 }
 
 
-void kchamp_state::machine_start_kchamp()
+MACHINE_START_MEMBER(kchamp_state,kchamp)
 {
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_sound_nmi_enable));
 }
 
-void kchamp_state::machine_start_kchampvs()
+MACHINE_START_MEMBER(kchamp_state,kchampvs)
 {
-	machine_start_kchamp();
+	MACHINE_START_CALL_MEMBER(kchamp);
 
 	save_item(NAME(m_msm_play_lo_nibble));
 }
@@ -421,7 +421,7 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, kchamp_state, nmi_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, kchamp_state, sound_reset_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_kchampvs, this));
+	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchampvs)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -481,7 +481,7 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, kchamp_state, flipscreen_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, kchamp_state, nmi_enable_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_kchamp, this));
+	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchamp)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

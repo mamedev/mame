@@ -321,8 +321,8 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 	MCFG_DEVICE_IO_MAP(pce_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pce, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mess_pce, this));
+	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
+	MCFG_MACHINE_RESET_OVERRIDE(pce_state, mess_pce )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -374,8 +374,8 @@ MACHINE_CONFIG_START(pce_state::sgx)
 	MCFG_DEVICE_IO_MAP(sgx_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pce, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mess_pce, this));
+	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
+	MCFG_MACHINE_RESET_OVERRIDE(pce_state, mess_pce )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

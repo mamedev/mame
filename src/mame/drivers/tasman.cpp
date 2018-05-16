@@ -70,7 +70,7 @@ public:
 	DECLARE_READ32_MEMBER(test_r);
 	// DECLARE_READ32_MEMBER(rng_r);
 	void init_kingtut();
-	void video_start_kongambl() ATTR_COLD;
+	DECLARE_VIDEO_START(kongambl);
 	uint8_t m_irq_mask;
 
 	virtual void machine_reset() override { m_irq_mask = 0; };
@@ -86,7 +86,7 @@ public:
 };
 
 
-void kongambl_state::video_start_kongambl()
+VIDEO_START_MEMBER(kongambl_state,kongambl)
 {
 	#if CUSTOM_DRAW
 
@@ -664,7 +664,7 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_FORMAT(XRGB)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_kongambl, this));
+	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
 
 	MCFG_K055555_ADD("k055555")
 

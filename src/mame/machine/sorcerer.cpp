@@ -354,7 +354,7 @@ void sorcerer_state::machine_start()
 		space.install_read_handler(0xc000, 0xdfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
-void sorcerer_state::machine_start_sorcererd()
+MACHINE_START_MEMBER(sorcerer_state,sorcererd)
 {
 	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
 	m_serial_timer = timer_alloc(TIMER_SERIAL);

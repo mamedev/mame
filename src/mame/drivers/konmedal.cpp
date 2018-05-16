@@ -57,7 +57,7 @@ public:
 	{ }
 
 	DECLARE_PALETTE_INIT(konmedal);
-	void machine_start_shuriboy() ATTR_COLD;
+	DECLARE_MACHINE_START(shuriboy);
 
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
@@ -367,7 +367,7 @@ void konmedal_state::machine_start()
 	membank("bank1")->set_entry(4);
 }
 
-void konmedal_state::machine_start_shuriboy()
+MACHINE_START_MEMBER(konmedal_state, shuriboy)
 {
 	membank("bank1")->configure_entries(0, 0x8, memregion("maincpu")->base()+0x8000, 0x2000);
 	membank("bank1")->set_entry(0);
@@ -564,7 +564,7 @@ MACHINE_CONFIG_START(konmedal_state::shuriboy)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(konmedal_state, shuriboy_tile_callback)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_shuriboy, this));
+	MCFG_MACHINE_START_OVERRIDE(konmedal_state, shuriboy)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

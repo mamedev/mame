@@ -61,9 +61,9 @@ public:
 	TILE_GET_INFO_MEMBER(ringking_get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void video_start_kingofb()  ATTR_COLD;
+	DECLARE_VIDEO_START(kingofb);
 	DECLARE_PALETTE_INIT(kingofb);
-	void video_start_ringking() ATTR_COLD;
+	DECLARE_VIDEO_START(ringking);
 	DECLARE_PALETTE_INIT(ringking);
 	uint32_t screen_update_kingofb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ringking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

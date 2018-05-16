@@ -88,7 +88,7 @@ void tecmo16_state::video_start()
 	save_state();
 }
 
-void tecmo16_state::video_start_ginkun()
+VIDEO_START_MEMBER(tecmo16_state,ginkun)
 {
 	/* set up tile layers */
 	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
@@ -110,7 +110,7 @@ void tecmo16_state::video_start_ginkun()
 	save_state();
 }
 
-void tecmo16_state::video_start_riot()
+VIDEO_START_MEMBER(tecmo16_state,riot)
 {
 	/* set up tile layers */
 	m_screen->register_screen_bitmap(m_tile_bitmap_bg);

@@ -166,7 +166,7 @@ WRITE8_MEMBER(nova2001_state::ninjakun_cpu2_io_A002_w)
  *
  *************************************/
 
-void nova2001_state::machine_start_ninjakun()
+MACHINE_START_MEMBER(nova2001_state,ninjakun)
 {
 	/* Save State Stuff */
 	save_item(NAME(m_ninjakun_io_a002_ctrl));
@@ -668,7 +668,7 @@ MACHINE_CONFIG_START(nova2001_state::nova2001)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
 	MCFG_PALETTE_INIT_OWNER(nova2001_state,nova2001)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_nova2001, this));
+	MCFG_VIDEO_START_OVERRIDE(nova2001_state,nova2001)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -697,7 +697,7 @@ MACHINE_CONFIG_START(nova2001_state::ninjakun)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ninjakun, this));
+	MCFG_MACHINE_START_OVERRIDE(nova2001_state,ninjakun)
 
 	/* video hardware */
 
@@ -712,7 +712,7 @@ MACHINE_CONFIG_START(nova2001_state::ninjakun)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ninjakun, this));
+	MCFG_VIDEO_START_OVERRIDE(nova2001_state,ninjakun)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -749,7 +749,7 @@ MACHINE_CONFIG_START(nova2001_state::pkunwar)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
 	MCFG_PALETTE_INIT_OWNER(nova2001_state,nova2001)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pkunwar, this));
+	MCFG_VIDEO_START_OVERRIDE(nova2001_state,pkunwar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -791,7 +791,7 @@ MACHINE_CONFIG_START(nova2001_state::raiders5)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT_CLASS(1, nova2001_state, BBGGRRII)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_raiders5, this));
+	MCFG_VIDEO_START_OVERRIDE(nova2001_state,raiders5)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

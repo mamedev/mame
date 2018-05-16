@@ -1471,8 +1471,8 @@ MACHINE_CONFIG_START(williams_state::williams)
 	MCFG_DEVICE_ADD("soundcpu", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_williams, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_williams, this));
+	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
+	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams)
 	MCFG_NVRAM_ADD_0FILL("nvram") // 5101 (Defender), 5114 or 6514 (later games) + battery
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams_va11_callback)
@@ -1486,7 +1486,7 @@ MACHINE_CONFIG_START(williams_state::williams)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 6, 298, 260, 7, 247)
 	MCFG_SCREEN_UPDATE_DRIVER(williams_state, screen_update_williams)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_williams, this));
+	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1530,8 +1530,8 @@ MACHINE_CONFIG_START(williams_state::defender)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_defender, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_defender, this));
+	MCFG_MACHINE_START_OVERRIDE(williams_state,defender)
+	MCFG_MACHINE_RESET_OVERRIDE(williams_state,defender)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(12, 304-1, 7, 247-1)
@@ -1648,11 +1648,11 @@ MACHINE_CONFIG_START(blaster_state::blastkit)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(blaster_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_blaster, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_blaster, this));
+	MCFG_MACHINE_START_OVERRIDE(blaster_state,blaster)
+	MCFG_MACHINE_RESET_OVERRIDE(blaster_state,blaster)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_blaster, this));
+	MCFG_VIDEO_START_OVERRIDE(blaster_state,blaster)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(blaster_state, screen_update_blaster)
 
@@ -1733,8 +1733,8 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_williams2, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_williams2, this));
+	MCFG_MACHINE_START_OVERRIDE(williams2_state,williams2)
+	MCFG_MACHINE_RESET_OVERRIDE(williams2_state,williams2)
 	MCFG_NVRAM_ADD_0FILL("nvram") // 5114 + battery
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", williams2_state, williams2_va11_callback)
@@ -1751,7 +1751,7 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 8, 284, 260, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(williams2_state, screen_update_williams2)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_williams2, this));
+	MCFG_VIDEO_START_OVERRIDE(williams2_state,williams2)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1846,8 +1846,8 @@ MACHINE_CONFIG_START(joust2_state::joust2)
 	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_joust2, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_joust2, this));
+	MCFG_MACHINE_START_OVERRIDE(joust2_state,joust2)
+	MCFG_MACHINE_RESET_OVERRIDE(joust2_state,joust2)
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")

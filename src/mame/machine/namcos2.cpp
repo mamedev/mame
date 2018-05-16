@@ -132,7 +132,7 @@ void namcos2_shared_state::reset_all_subcpus(int state)
 	}
 }
 
-void namcos2_shared_state::machine_start_namcos2()
+MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 {
 	if (m_audiobank.found())
 	{
@@ -150,9 +150,9 @@ void namcos2_shared_state::machine_start_namcos2()
 	machine().device<nvram_device>("nvram")->set_base(m_eeprom.get(), m_eeprom_size);
 }
 
-void namcos2_state::machine_start_gollygho()
+MACHINE_START_MEMBER(namcos2_state,gollygho)
 {
-	machine_start_namcos2();
+	MACHINE_START_CALL_MEMBER(namcos2);
 	m_zip1_output.resolve();
 	m_zip10_output.resolve();
 	m_zip100_output.resolve();
@@ -170,7 +170,7 @@ void namcos2_state::machine_start_gollygho()
 	m_gunrecoil_output.resolve();
 }
 
-void namcos2_shared_state::machine_reset_namcos2()
+MACHINE_RESET_MEMBER(namcos2_shared_state, namcos2)
 {
 //  address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -187,9 +187,9 @@ void namcos2_shared_state::machine_reset_namcos2()
 	reset_all_subcpus(ASSERT_LINE);
 }
 
-void namcos2_state::machine_reset_sgunner2()
+MACHINE_RESET_MEMBER(namcos2_state, sgunner2)
 {
-	machine_reset_namcos2();
+	MACHINE_RESET_CALL_MEMBER(namcos2);
 	m_player_mux = 0;
 }
 

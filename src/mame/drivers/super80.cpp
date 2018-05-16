@@ -711,7 +711,7 @@ MACHINE_CONFIG_START(super80_state::super80)
 	MCFG_DEVICE_PROGRAM_MAP(super80_map)
 	MCFG_DEVICE_IO_MAP(super80_io)
 	MCFG_Z80_DAISY_CHAIN(super80_daisy_chain)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_super80, this));
+	MCFG_MACHINE_RESET_OVERRIDE(super80_state, super80)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, MASTER_CLOCK/6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -729,7 +729,7 @@ MACHINE_CONFIG_START(super80_state::super80)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_super80)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )
-	set_video_start_cb(config, driver_callback_delegate(&video_start_super80, this));
+	MCFG_VIDEO_START_OVERRIDE(super80_state,super80)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -798,7 +798,7 @@ MACHINE_CONFIG_START(super80_state::super80v)
 	MCFG_DEVICE_PROGRAM_MAP(super80v_map)
 	MCFG_DEVICE_IO_MAP(super80v_io)
 	MCFG_Z80_DAISY_CHAIN(super80_daisy_chain)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_super80r, this));
+	MCFG_MACHINE_RESET_OVERRIDE(super80_state, super80r)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, MASTER_CLOCK/6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

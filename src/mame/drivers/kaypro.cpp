@@ -202,8 +202,8 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	MCFG_DEVICE_IO_MAP(kayproii_io)
 	MCFG_Z80_DAISY_CHAIN(kayproii_daisy_chain)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_kayproii, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_kaypro, this));
+	MCFG_MACHINE_START_OVERRIDE(kaypro_state, kayproii )
+	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -211,7 +211,7 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(80*7, 24*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*7-1,0,24*10-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_kaypro, this));
+	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kayproii)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_DEVICE_IO_MAP(kaypro484_io)
 	MCFG_Z80_DAISY_CHAIN(kaypro484_daisy_chain)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_kaypro, this));
+	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -302,7 +302,7 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(80*8, 25*16)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*16-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_kaypro, this));
+	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kaypro484)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kaypro484)

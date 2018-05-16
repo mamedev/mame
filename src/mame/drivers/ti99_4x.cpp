@@ -90,14 +90,14 @@ public:
 	{ }
 
 	// Machine management
-	void machine_start_ti99_4()   ATTR_COLD;
-	void machine_start_ti99_4a()  ATTR_COLD;
-	void machine_start_ti99_4qi() ATTR_COLD;
-	void machine_start_ti99_4ev() ATTR_COLD;
+	DECLARE_MACHINE_START(ti99_4);
+	DECLARE_MACHINE_START(ti99_4a);
+	DECLARE_MACHINE_START(ti99_4qi);
+	DECLARE_MACHINE_START(ti99_4ev);
 
-	void machine_reset_ti99_4();
-	void machine_reset_ti99_4a();
-	void machine_reset_ti99_4ev();
+	DECLARE_MACHINE_RESET(ti99_4);
+	DECLARE_MACHINE_RESET(ti99_4a);
+	DECLARE_MACHINE_RESET(ti99_4ev);
 
 	// Processor connections with the main board
 	DECLARE_READ8_MEMBER( cruread );
@@ -820,14 +820,14 @@ void ti99_4x_state::register_save_state()
     Machine definitions
 ******************************************************************************/
 
-void ti99_4x_state::machine_start_ti99_4()
+MACHINE_START_MEMBER(ti99_4x_state,ti99_4)
 {
 	m_nready_combined = 0;
 	m_model = MODEL_4;
 	register_save_state();
 }
 
-void ti99_4x_state::machine_reset_ti99_4()
+MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4)
 {
 	m_cpu->set_ready(ASSERT_LINE);
 	m_cpu->set_hold(CLEAR_LINE);
@@ -848,8 +848,8 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4)
 	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(*this, ti99_4x_state, clock_out) )
 	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(*this, ti99_4x_state, dbin_line) )
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ti99_4, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ti99_4, this));
+	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4 )
+	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4 )
 
 	// Main board
 	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)
@@ -942,14 +942,14 @@ MACHINE_CONFIG_END
     TI-99/4A - replaced the 99/4 and became the standard TI-99 console
 ***********************************************************************/
 
-void ti99_4x_state::machine_start_ti99_4a()
+MACHINE_START_MEMBER(ti99_4x_state,ti99_4a)
 {
 	m_nready_combined = 0;
 	m_model = MODEL_4A;
 	register_save_state();
 }
 
-void ti99_4x_state::machine_reset_ti99_4a()
+MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4a)
 {
 	m_cpu->set_ready(ASSERT_LINE);
 	m_cpu->set_hold(CLEAR_LINE);
@@ -966,8 +966,8 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4a)
 	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(*this, ti99_4x_state, clock_out) )
 	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(*this, ti99_4x_state, dbin_line) )
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ti99_4a, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ti99_4a, this));
+	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4a )
+	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4a )
 
 	// Main board
 	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)
@@ -1064,7 +1064,7 @@ MACHINE_CONFIG_END
     those from Atarisoft.
 *************************************************************************/
 
-void ti99_4x_state::machine_start_ti99_4qi()
+MACHINE_START_MEMBER(ti99_4x_state, ti99_4qi)
 {
 	m_model = MODEL_4QI;
 	m_nready_combined = 0;
@@ -1073,7 +1073,7 @@ void ti99_4x_state::machine_start_ti99_4qi()
 
 MACHINE_CONFIG_START(ti99_4x_state::ti99_4qi)
 	ti99_4a(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ti99_4qi, this));
+	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4qi )
 MACHINE_CONFIG_END
 
 /*
@@ -1098,7 +1098,7 @@ MACHINE_CONFIG_END
     which is intended to use the EVPC, does not have an own sound chip.
 *************************************************************************/
 
-void ti99_4x_state::machine_start_ti99_4ev()
+MACHINE_START_MEMBER(ti99_4x_state, ti99_4ev)
 {
 	m_nready_combined = 0;
 	m_model = MODEL_4A;
@@ -1108,7 +1108,7 @@ void ti99_4x_state::machine_start_ti99_4ev()
 	register_save_state();
 }
 
-void ti99_4x_state::machine_reset_ti99_4ev()
+MACHINE_RESET_MEMBER(ti99_4x_state, ti99_4ev)
 {
 	m_cpu->set_ready(ASSERT_LINE);
 	m_cpu->set_hold(CLEAR_LINE);
@@ -1126,8 +1126,8 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4ev_60hz)
 	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(*this, ti99_4x_state, clock_out) )
 	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(*this, ti99_4x_state, dbin_line) )
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ti99_4ev, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ti99_4ev, this));
+	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4ev )
+	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4ev )
 
 	// Main board
 	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)

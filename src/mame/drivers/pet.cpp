@@ -243,11 +243,11 @@ public:
 	required_ioport_array<10> m_row;
 	required_ioport m_lock;
 
-	void machine_start_pet();
-	void machine_start_pet2001();
-	void machine_reset_pet();
-	void machine_start_pet40();
-	void machine_reset_pet40();
+	DECLARE_MACHINE_START( pet );
+	DECLARE_MACHINE_START( pet2001 );
+	DECLARE_MACHINE_RESET( pet );
+	DECLARE_MACHINE_START( pet40 );
+	DECLARE_MACHINE_RESET( pet40 );
 
 	MC6845_BEGIN_UPDATE( pet_begin_update );
 	MC6845_UPDATE_ROW( pet40_update_row );
@@ -381,8 +381,8 @@ public:
 		pet2001b_state(mconfig, type, tag)
 	{ }
 
-	void machine_start_pet80() ATTR_COLD;
-	void machine_reset_pet80();
+	DECLARE_MACHINE_START( pet80 );
+	DECLARE_MACHINE_RESET( pet80 );
 
 	MC6845_UPDATE_ROW( pet80_update_row );
 	MC6845_UPDATE_ROW( cbm8296_update_row );
@@ -431,8 +431,8 @@ public:
 	required_device<pla_device> m_pla1;
 	required_device<pla_device> m_pla2;
 
-	void machine_start_cbm8296() ATTR_COLD;
-	void machine_reset_cbm8296();
+	DECLARE_MACHINE_START( cbm8296 );
+	DECLARE_MACHINE_RESET( cbm8296 );
 
 	void read_pla1(offs_t offset, int phi2, int brw, int noscreen, int noio, int ramsela, int ramsel9, int ramon, int norom,
 		int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
@@ -1599,7 +1599,7 @@ void cbm8296d_ieee488_devices(device_slot_interface &device)
 //  MACHINE_START( pet )
 //-------------------------------------------------
 
-void pet_state::machine_start_pet()
+MACHINE_START_MEMBER( pet_state, pet )
 {
 	// allocate memory
 	m_video_ram.allocate(m_video_ram_size);
@@ -1640,15 +1640,15 @@ void pet_state::machine_start_pet()
 //  MACHINE_START( pet2001 )
 //-------------------------------------------------
 
-void pet_state::machine_start_pet2001()
+MACHINE_START_MEMBER( pet_state, pet2001 )
 {
 	m_video_ram_size = 0x400;
 
-	machine_start_pet();
+	MACHINE_START_CALL_MEMBER(pet);
 }
 
 
-void pet_state::machine_reset_pet()
+MACHINE_RESET_MEMBER( pet_state, pet )
 {
 	m_maincpu->reset();
 
@@ -1666,17 +1666,17 @@ void pet_state::machine_reset_pet()
 //  MACHINE_START( pet40 )
 //-------------------------------------------------
 
-void pet_state::machine_start_pet40()
+MACHINE_START_MEMBER( pet_state, pet40 )
 {
 	m_video_ram_size = 0x400;
 
-	machine_start_pet();
+	MACHINE_START_CALL_MEMBER(pet);
 }
 
 
-void pet_state::machine_reset_pet40()
+MACHINE_RESET_MEMBER( pet_state, pet40 )
 {
-	machine_reset_pet();
+	MACHINE_RESET_CALL_MEMBER(pet);
 
 	m_crtc->reset();
 }
@@ -1686,29 +1686,29 @@ void pet_state::machine_reset_pet40()
 //  MACHINE_START( pet80 )
 //-------------------------------------------------
 
-void pet80_state::machine_start_pet80()
+MACHINE_START_MEMBER( pet80_state, pet80 )
 {
 	m_video_ram_size = 0x800;
 
-	machine_start_pet();
+	MACHINE_START_CALL_MEMBER(pet);
 }
 
 
-void pet80_state::machine_reset_pet80()
+MACHINE_RESET_MEMBER( pet80_state, pet80 )
 {
-	machine_reset_pet();
+	MACHINE_RESET_CALL_MEMBER(pet);
 
 	m_crtc->reset();
 }
 
 
 //-------------------------------------------------
-//  machine_start_cbm8296()
+//  MACHINE_START( cbm8296 )
 //-------------------------------------------------
 
-void cbm8296_state::machine_start_cbm8296()
+MACHINE_START_MEMBER( cbm8296_state, cbm8296 )
 {
-	machine_start_pet80();
+	MACHINE_START_CALL_MEMBER(pet80);
 
 	// state saving
 	save_item(NAME(m_cr));
@@ -1716,9 +1716,9 @@ void cbm8296_state::machine_start_cbm8296()
 }
 
 
-void cbm8296_state::machine_reset_cbm8296()
+MACHINE_RESET_MEMBER( cbm8296_state, cbm8296 )
 {
-	machine_reset_pet80();
+	MACHINE_RESET_CALL_MEMBER(pet80);
 
 	m_cr = 0;
 	m_via_pa = 0xff;
@@ -1778,8 +1778,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pet_state::pet)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pet2001, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pet, this));
+	MCFG_MACHINE_START_OVERRIDE(pet_state, pet2001)
+	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet)
 
 	// basic machine hardware
 	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(8'000'000)/8)
@@ -2072,8 +2072,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pet2001b_state::pet4032f)
 	pet4000(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pet40, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pet40, this));
+	MCFG_MACHINE_START_OVERRIDE(pet_state, pet40)
+	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet40)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
@@ -2148,8 +2148,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pet_state::cbm4032f)
 	cbm4000(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pet40, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pet40, this));
+	MCFG_MACHINE_START_OVERRIDE(pet_state, pet40)
+	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet40)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
@@ -2231,8 +2231,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pet80_state::pet80)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pet80, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pet80, this));
+	MCFG_MACHINE_START_OVERRIDE(pet80_state, pet80)
+	MCFG_MACHINE_RESET_OVERRIDE(pet80_state, pet80)
 
 	// basic machine hardware
 	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(16'000'000)/16)
@@ -2373,8 +2373,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cbm8296_state::cbm8296)
 	pet80(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cbm8296, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cbm8296, this));
+	MCFG_MACHINE_START_OVERRIDE(cbm8296_state, cbm8296)
+	MCFG_MACHINE_RESET_OVERRIDE(cbm8296_state, cbm8296)
 
 	MCFG_DEVICE_MODIFY(M6502_TAG)
 	MCFG_DEVICE_PROGRAM_MAP(cbm8296_mem)

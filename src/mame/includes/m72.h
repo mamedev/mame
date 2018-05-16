@@ -158,15 +158,15 @@ public:
 
 	void machine_start() override;
 	void machine_reset() override;
-	void video_start_m72()      ATTR_COLD;
-	void video_start_xmultipl() ATTR_COLD;
-	void video_start_hharry()   ATTR_COLD;
-	void video_start_rtype2()   ATTR_COLD;
-	void video_start_m82()      ATTR_COLD;
-	void video_start_hharryu()  ATTR_COLD;
-	void video_start_poundfor() ATTR_COLD;
-	void machine_start_kengo()  ATTR_COLD;
-	void machine_reset_kengo();
+	DECLARE_VIDEO_START(m72);
+	DECLARE_VIDEO_START(xmultipl);
+	DECLARE_VIDEO_START(hharry);
+	DECLARE_VIDEO_START(rtype2);
+	DECLARE_VIDEO_START(m82);
+	DECLARE_VIDEO_START(hharryu);
+	DECLARE_VIDEO_START(poundfor);
+	DECLARE_MACHINE_START(kengo);
+	DECLARE_MACHINE_RESET(kengo);
 	void init_dkgenm72();
 	void init_bchopper();
 	void init_gallop();

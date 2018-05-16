@@ -143,7 +143,7 @@ const atari_motion_objects_config atarisy1_state::s_mob_config =
 	0xffff              /* resulting value to indicate "special" */
 };
 
-void atarisy1_state::video_start_atarisy1()
+VIDEO_START_MEMBER(atarisy1_state,atarisy1)
 {
 	/* first decode the graphics */
 	uint16_t motable[256];

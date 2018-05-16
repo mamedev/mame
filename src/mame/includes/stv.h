@@ -105,10 +105,10 @@ public:
 
 	void install_stvbios_speedups( void );
 
-	void machine_start_stv() ATTR_COLD;
-	void machine_reset_stv();
+	DECLARE_MACHINE_START(stv);
+	DECLARE_MACHINE_RESET(stv);
 
-	void machine_reset_batmanfr();
+	DECLARE_MACHINE_RESET(batmanfr);
 	DECLARE_WRITE32_MEMBER(batmanfr_sound_comms_w);
 	optional_device<acclaim_rax_device> m_rax;
 

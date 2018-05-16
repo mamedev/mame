@@ -76,9 +76,9 @@ public:
 	void init_gatsbee();
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void machine_start_galaga() ATTR_COLD;
-	void machine_reset_galaga();
-	void video_start_galaga()   ATTR_COLD;
+	DECLARE_MACHINE_START(galaga);
+	DECLARE_MACHINE_RESET(galaga);
+	DECLARE_VIDEO_START(galaga);
 	DECLARE_PALETTE_INIT(galaga);
 	uint32_t screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_galaga);

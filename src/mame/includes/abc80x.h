@@ -288,9 +288,12 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void bankswitch();
+	void read_pal_p4(offs_t offset, bool m1l, bool xml, offs_t &m, bool &romd, bool &ramd, bool &hre, bool &vr);
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( m1_r ) override;
 	DECLARE_READ8_MEMBER( mai_r );
 	DECLARE_WRITE8_MEMBER( mao_w );
 	DECLARE_WRITE8_MEMBER( hrs_w );

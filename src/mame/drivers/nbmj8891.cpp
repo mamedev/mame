@@ -2280,7 +2280,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mjcamerb)
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start__1layer, this));
+	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::mmcamera)
@@ -2298,7 +2298,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mmcamera)
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start__1layer, this));
+	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::hanamomo)
@@ -2315,7 +2315,7 @@ MACHINE_CONFIG_START(nbmj8891_state::hanamomo)
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start__1layer, this));
+	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::msjiken)
@@ -2338,7 +2338,7 @@ MACHINE_CONFIG_START(nbmj8891_state::telmahjn)
 	MCFG_NB1413M3_TYPE( NB1413M3_TELMAHJN )
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start__1layer, this));
+	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::mgmen89)
@@ -2359,7 +2359,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mjfocus)
 	MCFG_NB1413M3_TYPE( NB1413M3_MJFOCUS )
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start__1layer, this));
+	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8891_state::pairsnb)
@@ -2522,7 +2522,7 @@ MACHINE_CONFIG_START(nbmj8891_state::mjfocusm)
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start__1layer, this));
+	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 
 	/* sound hardware */
 	MCFG_DEVICE_REPLACE("fmsnd", AY8910, 1250000)
@@ -2555,7 +2555,7 @@ MACHINE_CONFIG_START(nbmj8891_state::taiwanmb)
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start__1layer, this));
+	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 
 	/* sound hardware */
 	MCFG_DEVICE_REPLACE("fmsnd", AY8910, 1250000)

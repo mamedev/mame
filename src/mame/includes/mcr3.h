@@ -55,7 +55,7 @@ public:
 	void init_rampage();
 	void init_spyhunt();
 	void init_sarge();
-	void video_start_spyhunt() ATTR_COLD;
+	DECLARE_VIDEO_START(spyhunt);
 	DECLARE_PALETTE_INIT(spyhunt);
 
 	uint32_t screen_update_mcr3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

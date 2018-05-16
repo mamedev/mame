@@ -238,7 +238,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_cobracom_fix_tile_info)
 			0);
 }
 
-void dec8_state::video_start_cobracom()
+VIDEO_START_MEMBER(dec8_state,cobracom)
 {
 	allocate_buffered_spriteram16();
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_cobracom_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -272,7 +272,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_ghostb_fix_tile_info)
 			0);
 }
 
-void dec8_state::video_start_ghostb()
+VIDEO_START_MEMBER(dec8_state,ghostb)
 {
 	allocate_buffered_spriteram16();
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_ghostb_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -314,7 +314,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_oscar_fix_tile_info)
 			0);
 }
 
-void dec8_state::video_start_oscar()
+VIDEO_START_MEMBER(dec8_state,oscar)
 {
 	allocate_buffered_spriteram16();
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_oscar_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -387,7 +387,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_fix_tile_info)
 			0);
 }
 
-void dec8_state::video_start_lastmisn()
+VIDEO_START_MEMBER(dec8_state,lastmisn)
 {
 	allocate_buffered_spriteram16();
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_tile_info),this), tilemap_mapper_delegate(FUNC(dec8_state::lastmisn_scan_rows),this), 16, 16, 32, 32);
@@ -397,7 +397,7 @@ void dec8_state::video_start_lastmisn()
 	m_game_uses_priority = 0;
 }
 
-void dec8_state::video_start_shackled()
+VIDEO_START_MEMBER(dec8_state,shackled)
 {
 	allocate_buffered_spriteram16();
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_tile_info),this), tilemap_mapper_delegate(FUNC(dec8_state::lastmisn_scan_rows),this), 16, 16, 32, 32);
@@ -451,7 +451,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_tile_info)
 	tileinfo.group = color;
 }
 
-void dec8_state::video_start_srdarwin()
+VIDEO_START_MEMBER(dec8_state,srdarwin)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_srdarwin_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_srdarwin_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -519,7 +519,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_gondo_tile_info)
 			0);
 }
 
-void dec8_state::video_start_gondo()
+VIDEO_START_MEMBER(dec8_state,gondo)
 {
 	allocate_buffered_spriteram16();
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -530,7 +530,7 @@ void dec8_state::video_start_gondo()
 	m_game_uses_priority = 0;
 }
 
-void dec8_state::video_start_garyoret()
+VIDEO_START_MEMBER(dec8_state,garyoret)
 {
 	allocate_buffered_spriteram16();
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);

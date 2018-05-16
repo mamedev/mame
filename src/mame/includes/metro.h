@@ -98,8 +98,8 @@ public:
 	TILE_GET_INFO_MEMBER(metro_k053936_get_tile_info);
 	TILE_GET_INFO_MEMBER(metro_k053936_gstrik2_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_gstrik2);
-	void video_start_blzntrnd() ATTR_COLD;
-	void video_start_gstrik2()  ATTR_COLD;
+	DECLARE_VIDEO_START(blzntrnd);
+	DECLARE_VIDEO_START(gstrik2);
 	uint32_t screen_update_psac_vdp2_mix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(metro_vblank_irq);
 	INTERRUPT_GEN_MEMBER(metro_periodic_interrupt);

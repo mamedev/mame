@@ -325,12 +325,12 @@ void spectrum_state::spectrum_plus3_mem(address_map &map)
 	map(0xc000, 0xffff).bankrw("bank4");
 }
 
-void spectrum_state::machine_reset_spectrum_plus3()
+MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
 {
 	uint8_t *messram = m_ram->pointer();
 	memset(messram,0,128*1024);
 
-	machine_reset_spectrum();
+	MACHINE_RESET_CALL_MEMBER(spectrum);
 
 	/* Initial configuration */
 	m_port_7ffd_data = 0;
@@ -381,7 +381,7 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_plus3)
 	MCFG_SCREEN_REFRESH_RATE(50.01)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", specpls3)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_spectrum_plus3, this));
+	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_plus3 )
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats)

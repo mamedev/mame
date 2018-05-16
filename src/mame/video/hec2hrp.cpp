@@ -111,7 +111,7 @@ void hec2hrp_state::hector_80c(bitmap_ind16 &bitmap, uint8_t *page, int ymax, in
 }
 
 
-void hec2hrp_state::video_start_hec2hrp()
+VIDEO_START_MEMBER(hec2hrp_state,hec2hrp)
 {
 	Init_Hector_Palette();
 }

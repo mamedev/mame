@@ -85,7 +85,7 @@ private:
 	DECLARE_READ32_MEMBER(cpld_r);
 	DECLARE_WRITE32_MEMBER(cpld_w);
 	DECLARE_READ32_MEMBER(prot_cheater_r);
-	void machine_start_60in1() ATTR_COLD;
+	DECLARE_MACHINE_START(60in1);
 	virtual void machine_start() override;
 	uint32_t screen_update_39in1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pxa255_vblank_start);
@@ -1567,7 +1567,7 @@ void _39in1_state::machine_start()
 	pxa255_start();
 }
 
-void _39in1_state::machine_start_60in1()
+MACHINE_START_MEMBER(_39in1_state,60in1)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
@@ -1611,7 +1611,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(_39in1_state::_60in1)
 	_39in1(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_60in1, this));
+	MCFG_MACHINE_START_OVERRIDE(_39in1_state,60in1)
 MACHINE_CONFIG_END
 
 ROM_START( 39in1 )

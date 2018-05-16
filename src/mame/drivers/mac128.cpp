@@ -238,7 +238,7 @@ public:
 	void init_mac128k512k();
 	void init_mac512ke();
 	void init_macplus();
-	void video_start_mac() ATTR_COLD;
+	DECLARE_VIDEO_START(mac);
 	DECLARE_PALETTE_INIT(mac);
 	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 #ifndef MAC_USE_EMULATED_KBD
@@ -1227,7 +1227,7 @@ PALETTE_INIT_MEMBER(mac128_state,mac)
 	palette.set_pen_color(1, 0x00, 0x00, 0x00);
 }
 
-void mac128_state::video_start_mac()
+VIDEO_START_MEMBER(mac128_state,mac)
 {
 }
 
@@ -1339,7 +1339,7 @@ MACHINE_CONFIG_START(mac128_state::mac512ke)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(mac128_state,mac)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mac, this));
+	MCFG_VIDEO_START_OVERRIDE(mac128_state,mac)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mac128_state, mac_scanline, "screen", 0, 1)
 

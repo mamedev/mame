@@ -827,12 +827,12 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-void fantland_state::machine_start_fantland()
+MACHINE_START_MEMBER(fantland_state,fantland)
 {
 	save_item(NAME(m_nmi_enable));
 }
 
-void fantland_state::machine_reset_fantland()
+MACHINE_RESET_MEMBER(fantland_state,fantland)
 {
 	m_nmi_enable = 0;
 }
@@ -860,8 +860,8 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(fantland_state, fantland_sound_irq,  8000)
 	// NMI when soundlatch is written
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fantland, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_fantland, this));
+	MCFG_MACHINE_START_OVERRIDE(fantland_state,fantland)
+	MCFG_MACHINE_RESET_OVERRIDE(fantland_state,fantland)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(8000))  // sound irq must feed the DAC at 8kHz
 
@@ -910,8 +910,8 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 	MCFG_DEVICE_IO_MAP(galaxygn_sound_iomap)
 	// IRQ by YM2151, NMI when soundlatch is written
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fantland, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_fantland, this));
+	MCFG_MACHINE_START_OVERRIDE(fantland_state,fantland)
+	MCFG_MACHINE_RESET_OVERRIDE(fantland_state,fantland)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -939,9 +939,9 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 MACHINE_CONFIG_END
 
 
-void fantland_state::machine_start_borntofi()
+MACHINE_START_MEMBER(fantland_state,borntofi)
 {
-	machine_start_fantland();
+	MACHINE_START_CALL_MEMBER(fantland);
 
 	save_item(NAME(m_old_x));
 	save_item(NAME(m_old_y));
@@ -953,11 +953,13 @@ void fantland_state::machine_start_borntofi()
 	save_item(NAME(m_adpcm_nibble));
 }
 
-void fantland_state::machine_reset_borntofi()
+MACHINE_RESET_MEMBER(fantland_state,borntofi)
 {
-	machine_reset_fantland();
+	int i;
 
-	for (int i = 0; i < 2; i++)
+	MACHINE_RESET_CALL_MEMBER(fantland);
+
+	for (i = 0; i < 2; i++)
 	{
 		m_old_x[i] = 0;
 		m_old_y[i] = 0;
@@ -965,7 +967,7 @@ void fantland_state::machine_reset_borntofi()
 		m_input_ret[i] = 0;
 	}
 
-	for (int i = 0; i < 4; i++)
+	for (i = 0; i < 4; i++)
 	{
 		m_adpcm_playing[i] = 1;
 		m_adpcm_addr[0][i] = 0;
@@ -988,8 +990,8 @@ MACHINE_CONFIG_START(fantland_state::borntofi)
 	MCFG_DEVICE_ADD("audiocpu", I8088, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
 	MCFG_DEVICE_PROGRAM_MAP(borntofi_sound_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_borntofi, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_borntofi, this));
+	MCFG_MACHINE_START_OVERRIDE(fantland_state,borntofi)
+	MCFG_MACHINE_RESET_OVERRIDE(fantland_state,borntofi)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1043,8 +1045,8 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 	MCFG_DEVICE_PROGRAM_MAP(wheelrun_sound_map)
 	// IRQ by YM3526, NMI when soundlatch is written
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fantland, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_fantland, this));
+	MCFG_MACHINE_START_OVERRIDE(fantland_state,fantland)
+	MCFG_MACHINE_RESET_OVERRIDE(fantland_state,fantland)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

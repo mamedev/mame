@@ -1927,7 +1927,7 @@ MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_lockout_1_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_lockout_2_w))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_toaplan1, this));
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1943,7 +1943,7 @@ MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_rallybik, this));
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_rallybik_state,rallybik)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1966,7 +1966,7 @@ MACHINE_CONFIG_START(toaplan1_state::truxton)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_toaplan1, this));
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1980,7 +1980,7 @@ MACHINE_CONFIG_START(toaplan1_state::truxton)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan1, this));
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2003,7 +2003,7 @@ MACHINE_CONFIG_START(toaplan1_state::hellfire)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_toaplan1, this));
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2017,7 +2017,7 @@ MACHINE_CONFIG_START(toaplan1_state::hellfire)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan1, this));
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2040,7 +2040,7 @@ MACHINE_CONFIG_START(toaplan1_state::zerowing)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_zerowing, this));
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2054,7 +2054,7 @@ MACHINE_CONFIG_START(toaplan1_state::zerowing)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan1, this));
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2082,7 +2082,7 @@ MACHINE_CONFIG_START(toaplan1_state::demonwld)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_demonwld, this));
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,demonwld)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2096,7 +2096,7 @@ MACHINE_CONFIG_START(toaplan1_state::demonwld)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan1, this));
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2119,7 +2119,7 @@ MACHINE_CONFIG_START(toaplan1_state::samesame)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_zerowing, this));
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2133,7 +2133,7 @@ MACHINE_CONFIG_START(toaplan1_state::samesame)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan1, this));
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2156,7 +2156,7 @@ MACHINE_CONFIG_START(toaplan1_state::outzone)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_zerowing, this));
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2170,7 +2170,7 @@ MACHINE_CONFIG_START(toaplan1_state::outzone)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan1, this));
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2193,7 +2193,7 @@ MACHINE_CONFIG_START(toaplan1_state::outzonecv)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_zerowing, this));
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2207,7 +2207,7 @@ MACHINE_CONFIG_START(toaplan1_state::outzonecv)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan1, this));
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2230,7 +2230,7 @@ MACHINE_CONFIG_START(toaplan1_state::vimana)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600)) // GUESSED
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_vimana, this));
+	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,vimana)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2244,7 +2244,7 @@ MACHINE_CONFIG_START(toaplan1_state::vimana)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan1, this));
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -104,8 +104,8 @@ private:
 
 	DECLARE_PALETTE_INIT(wallc);
 	DECLARE_PALETTE_INIT(unkitpkr);
-	void video_start_unkitpkr() ATTR_COLD;
-	void video_start_sidampkr() ATTR_COLD;
+	DECLARE_VIDEO_START(unkitpkr);
+	DECLARE_VIDEO_START(sidampkr);
 };
 
 
@@ -238,12 +238,12 @@ void wallc_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info), this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
 }
 
-void wallc_state::video_start_unkitpkr()
+VIDEO_START_MEMBER(wallc_state, unkitpkr)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info_unkitpkr), this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
 }
 
-void wallc_state::video_start_sidampkr()
+VIDEO_START_MEMBER(wallc_state, sidampkr)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
@@ -545,7 +545,7 @@ MACHINE_CONFIG_START(wallc_state::unkitpkr)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(unkitpkr_map)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_unkitpkr, this));
+	MCFG_VIDEO_START_OVERRIDE(wallc_state, unkitpkr)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(wallc_state, unkitpkr)
 
@@ -558,7 +558,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(wallc_state::sidampkr)
 	unkitpkr(config);
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_sidampkr, this));
+	MCFG_VIDEO_START_OVERRIDE(wallc_state, sidampkr)
 MACHINE_CONFIG_END
 
 /***************************************************************************

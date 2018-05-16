@@ -66,7 +66,7 @@ TIMER_CALLBACK_MEMBER(rpunch_state::crtc_interrupt_gen)
 }
 
 
-void rpunch_state::video_start_rpunch()
+VIDEO_START_MEMBER(rpunch_state,rpunch)
 {
 	m_sprite_xoffs = 0;
 
@@ -85,9 +85,9 @@ void rpunch_state::video_start_rpunch()
 }
 
 
-void rpunch_state::video_start_svolley()
+VIDEO_START_MEMBER(rpunch_state,svolley)
 {
-	video_start_rpunch();
+	VIDEO_START_CALL_MEMBER(rpunch);
 	m_background[0]->set_scrolldx(8, 0); // aligns middle net sprite with bg as shown in reference
 	m_sprite_xoffs = -4;
 }

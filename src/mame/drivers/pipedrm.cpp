@@ -182,8 +182,8 @@ public:
 
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	void machine_start_pipedrm() ATTR_COLD;
-	void machine_reset_pipedrm();
+	DECLARE_MACHINE_START(pipedrm);
+	DECLARE_MACHINE_RESET(pipedrm);
 	void init_pipedrm();
 	void init_hatris();
 	DECLARE_WRITE8_MEMBER( pipedrm_bankswitch_w );
@@ -548,7 +548,7 @@ GFXDECODE_END
  *
  *************************************/
 
-void pipedrm_state::machine_start_pipedrm()
+MACHINE_START_MEMBER(pipedrm_state,pipedrm)
 {
 	/* initialize main Z80 bank */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x2000);
@@ -561,7 +561,7 @@ void pipedrm_state::machine_start_pipedrm()
 	/* video-related elements are saved in video_start */
 }
 
-void pipedrm_state::machine_reset_pipedrm()
+MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)
 {
 	m_flipscreen_old = -1;
 	m_scrollx_ofs = 0x159;
@@ -588,8 +588,8 @@ MACHINE_CONFIG_START(pipedrm_state::pipedrm)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pipedrm, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pipedrm, this));
+	MCFG_MACHINE_START_OVERRIDE(pipedrm_state,pipedrm)
+	MCFG_MACHINE_RESET_OVERRIDE(pipedrm_state,pipedrm)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -614,7 +614,7 @@ MACHINE_CONFIG_START(pipedrm_state::pipedrm)
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pipedrm, this));
+	MCFG_VIDEO_START_OVERRIDE(pipedrm_state,pipedrm)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -643,8 +643,8 @@ MACHINE_CONFIG_START(pipedrm_state::hatris)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(hatris_sound_portmap)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pipedrm, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pipedrm, this));
+	MCFG_MACHINE_START_OVERRIDE(pipedrm_state,pipedrm)
+	MCFG_MACHINE_RESET_OVERRIDE(pipedrm_state,pipedrm)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(pipedrm_state::hatris)
 
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_hatris, this));
+	MCFG_VIDEO_START_OVERRIDE(pipedrm_state,hatris)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

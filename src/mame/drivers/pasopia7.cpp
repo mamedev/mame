@@ -85,7 +85,7 @@ public:
 	TIMER_CALLBACK_MEMBER(pio_timer);
 	void init_p7_lcd();
 	void init_p7_raster();
-	void video_start_pasopia7() ATTR_COLD;
+	DECLARE_VIDEO_START(pasopia7);
 	DECLARE_PALETTE_INIT(p7_lcd);
 	uint32_t screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -152,7 +152,7 @@ TIMER_CALLBACK_MEMBER( pasopia7_state::pio_timer )
 	m_pio->port_b_write(keyb_r(generic_space(),0,0xff));
 }
 
-void pasopia7_state::video_start_pasopia7()
+VIDEO_START_MEMBER(pasopia7_state,pasopia7)
 {
 	m_p7_pal = std::make_unique<uint8_t[]>(0x10);
 }
@@ -978,7 +978,7 @@ MACHINE_CONFIG_START(pasopia7_state::p7_raster)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 32-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pasopia7, this));
+	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
 	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pasopia7)
@@ -996,7 +996,7 @@ MACHINE_CONFIG_START(pasopia7_state::p7_lcd)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pasopia7, this));
+	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
 	MCFG_SCREEN_PALETTE("palette")
 

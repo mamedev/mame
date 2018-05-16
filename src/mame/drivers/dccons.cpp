@@ -601,7 +601,7 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	MCFG_DEVICE_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MCFG_DEVICE_PROGRAM_MAP(dc_audio_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dc_console, this));
+	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
 
 //  MCFG_MACRONIX_29LV160TMC_ADD("dcflash")
 

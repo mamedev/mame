@@ -427,7 +427,7 @@ MACHINE_CONFIG_START(raiden_state::raidenb)
 	MCFG_DEVICE_PROGRAM_MAP(raidenb_main_map)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_raidenb, this));
+	MCFG_VIDEO_START_OVERRIDE(raiden_state,raidenb)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden_state, raidenb_layer_enable_w))

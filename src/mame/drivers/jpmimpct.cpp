@@ -144,7 +144,7 @@ void jpmimpct_state::update_irqs()
  *
  *************************************/
 
-void jpmimpct_state::machine_start_jpmimpct()
+MACHINE_START_MEMBER(jpmimpct_state,jpmimpct)
 {
 	m_digits.resolve();
 
@@ -160,7 +160,7 @@ void jpmimpct_state::machine_start_jpmimpct()
 }
 
 
-void jpmimpct_state::machine_reset_jpmimpct()
+MACHINE_RESET_MEMBER(jpmimpct_state,jpmimpct)
 {
 	memset(&m_duart_1, 0, sizeof(m_duart_1));
 
@@ -855,8 +855,8 @@ MACHINE_CONFIG_START(jpmimpct_state::jpmimpct)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(jpmimpct_state, from_shiftreg)      /* read from shiftreg function */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_jpmimpct, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_jpmimpct, this));
+	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,jpmimpct)
+	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,jpmimpct)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD("duart_1_timer", jpmimpct_state, duart_1_timer_event)
@@ -870,7 +870,7 @@ MACHINE_CONFIG_START(jpmimpct_state::jpmimpct)
 	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_jpmimpct, this));
+	MCFG_VIDEO_START_OVERRIDE(jpmimpct_state,jpmimpct)
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(5)
@@ -965,7 +965,7 @@ WRITE8_MEMBER(jpmimpct_state::display_c_w)
 	m_vfd->sclk(data & 0x01);
 }
 
-void jpmimpct_state::machine_start_impctawp()
+MACHINE_START_MEMBER(jpmimpct_state,impctawp)
 {
 	save_item(NAME(m_duart_1_irq));
 	save_item(NAME(m_touch_cnt));
@@ -977,7 +977,7 @@ void jpmimpct_state::machine_start_impctawp()
 	save_item(NAME(m_duart_1.CT));
 }
 
-void jpmimpct_state::machine_reset_impctawp()
+MACHINE_RESET_MEMBER(jpmimpct_state,impctawp)
 {
 	memset(&m_duart_1, 0, sizeof(m_duart_1));
 
@@ -1319,8 +1319,8 @@ MACHINE_CONFIG_START(jpmimpct_state::impctawp)
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 	MCFG_S16LF01_ADD("vfd",0)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_impctawp, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_impctawp, this));
+	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,impctawp)
+	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,impctawp)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)

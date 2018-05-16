@@ -89,9 +89,9 @@ public:
 	void init_indytemp();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	void machine_start_atarisy1() ATTR_COLD;
-	void machine_reset_atarisy1();
-	void video_start_atarisy1() ATTR_COLD;
+	DECLARE_MACHINE_START(atarisy1);
+	DECLARE_MACHINE_RESET(atarisy1);
+	DECLARE_VIDEO_START(atarisy1);
 	uint32_t screen_update_atarisy1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(joystick_int);
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_reset_yscroll_callback);

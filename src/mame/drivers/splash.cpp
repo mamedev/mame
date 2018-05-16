@@ -474,12 +474,12 @@ static GFXDECODE_START( gfx_splash )
 GFXDECODE_END
 
 
-void splash_state::machine_start_splash()
+MACHINE_START_MEMBER(splash_state,splash)
 {
 	save_item(NAME(m_adpcm_data));
 }
 
-void splash_state::machine_reset_splash()
+MACHINE_RESET_MEMBER(splash_state,splash)
 {
 	m_adpcm_data = 0;
 	m_ret = 0x100;
@@ -515,8 +515,8 @@ MACHINE_CONFIG_START(splash_state::splash)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_splash, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_splash, this));
+	MCFG_MACHINE_START_OVERRIDE(splash_state, splash )
+	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(splash_state::splash)
 MACHINE_CONFIG_END
 
 
-void splash_state::machine_start_roldfrog()
+MACHINE_START_MEMBER(splash_state, roldfrog)
 {
 	save_item(NAME(m_ret));
 	save_item(NAME(m_vblank_irq));
@@ -578,8 +578,8 @@ MACHINE_CONFIG_START(splash_state::roldfrog)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_roldfrog, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_splash, this));
+	MCFG_MACHINE_START_OVERRIDE(splash_state, roldfrog )
+	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

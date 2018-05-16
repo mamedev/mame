@@ -32,8 +32,8 @@ public:
 	void init_oneprom_coindsw();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	void machine_reset_phoenix();
-	void video_start_phoenix() ATTR_COLD;
+	DECLARE_MACHINE_RESET(phoenix);
+	DECLARE_VIDEO_START(phoenix);
 	DECLARE_PALETTE_INIT(phoenix);
 	DECLARE_PALETTE_INIT(survival);
 	DECLARE_PALETTE_INIT(pleiads);

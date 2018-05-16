@@ -33,7 +33,7 @@ public:
 	DECLARE_READ8_MEMBER(beta_neutral_r);
 	DECLARE_READ8_MEMBER(beta_enable_r);
 	DECLARE_READ8_MEMBER(beta_disable_r);
-	void machine_reset_atm();
+	DECLARE_MACHINE_RESET(atm);
 
 	void atm(machine_config &config);
 	void atmtb2(machine_config &config);
@@ -140,7 +140,7 @@ void atm_state::atm_switch(address_map &map)
 	map(0x4000, 0xffff).r(this, FUNC(atm_state::beta_disable_r));
 }
 
-void atm_state::machine_reset_atm()
+MACHINE_RESET_MEMBER(atm_state,atm)
 {
 	uint8_t *messram = m_ram->pointer();
 	m_program = &m_maincpu->space(AS_PROGRAM);
@@ -192,7 +192,7 @@ MACHINE_CONFIG_START(atm_state::atm)
 	MCFG_DEVICE_PROGRAM_MAP(atm_mem)
 	MCFG_DEVICE_IO_MAP(atm_io)
 	MCFG_DEVICE_OPCODES_MAP(atm_switch)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_atm, this));
+	MCFG_MACHINE_RESET_OVERRIDE(atm_state, atm )
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 

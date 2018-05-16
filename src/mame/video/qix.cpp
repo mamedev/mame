@@ -19,7 +19,7 @@
  *
  *************************************/
 
-void qix_state::video_start_qix()
+VIDEO_START_MEMBER(qix_state,qix)
 {
 	/* allocate memory for the full video RAM */
 	m_videoram.allocate(256 * 256);
@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(qix_state::qix_video)
 	MCFG_DEVICE_ADD("videocpu", MC6809E, MAIN_CLOCK_OSC/4/4) /* 1.25 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(qix_video_map)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_qix, this));
+	MCFG_VIDEO_START_OVERRIDE(qix_state,qix)
 
 	MCFG_MC6845_ADD("vid_u18", MC6845, "screen", QIX_CHARACTER_CLOCK)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

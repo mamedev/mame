@@ -76,7 +76,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_fix_info)
 
 ***************************************************************************/
 
-void lastduel_state::video_start_lastduel()
+VIDEO_START_MEMBER(lastduel_state,lastduel)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
@@ -91,7 +91,7 @@ void lastduel_state::video_start_lastduel()
 	m_tilemap_priority = 0;
 }
 
-void lastduel_state::video_start_madgear()
+VIDEO_START_MEMBER(lastduel_state,madgear)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,16,16,64,32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,16,16,64,32);

@@ -464,7 +464,7 @@ static INPUT_PORTS_START( bucky )
 INPUT_PORTS_END
 
 
-void moo_state::machine_start_moo()
+MACHINE_START_MEMBER(moo_state,moo)
 {
 	save_item(NAME(m_cur_control2));
 	save_item(NAME(m_alpha_enabled));
@@ -476,15 +476,17 @@ void moo_state::machine_start_moo()
 	m_dmaend_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(moo_state::dmaend_callback),this));
 }
 
-void moo_state::machine_reset_moo()
+MACHINE_RESET_MEMBER(moo_state,moo)
 {
-	for (int i = 0; i < 16; i++)
+	int i;
+
+	for (i = 0; i < 16; i++)
 		m_protram[i] = 0;
 
-	for (int i = 0; i < 4; i++)
+	for (i = 0; i < 4; i++)
 		m_layer_colorbase[i] = 0;
 
-	for (int i = 0; i < 3; i++)
+	for (i = 0; i < 3; i++)
 		m_layerpri[i] = 0;
 
 	m_cur_control2 = 0;
@@ -502,8 +504,8 @@ MACHINE_CONFIG_START(moo_state::moo)
 	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(32'000'000)/4) // 8MHz verified
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_moo, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_moo, this));
+	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
+	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
@@ -524,7 +526,7 @@ MACHINE_CONFIG_START(moo_state::moo)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_moo, this));
+	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
 	MCFG_K053246_CB(moo_state, sprite_callback)
@@ -562,8 +564,8 @@ MACHINE_CONFIG_START(moo_state::moobl)
 	MCFG_DEVICE_PROGRAM_MAP(moobl_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", moo_state,  moobl_interrupt)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_moo, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_moo, this));
+	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
+	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
@@ -581,7 +583,7 @@ MACHINE_CONFIG_START(moo_state::moobl)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_moo, this));
+	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
 	MCFG_K053246_CB(moo_state, sprite_callback)
@@ -624,7 +626,7 @@ MACHINE_CONFIG_START(moo_state::bucky)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_bucky, this));
+	MCFG_VIDEO_START_OVERRIDE(moo_state,bucky)
 MACHINE_CONFIG_END
 
 

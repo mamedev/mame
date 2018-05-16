@@ -2593,7 +2593,7 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV2)
 	OTHERS_TMZ84C011_MAIN_PORTS
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start__1layer, this));
+	MCFG_VIDEO_START_OVERRIDE(nbmj9195_state,_1layer)
 MACHINE_CONFIG_END
 
 
@@ -2608,7 +2608,7 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV3)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(512)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_nb22090, this));
+	MCFG_VIDEO_START_OVERRIDE(nbmj9195_state,nb22090)
 MACHINE_CONFIG_END
 
 

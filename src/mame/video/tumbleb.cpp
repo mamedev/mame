@@ -220,7 +220,7 @@ void tumbleb_state::tumbleb_tilemap_redraw()
 		m_pf2_alt_tilemap->mark_all_dirty();
 }
 
-void tumbleb_state::video_start_pangpang()
+VIDEO_START_MEMBER(tumbleb_state,pangpang)
 {
 	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::pangpang_get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
 	m_pf1_alt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::pangpang_get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
@@ -233,7 +233,7 @@ void tumbleb_state::video_start_pangpang()
 }
 
 
-void tumbleb_state::video_start_tumblepb()
+VIDEO_START_MEMBER(tumbleb_state,tumblepb)
 {
 	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
 	m_pf1_alt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
@@ -245,7 +245,7 @@ void tumbleb_state::video_start_tumblepb()
 	machine().save().register_postload(save_prepost_delegate(FUNC(tumbleb_state::tumbleb_tilemap_redraw), this));
 }
 
-void tumbleb_state::video_start_sdfight()
+VIDEO_START_MEMBER(tumbleb_state,sdfight)
 {
 	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 64); // 64*64 to prevent bad tilemap wrapping? - check real behavior
 	m_pf1_alt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
@@ -257,7 +257,7 @@ void tumbleb_state::video_start_sdfight()
 	machine().save().register_postload(save_prepost_delegate(FUNC(tumbleb_state::tumbleb_tilemap_redraw), this));
 }
 
-void tumbleb_state::video_start_fncywld()
+VIDEO_START_MEMBER(tumbleb_state,fncywld)
 {
 	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_fncywld_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
 	m_pf1_alt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_fncywld_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
@@ -270,7 +270,7 @@ void tumbleb_state::video_start_fncywld()
 }
 
 
-void tumbleb_state::video_start_suprtrio()
+VIDEO_START_MEMBER(tumbleb_state,suprtrio)
 {
 	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
 	m_pf1_alt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);

@@ -47,7 +47,7 @@ public:
 	{ }
 
 	void init_dmax8000();
-	void machine_reset_dmax8000();
+	DECLARE_MACHINE_RESET(dmax8000);
 	DECLARE_WRITE8_MEMBER(port0c_w);
 	DECLARE_WRITE8_MEMBER(port0d_w);
 	DECLARE_WRITE8_MEMBER(port14_w);
@@ -126,7 +126,7 @@ void dmax8000_state::dmax8000_io(address_map &map)
 static INPUT_PORTS_START( dmax8000 )
 INPUT_PORTS_END
 
-void dmax8000_state::machine_reset_dmax8000()
+MACHINE_RESET_MEMBER( dmax8000_state, dmax8000 )
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -154,7 +154,7 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000) ) // no idea what crystal is used, but 4MHz clock is confirmed
 	MCFG_DEVICE_PROGRAM_MAP(dmax8000_mem)
 	MCFG_DEVICE_IO_MAP(dmax8000_io)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dmax8000, this));
+	MCFG_MACHINE_RESET_OVERRIDE(dmax8000_state, dmax8000)
 
 	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(4'000'000) / 2) // 2MHz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg0))

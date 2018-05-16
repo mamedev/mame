@@ -272,7 +272,7 @@ public:
 	TILE_GET_INFO_MEMBER(x68k_get_bg1_tile);
 	TILE_GET_INFO_MEMBER(x68k_get_bg0_tile_16);
 	TILE_GET_INFO_MEMBER(x68k_get_bg1_tile_16);
-	void video_start_x68000() ATTR_COLD;
+	DECLARE_VIDEO_START(x68000);
 	DECLARE_PALETTE_INIT(x68000);
 	uint32_t screen_update_x68000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(x68k_led_callback);

@@ -489,7 +489,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sorcererd_mem)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sorcererd, this));
+	MCFG_MACHINE_START_OVERRIDE(sorcerer_state, sorcererd )
 
 	MCFG_DEVICE_ADD("fdc", MICROPOLIS, 0)
 	MCFG_MICROPOLIS_DEFAULT_DRIVE4_TAGS

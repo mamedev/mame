@@ -79,7 +79,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	void machine_reset_s11();
+	DECLARE_MACHINE_RESET(s11);
 	void init_s11();
 	void s11(machine_config &config);
 	void s11_audio_map(address_map &map);

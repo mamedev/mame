@@ -60,8 +60,8 @@ public:
 	}
 
 	// Machine
-	void machine_start_model1() ATTR_COLD;
-	void machine_reset_model1();
+	DECLARE_MACHINE_START(model1);
+	DECLARE_MACHINE_RESET(model1);
 
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
@@ -122,7 +122,7 @@ public:
 	DECLARE_WRITE8_MEMBER(r360_w);
 
 	// Rendering
-	void video_start_model1() ATTR_COLD;
+	DECLARE_VIDEO_START(model1);
 	DECLARE_READ16_MEMBER(model1_listctl_r);
 	DECLARE_WRITE16_MEMBER(model1_listctl_w);
 

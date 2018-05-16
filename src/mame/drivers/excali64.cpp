@@ -92,7 +92,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_hs);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	void machine_reset_excali64();
+	DECLARE_MACHINE_RESET(excali64);
 	required_device<palette_device> m_palette;
 
 	void excali64(machine_config &config);
@@ -410,7 +410,7 @@ WRITE8_MEMBER( excali64_state::port70_w )
 		membank("bankr1")->set_entry(2);
 }
 
-void excali64_state::machine_reset_excali64()
+MACHINE_RESET_MEMBER( excali64_state, excali64 )
 {
 	membank("bankr1")->set_entry(1); // read from ROM
 	membank("bankr2")->set_entry(1); // read from ROM
@@ -555,7 +555,7 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_excali64, this));
+	MCFG_MACHINE_RESET_OVERRIDE(excali64_state, excali64)
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	//MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))

@@ -28,8 +28,8 @@ public:
 	DECLARE_READ16_MEMBER(puckpkmna_70001c_r);
 	DECLARE_READ16_MEMBER(puckpkmna_4b2476_r);
 
-	void machine_start_md_bootleg() { machine_start_megadriv(); m_vdp->stop_timers(); }
-	void machine_start_md_6button() ATTR_COLD;
+	DECLARE_MACHINE_START(md_bootleg) { MACHINE_START_CALL_MEMBER(megadriv); m_vdp->stop_timers(); }
+	DECLARE_MACHINE_START(md_6button);
 	void megadrvb(machine_config &config);
 	void megadrvb_6b(machine_config &config);
 	void md_bootleg(machine_config &config);

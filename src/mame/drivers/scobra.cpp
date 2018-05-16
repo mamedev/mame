@@ -876,7 +876,7 @@ MACHINE_CONFIG_START(scobra_state::type1)
 	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scobra_state,scramble_sh_7474_q_callback))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_scramble, this));
+	MCFG_MACHINE_RESET_OVERRIDE(scobra_state,scramble)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -910,7 +910,7 @@ MACHINE_CONFIG_START(scobra_state::type1)
 	MCFG_PALETTE_ADD("palette", 32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,scrambold)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_scrambold, this));
+	MCFG_VIDEO_START_OVERRIDE(scobra_state,scrambold)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -941,7 +941,7 @@ MACHINE_CONFIG_START(scobra_state::rescue)
 	MCFG_PALETTE_ENTRIES(32+64+2+128)    /* 32 for characters, 64 for stars, 2 for bullets, 128 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,rescue)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_rescue, this));
+	MCFG_VIDEO_START_OVERRIDE(scobra_state,rescue)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scobra_state::rescuefe)
@@ -969,7 +969,7 @@ MACHINE_CONFIG_START(scobra_state::minefld)
 	MCFG_PALETTE_ENTRIES(32+64+2+256)    /* 32 for characters, 64 for stars, 2 for bullets, 256 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,minefld)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_minefld, this));
+	MCFG_VIDEO_START_OVERRIDE(scobra_state,minefld)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scobra_state::minefldfe)
@@ -987,7 +987,7 @@ MACHINE_CONFIG_START(scobra_state::mimonkey)
 	MCFG_DEVICE_PROGRAM_MAP(mimonkey_map)
 
 	/* video hardware */
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mimonkey, this));
+	MCFG_VIDEO_START_OVERRIDE(scobra_state,mimonkey)
 MACHINE_CONFIG_END
 
 
@@ -1024,7 +1024,7 @@ MACHINE_CONFIG_START(scobra_state::stratgyx)
 	MCFG_PALETTE_ENTRIES( 32+64+2+8)  /* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,stratgyx)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_stratgyx, this));
+	MCFG_VIDEO_START_OVERRIDE(scobra_state,stratgyx)
 MACHINE_CONFIG_END
 
 
@@ -1038,7 +1038,7 @@ MACHINE_CONFIG_START(scobra_state::darkplnt)
 	MCFG_PALETTE_ENTRIES(32+64+2) /* 32 for characters, 64 (buffer) for stars, 2 for bullets */
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,darkplnt)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_darkplnt, this));
+	MCFG_VIDEO_START_OVERRIDE(scobra_state,darkplnt)
 MACHINE_CONFIG_END
 
 
@@ -1056,7 +1056,7 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, scobra_state,scramble_sh_7474_q_callback))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_scramble, this));
+	MCFG_MACHINE_RESET_OVERRIDE(scobra_state,scramble)
 
 	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
 	MCFG_7474_OUTPUT_CB(WRITELINE(*this, scobra_state,galaxold_7474_9m_1_callback))
@@ -1090,7 +1090,7 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 	MCFG_PALETTE_ADD("palette", 32+64+2)    /* 32 for characters, 64 for stars, 2 for bullets */
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,galaxold)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_scrambold, this));
+	MCFG_VIDEO_START_OVERRIDE(scobra_state,scrambold)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

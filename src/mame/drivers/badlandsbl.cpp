@@ -230,7 +230,7 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_badlands, this));
+	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -253,7 +253,7 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 	MCFG_SCREEN_UPDATE_DRIVER(badlandsbl_state, screen_update_badlandsbl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_badlands, this));
+	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

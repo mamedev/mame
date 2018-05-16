@@ -1111,7 +1111,7 @@ MACHINE_CONFIG_START(midyunit_state::zunit)
 	MCFG_TMS340X0_TO_SHIFTREG_CB(midyunit_state, to_shiftreg)           /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midyunit_state, from_shiftreg)          /* read from shiftreg function */
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_midyunit, this));
+	MCFG_MACHINE_RESET_OVERRIDE(midyunit_state,midyunit)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -1124,7 +1124,7 @@ MACHINE_CONFIG_START(midyunit_state::zunit)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_midzunit, this));
+	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midzunit)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1154,7 +1154,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_core)
 	MCFG_TMS340X0_TO_SHIFTREG_CB(midyunit_state, to_shiftreg)           /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midyunit_state, from_shiftreg)          /* read from shiftreg function */
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_midyunit, this));
+	MCFG_MACHINE_RESET_OVERRIDE(midyunit_state,midyunit)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -1183,7 +1183,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_slow)
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_midyunit_4bit, this));
+	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_4bit)
 MACHINE_CONFIG_END
 
 
@@ -1200,7 +1200,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_fast)
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_midyunit_4bit, this));
+	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_4bit)
 MACHINE_CONFIG_END
 
 
@@ -1214,7 +1214,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_6bit_slow)
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_midyunit_6bit, this));
+	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
 MACHINE_CONFIG_END
 
 
@@ -1231,7 +1231,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_fast)
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_midyunit_6bit, this));
+	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
 MACHINE_CONFIG_END
 
 
@@ -1248,7 +1248,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_faster)
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_midyunit_6bit, this));
+	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
 MACHINE_CONFIG_END
 
 
@@ -1273,7 +1273,7 @@ MACHINE_CONFIG_START(midyunit_state::mkyawdim)
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mkyawdim, this));
+	MCFG_VIDEO_START_OVERRIDE(midyunit_state,mkyawdim)
 
 	/* sound hardware */
 

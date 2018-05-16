@@ -91,8 +91,8 @@ public:
 	DECLARE_READ8_MEMBER(apple3_c0xx_r);
 	DECLARE_WRITE8_MEMBER(apple3_c0xx_w);
 	void init_apple3();
-	void machine_reset_apple3();
-	void video_start_apple3() ATTR_COLD;
+	DECLARE_MACHINE_RESET(apple3);
+	DECLARE_VIDEO_START(apple3);
 	uint32_t screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple3_interrupt);
 	TIMER_CALLBACK_MEMBER(scanstart_cb);

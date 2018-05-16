@@ -421,8 +421,8 @@ MACHINE_CONFIG_START(z80ne_state::z80ne)
 	MCFG_DEVICE_PROGRAM_MAP(z80ne_mem)
 	MCFG_DEVICE_IO_MAP(z80ne_io)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_z80ne, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_z80ne, this));
+	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80ne)
+	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80ne)
 
 	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(4800.0)
@@ -453,8 +453,8 @@ MACHINE_CONFIG_START(z80ne_state::z80net)
 	MCFG_DEVICE_PROGRAM_MAP(z80net_mem)
 	MCFG_DEVICE_IO_MAP(z80net_io)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_z80net, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_z80net, this));
+	MCFG_MACHINE_START_OVERRIDE(z80ne_state, z80net )
+	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state, z80net )
 
 	MCFG_DEVICE_ADD("lx387_kr2376", KR2376_ST, 50000)
 	MCFG_KR2376_MATRIX_X0(IOPORT("X0"))
@@ -492,8 +492,8 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	MCFG_DEVICE_PROGRAM_MAP(z80netb_mem)
 	MCFG_DEVICE_IO_MAP(z80net_io)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_z80netb, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_z80netb, this));
+	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80netb)
+	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80netb)
 
 	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(4800.0)
@@ -543,8 +543,8 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	MCFG_DEVICE_PROGRAM_MAP(z80netf_mem)
 	MCFG_DEVICE_IO_MAP(z80netf_io)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_z80netf, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_z80netf, this));
+	MCFG_MACHINE_START_OVERRIDE(z80netf_state,z80netf)
+	MCFG_MACHINE_RESET_OVERRIDE(z80netf_state,z80netf)
 
 	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
 	MCFG_AY31015_TX_CLOCK(4800.0)

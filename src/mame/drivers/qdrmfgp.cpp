@@ -495,20 +495,20 @@ WRITE_LINE_MEMBER(qdrmfgp_state::k054539_irq1_gen)
  *
  *************************************/
 
-void qdrmfgp_state::machine_start_qdrmfgp()
+MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp)
 {
 	save_item(NAME(m_control));
 	save_item(NAME(m_pal));
 	save_item(NAME(m_gp2_irq_control));
 }
 
-void qdrmfgp_state::machine_start_qdrmfgp2()
+MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp2)
 {
 	/* sound irq (CCU? 240Hz) */
 	m_gp2_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(qdrmfgp_state::gp2_timer_callback), this));
 	m_gp2_timer->adjust(attotime::from_hz(XTAL(18'432'000)/76800), 0, attotime::from_hz(XTAL(18'432'000)/76800));
 
-	machine_start_qdrmfgp();
+	MACHINE_START_CALL_MEMBER( qdrmfgp );
 }
 
 void qdrmfgp_state::machine_reset()
@@ -530,7 +530,7 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 	MCFG_DEVICE_PROGRAM_MAP(qdrmfgp_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", qdrmfgp_state, qdrmfgp_interrupt, "screen", 0, 1)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_qdrmfgp, this));
+	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
@@ -548,7 +548,7 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_qdrmfgp, this));
+	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(qdrmfgp_state, qdrmfgp_tile_callback)
@@ -576,7 +576,7 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 	MCFG_DEVICE_PROGRAM_MAP(qdrmfgp2_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", qdrmfgp_state,  qdrmfgp2_interrupt)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_qdrmfgp2, this));
+	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
@@ -594,7 +594,7 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_qdrmfgp2, this));
+	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(qdrmfgp_state, qdrmfgp2_tile_callback)

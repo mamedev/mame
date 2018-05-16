@@ -106,8 +106,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
-	void video_start_perfrman()  ATTR_COLD;
-	void video_start_slapfight() ATTR_COLD;
+	DECLARE_VIDEO_START(perfrman);
+	DECLARE_VIDEO_START(slapfight);
 
 	void draw_perfrman_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 	void draw_slapfight_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

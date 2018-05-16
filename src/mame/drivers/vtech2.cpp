@@ -457,13 +457,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vtech2_state::laser500)
 	laser350(config);
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_laser500, this));
+	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser500 )
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(vtech2_state::laser700)
 	laser350(config);
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_laser700, this));
+	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser700 )
 
 	/* Second 5.25" floppy drive */
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD( FLOPPY_1, vtech2_floppy_interface )

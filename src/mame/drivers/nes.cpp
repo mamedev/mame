@@ -193,7 +193,7 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 }
 
 
-void nes_state::machine_start_fds()
+MACHINE_START_MEMBER( nes_state, fds )
 {
 	m_ciram = std::make_unique<uint8_t[]>(0x800);
 	m_io_disksel = ioport("FLIPDISK");
@@ -204,7 +204,7 @@ void nes_state::machine_start_fds()
 	save_pointer(NAME(m_ciram.get()), 0x800);
 }
 
-void nes_state::machine_reset_fds()
+MACHINE_RESET_MEMBER( nes_state, fds )
 {
 	// Reset the mapper variables
 	m_disk->pcb_reset();
@@ -215,8 +215,8 @@ void nes_state::machine_reset_fds()
 
 MACHINE_CONFIG_START(nes_state::fds)
 	famicom(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fds, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_fds, this));
+	MCFG_MACHINE_START_OVERRIDE( nes_state, fds )
+	MCFG_MACHINE_RESET_OVERRIDE( nes_state, fds )
 
 	MCFG_DEVICE_REMOVE("nes_slot")
 	MCFG_DEVICE_ADD("disk", NES_DISKSYS, 0)
@@ -230,7 +230,7 @@ MACHINE_CONFIG_START(nes_state::fds)
 MACHINE_CONFIG_END
 
 
-void nes_state::machine_start_famitwin()
+MACHINE_START_MEMBER( nes_state, famitwin )
 {
 	// start the base nes stuff
 	machine_start();
@@ -246,7 +246,7 @@ void nes_state::machine_start_famitwin()
 	}
 }
 
-void nes_state::machine_reset_famitwin()
+MACHINE_RESET_MEMBER( nes_state, famitwin )
 {
 	// Reset the mapper variables. Will also mark the char-gen ram as dirty
 	m_cartslot->pcb_reset();
@@ -261,8 +261,8 @@ void nes_state::machine_reset_famitwin()
 MACHINE_CONFIG_START(nes_state::famitwin)
 	famicom(config);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_famitwin, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_famitwin, this));
+	MCFG_MACHINE_START_OVERRIDE( nes_state, famitwin )
+	MCFG_MACHINE_RESET_OVERRIDE( nes_state, famitwin )
 
 	MCFG_DEVICE_MODIFY("nes_slot")
 	MCFG_NES_CARTRIDGE_NOT_MANDATORY

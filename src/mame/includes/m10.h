@@ -102,11 +102,11 @@ public:
 	void init_ipminva1();
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void machine_start_m10() ATTR_COLD;
-	void machine_reset_m10();
-	void video_start_m10()   ATTR_COLD;
+	DECLARE_MACHINE_START(m10);
+	DECLARE_MACHINE_RESET(m10);
+	DECLARE_VIDEO_START(m10);
 	DECLARE_PALETTE_INIT(m10);
-	void video_start_m15()   ATTR_COLD;
+	DECLARE_VIDEO_START(m15);
 	uint32_t screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m15_interrupt);

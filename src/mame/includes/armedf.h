@@ -94,10 +94,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_armedf_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	void machine_start_armedf() ATTR_COLD;
-	void machine_reset_armedf();
-	void video_start_terraf() ATTR_COLD;
-	void video_start_armedf() ATTR_COLD;
+	DECLARE_MACHINE_START(armedf);
+	DECLARE_MACHINE_RESET(armedf);
+	DECLARE_VIDEO_START(terraf);
+	DECLARE_VIDEO_START(armedf);
 	uint32_t screen_update_armedf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,

@@ -428,7 +428,7 @@ void msisaac_state::machine_start()
 
 void msisaac_state::machine_reset()
 {
-	//machine_reset_ta7630();
+	//MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	/* video */
 	m_bg2_textbank = 0;

@@ -246,7 +246,7 @@ WRITE16_MEMBER(m92_state::m92_master_control_w)
 
 /*****************************************************************************/
 
-void m92_state::video_start_m92()
+VIDEO_START_MEMBER(m92_state,m92)
 {
 	m_spritebuffer_timer = timer_alloc(TIMER_SPRITEBUFFER);
 
@@ -300,9 +300,9 @@ void m92_state::video_start_m92()
 	save_item(NAME(m_paletteram));
 }
 
-void m92_state::video_start_ppan()
+VIDEO_START_MEMBER(m92_state,ppan)
 {
-	video_start_m92();
+	VIDEO_START_CALL_MEMBER(m92);
 
 	for (int laynum = 0; laynum < 3; laynum++)
 	{

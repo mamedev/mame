@@ -250,7 +250,7 @@ void spectrum_state::spectrum_128_mem(address_map &map)
 	map(0xc000, 0xffff).bankrw("bank4");
 }
 
-void spectrum_state::machine_reset_spectrum_128()
+MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
 {
 	uint8_t *messram = m_ram->pointer();
 
@@ -263,7 +263,7 @@ void spectrum_state::machine_reset_spectrum_128()
 	/* Bank 2 is always in 0x8000 - 0xbfff */
 	membank("bank3")->set_base(messram + (2<<14));
 
-	machine_reset_spectrum();
+	MACHINE_RESET_CALL_MEMBER(spectrum);
 
 	/* set initial ram config */
 	m_port_7ffd_data = 0;
@@ -301,13 +301,13 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_128)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spectrum_state, spec_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_spectrum_128, this));
+	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_128 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(X1_128_SINCLAIR / 2.5f, 456, 0, 352,  311, 0, 296)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_spectrum_128, this));
+	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", spec128)
 
 	/* sound hardware */

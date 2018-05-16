@@ -316,7 +316,7 @@ MACHINE_CONFIG_START(galaxia_state::galaxia)
 	MCFG_PALETTE_ADD("palette", 0x18+2)
 
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,galaxia)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_galaxia, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxia_state,galaxia)
 
 	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
 	MCFG_S2636_OFFSETS(-13, -26)
@@ -360,7 +360,7 @@ MACHINE_CONFIG_START(galaxia_state::astrowar)
 	MCFG_PALETTE_ADD("palette", 0x18+2)
 
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,astrowar)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_astrowar, this));
+	MCFG_VIDEO_START_OVERRIDE(galaxia_state,astrowar)
 
 	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
 	MCFG_S2636_OFFSETS(-13, -8)

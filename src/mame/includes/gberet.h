@@ -57,9 +57,9 @@ public:
 	DECLARE_WRITE8_MEMBER(gberetb_scroll_w);
 	void init_mrgoemon();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	void machine_start_gberet() ATTR_COLD;
-	void machine_reset_gberet();
-	void video_start_gberet()   ATTR_COLD;
+	DECLARE_MACHINE_START(gberet);
+	DECLARE_MACHINE_RESET(gberet);
+	DECLARE_VIDEO_START(gberet);
 	DECLARE_PALETTE_INIT(gberet);
 	uint32_t screen_update_gberet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gberetb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

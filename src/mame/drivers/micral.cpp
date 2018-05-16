@@ -73,7 +73,7 @@ public:
 	{ }
 
 	void init_micral();
-	void machine_reset_micral();
+	DECLARE_MACHINE_RESET(micral);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(unk_r);
@@ -354,7 +354,7 @@ void micral_state::init_micral()
 	//membank("bankw0")->configure_entry(0, &main[0xf800]);
 }
 
-void micral_state::machine_reset_micral()
+MACHINE_RESET_MEMBER( micral_state, micral )
 {
 	//membank("bankr0")->set_entry(0); // point at rom
 	//membank("bankw0")->set_entry(0); // always write to ram
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(micral_state::micral)
 	MCFG_DEVICE_PROGRAM_MAP(mem_kbd)
 	MCFG_DEVICE_IO_MAP(io_kbd)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_micral, this));
+	MCFG_MACHINE_RESET_OVERRIDE(micral_state, micral)
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

@@ -77,7 +77,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	void machine_reset_s9();
+	DECLARE_MACHINE_RESET(s9);
 	void init_s9();
 	void s9(machine_config &config);
 	void s9_audio_map(address_map &map);
@@ -308,7 +308,7 @@ void s9_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 	}
 }
 
-void s9_state::machine_reset_s9()
+MACHINE_RESET_MEMBER( s9_state, s9 )
 {
 }
 
@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(s9_state::s9)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6808, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(s9_main_map)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_s9, this));
+	MCFG_MACHINE_RESET_OVERRIDE(s9_state, s9)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_s9)

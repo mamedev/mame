@@ -37,7 +37,7 @@ WRITE16_MEMBER(taitob_state::realpunc_video_ctrl_w)
 	COMBINE_DATA(&m_realpunc_video_ctrl);
 }
 
-void taitob_state::video_start_taitob_core()
+VIDEO_START_MEMBER(taitob_state,taitob_core)
 {
 	m_framebuffer[0] = std::make_unique<bitmap_ind16>(512, 256);
 	m_framebuffer[1] = std::make_unique<bitmap_ind16>(512, 256);
@@ -49,7 +49,7 @@ void taitob_state::video_start_taitob_core()
 	save_item(NAME(*m_framebuffer[1]));
 }
 
-void taitob_state::video_start_taitob_color_order0()
+VIDEO_START_MEMBER(taitob_state,taitob_color_order0)
 {
 	/*graphics are shared, only that they use different palette*/
 	/*this is the basic layout used in: Nastar, Ashura Blaster, Hit the Ice, Rambo3, Tetris*/
@@ -60,29 +60,29 @@ void taitob_state::video_start_taitob_color_order0()
 
 	/* bg, fg, tx color_base are set in the tc0180vcu interface */
 
-	video_start_taitob_core();
+	VIDEO_START_CALL_MEMBER(taitob_core);
 }
 
-void taitob_state::video_start_taitob_color_order1()
+VIDEO_START_MEMBER(taitob_state,taitob_color_order1)
 {
 	/* this is the reversed layout used in: Crime City, Puzzle Bobble */
 	m_b_sp_color_base = 0x80 * 16;
 
-	video_start_taitob_core();
+	VIDEO_START_CALL_MEMBER(taitob_core);
 }
 
-void taitob_state::video_start_taitob_color_order2()
+VIDEO_START_MEMBER(taitob_state,taitob_color_order2)
 {
 	/*this is used in: rambo3a, masterw, silentd, selfeena, ryujin */
 	m_b_sp_color_base = 0x10 * 16;
 
-	video_start_taitob_core();
+	VIDEO_START_CALL_MEMBER(taitob_core);
 }
 
 
-void taitob_state::video_start_hitice()
+VIDEO_START_MEMBER(taitob_state,hitice)
 {
-	video_start_taitob_color_order0();
+	VIDEO_START_CALL_MEMBER(taitob_color_order0);
 
 	m_b_fg_color_base = 0x80;       /* hitice also uses this for the pixel_bitmap */
 
@@ -91,18 +91,18 @@ void taitob_state::video_start_hitice()
 	save_item(NAME(*m_pixel_bitmap));
 }
 
-void taitob_state::video_reset_hitice()
+VIDEO_RESET_MEMBER(taitob_state,hitice)
 {
 	/* kludge: clear the bitmap on startup */
 	hitice_clear_pixel_bitmap();
 }
 
 
-void taitob_state::video_start_realpunc()
+VIDEO_START_MEMBER(taitob_state,realpunc)
 {
 	m_realpunc_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 
-	video_start_taitob_color_order0();
+	VIDEO_START_CALL_MEMBER(taitob_color_order0);
 }
 
 

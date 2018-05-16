@@ -1545,7 +1545,7 @@ MACHINE_CONFIG_START(pc6001mk2_state::pc6001mk2)
 	MCFG_DEVICE_PROGRAM_MAP(pc6001mk2_map)
 	MCFG_DEVICE_IO_MAP(pc6001mk2_io)
 
-//  set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pc6001mk2, this));
+//  MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2_state,pc6001mk2)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pc6001mk2_state, screen_update_pc6001mk2)
@@ -1583,7 +1583,7 @@ MACHINE_CONFIG_START(pc6001sr_state::pc6001sr)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc6001sr_state,  sr_vrtc_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
 
-//  set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pc6001sr, this));
+//  MCFG_MACHINE_RESET_OVERRIDE(pc6001sr_state,pc6001sr)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pc6001sr_state, screen_update_pc6001sr)

@@ -204,7 +204,7 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, blstroid_state, video_int_write_line))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_blstroid, this));
+	MCFG_VIDEO_START_OVERRIDE(blstroid_state,blstroid)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

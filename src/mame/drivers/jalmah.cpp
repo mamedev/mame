@@ -215,7 +215,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc3_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void video_start_urashima() ATTR_COLD;
+	DECLARE_VIDEO_START(urashima);
 	uint32_t screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(jalmah_mcu_sim);
@@ -369,7 +369,7 @@ void jalmah_state::video_start()
 	m_sc3_tilemap_3->set_transparent_pen(15);
 }
 
-void jalmah_state::video_start_urashima()
+VIDEO_START_MEMBER(jalmah_state,urashima)
 {
 	m_sc0_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc0_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range0_16x16),this),16,16,256,32);
 	m_sc3_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc3_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range2_8x8),this),8,8,128,64);
@@ -1459,7 +1459,7 @@ MACHINE_CONFIG_START(jalmah_state::urashima)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_urashima)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_urashima, this));
+	MCFG_VIDEO_START_OVERRIDE(jalmah_state,urashima)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(jalmah_state, screen_update_urashima)
 MACHINE_CONFIG_END

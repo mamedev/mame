@@ -96,7 +96,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	void machine_reset_s6();
+	DECLARE_MACHINE_RESET(s6);
 	void init_s6();
 	void s6(machine_config &config);
 	void s6_audio_map(address_map &map);
@@ -394,7 +394,7 @@ void s6_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 	}
 }
 
-void s6_state::machine_reset_s6()
+MACHINE_RESET_MEMBER( s6_state, s6 )
 {
 }
 
@@ -408,7 +408,7 @@ MACHINE_CONFIG_START(s6_state::s6)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6808, 3580000) // 6802 or 6808 could be used here
 	MCFG_DEVICE_PROGRAM_MAP(s6_main_map)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_s6, this));
+	MCFG_MACHINE_RESET_OVERRIDE(s6_state, s6)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_s6)

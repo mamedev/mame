@@ -319,11 +319,11 @@ private:
 	TILE_GET_INFO_MEMBER(get_stbsub_tile_info);
 	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_stbsub_reel_tile_info);
-	void video_start_subsino() ATTR_COLD;
+	DECLARE_VIDEO_START(subsino);
 	DECLARE_PALETTE_INIT(_2proms);
 	DECLARE_PALETTE_INIT(_3proms);
-	void video_start_reels()   ATTR_COLD;
-	void video_start_stbsub()  ATTR_COLD;
+	DECLARE_VIDEO_START(reels);
+	DECLARE_VIDEO_START(stbsub);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -389,7 +389,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_tile_info)
 }
 
 
-void subsino_state::video_start_subsino()
+VIDEO_START_MEMBER(subsino_state,subsino)
 {
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20);
 	m_tmap->set_transparent_pen(0 );
@@ -429,9 +429,9 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel_tile_info)
 }
 
 
-void subsino_state::video_start_reels()
+VIDEO_START_MEMBER(subsino_state, reels)
 {
-	video_start_subsino();
+	VIDEO_START_CALL_MEMBER( subsino );
 
 	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_reel_tile_info<0>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_reel_tile_info<1>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
@@ -443,7 +443,7 @@ void subsino_state::video_start_reels()
 
 }
 
-void subsino_state::video_start_stbsub()
+VIDEO_START_MEMBER(subsino_state,stbsub)
 {
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stbsub_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20);
 	m_tmap->set_transparent_pen(0 );
@@ -2731,7 +2731,7 @@ MACHINE_CONFIG_START(subsino_state::victor21)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(subsino_state, _2proms)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_subsino, this));
+	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2775,7 +2775,7 @@ MACHINE_CONFIG_START(subsino_state::crsbingo)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(subsino_state, _2proms)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_subsino, this));
+	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2817,7 +2817,7 @@ MACHINE_CONFIG_START(subsino_state::srider)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(subsino_state, _3proms)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_subsino, this));
+	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2870,7 +2870,7 @@ MACHINE_CONFIG_START(subsino_state::tisub)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(subsino_state, _3proms)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_reels, this));
+	MCFG_VIDEO_START_OVERRIDE(subsino_state, reels)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2913,7 +2913,7 @@ MACHINE_CONFIG_START(subsino_state::stbsub)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_stbsub, this));
+	MCFG_VIDEO_START_OVERRIDE(subsino_state,stbsub)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

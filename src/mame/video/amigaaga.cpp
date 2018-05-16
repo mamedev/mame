@@ -76,9 +76,9 @@ void amiga_state::aga_palette_write(int color_reg, uint16_t data)
  *
  *************************************/
 
-void amiga_state::video_start_amiga_aga()
+VIDEO_START_MEMBER(amiga_state,amiga_aga)
 {
-	video_start_amiga();
+	VIDEO_START_CALL_MEMBER( amiga );
 
 	m_aga_diwhigh_written = 0;
 	m_screen->register_screen_bitmap(m_flickerfixer32);

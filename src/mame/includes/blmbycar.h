@@ -60,10 +60,10 @@ public:
 
 	void init_blmbycar();
 	virtual void video_start() override;
-	void machine_start_blmbycar() ATTR_COLD;
-	void machine_reset_blmbycar();
-	void machine_start_watrball() ATTR_COLD;
-	void machine_reset_watrball();
+	DECLARE_MACHINE_START(blmbycar);
+	DECLARE_MACHINE_RESET(blmbycar);
+	DECLARE_MACHINE_START(watrball);
+	DECLARE_MACHINE_RESET(watrball);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );

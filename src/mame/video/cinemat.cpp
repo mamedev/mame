@@ -168,25 +168,25 @@ void cinemat_state::video_start()
 }
 
 
-void cinemat_state::video_start_cinemat_16level()
+VIDEO_START_MEMBER(cinemat_state,cinemat_16level)
 {
 	m_color_mode = COLOR_16LEVEL;
 }
 
 
-void cinemat_state::video_start_cinemat_64level()
+VIDEO_START_MEMBER(cinemat_state,cinemat_64level)
 {
 	m_color_mode = COLOR_64LEVEL;
 }
 
 
-void cinemat_state::video_start_cinemat_color()
+VIDEO_START_MEMBER(cinemat_state,cinemat_color)
 {
 	m_color_mode = COLOR_RGB;
 }
 
 
-void cinemat_state::video_start_cinemat_qb3color()
+VIDEO_START_MEMBER(cinemat_state,cinemat_qb3color)
 {
 	m_color_mode = COLOR_QB3;
 }

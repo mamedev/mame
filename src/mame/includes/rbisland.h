@@ -48,7 +48,7 @@ public:
 	void init_jumping();
 	void init_rbisland();
 	virtual void machine_start() override;
-	void video_start_jumping() ATTR_COLD;
+	DECLARE_VIDEO_START(jumping);
 	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jumping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(cchip_timer);

@@ -37,7 +37,7 @@ public:
 	{ }
 
 	void init_ccs300();
-	void machine_reset_ccs300();
+	DECLARE_MACHINE_RESET(ccs300);
 	DECLARE_WRITE8_MEMBER(port40_w);
 
 	void ccs300(machine_config &config);
@@ -90,7 +90,7 @@ WRITE8_MEMBER( ccs300_state::port40_w )
 	membank("bankr0")->set_entry( (data) ? 1 : 0);
 }
 
-void ccs300_state::machine_reset_ccs300()
+MACHINE_RESET_MEMBER( ccs300_state, ccs300 )
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -122,7 +122,7 @@ MACHINE_CONFIG_START(ccs300_state::ccs300)
 	MCFG_DEVICE_IO_MAP(ccs300_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ccs300, this));
+	MCFG_MACHINE_RESET_OVERRIDE(ccs300_state, ccs300)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)

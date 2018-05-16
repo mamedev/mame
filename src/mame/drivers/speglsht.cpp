@@ -144,9 +144,9 @@ public:
 	DECLARE_READ32_MEMBER(cop_r);
 	DECLARE_READ32_MEMBER(irq_ack_clear);
 	void init_speglsht();
-	void machine_reset_speglsht();
+	DECLARE_MACHINE_RESET(speglsht);
 	virtual void machine_start() override;
-	void video_start_speglsht() ATTR_COLD;
+	DECLARE_VIDEO_START(speglsht);
 	uint32_t screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
@@ -356,15 +356,15 @@ static GFXDECODE_START( gfx_speglsht )
 GFXDECODE_END
 
 
-void speglsht_state::machine_reset_speglsht()
+MACHINE_RESET_MEMBER(speglsht_state,speglsht)
 {
 	std::fill(&m_shared[0],&m_shared[m_shared.bytes()],0);
 }
 
-void speglsht_state::video_start_speglsht()
+VIDEO_START_MEMBER(speglsht_state,speglsht)
 {
 	m_bitmap = std::make_unique<bitmap_ind16>(512, 5122 );
-//  video_start_st0016();
+//  VIDEO_START_CALL_MEMBER(st0016);
 }
 
 #define PLOT_PIXEL_RGB(x,y,r,g,b)   if(y>=0 && x>=0 && x<512 && y<512) \
@@ -422,7 +422,7 @@ MACHINE_CONFIG_START(speglsht_state::speglsht)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speglsht_state,  irq4_line_assert)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_speglsht, this));
+	MCFG_MACHINE_RESET_OVERRIDE(speglsht_state,speglsht)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -435,7 +435,7 @@ MACHINE_CONFIG_START(speglsht_state::speglsht)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speglsht)
 	MCFG_PALETTE_ADD("palette", 16*16*4+1)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_speglsht, this));
+	MCFG_VIDEO_START_OVERRIDE(speglsht_state,speglsht)
 MACHINE_CONFIG_END
 
 ROM_START( speglsht )

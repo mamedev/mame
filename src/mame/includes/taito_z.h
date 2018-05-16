@@ -114,10 +114,10 @@ private:
 	DECLARE_READ16_MEMBER(sci_spriteframe_r);
 	DECLARE_WRITE16_MEMBER(sci_spriteframe_w);
 	DECLARE_WRITE16_MEMBER(contcirc_out_w);
-	void machine_start_taitoz() ATTR_COLD;
-	void machine_reset_taitoz();
-	void video_start_taitoz()   ATTR_COLD;
-	void machine_start_bshark() ATTR_COLD;
+	DECLARE_MACHINE_START(taitoz);
+	DECLARE_MACHINE_RESET(taitoz);
+	DECLARE_VIDEO_START(taitoz);
+	DECLARE_MACHINE_START(bshark);
 	uint32_t screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

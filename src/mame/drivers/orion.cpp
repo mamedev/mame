@@ -97,8 +97,8 @@ MACHINE_CONFIG_START(orion_state::orion128)
 	MCFG_DEVICE_PROGRAM_MAP(orion128_mem)
 	MCFG_DEVICE_IO_MAP(orion128_io)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_orion128, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_orion128, this));
+	MCFG_MACHINE_START_OVERRIDE(orion_state, orion128 )
+	MCFG_MACHINE_RESET_OVERRIDE(orion_state, orion128 )
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, orion_state, orion_romdisk_porta_r))
@@ -123,7 +123,7 @@ MACHINE_CONFIG_START(orion_state::orion128)
 	MCFG_PALETTE_ADD("palette", 18)
 	MCFG_PALETTE_INIT_OWNER(orion_state, orion128 )
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_orion128, this));
+	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -170,8 +170,8 @@ MACHINE_CONFIG_START(orion_state::orionz80)
 	MCFG_DEVICE_IO_MAP(orionz80_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", orion_state, orionz80_interrupt)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_orionz80, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_orionz80, this));
+	MCFG_MACHINE_START_OVERRIDE(orion_state, orionz80 )
+	MCFG_MACHINE_RESET_OVERRIDE(orion_state, orionz80 )
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, orion_state, orion_romdisk_porta_r))
@@ -196,7 +196,7 @@ MACHINE_CONFIG_START(orion_state::orionz80)
 	MCFG_PALETTE_ADD("palette", 18)
 	MCFG_PALETTE_INIT_OWNER(orion_state, orion128 )
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_orion128, this));
+	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
 	MCFG_MC146818_ADD( "rtc", XTAL(4'194'304) )
 
@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(orion_state::orionpro)
 	MCFG_DEVICE_PROGRAM_MAP(orionpro_mem)
 	MCFG_DEVICE_IO_MAP(orionpro_io)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_orionpro, this));
+	MCFG_MACHINE_RESET_OVERRIDE(orion_state, orionpro )
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(*this, orion_state, orion_romdisk_porta_r))
@@ -272,7 +272,7 @@ MACHINE_CONFIG_START(orion_state::orionpro)
 	MCFG_PALETTE_ADD("palette", 18)
 	MCFG_PALETTE_INIT_OWNER(orion_state, orion128 )
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_orion128, this));
+	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);

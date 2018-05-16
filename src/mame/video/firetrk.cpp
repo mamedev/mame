@@ -219,7 +219,7 @@ void firetrk_state::video_start()
 }
 
 
-void firetrk_state::video_start_superbug()
+VIDEO_START_MEMBER(firetrk_state,superbug)
 {
 	m_screen->register_screen_bitmap(m_helper1);
 	m_screen->register_screen_bitmap(m_helper2);
@@ -229,7 +229,7 @@ void firetrk_state::video_start_superbug()
 }
 
 
-void firetrk_state::video_start_montecar()
+VIDEO_START_MEMBER(firetrk_state,montecar)
 {
 	m_screen->register_screen_bitmap(m_helper1);
 	m_screen->register_screen_bitmap(m_helper2);

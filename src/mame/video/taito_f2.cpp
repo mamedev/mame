@@ -76,132 +76,132 @@ void taitof2_state::taitof2_core_vh_start (int sprite_type, int hide, int flip_h
 /*    ( spritetype, hide, hideflip, xoffs, yoffs, flipx, flipy, textflipx, textflipy) */
 /**************************************************************************************/
 
-void taitof2_state::video_start_taitof2_default()
+VIDEO_START_MEMBER(taitof2_state,taitof2_default)
 {
 	taitof2_core_vh_start(0, 0, 0);
 }
 
-void taitof2_state::video_start_taitof2_megab()/* Megab, Liquidk */
+VIDEO_START_MEMBER(taitof2_state,taitof2_megab)/* Megab, Liquidk */
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-void taitof2_state::video_start_taitof2_quiz()/* Quiz Crayons, Quiz Jinsei */
+VIDEO_START_MEMBER(taitof2_state,taitof2_quiz)/* Quiz Crayons, Quiz Jinsei */
 {
 	taitof2_core_vh_start(3, 3, 3);
 }
 
-void taitof2_state::video_start_taitof2_finalb()
+VIDEO_START_MEMBER(taitof2_state,taitof2_finalb)
 {
 	taitof2_core_vh_start(0, 1, 1);
 }
 
-void taitof2_state::video_start_taitof2_ssi()
+VIDEO_START_MEMBER(taitof2_state,taitof2_ssi)
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-void taitof2_state::video_start_taitof2_growl()
+VIDEO_START_MEMBER(taitof2_state,taitof2_growl)
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-void taitof2_state::video_start_taitof2_ninjak()
+VIDEO_START_MEMBER(taitof2_state,taitof2_ninjak)
 {
 	taitof2_core_vh_start(0, 0, 0);
 }
 
-void taitof2_state::video_start_taitof2_qzchikyu()
+VIDEO_START_MEMBER(taitof2_state,taitof2_qzchikyu)
 {
 	taitof2_core_vh_start(0, 0, 4);
 }
 
-void taitof2_state::video_start_taitof2_solfigtr()
+VIDEO_START_MEMBER(taitof2_state,taitof2_solfigtr)
 {
 	taitof2_core_vh_start(0, 3, -3);
 }
 
-void taitof2_state::video_start_taitof2_koshien()
+VIDEO_START_MEMBER(taitof2_state,taitof2_koshien)
 {
 	taitof2_core_vh_start(0, 1,  - 1);
 }
 
-void taitof2_state::video_start_taitof2_gunfront()
+VIDEO_START_MEMBER(taitof2_state,taitof2_gunfront)
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-void taitof2_state::video_start_taitof2_thundfox()
+VIDEO_START_MEMBER(taitof2_state,taitof2_thundfox)
 {
 	taitof2_core_vh_start(0, 3, -3);
 }
 
-void taitof2_state::video_start_taitof2_mjnquest()
+VIDEO_START_MEMBER(taitof2_state,taitof2_mjnquest)
 {
 	taitof2_core_vh_start(0, 0, 0);
 
 	m_tc0100scn->set_bg_tilemask(0x7fff);
 }
 
-void taitof2_state::video_start_taitof2_footchmp()
+VIDEO_START_MEMBER(taitof2_state,taitof2_footchmp)
 {
 	taitof2_core_vh_start(0, 3, 3);
 
 	m_game = FOOTCHMP;
 }
 
-void taitof2_state::video_start_taitof2_hthero()
+VIDEO_START_MEMBER(taitof2_state,taitof2_hthero)
 {
 	taitof2_core_vh_start(0, 3, 3);
 
 	m_game = FOOTCHMP;
 }
 
-void taitof2_state::video_start_taitof2_deadconx()
+VIDEO_START_MEMBER(taitof2_state,taitof2_deadconx)
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-void taitof2_state::video_start_taitof2_deadconxj()
+VIDEO_START_MEMBER(taitof2_state,taitof2_deadconxj)
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-void taitof2_state::video_start_taitof2_metalb()
+VIDEO_START_MEMBER(taitof2_state,taitof2_metalb)
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-void taitof2_state::video_start_taitof2_yuyugogo()
+VIDEO_START_MEMBER(taitof2_state,taitof2_yuyugogo)
 {
 	taitof2_core_vh_start(1, 3, 3);
 }
 
-void taitof2_state::video_start_taitof2_yesnoj()
+VIDEO_START_MEMBER(taitof2_state,taitof2_yesnoj)
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-void taitof2_state::video_start_taitof2_dinorex()
+VIDEO_START_MEMBER(taitof2_state,taitof2_dinorex)
 {
 	taitof2_core_vh_start(3, 3, 3);
 }
 
-void taitof2_state::video_start_taitof2_dondokod()/* dondokod, cameltry */
+VIDEO_START_MEMBER(taitof2_state,taitof2_dondokod)/* dondokod, cameltry */
 {
 	m_pivot_xdisp = -16;
 	m_pivot_ydisp = 0;
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-void taitof2_state::video_start_taitof2_pulirula()
+VIDEO_START_MEMBER(taitof2_state,taitof2_pulirula)
 {
 	m_pivot_xdisp = -10;    /* alignment seems correct (see level 2, falling */
 	m_pivot_ydisp = 16; /* block of ice after armour man) */
 	taitof2_core_vh_start(2, 3, 3);
 }
 
-void taitof2_state::video_start_taitof2_driftout()
+VIDEO_START_MEMBER(taitof2_state,taitof2_driftout)
 {
 	m_pivot_xdisp = -16;
 	m_pivot_ydisp = 16;

@@ -80,9 +80,9 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
 	DECLARE_READ8_MEMBER(pio_port_b_r);
 	void init_super80();
-	void machine_reset_super80();
-	void machine_reset_super80r();
-	void video_start_super80() ATTR_COLD;
+	DECLARE_MACHINE_RESET(super80);
+	DECLARE_MACHINE_RESET(super80r);
+	DECLARE_VIDEO_START(super80);
 	DECLARE_PALETTE_INIT(super80m);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(super80);
 	MC6845_UPDATE_ROW(crtc_update_row);

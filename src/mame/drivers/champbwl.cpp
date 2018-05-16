@@ -190,9 +190,9 @@ public:
 	DECLARE_READ8_MEMBER(trackball_reset_r);
 	DECLARE_WRITE8_MEMBER(champbwl_misc_w);
 	DECLARE_WRITE8_MEMBER(doraemon_outputs_w);
-	void machine_start_champbwl() ATTR_COLD;
-	void machine_reset_champbwl();
-	void machine_start_doraemon() ATTR_COLD;
+	DECLARE_MACHINE_START(champbwl);
+	DECLARE_MACHINE_RESET(champbwl);
+	DECLARE_MACHINE_START(doraemon);
 	DECLARE_PALETTE_INIT(champbwl);
 	uint32_t screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -450,7 +450,7 @@ static GFXDECODE_START( gfx_champbwl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
-void champbwl_state::machine_start_champbwl()
+MACHINE_START_MEMBER(champbwl_state,champbwl)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -460,7 +460,7 @@ void champbwl_state::machine_start_champbwl()
 	save_item(NAME(m_last_trackball_val));
 }
 
-void champbwl_state::machine_reset_champbwl()
+MACHINE_RESET_MEMBER(champbwl_state,champbwl)
 {
 	m_screenflip = 0;
 	m_last_trackball_val[0] = 0;
@@ -496,8 +496,8 @@ MACHINE_CONFIG_START(champbwl_state::champbwl)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_champbwl, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_champbwl, this));
+	MCFG_MACHINE_START_OVERRIDE(champbwl_state,champbwl)
+	MCFG_MACHINE_RESET_OVERRIDE(champbwl_state,champbwl)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -547,7 +547,7 @@ WRITE_LINE_MEMBER(champbwl_state::screen_vblank_doraemon)
 		m_seta001->setac_eof();
 }
 
-void champbwl_state::machine_start_doraemon()
+MACHINE_START_MEMBER(champbwl_state,doraemon)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
@@ -565,7 +565,7 @@ MACHINE_CONFIG_START(champbwl_state::doraemon)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_doraemon, this));
+	MCFG_MACHINE_START_OVERRIDE(champbwl_state,doraemon)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

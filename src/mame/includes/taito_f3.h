@@ -311,8 +311,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_vram);
 	TILE_GET_INFO_MEMBER(get_tile_info_pixel);
 	virtual void machine_start() override;
-	void machine_reset_f3();
-	void video_start_f3();
+	DECLARE_MACHINE_RESET(f3);
+	DECLARE_VIDEO_START(f3);
 	uint32_t screen_update_f3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_f3);
 	INTERRUPT_GEN_MEMBER(f3_interrupt2);

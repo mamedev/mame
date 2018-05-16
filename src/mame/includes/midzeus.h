@@ -70,9 +70,9 @@ public:
 	void init_mk4();
 	void init_thegrid();
 	void init_crusnexo();
-	void machine_start_midzeus() ATTR_COLD;
-	void machine_reset_midzeus();
-	void video_start_midzeus()   ATTR_COLD;
+	DECLARE_MACHINE_START(midzeus);
+	DECLARE_MACHINE_RESET(midzeus);
+	DECLARE_VIDEO_START(midzeus);
 	uint32_t screen_update_midzeus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(display_irq);
 	TIMER_CALLBACK_MEMBER(display_irq_off);

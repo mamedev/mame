@@ -189,7 +189,7 @@
  *
  *************************************/
 
-void turbo_state::machine_reset_buckrog()
+MACHINE_RESET_MEMBER(turbo_state,buckrog)
 {
 	m_buckrog_command = 0x00;
 	memset(m_alt_spriteram, 0x00, sizeof(m_alt_spriteram));
@@ -891,7 +891,7 @@ MACHINE_CONFIG_START(turbo_state::turbo)
 	MCFG_SCREEN_UPDATE_DRIVER(turbo_state, screen_update_turbo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_turbo, this));
+	MCFG_VIDEO_START_OVERRIDE(turbo_state,turbo)
 
 	/* sound hardware */
 	turbo_samples(config);
@@ -931,7 +931,7 @@ MACHINE_CONFIG_START(turbo_state::subroc3d)
 	MCFG_SCREEN_UPDATE_DRIVER(turbo_state, screen_update_subroc3d)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_turbo, this));
+	MCFG_VIDEO_START_OVERRIDE(turbo_state,turbo)
 
 	/* sound hardware */
 	subroc3d_samples(config);
@@ -951,7 +951,7 @@ MACHINE_CONFIG_START(turbo_state::buckrog)
 	MCFG_DEVICE_IO_MAP(buckrog_cpu2_portmap)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_buckrog, this));
+	MCFG_MACHINE_RESET_OVERRIDE(turbo_state,buckrog)
 
 	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, buckrog_ppi0a_w))
@@ -979,7 +979,7 @@ MACHINE_CONFIG_START(turbo_state::buckrog)
 	MCFG_SCREEN_UPDATE_DRIVER(turbo_state, screen_update_buckrog)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_buckrog, this));
+	MCFG_VIDEO_START_OVERRIDE(turbo_state,buckrog)
 
 	/* sound hardware */
 	buckrog_samples(config);

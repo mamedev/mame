@@ -652,7 +652,7 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	MCFG_DEVICE_IO_MAP(mbee_io)
 	MCFG_Z80_DAISY_CHAIN(mbee_daisy_chain)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mbee, this));
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(12'000'000) / 6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -673,7 +673,7 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	MCFG_PALETTE_ADD("palette", 100)
 	MCFG_PALETTE_INIT_OWNER(mbee_state, standard)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mono, this));
+	MCFG_VIDEO_START_OVERRIDE(mbee_state, mono)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -709,7 +709,7 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	MCFG_DEVICE_IO_MAP(mbeeic_io)
 	MCFG_Z80_DAISY_CHAIN(mbee_daisy_chain)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mbee, this));
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, 3375000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -730,7 +730,7 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	MCFG_PALETTE_ADD("palette", 100)
 	MCFG_PALETTE_INIT_OWNER(mbee_state, standard)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_standard, this));
+	MCFG_VIDEO_START_OVERRIDE(mbee_state, standard)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -770,7 +770,7 @@ MACHINE_CONFIG_START(mbee_state::mbeeppc)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP(mbeeppc_mem)
 	MCFG_DEVICE_IO_MAP(mbeeppc_io)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_premium, this));
+	MCFG_VIDEO_START_OVERRIDE(mbee_state, premium)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_premium)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(mbee_state, premium)
@@ -783,7 +783,7 @@ MACHINE_CONFIG_START(mbee_state::mbee56)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP(mbee56_mem)
 	MCFG_DEVICE_IO_MAP(mbee56_io)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mbee56, this));
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee56)
 	MCFG_WD2793_ADD("fdc", XTAL(4'000'000) / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_drq_w))
@@ -799,7 +799,7 @@ MACHINE_CONFIG_START(mbee_state::mbee128)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP(mbee256_mem)
 	MCFG_DEVICE_IO_MAP(mbee128_io)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mbee128, this));
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
 	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, mbee_state, rtc_irq_w))
 MACHINE_CONFIG_END
@@ -809,7 +809,7 @@ MACHINE_CONFIG_START(mbee_state::mbee128p)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP(mbee256_mem)
 	MCFG_DEVICE_IO_MAP(mbee128_io)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mbee128, this));
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
 	MCFG_WD2793_ADD("fdc", XTAL(4'000'000) / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_drq_w))
@@ -825,7 +825,7 @@ MACHINE_CONFIG_START(mbee_state::mbee256)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP(mbee256_mem)
 	MCFG_DEVICE_IO_MAP(mbee256_io)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mbee256, this));
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee256)
 
 	MCFG_DEVICE_REMOVE("fdc:0")
 	MCFG_DEVICE_REMOVE("fdc:1")
@@ -840,7 +840,7 @@ MACHINE_CONFIG_START(mbee_state::mbeett)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP(mbeett_mem)
 	MCFG_DEVICE_IO_MAP(mbeett_io)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mbeett, this));
+	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbeett)
 	MCFG_DEVICE_REMOVE("quickload")
 	MCFG_DEVICE_REMOVE("quickload2")
 	MCFG_DEVICE_ADD("scc", SCC8530, 4000000) // clock unknown

@@ -345,7 +345,7 @@ void bking_state::machine_start()
 	save_item(NAME(m_hit));
 }
 
-void bking_state::machine_start_bking3()
+MACHINE_START_MEMBER(bking_state,bking3)
 {
 	bking_state::machine_start();
 
@@ -380,7 +380,7 @@ void bking_state::machine_reset()
 	m_soundnmi->in_w<1>(0);
 }
 
-void bking_state::machine_reset_bking3()
+MACHINE_RESET_MEMBER(bking_state,bking3)
 {
 	bking_state::machine_reset();
 
@@ -452,8 +452,8 @@ MACHINE_CONFIG_START(bking_state::bking3)
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(3'000'000))      /* xtal is 3MHz, divided by 4 internally */
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bking3, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_bking3, this));
+	MCFG_MACHINE_START_OVERRIDE(bking_state,bking3)
+	MCFG_MACHINE_RESET_OVERRIDE(bking_state,bking3)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 MACHINE_CONFIG_END

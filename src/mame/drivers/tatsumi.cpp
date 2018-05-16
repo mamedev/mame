@@ -27,7 +27,7 @@
     changes the size at runtime.
     Big Fight/Cyclewarriors - misc graphics problems.
     Cyclewarriors - test mode text does not appear as it needs a -256 Y scroll offset from somewhere.
-
+    
     reference of bigfight : https://youtu.be/aUUoUCr6yhk
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
@@ -848,7 +848,7 @@ WRITE_LINE_MEMBER(apache3_state::apache3_68000_reset)
 	m_subcpu2->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
-void apache3_state::machine_reset_apache3()
+MACHINE_RESET_MEMBER(apache3_state,apache3)
 {
 	m_subcpu2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // TODO
 
@@ -877,7 +877,7 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_apache3, this));
+	MCFG_MACHINE_RESET_OVERRIDE(apache3_state, apache3)
 
 	MCFG_DEVICE_ADD("adc", M58990, 1000000) // unknown clock
 	MCFG_ADC0808_IN0_CB(IOPORT("STICK_X"))
@@ -907,7 +907,7 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	bit 0:  3.9kOhm resistor
 	*/
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_apache3, this));
+	MCFG_VIDEO_START_OVERRIDE(apache3_state, apache3)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -956,7 +956,7 @@ MACHINE_CONFIG_START(roundup5_state::roundup5)
 	MCFG_PALETTE_MEMBITS(8)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_roundup5, this));
+	MCFG_VIDEO_START_OVERRIDE(roundup5_state,roundup5)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1013,7 +1013,7 @@ MACHINE_CONFIG_START(cyclwarr_state::cyclwarr)
 	MCFG_PALETTE_ADD("palette", 8192 + 8192)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_cyclwarr, this));
+	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, cyclwarr)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1073,7 +1073,7 @@ MACHINE_CONFIG_START(cyclwarr_state::bigfight)
 	MCFG_PALETTE_ADD("palette", 8192 + 8192)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_bigfight, this));
+	MCFG_VIDEO_START_OVERRIDE(cyclwarr_state, bigfight)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

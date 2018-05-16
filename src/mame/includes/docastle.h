@@ -72,7 +72,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(docastle);
-	void video_start_dorunrun() ATTR_COLD;
+	DECLARE_VIDEO_START(dorunrun);
 	uint32_t screen_update_docastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void video_start_common( uint32_t tile_transmask );
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );

@@ -191,7 +191,7 @@ void shangkid_state::init_shangkid()
 
 /***************************************************************************************/
 
-void shangkid_state::machine_reset_shangkid()
+MACHINE_RESET_MEMBER(shangkid_state,shangkid)
 {
 	membank("bank2")->set_entry(0);
 }
@@ -415,7 +415,7 @@ MACHINE_CONFIG_START(shangkid_state::chinhero)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinhero)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_shangkid, this));
+	MCFG_VIDEO_START_OVERRIDE(shangkid_state,shangkid)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -450,7 +450,7 @@ MACHINE_CONFIG_START(shangkid_state::shangkid)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(MEMBANK("bank1"))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_shangkid, this));
+	MCFG_MACHINE_RESET_OVERRIDE(shangkid_state,shangkid)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shangkid)

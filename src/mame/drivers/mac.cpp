@@ -417,7 +417,7 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 }
 
 // Portable/PB100 video
-void mac_state::video_start_macprtb()
+VIDEO_START_MEMBER(mac_state,macprtb)
 {
 }
 
@@ -950,7 +950,7 @@ MACHINE_CONFIG_START(mac_state::mac512ke)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(mac_state,mac)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mac, this));
+	MCFG_VIDEO_START_OVERRIDE(mac_state,mac)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mac_state, mac_scanline, "screen", 0, 1)
 
@@ -1079,7 +1079,7 @@ MACHINE_CONFIG_START(mac_state::macprtb)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(mac_state,mac)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macprtb, this));
+	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1274,8 +1274,8 @@ MACHINE_CONFIG_START(mac_state::maclc)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macv8, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_macrbv, this));
+	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
+	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
 
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
@@ -1355,8 +1355,8 @@ MACHINE_CONFIG_START(mac_state::maclc3)
 	MCFG_DEVICE_PROGRAM_MAP(maclc3_map)
 	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macsonora, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_macsonora, this));
+	MCFG_VIDEO_START_OVERRIDE(mac_state,macsonora)
+	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macsonora)
 
 	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macsonora)
@@ -1397,8 +1397,8 @@ MACHINE_CONFIG_START(mac_state::maciivx)
 	MCFG_DEVICE_PROGRAM_MAP(maclc3_map)
 	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macv8, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_macrbv, this));
+	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
+	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
 
 	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbvvram)
@@ -1433,8 +1433,8 @@ MACHINE_CONFIG_START(mac_state::maciivi)
 	MCFG_DEVICE_PROGRAM_MAP(maclc3_map)
 	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macv8, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_macrbv, this));
+	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
+	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
 
 	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbvvram)
@@ -1500,7 +1500,7 @@ MACHINE_CONFIG_START(mac_state::macse30)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(mac_state,mac)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mac, this));
+	MCFG_VIDEO_START_OVERRIDE(mac_state,mac)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1579,7 +1579,7 @@ MACHINE_CONFIG_START(mac_state::macpb140)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(mac_state,mac)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macprtb, this));
+	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1670,7 +1670,7 @@ MACHINE_CONFIG_START(mac_state::macpb160)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(mac_state,macgsc)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macprtb, this));
+	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1763,8 +1763,8 @@ MACHINE_CONFIG_START(mac_state::macclas2)
 	MCFG_DEVICE_PROGRAM_MAP(maclc_map)
 	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macv8, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_maceagle, this));
+	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
+	MCFG_VIDEO_RESET_OVERRIDE(mac_state,maceagle)
 
 	MCFG_SCREEN_MODIFY(MAC_SCREEN_NAME)
 	MCFG_SCREEN_SIZE(MAC_H_TOTAL, MAC_V_TOTAL)
@@ -1801,8 +1801,8 @@ MACHINE_CONFIG_START(mac_state::maciici)
 	MCFG_NUBUS_SLOT_REMOVE("nba")
 	MCFG_NUBUS_SLOT_REMOVE("nbb")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macrbv, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_macrbv, this));
+	MCFG_VIDEO_START_OVERRIDE(mac_state,macrbv)
+	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
 
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
@@ -1836,8 +1836,8 @@ MACHINE_CONFIG_START(mac_state::maciisi)
 	MCFG_NUBUS_SLOT_REMOVE("nbe")
 	MCFG_DEVICE_REMOVE("nubus")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macrbv, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_macrbv, this));
+	MCFG_VIDEO_START_OVERRIDE(mac_state,macrbv)
+	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
 
 	MCFG_SCREEN_ADD(MAC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
@@ -1880,8 +1880,8 @@ MACHINE_CONFIG_START(mac_state::pwrmac)
 
 	MCFG_PALETTE_ADD("palette", 256)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macsonora, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_macrbv, this));
+	MCFG_VIDEO_START_OVERRIDE(mac_state,macsonora)
+	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1945,8 +1945,8 @@ MACHINE_CONFIG_START(mac_state::macqd700)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 870-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macdafb)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macdafb, this));
-	set_video_reset_cb(config, driver_callback_delegate(&video_reset_macdafb, this));
+	MCFG_VIDEO_START_OVERRIDE(mac_state,macdafb)
+	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macdafb)
 
 	MCFG_PALETTE_ADD("palette", 256)
 

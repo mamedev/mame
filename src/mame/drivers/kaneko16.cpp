@@ -118,12 +118,12 @@ Non-Bugs (happen on real PCB)
 
 
 
-void kaneko16_state::machine_reset_gtmr()
+MACHINE_RESET_MEMBER(kaneko16_state,gtmr)
 {
 	m_VIEW2_2_pri = 1;
 }
 
-void kaneko16_state::machine_reset_mgcrystl()
+MACHINE_RESET_MEMBER(kaneko16_state,mgcrystl)
 {
 	m_VIEW2_2_pri = 0;
 }
@@ -1810,7 +1810,7 @@ MACHINE_CONFIG_START(kaneko16_berlwall_state::berlwall)
 	MCFG_KANEKO16_SPRITE_OFFSETS(0, -1*64)
 	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_berlwall, this));
+	MCFG_VIDEO_START_OVERRIDE(kaneko16_berlwall_state,berlwall)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1847,7 +1847,7 @@ MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 	MCFG_DEVICE_PROGRAM_MAP(bakubrkr)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gtmr, this));
+	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,gtmr)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -1883,7 +1883,7 @@ MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 
 
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_kaneko16, this));
+	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1953,7 +1953,7 @@ MACHINE_CONFIG_START(kaneko16_state::blazeon)
 
 	// there is actually a 2nd sprite chip! looks like our device emulation handles both at once
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_kaneko16, this));
+	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2009,7 +2009,7 @@ MACHINE_CONFIG_START(kaneko16_state::wingforc)
 
 	// there is actually a 2nd sprite chip! looks like our device emulation handles both at once
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_kaneko16, this));
+	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2058,7 +2058,7 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 	MCFG_DEVICE_PROGRAM_MAP(gtmr_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gtmr, this));
+	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state,gtmr)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2097,7 +2097,7 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 	MCFG_KANEKO_HIT_TYPE(1)
 
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_kaneko16, this));
+	MCFG_VIDEO_START_OVERRIDE(kaneko16_gtmr_state,kaneko16)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2140,7 +2140,7 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::bloodwar)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bloodwar)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gtmr, this));
+	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state, gtmr )
 
 	MCFG_DEVICE_MODIFY("kan_spr")
 	MCFG_KANEKO16_SPRITE_PRIORITIES(2 /* never used? */ ,3 /* character selection / vs. portraits */ ,5 /* winning portrait*/ ,7 /* ? */)
@@ -2162,7 +2162,7 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::bonkadv)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bonkadv)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gtmr, this));
+	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_gtmr_state, gtmr )
 
 	MCFG_DEVICE_MODIFY("kan_spr")
 	MCFG_KANEKO16_SPRITE_PRIORITIES(2 /* never used? */ ,3 /* volcano lava on level 2 */ ,5 /* in-game player */ ,7 /* demostration text */)
@@ -2187,7 +2187,7 @@ MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 	MCFG_DEVICE_PROGRAM_MAP(mgcrystl)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_state, kaneko16_interrupt, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mgcrystl, this));
+	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_state,mgcrystl)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -2222,7 +2222,7 @@ MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 
 
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_kaneko16, this));
+	MCFG_VIDEO_START_OVERRIDE(kaneko16_state,kaneko16)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2307,7 +2307,7 @@ MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 	MCFG_DEVICE_PROGRAM_MAP(shogwarr)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kaneko16_shogwarr_state, shogwarr_interrupt, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mgcrystl, this));
+	MCFG_MACHINE_RESET_OVERRIDE(kaneko16_shogwarr_state,mgcrystl)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DATA(shogwarr_default_eeprom, 128)
@@ -2333,7 +2333,7 @@ MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 	MCFG_KANEKO_TMAP_OFFSET(0x33, -0x8, 320, 240)
 	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_kaneko16, this));
+	MCFG_VIDEO_START_OVERRIDE(kaneko16_shogwarr_state,kaneko16)
 
 	MCFG_DEVICE_ADD_VU002_SPRITES
 	MCFG_KANEKO16_SPRITE_PRIORITIES(1 /* below all */ ,3 /* above tile[0], below the others */ ,5 /* above all */ ,7 /* above all */)

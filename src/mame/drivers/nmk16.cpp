@@ -3861,7 +3861,7 @@ MACHINE_CONFIG_START(nmk16_state::tharrier)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tharrier)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3901,7 +3901,7 @@ MACHINE_CONFIG_START(nmk16_state::mustang)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3944,7 +3944,7 @@ MACHINE_CONFIG_START(nmk16_state::mustangb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3982,7 +3982,7 @@ MACHINE_CONFIG_START(nmk16_state::bioship)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_bioship, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bioship)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4022,7 +4022,7 @@ MACHINE_CONFIG_START(nmk16_state::vandyke)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4065,7 +4065,7 @@ MACHINE_CONFIG_START(nmk16_state::vandykeb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4091,7 +4091,7 @@ MACHINE_CONFIG_START(nmk16_state::acrobatm)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4135,7 +4135,7 @@ MACHINE_CONFIG_START(nmk16_state::tdragonb)    /* bootleg using Raiden sound har
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4170,7 +4170,7 @@ MACHINE_CONFIG_START(nmk16_state::tdragon)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4218,7 +4218,7 @@ MACHINE_CONFIG_START(nmk16_state::ssmissin)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4247,7 +4247,7 @@ MACHINE_CONFIG_START(nmk16_state::strahl)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_strahl, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,strahl)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4287,7 +4287,7 @@ MACHINE_CONFIG_START(nmk16_state::hachamf)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4333,7 +4333,7 @@ MACHINE_CONFIG_START(nmk16_state::macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4373,7 +4373,7 @@ MACHINE_CONFIG_START(nmk16_state::blkheart)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4412,7 +4412,7 @@ MACHINE_CONFIG_START(nmk16_state::gunnail)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gunnail, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4456,7 +4456,7 @@ MACHINE_CONFIG_START(nmk16_state::macross2)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross2, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4502,7 +4502,7 @@ MACHINE_CONFIG_START(nmk16_state::tdragon2)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross2, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4555,7 +4555,7 @@ MACHINE_CONFIG_START(nmk16_state::raphero)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_raphero, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,raphero)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4597,7 +4597,7 @@ MACHINE_CONFIG_START(nmk16_state::bjtwin)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_bjtwin, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bjtwin)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4659,7 +4659,7 @@ MACHINE_CONFIG_START(nmk16_state::manybloc)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5171,7 +5171,7 @@ MACHINE_CONFIG_START(nmk16_state::stagger1)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_afega, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,afega)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -5216,7 +5216,7 @@ MACHINE_CONFIG_START(nmk16_state::grdnstrm)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_grdnstrm)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_firehawk, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,firehawk)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_firehawk)
 MACHINE_CONFIG_END
@@ -5230,7 +5230,7 @@ MACHINE_CONFIG_START(nmk16_state::grdnstrmk) /* Side by side with PCB, the music
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(57) /* Side by side with PCB, MAME is too fast at 56 */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_grdnstrm)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_grdnstrm, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,grdnstrm)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nmk16_state::popspops)
@@ -5262,7 +5262,7 @@ MACHINE_CONFIG_START(nmk16_state::firehawk)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_firehawk, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,firehawk)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5303,7 +5303,7 @@ MACHINE_CONFIG_START(nmk16_state::twinactn)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

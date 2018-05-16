@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(gladiatr_state_base::fg_get_tile_info)
 
 ***************************************************************************/
 
-void ppking_state::video_start_ppking()
+VIDEO_START_MEMBER(ppking_state,ppking)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ppking_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ppking_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
@@ -59,7 +59,7 @@ void ppking_state::video_start_ppking()
 	save_item(NAME(m_fg_tile_bank));
 }
 
-void gladiatr_state::video_start_gladiatr()
+VIDEO_START_MEMBER(gladiatr_state,gladiatr)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);

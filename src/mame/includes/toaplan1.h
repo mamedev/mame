@@ -133,11 +133,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf3_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf4_tile_info);
-	void machine_reset_toaplan1();
-	void video_start_toaplan1() ATTR_COLD;
-	void machine_reset_zerowing();
-	void machine_reset_demonwld();
-	void machine_reset_vimana();
+	DECLARE_MACHINE_RESET(toaplan1);
+	DECLARE_VIDEO_START(toaplan1);
+	DECLARE_MACHINE_RESET(zerowing);
+	DECLARE_MACHINE_RESET(demonwld);
+	DECLARE_MACHINE_RESET(vimana);
 	uint32_t screen_update_toaplan1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_toaplan1);
@@ -207,7 +207,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_2_w);
 	DECLARE_READ16_MEMBER(rallybik_tileram16_r);
-	void video_start_rallybik() ATTR_COLD;
+	DECLARE_VIDEO_START(rallybik);
 	uint32_t screen_update_rallybik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_rallybik);
 

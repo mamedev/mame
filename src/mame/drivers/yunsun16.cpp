@@ -573,14 +573,14 @@ void yunsun16_state::machine_reset()
 	m_sprites_scrolldy = -0x0f;
 }
 
-void yunsun16_state::machine_start_shocking()
+MACHINE_START_MEMBER(yunsun16_state, shocking)
 {
 	machine_start();
 	membank("okibank")->configure_entries(0, 0x80000 / 0x20000, memregion("oki")->base(), 0x20000);
 	membank("okibank")->set_entry(0);
 }
 
-void yunsun16_state::machine_reset_shocking()
+MACHINE_RESET_MEMBER(yunsun16_state, shocking)
 {
 	machine_reset();
 	membank("okibank")->set_entry(0);
@@ -641,8 +641,8 @@ MACHINE_CONFIG_START(yunsun16_state::shocking)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", yunsun16_state,  irq2_line_hold)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_shocking, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_shocking, this));
+	MCFG_MACHINE_START_OVERRIDE(yunsun16_state, shocking)
+	MCFG_MACHINE_RESET_OVERRIDE(yunsun16_state, shocking)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

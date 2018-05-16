@@ -88,7 +88,7 @@ MACHINE_CONFIG_START(igs_fear_state::igs_fear)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_igs_fear, this));
+	MCFG_VIDEO_START_OVERRIDE(igs_fear_state, igs_fear)
 	MCFG_SCREEN_UPDATE_DRIVER(igs_fear_state, screen_update_igs_fear)
 	MCFG_SCREEN_PALETTE("palette")
 

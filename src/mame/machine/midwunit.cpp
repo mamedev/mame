@@ -338,7 +338,7 @@ void midwunit_state::init_rmpgwt()
  *
  *************************************/
 
-void midwunit_state::machine_reset_midwunit()
+MACHINE_RESET_MEMBER(midwunit_state,midwunit)
 {
 	int i;
 

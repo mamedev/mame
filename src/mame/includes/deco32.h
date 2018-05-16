@@ -112,7 +112,7 @@ public:
 	DECLARE_READ8_MEMBER(captaven_dsw3_r);
 	DECLARE_READ8_MEMBER(captaven_soundcpu_status_r);
 
-	void video_start_captaven() ATTR_COLD;
+	DECLARE_VIDEO_START(captaven);
 	void init_captaven();
 
 	uint32_t screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -138,7 +138,7 @@ public:
 	DECLARE_READ32_MEMBER(unk_status_r);
 
 	void init_fghthist();
-	void video_start_fghthist() ATTR_COLD;
+	DECLARE_VIDEO_START(fghthist);
 
 	uint32_t screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -168,7 +168,7 @@ public:
 
 	void init_tattass();
 	void init_nslasher();
-	void video_start_nslasher() ATTR_COLD;
+	DECLARE_VIDEO_START(nslasher);
 
 	uint32_t screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -241,7 +241,7 @@ public:
 	void init_dragngun();
 	void init_dragngunj();
 	void init_lockload();
-	void video_start_dragngun() ATTR_COLD;
+	DECLARE_VIDEO_START(dragngun);
 	void dragngun_init_common();
 	DECLARE_INPUT_CHANGED_MEMBER(lockload_gun_trigger);
 

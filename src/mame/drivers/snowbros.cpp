@@ -1706,7 +1706,7 @@ static GFXDECODE_START( gfx_hyperpac )
 	GFXDECODE_ENTRY( "gfx1", 0, hyperpac_tilelayout,  0, 16 )
 GFXDECODE_END
 
-void snowbros_state::machine_reset_semiprot()
+MACHINE_RESET_MEMBER(snowbros_state,semiprot)
 {
 	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 	int i;
@@ -1715,7 +1715,7 @@ void snowbros_state::machine_reset_semiprot()
 		m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 }
 
-void snowbros_state::machine_reset_finalttr()
+MACHINE_RESET_MEMBER(snowbros_state,finalttr)
 {
 	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 	int i;
@@ -1830,7 +1830,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(snowbros_state::semiprot)
 	semicom(config);
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_semiprot, this));
+	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, semiprot )
 MACHINE_CONFIG_END
 
 
@@ -1941,7 +1941,7 @@ MACHINE_CONFIG_START(snowbros_state::finalttr)
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_CLOCK(XTAL(3'579'545))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_finalttr, this));
+	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, finalttr )
 
 	MCFG_DEVICE_REPLACE("ymsnd", YM2151, XTAL(3'579'545)) /* possible but less likely 4MHz (12MHz/3) */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))

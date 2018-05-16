@@ -109,11 +109,11 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info_raiga);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	void machine_start_mastninj() ATTR_COLD;
-	void machine_reset_raiga();
-	void video_start_gaiden()     ATTR_COLD;
-	void video_start_drgnbowl()   ATTR_COLD;
-	void video_start_raiga()      ATTR_COLD;
+	DECLARE_MACHINE_START(mastninj);
+	DECLARE_MACHINE_RESET(raiga);
+	DECLARE_VIDEO_START(gaiden);
+	DECLARE_VIDEO_START(drgnbowl);
+	DECLARE_VIDEO_START(raiga);
 	uint32_t screen_update_gaiden(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_drgnbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void drgnbowl_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -1023,7 +1023,7 @@ void sms_state::setup_bios()
 	}
 }
 
-void sms_state::machine_start_sms()
+MACHINE_START_MEMBER(sms_state,sms)
 {
 	m_led_pwr.resolve();
 
@@ -1119,7 +1119,7 @@ void sms_state::machine_start_sms()
 		m_cartslot->save_ram();
 }
 
-void sms_state::machine_reset_sms()
+MACHINE_RESET_MEMBER(sms_state,sms)
 {
 	if (m_is_smsj)
 	{
@@ -1326,7 +1326,7 @@ void sms_state::init_gamegeaj()
 }
 
 
-void sms_state::video_start_sms1()
+VIDEO_START_MEMBER(sms_state,sms1)
 {
 	m_left_lcd = machine().device("left_lcd");
 	m_right_lcd = machine().device("right_lcd");
@@ -1343,7 +1343,7 @@ void sms_state::video_start_sms1()
 }
 
 
-void sms_state::video_reset_sms1()
+VIDEO_RESET_MEMBER(sms_state,sms1)
 {
 	if (m_port_scope->read())
 	{
@@ -1473,7 +1473,7 @@ uint32_t sms_state::screen_update_sms(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-void sms_state::video_start_gamegear()
+VIDEO_START_MEMBER(sms_state,gamegear)
 {
 	m_prev_bitmap_copied = false;
 	m_main_scr->register_screen_bitmap(m_prev_bitmap);
@@ -1486,7 +1486,7 @@ void sms_state::video_start_gamegear()
 	save_pointer(NAME(m_line_buffer.get()), 160 * 4);
 }
 
-void sms_state::video_reset_gamegear()
+VIDEO_RESET_MEMBER(sms_state,gamegear)
 {
 	if (m_prev_bitmap_copied)
 	{

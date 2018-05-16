@@ -719,7 +719,7 @@ WRITE_LINE_MEMBER(liberate_state::prosport_interrupt)
  *
  *************************************/
 
-void liberate_state::machine_start_liberate()
+MACHINE_START_MEMBER(liberate_state,liberate)
 {
 	save_item(NAME(m_background_disable));
 	save_item(NAME(m_background_color));
@@ -730,7 +730,7 @@ void liberate_state::machine_start_liberate()
 	save_item(NAME(m_io_ram));
 }
 
-void liberate_state::machine_reset_liberate()
+MACHINE_RESET_MEMBER(liberate_state,liberate)
 {
 	memset(m_io_ram, 0, ARRAY_LENGTH(m_io_ram));
 
@@ -754,8 +754,8 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_liberate, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_liberate, this));
+	MCFG_MACHINE_START_OVERRIDE(liberate_state,liberate)
+	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -771,7 +771,7 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 	MCFG_PALETTE_ADD("palette", 33)
 	MCFG_PALETTE_INIT_OWNER(liberate_state,liberate)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_liberate, this));
+	MCFG_VIDEO_START_OVERRIDE(liberate_state,liberate)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -802,7 +802,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(liberate_state::boomrang)
 	liberate_base(config);
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_boomrang, this));
+	MCFG_VIDEO_START_OVERRIDE(liberate_state,boomrang)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_boomrang)
 MACHINE_CONFIG_END
@@ -828,7 +828,7 @@ MACHINE_CONFIG_START(liberate_state::prosoccr)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_prosoccr)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_prosoccr, this));
+	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosoccr)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(liberate_state::prosport)
@@ -844,8 +844,8 @@ MACHINE_CONFIG_START(liberate_state::prosport)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_liberate, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_liberate, this));
+	MCFG_MACHINE_START_OVERRIDE(liberate_state,liberate)
+	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -861,7 +861,7 @@ MACHINE_CONFIG_START(liberate_state::prosport)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_prosport, this));
+	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosport)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -54,11 +54,11 @@ public:
 	void init_pbillrds();
 	TILE_GET_INFO_MEMBER(get_freek_tile_info);
 	virtual void video_start() override;
-	void machine_start_pbillrd()    ATTR_COLD;
-	void machine_reset_freekick();
-	void machine_start_freekick()   ATTR_COLD;
-	void machine_start_oigas()      ATTR_COLD;
-	void machine_reset_oigas();
+	DECLARE_MACHINE_START(pbillrd);
+	DECLARE_MACHINE_RESET(freekick);
+	DECLARE_MACHINE_START(freekick);
+	DECLARE_MACHINE_START(oigas);
+	DECLARE_MACHINE_RESET(oigas);
 	uint32_t screen_update_pbillrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_freekick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gigas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

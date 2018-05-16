@@ -53,7 +53,7 @@ public:
 	uint32_t screen_update_galspnbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	bitmap_ind16 m_sprite_bitmap;
-	void video_start_galspnbl() ATTR_COLD;
+	DECLARE_VIDEO_START(galspnbl);
 
 	void mix_sprite_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 

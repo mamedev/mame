@@ -137,8 +137,8 @@ public:
 
 	void init_gladiatr();
 
-	void machine_reset_gladiator();
-	void video_start_gladiatr() ATTR_COLD;
+	DECLARE_MACHINE_RESET(gladiator);
+	DECLARE_VIDEO_START(gladiatr);
 
 	uint32_t screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void swap_block(uint8_t *src1,uint8_t *src2,int len);
@@ -187,8 +187,8 @@ public:
 
 	void init_ppking();
 
-	void machine_reset_ppking();
-	void video_start_ppking() ATTR_COLD;
+	DECLARE_MACHINE_RESET(ppking);
+	DECLARE_VIDEO_START(ppking);
 
 	uint32_t screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

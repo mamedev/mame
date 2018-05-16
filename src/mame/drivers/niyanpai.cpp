@@ -71,7 +71,7 @@ READ16_MEMBER(niyanpai_state::dipsw_r)
 	return ((dipsw_a << 8) | dipsw_b);
 }
 
-void niyanpai_state::machine_start_musobana()
+MACHINE_START_MEMBER(niyanpai_state, musobana)
 {
 	save_item(NAME(m_motor_on));
 	save_item(NAME(m_musobana_inputport));
@@ -728,7 +728,7 @@ MACHINE_CONFIG_START(niyanpai_state::musobana)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(musobana_map)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_musobana, this));
+	MCFG_MACHINE_START_OVERRIDE(niyanpai_state, musobana)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(niyanpai_state::mhhonban)

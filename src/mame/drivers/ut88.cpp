@@ -192,7 +192,7 @@ MACHINE_CONFIG_START(ut88_state::ut88)
 	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
 	MCFG_DEVICE_PROGRAM_MAP(ut88_mem)
 	MCFG_DEVICE_IO_MAP(ut88_io)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ut88, this));
+	MCFG_MACHINE_RESET_OVERRIDE(ut88_state, ut88 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -200,7 +200,7 @@ MACHINE_CONFIG_START(ut88_state::ut88)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(64*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 28*8-1)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ut88, this));
+	MCFG_VIDEO_START_OVERRIDE(ut88_state,ut88)
 	MCFG_SCREEN_UPDATE_DRIVER(ut88_state, screen_update_ut88)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -234,8 +234,8 @@ MACHINE_CONFIG_START(ut88_state::ut88mini)
 	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
 	MCFG_DEVICE_PROGRAM_MAP(ut88mini_mem)
 	MCFG_DEVICE_IO_MAP(ut88mini_io)
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ut88mini, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ut88mini, this));
+	MCFG_MACHINE_START_OVERRIDE(ut88_state,ut88mini)
+	MCFG_MACHINE_RESET_OVERRIDE(ut88_state, ut88mini )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_ut88mini)

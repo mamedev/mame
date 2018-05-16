@@ -47,7 +47,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	void video_start_dodgeman(); ATTR_COLD
+	DECLARE_VIDEO_START(dodgeman);
 	TILE_GET_INFO_MEMBER(get_dodgeman_bg_tile_info);
 	void dodgeman(machine_config &config);
 	void battlex(machine_config &config);

@@ -60,7 +60,7 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	MCFG_DEVICE_PROGRAM_MAP(apple3_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_apple3, this));
+	MCFG_MACHINE_RESET_OVERRIDE(apple3_state, apple3 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -74,7 +74,7 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(apple3_state, apple3 )
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_apple3, this));
+	MCFG_VIDEO_START_OVERRIDE(apple3_state, apple3 )
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", apple3_state, apple3_interrupt, "screen", 0, 1)
 

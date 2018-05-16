@@ -108,7 +108,7 @@ public:
 	void init_equites();
 	TILE_GET_INFO_MEMBER(equites_fg_info);
 	TILE_GET_INFO_MEMBER(equites_bg_info);
-	void video_start_equites() ATTR_COLD;
+	DECLARE_VIDEO_START(equites);
 	DECLARE_PALETTE_INIT(equites);
 	uint32_t screen_update_equites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(equites_8155_timer_pulse);
@@ -165,7 +165,7 @@ protected:
 	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrolly_w);
 	TILE_GET_INFO_MEMBER(splndrbt_fg_info);
 	TILE_GET_INFO_MEMBER(splndrbt_bg_info);
-	void video_start_splndrbt() ATTR_COLD;
+	DECLARE_VIDEO_START(splndrbt);
 	DECLARE_PALETTE_INIT(splndrbt);
 	uint32_t screen_update_splndrbt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_scanline);

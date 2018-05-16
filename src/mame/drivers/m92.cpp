@@ -215,7 +215,7 @@ psoldier dip locations still need verification.
 
 /*****************************************************************************/
 
-void m92_state::machine_reset_m92()
+MACHINE_RESET_MEMBER(m92_state,m92)
 {
 	m_sprite_buffer_busy = 1;
 }
@@ -905,7 +905,7 @@ MACHINE_CONFIG_START(m92_state::m92)
 	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_m92, this));
+	MCFG_MACHINE_RESET_OVERRIDE(m92_state,m92)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m92_state, m92_scanline_interrupt, "screen", 0, 1)
 
@@ -924,7 +924,7 @@ MACHINE_CONFIG_START(m92_state::m92)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_m92, this));
+	MCFG_VIDEO_START_OVERRIDE(m92_state,m92)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1004,7 +1004,7 @@ MACHINE_CONFIG_START(m92_state::ppan)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(m92_state, screen_update_ppan)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ppan, this));
+	MCFG_VIDEO_START_OVERRIDE(m92_state,ppan)
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

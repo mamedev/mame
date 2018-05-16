@@ -57,8 +57,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_gaelco_screen1);
 
 	virtual void machine_start() override;
-	void video_start_bigkarnk() ATTR_COLD;
-	void video_start_maniacsq() ATTR_COLD;
+	DECLARE_VIDEO_START(bigkarnk);
+	DECLARE_VIDEO_START(maniacsq);
 
 	uint32_t screen_update_bigkarnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_maniacsq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

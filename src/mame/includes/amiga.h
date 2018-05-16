@@ -412,8 +412,8 @@ public:
 	int m_aga_sprite_fetched_words;
 	int m_aga_sprite_dma_used_words[8];
 
-	void video_start_amiga()     ATTR_COLD;
-	void video_start_amiga_aga() ATTR_COLD;
+	DECLARE_VIDEO_START( amiga );
+	DECLARE_VIDEO_START( amiga_aga );
 	DECLARE_PALETTE_INIT( amiga );
 
 	uint32_t screen_update_amiga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

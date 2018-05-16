@@ -85,7 +85,7 @@ void fromance_state::init_common(  )
 	save_pointer(NAME(m_local_paletteram.get()), 0x800 * 2);
 }
 
-void fromance_state::video_start_fromance()
+VIDEO_START_MEMBER(fromance_state,fromance)
 {
 	/* allocate tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
@@ -94,7 +94,7 @@ void fromance_state::video_start_fromance()
 	init_common();
 }
 
-void fromance_state::video_start_nekkyoku()
+VIDEO_START_MEMBER(fromance_state,nekkyoku)
 {
 	/* allocate tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
@@ -103,15 +103,15 @@ void fromance_state::video_start_nekkyoku()
 	init_common();
 }
 
-void fromance_state::video_start_pipedrm()
+VIDEO_START_MEMBER(fromance_state,pipedrm)
 {
-	video_start_fromance();
+	VIDEO_START_CALL_MEMBER(fromance);
 	m_scrolly_ofs = 0x00;
 }
 
-void fromance_state::video_start_hatris()
+VIDEO_START_MEMBER(fromance_state,hatris)
 {
-	video_start_fromance();
+	VIDEO_START_CALL_MEMBER(fromance);
 	m_scrollx_ofs = 0xB9;
 	m_scrolly_ofs = 0x00;
 }

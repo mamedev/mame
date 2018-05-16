@@ -152,10 +152,10 @@ public:
 	void init_stdragona();
 	void init_stdragonb();
 	void init_systemz();
-	void machine_reset_megasys1();
-	void video_start_megasys1() ATTR_COLD;
+	DECLARE_MACHINE_RESET(megasys1);
+	DECLARE_VIDEO_START(megasys1);
 	DECLARE_PALETTE_INIT(megasys1);
-	void machine_reset_megasys1_hachoo();
+	DECLARE_MACHINE_RESET(megasys1_hachoo);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);

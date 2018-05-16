@@ -31,7 +31,7 @@ public:
 	{ }
 
 	void init_alto2();
-	void machine_reset_alto2();
+	DECLARE_MACHINE_RESET(alto2);
 
 	void alto2(machine_config &config);
 	void alto2_const_map(address_map &map);

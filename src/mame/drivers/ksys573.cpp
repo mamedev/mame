@@ -419,7 +419,7 @@ public:
 	void init_ddr();
 	void init_hyperbbc();
 	void init_drmn();
-	void machine_reset_konami573();
+	DECLARE_MACHINE_RESET( konami573 );
 	WRITE_LINE_MEMBER( h8_clk_w );
 	DECLARE_READ_LINE_MEMBER( h8_d0_r );
 	DECLARE_READ_LINE_MEMBER( h8_d1_r );
@@ -800,7 +800,7 @@ void ksys573_state::driver_start()
 	save_item( NAME( m_control ) );
 }
 
-void ksys573_state::machine_reset_konami573()
+MACHINE_RESET_MEMBER( ksys573_state,konami573 )
 {
 	update_disc();
 
@@ -2082,7 +2082,7 @@ MACHINE_CONFIG_START(ksys573_state::konami573)
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&ksys573_state::cdrom_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&ksys573_state::cdrom_dma_write, this ) )
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_konami573, this));
+	MCFG_MACHINE_RESET_OVERRIDE( ksys573_state, konami573 )
 
 	MCFG_DEVICE_ADD( "mb89371", MB89371, 0 )
 

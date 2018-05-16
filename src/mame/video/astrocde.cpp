@@ -179,7 +179,7 @@ void astrocde_state::video_start()
 }
 
 
-void astrocde_state::video_start_profpac()
+VIDEO_START_MEMBER(astrocde_state,profpac)
 {
 	/* allocate timers */
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);

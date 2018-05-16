@@ -1915,7 +1915,7 @@ void fm7_state::init_fm7()
 	m_fm77av_vsync_timer = timer_alloc(TIMER_FM77AV_VSYNC);
 }
 
-void fm7_state::machine_start_fm7()
+MACHINE_START_MEMBER(fm7_state,fm7)
 {
 	// The FM-7 has no initialisation ROM, and no other obvious
 	// way to set the reset vector, so for now this will have to do.
@@ -1930,7 +1930,7 @@ void fm7_state::machine_start_fm7()
 	m_beeper->set_state(0);
 }
 
-void fm7_state::machine_start_fm77av()
+MACHINE_START_MEMBER(fm7_state,fm77av)
 {
 	uint8_t* RAM = memregion("maincpu")->base();
 	uint8_t* ROM = memregion("init")->base();
@@ -1950,7 +1950,7 @@ void fm7_state::machine_start_fm77av()
 	m_beeper->set_state(0);
 }
 
-void fm7_state::machine_start_fm11()
+MACHINE_START_MEMBER(fm7_state,fm11)
 {
 	uint8_t* RAM = memregion("maincpu")->base();
 	uint8_t* ROM = memregion("init")->base();
@@ -1962,7 +1962,7 @@ void fm7_state::machine_start_fm11()
 	memcpy(RAM+0x3fff0,ROM+0x0ff0,16);
 }
 
-void fm7_state::machine_start_fm16()
+MACHINE_START_MEMBER(fm7_state,fm16)
 {
 	m_type = SYS_FM16;
 	m_beeper->set_state(0);
@@ -2084,7 +2084,7 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fm7, this));
+	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2135,7 +2135,7 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fm7, this));
+	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2186,7 +2186,7 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fm77av, this));
+	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm77av)
 
 	MCFG_ADDRESS_BANK("av_bank1")
 	MCFG_ADDRESS_BANK("av_bank2")
@@ -2259,7 +2259,7 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fm11, this));
+	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm11)
 
 	MCFG_ADDRESS_BANK("av_bank1")
 	MCFG_ADDRESS_BANK("av_bank2")
@@ -2322,7 +2322,7 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fm16, this));
+	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm16)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -498,7 +498,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(csc_pia1_cb2_w);
 	DECLARE_READ_LINE_MEMBER(csc_pia1_ca1_r);
 	DECLARE_READ_LINE_MEMBER(csc_pia1_cb1_r);
-	void machine_reset_su9();
+	DECLARE_MACHINE_RESET(su9);
 	DECLARE_INPUT_CHANGED_MEMBER(su9_cpu_freq);
 	void su9_set_cpu_freq();
 	void csc_map(address_map &map);
@@ -529,7 +529,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sc9_led_w);
 	DECLARE_READ8_MEMBER(sc9_input_r);
 	DECLARE_READ8_MEMBER(sc9d_input_r);
-	void machine_reset_sc9c();
+	DECLARE_MACHINE_RESET(sc9c);
 	DECLARE_INPUT_CHANGED_MEMBER(sc9c_cpu_freq);
 	void sc9c_set_cpu_freq();
 	void sc9_map(address_map &map);
@@ -579,7 +579,7 @@ public:
 	void fdes2100d(machine_config &config);
 
 	// Phantom
-	void machine_reset_fphantom();
+	DECLARE_MACHINE_RESET(fphantom);
 	void init_fphantom();
 	void fphantom_map(address_map &map);
 	void fphantom(machine_config &config);
@@ -628,7 +628,7 @@ void fidel6502_state::su9_set_cpu_freq()
 	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (5_MHz_XTAL/2) : (3.9_MHz_XTAL/2));
 }
 
-void fidel6502_state::machine_reset_su9()
+MACHINE_RESET_MEMBER(fidel6502_state, su9)
 {
 	fidelbase_state::machine_reset();
 	su9_set_cpu_freq();
@@ -873,7 +873,7 @@ void fidel6502_state::sc9c_set_cpu_freq()
 	m_maincpu->set_unscaled_clock((inp & 2) ? 1900000 : ((inp & 1) ? 1600000 : 1500000));
 }
 
-void fidel6502_state::machine_reset_sc9c()
+MACHINE_RESET_MEMBER(fidel6502_state, sc9c)
 {
 	fidelbase_state::machine_reset();
 	sc9c_set_cpu_freq();
@@ -1098,7 +1098,7 @@ void fidel6502_state::init_fdesdis()
 
 // TTL/generic
 
-void fidel6502_state::machine_reset_fphantom()
+MACHINE_RESET_MEMBER(fidel6502_state, fphantom)
 {
 	fidelbase_state::machine_reset();
 	membank("bank1")->set_entry(0);
@@ -1758,7 +1758,7 @@ MACHINE_CONFIG_START(fidel6502_state::su9)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(su9_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_su9, this));
+	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, su9)
 
 	MCFG_DEFAULT_LAYOUT(layout_fidel_su9)
 MACHINE_CONFIG_END
@@ -1873,7 +1873,7 @@ MACHINE_CONFIG_START(fidel6502_state::sc9c)
 	sc9b(config);
 
 	/* basic machine hardware */
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sc9c, this));
+	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, sc9c)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::playmatic)
@@ -2063,7 +2063,7 @@ MACHINE_CONFIG_START(fidel6502_state::fphantom)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 	MCFG_DEVICE_PROGRAM_MAP(fphantom_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_fphantom, this));
+	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, fphantom)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
 	//MCFG_DEFAULT_LAYOUT(layout_fidel_phantom)

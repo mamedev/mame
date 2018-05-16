@@ -70,17 +70,17 @@ void galaxold_state::machine_reset_common(int line)
 	int_timer->adjust(m_screen->time_until_pos(0));
 }
 
-void galaxold_state::machine_reset_galaxold()
+MACHINE_RESET_MEMBER(galaxold_state,galaxold)
 {
 	machine_reset_common(INPUT_LINE_NMI);
 }
 
-void galaxold_state::machine_reset_devilfsg()
+MACHINE_RESET_MEMBER(galaxold_state,devilfsg)
 {
 	machine_reset_common(0);
 }
 
-void galaxold_state::machine_reset_hunchbkg()
+MACHINE_RESET_MEMBER(galaxold_state,hunchbkg)
 {
 	machine_reset_common(0);
 }

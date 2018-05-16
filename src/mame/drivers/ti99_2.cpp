@@ -203,9 +203,9 @@ public:
 		{ }
 
 
-	void machine_start_ti99_224() ATTR_COLD;
-	void machine_start_ti99_232() ATTR_COLD;
-	void machine_reset_ti99_2();
+	DECLARE_MACHINE_START( ti99_224 );
+	DECLARE_MACHINE_START( ti99_232 );
+	DECLARE_MACHINE_RESET( ti99_2 );
 
 	DECLARE_WRITE8_MEMBER(intflag_write);
 
@@ -244,7 +244,7 @@ private:
 	int m_first_ram_page;
 };
 
-void ti99_2_state::machine_start_ti99_224()
+MACHINE_START_MEMBER(ti99_2_state, ti99_224)
 {
 	m_rom = memregion(TI992_ROM)->base();
 	m_ram_start = 0xf000 - m_ram->default_size();
@@ -252,7 +252,7 @@ void ti99_2_state::machine_start_ti99_224()
 	m_have_banked_ROM = false;
 }
 
-void ti99_2_state::machine_start_ti99_232()
+MACHINE_START_MEMBER(ti99_2_state, ti99_232)
 {
 	m_rom = memregion(TI992_ROM)->base();
 	m_ram_start = 0xf000 - m_ram->default_size();
@@ -260,7 +260,7 @@ void ti99_2_state::machine_start_ti99_232()
 	m_have_banked_ROM = true;
 }
 
-void ti99_2_state::machine_reset_ti99_2()
+MACHINE_RESET_MEMBER(ti99_2_state, ti99_2)
 {
 	m_otherbank = false;
 
@@ -591,7 +591,7 @@ MACHINE_CONFIG_START(ti99_2_state::ti99_224)
 	MCFG_VIDEO992_SCREEN_ADD( TI_SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TI_VDC_TAG, bus::ti99::internal::video992_device, screen_update )
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ti99_224, this));
+	MCFG_MACHINE_START_OVERRIDE(ti99_2_state, ti99_224 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti99_2_state::ti99_232)
@@ -604,7 +604,7 @@ MACHINE_CONFIG_START(ti99_2_state::ti99_232)
 	MCFG_VIDEO992_SCREEN_ADD( TI_SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TI_VDC_TAG, bus::ti99::internal::video992_device, screen_update )
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ti99_232, this));
+	MCFG_MACHINE_START_OVERRIDE(ti99_2_state, ti99_232 )
 
 MACHINE_CONFIG_END
 
@@ -622,7 +622,7 @@ MACHINE_CONFIG_START(ti99_2_state::ti99_2)
 	MCFG_RAM_DEFAULT_SIZE("4096")
 	MCFG_RAM_DEFAULT_VALUE(0)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ti99_2, this));
+	MCFG_MACHINE_RESET_OVERRIDE(ti99_2_state, ti99_2 )
 
 	// Cassette drives
 	// There is no route from the cassette to some audio output, so we don't hear it.

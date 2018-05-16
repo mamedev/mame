@@ -65,7 +65,7 @@ public:
 	DECLARE_PALETTE_INIT(svision);
 	DECLARE_PALETTE_INIT(svisionp);
 	DECLARE_PALETTE_INIT(svisionn);
-	void machine_reset_tvlink();
+	DECLARE_MACHINE_RESET(tvlink);
 	uint32_t screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(svision_frame_int);

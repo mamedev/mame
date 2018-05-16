@@ -106,12 +106,12 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void video_start_mnight()   ATTR_COLD;
-	void video_start_arkarea()  ATTR_COLD;
-	void video_start_robokid()  ATTR_COLD;
-	void machine_start_omegaf() ATTR_COLD;
-	void machine_reset_omegaf();
-	void video_start_omegaf()   ATTR_COLD;
+	DECLARE_VIDEO_START(mnight);
+	DECLARE_VIDEO_START(arkarea);
+	DECLARE_VIDEO_START(robokid);
+	DECLARE_MACHINE_START(omegaf);
+	DECLARE_MACHINE_RESET(omegaf);
+	DECLARE_VIDEO_START(omegaf);
 	uint32_t screen_update_ninjakd2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

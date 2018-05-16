@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(mcr68_state::get_bg_tile_info)
  *
  *************************************/
 
-void mcr68_state::video_start_mcr68()
+VIDEO_START_MEMBER(mcr68_state,mcr68)
 {
 	/* initialize the background tilemap */
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr68_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,32);

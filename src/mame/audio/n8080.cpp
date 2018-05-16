@@ -377,7 +377,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::helifire_dac_volume_timer)
 }
 
 
-void n8080_state::sound_start_spacefev()
+SOUND_START_MEMBER(n8080_state,spacefev)
 {
 	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
 	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
@@ -390,7 +390,7 @@ void n8080_state::sound_start_spacefev()
 	save_item(NAME(m_mono_flop));
 }
 
-void n8080_state::sound_reset_spacefev()
+SOUND_RESET_MEMBER(n8080_state,spacefev)
 {
 	m_n8080_hardware = 1;
 
@@ -406,7 +406,7 @@ void n8080_state::sound_reset_spacefev()
 }
 
 
-void n8080_state::sound_start_sheriff()
+SOUND_START_MEMBER(n8080_state,sheriff)
 {
 	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
 	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
@@ -418,7 +418,7 @@ void n8080_state::sound_start_sheriff()
 	save_item(NAME(m_mono_flop));
 }
 
-void n8080_state::sound_reset_sheriff()
+SOUND_RESET_MEMBER(n8080_state,sheriff)
 {
 	m_n8080_hardware = 2;
 
@@ -433,7 +433,7 @@ void n8080_state::sound_reset_sheriff()
 }
 
 
-void n8080_state::sound_start_helifire()
+SOUND_START_MEMBER(n8080_state,helifire)
 {
 	save_item(NAME(m_prev_snd_data));
 	save_item(NAME(m_prev_sound_pins));
@@ -444,7 +444,7 @@ void n8080_state::sound_start_helifire()
 	save_item(NAME(m_helifire_dac_phase));
 }
 
-void n8080_state::sound_reset_helifire()
+SOUND_RESET_MEMBER(n8080_state,helifire)
 {
 	m_n8080_hardware = 3;
 
@@ -475,8 +475,8 @@ void n8080_state::helifire_sound_io_map(address_map &map)
 
 MACHINE_CONFIG_START(n8080_state::spacefev_sound)
 
-	set_sound_start_cb(config, driver_callback_delegate(&sound_start_spacefev, this));
-	set_sound_reset_cb(config, driver_callback_delegate(&sound_reset_spacefev, this));
+	MCFG_SOUND_START_OVERRIDE(n8080_state,spacefev)
+	MCFG_SOUND_RESET_OVERRIDE(n8080_state,spacefev)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("audiocpu", I8035, 6000000)
@@ -515,8 +515,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(n8080_state::sheriff_sound)
 
-	set_sound_start_cb(config, driver_callback_delegate(&sound_start_sheriff, this));
-	set_sound_reset_cb(config, driver_callback_delegate(&sound_reset_sheriff, this));
+	MCFG_SOUND_START_OVERRIDE(n8080_state,sheriff)
+	MCFG_SOUND_RESET_OVERRIDE(n8080_state,sheriff)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("audiocpu", I8035, 6000000)
@@ -553,8 +553,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(n8080_state::helifire_sound)
 
-	set_sound_start_cb(config, driver_callback_delegate(&sound_start_helifire, this));
-	set_sound_reset_cb(config, driver_callback_delegate(&sound_reset_helifire, this));
+	MCFG_SOUND_START_OVERRIDE(n8080_state,helifire)
+	MCFG_SOUND_RESET_OVERRIDE(n8080_state,helifire)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("audiocpu", I8035, 6000000)

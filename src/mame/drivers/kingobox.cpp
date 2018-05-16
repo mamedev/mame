@@ -503,7 +503,7 @@ MACHINE_CONFIG_START(kingofb_state::kingofb)
 	MCFG_PALETTE_ADD("palette", 256+8*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+8)
 	MCFG_PALETTE_INIT_OWNER(kingofb_state,kingofb)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_kingofb, this));
+	MCFG_VIDEO_START_OVERRIDE(kingofb_state,kingofb)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -562,7 +562,7 @@ MACHINE_CONFIG_START(kingofb_state::ringking)
 	MCFG_PALETTE_ADD("palette", 256+8*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+8)
 	MCFG_PALETTE_INIT_OWNER(kingofb_state,ringking)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ringking, this));
+	MCFG_VIDEO_START_OVERRIDE(kingofb_state,ringking)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

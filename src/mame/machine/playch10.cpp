@@ -57,7 +57,7 @@ void playch10_state::machine_start()
 		nvram->set_base(memregion("cart")->base() + 0x6000, 0x1000);
 }
 
-void playch10_state::machine_start_playch10_hboard()
+MACHINE_START_MEMBER(playch10_state,playch10_hboard)
 {
 	m_vrom = (m_vrom_region != nullptr) ? m_vrom_region->base() : nullptr;
 

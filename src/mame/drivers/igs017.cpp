@@ -603,9 +603,9 @@ private:
 	DECLARE_READ16_MEMBER(slqz2_magic_r);
 	DECLARE_READ8_MEMBER(mgcs_keys_r);
 
-	void machine_reset_iqblocka();
-	void machine_reset_mgcs();
-	void machine_reset_lhzb2a();
+	DECLARE_MACHINE_RESET(iqblocka);
+	DECLARE_MACHINE_RESET(mgcs);
+	DECLARE_MACHINE_RESET(lhzb2a);
 	uint32_t screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(iqblocka_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mgcs_interrupt);
@@ -3547,7 +3547,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::iqblocka_interrupt)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-void igs017_state::machine_reset_iqblocka()
+MACHINE_RESET_MEMBER(igs017_state,iqblocka)
 {
 	m_input_select = 0;
 }
@@ -3558,7 +3558,7 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 	MCFG_DEVICE_IO_MAP(iqblocka_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_iqblocka, this));
+	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
 	// i/o
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
@@ -3642,9 +3642,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgcs_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-void igs017_state::machine_reset_mgcs()
+MACHINE_RESET_MEMBER(igs017_state,mgcs)
 {
-	machine_reset_iqblocka();
+	MACHINE_RESET_CALL_MEMBER( iqblocka );
 
 	m_scramble_data = 0;
 	memset(m_igs_magic, 0, sizeof(m_igs_magic));
@@ -3655,7 +3655,7 @@ MACHINE_CONFIG_START(igs017_state::mgcs)
 	MCFG_DEVICE_PROGRAM_MAP(mgcs)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mgcs, this));
+	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
 	// i/o
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
@@ -3694,7 +3694,7 @@ MACHINE_CONFIG_START(igs017_state::lhzb2)
 	MCFG_DEVICE_PROGRAM_MAP(lhzb2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mgcs, this));
+	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
 	// i/o
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
@@ -3733,9 +3733,9 @@ MACHINE_CONFIG_END
 
 // lhzb2a
 
-void igs017_state::machine_reset_lhzb2a()
+MACHINE_RESET_MEMBER(igs017_state,lhzb2a)
 {
-	machine_reset_mgcs();
+	MACHINE_RESET_CALL_MEMBER( mgcs );
 	lhzb2a_remap_addr_w(m_maincpu->space(AS_PROGRAM), 0, 0xf0);
 }
 
@@ -3744,7 +3744,7 @@ MACHINE_CONFIG_START(igs017_state::lhzb2a)
 	MCFG_DEVICE_PROGRAM_MAP(lhzb2a)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_lhzb2a, this));
+	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,lhzb2a)
 
 	// i/o
 //  MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
@@ -3790,7 +3790,7 @@ MACHINE_CONFIG_START(igs017_state::slqz2)
 	MCFG_DEVICE_PROGRAM_MAP(slqz2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mgcs, this));
+	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
 	// i/o
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
@@ -3834,7 +3834,7 @@ MACHINE_CONFIG_START(igs017_state::sdmg2)
 	MCFG_DEVICE_PROGRAM_MAP(sdmg2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mgcs, this));
+	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
 	// i/o
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
@@ -3881,7 +3881,7 @@ MACHINE_CONFIG_START(igs017_state::mgdha)
 	MCFG_DEVICE_PROGRAM_MAP(mgdha_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgdh_interrupt, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mgcs, this));
+	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,mgcs)
 
 	// i/o
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
@@ -3917,7 +3917,7 @@ MACHINE_CONFIG_START(igs017_state::tjsb)
 	MCFG_DEVICE_IO_MAP(tjsb_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_iqblocka, this));
+	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
 	// i/o
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
@@ -3959,7 +3959,7 @@ MACHINE_CONFIG_START(igs017_state::spkrform)
 	MCFG_DEVICE_IO_MAP(spkrform_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_iqblocka, this));
+	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
 
 	// i/o
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)

@@ -130,13 +130,13 @@ void timeplt_state::video_start()
 	save_item(NAME(m_video_enable));
 }
 
-void timeplt_state::video_start_psurge()
+VIDEO_START_MEMBER(timeplt_state,psurge)
 {
 	video_start();
 	m_video_enable = 1; //psurge doesn't seem to have the video enable
 }
 
-void timeplt_state::video_start_chkun()
+VIDEO_START_MEMBER(timeplt_state,chkun)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(timeplt_state::get_chkun_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_video_enable = 0;

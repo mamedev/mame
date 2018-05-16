@@ -795,7 +795,7 @@ INTERRUPT_GEN_MEMBER(snk6502_state::snk6502_interrupt)
  *
  *************************************/
 
-void snk6502_state::machine_reset_sasuke()
+MACHINE_RESET_MEMBER(snk6502_state,sasuke)
 {
 	m_sound->set_music_clock(M_LN2 * (RES_K(18) + RES_K(1)) * CAP_U(1));
 
@@ -805,7 +805,7 @@ void snk6502_state::machine_reset_sasuke()
 	sasuke_start_counter();
 }
 
-void snk6502_state::machine_reset_satansat()
+MACHINE_RESET_MEMBER(snk6502_state,satansat)
 {
 	// same as sasuke (assumption?)
 	// NOTE: this was set before sasuke was adjusted to a lower freq, please don't modify until measured/confirmed on pcb
@@ -814,13 +814,13 @@ void snk6502_state::machine_reset_satansat()
 	sasuke_start_counter();
 }
 
-void snk6502_state::machine_reset_vanguard()
+MACHINE_RESET_MEMBER(snk6502_state,vanguard)
 {
 	// 41.6 Hz update (measured)
 	m_sound->set_music_clock(1 / 41.6);
 }
 
-void snk6502_state::machine_reset_pballoon()
+MACHINE_RESET_MEMBER(snk6502_state,pballoon)
 {
 	// 40.3 Hz update (measured)
 	m_sound->set_music_clock(1 / 40.3);
@@ -840,7 +840,7 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_DEVICE_PROGRAM_MAP(sasuke_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk6502_state, satansat_interrupt)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sasuke, this));
+	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,sasuke)
 
 	// video hardware
 
@@ -856,7 +856,7 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_PALETTE_ADD("palette", 32)
 
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,satansat)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_satansat, this));
+	MCFG_VIDEO_START_OVERRIDE(snk6502_state,satansat)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -934,7 +934,7 @@ MACHINE_CONFIG_START(snk6502_state::satansat)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(satansat_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_satansat, this));
+	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,satansat)
 
 	// video hardware
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_satansat)
@@ -974,7 +974,7 @@ MACHINE_CONFIG_START(snk6502_state::vanguard)
 	MCFG_DEVICE_PROGRAM_MAP(vanguard_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk6502_state, snk6502_interrupt)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_vanguard, this));
+	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,vanguard)
 
 	// video hardware
 
@@ -990,7 +990,7 @@ MACHINE_CONFIG_START(snk6502_state::vanguard)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,snk6502)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_snk6502, this));
+	MCFG_VIDEO_START_OVERRIDE(snk6502_state,snk6502)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -1092,9 +1092,9 @@ MACHINE_CONFIG_START(snk6502_state::pballoon)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(pballoon_map)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pballoon, this));
+	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,pballoon)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_pballoon, this));
+	MCFG_VIDEO_START_OVERRIDE(snk6502_state, pballoon )
 MACHINE_CONFIG_END
 
 

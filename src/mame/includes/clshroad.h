@@ -46,9 +46,9 @@ public:
 
 	void init_firebatl();
 	virtual void machine_reset() override;
-	void video_start_firebatl() ATTR_COLD;
+	DECLARE_VIDEO_START(firebatl);
 	DECLARE_PALETTE_INIT(firebatl);
-	void video_start_clshroad() ATTR_COLD;
+	DECLARE_VIDEO_START(clshroad);
 	DECLARE_PALETTE_INIT(clshroad);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

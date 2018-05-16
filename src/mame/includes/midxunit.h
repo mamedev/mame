@@ -32,8 +32,8 @@ public:
 	DECLARE_WRITE16_MEMBER(midxunit_sound_w);
 	DECLARE_WRITE_LINE_MEMBER(midxunit_dcs_output_full);
 	void init_revx();
-	void machine_reset_midxunit();
-	void video_start_midxunit() ATTR_COLD;
+	DECLARE_MACHINE_RESET(midxunit);
+	DECLARE_VIDEO_START(midxunit);
 	void register_state_saving();
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 

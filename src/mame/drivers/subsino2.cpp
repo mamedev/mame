@@ -173,7 +173,7 @@ public:
 	void init_ptrain();
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_0);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
-	void video_start_subsino2() ATTR_COLD;
+	DECLARE_VIDEO_START(subsino2);
 	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
 	required_device<cpu_device> m_maincpu;
@@ -624,7 +624,7 @@ WRITE8_MEMBER(subsino2_state::ss9601_disable_w)
                                 Video Update
 ***************************************************************************/
 
-void subsino2_state::video_start_subsino2()
+VIDEO_START_MEMBER(subsino2_state,subsino2)
 {
 	// SS9601 Regs:
 
@@ -2387,7 +2387,7 @@ MACHINE_CONFIG_START(subsino2_state::bishjan)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_subsino2, this));
+	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
 	// SS9904
@@ -2438,7 +2438,7 @@ MACHINE_CONFIG_START(subsino2_state::mtrain)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_subsino2, this));
+	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2472,7 +2472,7 @@ MACHINE_CONFIG_START(subsino2_state::saklove)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_subsino2, this));
+	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2510,7 +2510,7 @@ MACHINE_CONFIG_START(subsino2_state::xplan)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_subsino2, this));
+	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

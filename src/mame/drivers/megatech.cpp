@@ -126,7 +126,7 @@ public:
 
 	void init_mt_crt();
 	void init_mt_slot();
-	void machine_reset_megatech();
+	DECLARE_MACHINE_RESET(megatech);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart1 ) { return load_cart(image, m_cart1, 0); }
@@ -640,10 +640,10 @@ WRITE_LINE_MEMBER(mtech_state::screen_vblank_main)
 		screen_vblank_megadriv(state);
 }
 
-void mtech_state::machine_reset_megatech()
+MACHINE_RESET_MEMBER(mtech_state, megatech)
 {
 	m_mt_bank_addr = 0;
-	machine_reset_megadriv();
+	MACHINE_RESET_CALL_MEMBER(megadriv);
 
 	std::string region_tag;
 	if (m_cart1->get_rom_size() > 0)
@@ -697,7 +697,7 @@ MACHINE_CONFIG_START(mtech_state::megatech)
 	MCFG_CXD1095_IN_PORTE_CB(READ8(*this, mtech_state, bios_porte_r))
 	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, mtech_state, bios_porte_w))
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_megatech, this));
+	MCFG_MACHINE_RESET_OVERRIDE(mtech_state, megatech)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhovu)
 

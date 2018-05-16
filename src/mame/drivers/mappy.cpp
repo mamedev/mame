@@ -1354,7 +1354,7 @@ MACHINE_CONFIG_START(mappy_state::superpac_common)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mappy_state, vblank_irq))   // cause IRQs on both CPUs; also update the custom I/O chips
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_superpac, this));
+	MCFG_VIDEO_START_OVERRIDE(mappy_state,superpac)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1482,7 +1482,7 @@ MACHINE_CONFIG_START(mappy_state::phozon)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mappy_state, vblank_irq))   // cause IRQs on all three CPUs; also update the custom I/O chips
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_phozon, this));
+	MCFG_VIDEO_START_OVERRIDE(mappy_state,phozon)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1532,7 +1532,7 @@ MACHINE_CONFIG_START(mappy_state::mappy_common)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mappy_state, vblank_irq))   // cause IRQs on both CPUs; also update the custom I/O chips
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mappy, this));
+	MCFG_VIDEO_START_OVERRIDE(mappy_state,mappy)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

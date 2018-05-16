@@ -51,7 +51,7 @@ public:
 	uint8_t m_cd_io_status;
 	uint8_t m_cd_param[8];
 	uint8_t m_cd_result[8];
-	void machine_reset_psx();
+	DECLARE_MACHINE_RESET(psx);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void psxexe_conv32(uint32_t *uint32);
 	int load_psxexe(std::vector<uint8_t> buffer);

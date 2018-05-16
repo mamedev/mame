@@ -2186,21 +2186,21 @@ void apple2_state::apple2eplus_init_common(void *apple2cp_ce00_ram)
 	apple2_setup_memory(&mem_cfg);
 }
 
-void apple2_state::machine_start_apple2c()
+MACHINE_START_MEMBER(apple2_state,apple2c)
 {
 	m_machinetype = APPLE_IIC;
 
 	apple2eplus_init_common((void *)nullptr);
 }
 
-void apple2_state::machine_start_tk3000()
+MACHINE_START_MEMBER(apple2_state,tk3000)
 {
 	m_machinetype = TK3000; // enhanced IIe clone with Z80 keyboard scanner subcpu
 
 	apple2eplus_init_common((void *)nullptr);
 }
 
-void apple2_state::machine_start_apple2cp()
+MACHINE_START_MEMBER(apple2_state,apple2cp)
 {
 	void *apple2cp_ce00_ram;
 
@@ -2215,7 +2215,7 @@ void apple2_state::machine_start_apple2cp()
 	apple2eplus_init_common(apple2cp_ce00_ram);
 }
 
-void apple2_state::machine_start_apple2e()
+MACHINE_START_MEMBER(apple2_state,apple2e)
 {
 	apple2_memmap_config mem_cfg;
 
@@ -2233,7 +2233,7 @@ void apple2_state::machine_start_apple2e()
 	apple2_setup_memory(&mem_cfg);
 }
 
-void apple2_state::machine_start_laser128()
+MACHINE_START_MEMBER(apple2_state,laser128)
 {
 	apple2_memmap_config mem_cfg;
 
@@ -2264,7 +2264,7 @@ void apple2_state::machine_start_laser128()
 	apple2_setup_memory(&mem_cfg);
 }
 
-void apple2_state::machine_start_apple2orig()
+MACHINE_START_MEMBER(apple2_state,apple2orig)
 {
 	apple2_memmap_config mem_cfg;
 	void *apple2cp_ce00_ram = nullptr;
@@ -2284,7 +2284,7 @@ void apple2_state::machine_start_apple2orig()
 	apple2_setup_memory(&mem_cfg);
 }
 
-void apple2_state::machine_start_space84()
+MACHINE_START_MEMBER(apple2_state,space84)
 {
 	apple2_memmap_config mem_cfg;
 	void *apple2cp_ce00_ram = nullptr;
@@ -2304,7 +2304,7 @@ void apple2_state::machine_start_space84()
 	apple2_setup_memory(&mem_cfg);
 }
 
-void apple2_state::machine_start_laba2p()
+MACHINE_START_MEMBER(apple2_state,laba2p)
 {
 	apple2_memmap_config mem_cfg;
 	void *apple2cp_ce00_ram = nullptr;
@@ -2324,7 +2324,7 @@ void apple2_state::machine_start_laba2p()
 	apple2_setup_memory(&mem_cfg);
 }
 
-void apple2_state::machine_start_tk2000()
+MACHINE_START_MEMBER(apple2_state,tk2000)
 {
 	apple2_memmap_config mem_cfg;
 

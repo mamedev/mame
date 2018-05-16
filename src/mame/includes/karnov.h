@@ -70,8 +70,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void video_start_karnov()   ATTR_COLD;
-	void video_start_wndrplnt() ATTR_COLD;
+	DECLARE_VIDEO_START(karnov);
+	DECLARE_VIDEO_START(wndrplnt);
 	uint32_t screen_update_karnov(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vbint_w);
 	void karnov_flipscreen_w( int data );

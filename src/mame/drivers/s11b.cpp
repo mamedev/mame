@@ -145,7 +145,7 @@ static INPUT_PORTS_START( s11b )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
-void s11b_state::machine_reset_s11b()
+MACHINE_RESET_MEMBER( s11b_state, s11b )
 {
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
@@ -252,7 +252,7 @@ MACHINE_CONFIG_START(s11b_state::s11b)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6808, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(s11b_main_map)
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_s11b, this));
+	MCFG_MACHINE_RESET_OVERRIDE(s11b_state, s11b)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_s11b)

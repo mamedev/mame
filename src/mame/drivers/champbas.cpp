@@ -555,7 +555,7 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_champbas, this));
+	MCFG_VIDEO_START_OVERRIDE(champbas_state,champbas)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -602,7 +602,7 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_champbas, this));
+	MCFG_VIDEO_START_OVERRIDE(champbas_state,champbas)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -713,7 +713,7 @@ MACHINE_CONFIG_START(champbas_state::exctsccr)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(champbas_state,exctsccr)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_exctsccr, this));
+	MCFG_VIDEO_START_OVERRIDE(champbas_state,exctsccr)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -779,7 +779,7 @@ MACHINE_CONFIG_START(champbas_state::exctsccrb)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(champbas_state,exctsccr)
-	set_video_start_cb(config, driver_callback_delegate(&video_start_exctsccr, this));
+	MCFG_VIDEO_START_OVERRIDE(champbas_state,exctsccr)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

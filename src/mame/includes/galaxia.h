@@ -25,9 +25,9 @@ public:
 	DECLARE_READ8_MEMBER(galaxia_collision_clear);
 	TILE_GET_INFO_MEMBER(get_galaxia_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_astrowar_bg_tile_info);
-	void video_start_galaxia()  ATTR_COLD;
+	DECLARE_VIDEO_START(galaxia);
 	DECLARE_PALETTE_INIT(galaxia);
-	void video_start_astrowar() ATTR_COLD;
+	DECLARE_VIDEO_START(astrowar);
 	DECLARE_PALETTE_INIT(astrowar);
 	uint32_t screen_update_galaxia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_astrowar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

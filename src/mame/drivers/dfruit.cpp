@@ -377,8 +377,8 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_DEVICE_PROGRAM_MAP(dfruit_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dfruit_state, dfruit_irq_scanline, "screen", 0, 1)
 
-	//set_machine_start_cb(config, driver_callback_delegate(&machine_start_4enraya, this));
-	//set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_4enraya, this));
+	//MCFG_MACHINE_START_OVERRIDE(dfruit_state,4enraya)
+	//MCFG_MACHINE_RESET_OVERRIDE(dfruit_state,4enraya)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

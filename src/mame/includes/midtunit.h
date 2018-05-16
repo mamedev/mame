@@ -85,8 +85,8 @@ public:
 	void init_jdreddp();
 	void init_mk2();
 
-	void machine_reset_midtunit();
-	void video_start_midtunit() ATTR_COLD;
+	DECLARE_MACHINE_RESET(midtunit);
+	DECLARE_VIDEO_START(midtunit);
 
 	void register_state_saving();
 	void init_tunit_generic(int sound);

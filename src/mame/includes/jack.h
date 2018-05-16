@@ -68,12 +68,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_flipy);
 	TILE_GET_INFO_MEMBER(joinem_get_bg_tile_info);
-	void video_start_joinem()   ATTR_COLD;
+	DECLARE_VIDEO_START(joinem);
 	DECLARE_PALETTE_INIT(joinem);
-	void machine_start_striv()  ATTR_COLD;
-	void machine_reset_striv();
-	void machine_start_joinem() ATTR_COLD;
-	void machine_reset_joinem();
+	DECLARE_MACHINE_START(striv);
+	DECLARE_MACHINE_RESET(striv);
+	DECLARE_MACHINE_START(joinem);
+	DECLARE_MACHINE_RESET(joinem);
 
 	uint32_t screen_update_jack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_striv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

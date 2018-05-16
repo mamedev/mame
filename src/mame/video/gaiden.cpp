@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_tx_tile_info)
 
 ***************************************************************************/
 
-void gaiden_state::video_start_gaiden()
+VIDEO_START_MEMBER(gaiden_state,gaiden)
 {
 	/* set up tile layers */
 	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
@@ -92,7 +92,7 @@ void gaiden_state::video_start_gaiden()
 }
 
 
-void gaiden_state::video_start_raiga()
+VIDEO_START_MEMBER(gaiden_state,raiga)
 {
 	/* set up tile layers */
 	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
@@ -110,7 +110,7 @@ void gaiden_state::video_start_raiga()
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
 }
 
-void gaiden_state::video_start_drgnbowl()
+VIDEO_START_MEMBER(gaiden_state,drgnbowl)
 {
 	/* set up tile layers */
 	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);

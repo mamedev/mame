@@ -87,9 +87,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(color_bank_1_w);
 	DECLARE_WRITE_LINE_MEMBER(color_bank_2_w);
 
-	void machine_start_ambush() ATTR_COLD;
-	void machine_start_mariobl() ATTR_COLD;
-	void machine_start_dkong3abl() ATTR_COLD;
+	DECLARE_MACHINE_START(ambush);
+	DECLARE_MACHINE_START(mariobl);
+	DECLARE_MACHINE_START(dkong3abl);
 
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
@@ -637,7 +637,7 @@ void ambush_state::register_save_states()
 	save_item(NAME(m_color_bank));
 }
 
-void ambush_state::machine_start_ambush()
+MACHINE_START_MEMBER( ambush_state, ambush )
 {
 	register_save_states();
 
@@ -647,7 +647,7 @@ void ambush_state::machine_start_ambush()
 	m_char_tilemap->set_scroll_cols(32);
 }
 
-void ambush_state::machine_start_mariobl()
+MACHINE_START_MEMBER( ambush_state, mariobl )
 {
 	register_save_states();
 
@@ -657,7 +657,7 @@ void ambush_state::machine_start_mariobl()
 	m_gfxdecode->gfx(0)->set_granularity(8);
 }
 
-void ambush_state::machine_start_dkong3abl()
+MACHINE_START_MEMBER( ambush_state, dkong3abl )
 {
 	register_save_states();
 
@@ -704,7 +704,7 @@ MACHINE_CONFIG_START(ambush_state::ambush)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ambush, this));
+	MCFG_MACHINE_START_OVERRIDE(ambush_state, ambush)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -740,7 +740,7 @@ MACHINE_CONFIG_START(ambush_state::mariobl)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, ambush_state, coin_counter_1_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, ambush_state, color_bank_1_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mariobl, this));
+	MCFG_MACHINE_START_OVERRIDE(ambush_state, mariobl)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update_bootleg)
@@ -761,7 +761,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ambush_state::dkong3abl)
 	mariobl(config);
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_dkong3abl, this));
+	MCFG_MACHINE_START_OVERRIDE(ambush_state, dkong3abl)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_dkong3abl)
 

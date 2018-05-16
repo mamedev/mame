@@ -235,21 +235,21 @@ public:
 	uint8_t m_mjflove_irq_cause;
 	uint8_t m_daimyojn_palette_sel;
 
-	void machine_start_ddenlovr();
-	void machine_reset_ddenlovr();
-	void video_start_ddenlovr();
-	void machine_start_rongrong();
-	void machine_start_mmpanic();
-	void video_start_mmpanic();
-	void machine_start_hanakanz();
-	void video_start_hanakanz();
-	void machine_start_sryudens();
-	void video_start_mjflove();
-	void machine_start_seljan2();
-	void machine_start_mjflove();
-	void machine_start_funkyfig();
-	void machine_start_mjmyster();
-	void machine_start_hparadis();
+	DECLARE_MACHINE_START(ddenlovr);
+	DECLARE_MACHINE_RESET(ddenlovr);
+	DECLARE_VIDEO_START(ddenlovr);
+	DECLARE_MACHINE_START(rongrong);
+	DECLARE_MACHINE_START(mmpanic);
+	DECLARE_VIDEO_START(mmpanic);
+	DECLARE_MACHINE_START(hanakanz);
+	DECLARE_VIDEO_START(hanakanz);
+	DECLARE_MACHINE_START(sryudens);
+	DECLARE_VIDEO_START(mjflove);
+	DECLARE_MACHINE_START(seljan2);
+	DECLARE_MACHINE_START(mjflove);
+	DECLARE_MACHINE_START(funkyfig);
+	DECLARE_MACHINE_START(mjmyster);
+	DECLARE_MACHINE_START(hparadis);
 	uint32_t screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -414,7 +414,7 @@ public:
 	DECLARE_READ8_MEMBER(htengoku_coin_r);
 	DECLARE_WRITE8_MEMBER(htengoku_rombank_w);
 	DECLARE_WRITE8_MEMBER(htengoku_blit_romregion_w);
-	void video_start_htengoku() ATTR_COLD;
+	DECLARE_VIDEO_START(htengoku);
 	DECLARE_WRITE8_MEMBER(htengoku_dsw_w);
 	DECLARE_READ8_MEMBER(htengoku_dsw_r);
 	DECLARE_WRITE8_MEMBER(quizchq_oki_bank_w);
@@ -534,7 +534,7 @@ public:
 	void ultrchmp_map(address_map &map);
 };
 
-void ddenlovr_state::video_start_ddenlovr()
+VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
 {
 	m_blitter_irq_handler.bind_relative_to(*this);
 
@@ -631,24 +631,24 @@ void ddenlovr_state::video_start_ddenlovr()
 	save_pointer(NAME(m_ddenlovr_pixmap[7].get()), 512 * 512);
 }
 
-void ddenlovr_state::video_start_mmpanic()
+VIDEO_START_MEMBER(ddenlovr_state,mmpanic)
 {
-	video_start_ddenlovr();
+	VIDEO_START_CALL_MEMBER(ddenlovr);
 
 	m_extra_layers = 1;
 }
 
-void ddenlovr_state::video_start_hanakanz()
+VIDEO_START_MEMBER(ddenlovr_state,hanakanz)
 {
-	video_start_ddenlovr();
+	VIDEO_START_CALL_MEMBER(ddenlovr);
 
 	m_ddenlovr_blit_rom_bits = 16;
 	m_ddenlovr_blit_commands = hanakanz_commands;
 }
 
-void ddenlovr_state::video_start_mjflove()
+VIDEO_START_MEMBER(ddenlovr_state,mjflove)
 {
-	video_start_ddenlovr();
+	VIDEO_START_CALL_MEMBER(ddenlovr);
 
 	m_ddenlovr_blit_commands = mjflove_commands;
 }
@@ -4182,10 +4182,10 @@ void ddenlovr_state::seljan2_portmap(address_map &map)
 ***************************************************************************/
 // htengoku uses the mixer chip from ddenlovr
 
-void ddenlovr_state::video_start_htengoku()
+VIDEO_START_MEMBER(ddenlovr_state,htengoku)
 {
-	video_start_ddenlovr();
-	video_start_hnoridur();
+	VIDEO_START_CALL_MEMBER(ddenlovr);
+	VIDEO_START_CALL_MEMBER(hnoridur);
 }
 
 uint32_t ddenlovr_state::screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -4361,8 +4361,8 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_dynax, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dynax, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,dynax)
+	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,dynax)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4388,7 +4388,7 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_htengoku, this));
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,htengoku)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9571,7 +9571,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-void ddenlovr_state::machine_start_ddenlovr()
+MACHINE_START_MEMBER(ddenlovr_state,ddenlovr)
 {
 	save_item(NAME(m_input_sel));
 	save_item(NAME(m_dsw_sel));
@@ -9595,7 +9595,7 @@ void ddenlovr_state::machine_start_ddenlovr()
 	save_item(NAME(m_palram));
 }
 
-void ddenlovr_state::machine_reset_ddenlovr()
+MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 {
 	m_input_sel = 0;
 	m_dsw_sel = 0;
@@ -9621,75 +9621,75 @@ void ddenlovr_state::machine_reset_ddenlovr()
 	memset(m_palram, 0, ARRAY_LENGTH(m_palram));
 }
 
-void ddenlovr_state::machine_start_rongrong()
+MACHINE_START_MEMBER(ddenlovr_state,rongrong)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x20, &ROM[0x010000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &ROM[0x110000], 0x1000);
 
-	machine_start_ddenlovr();
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-void ddenlovr_state::machine_start_mmpanic()
+MACHINE_START_MEMBER(ddenlovr_state,mmpanic)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
 
-	machine_start_ddenlovr();
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-void ddenlovr_state::machine_start_funkyfig()
+MACHINE_START_MEMBER(ddenlovr_state,funkyfig)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
-	machine_start_ddenlovr();
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-void ddenlovr_state::machine_start_hanakanz()
+MACHINE_START_MEMBER(ddenlovr_state,hanakanz)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
 
-	machine_start_ddenlovr();
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-void ddenlovr_state::machine_start_mjmyster()
+MACHINE_START_MEMBER(ddenlovr_state,mjmyster)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
-	machine_start_ddenlovr();
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-void ddenlovr_state::machine_start_hparadis()
+MACHINE_START_MEMBER(ddenlovr_state,hparadis)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &ROM[0x50000], 0x1000);
 
-	machine_start_ddenlovr();
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-void ddenlovr_state::machine_start_mjflove()
+MACHINE_START_MEMBER(ddenlovr_state,mjflove)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
-	machine_start_ddenlovr();
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
-void ddenlovr_state::machine_start_sryudens()
+MACHINE_START_MEMBER(ddenlovr_state,sryudens)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
 
-	machine_start_ddenlovr();
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 /***************************************************************************
@@ -9713,8 +9713,8 @@ MACHINE_CONFIG_START(ddenlovr_state::ddenlovr)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, ddenlovr_state, ddenlovr_coincounter_0_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ddenlovr_state, ddenlovr_coincounter_1_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ddenlovr, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddenlovr, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,ddenlovr)
+	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9731,7 +9731,7 @@ MACHINE_CONFIG_START(ddenlovr_state::ddenlovr)
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, ddenlovr_blitter_irq)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ddenlovr, this));
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9816,7 +9816,7 @@ MACHINE_CONFIG_START(ddenlovr_state::ultrchmp)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mjflove, this));
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -9841,8 +9841,8 @@ MACHINE_CONFIG_START(ddenlovr_state::quizchq)
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, rongrong_select_w))
 	// bit 5 of 0x1b (SIO CTSB?) = blitter busy
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_rongrong, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddenlovr, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,rongrong)
+	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9859,7 +9859,7 @@ MACHINE_CONFIG_START(ddenlovr_state::quizchq)
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, rongrong_blitter_irq)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ddenlovr, this));
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9930,8 +9930,8 @@ MACHINE_CONFIG_START(ddenlovr_state::mmpanic)
 	MCFG_DEVICE_PROGRAM_MAP(mmpanic_sound_map)
 	MCFG_DEVICE_IO_MAP(mmpanic_sound_portmap)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mmpanic, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddenlovr, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mmpanic)
+	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9948,7 +9948,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mmpanic)
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mmpanic_blitter_irq)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mmpanic, this));  // extra layers
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mmpanic)  // extra layers
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10018,8 +10018,8 @@ MACHINE_CONFIG_START(ddenlovr_state::hanakanz)
 	MCFG_DEVICE_PROGRAM_MAP(hanakanz_map)
 	MCFG_DEVICE_IO_MAP(hanakanz_portmap)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hanakanz, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddenlovr, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
+	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -10034,7 +10034,7 @@ MACHINE_CONFIG_START(ddenlovr_state::hanakanz)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_hanakanz, this)); // blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10065,8 +10065,8 @@ MACHINE_CONFIG_START(ddenlovr_state::kotbinyo)
 	MCFG_DEVICE_PROGRAM_MAP(hanakanz_map)
 	MCFG_DEVICE_IO_MAP(kotbinyo_portmap)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hanakanz, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddenlovr, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
+	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -10081,7 +10081,7 @@ MACHINE_CONFIG_START(ddenlovr_state::kotbinyo)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_hanakanz, this)); // blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10159,7 +10159,7 @@ MACHINE_CONFIG_START(ddenlovr_state::funkyfig)
 	MCFG_TMPZ84C015_IN_PA_CB(READ8(*this, ddenlovr_state, funkyfig_dsw_r))
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, funkyfig_rombank_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_funkyfig, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,funkyfig)
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0))
@@ -10173,7 +10173,7 @@ MACHINE_CONFIG_START(ddenlovr_state::funkyfig)
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_IO_MAP(funkyfig_sound_portmap)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ddenlovr, this)); // no extra layers?
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr) // no extra layers?
 MACHINE_CONFIG_END
 
 
@@ -10190,8 +10190,8 @@ MACHINE_CONFIG_START(ddenlovr_state::mjschuka)
 	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, sryudens_rambank_w))
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mjflove_rombank_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hanakanz, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddenlovr, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
+	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -10208,7 +10208,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjschuka)
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mjflove, this));  // blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10258,7 +10258,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjmyster)
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mjmyster, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 3579545)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ddenlovr_state, ddenlovr_select_w))
@@ -10296,7 +10296,7 @@ MACHINE_CONFIG_START(ddenlovr_state::hginga)
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mjmyster, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 3579545)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ddenlovr_state, hginga_dsw_r))
@@ -10323,7 +10323,7 @@ MACHINE_CONFIG_START(ddenlovr_state::hgokou)
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mjmyster, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 3579545)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ddenlovr_state, hginga_dsw_r))
@@ -10364,7 +10364,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjmyuniv)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mjmyster, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
 	MCFG_DEVICE_MODIFY("rtc")
 	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
@@ -10393,7 +10393,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjmyornt)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 4, 256-16+4-1)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mjmyster, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
 	MCFG_DEVICE_MODIFY("rtc")
 	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
@@ -10441,7 +10441,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjflove)
 	MCFG_TMPZ84C015_IN_PA_CB(IOPORT("DSW2"))
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, hanakanz_keyb_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mjflove, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjflove)
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddenlovr_state, mjflove_irq))
@@ -10452,7 +10452,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjflove)
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjflove_blitter_irq)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mjflove, this));  // blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
 	MCFG_DEVICE_ADD("aysnd", AY8910, 28636363/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -10471,7 +10471,7 @@ MACHINE_CONFIG_START(ddenlovr_state::hparadis)
 	// the RTC seems unused
 	MCFG_DEVICE_REMOVE("rtc")
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hparadis, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hparadis)
 MACHINE_CONFIG_END
 
 
@@ -10483,8 +10483,8 @@ MACHINE_CONFIG_START(ddenlovr_state::jongtei)
 	MCFG_DEVICE_PROGRAM_MAP(hanakanz_map)
 	MCFG_DEVICE_IO_MAP(jongtei_portmap)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hanakanz, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddenlovr, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
+	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -10501,7 +10501,7 @@ MACHINE_CONFIG_START(ddenlovr_state::jongtei)
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjflove_blitter_irq)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_hanakanz, this)); // blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10540,8 +10540,8 @@ MACHINE_CONFIG_START(ddenlovr_state::sryudens)
 	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, sryudens_rambank_w))
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mjflove_rombank_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sryudens, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddenlovr, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,sryudens)
+	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -10558,7 +10558,7 @@ MACHINE_CONFIG_START(ddenlovr_state::sryudens)
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjflove_blitter_irq)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mjflove, this));  // blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10591,8 +10591,8 @@ MACHINE_CONFIG_START(ddenlovr_state::janshinp)
 	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, sryudens_rambank_w))
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, mjflove_rombank_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hanakanz, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddenlovr, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
+	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -10609,7 +10609,7 @@ MACHINE_CONFIG_START(ddenlovr_state::janshinp)
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjflove_blitter_irq)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_ddenlovr, this));
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10632,7 +10632,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddenlovr_state::dtoyoken)
 	janshinp(config);
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mjflove, this));  // blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 MACHINE_CONFIG_END
 
 
@@ -10640,7 +10640,7 @@ MACHINE_CONFIG_END
                              Return Of Sel Jan II
 ***************************************************************************/
 
-void ddenlovr_state::machine_start_seljan2()
+MACHINE_START_MEMBER(ddenlovr_state,seljan2)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -10651,7 +10651,7 @@ void ddenlovr_state::machine_start_seljan2()
 
 	membank("bank2")->configure_entries(0, 0x10, &ROM[0x98000], 0x1000);
 
-	machine_start_ddenlovr();
+	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_CONFIG_START(ddenlovr_state::seljan2)
@@ -10663,8 +10663,8 @@ MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(*this, ddenlovr_state, hanakanz_keyb_w))
 	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(*this, ddenlovr_state, sryudens_coincounter_w))
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_seljan2, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddenlovr, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,seljan2)
+	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -10681,7 +10681,7 @@ MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, seljan2_blitter_irq)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_mjflove, this));  // blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10715,8 +10715,8 @@ MACHINE_CONFIG_START(ddenlovr_state::daimyojn)
 	MCFG_DEVICE_PROGRAM_MAP(hanakanz_map)
 	MCFG_DEVICE_IO_MAP(daimyojn_portmap)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mjflove, this));
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddenlovr, this));
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjflove)
+	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -10731,7 +10731,7 @@ MACHINE_CONFIG_START(ddenlovr_state::daimyojn)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_hanakanz, this)); // blitter commands in the roms are shuffled around
+	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

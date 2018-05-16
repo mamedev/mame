@@ -163,7 +163,7 @@ public:
 	DECLARE_WRITE32_MEMBER(namcos21_video_enable_w);
 	DECLARE_READ32_MEMBER(rso_r);
 	DECLARE_WRITE32_MEMBER(rso_w);
-	void video_start_gal3() ATTR_COLD;
+	DECLARE_VIDEO_START(gal3);
 	uint32_t screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_palette(  );
 	void gal3(machine_config &config);
@@ -175,7 +175,7 @@ public:
 };
 
 
-void gal3_state::video_start_gal3()
+VIDEO_START_MEMBER(gal3_state,gal3)
 {
 	m_generic_paletteram_16.allocate(0x10000);
 
@@ -650,7 +650,7 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gal3, this));
+	MCFG_VIDEO_START_OVERRIDE(gal3_state,gal3)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

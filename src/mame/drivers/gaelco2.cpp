@@ -198,7 +198,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0080000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2, this));
+	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -629,7 +629,7 @@ MACHINE_CONFIG_START(gaelco2_state::play2000)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0200000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2, this));
+	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -734,7 +734,7 @@ MACHINE_CONFIG_START(bang_state::bang)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0200000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2, this));
+	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -972,7 +972,7 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0400000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2, this));
+	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1285,7 +1285,7 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2_dual, this));
+	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2_dual)
 
 	/* sound hardware */
 	/* the chip is stereo, but the game sound is mono because the right channel
@@ -1584,7 +1584,7 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0400000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2, this));
+	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1627,7 +1627,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0080000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2, this));
+	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1882,7 +1882,7 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	MCFG_SCREEN_PALETTE("palette")
 
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2_dual, this));
+	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2_dual)
 
 	/* sound hardware */
 	/* the chip is stereo, but the game sound is mono because the right channel

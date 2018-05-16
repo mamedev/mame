@@ -76,7 +76,7 @@ void atarigt_state::update_interrupts()
 }
 
 
-void atarigt_state::machine_reset_atarigt()
+MACHINE_RESET_MEMBER(atarigt_state,atarigt)
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -798,7 +798,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(atarigt_state, scanline_int_gen, 250)
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_atarigt, this));
+	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16) // should be 447 kHz according to schematics, but that fails the self-test
 	MCFG_ADC0808_IN2_CB(IOPORT("AN4"))
@@ -824,7 +824,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	MCFG_SCREEN_UPDATE_DRIVER(atarigt_state, screen_update_atarigt)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarigt_state, video_int_write_line))
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_atarigt, this));
+	MCFG_VIDEO_START_OVERRIDE(atarigt_state,atarigt)
 
 	MCFG_ATARIRLE_ADD("rle", modesc)
 

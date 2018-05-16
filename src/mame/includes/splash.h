@@ -81,9 +81,9 @@ public:
 	void init_splash();
 	void init_rebus();
 	virtual void video_start() override;
-	void machine_start_splash()   ATTR_COLD;
-	void machine_start_roldfrog() ATTR_COLD;
-	void machine_reset_splash();
+	DECLARE_MACHINE_START(splash);
+	DECLARE_MACHINE_START(roldfrog);
+	DECLARE_MACHINE_RESET(splash);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap0);
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap1);

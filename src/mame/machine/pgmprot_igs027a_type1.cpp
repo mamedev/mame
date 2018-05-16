@@ -204,9 +204,9 @@ void pgm_arm_type1_state::cavepgm_mem(address_map &map)
 }
 
 
-void pgm_arm_type1_state::machine_start_pgm_arm_type1()
+MACHINE_START_MEMBER(pgm_arm_type1_state,pgm_arm_type1)
 {
-	machine_start_pgm();
+	MACHINE_START_CALL_MEMBER(pgm);
 	save_item(NAME(m_value0));
 	save_item(NAME(m_value1));
 	save_item(NAME(m_valuekey));
@@ -221,7 +221,7 @@ MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_cave)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(cavepgm_mem)
 
-	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pgm_arm_type1, this));
+	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type1_state, pgm_arm_type1 )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(59.17) // verified on pcb

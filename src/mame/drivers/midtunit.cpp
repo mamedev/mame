@@ -603,7 +603,7 @@ MACHINE_CONFIG_START(midtunit_state::tunit_core)
 	MCFG_TMS340X0_TO_SHIFTREG_CB(midtunit_state, to_shiftreg)           /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(midtunit_state, from_shiftreg)          /* read from shiftreg function */
 
-	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_midtunit, this));
+	MCFG_MACHINE_RESET_OVERRIDE(midtunit_state,midtunit)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -618,7 +618,7 @@ MACHINE_CONFIG_START(midtunit_state::tunit_core)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	set_video_start_cb(config, driver_callback_delegate(&video_start_midtunit, this));
+	MCFG_VIDEO_START_OVERRIDE(midtunit_state,midtunit)
 MACHINE_CONFIG_END
 
 
