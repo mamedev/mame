@@ -1404,7 +1404,7 @@ READ16_MEMBER(tx1_state::buggyboy_spcs_ram_r)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(tx1_state,buggyboy)
+void tx1_state::machine_reset_buggyboy()
 {
 	// TODO: This is connected to the /BUSACK line of the Z80
 	m_maincpu->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
@@ -1412,7 +1412,7 @@ MACHINE_RESET_MEMBER(tx1_state,buggyboy)
 	memset(&m_math, 0, sizeof(m_math));
 }
 
-MACHINE_RESET_MEMBER(tx1_state,tx1)
+void tx1_state::machine_reset_tx1()
 {
 	// TODO: This is connected to the /BUSACK line of the Z80
 	m_maincpu->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);

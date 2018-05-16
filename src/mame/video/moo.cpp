@@ -34,7 +34,7 @@ K056832_CB_MEMBER(moo_state::tile_callback)
 	*color = m_layer_colorbase[layer] | (*color >> 2 & 0x0f);
 }
 
-VIDEO_START_MEMBER(moo_state,moo)
+void moo_state::video_start_moo()
 {
 	assert(m_screen->format() == BITMAP_FORMAT_RGB32);
 
@@ -48,7 +48,7 @@ VIDEO_START_MEMBER(moo_state,moo)
 	m_k056832->set_layer_offs(3,  6 + 1, 0);
 }
 
-VIDEO_START_MEMBER(moo_state,bucky)
+void moo_state::video_start_bucky()
 {
 	assert(m_screen->format() == BITMAP_FORMAT_RGB32);
 

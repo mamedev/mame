@@ -99,7 +99,7 @@ WRITE16_MEMBER(karnov_state::karnov_playfield_swap_w)
 
 /******************************************************************************/
 
-VIDEO_START_MEMBER(karnov_state,karnov)
+void karnov_state::video_start_karnov()
 {
 	/* Allocate bitmap & tilemap */
 	m_bitmap_f = std::make_unique<bitmap_ind16>(512, 512);
@@ -110,7 +110,7 @@ VIDEO_START_MEMBER(karnov_state,karnov)
 	m_fix_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(karnov_state,wndrplnt)
+void karnov_state::video_start_wndrplnt()
 {
 	/* Allocate bitmap & tilemap */
 	m_bitmap_f = std::make_unique<bitmap_ind16>(512, 512);

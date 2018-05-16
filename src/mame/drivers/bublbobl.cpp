@@ -814,32 +814,35 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(bublbobl_state,common)
+void bublbobl_state::machine_start_common()
 {
 	m_sreset_old = CLEAR_LINE;
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_sreset_old));
 }
 
-MACHINE_RESET_MEMBER(bublbobl_state,common) // things common on both tokio and bubble bobble hw
+void bublbobl_state::machine_reset_common() // things common on both tokio and bubble bobble hw
 {
 	m_soundnmi->in_w<0>(0); // clear sound NMI stuff
 	m_soundnmi->in_w<1>(0);
 	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); // if a subcpu nmi is active (extremely remote chance), it is cleared
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE); // maincpu is reset
-	m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE); // subcpu is reset
-	common_sreset(PULSE_LINE); // /SRESET is pulsed
+	if (!m_sreset_old)
+	{
+		// /SRESET is pulsed
+		common_sreset(ASSERT_LINE);
+		common_sreset(CLEAR_LINE);
+	}
 }
 
 
-MACHINE_START_MEMBER(bublbobl_state,tokio)
+void bublbobl_state::machine_start_tokio()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 }
 
-MACHINE_RESET_MEMBER(bublbobl_state,tokio)
+void bublbobl_state::machine_reset_tokio()
 {
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 	tokio_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
 	tokio_videoctrl_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // TODO: does /RESET clear this the same as above? probably yes, needs tracing...
 }
@@ -865,8 +868,8 @@ MACHINE_CONFIG_START(bublbobl_state::tokio)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
-	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, tokio)
-	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, tokio)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_tokio, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tokio, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -923,9 +926,9 @@ MACHINE_CONFIG_START(bublbobl_state::tokiob)
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(bublbobl_state,bublbobl)
+void bublbobl_state::machine_start_bublbobl()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 
 	save_item(NAME(m_ddr1));
 	save_item(NAME(m_ddr2));
@@ -941,9 +944,9 @@ MACHINE_START_MEMBER(bublbobl_state,bublbobl)
 	save_item(NAME(m_port4_out));
 }
 
-MACHINE_RESET_MEMBER(bublbobl_state,bublbobl)
+void bublbobl_state::machine_reset_bublbobl()
 {
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
 
 	m_ddr1 = 0;
@@ -978,8 +981,8 @@ MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
-	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, bublbobl)
-	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, bublbobl)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bublbobl, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_bublbobl, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1024,17 +1027,17 @@ MACHINE_CONFIG_START(bublbobl_state::bublbobl)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", M6801_IRQ_LINE)) // same clock latches the INT pin on the second Z80
 MACHINE_CONFIG_END
 
-MACHINE_START_MEMBER(bublbobl_state,boblbobl)
+void bublbobl_state::machine_start_boblbobl()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 
 	save_item(NAME(m_ic43_a));
 	save_item(NAME(m_ic43_b));
 }
 
-MACHINE_RESET_MEMBER(bublbobl_state,boblbobl)
+void bublbobl_state::machine_reset_boblbobl()
 {
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xff); // force a bankswitch write of all zeroes, as /RESET clears the latch
 
 	m_ic43_a = 0;
@@ -1049,14 +1052,14 @@ MACHINE_CONFIG_START(bublbobl_state::boblbobl)
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold) // interrupt mode 1, unlike Bubble Bobble
 
-	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, boblbobl)
-	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, boblbobl)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_boblbobl, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_boblbobl, this));
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(bub68705_state, bub68705)
+void bub68705_state::machine_start_bub68705()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 
 	save_item(NAME(m_port_a_out));
 	save_item(NAME(m_port_b_out));
@@ -1067,9 +1070,9 @@ MACHINE_START_MEMBER(bub68705_state, bub68705)
 	m_port_b_out = 0xff;
 }
 
-MACHINE_RESET_MEMBER(bub68705_state, bub68705)
+void bub68705_state::machine_reset_bub68705()
 {
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xff); // force a bankswitch write of all zeroes, as /RESET clears the latch
 
 	m_address = 0;
@@ -1086,8 +1089,8 @@ MACHINE_CONFIG_START(bub68705_state::bub68705)
 	MCFG_M68705_PORTB_W_CB(WRITE8(*this, bub68705_state, port_b_w))
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bub68705_state, bublbobl_m68705_interrupt) // ??? should come from the same clock which latches the INT pin on the second Z80
 
-	MCFG_MACHINE_START_OVERRIDE(bub68705_state, bub68705)
-	MCFG_MACHINE_RESET_OVERRIDE(bub68705_state, bub68705)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bub68705, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_bub68705, this));
 MACHINE_CONFIG_END
 
 

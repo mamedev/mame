@@ -187,7 +187,7 @@ void psychic5_state::video_start()
 }
 
 
-VIDEO_START_MEMBER(psychic5_state,psychic5)
+void psychic5_state::video_start_psychic5()
 {
 	video_start();
 
@@ -199,7 +199,7 @@ VIDEO_START_MEMBER(psychic5_state,psychic5)
 
 }
 
-VIDEO_START_MEMBER(psychic5_state,bombsa)
+void psychic5_state::video_start_bombsa()
 {
 	video_start();
 
@@ -210,7 +210,7 @@ VIDEO_START_MEMBER(psychic5_state,bombsa)
 	save_item(NAME(m_bombsa_unknown));
 }
 
-VIDEO_RESET_MEMBER(psychic5_state,psychic5)
+void psychic5_state::video_reset_psychic5()
 {
 	m_bg_clip_mode = 0;
 	m_ps5_vram_page = 0;

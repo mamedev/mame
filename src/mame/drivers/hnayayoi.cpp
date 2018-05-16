@@ -617,7 +617,7 @@ MACHINE_CONFIG_START(hnayayoi_state::untoucha)
 	MCFG_DEVICE_MODIFY("crtc")
 	MCFG_MC6845_UPDATE_ROW_CB(hnayayoi_state, untoucha_update_row)
 
-	MCFG_VIDEO_START_OVERRIDE(hnayayoi_state,untoucha)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_untoucha, this));
 MACHINE_CONFIG_END
 
 

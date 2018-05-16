@@ -186,7 +186,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MACHINE_RESET_OVERRIDE(galaxy_state, galaxy )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_galaxy, this));
 
 	/* video hardware */
 	MCFG_SCREEN_SIZE(384, 212)
@@ -228,7 +228,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MACHINE_RESET_OVERRIDE(galaxy_state, galaxyp )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_galaxyp, this));
 
 	/* video hardware */
 	MCFG_SCREEN_SIZE(384, 208)

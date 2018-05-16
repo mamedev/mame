@@ -3952,7 +3952,7 @@ MACHINE_CONFIG_START(namcos22_state::propcycl)
 	MCFG_TIMER_DRIVER_ADD("pc_p_int", namcos22_state, propcycl_pedal_interrupt)
 MACHINE_CONFIG_END
 
-MACHINE_START_MEMBER(namcos22_state,adillor)
+void namcos22_state::machine_start_adillor()
 {
 	machine_start();
 
@@ -3966,7 +3966,7 @@ MACHINE_CONFIG_START(namcos22_state::adillor)
 	/* basic machine hardware */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ar_tb_upd", namcos22_state, adillor_trackball_update, attotime::from_msec(20))
 
-	MCFG_MACHINE_START_OVERRIDE(namcos22_state,adillor)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_adillor, this));
 MACHINE_CONFIG_END
 
 

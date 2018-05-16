@@ -259,7 +259,7 @@ void argus_state::reset_common()
 	m_palette_intensity = 0;
 }
 
-VIDEO_START_MEMBER(argus_state,argus)
+void argus_state::video_start_argus()
 {
 	/*                           info                     offset             w   h  col  row */
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
@@ -280,7 +280,7 @@ VIDEO_START_MEMBER(argus_state,argus)
 	save_item(NAME(m_prvscrollx));
 }
 
-VIDEO_RESET_MEMBER(argus_state,argus)
+void argus_state::video_reset_argus()
 {
 	m_lowbitscroll = 0;
 	m_prvscrollx = 0;
@@ -290,7 +290,7 @@ VIDEO_RESET_MEMBER(argus_state,argus)
 	reset_common();
 }
 
-VIDEO_START_MEMBER(argus_state,valtric)
+void argus_state::video_start_valtric()
 {
 	/*                           info                      offset             w   h  col  row */
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::valtric_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
@@ -308,13 +308,13 @@ VIDEO_START_MEMBER(argus_state,valtric)
 	save_item(NAME(m_mosaic));
 }
 
-VIDEO_RESET_MEMBER(argus_state,valtric)
+void argus_state::video_reset_valtric()
 {
 	m_valtric_mosaic = 0x0f;
 	reset_common();
 }
 
-VIDEO_START_MEMBER(argus_state,butasan)
+void argus_state::video_start_butasan()
 {
 	/*                           info                       offset             w   h  col  row */
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::butasan_get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -342,7 +342,7 @@ VIDEO_START_MEMBER(argus_state,butasan)
 	save_item(NAME(m_butasan_unknown));
 }
 
-VIDEO_RESET_MEMBER(argus_state,butasan)
+void argus_state::video_reset_butasan()
 {
 	m_butasan_page_latch = 0;
 	m_butasan_bg1_status = 0x01;

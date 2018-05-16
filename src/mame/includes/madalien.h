@@ -70,7 +70,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_BG_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_BG_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_FG);
-	DECLARE_VIDEO_START(madalien);
+	void video_start_madalien() ATTR_COLD;
 	DECLARE_PALETTE_INIT(madalien);
 	uint32_t screen_update_madalien(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline int scan_helper(int col, int row, int section);

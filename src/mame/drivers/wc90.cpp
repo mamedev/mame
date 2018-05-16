@@ -394,7 +394,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wc90_state::wc90t)
 	wc90(config);
-	MCFG_VIDEO_START_OVERRIDE(wc90_state, wc90t )
+	set_video_start_cb(config, driver_callback_delegate(&video_start_wc90t, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wc90_state::pac90)

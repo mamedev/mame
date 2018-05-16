@@ -73,8 +73,8 @@ public:
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
 
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(ginkun);
-	DECLARE_VIDEO_START(riot);
+	void video_start_ginkun() ATTR_COLD;
+	void video_start_riot()   ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

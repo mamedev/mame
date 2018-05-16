@@ -1575,14 +1575,14 @@ void bbc_state::bbcm_setup_banks(memory_bank *membank, int banks, uint32_t shift
 	}
 }
 
-MACHINE_START_MEMBER(bbc_state, bbca)
+void bbc_state::machine_start_bbca()
 {
 	m_machinetype = MODELA;
 
 	bbc_setup_banks(m_bank4, 4, 0, 0x4000);
 }
 
-MACHINE_RESET_MEMBER(bbc_state, bbca)
+void bbc_state::machine_reset_bbca()
 {
 	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
 	m_swramtype = (m_bbcconfig.read_safe(0) & 0x0c) >> 2;
@@ -1605,14 +1605,14 @@ MACHINE_RESET_MEMBER(bbc_state, bbca)
 	bbcb_IC32_initialise(this);
 }
 
-MACHINE_START_MEMBER(bbc_state, bbcb)
+void bbc_state::machine_start_bbcb()
 {
 	m_machinetype = MODELB;
 	m_mc6850_clock = 0;
 	bbc_setup_banks(m_bank4, 16, 0, 0x4000);
 }
 
-MACHINE_RESET_MEMBER(bbc_state, bbcb)
+void bbc_state::machine_reset_bbcb()
 {
 	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
 	m_swramtype = (m_bbcconfig.read_safe(0) & 0x0c) >> 2;
@@ -1627,16 +1627,16 @@ MACHINE_RESET_MEMBER(bbc_state, bbcb)
 }
 
 
-MACHINE_RESET_MEMBER(bbc_state, torch)
+void bbc_state::machine_reset_torch()
 {
-	MACHINE_RESET_CALL_MEMBER(bbcb);
+	machine_reset_bbcb();
 
 	m_monitortype = monitor_type_t::COLOUR;
 	m_swramtype = 0;
 }
 
 
-MACHINE_START_MEMBER(bbc_state, bbcbp)
+void bbc_state::machine_start_bbcbp()
 {
 	m_machinetype = BPLUS;
 	m_mc6850_clock = 0;
@@ -1646,7 +1646,7 @@ MACHINE_START_MEMBER(bbc_state, bbcbp)
 	bbc_setup_banks(m_bank6, 16, 0x3000, 0x1000);
 }
 
-MACHINE_RESET_MEMBER(bbc_state, bbcbp)
+void bbc_state::machine_reset_bbcbp()
 {
 	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
 	m_swramtype = 0;
@@ -1661,7 +1661,7 @@ MACHINE_RESET_MEMBER(bbc_state, bbcbp)
 }
 
 
-MACHINE_START_MEMBER(bbc_state, bbcm)
+void bbc_state::machine_start_bbcm()
 {
 	m_machinetype = MASTER;
 	m_mc6850_clock = 0;
@@ -1680,7 +1680,7 @@ MACHINE_START_MEMBER(bbc_state, bbcm)
 	output().set_value("power_led", 0);
 }
 
-MACHINE_RESET_MEMBER(bbc_state, bbcm)
+void bbc_state::machine_reset_bbcm()
 {
 	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
 	m_swramtype = 0;
@@ -1695,39 +1695,39 @@ MACHINE_RESET_MEMBER(bbc_state, bbcm)
 }
 
 
-MACHINE_START_MEMBER(bbc_state, bbcmc)
+void bbc_state::machine_start_bbcmc()
 {
-	MACHINE_START_CALL_MEMBER(bbcm);
+	machine_start_bbcm();
 
 	m_machinetype = COMPACT;
 }
 
-MACHINE_RESET_MEMBER(bbc_state, bbcmc)
+void bbc_state::machine_reset_bbcmc()
 {
-	MACHINE_RESET_CALL_MEMBER(bbcm);
+	machine_reset_bbcm();
 }
 
 
-MACHINE_RESET_MEMBER(bbc_state, ltmpbp)
+void bbc_state::machine_reset_ltmpbp()
 {
-	MACHINE_RESET_CALL_MEMBER(bbcbp);
+	machine_reset_bbcbp();
 
 	m_monitortype = monitor_type_t::GREEN;
 	m_swramtype = 0;
 }
 
-MACHINE_RESET_MEMBER(bbc_state, ltmpm)
+void bbc_state::machine_reset_ltmpm()
 {
-	MACHINE_RESET_CALL_MEMBER(bbcm);
+	machine_reset_bbcm();
 
 	m_monitortype = monitor_type_t::GREEN;
 	m_swramtype = 0;
 }
 
 
-MACHINE_START_MEMBER(bbc_state, cfa3000)
+void bbc_state::machine_start_cfa3000()
 {
-	MACHINE_START_CALL_MEMBER(bbcm);
+	machine_start_bbcm();
 
 	m_lk18_ic41_paged_rom = true; /* Link set for ROM in slots 6 and 7 */
 	m_lk19_ic37_paged_rom = true; /* Link set for ROM in slots 4 and 5 */

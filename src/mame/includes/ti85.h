@@ -171,14 +171,14 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ti85);
-	DECLARE_MACHINE_RESET(ti85);
-	DECLARE_MACHINE_RESET(ti83p);
+	void machine_reset_ti85();
+	void machine_reset_ti83p();
 	DECLARE_PALETTE_INIT(ti82);
-	DECLARE_MACHINE_START(ti86);
-	DECLARE_MACHINE_START(ti83p);
-	DECLARE_MACHINE_START(ti83pse);
-	DECLARE_MACHINE_START(ti84pse);
-	DECLARE_MACHINE_START(ti84p);
+	void machine_start_ti86()    ATTR_COLD;
+	void machine_start_ti83p()   ATTR_COLD;
+	void machine_start_ti83pse() ATTR_COLD;
+	void machine_start_ti84pse() ATTR_COLD;
+	void machine_start_ti84p()   ATTR_COLD;
 	void ti8xpse_init_common();
 
 	uint32_t screen_update_ti85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

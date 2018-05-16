@@ -63,7 +63,7 @@ void hitme_state::video_start()
 }
 
 
-VIDEO_START_MEMBER(hitme_state,barricad)
+void hitme_state::video_start_barricad()
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hitme_state::get_hitme_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 24);
 }
@@ -360,7 +360,7 @@ MACHINE_CONFIG_START(hitme_state::barricad)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_barricad)
 
-	MCFG_VIDEO_START_OVERRIDE(hitme_state,barricad)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_barricad, this));
 MACHINE_CONFIG_END
 
 

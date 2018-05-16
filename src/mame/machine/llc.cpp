@@ -98,13 +98,13 @@ void llc_state::init_llc1()
 {
 }
 
-MACHINE_RESET_MEMBER(llc_state,llc1)
+void llc_state::machine_reset_llc1()
 {
 	m_term_status = 0;
 	m_llc1_key = 0;
 }
 
-MACHINE_START_MEMBER(llc_state,llc1)
+void llc_state::machine_start_llc1()
 {
 	m_digits.resolve();
 }
@@ -115,7 +115,7 @@ void llc_state::init_llc2()
 	m_p_videoram.set_target( m_ram->pointer() + 0xc000,m_p_videoram.bytes());
 }
 
-MACHINE_RESET_MEMBER(llc_state,llc2)
+void llc_state::machine_reset_llc2()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 

@@ -61,12 +61,12 @@ public:
 	DECLARE_WRITE8_MEMBER(srmp3_irq_ack_w);
 
 	virtual void machine_start() override;
-	DECLARE_MACHINE_START(srmp2);
+	void machine_start_srmp2()    ATTR_COLD;
 	DECLARE_PALETTE_INIT(srmp2);
-	DECLARE_MACHINE_START(srmp3);
+	void machine_start_srmp3()    ATTR_COLD;
 	DECLARE_PALETTE_INIT(srmp3);
-	DECLARE_MACHINE_START(rmgoldyh);
-	DECLARE_MACHINE_START(mjyuugi);
+	void machine_start_rmgoldyh() ATTR_COLD;
+	void machine_start_mjyuugi()  ATTR_COLD;
 
 	uint32_t screen_update_srmp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_srmp3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

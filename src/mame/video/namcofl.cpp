@@ -88,7 +88,7 @@ int namcofl_state::FLobjcode2tile(int code)
 	return code;
 }
 
-VIDEO_START_MEMBER(namcofl_state,namcofl)
+void namcofl_state::video_start_namcofl()
 {
 	c123_tilemap_init(NAMCOFL_TILEGFX, memregion(NAMCOFL_TILEMASKREGION)->base(), namcos2_shared_state::c123_tilemap_delegate(&namcofl_state::TilemapCB, this));
 	c355_obj_init(NAMCOFL_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namcofl_state::FLobjcode2tile, this));

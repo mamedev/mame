@@ -79,18 +79,19 @@ TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
 void lwings_state::video_start()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lwings_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lwings_state::lwings_get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-
 	m_fg_tilemap->set_transparent_pen(3);
+
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lwings_state::lwings_get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 }
 
-VIDEO_START_MEMBER(lwings_state,trojan)
+void lwings_state::video_start_trojan()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lwings_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap->set_transparent_pen(3);
+
 	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lwings_state::trojan_get_bg1_tile_info),this),TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lwings_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(lwings_state::get_bg2_memory_offset),this), 16, 16, 32, 16);
 
-	m_fg_tilemap->set_transparent_pen(3);
 	m_bg1_tilemap->set_transmask(0, 0xffff, 0x0001); /* split type 0 is totally transparent in front half */
 	m_bg1_tilemap->set_transmask(1, 0xf07f, 0x0f81); /* split type 1 has pens 7-11 opaque in front half */
 
@@ -98,16 +99,16 @@ VIDEO_START_MEMBER(lwings_state,trojan)
 	m_spr_avenger_hw = 0;
 }
 
-VIDEO_START_MEMBER(lwings_state,avengers)
+void lwings_state::video_start_avengers()
 {
-	VIDEO_START_CALL_MEMBER(trojan);
+	video_start_trojan();
 	m_bg2_avenger_hw = 1;
 	m_spr_avenger_hw = 1;
 }
 
-VIDEO_START_MEMBER(lwings_state,avengersb)
+void lwings_state::video_start_avengersb()
 {
-	VIDEO_START_CALL_MEMBER(trojan);
+	video_start_trojan();
 	m_bg2_avenger_hw = 0;
 	m_spr_avenger_hw = 1;
 }

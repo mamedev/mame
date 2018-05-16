@@ -107,12 +107,12 @@ public:
 	TILE_GET_INFO_MEMBER(butasan_get_bg1_tile_info);
 
 	virtual void machine_start() override;
-	DECLARE_VIDEO_START(argus);
-	DECLARE_VIDEO_RESET(argus);
-	DECLARE_VIDEO_START(valtric);
-	DECLARE_VIDEO_RESET(valtric);
-	DECLARE_VIDEO_START(butasan);
-	DECLARE_VIDEO_RESET(butasan);
+	void video_start_argus()   ATTR_COLD;
+	void video_reset_argus();
+	void video_start_valtric() ATTR_COLD;
+	void video_reset_valtric();
+	void video_start_butasan() ATTR_COLD;
+	void video_reset_butasan();
 
 	uint32_t screen_update_argus(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_valtric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

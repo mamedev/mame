@@ -117,7 +117,7 @@ TILE_GET_INFO_MEMBER(splndrbt_state::splndrbt_bg_info)
  *
  *************************************/
 
-VIDEO_START_MEMBER(equites_state,equites)
+void equites_state::video_start_equites()
 {
 	m_fg_videoram = std::make_unique<uint8_t[]>(0x800);
 	save_pointer(NAME(m_fg_videoram.get()), 0x800);
@@ -130,7 +130,7 @@ VIDEO_START_MEMBER(equites_state,equites)
 	m_bg_tilemap->set_scrolldx(0, -10);
 }
 
-VIDEO_START_MEMBER(splndrbt_state,splndrbt)
+void splndrbt_state::video_start_splndrbt()
 {
 	assert(m_screen->format() == BITMAP_FORMAT_IND16);
 

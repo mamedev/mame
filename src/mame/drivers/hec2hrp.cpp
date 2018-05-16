@@ -303,21 +303,18 @@ static INPUT_PORTS_START( hec2hrp )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-/*****************************************************************************/
-MACHINE_START_MEMBER(hec2hrp_state,hec2hrp)
-/*****************************************************************************/
+void hec2hrp_state::machine_start_hec2hrp()
 {
 	hector_init();
 }
 
-MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrp)
+void hec2hrp_state::machine_reset_hec2hrp()
 {
 	// Machines init
 	hector_reset(1, 0);
 }
-/*****************************************************************************/
-MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
-/*****************************************************************************/
+
+void hec2hrp_state::machine_start_hec2hrx()
 {
 	uint8_t *RAM   = memregion("maincpu"  )->base();  // pointer to mess ram
 	//Patch rom possible !
@@ -348,9 +345,8 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
 
 	hector_init();
 }
-/*****************************************************************************/
-MACHINE_START_MEMBER(hec2hrp_state,hec2mdhrx)
-/*****************************************************************************/
+
+void hec2hrp_state::machine_start_hec2mdhrx()
 //minidisc
 {
 	uint8_t *RAM   = memregion("maincpu"  )->base();  // pointer to mess ram
@@ -373,7 +369,8 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2mdhrx)
 
 	hector_init();
 }
-MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrx)
+
+void hec2hrp_state::machine_reset_hec2hrx()
 {
 	//Hector Memory
 	membank("bank1")->set_entry(HECTOR_BANK_PROG);
@@ -385,8 +382,9 @@ MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrx)
 	hector_reset(1, 1);
 	hector_disc2_reset();
 }
+
 //minidisc
-MACHINE_RESET_MEMBER(hec2hrp_state,hec2mdhrx)
+void hec2hrp_state::machine_reset_hec2mdhrx()
 {
 	//Hector Memory
 	membank("bank1")->set_entry(HECTOR_BANK_PROG);
@@ -418,8 +416,8 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hr)
 	MCFG_DEVICE_PROGRAM_MAP(hec2hrp_mem)
 	MCFG_DEVICE_IO_MAP(hec2hrp_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
-	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrp)
-	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrp)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_hec2hrp, this));
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hec2hrp, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -431,7 +429,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_hec2hrp, this));
 
 	hector_audio(config);
 
@@ -453,8 +451,8 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hrp)
 	MCFG_DEVICE_PROGRAM_MAP(hec2hrp_mem)
 	MCFG_DEVICE_IO_MAP(hec2hrp_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) /*  put on the Z80 irq in Hz*/
-	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrp)
-	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrp)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_hec2hrp, this));
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hec2hrp, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -466,7 +464,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hrp)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_hec2hrp, this));
 
 	hector_audio(config);
 
@@ -503,8 +501,8 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mx40)
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, hec2hrp_state, disc2_fdc_dma_irq))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
-	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_hec2hrx, this));
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hec2hrx, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -516,7 +514,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mx40)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_hec2hrp, this));
 
 	hector_audio(config);
 
@@ -537,8 +535,8 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hrx)
 	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
 	MCFG_DEVICE_IO_MAP(hec2hrx_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
-	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
-	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_hec2hrx, this));
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hec2hrx, this));
 
 	/* Disc II unit */
 	MCFG_DEVICE_ADD("disc2cpu",Z80, XTAL(4'000'000))
@@ -560,7 +558,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hrx)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_hec2hrp, this));
 
 	hector_audio(config);
 
@@ -582,8 +580,8 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mdhrx)
 	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
 	MCFG_DEVICE_IO_MAP(hec2mdhrx_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
-	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2mdhrx)
-	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2mdhrx)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_hec2mdhrx, this));
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hec2mdhrx, this));
 
 	/* Mini Disc */
 	MCFG_FD1793_ADD("wd179x", XTAL(1'000'000))
@@ -599,9 +597,9 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mdhrx)
 	MCFG_SCREEN_UPDATE_DRIVER(hec2hrp_state, screen_update_hec2hrp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_hec2hrp, this));
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_hec2hrp, this)); // TODO: Perhaps this should be video_reset?
 
 	hector_audio(config);
 
@@ -623,8 +621,8 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mx80)
 	MCFG_DEVICE_PROGRAM_MAP(hec2hrx_mem)
 	MCFG_DEVICE_IO_MAP(hec2mx80_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(hec2hrp_state, irq0_line_hold, 50) //  put on the Z80 irq in Hz
-	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
-	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_hec2hrx, this));
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_hec2hrx, this));
 
 	/* Disc II unit */
 	MCFG_DEVICE_ADD("disc2cpu",Z80, XTAL(4'000'000))
@@ -646,7 +644,7 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2mx80)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_hec2hrp, this));
 
 	hector_audio(config);
 

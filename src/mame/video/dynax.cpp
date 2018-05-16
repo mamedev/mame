@@ -885,7 +885,7 @@ void dynax_state::dynax_common_reset()
 	save_item(NAME(m_hanamai_priority));
 }
 
-VIDEO_START_MEMBER(dynax_state,hanamai)
+void dynax_state::video_start_hanamai()
 {
 	m_pixmap[0][0] = std::make_unique<uint8_t[]>(256 * 256);
 	m_pixmap[0][1] = std::make_unique<uint8_t[]>(256 * 256);
@@ -909,7 +909,7 @@ VIDEO_START_MEMBER(dynax_state,hanamai)
 	save_pointer(NAME(m_pixmap[3][1].get()), 256 * 256);
 }
 
-VIDEO_START_MEMBER(dynax_state,hnoridur)
+void dynax_state::video_start_hnoridur()
 {
 	m_pixmap[0][0] = std::make_unique<uint8_t[]>(256 * 256);
 	m_pixmap[0][1] = std::make_unique<uint8_t[]>(256 * 256);
@@ -935,13 +935,13 @@ VIDEO_START_MEMBER(dynax_state,hnoridur)
 	save_pointer(NAME(m_pixmap[3][1].get()), 256 * 256);
 }
 
-VIDEO_START_MEMBER(dynax_state,mcnpshnt)
+void dynax_state::video_start_mcnpshnt()
 {
-	VIDEO_START_CALL_MEMBER(hnoridur);
+	video_start_hnoridur();
 	m_priority_table = priority_mcnpshnt;
 }
 
-VIDEO_START_MEMBER(dynax_state,sprtmtch)
+void dynax_state::video_start_sprtmtch()
 {
 	m_pixmap[0][0] = std::make_unique<uint8_t[]>(256 * 256);
 	m_pixmap[0][1] = std::make_unique<uint8_t[]>(256 * 256);
@@ -961,7 +961,7 @@ VIDEO_START_MEMBER(dynax_state,sprtmtch)
 	save_pointer(NAME(m_pixmap[2][1].get()), 256 * 256);
 }
 
-VIDEO_START_MEMBER(dynax_state,jantouki)
+void dynax_state::video_start_jantouki()
 {
 	m_pixmap[0][0] = std::make_unique<uint8_t[]>(256 * 256);
 	m_pixmap[0][1] = std::make_unique<uint8_t[]>(256 * 256);
@@ -1002,7 +1002,7 @@ VIDEO_START_MEMBER(dynax_state,jantouki)
 	save_pointer(NAME(m_pixmap[7][1].get()), 256 * 256);
 }
 
-VIDEO_START_MEMBER(dynax_state,mjdialq2)
+void dynax_state::video_start_mjdialq2()
 {
 	m_pixmap[0][0] = std::make_unique<uint8_t[]>(256 * 256);
 	m_pixmap[1][0] = std::make_unique<uint8_t[]>(256 * 256);
@@ -1015,33 +1015,33 @@ VIDEO_START_MEMBER(dynax_state,mjdialq2)
 	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
 }
 
-VIDEO_START_MEMBER(dynax_state,mjelctrn)
+void dynax_state::video_start_mjelctrn()
 {
-	VIDEO_START_CALL_MEMBER(hnoridur);
+	video_start_hnoridur();
 
 	m_priority_table = priority_mjelctrn;
 	m_update_irq_func = &dynax_state::mjelctrn_update_irq;
 }
 
-VIDEO_START_MEMBER(dynax_state,mjembase)
+void dynax_state::video_start_mjembase()
 {
-	VIDEO_START_CALL_MEMBER(hnoridur);
+	video_start_hnoridur();
 
 	m_priority_table = priority_mjembase;
 	m_update_irq_func = &dynax_state::mjelctrn_update_irq;
 }
 
-VIDEO_START_MEMBER(dynax_state,neruton)
+void dynax_state::video_start_neruton()
 {
-	VIDEO_START_CALL_MEMBER(hnoridur);
+	video_start_hnoridur();
 
 //  m_priority_table = priority_mjelctrn;
 	m_update_irq_func = &dynax_state::mjelctrn_update_irq;
 }
 
-VIDEO_START_MEMBER(dynax_state,tenkai)
+void dynax_state::video_start_tenkai()
 {
-	VIDEO_START_CALL_MEMBER(hnoridur);
+	video_start_hnoridur();
 
 	m_priority_table = priority_mjelctrn;
 	m_update_irq_func = &dynax_state::tenkai_update_irq;

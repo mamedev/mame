@@ -88,7 +88,7 @@ void srmp2_state::machine_start()
 	save_item(NAME(m_iox.data));
 }
 
-MACHINE_START_MEMBER(srmp2_state,srmp2)
+void srmp2_state::machine_start_srmp2()
 {
 	machine_start();
 
@@ -104,7 +104,7 @@ MACHINE_START_MEMBER(srmp2_state,srmp2)
 	save_item(NAME(m_color_bank));
 }
 
-MACHINE_START_MEMBER(srmp2_state,srmp3)
+void srmp2_state::machine_start_srmp3()
 {
 	machine_start();
 
@@ -121,7 +121,7 @@ MACHINE_START_MEMBER(srmp2_state,srmp3)
 	save_item(NAME(m_gfx_bank));
 }
 
-MACHINE_START_MEMBER(srmp2_state,rmgoldyh)
+void srmp2_state::machine_start_rmgoldyh()
 {
 	machine_start();
 
@@ -138,7 +138,7 @@ MACHINE_START_MEMBER(srmp2_state,rmgoldyh)
 	save_item(NAME(m_gfx_bank));
 }
 
-MACHINE_START_MEMBER(srmp2_state,mjyuugi)
+void srmp2_state::machine_start_mjyuugi()
 {
 	machine_start();
 
@@ -1149,7 +1149,7 @@ MACHINE_CONFIG_START(srmp2_state::srmp2)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp2_state, irq4_line_assert)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)      /* Interrupt times is not understood */
 
-	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_srmp2, this));
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -1195,7 +1195,7 @@ MACHINE_CONFIG_START(srmp2_state::srmp3)
 	MCFG_DEVICE_IO_MAP(srmp3_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp2_state,  irq0_line_assert)
 
-	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp3)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_srmp3, this));
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -1238,7 +1238,7 @@ MACHINE_CONFIG_START(srmp2_state::rmgoldyh)
 	MCFG_DEVICE_PROGRAM_MAP(rmgoldyh_map)
 	MCFG_DEVICE_IO_MAP(rmgoldyh_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(srmp2_state,rmgoldyh)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_rmgoldyh, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(srmp2_state::mjyuugi)
@@ -1249,7 +1249,7 @@ MACHINE_CONFIG_START(srmp2_state::mjyuugi)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp2_state, irq4_line_assert)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)      /* Interrupt times is not understood */
 
-	MCFG_MACHINE_START_OVERRIDE(srmp2_state,mjyuugi)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mjyuugi, this));
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

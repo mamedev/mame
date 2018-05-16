@@ -49,7 +49,7 @@ K053246_CB_MEMBER(xmen_state::sprite_callback)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(xmen_state,xmen6p)
+void xmen_state::video_start_xmen6p()
 {
 	m_k053246->k053247_get_ram( &m_k053247_ram);
 

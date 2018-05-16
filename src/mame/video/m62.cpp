@@ -388,7 +388,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_kungfum_bg_tile_info)
 		tileinfo.category = 0;
 }
 
-VIDEO_START_MEMBER(m62_state,kungfum)
+void m62_state::video_start_kungfum()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_kungfum_bg_tile_info),this), 32, 0, 8, 8, 64, 32);
 }
@@ -468,7 +468,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_ldrun2_bg_tile_info)
 		tileinfo.group = 0;
 }
 
-VIDEO_START_MEMBER(m62_state,ldrun2)
+void m62_state::video_start_ldrun2()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_ldrun2_bg_tile_info),this), 1, 1, 8, 8, 64, 32);
 	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
@@ -530,7 +530,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_battroad_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code | ((color & 0x40) << 3) | ((color & 0x10) << 4), color & 0x0f, 0);
 }
 
-VIDEO_START_MEMBER(m62_state,battroad)
+void m62_state::video_start_battroad()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_battroad_bg_tile_info),this), 1, 1, 8, 8, 64, 32);
 	m62_textlayer(tilemap_get_info_delegate(FUNC(m62_state::get_battroad_fg_tile_info),this), 1, 1, 8, 8, 32, 32);
@@ -566,7 +566,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_ldrun4_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0) << 2) | ((color & 0x20) << 5), color & 0x1f, 0);
 }
 
-VIDEO_START_MEMBER(m62_state,ldrun4)
+void m62_state::video_start_ldrun4()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_ldrun4_bg_tile_info),this), 1, 0, 8, 8, 64, 32);
 }
@@ -605,7 +605,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_lotlot_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0) << 2), color & 0x1f, 0);
 }
 
-VIDEO_START_MEMBER(m62_state,lotlot)
+void m62_state::video_start_lotlot()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_lotlot_bg_tile_info),this), 1, 1, 12, 10, 32, 64);
 	m62_textlayer(tilemap_get_info_delegate(FUNC(m62_state::get_lotlot_fg_tile_info),this), 1, 1, 12, 10, 32, 64);
@@ -664,7 +664,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_kidniki_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code | ( ( color & 0xc0 ) << 2 ), color & 0x1f, 0);
 }
 
-VIDEO_START_MEMBER(m62_state,kidniki)
+void m62_state::video_start_kidniki()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_chr_decode, tilemap_get_info_delegate(FUNC(m62_state::get_kidniki_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
@@ -719,7 +719,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_spelunkr_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code | ((color & 0x10) << 4), (color & 0x0f) | (m_spelunkr_palbank << 4), 0);
 }
 
-VIDEO_START_MEMBER(m62_state,spelunkr)
+void m62_state::video_start_spelunkr()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_spelunkr_bg_tile_info),this), 1, 1, 8, 8, 64, 64);
 	m62_textlayer(tilemap_get_info_delegate(FUNC(m62_state::get_spelunkr_fg_tile_info),this), 1, 1, 12, 8, 32, 32);
@@ -761,7 +761,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_spelunk2_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code | ((color & 0xf0) << 4), (color & 0x0f) | (m_spelunkr_palbank << 4), 0 );
 }
 
-VIDEO_START_MEMBER(m62_state,spelunk2)
+void m62_state::video_start_spelunk2()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_spelunk2_bg_tile_info),this), 1, 1, 8, 8, 64, 64);
 	m62_textlayer(tilemap_get_info_delegate(FUNC(m62_state::get_spelunkr_fg_tile_info),this), 1, 1, 12, 8, 32, 32);
@@ -804,7 +804,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_youjyudn_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0) << 2), (color & 0x0f), 0);
 }
 
-VIDEO_START_MEMBER(m62_state,youjyudn)
+void m62_state::video_start_youjyudn()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_youjyudn_bg_tile_info),this), 1, 0, 8, 16, 64, 16);
 	m62_textlayer(tilemap_get_info_delegate(FUNC(m62_state::get_youjyudn_fg_tile_info),this), 1, 1, 12, 8, 32, 32);
@@ -846,7 +846,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_horizon_bg_tile_info)
 		tileinfo.group = 0;
 }
 
-VIDEO_START_MEMBER(m62_state,horizon)
+void m62_state::video_start_horizon()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_horizon_bg_tile_info),this), 32, 0, 8, 8, 64, 32);
 	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */

@@ -1482,7 +1482,7 @@ static INPUT_PORTS_START( wofabl )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(B):8" )
 INPUT_PORTS_END
 
-MACHINE_START_MEMBER(cps_state,fcrash)
+void cps_state::machine_start_fcrash()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -1506,16 +1506,16 @@ MACHINE_START_MEMBER(cps_state,fcrash)
 	save_item(NAME(m_sample_select2));
 }
 
-MACHINE_START_MEMBER(cps_state,sgyxz)
+void cps_state::machine_start_sgyxz()
 {
-	MACHINE_START_CALL_MEMBER(kodb);
+	machine_start_kodb();
 	m_layer_scroll1x_offset = 0x40;
 	m_layer_scroll2x_offset = 0x40;
 	m_layer_scroll3x_offset = 0x40;
 	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
-MACHINE_START_MEMBER(cps_state,kodb)
+void cps_state::machine_start_kodb()
 {
 	m_layer_enable_reg = 0x20;
 	m_layer_mask_reg[0] = 0x2e;
@@ -1530,9 +1530,9 @@ MACHINE_START_MEMBER(cps_state,kodb)
 	m_sprite_x_offset = 0;
 }
 
-MACHINE_START_MEMBER(cps_state, cawingbl)
+void cps_state::machine_start_cawingbl()
 {
-	MACHINE_START_CALL_MEMBER(fcrash);
+	machine_start_fcrash();
 
 	m_layer_enable_reg = 0x0c;
 	m_layer_mask_reg[0] = 0x0a;
@@ -1545,7 +1545,7 @@ MACHINE_START_MEMBER(cps_state, cawingbl)
 	m_sprite_base = 0x1000;
 }
 
-MACHINE_START_MEMBER(cps_state, sf2mdt)
+void cps_state::machine_start_sf2mdt()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -1569,7 +1569,7 @@ MACHINE_START_MEMBER(cps_state, sf2mdt)
 	save_item(NAME(m_sample_select2));
 }
 
-MACHINE_START_MEMBER(cps_state, knightsb)
+void cps_state::machine_start_knightsb()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -1588,7 +1588,7 @@ MACHINE_START_MEMBER(cps_state, knightsb)
 	m_sprite_x_offset = 0;
 }
 
-MACHINE_START_MEMBER(cps_state, sf2m1)
+void cps_state::machine_start_sf2m1()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -1607,7 +1607,7 @@ MACHINE_START_MEMBER(cps_state, sf2m1)
 	m_sprite_x_offset = 0;
 }
 
-MACHINE_RESET_MEMBER(cps_state,fcrash)
+void cps_state::machine_reset_fcrash()
 {
 	m_sample_buffer1 = 0;
 	m_sample_buffer2 = 0;
@@ -1626,8 +1626,8 @@ MACHINE_CONFIG_START(cps_state::fcrash)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 24000000/6) /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(cps_state,fcrash)
-	MCFG_MACHINE_RESET_OVERRIDE(cps_state,fcrash)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fcrash, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_fcrash, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1642,7 +1642,7 @@ MACHINE_CONFIG_START(cps_state::fcrash)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cps1, this));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1678,7 +1678,7 @@ MACHINE_CONFIG_START(cps_state::cawingbl)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cps_state,  irq6_line_hold) /* needed to write to scroll values */
 
-	MCFG_MACHINE_START_OVERRIDE(cps_state, cawingbl)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cawingbl, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cps_state::kodb)
@@ -1692,7 +1692,7 @@ MACHINE_CONFIG_START(cps_state::kodb)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
 	MCFG_DEVICE_PROGRAM_MAP(kodb_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(cps_state,kodb)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_kodb, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1707,7 +1707,7 @@ MACHINE_CONFIG_START(cps_state::kodb)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cps1, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1734,8 +1734,8 @@ MACHINE_CONFIG_START(cps_state::sf2mdt)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
 	MCFG_DEVICE_PROGRAM_MAP(sf2mdt_z80map)
 
-	MCFG_MACHINE_START_OVERRIDE(cps_state, sf2mdt)
-	MCFG_MACHINE_RESET_OVERRIDE(cps_state,fcrash)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sf2mdt, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_fcrash, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1750,7 +1750,7 @@ MACHINE_CONFIG_START(cps_state::sf2mdt)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cps1, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1790,7 +1790,7 @@ MACHINE_CONFIG_START(cps_state::knightsb)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 29821000 / 8)
 	MCFG_DEVICE_PROGRAM_MAP(knightsb_z80map)
 
-	MCFG_MACHINE_START_OVERRIDE(cps_state, knightsb)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_knightsb, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1805,7 +1805,7 @@ MACHINE_CONFIG_START(cps_state::knightsb)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cps1, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2147,7 +2147,7 @@ void cps_state::init_cawingbl()
 
 // ************************************************************************* DINOPIC, DINOPIC2
 
-MACHINE_START_MEMBER(cps_state, dinopic)
+void cps_state::machine_start_dinopic()
 {
 	m_layer_enable_reg = 0x0a;
 	m_layer_mask_reg[0] = 0x0c;
@@ -2173,7 +2173,7 @@ MACHINE_CONFIG_START(cps_state::dinopic)
 	//MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000)
 	//MCFG_DEVICE_DISABLE() /* no valid dumps .. */
 
-	MCFG_MACHINE_START_OVERRIDE(cps_state, dinopic)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_dinopic, this));
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
@@ -2190,7 +2190,7 @@ MACHINE_CONFIG_START(cps_state::dinopic)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cps1, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2333,7 +2333,7 @@ MACHINE_CONFIG_START(cps_state::sgyxz)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
 	MCFG_DEVICE_PROGRAM_MAP(sgyxz_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(cps_state,sgyxz)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sgyxz, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2346,7 +2346,7 @@ MACHINE_CONFIG_START(cps_state::sgyxz)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cps1, this));
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
@@ -2433,7 +2433,7 @@ ROM_END
 
 // ************************************************************************* PUNIPIC, PUNIPIC2, PUNIPIC3
 
-MACHINE_START_MEMBER(cps_state, punipic)
+void cps_state::machine_start_punipic()
 {
 	m_layer_enable_reg = 0x12;
 	m_layer_mask_reg[0] = 0x14;
@@ -2458,7 +2458,7 @@ MACHINE_CONFIG_START(cps_state::punipic)
 	//MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000)
 	//MCFG_DEVICE_DISABLE() /* no valid dumps .. */
 
-	MCFG_MACHINE_START_OVERRIDE(cps_state, punipic)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_punipic, this));
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
@@ -2475,7 +2475,7 @@ MACHINE_CONFIG_START(cps_state::punipic)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cps1, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2654,7 +2654,7 @@ MACHINE_CONFIG_START(cps_state::sf2m1)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(sgyxz_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(cps_state,sf2m1)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sf2m1, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2665,7 +2665,7 @@ MACHINE_CONFIG_START(cps_state::sf2m1)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cps1, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3005,7 +3005,7 @@ void cps_state::init_wofabl()
 
 // ************************************************************************* SLAMPIC
 
-MACHINE_START_MEMBER(cps_state, slampic)
+void cps_state::machine_start_slampic()
 {
 	m_layer_enable_reg = 0x16;
 	m_layer_mask_reg[0] = 0x00;
@@ -3031,7 +3031,7 @@ MACHINE_CONFIG_START(cps_state::slampic)
 	//MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000)
 	//MCFG_DEVICE_DISABLE() /* no valid dumps .. */
 
-	MCFG_MACHINE_START_OVERRIDE(cps_state, slampic)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_slampic, this));
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
@@ -3048,7 +3048,7 @@ MACHINE_CONFIG_START(cps_state::slampic)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cps1, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3134,7 +3134,7 @@ MACHINE_CONFIG_START(cps_state::varthb)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
 	MCFG_DEVICE_PROGRAM_MAP(sgyxz_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(cps_state,cps1)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cps1, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3149,7 +3149,7 @@ MACHINE_CONFIG_START(cps_state::varthb)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cps1, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -195,13 +195,13 @@ public:
 	DECLARE_WRITE8_MEMBER(bb_coin_cnt_w);
 	DECLARE_READ8_MEMBER(tx1_ppi_porta_r);
 	DECLARE_READ8_MEMBER(tx1_ppi_portb_r);
-	DECLARE_MACHINE_RESET(tx1);
-	DECLARE_VIDEO_START(tx1);
+	void machine_reset_tx1();
+	void video_start_tx1()      ATTR_COLD;
 	DECLARE_PALETTE_INIT(tx1);
-	DECLARE_MACHINE_RESET(buggyboy);
-	DECLARE_VIDEO_START(buggyboy);
+	void machine_reset_buggyboy();
+	void video_start_buggyboy() ATTR_COLD;
 	DECLARE_PALETTE_INIT(buggyboy);
-	DECLARE_VIDEO_START(buggybjr);
+	void video_start_buggybjr() ATTR_COLD;
 
 	void tx1_draw_char(uint8_t *bitmap);
 	void tx1_draw_road_pixel(int screen, uint8_t *bmpaddr,

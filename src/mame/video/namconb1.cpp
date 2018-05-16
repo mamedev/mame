@@ -124,7 +124,7 @@ int namconb1_state::NB1objcode2tile( int code )
 	return (code&0x7ff) + bank*0x800;
 }
 
-VIDEO_START_MEMBER(namconb1_state,namconb1)
+void namconb1_state::video_start_namconb1()
 {
 	c123_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), namcos2_shared_state::c123_tilemap_delegate(&namconb1_state::NB1TilemapCB, this));
 	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namconb1_state::NB1objcode2tile, this));
@@ -182,7 +182,7 @@ int namconb1_state::NB2objcode2tile( int code )
 	return code;
 } /* NB2objcode2tile */
 
-VIDEO_START_MEMBER(namconb1_state,namconb2)
+void namconb1_state::video_start_namconb2()
 {
 	c123_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), namcos2_shared_state::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB, this));
 	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile, this));

@@ -859,7 +859,7 @@ WRITE16_MEMBER(wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w)
                             Initializations
 ***************************************************************************/
 
-VIDEO_START_MEMBER(wecleman_state,wecleman)
+void wecleman_state::video_start_wecleman()
 {
 	/*
 	    Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)
@@ -961,7 +961,7 @@ K051316_CB_MEMBER(wecleman_state::hotchase_zoom_callback_2)
 }
 
 
-VIDEO_START_MEMBER(wecleman_state,hotchase)
+void wecleman_state::video_start_hotchase()
 {
 	/*
 	    Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)

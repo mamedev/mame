@@ -1120,7 +1120,7 @@ void nc_state::nc200_floppy_drive_index_callback(int drive_id)
 }
 #endif
 
-MACHINE_RESET_MEMBER(nc_state, nc200)
+void nc_state::machine_reset_nc200()
 {
 	/* 512k of rom */
 	m_membank_rom_mask = 0x1f;
@@ -1139,7 +1139,7 @@ MACHINE_RESET_MEMBER(nc_state, nc200)
 	nc200_video_set_backlight(0);
 }
 
-MACHINE_START_MEMBER(nc_state, nc200)
+void nc_state::machine_start_nc200()
 {
 	m_type = NC_TYPE_200;
 
@@ -1477,8 +1477,8 @@ MACHINE_CONFIG_START(nc_state::nc200)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_IO_MAP(nc200_io)
 
-	MCFG_MACHINE_START_OVERRIDE(nc_state, nc200)
-	MCFG_MACHINE_RESET_OVERRIDE(nc_state, nc200)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_nc200, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_nc200, this));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

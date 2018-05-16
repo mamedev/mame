@@ -681,12 +681,12 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(md_boot_state::megadrvb)
 	md_ntsc(config);
-	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_md_bootleg, this));
 MACHINE_CONFIG_END
 
-MACHINE_START_MEMBER(md_boot_state, md_6button)
+void md_boot_state::machine_start_md_6button()
 {
-	MACHINE_START_CALL_MEMBER(md_bootleg);
+	machine_start_md_bootleg();
 
 	m_io_pad_6b[0] = ioport("EXTRA1");
 	m_io_pad_6b[1] = ioport("EXTRA2");
@@ -700,7 +700,7 @@ MACHINE_START_MEMBER(md_boot_state, md_6button)
 
 MACHINE_CONFIG_START(md_boot_state::megadrvb_6b)
 	md_ntsc(config);
-	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_6button)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_md_6button, this));
 MACHINE_CONFIG_END
 
 

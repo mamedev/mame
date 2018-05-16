@@ -2000,7 +2000,7 @@ GFXDECODE_END
 /******************************************************************************/
 
 
-MACHINE_START_MEMBER(tumbleb_state,tumbleb)
+void tumbleb_state::machine_start_tumbleb()
 {
 	save_item(NAME(m_music_command));
 	save_item(NAME(m_music_bank));
@@ -2010,7 +2010,7 @@ MACHINE_START_MEMBER(tumbleb_state,tumbleb)
 	save_item(NAME(m_tilebank));
 }
 
-MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
+void tumbleb_state::machine_reset_tumbleb()
 {
 	m_music_command = 0;
 	m_music_bank = 0;
@@ -2026,8 +2026,8 @@ MACHINE_CONFIG_START(tumbleb_state::tumblepb)
 	MCFG_DEVICE_PROGRAM_MAP(tumblepopb_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
 
-	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
-	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_tumbleb, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tumbleb, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2047,7 +2047,7 @@ MACHINE_CONFIG_START(tumbleb_state::tumblepb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_tumblepb, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2064,8 +2064,8 @@ MACHINE_CONFIG_START(tumbleb_state::tumbleb2)
 	MCFG_DEVICE_PROGRAM_MAP(tumblepopb_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  tumbleb2_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
-	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_tumbleb, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tumbleb, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2085,7 +2085,7 @@ MACHINE_CONFIG_START(tumbleb_state::tumbleb2)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_tumblepb, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2105,8 +2105,8 @@ MACHINE_CONFIG_START(tumbleb_state::jumpkids)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000/2)
 	MCFG_DEVICE_PROGRAM_MAP(jumpkids_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
-	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_tumbleb, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tumbleb, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2126,7 +2126,7 @@ MACHINE_CONFIG_START(tumbleb_state::jumpkids)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_tumblepb, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2144,8 +2144,8 @@ MACHINE_CONFIG_START(tumbleb_state::fncywld)
 	MCFG_DEVICE_PROGRAM_MAP(fncywld_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  irq6_line_hold)
 
-	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
-	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_tumbleb, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tumbleb, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2166,7 +2166,7 @@ MACHINE_CONFIG_START(tumbleb_state::fncywld)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,fncywld)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_fncywld, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2180,7 +2180,7 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
+void tumbleb_state::machine_reset_htchctch()
 {
 	if (memregion("user1") != nullptr)
 	{
@@ -2192,7 +2192,7 @@ MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
 			m_mainram[0x000 / 2 + i] = PROTDATA[i];
 	}
 
-	MACHINE_RESET_CALL_MEMBER(tumbleb);
+	machine_reset_tumbleb();
 }
 
 MACHINE_CONFIG_START(tumbleb_state::htchctch)
@@ -2205,8 +2205,8 @@ MACHINE_CONFIG_START(tumbleb_state::htchctch)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 15000000/4) /* verified on dquizgo */
 	MCFG_DEVICE_PROGRAM_MAP(semicom_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
-	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,htchctch)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_tumbleb, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_htchctch, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2226,7 +2226,7 @@ MACHINE_CONFIG_START(tumbleb_state::htchctch)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_tumblepb, this));
 
 	/* sound hardware - same as hyperpac */
 	SPEAKER(config, "mono").front_center();
@@ -2290,7 +2290,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tumbleb_state::sdfight)
 	bcstory(config);
-	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,sdfight)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_sdfight, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_sdfight)
 MACHINE_CONFIG_END
@@ -2319,8 +2319,8 @@ MACHINE_CONFIG_START(tumbleb_state::suprtrio)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)
 	MCFG_DEVICE_PROGRAM_MAP(suprtrio_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
-	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_tumbleb, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tumbleb, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2340,7 +2340,7 @@ MACHINE_CONFIG_START(tumbleb_state::suprtrio)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,suprtrio)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_suprtrio, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2358,8 +2358,8 @@ MACHINE_CONFIG_START(tumbleb_state::pangpang)
 	MCFG_DEVICE_PROGRAM_MAP(pangpang_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tumbleb_state,  tumbleb2_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
-	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_tumbleb, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tumbleb, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2379,7 +2379,7 @@ MACHINE_CONFIG_START(tumbleb_state::pangpang)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,pangpang)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pangpang, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

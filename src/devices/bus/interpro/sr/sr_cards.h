@@ -7,6 +7,7 @@
 #pragma once
 
 // supported devices
-void sr_cards(device_slot_interface &device);
+void cbus_cards(device_slot_interface &device);
+void srx_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_INTERPRO_SR_SR_CARDS_H

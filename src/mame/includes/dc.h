@@ -94,7 +94,7 @@ class dc_state : public driver_device
 
 	void generic_dma(uint32_t main_adr, void *dma_ptr, uint32_t length, uint32_t size, bool to_mainram);
 	TIMER_DEVICE_CALLBACK_MEMBER(dc_scanline);
-	DECLARE_MACHINE_RESET(dc_console);
+	void machine_reset_dc_console();
 
 	void naomi_aw_base(machine_config &config);
 	void dc_audio_map(address_map &map);

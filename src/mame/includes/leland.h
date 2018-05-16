@@ -172,13 +172,13 @@ public:
 	void init_indyheat();
 	void init_brutforc();
 	void init_asylum();
-	DECLARE_MACHINE_START(ataxx);
-	DECLARE_MACHINE_RESET(ataxx);
-	DECLARE_MACHINE_START(leland);
-	DECLARE_MACHINE_RESET(leland);
-	DECLARE_VIDEO_START(leland);
-	DECLARE_VIDEO_START(leland2);
-	DECLARE_VIDEO_START(ataxx);
+	void machine_start_ataxx()  ATTR_COLD;
+	void machine_reset_ataxx();
+	void machine_start_leland() ATTR_COLD;
+	void machine_reset_leland();
+	void video_start_leland()   ATTR_COLD;
+	void video_start_leland2()  ATTR_COLD;
+	void video_start_ataxx()    ATTR_COLD;
 
 	uint32_t screen_update_leland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ataxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

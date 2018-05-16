@@ -71,12 +71,12 @@ public:
 	DECLARE_WRITE8_MEMBER(gbc_io2_w);
 	DECLARE_READ8_MEMBER(gbc_io2_r);
 	DECLARE_PALETTE_INIT(gb);
-	DECLARE_MACHINE_START(sgb);
-	DECLARE_MACHINE_RESET(sgb);
+	void machine_start_sgb() ATTR_COLD;
+	void machine_reset_sgb();
 	DECLARE_PALETTE_INIT(sgb);
 	DECLARE_PALETTE_INIT(gbp);
-	DECLARE_MACHINE_START(gbc);
-	DECLARE_MACHINE_RESET(gbc);
+	void machine_start_gbc() ATTR_COLD;
+	void machine_reset_gbc();
 	DECLARE_PALETTE_INIT(gbc);
 	DECLARE_WRITE8_MEMBER(gb_timer_callback);
 
@@ -142,8 +142,8 @@ public:
 	DECLARE_READ8_MEMBER(megaduck_sound_r1);
 	DECLARE_WRITE8_MEMBER(megaduck_sound_w2);
 	DECLARE_READ8_MEMBER(megaduck_sound_r2);
-	DECLARE_MACHINE_START(megaduck);
-	DECLARE_MACHINE_RESET(megaduck);
+	void machine_start_megaduck() ATTR_COLD;
+	void machine_reset_megaduck();
 	DECLARE_PALETTE_INIT(megaduck);
 
 	DECLARE_READ8_MEMBER(cart_r);

@@ -1916,7 +1916,7 @@ READ8_MEMBER(apple2gs_state::apple2gs_read_vector)
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset | 0xFFFFE0);
 }
 
-MACHINE_RESET_MEMBER(apple2gs_state,apple2gs)
+void apple2gs_state::machine_reset_apple2gs()
 {
 	apple2gs_refresh_delegates();
 
@@ -1971,7 +1971,7 @@ MACHINE_RESET_MEMBER(apple2gs_state,apple2gs)
 	m_last_adb_time = 0;
 }
 
-MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
+void apple2gs_state::machine_start_apple2gscommon()
 {
 	apple2gs_refresh_delegates();
 
@@ -2045,15 +2045,15 @@ MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 	m_scanline_timer->adjust(m_screen->time_until_pos(0, 0));
 }
 
-MACHINE_START_MEMBER(apple2gs_state,apple2gs)
+void apple2gs_state::machine_start_apple2gs()
 {
-	MACHINE_START_CALL_MEMBER(apple2gscommon);
+	machine_start_apple2gscommon();
 	apple2gs_setup_memory();
 }
 
-MACHINE_START_MEMBER(apple2gs_state,apple2gsr1)
+void apple2gs_state::machine_start_apple2gsr1()
 {
-	MACHINE_START_CALL_MEMBER(apple2gscommon);
+	machine_start_apple2gscommon();
 
 	m_is_rom3 = false;
 	apple2gs_setup_memory();

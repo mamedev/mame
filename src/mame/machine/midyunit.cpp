@@ -530,7 +530,7 @@ void midyunit_state::init_totcarn()
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(midyunit_state,midyunit)
+void midyunit_state::machine_reset_midyunit()
 {
 	/* reset sound */
 	switch (m_chip_type)

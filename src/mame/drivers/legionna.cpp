@@ -1255,7 +1255,7 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(legionna_state,legionna)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_legionna, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1308,7 +1308,7 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(legionna_state,heatbrl)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_heatbrl, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1362,7 +1362,7 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(legionna_state,godzilla)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_godzilla, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1415,7 +1415,7 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(legionna_state,denjinmk)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_denjinmk, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1468,7 +1468,7 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(legionna_state,grainbow)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_grainbow, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1522,7 +1522,7 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(legionna_state,cupsoc)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cupsoc, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

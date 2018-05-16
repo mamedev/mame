@@ -347,7 +347,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ladyfrog_state::toucheme)
 	ladyfrog(config);
-	MCFG_VIDEO_START_OVERRIDE(ladyfrog_state,toucheme)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_toucheme, this));
 MACHINE_CONFIG_END
 
 

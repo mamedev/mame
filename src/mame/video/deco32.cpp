@@ -83,14 +83,14 @@ void deco32_state::allocate_rowscroll(int size1, int size2, int size3, int size4
 	save_pointer(NAME(m_pf_rowscroll[3].get()), size4);
 }
 
-VIDEO_START_MEMBER( captaven_state, captaven )
+void captaven_state::video_start_captaven()
 {
 	deco32_state::allocate_spriteram(0);
 	deco32_state::allocate_rowscroll(0x4000/4, 0x2000/4, 0x4000/4, 0x2000/4);
 	deco32_state::video_start();
 }
 
-VIDEO_START_MEMBER( fghthist_state, fghthist )
+void fghthist_state::video_start_fghthist()
 {
 	m_sprgen[0]->alloc_sprite_bitmap();
 	deco32_state::allocate_spriteram(0);
@@ -99,11 +99,10 @@ VIDEO_START_MEMBER( fghthist_state, fghthist )
 	deco32_state::video_start();
 }
 
-VIDEO_START_MEMBER( nslasher_state, nslasher )
+void nslasher_state::video_start_nslasher()
 {
-	int width, height;
-	width = m_screen->width();
-	height = m_screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 	m_tilemap_alpha_bitmap=std::make_unique<bitmap_ind16>(width, height );
 	for (int chip = 0; chip < 2; chip++)
 	{
@@ -114,7 +113,7 @@ VIDEO_START_MEMBER( nslasher_state, nslasher )
 	deco32_state::video_start();
 }
 
-VIDEO_START_MEMBER( dragngun_state, dragngun )
+void dragngun_state::video_start_dragngun()
 {
 	m_screen->register_screen_bitmap(m_temp_render_bitmap);
 	deco32_state::allocate_rowscroll(0x4000/4, 0x2000/4, 0x4000/4, 0x2000/4);

@@ -1175,7 +1175,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrscroll)
 	MCFG_PALETTE_ENTRIES(64+4)
 
 	MCFG_PALETTE_INIT_OWNER(mcr3_state,spyhunt)
-	MCFG_VIDEO_START_OVERRIDE(mcr3_state,spyhunt)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_spyhunt, this));
 MACHINE_CONFIG_END
 
 

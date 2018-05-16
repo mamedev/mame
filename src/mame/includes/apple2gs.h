@@ -190,12 +190,12 @@ public:
 	write8_delegate write_delegates_2gs0400[2];
 	write8_delegate write_delegates_2gs2000[2];
 	write8_delegate write_delegates_2gs4000[2];
-	DECLARE_MACHINE_START(apple2gs);
-	DECLARE_MACHINE_RESET(apple2gs);
-	DECLARE_VIDEO_START(apple2gs);
+	void machine_start_apple2gs() ATTR_COLD;
+	void machine_reset_apple2gs();
+	void video_start_apple2gs() ATTR_COLD;
 	DECLARE_PALETTE_INIT(apple2gs);
-	DECLARE_MACHINE_START(apple2gsr1);
-	DECLARE_MACHINE_START(apple2gscommon);
+	void machine_start_apple2gsr1() ATTR_COLD;
+	void machine_start_apple2gscommon() ATTR_COLD;
 	uint32_t screen_update_apple2gs(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(apple2gs_clock_tick);
 	TIMER_CALLBACK_MEMBER(apple2gs_qsecond_tick);

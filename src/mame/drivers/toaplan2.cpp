@@ -424,7 +424,7 @@ WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
 }
 
 
-MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
+void toaplan2_state::machine_reset_toaplan2()
 {
 	// All games execute a RESET instruction on init, presumably to reset the sound CPU.
 	// This is important for games with common RAM; the RAM test will fail
@@ -433,9 +433,9 @@ MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
 }
 
 
-MACHINE_RESET_MEMBER(toaplan2_state,ghox)
+void toaplan2_state::machine_reset_ghox()
 {
-	MACHINE_RESET_CALL_MEMBER(toaplan2);
+	machine_reset_toaplan2();
 	m_old_p1_paddle_h = 0;
 	m_old_p2_paddle_h = 0;
 }
@@ -3206,7 +3206,7 @@ MACHINE_CONFIG_START(toaplan2_state::tekipaki)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_toaplan2, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3226,7 +3226,7 @@ MACHINE_CONFIG_START(toaplan2_state::tekipaki)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3249,7 +3249,7 @@ MACHINE_CONFIG_START(toaplan2_state::ghox)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,ghox)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ghox, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3269,7 +3269,7 @@ MACHINE_CONFIG_START(toaplan2_state::ghox)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3360,7 +3360,7 @@ MACHINE_CONFIG_START(toaplan2_state::dogyuun)
 	MCFG_DEVICE_ADD("gp9001_1", GP9001_VDP, XTAL(27'000'000))
 	MCFG_GFX_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3406,7 +3406,7 @@ MACHINE_CONFIG_START(toaplan2_state::kbash)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3443,7 +3443,7 @@ MACHINE_CONFIG_START(toaplan2_state::kbash2)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3478,7 +3478,7 @@ MACHINE_CONFIG_START(toaplan2_state::truxton2)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_2))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,truxton2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_truxton2, this));
 
 	/* sound hardware */
 #ifdef TRUXTON2_STEREO  // music data is stereo...
@@ -3515,7 +3515,7 @@ MACHINE_CONFIG_START(toaplan2_state::pipibibs)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_toaplan2, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3535,7 +3535,7 @@ MACHINE_CONFIG_START(toaplan2_state::pipibibs)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3558,7 +3558,7 @@ MACHINE_CONFIG_START(toaplan2_state::pipibibsbl)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_toaplan2, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3578,7 +3578,7 @@ MACHINE_CONFIG_START(toaplan2_state::pipibibsbl)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(ASSERTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3657,7 +3657,7 @@ MACHINE_CONFIG_START(toaplan2_state::fixeight)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,truxton2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_truxton2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3696,7 +3696,7 @@ MACHINE_CONFIG_START(toaplan2_state::fixeightbl)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(ASSERTLINE("maincpu", M68K_IRQ_2))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,fixeightbl)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_fixeightbl, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3736,7 +3736,7 @@ MACHINE_CONFIG_START(toaplan2_state::vfive)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3780,7 +3780,7 @@ MACHINE_CONFIG_START(toaplan2_state::batsugun)
 	MCFG_DEVICE_ADD("gp9001_1", GP9001_VDP, XTAL(27'000'000))
 	MCFG_GFX_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3819,7 +3819,7 @@ MACHINE_CONFIG_START(toaplan2_state::pwrkick)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3852,7 +3852,7 @@ MACHINE_CONFIG_START(toaplan2_state::othldrby)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3882,7 +3882,7 @@ MACHINE_CONFIG_START(toaplan2_state::enmadaio)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3919,7 +3919,7 @@ MACHINE_CONFIG_START(toaplan2_state::snowbro2)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3943,7 +3943,7 @@ MACHINE_CONFIG_START(toaplan2_state::mahoudai)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_toaplan2, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3964,7 +3964,7 @@ MACHINE_CONFIG_START(toaplan2_state::mahoudai)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgaregga)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_bgaregga, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3988,7 +3988,7 @@ MACHINE_CONFIG_START(toaplan2_state::shippumd)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_toaplan2, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4009,7 +4009,7 @@ MACHINE_CONFIG_START(toaplan2_state::shippumd)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgaregga)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_bgaregga, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4032,7 +4032,7 @@ MACHINE_CONFIG_START(toaplan2_state::bgaregga)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_toaplan2, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -4053,7 +4053,7 @@ MACHINE_CONFIG_START(toaplan2_state::bgaregga)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgaregga)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_bgaregga, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4075,7 +4075,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(toaplan2_state::bgareggabl)
 	bgaregga(config);
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgareggabl)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_bgareggabl, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_bootleg)
@@ -4096,7 +4096,7 @@ MACHINE_CONFIG_START(toaplan2_state::batrider)
 	MCFG_INPUT_MERGER_ANY_HIGH("batrider_sndirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_toaplan2, this));
 
 	MCFG_DEVICE_ADD("dma_space", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(batrider_dma_mem)
@@ -4124,7 +4124,7 @@ MACHINE_CONFIG_START(toaplan2_state::batrider)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_2))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,batrider)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_batrider, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4172,7 +4172,7 @@ MACHINE_CONFIG_START(toaplan2_state::bbakraid)
 	MCFG_INPUT_MERGER_ANY_HIGH("batrider_sndirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_toaplan2, this));
 
 	MCFG_EEPROM_SERIAL_93C66_8BIT_ADD("eeprom")
 
@@ -4202,7 +4202,7 @@ MACHINE_CONFIG_START(toaplan2_state::bbakraid)
 	MCFG_GFX_PALETTE("palette")
 	MCFG_GP9001_VINT_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_1))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,batrider)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_batrider, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -55,20 +55,20 @@ void tsamurai_state::machine_start()
 	save_item(NAME(m_nmi_enabled));
 }
 
-MACHINE_START_MEMBER(tsamurai_state, tsamurai)
+void tsamurai_state::machine_start_tsamurai()
 {
 	save_item(NAME(m_sound_command1));
 	save_item(NAME(m_sound_command2));
 	machine_start();
 }
 
-MACHINE_START_MEMBER(tsamurai_state, m660)
+void tsamurai_state::machine_start_m660()
 {
-	MACHINE_START_CALL_MEMBER(tsamurai);
+	machine_start_tsamurai();
 	save_item(NAME(m_sound_command3));
 }
 
-MACHINE_START_MEMBER(tsamurai_state, vsgongf)
+void tsamurai_state::machine_start_vsgongf()
 {
 	save_item(NAME(m_vsgongf_sound_nmi_enabled));
 	machine_start();
@@ -729,7 +729,7 @@ MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 	MCFG_DEVICE_ADD("audio2", Z80, XTAL(24'000'000)/8)
 	MCFG_DEVICE_PROGRAM_MAP(sound2_map)
 
-	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,tsamurai)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_tsamurai, this));
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tsamurai_state, flip_screen_w))
@@ -750,7 +750,7 @@ MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,tsamurai)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_tsamurai, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -777,7 +777,7 @@ MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 	MCFG_DEVICE_IO_MAP(vsgongf_audio_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(tsamurai_state, vsgongf_sound_interrupt, 3*60)
 
-	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,vsgongf)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_vsgongf, this));
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 4L
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // vreg? always 0
@@ -798,7 +798,7 @@ MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,vsgongf)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_vsgongf, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -831,7 +831,7 @@ MACHINE_CONFIG_START(tsamurai_state::m660)
 	MCFG_DEVICE_PROGRAM_MAP(sound3_m660_map)
 	MCFG_DEVICE_IO_MAP(sound3_m660_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,m660)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_m660, this));
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, tsamurai_state, flip_screen_w))
@@ -854,7 +854,7 @@ MACHINE_CONFIG_START(tsamurai_state::m660)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,m660)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_m660, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

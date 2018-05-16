@@ -3517,12 +3517,15 @@ bool sh34_base_device::generate_group_15_FDIV(drcuml_block &block, compiler_stat
 
 bool sh34_base_device::generate_group_15_FCMP_EQ(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
+	UML_MOV(block, I1, 0);
+	
 	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 0);
 	UML_JMPc(block, COND_Z, compiler.labelnum);
 
 	UML_AND(block, I0, uml::mem(&m_sh2_state->sr), ~SH_T);
 	UML_FDCMP(block, FPD32(Rm & 14), FPD32(Rn & 14));
-	UML_MOVc(block, COND_Z, I0, SH_T);
+	UML_MOVc(block, COND_Z, I1, SH_T);
+	UML_OR(block, I0, I0, I1);
 	UML_MOV(block, uml::mem(&m_sh2_state->sr), I0);
 
 	UML_JMP(block, compiler.labelnum+1);
@@ -3531,7 +3534,8 @@ bool sh34_base_device::generate_group_15_FCMP_EQ(drcuml_block &block, compiler_s
 
 	UML_AND(block, I0, uml::mem(&m_sh2_state->sr), ~SH_T);
 	UML_FSCMP(block, FPS32(Rm), FPS32(Rn));
-	UML_MOVc(block, COND_Z, I0, SH_T);
+	UML_MOVc(block, COND_Z, I1, SH_T);
+	UML_OR(block, I0, I0, I1);
 	UML_MOV(block, uml::mem(&m_sh2_state->sr), I0);
 
 	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:
@@ -3540,12 +3544,15 @@ bool sh34_base_device::generate_group_15_FCMP_EQ(drcuml_block &block, compiler_s
 
 bool sh34_base_device::generate_group_15_FCMP_GT(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
+	UML_MOV(block, I1, 0);
+
 	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 0);
 	UML_JMPc(block, COND_Z, compiler.labelnum);
 
 	UML_AND(block, I0, uml::mem(&m_sh2_state->sr), ~SH_T);
 	UML_FDCMP(block, FPD32(Rm & 14), FPD32(Rn & 14));
-	UML_MOVc(block, COND_C, I0, SH_T);
+	UML_MOVc(block, COND_C, I1, SH_T);
+	UML_OR(block, I0, I0, I1);
 	UML_MOV(block, uml::mem(&m_sh2_state->sr), I0);
 
 	UML_JMP(block, compiler.labelnum+1);
@@ -3554,7 +3561,8 @@ bool sh34_base_device::generate_group_15_FCMP_GT(drcuml_block &block, compiler_s
 
 	UML_AND(block, I0, uml::mem(&m_sh2_state->sr), ~SH_T);
 	UML_FSCMP(block, FPS32(Rm), FPS32(Rn));
-	UML_MOVc(block, COND_C, I0, SH_T);
+	UML_MOVc(block, COND_C, I1, SH_T);
+	UML_OR(block, I0, I0, I1);
 	UML_MOV(block, uml::mem(&m_sh2_state->sr), I0);
 
 	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:

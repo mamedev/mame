@@ -90,8 +90,8 @@ public:
 	void init_kisekaeh();
 	void init_kisekaem();
 	void init_macs2();
-	DECLARE_MACHINE_RESET(macs);
-	DECLARE_MACHINE_START(macs);
+	void machine_reset_macs();
+	void machine_start_macs();
 	ST0016_DMA_OFFS_CB(dma_offset);
 
 	uint32_t screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -505,8 +505,8 @@ MACHINE_CONFIG_START(macs_state::macs)
 
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", macs_state, irq0_line_hold)
 
-	MCFG_MACHINE_START_OVERRIDE(macs_state, macs)
-	MCFG_MACHINE_RESET_OVERRIDE(macs_state, macs)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_macs, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_macs, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -654,7 +654,7 @@ static const uint8_t ramdata[160]=
 };
 #endif
 
-MACHINE_START_MEMBER(macs_state,macs)
+void macs_state::machine_start_macs()
 {
 	m_rombank[0]->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
 	m_rombank[0]->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
@@ -673,7 +673,7 @@ MACHINE_START_MEMBER(macs_state,macs)
 	m_rambank[1]->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER(macs_state,macs)
+void macs_state::machine_reset_macs()
 {
 	#if 0
 	uint8_t *macs_ram1 = m_ram1.get();

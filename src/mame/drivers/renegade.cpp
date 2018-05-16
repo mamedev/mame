@@ -187,7 +187,11 @@ void renegade_state::machine_start()
 
 READ8_MEMBER(renegade_state::mcu_reset_r)
 {
-	m_mcu->reset_w(PULSE_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		m_mcu->reset_w(ASSERT_LINE);
+		m_mcu->reset_w(CLEAR_LINE);
+	}
 	return 0;
 }
 

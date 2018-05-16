@@ -688,7 +688,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(freekick_state,freekick)
+void freekick_state::machine_start_freekick()
 {
 	save_item(NAME(m_romaddr));
 	save_item(NAME(m_spinner));
@@ -696,7 +696,7 @@ MACHINE_START_MEMBER(freekick_state,freekick)
 	save_item(NAME(m_ff_data));
 }
 
-MACHINE_RESET_MEMBER(freekick_state,freekick)
+void freekick_state::machine_reset_freekick()
 {
 	m_romaddr = 0;
 	m_spinner = 0;
@@ -706,25 +706,25 @@ MACHINE_RESET_MEMBER(freekick_state,freekick)
 	machine().bookkeeping().coin_counter_w(1, 0);
 }
 
-MACHINE_START_MEMBER(freekick_state,pbillrd)
+void freekick_state::machine_start_pbillrd()
 {
 	m_bank1->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x4000);
 
-	MACHINE_START_CALL_MEMBER(freekick);
+	machine_start_freekick();
 }
 
-MACHINE_START_MEMBER(freekick_state,oigas)
+void freekick_state::machine_start_oigas()
 {
 	save_item(NAME(m_inval));
 	save_item(NAME(m_outval));
 	save_item(NAME(m_cnt));
 
-	MACHINE_START_CALL_MEMBER(freekick);
+	machine_start_freekick();
 }
 
-MACHINE_RESET_MEMBER(freekick_state,oigas)
+void freekick_state::machine_reset_oigas()
 {
-	MACHINE_RESET_CALL_MEMBER(freekick);
+	machine_reset_freekick();
 
 	m_inval = 0;
 	m_outval = 0;
@@ -816,8 +816,8 @@ MACHINE_CONFIG_START(freekick_state::pbillrd)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_y_w))
 	/* flip Y/X could be the other way round... */
 
-	MCFG_MACHINE_START_OVERRIDE(freekick_state,pbillrd)
-	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pbillrd, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_freekick, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(freekick_state::pbillrdm)
@@ -840,8 +840,8 @@ MACHINE_CONFIG_START(freekick_state::freekick)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, freekick_state, spinner_select_w))
 
-	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
-	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_freekick, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_freekick, this));
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, freekick_state, snd_rom_addr_l_w))
@@ -871,8 +871,8 @@ MACHINE_CONFIG_START(freekick_state::gigas)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // ???
 
-	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
-	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_freekick, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_freekick, this));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -893,8 +893,8 @@ MACHINE_CONFIG_START(freekick_state::gigasm)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, freekick_state, flipscreen_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // ???
 
-	MCFG_MACHINE_START_OVERRIDE(freekick_state,freekick)
-	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_freekick, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_freekick, this));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -908,8 +908,8 @@ MACHINE_CONFIG_START(freekick_state::oigas)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(oigas_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(freekick_state,oigas)
-	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,oigas)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_oigas, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_oigas, this));
 MACHINE_CONFIG_END
 
 

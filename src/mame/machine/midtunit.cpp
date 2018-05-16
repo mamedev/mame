@@ -483,7 +483,7 @@ void midtunit_state::init_mk2()
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(midtunit_state,midtunit)
+void midtunit_state::machine_reset_midtunit()
 {
 	/* reset sound */
 	switch (m_chip_type)

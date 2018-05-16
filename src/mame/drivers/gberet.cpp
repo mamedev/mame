@@ -394,14 +394,14 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(gberet_state,gberet)
+void gberet_state::machine_start_gberet()
 {
 	save_item(NAME(m_interrupt_mask));
 	save_item(NAME(m_interrupt_ticks));
 	save_item(NAME(m_spritebank));
 }
 
-MACHINE_RESET_MEMBER(gberet_state,gberet)
+void gberet_state::machine_reset_gberet()
 {
 	m_interrupt_mask = 0;
 	m_interrupt_ticks = 0;
@@ -416,8 +416,8 @@ MACHINE_CONFIG_START(gberet_state::gberet)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gberet_state, gberet_interrupt_tick, "screen", 0, 16)
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_MACHINE_START_OVERRIDE(gberet_state,gberet)
-	MCFG_MACHINE_RESET_OVERRIDE(gberet_state,gberet)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_gberet, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gberet, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(gberet_state::gberet)
 	MCFG_PALETTE_ADD("palette", 2*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gberet_state,gberet)
-	MCFG_VIDEO_START_OVERRIDE(gberet_state,gberet)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gberet, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -457,8 +457,8 @@ MACHINE_CONFIG_START(gberet_state::gberetb)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gberet_state,  irq0_line_assert)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(gberet_state, nmi_line_assert,  XTAL(20'000'000)/0x8000) // divider guessed
 
-	MCFG_MACHINE_START_OVERRIDE(gberet_state,gberet)
-	MCFG_MACHINE_RESET_OVERRIDE(gberet_state,gberet)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_gberet, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gberet, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -473,7 +473,7 @@ MACHINE_CONFIG_START(gberet_state::gberetb)
 	MCFG_PALETTE_ADD("palette", 2*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gberet_state,gberet)
-	MCFG_VIDEO_START_OVERRIDE(gberet_state,gberet)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gberet, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

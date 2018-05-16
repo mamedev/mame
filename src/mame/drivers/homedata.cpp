@@ -1125,7 +1125,7 @@ static GFXDECODE_START( gfx_lemnangl )
 GFXDECODE_END
 
 
-MACHINE_START_MEMBER(homedata_state,homedata)
+void homedata_state::machine_start_homedata()
 {
 	save_item(NAME(m_visible_page));
 	save_item(NAME(m_flipscreen));
@@ -1138,14 +1138,14 @@ MACHINE_START_MEMBER(homedata_state,homedata)
 	save_item(NAME(m_snd_command));
 }
 
-MACHINE_START_MEMBER(homedata_state,reikaids)
+void homedata_state::machine_start_reikaids()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0xc000], 0x4000);
 	membank("bank2")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x10000);
 
-	MACHINE_START_CALL_MEMBER(homedata);
+	machine_start_homedata();
 
 	save_item(NAME(m_upd7807_porta));
 	save_item(NAME(m_upd7807_portc));
@@ -1154,14 +1154,14 @@ MACHINE_START_MEMBER(homedata_state,reikaids)
 	save_item(NAME(m_gfx_bank));
 }
 
-MACHINE_START_MEMBER(homedata_state,pteacher)
+void homedata_state::machine_start_pteacher()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 	membank("bank2")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x10000);
 
-	MACHINE_START_CALL_MEMBER(homedata);
+	machine_start_homedata();
 
 	save_item(NAME(m_upd7807_porta));
 	save_item(NAME(m_upd7807_portc));
@@ -1171,7 +1171,7 @@ MACHINE_START_MEMBER(homedata_state,pteacher)
 	save_item(NAME(m_from_cpu));
 }
 
-MACHINE_RESET_MEMBER(homedata_state,homedata)
+void homedata_state::machine_reset_homedata()
 {
 	m_visible_page = 0;
 	m_flipscreen = 0;
@@ -1187,14 +1187,14 @@ MACHINE_RESET_MEMBER(homedata_state,homedata)
 	m_snd_command = 0;
 }
 
-MACHINE_RESET_MEMBER(homedata_state,pteacher)
+void homedata_state::machine_reset_pteacher()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	pteacher_upd7807_portc_w(space, 0, 0xff);
 
-	MACHINE_RESET_CALL_MEMBER(homedata);
+	machine_reset_homedata();
 
 	m_upd7807_porta = 0;
 	m_gfx_bank[0] = 0;
@@ -1203,14 +1203,14 @@ MACHINE_RESET_MEMBER(homedata_state,pteacher)
 	m_from_cpu = 0;
 }
 
-MACHINE_RESET_MEMBER(homedata_state,reikaids)
+void homedata_state::machine_reset_reikaids()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	reikaids_upd7807_portc_w(space, 0, 0xff);
 
-	MACHINE_RESET_CALL_MEMBER(homedata);
+	machine_reset_homedata();
 
 	m_reikaids_which = m_priority;  // m_priority is set in DRIVER_INIT
 	m_upd7807_porta = 0;
@@ -1229,8 +1229,8 @@ MACHINE_CONFIG_START(homedata_state::mrokumei)
 	MCFG_DEVICE_PROGRAM_MAP(mrokumei_sound_map)
 	MCFG_DEVICE_IO_MAP(mrokumei_sound_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(homedata_state,homedata)
-	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,homedata)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_homedata, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_homedata, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1247,7 +1247,7 @@ MACHINE_CONFIG_START(homedata_state::mrokumei)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,mrokumei)
-	MCFG_VIDEO_START_OVERRIDE(homedata_state,mrokumei)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_mrokumei, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1283,8 +1283,8 @@ MACHINE_CONFIG_START(homedata_state::reikaids)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) // very high interleave required to sync for startup tests
 
-	MCFG_MACHINE_START_OVERRIDE(homedata_state,reikaids)
-	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,reikaids)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_reikaids, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_reikaids, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1300,7 +1300,7 @@ MACHINE_CONFIG_START(homedata_state::reikaids)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,reikaids)
-	MCFG_VIDEO_START_OVERRIDE(homedata_state,reikaids)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_reikaids, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1340,8 +1340,8 @@ MACHINE_CONFIG_START(homedata_state::pteacher)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  // should be enough
 
-	MCFG_MACHINE_START_OVERRIDE(homedata_state,pteacher)
-	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,pteacher)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pteacher, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pteacher, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1358,7 +1358,7 @@ MACHINE_CONFIG_START(homedata_state::pteacher)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,pteacher)
-	MCFG_VIDEO_START_OVERRIDE(homedata_state,pteacher)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pteacher, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1384,7 +1384,7 @@ MACHINE_CONFIG_START(homedata_state::lemnangl)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lemnangl)
 
-	MCFG_VIDEO_START_OVERRIDE(homedata_state,lemnangl)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_lemnangl, this));
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( mirderby )
@@ -1527,7 +1527,7 @@ MACHINE_CONFIG_START(homedata_state::mirderby)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,mirderby)
-	MCFG_VIDEO_START_OVERRIDE(homedata_state,mirderby)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_mirderby, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -86,13 +86,13 @@ public:
 	DECLARE_WRITE8_MEMBER(ay8910_portB_1_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portA_2_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portB_2_w);
-	DECLARE_MACHINE_START(tubep);
-	DECLARE_MACHINE_RESET(tubep);
+	void machine_start_tubep() ATTR_COLD;
+	void machine_reset_tubep();
 	virtual void video_start() override;
 	virtual void video_reset() override;
 	DECLARE_PALETTE_INIT(tubep);
-	DECLARE_MACHINE_START(rjammer);
-	DECLARE_MACHINE_RESET(rjammer);
+	void machine_start_rjammer() ATTR_COLD;
+	void machine_reset_rjammer();
 	DECLARE_PALETTE_INIT(rjammer);
 	uint32_t screen_update_tubep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

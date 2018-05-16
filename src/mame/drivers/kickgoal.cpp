@@ -661,7 +661,7 @@ MACHINE_CONFIG_START(kickgoal_state::kickgoal)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,kickgoal)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_kickgoal, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -700,7 +700,7 @@ MACHINE_CONFIG_START(kickgoal_state::actionhw)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,actionhw)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_actionhw, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -173,7 +173,7 @@ public:
 	DECLARE_WRITE32_MEMBER(_3do_clio_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_VIDEO_START(_3do);
+	void video_start__3do() ATTR_COLD;
 	uint32_t screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( timer_x16_cb );

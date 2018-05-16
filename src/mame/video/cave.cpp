@@ -388,13 +388,13 @@ void cave_state::cave_vh_start( int num )
 	}
 }
 
-VIDEO_START_MEMBER(cave_state,cave_1_layer){    cave_vh_start(1);    }
-VIDEO_START_MEMBER(cave_state,cave_2_layers){   cave_vh_start(2);    }
-VIDEO_START_MEMBER(cave_state,cave_3_layers){   cave_vh_start(3);    }
-VIDEO_START_MEMBER(cave_state,cave_4_layers){   cave_vh_start(4);    }
+void cave_state::video_start_cave_1_layer()  { cave_vh_start(1); }
+void cave_state::video_start_cave_2_layers() { cave_vh_start(2); }
+void cave_state::video_start_cave_3_layers() { cave_vh_start(3); }
+void cave_state::video_start_cave_4_layers() { cave_vh_start(4); }
 
 
-VIDEO_START_MEMBER(cave_state,sailormn_3_layers)
+void cave_state::video_start_sailormn_3_layers()
 {
 	cave_vh_start(2);
 

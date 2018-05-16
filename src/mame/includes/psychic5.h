@@ -76,12 +76,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_START(psychic5);
-	DECLARE_MACHINE_START(bombsa);
+	void machine_start_psychic5() ATTR_COLD;
+	void machine_start_bombsa()   ATTR_COLD;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(psychic5);
-	DECLARE_VIDEO_START(bombsa);
-	DECLARE_VIDEO_RESET(psychic5);
+	void video_start_psychic5()   ATTR_COLD;
+	void video_start_bombsa()     ATTR_COLD;
+	void video_reset_psychic5();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 

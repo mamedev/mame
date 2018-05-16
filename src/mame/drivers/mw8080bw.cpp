@@ -235,8 +235,8 @@ MACHINE_CONFIG_START(mw8080bw_state::mw8080bw_root)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu",I8080,MW8080BW_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,mw8080bw)
-	MCFG_MACHINE_RESET_OVERRIDE(mw8080bw_state,mw8080bw)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mw8080bw, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mw8080bw, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -890,7 +890,7 @@ TIMER_CALLBACK_MEMBER(mw8080bw_state::maze_tone_timing_timer_callback)
 }
 
 
-MACHINE_START_MEMBER(mw8080bw_state,maze)
+void mw8080bw_state::machine_start_maze()
 {
 	/* create astable timer for IC B1 */
 	m_maze_tone_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mw8080bw_state::maze_tone_timing_timer_callback), this));
@@ -903,7 +903,7 @@ MACHINE_START_MEMBER(mw8080bw_state,maze)
 	save_item(NAME(m_maze_tone_timing_state));
 	machine().save().register_postload(save_prepost_delegate(FUNC(mw8080bw_state::maze_update_discrete), this));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -968,7 +968,7 @@ MACHINE_CONFIG_START(mw8080bw_state::maze)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(maze_io_map)
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,maze)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_maze, this));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10))) /* 2.97s */
@@ -986,12 +986,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mw8080bw_state,boothill)
+void mw8080bw_state::machine_start_boothill()
 {
 	/* setup for save states */
 	save_item(NAME(m_rev_shift_res));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -1062,7 +1062,7 @@ MACHINE_CONFIG_START(mw8080bw_state::boothill)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(boothill_io_map)
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,boothill)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_boothill, this));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10))) /* 2.97s */
@@ -1192,12 +1192,12 @@ MACHINE_CONFIG_END
 #define DESERTGU_DIP_SW_0_1_SET_2_TAG   ("DIPSW01SET2")
 
 
-MACHINE_START_MEMBER(mw8080bw_state,desertgu)
+void mw8080bw_state::machine_start_desertgu()
 {
 	/* setup for save states */
 	save_item(NAME(m_desertgun_controller_select));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -1300,7 +1300,7 @@ MACHINE_CONFIG_START(mw8080bw_state::desertgu)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(desertgu_io_map)
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,desertgu)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_desertgu, this));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
@@ -1524,12 +1524,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mw8080bw_state,gmissile)
+void mw8080bw_state::machine_start_gmissile()
 {
 	/* setup for save states */
 	save_item(NAME(m_rev_shift_res));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -1601,7 +1601,7 @@ MACHINE_CONFIG_START(mw8080bw_state::gmissile)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(gmissile_io_map)
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,gmissile)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_gmissile, this));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
@@ -1622,12 +1622,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mw8080bw_state,m4)
+void mw8080bw_state::machine_start_m4()
 {
 	/* setup for save states */
 	save_item(NAME(m_rev_shift_res));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -1697,7 +1697,7 @@ MACHINE_CONFIG_START(mw8080bw_state::m4)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(m4_io_map)
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,m4)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_m4, this));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
@@ -1722,12 +1722,12 @@ MACHINE_CONFIG_END
 #define CLOWNS_CONTROLLER_P2_TAG        ("CONTP2")
 
 
-MACHINE_START_MEMBER(mw8080bw_state,clowns)
+void mw8080bw_state::machine_start_clowns()
 {
 	/* setup for save states */
 	save_item(NAME(m_clowns_controller_select));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -1868,7 +1868,7 @@ MACHINE_CONFIG_START(mw8080bw_state::clowns)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(clowns_io_map)
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,clowns)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_clowns, this));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
@@ -1966,7 +1966,7 @@ MACHINE_CONFIG_START(mw8080bw_state::spacwalk)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(spacwalk_io_map)
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,clowns)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_clowns, this));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
@@ -2170,7 +2170,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mw8080bw_state::spcenctr_strobe_timer_callback)
 }
 
 
-MACHINE_START_MEMBER(mw8080bw_state,spcenctr)
+void mw8080bw_state::machine_start_spcenctr()
 {
 	/* setup for save states */
 	save_item(NAME(m_spcenctr_strobe_state));
@@ -2180,7 +2180,7 @@ MACHINE_START_MEMBER(mw8080bw_state,spcenctr)
 	save_item(NAME(m_spcenctr_bright_control));
 	save_item(NAME(m_spcenctr_brightness));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -2292,7 +2292,7 @@ MACHINE_CONFIG_START(mw8080bw_state::spcenctr)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(spcenctr_io_map)
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,spcenctr)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_spcenctr, this));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
@@ -2323,12 +2323,12 @@ MACHINE_CONFIG_END
  *************************************/
 
 
-MACHINE_START_MEMBER(mw8080bw_state,phantom2)
+void mw8080bw_state::machine_start_phantom2()
 {
 	/* setup for save states */
 	save_item(NAME(m_phantom2_cloud_counter));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -2390,7 +2390,7 @@ MACHINE_CONFIG_START(mw8080bw_state::phantom2)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(phantom2_io_map)
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,phantom2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_phantom2, this));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))
@@ -2553,12 +2553,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mw8080bw_state,invaders)
+void mw8080bw_state::machine_start_invaders()
 {
 	/* setup for save states */
 	save_item(NAME(m_flip_screen));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -2746,7 +2746,7 @@ MACHINE_CONFIG_START(mw8080bw_state::invaders)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(invaders_io_map)
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state,invaders)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_invaders, this));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(255 * attotime::from_hz(MW8080BW_60HZ))

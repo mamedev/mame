@@ -33,7 +33,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(kangaroo_mcu);
+	void machine_start_kangaroo_mcu() ATTR_COLD;
 	uint32_t screen_update_kangaroo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void videoram_write( uint16_t offset, uint8_t data, uint8_t mask );
 	void blitter_execute(  );

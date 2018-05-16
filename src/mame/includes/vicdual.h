@@ -86,7 +86,7 @@ public:
 	DECLARE_READ8_MEMBER(headon_io_r);
 	DECLARE_READ8_MEMBER(sspaceat_io_r);
 	DECLARE_WRITE8_MEMBER(headon_io_w);
-	DECLARE_MACHINE_RESET(headon2);
+	void machine_reset_headon2();
 	DECLARE_READ8_MEMBER(headon2_io_r);
 	DECLARE_WRITE8_MEMBER(headon2_io_w);
 	DECLARE_WRITE8_MEMBER(digger_io_w);
@@ -147,8 +147,8 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(clear_coin_status);
 
-	DECLARE_MACHINE_START(samurai);
-	DECLARE_MACHINE_START(frogs_audio);
+	void machine_start_samurai()     ATTR_COLD;
+	void machine_start_frogs_audio() ATTR_COLD;
 
 	virtual void machine_start() override;
 
@@ -247,8 +247,8 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nsub_coin_pulse);
 
-	DECLARE_MACHINE_START(nsub);
-	DECLARE_MACHINE_RESET(nsub);
+	void machine_start_nsub() ATTR_COLD;
+	void machine_reset_nsub();
 
 	virtual pen_t choose_pen(uint8_t x, uint8_t y, pen_t back_pen) override;
 	void nsub(machine_config &config);

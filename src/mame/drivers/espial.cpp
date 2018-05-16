@@ -368,7 +368,7 @@ MACHINE_CONFIG_START(espial_state::netwars)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*8, 64*8)
 
-	MCFG_VIDEO_START_OVERRIDE(espial_state,netwars)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_netwars, this));
 MACHINE_CONFIG_END
 
 

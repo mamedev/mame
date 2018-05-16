@@ -44,8 +44,8 @@ public:
 	void init_landbrka();
 	void init_landbrkb();
 
-	DECLARE_MACHINE_RESET(eolith);
-	DECLARE_VIDEO_START(eolith);
+	void machine_reset_eolith();
+	void video_start_eolith();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(eolith_speedup);
 

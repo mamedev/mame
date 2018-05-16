@@ -470,32 +470,32 @@ void n8080_state::machine_start()
 	save_item(NAME(m_inte));
 }
 
-MACHINE_RESET_MEMBER(n8080_state,n8080)
+void n8080_state::machine_reset_n8080()
 {
 	m_shift_data = 0;
 	m_shift_bits = 0;
 	m_inte = 0;
 }
 
-MACHINE_RESET_MEMBER(n8080_state,spacefev)
+void n8080_state::machine_reset_spacefev()
 {
-	MACHINE_RESET_CALL_MEMBER(n8080);
+	machine_reset_n8080();
 
 	m_spacefev_red_screen = 0;
 	m_spacefev_red_cannon = 0;
 }
 
-MACHINE_RESET_MEMBER(n8080_state,sheriff)
+void n8080_state::machine_reset_sheriff()
 {
-	MACHINE_RESET_CALL_MEMBER(n8080);
+	machine_reset_n8080();
 
 	m_sheriff_color_mode = 0;
 	m_sheriff_color_data = 0;
 }
 
-MACHINE_RESET_MEMBER(n8080_state,helifire)
+void n8080_state::machine_reset_helifire()
 {
-	MACHINE_RESET_CALL_MEMBER(n8080);
+	machine_reset_n8080();
 
 	m_helifire_mv = 0;
 	m_helifire_sc = 0;
@@ -512,7 +512,7 @@ MACHINE_CONFIG_START(n8080_state::spacefev)
 	MCFG_DEVICE_PROGRAM_MAP(main_cpu_map)
 	MCFG_DEVICE_IO_MAP(main_io_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(n8080_state,spacefev)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_spacefev, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -524,7 +524,7 @@ MACHINE_CONFIG_START(n8080_state::spacefev)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(n8080_state,n8080)
-	MCFG_VIDEO_START_OVERRIDE(n8080_state,spacefev)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_spacefev, this));
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst1", n8080_state, rst1_tick, "screen", 128, 256)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst2", n8080_state, rst2_tick, "screen", 240, 256)
@@ -543,7 +543,7 @@ MACHINE_CONFIG_START(n8080_state::sheriff)
 	MCFG_DEVICE_PROGRAM_MAP(main_cpu_map)
 	MCFG_DEVICE_IO_MAP(main_io_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(n8080_state,sheriff)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sheriff, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -555,7 +555,7 @@ MACHINE_CONFIG_START(n8080_state::sheriff)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(n8080_state,n8080)
-	MCFG_VIDEO_START_OVERRIDE(n8080_state,sheriff)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_sheriff, this));
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst1", n8080_state, rst1_tick, "screen", 128, 256)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst2", n8080_state, rst2_tick, "screen", 240, 256)
@@ -587,7 +587,7 @@ MACHINE_CONFIG_START(n8080_state::helifire)
 	MCFG_DEVICE_PROGRAM_MAP(helifire_main_cpu_map)
 	MCFG_DEVICE_IO_MAP(main_io_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(n8080_state,helifire)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_helifire, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -600,7 +600,7 @@ MACHINE_CONFIG_START(n8080_state::helifire)
 
 	MCFG_PALETTE_ADD("palette", 8 + 0x400)
 	MCFG_PALETTE_INIT_OWNER(n8080_state,helifire)
-	MCFG_VIDEO_START_OVERRIDE(n8080_state,helifire)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_helifire, this));
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst1", n8080_state, rst1_tick, "screen", 128, 256)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst2", n8080_state, rst2_tick, "screen", 240, 256)

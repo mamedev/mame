@@ -73,8 +73,8 @@ public:
 			m_videoram(*this, "videoram") { }
 
 	required_shared_ptr<uint8_t> m_videoram;
-	DECLARE_MACHINE_START(interact);
-	DECLARE_MACHINE_RESET(interact);
+	void machine_start_interact() ATTR_COLD;
+	void machine_reset_interact() ATTR_COLD;
 	uint32_t screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void hector1(machine_config &config);
 	void interact(machine_config &config);
@@ -106,12 +106,12 @@ void interact_state::interact_mem(address_map &map)
 }
 
 
-MACHINE_RESET_MEMBER(interact_state,interact)
+void interact_state::machine_reset_interact()
 {
 	hector_reset(0, 0);
 }
 
-MACHINE_START_MEMBER(interact_state,interact)
+void interact_state::machine_start_interact()
 {
 	hector_init();
 }
@@ -131,8 +131,8 @@ MACHINE_CONFIG_START(interact_state::interact)
 	MCFG_DEVICE_PROGRAM_MAP(interact_mem)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
 
-	MCFG_MACHINE_RESET_OVERRIDE(interact_state,interact)
-	MCFG_MACHINE_START_OVERRIDE(interact_state,interact)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_interact, this));
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_interact, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -145,7 +145,7 @@ MACHINE_CONFIG_START(interact_state::interact)
 
 	MCFG_PALETTE_ADD("palette", 16)             /* 8 colours, but only 4 at a time*/
 
-	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_hec2hrp, this));
 
 	hector_audio(config);
 
@@ -168,8 +168,8 @@ MACHINE_CONFIG_START(interact_state::hector1)
 	MCFG_DEVICE_PROGRAM_MAP(interact_mem)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
 
-	MCFG_MACHINE_RESET_OVERRIDE(interact_state,interact)
-	MCFG_MACHINE_START_OVERRIDE(interact_state,interact)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_interact, this));
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_interact, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -182,7 +182,7 @@ MACHINE_CONFIG_START(interact_state::hector1)
 
 	MCFG_PALETTE_ADD("palette", 16)             /* 8 colours, but only 4 at a time*/
 
-	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_hec2hrp, this));
 
 	hector_audio(config);
 

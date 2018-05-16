@@ -484,7 +484,7 @@ MACHINE_CONFIG_START(st0016_state::st0016)
 	MCFG_SCREEN_PALETTE("maincpu:palette")
 
 
-//  MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
+//  set_video_start_cb(config, driver_callback_delegate(&video_start_st0016, this));
 
 MACHINE_CONFIG_END
 

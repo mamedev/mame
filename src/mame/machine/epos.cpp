@@ -99,7 +99,7 @@ each IN($xx) command, as opposed to dynamically decrypting every byte.
 
 */
 
-MACHINE_START_MEMBER(pacman_state, theglobp)
+void pacman_state::machine_start_theglobp()
 {
 	/*  Note: D2 is inverted and connected to D1, D5 is inverted and
 	connected to D0.  The other six data bits are converted by a
@@ -127,7 +127,7 @@ MACHINE_START_MEMBER(pacman_state, theglobp)
 	save_item(NAME(m_counter));
 }
 
-MACHINE_RESET_MEMBER(pacman_state, theglobp)
+void pacman_state::machine_reset_theglobp()
 {
 	m_counter = 0x0A;
 	membank("bank1")->set_entry(m_counter & 3);
@@ -145,7 +145,7 @@ David Widel d_widel@hotmail.com
 
 */
 
-MACHINE_START_MEMBER(pacman_state, acitya)
+void pacman_state::machine_start_acitya()
 {
 	/*  Note: D2 is inverted and connected to D1, D5 is inverted and
 	connected to D0.  The other six data bits are converted by a
@@ -173,14 +173,14 @@ MACHINE_START_MEMBER(pacman_state, acitya)
 	save_item(NAME(m_counter));
 }
 
-MACHINE_RESET_MEMBER(pacman_state, acitya)
+void pacman_state::machine_reset_acitya()
 {
 	m_counter = 0x0B;
 	membank("bank1")->set_entry(m_counter & 3);
 }
 
 
-MACHINE_START_MEMBER(pacman_state, eeekk)
+void pacman_state::machine_start_eeekk()
 {
 	/*  Note: D2 is inverted and connected to D1, D5 is inverted and
 	connected to D0.  The other six data bits are converted by a
@@ -208,7 +208,7 @@ MACHINE_START_MEMBER(pacman_state, eeekk)
 	save_item(NAME(m_counter));
 }
 
-MACHINE_RESET_MEMBER(pacman_state, eeekk)
+void pacman_state::machine_reset_eeekk()
 {
 	m_counter = 0x09;
 	membank("bank1")->set_entry(m_counter & 3);

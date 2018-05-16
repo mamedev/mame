@@ -34,9 +34,22 @@ public:
 		m_custom(*this, "exidy"),
 		m_screen(*this, "screen"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram")
+		m_colorram(*this, "colorram"),
+		m_led(*this, "led0")
 	{ }
 
+	void berzerk(machine_config &config);
+	void frenzy(machine_config &config);
+
+	void init_moonwarp();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void sound_reset() override;
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s14001a_device> m_s14001a;
 	required_device<ttl74181_device> m_ls181_10c;
@@ -46,6 +59,8 @@ public:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
+
+	output_finder<> m_led;
 
 	uint8_t m_magicram_control;
 	uint8_t m_last_shift_data;
@@ -76,12 +91,6 @@ public:
 	DECLARE_READ8_MEMBER(moonwarp_p1_r);
 	DECLARE_READ8_MEMBER(moonwarp_p2_r);
 
-	void init_moonwarp();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void sound_reset() override;
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(irq_callback);
@@ -93,8 +102,6 @@ public:
 	void create_nmi_timer();
 	void start_nmi_timer();
 	void get_pens(rgb_t *pens);
-	void berzerk(machine_config &config);
-	void frenzy(machine_config &config);
 	void berzerk_io_map(address_map &map);
 	void berzerk_map(address_map &map);
 	void frenzy_map(address_map &map);
@@ -125,13 +132,13 @@ static const uint8_t nmi_trigger_v256s [NMIS_PER_FRAME] = { 0x00, 0x00, 0x00, 0x
 
 /*************************************
  *
- *  Start LED handling
+ *  LED handling
  *
  *************************************/
 
 READ8_MEMBER(berzerk_state::led_on_r)
 {
-	output().set_led_value(0, 1);
+	m_led = 1;
 
 	return 0;
 }
@@ -139,13 +146,13 @@ READ8_MEMBER(berzerk_state::led_on_r)
 
 WRITE8_MEMBER(berzerk_state::led_on_w)
 {
-	output().set_led_value(0, 1);
+	m_led = 1;
 }
 
 
 READ8_MEMBER(berzerk_state::led_off_r)
 {
-	output().set_led_value(0, 0);
+	m_led = 0;
 
 	return 0;
 }
@@ -153,7 +160,7 @@ READ8_MEMBER(berzerk_state::led_off_r)
 
 WRITE8_MEMBER(berzerk_state::led_off_w)
 {
-	output().set_led_value(0, 0);
+	m_led = 0;
 }
 
 
@@ -342,6 +349,8 @@ void berzerk_state::machine_start()
 	create_irq_timer();
 	create_nmi_timer();
 
+	m_led.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_magicram_control));
 	save_item(NAME(m_last_shift_data));
@@ -362,7 +371,7 @@ void berzerk_state::machine_reset()
 {
 	m_irq_enabled = 0;
 	m_nmi_enabled = 0;
-	output().set_led_value(0, 0);
+	m_led = 0;
 	m_magicram_control = 0;
 
 	start_irq_timer();

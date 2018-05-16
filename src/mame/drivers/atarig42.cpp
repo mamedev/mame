@@ -545,7 +545,7 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarig42_state, video_int_write_line))
 
-	MCFG_VIDEO_START_OVERRIDE(atarig42_state,atarig42)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_atarig42, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
