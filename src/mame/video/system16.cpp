@@ -348,7 +348,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_textram_w)
 
 /***************************************************************************/
 
-VIDEO_START_MEMBER(segas1x_bootleg_state,system16)
+void segas1x_bootleg_state::video_start_system16()
 {
 	/* Normal colors */
 	compute_resistor_weights(0, 255, -1.0,
@@ -415,9 +415,9 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,system16)
 		setup_system16_bootleg_spritebanking();
 }
 
-VIDEO_START_MEMBER(segas1x_bootleg_state,system18old)
+void segas1x_bootleg_state::video_start_system18old()
 {
-	VIDEO_START_CALL_MEMBER(system16);
+	video_start_system16();
 
 	m_bg1_trans = 1;
 
@@ -539,7 +539,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_tilemapselect_w)
 }
 
 
-VIDEO_START_MEMBER(segas1x_bootleg_state,s16a_bootleg)
+void segas1x_bootleg_state::video_start_s16a_bootleg()
 {
 	/* Normal colors */
 	compute_resistor_weights(0, 255, -1.0,
@@ -568,21 +568,21 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,s16a_bootleg)
 	m_bg_tilemaps[1]->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(segas1x_bootleg_state,s16a_bootleg_wb3bl)
+void segas1x_bootleg_state::video_start_s16a_bootleg_wb3bl()
 {
-	VIDEO_START_CALL_MEMBER(s16a_bootleg);
+	video_start_s16a_bootleg();
 	setup_system16_bootleg_spritebanking();
 }
 
-VIDEO_START_MEMBER(segas1x_bootleg_state,s16a_bootleg_shinobi)
+void segas1x_bootleg_state::video_start_s16a_bootleg_shinobi()
 {
-	VIDEO_START_CALL_MEMBER(s16a_bootleg);
+	video_start_s16a_bootleg();
 	setup_system16_bootleg_spritebanking();
 }
 
-VIDEO_START_MEMBER(segas1x_bootleg_state,s16a_bootleg_passsht)
+void segas1x_bootleg_state::video_start_s16a_bootleg_passsht()
 {
-	VIDEO_START_CALL_MEMBER(s16a_bootleg);
+	video_start_s16a_bootleg();
 	setup_system16_bootleg_spritebanking();
 }
 

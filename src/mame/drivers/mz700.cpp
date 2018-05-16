@@ -385,7 +385,7 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	MCFG_MACHINE_RESET_OVERRIDE(mz_state, mz700)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mz700, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -450,8 +450,7 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	MCFG_MACHINE_RESET_OVERRIDE(mz_state, mz800)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mz800)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mz800, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz800)

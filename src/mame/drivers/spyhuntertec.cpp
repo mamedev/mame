@@ -81,7 +81,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(spyhuntertec_paletteram_w);
 	void init_spyhuntertec();
-//  DECLARE_VIDEO_START(spyhuntertec);
+//  void video_start_spyhuntertec() ATTR_COLD;
 //  uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_port04_w);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_portf0_w);

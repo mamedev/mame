@@ -920,7 +920,7 @@ void superqix_state_base::machine_init_common()
 	// superqix specific stuff, TODO: should be moved to superqix_state below
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_show_bitmap));
-	// the following are saved in VIDEO_START_MEMBER(superqix_state,superqix):
+	// the following are saved in superqix_state::video_start_superqix:
 	//save_item(NAME(*m_fg_bitmap[0]));
 	//save_item(NAME(*m_fg_bitmap[1]));
 }
@@ -949,7 +949,7 @@ void hotsmash_state::machine_init_common()
 	save_item(NAME(m_dial_sign));
 }
 
-MACHINE_RESET_MEMBER(superqix_state, superqix)
+void superqix_state::machine_reset_superqix()
 {
 	if (m_mcu.found()) // mcu sets only
 	{
@@ -962,7 +962,7 @@ MACHINE_RESET_MEMBER(superqix_state, superqix)
 	}
 }
 
-MACHINE_START_MEMBER(superqix_state, superqix)
+void superqix_state::machine_start_superqix()
 {
 	/* configure the banks */
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -970,7 +970,7 @@ MACHINE_START_MEMBER(superqix_state, superqix)
 	machine_init_common();
 }
 
-MACHINE_START_MEMBER(hotsmash_state, pbillian)
+void hotsmash_state::machine_start_pbillian()
 {
 	/* configure the banks */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -1362,7 +1362,7 @@ MACHINE_CONFIG_START(hotsmash_state::pbillian)
 	MCFG_M68705_PORTC_W_CB(WRITE8(*this, hotsmash_state, hotsmash_68705_portC_w))
 
 	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
-	MCFG_MACHINE_START_OVERRIDE(hotsmash_state, pbillian)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pbillian, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1378,7 +1378,7 @@ MACHINE_CONFIG_START(hotsmash_state::pbillian)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
-	MCFG_VIDEO_START_OVERRIDE(hotsmash_state, pbillian)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pbillian, this));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1408,7 +1408,7 @@ MACHINE_CONFIG_START(superqix_state::sqix)
 	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, superqix_state, mcu_port3_r))
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, superqix_state, mcu_port3_w))
 
-	MCFG_MACHINE_START_OVERRIDE(superqix_state,superqix)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_superqix, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1423,7 +1423,7 @@ MACHINE_CONFIG_START(superqix_state::sqix)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
-	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_superqix, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1461,7 +1461,7 @@ MACHINE_CONFIG_START(superqix_state::sqix_nomcu)
 	MCFG_DEVICE_IO_MAP(sqix_port_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
 
-	MCFG_MACHINE_START_OVERRIDE(superqix_state,superqix)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_superqix, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1476,7 +1476,7 @@ MACHINE_CONFIG_START(superqix_state::sqix_nomcu)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT_CLASS(1, superqix_state, BBGGRRII)
 
-	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_superqix, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

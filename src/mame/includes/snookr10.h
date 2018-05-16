@@ -32,8 +32,8 @@ public:
 	TILE_GET_INFO_MEMBER(crystalc_get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(snookr10);
-	DECLARE_VIDEO_START(apple10);
-	DECLARE_VIDEO_START(crystalc);
+	void video_start_apple10()  ATTR_COLD;
+	void video_start_crystalc() ATTR_COLD;
 	DECLARE_PALETTE_INIT(apple10);
 	DECLARE_PALETTE_INIT(crystalc);
 	uint32_t screen_update_snookr10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

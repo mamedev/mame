@@ -50,7 +50,7 @@ void tsamurai_state::video_start()
 	save_item(NAME(m_textbank1));
 }
 
-VIDEO_START_MEMBER(tsamurai_state, tsamurai)
+void tsamurai_state::video_start_tsamurai()
 {
 	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tsamurai_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tsamurai_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
@@ -62,9 +62,9 @@ VIDEO_START_MEMBER(tsamurai_state, tsamurai)
 	video_start();
 }
 
-VIDEO_START_MEMBER(tsamurai_state, m660)
+void tsamurai_state::video_start_m660()
 {
-	VIDEO_START_CALL_MEMBER(tsamurai);
+	video_start_tsamurai();
 
 	save_item(NAME(m_textbank2));
 }
@@ -249,7 +249,7 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_vsgongf_tile_info)
 			0);
 }
 
-VIDEO_START_MEMBER(tsamurai_state,vsgongf)
+void tsamurai_state::video_start_vsgongf()
 {
 	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tsamurai_state::get_vsgongf_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 

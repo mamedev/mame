@@ -82,7 +82,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(a6809_address_w);
 	DECLARE_WRITE8_MEMBER(a6809_register_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	DECLARE_MACHINE_RESET(a6809);
+	void machine_reset_a6809();
 	TIMER_DEVICE_CALLBACK_MEMBER(a6809_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(a6809_p);
 
@@ -120,7 +120,7 @@ static INPUT_PORTS_START( a6809 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER( a6809_state, a6809)
+void a6809_state::machine_reset_a6809()
 {
 	m_via->write_pb0(0);
 	m_via->write_pb1(0);
@@ -227,7 +227,7 @@ MACHINE_CONFIG_START(a6809_state::a6809)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(a6809_mem)
-	MCFG_MACHINE_RESET_OVERRIDE(a6809_state, a6809)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_a6809, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

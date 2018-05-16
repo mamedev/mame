@@ -84,9 +84,9 @@ public:
 	void init_nomnlnd();
 	void init_cosmica();
 	void init_panic();
-	DECLARE_MACHINE_START(cosmic);
-	DECLARE_MACHINE_RESET(cosmic);
-	DECLARE_MACHINE_RESET(cosmicg);
+	void machine_start_cosmic() ATTR_COLD;
+	void machine_reset_cosmic();
+	void machine_reset_cosmicg();
 	DECLARE_PALETTE_INIT(cosmicg);
 	DECLARE_PALETTE_INIT(panic);
 	DECLARE_PALETTE_INIT(cosmica);

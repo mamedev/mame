@@ -43,8 +43,8 @@ public:
 	DECLARE_WRITE8_MEMBER(triothep_control_select_w);
 	DECLARE_READ8_MEMBER(triothep_control_r);
 	DECLARE_WRITE8_MEMBER(actfancr_buffer_spriteram_w);
-	DECLARE_MACHINE_START(triothep);
-	DECLARE_MACHINE_RESET(triothep);
+	void machine_start_triothep() ATTR_COLD;
+	void machine_reset_triothep();
 	uint32_t screen_update_actfancr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void triothep(machine_config &config);
 	void actfancr(machine_config &config);

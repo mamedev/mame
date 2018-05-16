@@ -72,8 +72,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(toucheme);
-	DECLARE_VIDEO_START(ladyfrog_common);
+	void video_start_toucheme()        ATTR_COLD;
+	void video_start_ladyfrog_common() ATTR_COLD;
 	uint32_t screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

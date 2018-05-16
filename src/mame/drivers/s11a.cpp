@@ -143,9 +143,9 @@ static INPUT_PORTS_START( s11a )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER( s11a_state, s11a )
+void s11a_state::machine_reset_s11a()
 {
-	MACHINE_RESET_CALL_MEMBER(s11);
+	machine_reset_s11();
 	membank("bgbank")->set_entry(0);
 }
 
@@ -178,7 +178,7 @@ MACHINE_CONFIG_START(s11a_state::s11a)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6808, XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(s11a_main_map)
-	MCFG_MACHINE_RESET_OVERRIDE(s11a_state, s11a)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_s11a, this));
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_s11a)

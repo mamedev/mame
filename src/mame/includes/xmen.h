@@ -64,7 +64,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(xmen_frame_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_VIDEO_START(xmen6p);
+	void video_start_xmen6p() ATTR_COLD;
 	uint32_t screen_update_xmen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_xmen6p_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_xmen6p_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

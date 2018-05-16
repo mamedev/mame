@@ -88,7 +88,7 @@ static struct
  *
  *************************************/
 
-VIDEO_START_MEMBER(midtunit_state,midtunit)
+void midtunit_state::video_start_midtunit()
 {
 	/* allocate memory */
 	local_videoram = std::make_unique<uint16_t[]>(0x100000/2);
@@ -112,16 +112,16 @@ VIDEO_START_MEMBER(midtunit_state,midtunit)
 }
 
 
-VIDEO_START_MEMBER(midwunit_state,midwunit)
+void midwunit_state::video_start_midwunit()
 {
-	VIDEO_START_CALL_MEMBER(midtunit);
+	video_start_midtunit();
 	m_gfx_rom_large = 1;
 }
 
 
-VIDEO_START_MEMBER(midxunit_state,midxunit)
+void midxunit_state::video_start_midxunit()
 {
-	VIDEO_START_CALL_MEMBER(midtunit);
+	video_start_midtunit();
 	m_gfx_rom_large = 1;
 	videobank_select = 1;
 }

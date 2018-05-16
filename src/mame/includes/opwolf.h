@@ -70,7 +70,7 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	DECLARE_MACHINE_RESET(opwolf);
+	void machine_reset_opwolf();
 	uint32_t screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(opwolf_timer_callback);
 	TIMER_CALLBACK_MEMBER(cchip_timer);

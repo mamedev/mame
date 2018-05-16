@@ -193,7 +193,7 @@ TILE_GET_INFO_MEMBER(kingofb_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-VIDEO_START_MEMBER(kingofb_state,kingofb)
+void kingofb_state::video_start_kingofb()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kingofb_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y, 16, 16, 16, 16);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kingofb_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y,  8,  8, 32, 32);
@@ -257,7 +257,7 @@ TILE_GET_INFO_MEMBER(kingofb_state::ringking_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(4, code, color, 0);
 }
 
-VIDEO_START_MEMBER(kingofb_state,ringking)
+void kingofb_state::video_start_ringking()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kingofb_state::ringking_get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y, 16, 16, 16, 16);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kingofb_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);

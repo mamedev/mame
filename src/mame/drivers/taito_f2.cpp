@@ -2838,14 +2838,14 @@ WRITE8_MEMBER(taitof2_state::cameltrya_porta_w)
                       MACHINE DRIVERS
 ***********************************************************/
 
-MACHINE_START_MEMBER(taitof2_state,common)
+void taitof2_state::machine_start_common()
 {
 	m_int6_timer = timer_alloc(TIMER_TAITOF2_INTERRUPT6);
 }
 
-MACHINE_START_MEMBER(taitof2_state,f2)
+void taitof2_state::machine_start_f2()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 	membank("bank2")->configure_entries(0, 8, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
@@ -2858,7 +2858,7 @@ MACHINE_CONFIG_START(taitof2_state::taito_f2)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 24000000/6)   /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(taitof2_state,f2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_f2, this));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2876,7 +2876,7 @@ MACHINE_CONFIG_START(taitof2_state::taito_f2)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_default)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_default, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2947,7 +2947,7 @@ MACHINE_CONFIG_START(taitof2_state::finalb)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_finalb)
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_finalb)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_finalb, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed))
 
@@ -2971,8 +2971,13 @@ MACHINE_CONFIG_START(taitof2_state::dondokod)
 	MCFG_DEVICE_PROGRAM_MAP(dondokod_map)
 
 	/* video hardware */
+<<<<<<< HEAD
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pivot)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_dondokod)
+=======
+	MCFG_GFXDECODE_MODIFY("gfxdecode", pivot)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_dondokod, this));
+>>>>>>> - Removed MACHINE/SOUND/VIDEO _START/_RESET macros. This has the side effect of making machine-config overrides of these much
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed))
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
@@ -3006,7 +3011,7 @@ MACHINE_CONFIG_START(taitof2_state::megab)
 	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", taitof2_state, cchip_irq_clear_cb)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_megab)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_megab, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
@@ -3029,8 +3034,13 @@ MACHINE_CONFIG_START(taitof2_state::thundfox)
 	MCFG_DEVICE_PROGRAM_MAP(thundfox_map)
 
 	/* video hardware */
+<<<<<<< HEAD
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_thundfox)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_thundfox)
+=======
+	MCFG_GFXDECODE_MODIFY("gfxdecode", thundfox)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_thundfox, this));
+>>>>>>> - Removed MACHINE/SOUND/VIDEO _START/_RESET macros. This has the side effect of making machine-config overrides of these much
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_thundfox)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed_thundfox))
@@ -3067,8 +3077,13 @@ MACHINE_CONFIG_START(taitof2_state::cameltry)
 	MCFG_DEVICE_PROGRAM_MAP(cameltry_map)
 
 	/* video hardware */
+<<<<<<< HEAD
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pivot)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_dondokod)
+=======
+	MCFG_GFXDECODE_MODIFY("gfxdecode", pivot)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_dondokod, this));
+>>>>>>> - Removed MACHINE/SOUND/VIDEO _START/_RESET macros. This has the side effect of making machine-config overrides of these much
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
 
@@ -3118,7 +3133,7 @@ MACHINE_CONFIG_START(taitof2_state::liquidk)
 	MCFG_DEVICE_PROGRAM_MAP(liquidk_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_megab)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_megab, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed))
@@ -3168,7 +3183,7 @@ MACHINE_CONFIG_START(taitof2_state::ssi)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_ssi)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_ssi, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_ssi)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed_thundfox))
@@ -3193,7 +3208,7 @@ MACHINE_CONFIG_START(taitof2_state::gunfront)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_gunfront)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_gunfront, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed))
@@ -3217,7 +3232,7 @@ MACHINE_CONFIG_START(taitof2_state::growl)
 	MCFG_DEVICE_PROGRAM_MAP(growl_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_growl)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_growl, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
@@ -3243,7 +3258,7 @@ MACHINE_CONFIG_START(taitof2_state::mjnquest)
 	MCFG_DEVICE_PROGRAM_MAP(mjnquest_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_mjnquest)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_mjnquest, this));
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3264,8 +3279,13 @@ MACHINE_CONFIG_START(taitof2_state::footchmp)
 	MCFG_DEVICE_PROGRAM_MAP(footchmp_map)
 
 	/* video hardware */
+<<<<<<< HEAD
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_deadconx)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_footchmp)
+=======
+	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_footchmp, this));
+>>>>>>> - Removed MACHINE/SOUND/VIDEO _START/_RESET macros. This has the side effect of making machine-config overrides of these much
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_full_buffer_delayed))
@@ -3297,8 +3317,13 @@ MACHINE_CONFIG_START(taitof2_state::hthero)
 	MCFG_DEVICE_PROGRAM_MAP(footchmp_map)
 
 	/* video hardware */
+<<<<<<< HEAD
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_deadconx)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_hthero)
+=======
+	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_hthero, this));
+>>>>>>> - Removed MACHINE/SOUND/VIDEO _START/_RESET macros. This has the side effect of making machine-config overrides of these much
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_full_buffer_delayed))
@@ -3323,7 +3348,7 @@ MACHINE_CONFIG_START(taitof2_state::koshien)
 	MCFG_DEVICE_PROGRAM_MAP(koshien_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_koshien)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_koshien, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
@@ -3353,8 +3378,13 @@ MACHINE_CONFIG_START(taitof2_state::yuyugogo)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	/* video hardware */
+<<<<<<< HEAD
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_yuyugogo)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_yuyugogo)
+=======
+	MCFG_GFXDECODE_MODIFY("gfxdecode", yuyugogo)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_yuyugogo, this));
+>>>>>>> - Removed MACHINE/SOUND/VIDEO _START/_RESET macros. This has the side effect of making machine-config overrides of these much
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_yesnoj)
 
@@ -3385,7 +3415,7 @@ MACHINE_CONFIG_START(taitof2_state::ninjak)
 	MCFG_TE7750_OUT_PORT8_CB(WRITE8(*this, taitof2_state, taitof2_4p_coin_word_w))
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_ninjak)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_ninjak, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
@@ -3408,7 +3438,7 @@ MACHINE_CONFIG_START(taitof2_state::solfigtr)
 	MCFG_DEVICE_PROGRAM_MAP(solfigtr_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_solfigtr)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_solfigtr, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
@@ -3452,8 +3482,13 @@ MACHINE_CONFIG_START(taitof2_state::pulirula)
 	MCFG_DEVICE_PROGRAM_MAP(pulirula_map)
 
 	/* video hardware */
+<<<<<<< HEAD
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pivot)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_pulirula)
+=======
+	MCFG_GFXDECODE_MODIFY("gfxdecode", pivot)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_pulirula, this));
+>>>>>>> - Removed MACHINE/SOUND/VIDEO _START/_RESET macros. This has the side effect of making machine-config overrides of these much
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
 
@@ -3485,7 +3520,7 @@ MACHINE_CONFIG_START(taitof2_state::metalb)
 	MCFG_PALETTE_ENTRIES(8192)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_metalb)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_metalb, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_metalb)
 
@@ -3510,7 +3545,7 @@ MACHINE_CONFIG_START(taitof2_state::qzchikyu)
 	MCFG_DEVICE_PROGRAM_MAP(qzchikyu_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_qzchikyu)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_qzchikyu, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitof2_state, screen_vblank_partial_buffer_delayed_qzchikyu))
 
@@ -3537,7 +3572,7 @@ MACHINE_CONFIG_START(taitof2_state::yesnoj)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_yesnoj)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_yesnoj, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_yesnoj)
 
@@ -3564,7 +3599,7 @@ MACHINE_CONFIG_START(taitof2_state::deadconx)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_deadconx)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_deadconx, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
 
@@ -3588,8 +3623,13 @@ MACHINE_CONFIG_START(taitof2_state::deadconxj)
 	MCFG_DEVICE_PROGRAM_MAP(deadconx_map)
 
 	/* video hardware */
+<<<<<<< HEAD
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_deadconx)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_deadconxj)
+=======
+	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_deadconxj, this));
+>>>>>>> - Removed MACHINE/SOUND/VIDEO _START/_RESET macros. This has the side effect of making machine-config overrides of these much
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
 
@@ -3613,7 +3653,7 @@ MACHINE_CONFIG_START(taitof2_state::dinorex)
 	MCFG_DEVICE_PROGRAM_MAP(dinorex_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_dinorex)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_dinorex, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
@@ -3639,7 +3679,7 @@ MACHINE_CONFIG_START(taitof2_state::qjinsei)
 	MCFG_DEVICE_PROGRAM_MAP(qjinsei_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_quiz)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_quiz, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
@@ -3665,7 +3705,7 @@ MACHINE_CONFIG_START(taitof2_state::qcrayon)
 	MCFG_DEVICE_PROGRAM_MAP(qcrayon_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_quiz)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_quiz, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
@@ -3691,7 +3731,7 @@ MACHINE_CONFIG_START(taitof2_state::qcrayon2)
 	MCFG_DEVICE_PROGRAM_MAP(qcrayon2_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_quiz)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_quiz, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
@@ -3719,7 +3759,7 @@ MACHINE_CONFIG_START(taitof2_state::driftout)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pivot)
 
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_driftout)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_driftout, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
 
@@ -3748,7 +3788,7 @@ MACHINE_CONFIG_START(taitof2_state::cameltrya)
 	MCFG_DEVICE_ADD("audiocpu", Z80,24000000/4)    /* verifed on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(cameltrya_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(taitof2_state,common)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
 
 	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
 	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
@@ -3772,7 +3812,7 @@ MACHINE_CONFIG_START(taitof2_state::cameltrya)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_dondokod)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_dondokod, this));
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3817,7 +3857,7 @@ MACHINE_CONFIG_START(taitof2_state::driveout)
 	MCFG_DEVICE_ADD("audiocpu", Z80,24000000/6)    /* 4 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(driveout_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(taitof2_state,common)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
@@ -3841,7 +3881,7 @@ MACHINE_CONFIG_START(taitof2_state::driveout)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_driftout)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitof2_driftout, this));
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)

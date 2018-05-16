@@ -112,7 +112,7 @@ public:
 
 	void machine_start() override;
 
-	DECLARE_MACHINE_RESET(tandy1000rl);
+	void machine_reset_tandy1000rl();
 
 	struct
 	{
@@ -405,7 +405,7 @@ void tandy1000_state::tandy1000_set_bios_bank()
 	m_biosbank->set_bank( bank );
 }
 
-MACHINE_RESET_MEMBER(tandy1000_state, tandy1000rl)
+void tandy1000_state::machine_reset_tandy1000rl()
 {
 	m_tandy_bios_bank = 6;
 	tandy1000_set_bios_bank();
@@ -733,7 +733,7 @@ MACHINE_CONFIG_START(tandy1000_state::t1000rl)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
-	MCFG_MACHINE_RESET_OVERRIDE(tandy1000_state,tandy1000rl)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tandy1000rl, this));
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_EXTRA_OPTIONS("384K")
 MACHINE_CONFIG_END

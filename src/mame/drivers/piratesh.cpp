@@ -95,9 +95,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(helm_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(battery_r);
 
-	DECLARE_MACHINE_START(piratesh);
-	DECLARE_MACHINE_RESET(piratesh);
-	DECLARE_VIDEO_START(piratesh);
+	void machine_start_piratesh() ATTR_COLD;
+	void machine_reset_piratesh();
+	void video_start_piratesh() ATTR_COLD;
 	uint32_t screen_update_piratesh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(piratesh_interrupt);
@@ -181,7 +181,7 @@ K055673_CB_MEMBER(piratesh_state::piratesh_sprite_callback)
 
 
 
-VIDEO_START_MEMBER(piratesh_state, piratesh)
+void piratesh_state::video_start_piratesh()
 {
 	// TODO: These come from the 055555
 	m_layer_colorbase[0] = 0;
@@ -551,7 +551,7 @@ INPUT_PORTS_END
 
 /**********************************************************************************/
 
-MACHINE_START_MEMBER(piratesh_state, piratesh)
+void piratesh_state::machine_start_piratesh()
 {
 #if 0
 	m_sound_ctrl = 2;
@@ -566,14 +566,12 @@ MACHINE_START_MEMBER(piratesh_state, piratesh)
 #endif
 }
 
-MACHINE_RESET_MEMBER(piratesh_state,piratesh)
+void piratesh_state::machine_reset_piratesh()
 {
 	m_int_status = 0;
 
-	int i;
-
 	// soften chorus(chip 0 channel 0-3), boost voice(chip 0 channel 4-7)
-	for (i=0; i<=7; i++)
+	for (int i = 0; i <= 7; i++)
 	{
 	//  m_k054539->set_gain(i, 0.5);
 	}
@@ -595,8 +593,8 @@ MACHINE_CONFIG_START(piratesh_state::piratesh)
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
 	MCFG_K053252_OFFSETS(40, 16) // TODO
 
-	MCFG_MACHINE_START_OVERRIDE(piratesh_state, piratesh)
-	MCFG_MACHINE_RESET_OVERRIDE(piratesh_state, piratesh)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_piratesh, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_piratesh, this));
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
@@ -640,7 +638,7 @@ MACHINE_CONFIG_START(piratesh_state::piratesh)
 	MCFG_K054338_ALPHAINV(1)
 	MCFG_K054338_MIXER("k055555")
 
-	MCFG_VIDEO_START_OVERRIDE(piratesh_state, piratesh)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_piratesh, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

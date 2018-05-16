@@ -26,7 +26,7 @@ inline void spectrum_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int
 }
 
 /* Update FLASH status for ts2068. Assumes flash update every 1/2s. */
-VIDEO_START_MEMBER(spectrum_state,ts2068)
+void spectrum_state::video_start_ts2068()
 {
 	m_frame_invert_count = 30;
 

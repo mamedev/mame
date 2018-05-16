@@ -1865,7 +1865,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gottlieb_state::screwloo)
 	gottlieb2(config);
 
-	MCFG_VIDEO_START_OVERRIDE(gottlieb_state,screwloo)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_screwloo, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gottlieb_state::cobram3)

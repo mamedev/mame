@@ -129,7 +129,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddragon_state::ddragon_scanline)
  *
  *************************************/
 
-MACHINE_START_MEMBER(ddragon_state,ddragon)
+void ddragon_state::machine_start_ddragon()
 {
 	/* configure banks */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -145,7 +145,7 @@ MACHINE_START_MEMBER(ddragon_state,ddragon)
 }
 
 
-MACHINE_RESET_MEMBER(ddragon_state,ddragon)
+void ddragon_state::machine_reset_ddragon()
 {
 	m_scrollx_hi = 0;
 	m_scrolly_hi = 0;
@@ -959,8 +959,8 @@ MACHINE_CONFIG_START(ddragon_state::ddragon)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
 
-	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
-	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ddragon, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddragon, this));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
@@ -972,7 +972,7 @@ MACHINE_CONFIG_START(ddragon_state::ddragon)
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon_state, screen_update_ddragon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ddragon, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1031,8 +1031,8 @@ MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
 
-	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
-	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ddragon, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddragon, this));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
@@ -1044,7 +1044,7 @@ MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon_state, screen_update_ddragon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ddragon, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1084,8 +1084,8 @@ MACHINE_CONFIG_START(ddragon_state::ddragon2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
 
-	MCFG_MACHINE_START_OVERRIDE(ddragon_state,ddragon)
-	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ddragon, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddragon, this));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon)
@@ -1097,7 +1097,7 @@ MACHINE_CONFIG_START(ddragon_state::ddragon2)
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon_state, screen_update_ddragon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ddragon, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

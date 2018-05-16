@@ -63,7 +63,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(searchar);
+	void video_start_searchar() ATTR_COLD;
 	void common_video_start();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

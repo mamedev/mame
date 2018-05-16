@@ -117,7 +117,7 @@ void kickgoal_state::kickgoal_draw_sprites(bitmap_ind16 &bitmap,const rectangle 
 }
 
 
-VIDEO_START_MEMBER(kickgoal_state,kickgoal)
+void kickgoal_state::video_start_kickgoal()
 {
 	m_sprbase = 0x0000;
 
@@ -137,7 +137,7 @@ VIDEO_START_MEMBER(kickgoal_state,kickgoal)
 	m_bgtm->set_transparent_pen(15);
 }
 
-VIDEO_START_MEMBER(kickgoal_state,actionhw)
+void kickgoal_state::video_start_actionhw()
 {
 	m_sprbase = 0x4000;
 	m_fg_base = 0x7000 * 2;

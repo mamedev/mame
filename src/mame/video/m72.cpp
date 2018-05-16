@@ -110,7 +110,7 @@ void m72_state::register_savestate()
 }
 
 
-VIDEO_START_MEMBER(m72_state,m72)
+void m72_state::video_start_m72()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
@@ -144,9 +144,9 @@ VIDEO_START_MEMBER(m72_state,m72)
 	register_savestate();
 }
 
-VIDEO_START_MEMBER(m72_state,xmultipl)
+void m72_state::video_start_xmultipl()
 {
-	VIDEO_START_CALL_MEMBER(m72);
+	video_start_m72();
 
 	m_fg_tilemap->set_scrolldx(4,64);
 	m_fg_tilemap->set_scrolldy(-128, 0);
@@ -157,9 +157,9 @@ VIDEO_START_MEMBER(m72_state,xmultipl)
 }
 
 
-VIDEO_START_MEMBER(m72_state,hharry)
+void m72_state::video_start_hharry()
 {
-	VIDEO_START_CALL_MEMBER(m72);
+	video_start_m72();
 
 	m_bg_tilemap->set_transmask(2,0x0001,0xfffe); // ? maybe the standard logic is ok.
 
@@ -181,7 +181,7 @@ TILEMAP_MAPPER_MEMBER(m72_state::m82_scan_rows)
 	return row*256 + col;
 }
 
-VIDEO_START_MEMBER(m72_state,m82)
+void m72_state::video_start_m82()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
@@ -220,7 +220,7 @@ VIDEO_START_MEMBER(m72_state,m82)
 
 
 // M84
-VIDEO_START_MEMBER(m72_state,rtype2)
+void m72_state::video_start_rtype2()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
@@ -247,9 +247,9 @@ VIDEO_START_MEMBER(m72_state,rtype2)
 }
 
 
-VIDEO_START_MEMBER(m72_state,hharryu)
+void m72_state::video_start_hharryu()
 {
-	VIDEO_START_CALL_MEMBER(rtype2);
+	video_start_rtype2();
 
 	m_fg_tilemap->set_scrolldx(4,3);
 	m_bg_tilemap->set_scrolldx(6,0);
@@ -258,9 +258,9 @@ VIDEO_START_MEMBER(m72_state,hharryu)
 }
 
 // m85
-VIDEO_START_MEMBER(m72_state,poundfor)
+void m72_state::video_start_poundfor()
 {
-	VIDEO_START_CALL_MEMBER(rtype2);
+	video_start_rtype2();
 
 	m_fg_tilemap->set_scrolldx(6,0);
 	m_bg_tilemap->set_scrolldx(6,0);

@@ -302,7 +302,7 @@ INTERRUPT_GEN_MEMBER( cdi_state::mcu_frame )
 	m_scc->mcu_frame();
 }
 
-MACHINE_RESET_MEMBER( cdi_state, cdimono1 )
+void cdi_state::machine_reset_cdimono1()
 {
 	uint16_t *src   = (uint16_t*)memregion("maincpu")->base();
 	uint16_t *dst   = m_planea;
@@ -316,7 +316,7 @@ MACHINE_RESET_MEMBER( cdi_state, cdimono1 )
 	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
 }
 
-MACHINE_RESET_MEMBER( cdi_state, cdimono2 )
+void cdi_state::machine_reset_cdimono2()
 {
 	uint16_t *src   = (uint16_t*)memregion("maincpu")->base();
 	uint16_t *dst   = m_planea;
@@ -328,17 +328,17 @@ MACHINE_RESET_MEMBER( cdi_state, cdimono2 )
 	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
 }
 
-MACHINE_RESET_MEMBER( cdi_state, quizard1 )
+void cdi_state::machine_reset_quizard1()
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	machine_reset_cdimono1();
 
 	m_scc->set_quizard_mcu_value(0x021f);
 	m_scc->set_quizard_mcu_ack(0x5a);
 }
 
-MACHINE_RESET_MEMBER( cdi_state, quizard2 )
+void cdi_state::machine_reset_quizard2()
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	machine_reset_cdimono1();
 
 	// 0x2b1: Italian
 	// 0x001: French
@@ -350,17 +350,17 @@ MACHINE_RESET_MEMBER( cdi_state, quizard2 )
 
 
 
-MACHINE_RESET_MEMBER( cdi_state, quizard3 )
+void cdi_state::machine_reset_quizard3()
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	machine_reset_cdimono1();
 
 	m_scc->set_quizard_mcu_value(0x00ae);
 	m_scc->set_quizard_mcu_ack(0x58);
 }
 
-MACHINE_RESET_MEMBER( cdi_state, quizard4 )
+void cdi_state::machine_reset_quizard4()
 {
-	MACHINE_RESET_CALL_MEMBER( cdimono1 );
+	machine_reset_cdimono1();
 
 	//m_scc->set_quizard_mcu_value(0x0139);
 	m_scc->set_quizard_mcu_value(0x011f);
@@ -847,7 +847,7 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 
 	MCFG_DEFAULT_LAYOUT(layout_cdi)
 
-	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cdimono2, this));
 
 	MCFG_CDI68070_ADD("scc68070")
 	MCFG_DEVICE_ADD("servo", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
@@ -902,7 +902,7 @@ MACHINE_CONFIG_START(cdi_state::cdi910)
 
 	MCFG_DEFAULT_LAYOUT(layout_cdi)
 
-	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cdimono2, this));
 
 	MCFG_CDI68070_ADD("scc68070")
 	MCFG_DEVICE_ADD("servo", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
@@ -935,7 +935,7 @@ MACHINE_CONFIG_END
 // CD-i Mono-I, with CD-ROM image device (MESS) and Software List (MESS)
 MACHINE_CONFIG_START(cdi_state::cdimono1)
 	cdimono1_base(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, cdimono1)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cdimono1, this));
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("cdi_cdrom")
@@ -958,7 +958,7 @@ READ8_MEMBER( cdi_state::quizard_mcu_p1_r )
 
 MACHINE_CONFIG_START(cdi_state::quizard1)
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard1 )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_quizard1, this));
 
 	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
 	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, cdi_state, quizard_mcu_p1_r))
@@ -968,17 +968,17 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cdi_state::quizard2)
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard2 )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_quizard2, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cdi_state::quizard3)
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard3 )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_quizard3, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cdi_state::quizard4)
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4 )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_quizard4, this));
 
 	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
 	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, cdi_state, quizard_mcu_p1_r))

@@ -89,7 +89,7 @@ public:
 	DECLARE_WRITE8_MEMBER(v6809_address_w);
 	DECLARE_WRITE8_MEMBER(v6809_register_w);
 	void kbd_put(u8 data);
-	DECLARE_MACHINE_RESET(v6809);
+	void machine_reset_v6809();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
@@ -135,7 +135,7 @@ void v6809_state::v6809_mem(address_map &map)
 static INPUT_PORTS_START( v6809 )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( v6809_state, v6809)
+void v6809_state::machine_reset_v6809()
 {
 	m_term_data = 0;
 	m_pia0->cb1_w(1);
@@ -282,7 +282,7 @@ MACHINE_CONFIG_START(v6809_state::v6809)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(16'000'000) / 4) // divided by 4 again internally
 	MCFG_DEVICE_PROGRAM_MAP(v6809_mem)
-	MCFG_MACHINE_RESET_OVERRIDE(v6809_state, v6809)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_v6809, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

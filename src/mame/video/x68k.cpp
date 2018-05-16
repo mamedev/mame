@@ -1084,7 +1084,7 @@ TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg1_tile_16)
 	SET_TILE_INFO_MEMBER(1,code,colour,flags);
 }
 
-VIDEO_START_MEMBER(x68k_state,x68000)
+void x68k_state::video_start_x68000()
 {
 	int gfx_index;
 

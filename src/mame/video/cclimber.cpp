@@ -452,7 +452,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::toproller_get_bg_tile_info)
 }
 
 
-VIDEO_START_MEMBER(cclimber_state,cclimber)
+void cclimber_state::video_start_cclimber()
 {
 	m_pf_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cclimber_state::cclimber_get_pf_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_pf_tilemap->set_transparent_pen(0);
@@ -469,7 +469,7 @@ VIDEO_START_MEMBER(cclimber_state,cclimber)
 }
 
 
-VIDEO_START_MEMBER(cclimber_state,swimmer)
+void cclimber_state::video_start_swimmer()
 {
 	m_pf_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cclimber_state::swimmer_get_pf_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_pf_tilemap->set_transparent_pen(0);
@@ -488,7 +488,7 @@ VIDEO_START_MEMBER(cclimber_state,swimmer)
 }
 
 
-VIDEO_START_MEMBER(cclimber_state,toprollr)
+void cclimber_state::video_start_toprollr()
 {
 	m_pf_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cclimber_state::toprollr_get_pf_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_pf_tilemap->set_transparent_pen(0);

@@ -39,7 +39,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vram_1_w);
 	DECLARE_READ8_MEMBER(powerinsb_fake_ym2203_r);
 
-	DECLARE_MACHINE_START(powerinsa);
+	void machine_start_powerinsa() ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);

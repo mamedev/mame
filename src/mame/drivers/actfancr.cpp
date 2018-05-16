@@ -274,12 +274,12 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-MACHINE_START_MEMBER(actfancr_state,triothep)
+void actfancr_state::machine_start_triothep()
 {
 	save_item(NAME(m_trio_control_select));
 }
 
-MACHINE_RESET_MEMBER(actfancr_state,triothep)
+void actfancr_state::machine_reset_triothep()
 {
 	m_trio_control_select = 0;
 }
@@ -351,8 +351,8 @@ MACHINE_CONFIG_START(actfancr_state::triothep)
 	MCFG_DEVICE_ADD("audiocpu",M6502, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(dec0_s_map)
 
-	MCFG_MACHINE_START_OVERRIDE(actfancr_state,triothep)
-	MCFG_MACHINE_RESET_OVERRIDE(actfancr_state,triothep)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_triothep, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_triothep, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

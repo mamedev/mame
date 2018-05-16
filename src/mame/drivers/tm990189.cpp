@@ -151,10 +151,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sys9901_tapewdata_w);
 
 	DECLARE_WRITE8_MEMBER( xmit_callback );
-	DECLARE_MACHINE_START(tm990_189);
-	DECLARE_MACHINE_RESET(tm990_189);
-	DECLARE_MACHINE_START(tm990_189_v);
-	DECLARE_MACHINE_RESET(tm990_189_v);
+
+	void machine_start_tm990_189() ATTR_COLD;
+	void machine_reset_tm990_189();
+
+	void machine_start_tm990_189_v() ATTR_COLD;
+	void machine_reset_tm990_189_v();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_callback);
 	TIMER_CALLBACK_MEMBER(clear_load);
@@ -177,20 +179,20 @@ private:
 
 #define displayena_duration attotime::from_usec(4500)   /* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
 
-MACHINE_RESET_MEMBER(tm990189_state,tm990_189)
+void tm990189_state::machine_reset_tm990_189()
 {
 	m_tms9980a->set_ready(ASSERT_LINE);
 	m_tms9980a->set_hold(CLEAR_LINE);
 	hold_load();
 }
 
-MACHINE_START_MEMBER(tm990189_state,tm990_189)
+void tm990189_state::machine_start_tm990_189()
 {
 	m_digits.resolve();
 	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 }
 
-MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
+void tm990189_state::machine_start_tm990_189_v()
 {
 	m_digits.resolve();
 	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
@@ -201,7 +203,7 @@ MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
 	m_joy2y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 }
 
-MACHINE_RESET_MEMBER(tm990189_state,tm990_189_v)
+void tm990189_state::machine_reset_tm990_189_v()
 {
 	m_tms9980a->set_ready(ASSERT_LINE);
 	m_tms9980a->set_hold(CLEAR_LINE);
@@ -816,8 +818,8 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189)
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_memmap, tm990_189_cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, tm990189_state, external_operation) )
 
-	MCFG_MACHINE_START_OVERRIDE(tm990189_state, tm990_189 )
-	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189 )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_tm990_189, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tm990_189, this));
 
 	/* Video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_tm990189)
@@ -871,8 +873,8 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_v_memmap, tm990_189_cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, tm990189_state, external_operation) )
 
-	MCFG_MACHINE_START_OVERRIDE(tm990189_state, tm990_189_v )
-	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189_v )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_tm990_189_v, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tm990_189_v, this));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9918", TMS9918, XTAL(10'738'635) / 2 )

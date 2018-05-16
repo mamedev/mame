@@ -3679,7 +3679,7 @@ MACHINE_CONFIG_START(snk_state::marvins)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_PALETTE_INIT_OWNER(snk_state,tnk3)
-	MCFG_VIDEO_START_OVERRIDE(snk_state,marvins)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_marvins, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3753,7 +3753,7 @@ MACHINE_CONFIG_START(snk_state::jcross)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_PALETTE_INIT_OWNER(snk_state,tnk3)
-	MCFG_VIDEO_START_OVERRIDE(snk_state,jcross)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_jcross, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3782,7 +3782,7 @@ MACHINE_CONFIG_START(snk_state::sgladiat)
 	/* visible area is correct. Debug info is shown in the black bars at the sides
 	   of the screen when the Debug dip switch is on */
 
-	MCFG_VIDEO_START_OVERRIDE(snk_state,sgladiat)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_sgladiat, this));
 MACHINE_CONFIG_END
 
 
@@ -3802,7 +3802,7 @@ MACHINE_CONFIG_START(snk_state::hal21)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(snk_state, irq0_line_hold,  220) // music tempo, hand tuned
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(snk_state,hal21)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_hal21, this));
 MACHINE_CONFIG_END
 
 
@@ -3836,7 +3836,7 @@ MACHINE_CONFIG_START(snk_state::tnk3)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_PALETTE_INIT_OWNER(snk_state,tnk3)
-	MCFG_VIDEO_START_OVERRIDE(snk_state,tnk3)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_tnk3, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3863,7 +3863,7 @@ MACHINE_CONFIG_START(snk_state::aso)
 	MCFG_DEVICE_PROGRAM_MAP(aso_YM3526_sound_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(snk_state,aso)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_aso, this));
 MACHINE_CONFIG_END
 
 
@@ -3931,7 +3931,7 @@ MACHINE_CONFIG_START(snk_state::ikari)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_VIDEO_START_OVERRIDE(snk_state,ikari)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ikari, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3989,7 +3989,7 @@ MACHINE_CONFIG_START(snk_state::bermudat)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gwar)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
-	MCFG_VIDEO_START_OVERRIDE(snk_state,gwar)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gwar, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4010,7 +4010,7 @@ MACHINE_CONFIG_START(snk_state::psychos)
 	bermudat(config);
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(snk_state,psychos)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_psychos, this));
 MACHINE_CONFIG_END
 
 
@@ -4094,7 +4094,7 @@ MACHINE_CONFIG_START(snk_state::tdfever)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_VIDEO_START_OVERRIDE(snk_state,tdfever)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_tdfever, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

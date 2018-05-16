@@ -420,14 +420,14 @@ MACHINE_CONFIG_START(tecmo16_state::ginkun)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ginkun_map)
 
-	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,ginkun)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ginkun, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tecmo16_state::riot)
 	ginkun(config);
 
 	/* basic machine hardware */
-	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,riot)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_riot, this));
 MACHINE_CONFIG_END
 
 /******************************************************************************/

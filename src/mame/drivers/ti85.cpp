@@ -607,7 +607,7 @@ MACHINE_CONFIG_START(ti85_state::ti85)
 	MCFG_DEVICE_CLOCK(6000000)        /* 6 MHz */
 	MCFG_DEVICE_IO_MAP(ti85_io)
 
-	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ti85, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(128, 64)
@@ -630,7 +630,7 @@ MACHINE_CONFIG_START(ti85_state::ti82)
 	MCFG_DEVICE_CLOCK(6000000)        /* 6 MHz */
 	MCFG_DEVICE_IO_MAP(ti82_io)
 
-	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ti85, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("t6a04", t6a04_device, screen_update)
@@ -659,7 +659,7 @@ MACHINE_CONFIG_START(ti85_state::ti83)
 	MCFG_DEVICE_CLOCK(6000000)        /* 6 MHz */
 	MCFG_DEVICE_IO_MAP(ti83_io)
 
-	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ti85, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("t6a04", t6a04_device, screen_update)
@@ -678,8 +678,8 @@ MACHINE_CONFIG_START(ti85_state::ti86)
 	MCFG_DEVICE_PROGRAM_MAP(ti86_mem)
 	MCFG_DEVICE_IO_MAP(ti86_io)
 
-	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti86 )
-	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ti86, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ti85, this));
 
 	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav", 0)
 MACHINE_CONFIG_END
@@ -691,8 +691,8 @@ MACHINE_CONFIG_START(ti85_state::ti83p)
 	MCFG_DEVICE_PROGRAM_MAP(ti83p_asic_mem)
 	MCFG_DEVICE_IO_MAP(ti83p_io)
 
-	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti83p )
-	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti83p )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ti83p, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ti83p, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("t6a04", t6a04_device, screen_update)
@@ -751,7 +751,7 @@ MACHINE_CONFIG_START(ti85_state::ti83pse)
 	MCFG_DEVICE_MODIFY("membank4")
 	MCFG_DEVICE_PROGRAM_MAP(ti83pse_banked_mem)
 
-	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti83pse )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ti83pse, this));
 	MCFG_DEVICE_REPLACE("flash", FUJITSU_29F160T, 0)
 MACHINE_CONFIG_END
 
@@ -769,13 +769,13 @@ MACHINE_CONFIG_START(ti85_state::ti84p)
 	MCFG_DEVICE_MODIFY("membank4")
 	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
 
-	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti84p )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ti84p, this));
 	MCFG_DEVICE_REPLACE("flash", AMD_29F800T , 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti84pse)
 	ti83pse(config);
-	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti84pse )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ti84pse, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti73)

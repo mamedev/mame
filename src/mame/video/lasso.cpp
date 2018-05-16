@@ -170,7 +170,7 @@ void lasso_state::video_start()
 	m_bg_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(lasso_state,wwjgtin)
+void lasso_state::video_start_wwjgtin()
 {
 	/* create tilemaps */
 	m_bg_tilemap =    &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lasso_state::lasso_get_bg_tile_info),this),      TILEMAP_SCAN_ROWS,  8,  8,  32, 32);
@@ -179,7 +179,7 @@ VIDEO_START_MEMBER(lasso_state,wwjgtin)
 	m_bg_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(lasso_state,pinbo)
+void lasso_state::video_start_pinbo()
 {
 	/* create tilemap */
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lasso_state::pinbo_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);

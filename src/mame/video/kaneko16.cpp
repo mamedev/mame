@@ -18,7 +18,7 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_display_enable)
 	COMBINE_DATA(&m_disp_enable);
 }
 
-VIDEO_START_MEMBER(kaneko16_state,kaneko16)
+void kaneko16_state::video_start_kaneko16()
 {
 	m_disp_enable = 1;  // default enabled for games not using it
 	save_item(NAME(m_disp_enable));
@@ -113,7 +113,7 @@ PALETTE_INIT_MEMBER(kaneko16_berlwall_state,berlwall)
 		palette.set_pen_color(i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
-VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
+void kaneko16_berlwall_state::video_start_berlwall()
 {
 	uint8_t *RAM  =   memregion("gfx3")->base();
 
@@ -160,12 +160,8 @@ VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
 		}
 	}
 
-	VIDEO_START_CALL_MEMBER(kaneko16);
+	video_start_kaneko16();
 }
-
-
-
-
 
 
 

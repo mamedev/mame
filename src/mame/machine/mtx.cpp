@@ -511,7 +511,7 @@ SNAPSHOT_LOAD_MEMBER( mtx_state, mtx )
     MACHINE_START( mtx512 )
 -------------------------------------------------*/
 
-MACHINE_START_MEMBER(mtx_state, mtx512)
+void mtx_state::machine_start_mtx512()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -544,7 +544,7 @@ MACHINE_START_MEMBER(mtx_state, mtx512)
 	program.install_ram(0xc000, 0xffff, m_ram->pointer());
 }
 
-MACHINE_RESET_MEMBER(mtx_state, mtx512)
+void mtx_state::machine_reset_mtx512()
 {
 	/* bank switching */
 	bankswitch(0);

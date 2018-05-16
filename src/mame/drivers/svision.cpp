@@ -500,7 +500,7 @@ void svision_state::machine_reset()
 }
 
 
-MACHINE_RESET_MEMBER(svision_state,tvlink)
+void svision_state::machine_reset_tvlink()
 {
 	svision_state::machine_reset();
 	m_tvlink.palette_on = false;
@@ -581,7 +581,7 @@ MACHINE_CONFIG_START(svision_state::tvlinkp)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(tvlink_mem)
 
-	MCFG_MACHINE_RESET_OVERRIDE(svision_state, tvlink)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tvlink, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_NO_PALETTE

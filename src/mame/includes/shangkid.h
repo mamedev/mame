@@ -60,9 +60,9 @@ public:
 	void init_dynamski();
 	void init_shangkid();
 	void init_chinhero();
-	DECLARE_VIDEO_START(shangkid);
+	void video_start_shangkid() ATTR_COLD;
 	DECLARE_PALETTE_INIT(dynamski);
-	DECLARE_MACHINE_RESET(shangkid);
+	void machine_reset_shangkid();
 
 	uint32_t screen_update_shangkid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dynamski(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

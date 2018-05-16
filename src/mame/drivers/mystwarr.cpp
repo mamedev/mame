@@ -859,7 +859,7 @@ static GFXDECODE_START( gfx_dadandrn )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x0000, 8 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(mystwarr_state,mystwarr)
+void mystwarr_state::machine_start_mystwarr()
 {
 	membank("z80bank")->configure_entries(0, 16, memregion("soundcpu")->base(), 0x4000);
 	membank("z80bank")->set_entry(2);
@@ -875,43 +875,38 @@ MACHINE_START_MEMBER(mystwarr_state,mystwarr)
 	save_item(NAME(m_sound_nmi_clk));
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,mystwarr)
+void mystwarr_state::machine_reset_mystwarr()
 {
-	int i;
-
 	// soften chorus(chip 0 channel 0-3), boost voice(chip 0 channel 4-7)
-	for (i=0; i<=3; i++)
+	for (int i = 0; i <= 3; i++)
 	{
 		m_k054539_1->set_gain(i, 0.8);
 		m_k054539_1->set_gain(i+4, 2.0);
 	}
 
 	// soften percussions(chip 1 channel 0-7)
-	for (i=0; i<=7; i++) m_k054539_2->set_gain(i, 0.5);
+	for (int i = 0; i <= 7; i++)
+		m_k054539_2->set_gain(i, 0.5);
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,dadandrn)
+void mystwarr_state::machine_reset_dadandrn()
 {
-	int i;
-
 	// boost voice(chip 0 channel 4-7)
-	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 2.0);
+	for (int i = 4; i <= 7; i++)
+		m_k054539_1->set_gain(i, 2.0);
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,viostorm)
+void mystwarr_state::machine_reset_viostorm()
 {
-	int i;
-
 	// boost voice(chip 0 channel 4-7)
-	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 2.0);
+	for (int i = 4; i <= 7; i++)
+		m_k054539_1->set_gain(i, 2.0);
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
+void mystwarr_state::machine_reset_metamrph()
 {
-	int i;
-
 	// boost voice(chip 0 channel 4-7) and soften other channels
-	for (i=0; i<=3; i++)
+	for (int i = 0; i <= 3; i++)
 	{
 		m_k054539_1->set_gain(i,   0.8);
 		m_k054539_1->set_gain(i+4, 1.8);
@@ -920,23 +915,22 @@ MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
 	}
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
+void mystwarr_state::machine_reset_martchmp()
 {
-	int i;
 	k054539_device *k054539 = subdevice<k054539_device>("k054539");
 
 	k054539->init_flags(k054539_device::REVERSE_STEREO);
 
 	// boost voice(chip 0 channel 4-7)
-	for (i=4; i<=7; i++) k054539->set_gain(i, 1.4);
+	for (int i = 4; i <= 7; i++)
+		k054539->set_gain(i, 1.4);
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
+void mystwarr_state::machine_reset_gaiapols()
 {
-	int i;
-
 	// boost voice(chip 0 channel 5-7)
-	for (i=5; i<=7; i++) m_k054539_1->set_gain(i, 2.0);
+	for (int i = 5; i <= 7; i++)
+		m_k054539_1->set_gain(i, 2.0);
 }
 
 
@@ -957,8 +951,8 @@ MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 	MCFG_DEVICE_ADD("k053252", K053252, 6000000) // 6 MHz?
 	MCFG_K053252_OFFSETS(24, 16)
 
-	MCFG_MACHINE_START_OVERRIDE(mystwarr_state,mystwarr)
-	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,mystwarr)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mystwarr, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mystwarr, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -991,7 +985,7 @@ MACHINE_CONFIG_START(mystwarr_state::mystwarr)
 	MCFG_K054338_ALPHAINV(1)
 	MCFG_K054338_MIXER("k055555")
 
-	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, mystwarr)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_mystwarr, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1014,7 +1008,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mystwarr_state::viostorm)
 	mystwarr(config);
 
-	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,viostorm)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_viostorm, this));
 
 	MCFG_DEVICE_REPLACE("k053252", K053252, 16000000/2)
 	MCFG_K053252_OFFSETS(40, 16)
@@ -1026,7 +1020,7 @@ MACHINE_CONFIG_START(mystwarr_state::viostorm)
 	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, metamrph_interrupt)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, viostorm)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_viostorm, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_metamrph)
 
@@ -1046,7 +1040,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mystwarr_state::metamrph)
 	mystwarr(config);
 
-	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,metamrph)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_metamrph, this));
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -1060,7 +1054,7 @@ MACHINE_CONFIG_START(mystwarr_state::metamrph)
 	MCFG_K053250_ADD("k053250_1", "palette", "screen", -7, 0)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, metamrph)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_metamrph, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_metamrph)
 
@@ -1080,7 +1074,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mystwarr_state::dadandrn)
 	mystwarr(config);
 
-	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,dadandrn)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dadandrn, this));
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -1094,7 +1088,7 @@ MACHINE_CONFIG_START(mystwarr_state::dadandrn)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dadandrn)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, dadandrn)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_dadandrn, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_dadandrn)
 
@@ -1114,7 +1108,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mystwarr_state::gaiapols)
 	mystwarr(config);
 
-	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,gaiapols)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gaiapols, this));
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -1130,7 +1124,7 @@ MACHINE_CONFIG_START(mystwarr_state::gaiapols)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaiapols)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, gaiapols)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gaiapols, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_dadandrn)
 
@@ -1151,7 +1145,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mystwarr_state::martchmp)
 	mystwarr(config);
 
-	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,martchmp)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_martchmp, this));
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -1170,7 +1164,7 @@ MACHINE_CONFIG_START(mystwarr_state::martchmp)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, martchmp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_martchmp, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

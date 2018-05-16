@@ -216,8 +216,7 @@ WRITE16_MEMBER(tetrisp2_state::rocknms_sub_vram_rot_w)
 }
 
 
-
-VIDEO_START_MEMBER(tetrisp2_state,tetrisp2)
+void tetrisp2_state::video_start_tetrisp2()
 {
 	m_flipscreen_old = -1;
 
@@ -236,13 +235,13 @@ VIDEO_START_MEMBER(tetrisp2_state,tetrisp2)
 	save_pointer(NAME(m_priority.get()), 0x40000);
 }
 
-VIDEO_START_MEMBER(tetrisp2_state,nndmseal)
+void tetrisp2_state::video_start_nndmseal()
 {
-	VIDEO_START_CALL_MEMBER( tetrisp2 );
+	video_start_tetrisp2();
 	m_tilemap_bg->set_scrolldx(-4,-4);
 }
 
-VIDEO_START_MEMBER(tetrisp2_state,rockntread)
+void tetrisp2_state::video_start_rockntread()
 {
 	m_flipscreen_old = -1;
 
@@ -263,9 +262,9 @@ VIDEO_START_MEMBER(tetrisp2_state,rockntread)
 }
 
 
-VIDEO_START_MEMBER(tetrisp2_state,rocknms)
+void tetrisp2_state::video_start_rocknms()
 {
-	VIDEO_START_CALL_MEMBER( rockntread );
+	video_start_rockntread();
 
 	m_tilemap_sub_bg = &machine().tilemap().create(*m_sub_gfxdecode, tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rocknms_sub_bg),this),TILEMAP_SCAN_ROWS,16, 16, 32, 256);   // rockn ms(sub)
 	m_tilemap_sub_fg = &machine().tilemap().create(*m_sub_gfxdecode, tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rocknms_sub_fg),this),TILEMAP_SCAN_ROWS,8, 8, 64, 64);
@@ -722,7 +721,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::stepstag_get_tile_info_fg)
 			0);
 }
 
-VIDEO_START_MEMBER(stepstag_state,stepstag)
+void stepstag_state::video_start_stepstag()
 {
 	m_flipscreen_old = -1;
 

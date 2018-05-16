@@ -487,7 +487,7 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2) // verified from rpunch schematics
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, rpunch_state, rpunch_gga_data_w))
 
-	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_rpunch, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -503,7 +503,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rpunch_state::svolley)
 	rpunch(config);
-	MCFG_VIDEO_START_OVERRIDE(rpunch_state,svolley)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_svolley, this));
 MACHINE_CONFIG_END
 
 
@@ -538,7 +538,7 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2)
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, rpunch_state, rpunch_gga_data_w))
 
-	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_rpunch, this));
 
 	/* sound hardware */
 

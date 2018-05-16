@@ -115,7 +115,7 @@ public:
 	{ }
 
 	void init_amust();
-	DECLARE_MACHINE_RESET(amust);
+	void machine_reset_amust();
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_WRITE8_MEMBER(port04_w);
 	DECLARE_READ8_MEMBER(port05_r);
@@ -353,7 +353,7 @@ MC6845_UPDATE_ROW( amust_state::crtc_update_row )
 	}
 }
 
-MACHINE_RESET_MEMBER( amust_state, amust )
+void amust_state::machine_reset_amust()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(amust_state::amust)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", amust_state, irq_vs)
-	MCFG_MACHINE_RESET_OVERRIDE(amust_state, amust)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_amust, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

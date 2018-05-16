@@ -973,7 +973,7 @@ static const char *const cosmicg_sample_names[] =
 };
 
 
-MACHINE_START_MEMBER(cosmic_state,cosmic)
+void cosmic_state::machine_start_cosmic()
 {
 	save_item(NAME(m_sound_enabled));
 	save_item(NAME(m_march_select));
@@ -985,7 +985,7 @@ MACHINE_START_MEMBER(cosmic_state,cosmic)
 	save_item(NAME(m_color_registers));
 }
 
-MACHINE_RESET_MEMBER(cosmic_state,cosmic)
+void cosmic_state::machine_reset_cosmic()
 {
 	m_pixel_clock = 0;
 	m_background_enable = 0;
@@ -994,7 +994,7 @@ MACHINE_RESET_MEMBER(cosmic_state,cosmic)
 	m_color_registers[2] = 0;
 }
 
-MACHINE_RESET_MEMBER(cosmic_state,cosmicg)
+void cosmic_state::machine_reset_cosmicg()
 {
 	m_pixel_clock = 0;
 	m_background_enable = 0;
@@ -1010,8 +1010,8 @@ MACHINE_CONFIG_START(cosmic_state::cosmic)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80,Z80_MASTER_CLOCK/6) /* 1.8026 MHz */
 
-	MCFG_MACHINE_START_OVERRIDE(cosmic_state,cosmic)
-	MCFG_MACHINE_RESET_OVERRIDE(cosmic_state,cosmic)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cosmic, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cosmic, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1098,8 +1098,8 @@ MACHINE_CONFIG_START(cosmic_state::cosmicg)
 		fed to the tms9904 or tms9980.  Also, I have never heard of a tms9900/9980 operating under
 		1.5MHz.  So, if someone can check this... */
 
-	MCFG_MACHINE_START_OVERRIDE(cosmic_state,cosmic)
-	MCFG_MACHINE_RESET_OVERRIDE(cosmic_state,cosmicg)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cosmic, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cosmicg, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

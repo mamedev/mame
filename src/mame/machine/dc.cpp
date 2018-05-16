@@ -747,7 +747,7 @@ WRITE_LINE_MEMBER(dc_state::sh4_aica_irq)
 	dc_update_interrupt_status();
 }
 
-MACHINE_RESET_MEMBER(dc_state,dc_console)
+void dc_state::machine_reset_dc_console()
 {
 	dc_state::machine_reset();
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);

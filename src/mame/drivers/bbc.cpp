@@ -845,8 +845,8 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	MCFG_RAM_EXTRA_OPTIONS("32K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 
-	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbca)
-	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbca)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bbca, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_bbca, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -868,7 +868,7 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, bbc_state, bbc_hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, bbc_state, bbc_vsync_changed))
 
-	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbc)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_bbc, this));
 
 	MCFG_DEFAULT_LAYOUT(layout_bbc)
 
@@ -925,8 +925,8 @@ MACHINE_CONFIG_START(bbc_state::bbcb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bbcb_nofdc_mem)
 
-	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcb)
-	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcb)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bbcb, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_bbcb, this));
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1053,8 +1053,8 @@ MACHINE_CONFIG_START(bbc_state::bbcbp)
 	MCFG_DEVICE_PROGRAM_MAP(bbcbp_mem)
 	MCFG_DEVICE_OPCODES_MAP(bbcbp_fetch)
 
-	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcbp)
-	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcbp)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bbcbp, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_bbcbp, this));
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("fdc")
@@ -1076,8 +1076,8 @@ MACHINE_CONFIG_START(bbc_state::bbcbp128)
 	MCFG_DEVICE_PROGRAM_MAP(bbcbp128_mem)
 	MCFG_DEVICE_OPCODES_MAP(bbcbp_fetch)
 
-	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcbp)
-	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcbp)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bbcbp, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_bbcbp, this));
 MACHINE_CONFIG_END
 
 
@@ -1094,7 +1094,7 @@ MACHINE_CONFIG_START(torch_state::torchf)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bbcb_mem)
 
-	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, torch)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_torch, this));
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("fdc")
@@ -1310,8 +1310,8 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 
-	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcm)
-	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcm)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bbcm, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_bbcm, this));
 
 	MCFG_DEFAULT_LAYOUT(layout_bbcm)
 
@@ -1335,7 +1335,7 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, bbc_state, bbc_hsync_changed))
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, bbc_state, bbc_vsync_changed))
 
-	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbc)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_bbc, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1568,7 +1568,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bbc_state::cfa3000)
 	bbcm(config);
-	MCFG_MACHINE_START_OVERRIDE(bbc_state, cfa3000)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cfa3000, this));
 
 	/* fdc */
 	MCFG_DEVICE_MODIFY("wd1770:0")
@@ -1625,8 +1625,8 @@ MACHINE_CONFIG_START(bbc_state::bbcmc)
 	/* eeprom pcd8572 */
 	//MCFG_DEVICE_REMOVE("rtc")
 
-	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcmc)
-	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcmc)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bbcmc, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_bbcmc, this));
 
 	/* user via */
 	MCFG_DEVICE_MODIFY("via6522_1")
@@ -1681,14 +1681,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(bbc_state::ltmpbp)
 	bbcbp(config);
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, ltmpbp)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ltmpbp, this));
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(bbc_state::ltmpm)
 	bbcm(config);
 	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, ltmpm)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ltmpm, this));
 MACHINE_CONFIG_END
 
 

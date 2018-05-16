@@ -1227,7 +1227,7 @@ static DISCRETE_SOUND_START( btime_sound_discrete )
 DISCRETE_SOUND_END
 
 
-MACHINE_START_MEMBER(btime_state,btime)
+void btime_state::machine_start_btime()
 {
 	save_item(NAME(m_btime_palette));
 	save_item(NAME(m_bnj_scroll1));
@@ -1235,9 +1235,9 @@ MACHINE_START_MEMBER(btime_state,btime)
 	save_item(NAME(m_btime_tilemap));
 }
 
-MACHINE_START_MEMBER(btime_state,mmonkey)
+void btime_state::machine_start_mmonkey()
 {
-	MACHINE_START_CALL_MEMBER(btime);
+	machine_start_btime();
 
 	save_item(NAME(m_protection_command));
 	save_item(NAME(m_protection_status));
@@ -1245,7 +1245,7 @@ MACHINE_START_MEMBER(btime_state,mmonkey)
 	save_item(NAME(m_protection_ret));
 }
 
-MACHINE_RESET_MEMBER(btime_state,btime)
+void btime_state::machine_reset_btime()
 {
 	/* by default, the audio NMI is disabled, except for bootlegs which don't use the enable */
 	if (m_audionmi.found())
@@ -1260,16 +1260,16 @@ MACHINE_RESET_MEMBER(btime_state,btime)
 	m_btime_tilemap[3] = 0;
 }
 
-MACHINE_RESET_MEMBER(btime_state,lnc)
+void btime_state::machine_reset_lnc()
 {
 	*m_lnc_charbank = 1;
 
-	MACHINE_RESET_CALL_MEMBER(btime);
+	machine_reset_btime();
 }
 
-MACHINE_RESET_MEMBER(btime_state,mmonkey)
+void btime_state::machine_reset_mmonkey()
 {
-	MACHINE_RESET_CALL_MEMBER(lnc);
+	machine_reset_lnc();
 
 	m_protection_command = 0;
 	m_protection_status = 0;
@@ -1296,8 +1296,8 @@ MACHINE_CONFIG_START(btime_state::btime)
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_btime)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MACHINE_START_OVERRIDE(btime_state,btime)
-	MCFG_MACHINE_RESET_OVERRIDE(btime_state,btime)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_btime, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_btime, this));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_btime)
 
@@ -1356,7 +1356,7 @@ MACHINE_CONFIG_START(btime_state::lnc)
 	MCFG_DEVICE_REPLACE("maincpu", DECO_C10707, HCLK2)
 	MCFG_DEVICE_PROGRAM_MAP(lnc_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(btime_state,lnc)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_lnc, this));
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lnc)
@@ -1388,8 +1388,8 @@ MACHINE_CONFIG_START(btime_state::mmonkey)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mmonkey_map)
 
-	MCFG_MACHINE_START_OVERRIDE(btime_state,mmonkey)
-	MCFG_MACHINE_RESET_OVERRIDE(btime_state,mmonkey)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mmonkey, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mmonkey, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(btime_state::bnj)
@@ -1403,7 +1403,7 @@ MACHINE_CONFIG_START(btime_state::bnj)
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bnj)
 
-	MCFG_VIDEO_START_OVERRIDE(btime_state,bnj)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_bnj, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_bnj)
@@ -1469,7 +1469,7 @@ MACHINE_CONFIG_START(btime_state::disco)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32)
 
-	MCFG_VIDEO_START_OVERRIDE(btime_state,disco)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_disco, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_disco)

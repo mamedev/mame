@@ -65,7 +65,7 @@ public:
 	void init_npcartv1();
 	void init_nprsp();
 	void init_unkneo();
-	DECLARE_MACHINE_RESET(nprsp);
+	void machine_reset_nprsp();
 	uint32_t screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(neoprint_state::neoprint)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_RESET_MEMBER(neoprint_state,nprsp)
+void neoprint_state::machine_reset_nprsp()
 {
 	m_bank_val = 0;
 }
@@ -562,7 +562,7 @@ MACHINE_CONFIG_START(neoprint_state::nprsp)
 	MCFG_SCREEN_UPDATE_DRIVER(neoprint_state, screen_update_nprsp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MACHINE_RESET_OVERRIDE(neoprint_state,nprsp)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_nprsp, this));
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

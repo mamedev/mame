@@ -118,7 +118,7 @@ void apple3_state::apple3_write_charmem()
 
 
 
-VIDEO_START_MEMBER(apple3_state,apple3)
+void apple3_state::video_start_apple3()
 {
 	int i, j;
 	uint32_t v;

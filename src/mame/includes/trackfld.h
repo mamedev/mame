@@ -97,11 +97,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_MACHINE_START(trackfld);
-	DECLARE_MACHINE_RESET(trackfld);
-	DECLARE_VIDEO_START(trackfld);
+	void machine_start_trackfld() ATTR_COLD;
+	void machine_reset_trackfld();
+	void video_start_trackfld()   ATTR_COLD;
 	DECLARE_PALETTE_INIT(trackfld);
-	DECLARE_VIDEO_START(atlantol);
+	void video_start_atlantol()   ATTR_COLD;
 	uint32_t screen_update_trackfld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	DECLARE_WRITE_LINE_MEMBER(vblank_nmi);

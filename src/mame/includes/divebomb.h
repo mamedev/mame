@@ -52,9 +52,9 @@ public:
 	uint8_t m_roz_pal;
 	bool m_roz_enable[2];
 
-	DECLARE_MACHINE_RESET(divebomb);
-	DECLARE_MACHINE_START(divebomb);
-	DECLARE_VIDEO_START(divebomb);
+	void machine_reset_divebomb();
+	void machine_start_divebomb() ATTR_COLD;
+	void video_start_divebomb() ATTR_COLD;
 	DECLARE_PALETTE_INIT(divebomb);
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

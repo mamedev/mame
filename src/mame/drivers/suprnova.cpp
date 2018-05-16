@@ -826,31 +826,31 @@ MACHINE_CONFIG_START(skns_state::skns)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_RESET_MEMBER(skns_state,sknsa)
+void skns_state::machine_reset_sknsa()
 {
 	m_region = 'A';
 	skns_state::machine_reset();
 }
 
-MACHINE_RESET_MEMBER(skns_state,sknsj)
+void skns_state::machine_reset_sknsj()
 {
 	m_region = 'J';
 	skns_state::machine_reset();
 }
 
-MACHINE_RESET_MEMBER(skns_state,sknsu)
+void skns_state::machine_reset_sknsu()
 {
 	m_region = 'U';
 	skns_state::machine_reset();
 }
 
-MACHINE_RESET_MEMBER(skns_state,sknse)
+void skns_state::machine_reset_sknse()
 {
 	m_region = 'E';
 	skns_state::machine_reset();
 }
 
-MACHINE_RESET_MEMBER(skns_state,sknsk)
+void skns_state::machine_reset_sknsk()
 {
 	m_region = 'K';
 	skns_state::machine_reset();
@@ -859,27 +859,27 @@ MACHINE_RESET_MEMBER(skns_state,sknsk)
 
 MACHINE_CONFIG_START(skns_state::sknsa)
 	skns(config);
-	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsa)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sknsa, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(skns_state::sknsj)
 	skns(config);
-	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsj)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sknsj, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(skns_state::sknsu)
 	skns(config);
-	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsu)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sknsu, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(skns_state::sknse)
 	skns(config);
-	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknse)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sknse, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(skns_state::sknsk)
 	skns(config);
-	MCFG_MACHINE_RESET_OVERRIDE(skns_state,sknsk)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sknsk, this));
 MACHINE_CONFIG_END
 
 /***** IDLE SKIPPING *****/

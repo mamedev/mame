@@ -1185,8 +1185,7 @@ MACHINE_CONFIG_START(ampoker2_state::sigma2k)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sigma2k)
-	MCFG_VIDEO_START_OVERRIDE(ampoker2_state, sigma2k)
-MACHINE_CONFIG_END
+	set_video_start_cb(config, driver_callback_delegate(&video_start_sigma2k, this));
 
 
 /*************************

@@ -812,7 +812,7 @@ MACHINE_CONFIG_START(pc1251_state::pc1260)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP( pc1260_mem)
 
-	MCFG_MACHINE_START_OVERRIDE(pc1251_state, pc1260 )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pc1260, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc1251_state::pc1261)

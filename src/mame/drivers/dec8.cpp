@@ -1982,7 +1982,7 @@ MACHINE_CONFIG_START(dec8_state::lastmisn)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_lastmisn, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2047,7 +2047,7 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,shackled)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_shackled, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2108,7 +2108,7 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,gondo)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gondo, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2169,7 +2169,7 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,garyoret)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_garyoret, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2229,7 +2229,7 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ghostb)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,ghostb)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ghostb, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2289,7 +2289,7 @@ MACHINE_CONFIG_START(dec8_state::csilver)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_lastmisn, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2353,7 +2353,7 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(1024)
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,oscar)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_oscar, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2407,7 +2407,7 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(144)
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,srdarwin)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_srdarwin, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2464,7 +2464,7 @@ MACHINE_CONFIG_START(dec8_state::cobracom)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
 	MCFG_DECO_RMC3_SET_PALETTE_SIZE(256)
 
-	MCFG_VIDEO_START_OVERRIDE(dec8_state,cobracom)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cobracom, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

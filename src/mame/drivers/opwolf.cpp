@@ -457,7 +457,7 @@ void opwolf_state::machine_start()
 	save_item(NAME(m_adpcm_end));
 }
 
-MACHINE_RESET_MEMBER(opwolf_state,opwolf)
+void opwolf_state::machine_reset_opwolf()
 {
 	m_adpcm_b[0] = m_adpcm_b[1] = 0;
 	m_adpcm_c[0] = m_adpcm_c[1] = 0;
@@ -796,7 +796,7 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_RESET_OVERRIDE(opwolf_state,opwolf)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_opwolf, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

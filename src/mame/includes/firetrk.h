@@ -130,8 +130,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(firetrk);
-	DECLARE_VIDEO_START(superbug);
-	DECLARE_VIDEO_START(montecar);
+	void video_start_superbug() ATTR_COLD;
+	void video_start_montecar() ATTR_COLD;
 	DECLARE_PALETTE_INIT(montecar);
 	uint32_t screen_update_firetrk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_superbug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

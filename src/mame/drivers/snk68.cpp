@@ -646,7 +646,7 @@ MACHINE_CONFIG_START(snk68_state::searchar)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(searchar_map)
 
-	MCFG_VIDEO_START_OVERRIDE(snk68_state,searchar)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_searchar, this));
 MACHINE_CONFIG_END
 
 

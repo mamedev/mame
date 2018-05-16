@@ -22,7 +22,7 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
-	DECLARE_VIDEO_START(digdug);
+	void video_start_digdug() ATTR_COLD;
 	DECLARE_PALETTE_INIT(digdug);
 	uint32_t screen_update_digdug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

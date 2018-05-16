@@ -70,8 +70,8 @@ public:
 	DECLARE_READ8_MEMBER(scregg_irqack_r);
 
 	void init_rockduck();
-	DECLARE_MACHINE_START(scregg);
-	DECLARE_MACHINE_RESET(scregg);
+	void machine_start_scregg() ATTR_COLD;
+	void machine_reset_scregg();
 	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
 	void scregg(machine_config &config);
 	void dommy(machine_config &config);
@@ -245,7 +245,7 @@ GFXDECODE_END
 
 
 
-MACHINE_START_MEMBER(scregg_state,scregg)
+void scregg_state::machine_start_scregg()
 {
 	save_item(NAME(m_btime_palette));
 	save_item(NAME(m_bnj_scroll1));
@@ -253,7 +253,7 @@ MACHINE_START_MEMBER(scregg_state,scregg)
 	save_item(NAME(m_btime_tilemap));
 }
 
-MACHINE_RESET_MEMBER(scregg_state,scregg)
+void scregg_state::machine_reset_scregg()
 {
 	m_btime_palette = 0;
 	m_bnj_scroll1 = 0;
@@ -271,8 +271,8 @@ MACHINE_CONFIG_START(scregg_state::dommy)
 	MCFG_DEVICE_PROGRAM_MAP(dommy_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq", scregg_state, scregg_interrupt, "screen", 0, 8)
 
-	MCFG_MACHINE_START_OVERRIDE(scregg_state,scregg)
-	MCFG_MACHINE_RESET_OVERRIDE(scregg_state,scregg)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_scregg, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_scregg, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -303,8 +303,8 @@ MACHINE_CONFIG_START(scregg_state::scregg)
 	MCFG_DEVICE_PROGRAM_MAP(eggs_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq", scregg_state, scregg_interrupt, "screen", 0, 8)
 
-	MCFG_MACHINE_START_OVERRIDE(scregg_state,scregg)
-	MCFG_MACHINE_RESET_OVERRIDE(scregg_state,scregg)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_scregg, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_scregg, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
