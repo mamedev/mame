@@ -40,38 +40,33 @@ void nereid_device::device_reset()
 
 READ16_MEMBER(nereid_device::ctrl_r)
 {
-	uint8_t ret = 0;
-
-	LOG("NEREID: %02X\n", offset);
+	LOG("NEREID ctrl_r: %02X\n", offset);
 
 	switch(offset) {
+	case NEREID_BUSY:
+		return 0;
 	case NEREID_RED_DATA:
-		ret = m_red;
-		break;
+		return 0xff00 | m_red;
 	case NEREID_GREEN_DATA:
-		ret = m_red;
-		break;
+		return 0xff00 | m_red;
 	case NEREID_BLUE_DATA:
-		ret = m_red;
-		break;
+		return 0xff00 | m_red;
 	case NEREID_INDEX:
-		ret = m_index;
-		break;
+		return 0xff00 | m_index;
 	case NEREID_STROBE:
-		ret = 0;
-		break;
+		return 0xff00;
 	case NEREID_PLANE_MASK:
-		ret = m_plane_mask;
-		break;
+		return 0xff00 | m_plane_mask;
 	default:
 		space.unmap();
+		break;
 	}
-	return ret;
+	return 0xffff;
 }
 
 WRITE16_MEMBER(nereid_device::ctrl_w)
 {
-	LOG("NEREID: %02X = %02X\n", offset, data);
+	LOG("NEREID: ctrl_w %02X = %02X\n", offset, data);
 	data &= 0xff;
 	switch(offset) {
 	case NEREID_RED_DATA:
