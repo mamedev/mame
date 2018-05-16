@@ -176,7 +176,8 @@ u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 {
 	// While screen height is fixed at 240 pixels, the number of character rows and the height of each row are not.
 	// The "Set-Up" screens configure 3 ordinary 10-pixel rows on the top (using two for double-height characters)
-	// and 2 more on the bottom, separated by 11 blank rows of 16 pixels and 1 blank row of 14 pixels.
+	// and 2 more on the bottom, separated by 11 blank rows of 16 pixels and 1 blank row of 14 pixels. This is
+	// also used to implement the "smooth scroll" option.
 
 	const u8 scrattr = m_extraram[0];
 
