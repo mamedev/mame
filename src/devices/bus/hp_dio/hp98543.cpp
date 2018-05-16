@@ -29,25 +29,25 @@ MACHINE_CONFIG_START(dio16_98543_device::device_add_mconfig)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(70)
 
-	MCFG_DEVICE_ADD("topcat_plane_0", TOPCAT, XTAL(35904000))
+	MCFG_DEVICE_ADD("topcat0", TOPCAT, XTAL(35904000))
 	MCFG_TOPCAT_FB_WIDTH(1024)
 	MCFG_TOPCAT_FB_HEIGHT(400)
 	MCFG_TOPCAT_PLANEMASK(1)
 	MCFG_TOPCAT_VRAM(&m_vram)
 
-	MCFG_DEVICE_ADD("topcat_plane_1", TOPCAT, XTAL(35904000))
+	MCFG_DEVICE_ADD("topcat1", TOPCAT, XTAL(35904000))
 	MCFG_TOPCAT_FB_WIDTH(1024)
 	MCFG_TOPCAT_FB_HEIGHT(400)
 	MCFG_TOPCAT_PLANEMASK(2)
 	MCFG_TOPCAT_VRAM(&m_vram)
 
-	MCFG_DEVICE_ADD("topcat_plane_2", TOPCAT, XTAL(35904000))
+	MCFG_DEVICE_ADD("topcat2", TOPCAT, XTAL(35904000))
 	MCFG_TOPCAT_FB_WIDTH(1024)
 	MCFG_TOPCAT_FB_HEIGHT(400)
 	MCFG_TOPCAT_PLANEMASK(4)
 	MCFG_TOPCAT_VRAM(&m_vram)
 
-	MCFG_DEVICE_ADD("topcat_plane_3", TOPCAT, XTAL(35904000))
+	MCFG_DEVICE_ADD("topcat3", TOPCAT, XTAL(35904000))
 	MCFG_TOPCAT_FB_WIDTH(1024)
 	MCFG_TOPCAT_FB_HEIGHT(400)
 	MCFG_TOPCAT_PLANEMASK(8)
@@ -69,10 +69,7 @@ dio16_98543_device::dio16_98543_device(const machine_config &mconfig, const char
 dio16_98543_device::dio16_98543_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_dio16_card_interface(mconfig, *this),
-	m_topcat0(*this, "topcat_plane_0"),
-	m_topcat1(*this, "topcat_plane_1"),
-	m_topcat2(*this, "topcat_plane_2"),
-	m_topcat3(*this, "topcat_plane_3"),
+	m_topcat(*this, "topcat%u", 0),
 	m_nereid(*this, "nereid")
 {
 	m_vram.resize(0x80000);
@@ -118,34 +115,32 @@ WRITE16_MEMBER(dio16_98543_device::rom_w)
 
 READ16_MEMBER(dio16_98543_device::ctrl_r)
 {
-	return m_topcat0->ctrl_r(space, offset, mem_mask) |
-		m_topcat1->ctrl_r(space, offset, mem_mask) |
-		m_topcat2->ctrl_r(space, offset, mem_mask) |
-		m_topcat3->ctrl_r(space, offset, mem_mask);
+	uint16_t ret = 0;
+
+	for(auto tc: m_topcat)
+		ret |= tc->ctrl_r(space, offset, mem_mask);
+
+	return ret;
 }
 
 WRITE16_MEMBER(dio16_98543_device::ctrl_w)
 {
-	m_topcat0->ctrl_w(space, offset, data, mem_mask);
-	m_topcat1->ctrl_w(space, offset, data, mem_mask);
-	m_topcat2->ctrl_w(space, offset, data, mem_mask);
-	m_topcat3->ctrl_w(space, offset, data, mem_mask);
+	for(auto tc: m_topcat)
+		tc->ctrl_w(space, offset, data, mem_mask);
 }
 
 READ16_MEMBER(dio16_98543_device::vram_r)
 {
-	return m_topcat0->vram_r(space, offset, mem_mask) |
-		m_topcat1->vram_r(space, offset, mem_mask) |
-		m_topcat2->vram_r(space, offset, mem_mask) |
-		m_topcat3->vram_r(space, offset, mem_mask);
+	uint16_t ret = 0;
+	for(auto tc: m_topcat)
+		ret |= tc->vram_r(space, offset, mem_mask);
+	return ret;
 }
 
 WRITE16_MEMBER(dio16_98543_device::vram_w)
 {
-	m_topcat0->vram_w(space, offset, data, mem_mask);
-	m_topcat1->vram_w(space, offset, data, mem_mask);
-	m_topcat2->vram_w(space, offset, data, mem_mask);
-	m_topcat3->vram_w(space, offset, data, mem_mask);
+	for(auto tc: m_topcat)
+		tc->vram_w(space, offset, data, mem_mask);
 }
 
 uint32_t dio16_98543_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
