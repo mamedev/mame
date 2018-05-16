@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sven Schnelle
-#ifndef MAME_VIDEO_TOPCAT_H_
-#define MAME_VIDEO_TOPCAT_H_
+#ifndef MAME_VIDEO_TOPCAT_H
+#define MAME_VIDEO_TOPCAT_H
 
 #pragma once
 
@@ -145,4 +145,4 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(TOPCAT, topcat_device)
-#endif // MAME_VIDEO_TOPCAT_H_
+#endif // MAME_VIDEO_TOPCAT_H
