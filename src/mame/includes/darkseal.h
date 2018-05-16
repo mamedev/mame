@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#ifndef MAME_INCLUDES_DARKSEAL_H
+#define MAME_INCLUDES_DARKSEAL_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "cpu/h6280/h6280.h"
@@ -14,7 +18,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
-		, m_palette(*this, "palette")
+		, m_palette(*this, "colors")
 		, m_deco_tilegen(*this, "tilegen%u", 1U)
 		, m_sprgen(*this, "spritegen")
 		, m_spriteram(*this, "spriteram")
@@ -25,6 +29,21 @@ public:
 		, m_paletteram_ext(*this, "palette_ext")
 	{ }
 
+	void init_darkseal();
+
+	void darkseal(machine_config &config);
+
+protected:
+	DECLARE_WRITE16_MEMBER(irq_ack_w);
+	DECLARE_WRITE16_MEMBER(palette_w);
+	DECLARE_WRITE16_MEMBER(palette_ext_w);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void update_palette(int offset);
+	void darkseal_map(address_map &map);
+	void sound_map(address_map &map);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
 	required_device<palette_device> m_palette;
@@ -39,16 +58,6 @@ public:
 	//uint16_t *m_pf4_rowscroll;
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_shared_ptr<uint16_t> m_paletteram_ext;
-
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_WRITE16_MEMBER(palette_w);
-	DECLARE_WRITE16_MEMBER(palette_ext_w);
-
-	void init_darkseal();
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void update_palette(int offset);
-	void darkseal(machine_config &config);
-	void darkseal_map(address_map &map);
-	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DARKSEAL_H

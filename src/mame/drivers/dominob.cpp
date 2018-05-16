@@ -288,7 +288,7 @@ static const gfx_layout bglayout =
 	16*32*2
 };
 
-static GFXDECODE_START( dominob )
+static GFXDECODE_START( gfx_dominob )
 	GFXDECODE_ENTRY("gfx1", 0, charlayout,   0, 0x20)
 	GFXDECODE_ENTRY("gfx2", 0, bglayout,     0x100, 0x10)
 GFXDECODE_END
@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(dominob_state::dominob)
 	MCFG_SCREEN_UPDATE_DRIVER(dominob_state, screen_update_dominob)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dominob)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dominob)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 

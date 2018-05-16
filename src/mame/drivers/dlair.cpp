@@ -37,7 +37,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/ldv1000.h"
 #include "machine/ldstub.h"
 #include "machine/watchdog.h"
@@ -718,7 +718,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( dlair )
+static GFXDECODE_START( gfx_dlair )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -791,7 +791,7 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", "ld_22vp932")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dlair)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dlair)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	MCFG_PALETTE_INIT_OWNER(dlair_state,dleuro)

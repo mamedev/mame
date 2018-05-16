@@ -189,7 +189,7 @@
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(turbo_state,buckrog)
+void turbo_state::machine_reset_buckrog()
 {
 	m_buckrog_command = 0x00;
 	memset(m_alt_spriteram, 0x00, sizeof(m_alt_spriteram));
@@ -831,7 +831,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static GFXDECODE_START( turbo )
+static GFXDECODE_START( gfx_turbo )
 	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x2_planar, 0, 64 )
 GFXDECODE_END
 
@@ -881,7 +881,7 @@ MACHINE_CONFIG_START(turbo_state::turbo)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, turbo_state, start_lamp_w))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(turbo_state,turbo)
 
@@ -891,7 +891,7 @@ MACHINE_CONFIG_START(turbo_state::turbo)
 	MCFG_SCREEN_UPDATE_DRIVER(turbo_state, screen_update_turbo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(turbo_state,turbo)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_turbo, this));
 
 	/* sound hardware */
 	turbo_samples(config);
@@ -921,7 +921,7 @@ MACHINE_CONFIG_START(turbo_state::subroc3d)
 	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(turbo_state,subroc3d)
 
@@ -931,7 +931,7 @@ MACHINE_CONFIG_START(turbo_state::subroc3d)
 	MCFG_SCREEN_UPDATE_DRIVER(turbo_state, screen_update_subroc3d)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(turbo_state,turbo)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_turbo, this));
 
 	/* sound hardware */
 	subroc3d_samples(config);
@@ -951,7 +951,7 @@ MACHINE_CONFIG_START(turbo_state::buckrog)
 	MCFG_DEVICE_IO_MAP(buckrog_cpu2_portmap)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-	MCFG_MACHINE_RESET_OVERRIDE(turbo_state,buckrog)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_buckrog, this));
 
 	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, turbo_state, buckrog_ppi0a_w))
@@ -969,7 +969,7 @@ MACHINE_CONFIG_START(turbo_state::buckrog)
 	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbo)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(turbo_state,buckrog)
 
@@ -979,7 +979,7 @@ MACHINE_CONFIG_START(turbo_state::buckrog)
 	MCFG_SCREEN_UPDATE_DRIVER(turbo_state, screen_update_buckrog)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(turbo_state,buckrog)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_buckrog, this));
 
 	/* sound hardware */
 	buckrog_samples(config);

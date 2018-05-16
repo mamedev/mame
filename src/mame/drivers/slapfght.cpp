@@ -870,12 +870,12 @@ static const gfx_layout perfrman_spritelayout =
 };
 
 
-static GFXDECODE_START( perfrman )
+static GFXDECODE_START( gfx_perfrman )
 	GFXDECODE_ENTRY( "gfx1", 0, perfrman_charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, perfrman_spritelayout, 128, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( slapfght )
+static GFXDECODE_START( gfx_slapfght )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0,  64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0,  16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0,  16 )
@@ -921,9 +921,9 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, slapfght_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", perfrman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_perfrman)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	MCFG_VIDEO_START_OVERRIDE(slapfght_state, perfrman)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_perfrman, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -973,9 +973,9 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, slapfght_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_slapfight, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1046,9 +1046,9 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, slapfght_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_slapfight, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

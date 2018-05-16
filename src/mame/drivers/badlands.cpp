@@ -185,13 +185,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(badlands_state::sound_scanline)
 }
 
 
-MACHINE_START_MEMBER(badlands_state,badlands)
+void badlands_state::machine_start_badlands()
 {
 	save_item(NAME(m_pedal_value));
 }
 
 
-MACHINE_RESET_MEMBER(badlands_state,badlands)
+void badlands_state::machine_reset_badlands()
 {
 	m_pedal_value[0] = m_pedal_value[1] = 0x80;
 
@@ -427,7 +427,7 @@ static const gfx_layout badlands_molayout =
 	64*8
 };
 
-static GFXDECODE_START( badlands )
+static GFXDECODE_START( gfx_badlands )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout,           0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, badlands_molayout,  128, 8 )
 GFXDECODE_END
@@ -451,8 +451,8 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", badlands_state, sound_scanline, "screen", 0, 1)
 
-	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
-	MCFG_MACHINE_RESET_OVERRIDE(badlands_state,badlands)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_badlands, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_badlands, this));
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -460,7 +460,7 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", badlands)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_badlands)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)
@@ -477,7 +477,7 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 	MCFG_SCREEN_UPDATE_DRIVER(badlands_state, screen_update_badlands)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_badlands, this));
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_2))

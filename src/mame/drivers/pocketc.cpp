@@ -716,11 +716,11 @@ static const gfx_layout pc1251_charlayout =
 	1*8
 };
 
-static GFXDECODE_START( pc1401 )
+static GFXDECODE_START( gfx_pc1401 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc1401_charlayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( pc1251 )
+static GFXDECODE_START( gfx_pc1251 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc1251_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -745,7 +745,7 @@ MACHINE_CONFIG_START(pocketc_state::pocketc)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 273-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc1401 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc1401)
 	MCFG_PALETTE_ADD("palette", 8*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(6)
 	MCFG_PALETTE_INIT_OWNER( pocketc_state, pocketc )
@@ -792,7 +792,7 @@ MACHINE_CONFIG_START(pc1251_state::pc1250)
 	MCFG_SCREEN_SIZE(608, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 608-1, 0, 300-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pc1251_state, screen_update_pc1251)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pc1251 )
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pc1251)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc1251_state::pc1251)
@@ -812,7 +812,7 @@ MACHINE_CONFIG_START(pc1251_state::pc1260)
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP( pc1260_mem)
 
-	MCFG_MACHINE_START_OVERRIDE(pc1251_state, pc1260 )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pc1260, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc1251_state::pc1261)

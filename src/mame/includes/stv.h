@@ -1,5 +1,9 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
+#ifndef MAME_INCLUDES_STV_H
+#define MAME_INCLUDES_STV_H
+
+#pragma once
 
 #include "includes/saturn.h"
 #include "audio/rax.h"
@@ -101,10 +105,10 @@ public:
 
 	void install_stvbios_speedups( void );
 
-	DECLARE_MACHINE_START(stv);
-	DECLARE_MACHINE_RESET(stv);
+	void machine_start_stv() ATTR_COLD;
+	void machine_reset_stv();
 
-	DECLARE_MACHINE_RESET(batmanfr);
+	void machine_reset_batmanfr();
 	DECLARE_WRITE32_MEMBER(batmanfr_sound_comms_w);
 	optional_device<acclaim_rax_device> m_rax;
 
@@ -170,4 +174,6 @@ public:
 #define STV_VDP1_VBE  ((STV_VDP1_TVMR & 0x0008) >> 3)
 #define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
 
-GFXDECODE_EXTERN( stv );
+extern gfx_decode_entry const gfx_stv[];
+
+#endif // MAME_INCLUDES_STV_H

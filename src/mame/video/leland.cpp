@@ -56,7 +56,7 @@ TIMER_CALLBACK_MEMBER(leland_state::scanline_callback)
  *
  *************************************/
 
-VIDEO_START_MEMBER(leland_state,leland)
+void leland_state::video_start_leland()
 {
 	/* allocate memory */
 	m_video_ram = make_unique_clear<uint8_t[]>(VRAM_SIZE);
@@ -78,7 +78,7 @@ VIDEO_START_MEMBER(leland_state,leland)
 	}
 }
 
-VIDEO_START_MEMBER(leland_state,ataxx)
+void leland_state::video_start_ataxx()
 {
 	/* first do the standard stuff */
 	m_video_ram = make_unique_clear<uint8_t[]>(VRAM_SIZE);
@@ -532,7 +532,7 @@ uint32_t leland_state::screen_update_ataxx(screen_device &screen, bitmap_ind16 &
 
 MACHINE_CONFIG_START(leland_state::leland_video)
 
-	MCFG_VIDEO_START_OVERRIDE(leland_state,leland)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_leland, this));
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
@@ -548,7 +548,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(leland_state::ataxx_video)
 	leland_video(config);
-	MCFG_VIDEO_START_OVERRIDE(leland_state,ataxx)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ataxx, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(leland_state, screen_update_ataxx)

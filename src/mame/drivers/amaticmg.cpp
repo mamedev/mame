@@ -809,11 +809,11 @@ static const gfx_layout charlayout_6bpp =
 *    Graphics Decode Information    *
 ************************************/
 
-static GFXDECODE_START( amaticmg )
+static GFXDECODE_START( gfx_amaticmg )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_4bpp, 0, 0x20 )
 GFXDECODE_END
 
-static GFXDECODE_START( amaticmg2 )
+static GFXDECODE_START( gfx_amaticmg2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_6bpp, 0, 0x10000/0x40 )
 GFXDECODE_END
 
@@ -875,7 +875,7 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // no NMI mask?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amaticmg)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amaticmg)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(amaticmg_state, amaticmg)
@@ -909,7 +909,7 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg2)
 	MCFG_DEVICE_MODIFY("crtc")
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amaticmg_state, amaticmg2_irq))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", amaticmg2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_amaticmg2)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x10000)
 	MCFG_PALETTE_INIT_OWNER(amaticmg_state,amaticmg2)
@@ -930,7 +930,7 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg4)
 	MCFG_DEVICE_MODIFY("crtc")
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amaticmg_state, amaticmg2_irq))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", amaticmg2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_amaticmg2)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x10000)
 	MCFG_PALETTE_INIT_OWNER(amaticmg_state,amaticmg2)

@@ -693,7 +693,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( m90 )
+static GFXDECODE_START( gfx_m90 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )
 GFXDECODE_END
@@ -753,7 +753,7 @@ MACHINE_CONFIG_START(m90_state::m90)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", NEC_INPUT_LINE_INTP0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m90)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m90)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -851,7 +851,7 @@ MACHINE_CONFIG_START(m90_state::bomblord)
 	MCFG_SCREEN_UPDATE_DRIVER(m90_state, screen_update_bomblord)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, m90_state, bomblord_vblank_int_w))
 
-	MCFG_VIDEO_START_OVERRIDE(m90_state,bomblord)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_bomblord, this));
 MACHINE_CONFIG_END
 
 
@@ -872,7 +872,7 @@ MACHINE_CONFIG_START(m90_state::dynablsb)
 	MCFG_SCREEN_UPDATE_DRIVER(m90_state, screen_update_dynablsb)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, m90_state, dynablsb_vblank_int_w))
 
-	MCFG_VIDEO_START_OVERRIDE(m90_state,dynablsb)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_dynablsb, this));
 
 	MCFG_DEVICE_REMOVE("m72")
 	MCFG_DEVICE_REMOVE("soundirq")

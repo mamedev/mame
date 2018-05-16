@@ -295,7 +295,7 @@ static const gfx_layout tile_layout =
 	64*8
 };
 
-static GFXDECODE_START( funkyjet )
+static GFXDECODE_START( gfx_funkyjet )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  256, 32 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 256, 32 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   0, 16 )  /* Sprites 16x16 */
@@ -329,7 +329,7 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funkyjet)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funkyjet)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

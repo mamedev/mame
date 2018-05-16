@@ -223,7 +223,7 @@ static const gfx_layout lcmate2_charlayout =
 	8*8 /* 8 bytes */
 };
 
-static GFXDECODE_START( lcmate2 )
+static GFXDECODE_START( gfx_lcmate2 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, lcmate2_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -246,7 +246,7 @@ MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(lcmate2_state, lcmate2)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lcmate2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lcmate2)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 20)

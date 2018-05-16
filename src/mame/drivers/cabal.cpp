@@ -56,13 +56,13 @@ Dip locations verified with Fabtek manual for the trackball version
 #include "speaker.h"
 
 
-MACHINE_START_MEMBER(cabal_state,cabalbl)
+void cabal_state::machine_start_cabalbl()
 {
 	save_item(NAME(m_sound_command1));
 	save_item(NAME(m_sound_command2));
 }
 
-MACHINE_RESET_MEMBER(cabal_state,cabalbl)
+void cabal_state::machine_reset_cabalbl()
 {
 	m_sound_command1 = m_sound_command2 = 0xff;
 }
@@ -494,7 +494,7 @@ static const gfx_layout sprite_layout =
 
 
 
-static GFXDECODE_START( cabal )
+static GFXDECODE_START( gfx_cabal )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, text_layout,   0, 1024/4 )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, tile_layout,   32*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0x000000, sprite_layout, 16*16, 16 )
@@ -524,7 +524,7 @@ MACHINE_CONFIG_START(cabal_state::cabal)
 	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cabal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cabal)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -595,8 +595,8 @@ MACHINE_CONFIG_START(cabal_state::cabalbl)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START_OVERRIDE(cabal_state,cabalbl)
-	MCFG_MACHINE_RESET_OVERRIDE(cabal_state,cabalbl)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cabalbl, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cabalbl, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -607,7 +607,7 @@ MACHINE_CONFIG_START(cabal_state::cabalbl)
 	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cabal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cabal)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

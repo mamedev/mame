@@ -8,11 +8,10 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_Z80DAISY_H
+#define MAME_MACHINE_Z80DAISY_H
+
 #pragma once
-
-#ifndef __Z80DAISY_H__
-#define __Z80DAISY_H__
-
 
 
 //**************************************************************************
@@ -114,4 +113,4 @@ private:
 };
 
 
-#endif
+#endif // MAME_MACHINE_Z80DAISY_H

@@ -1134,11 +1134,11 @@ static const gfx_layout s2k_charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( ampoker2 )
+static GFXDECODE_START( gfx_ampoker2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 128 )
 GFXDECODE_END
 
-static GFXDECODE_START( sigma2k )
+static GFXDECODE_START( gfx_sigma2k )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, s2k_charlayout, 0, 128 )
 GFXDECODE_END
 
@@ -1170,7 +1170,7 @@ MACHINE_CONFIG_START(ampoker2_state::ampoker2)
 	MCFG_SCREEN_UPDATE_DRIVER(ampoker2_state, screen_update_ampoker2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ampoker2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ampoker2)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(ampoker2_state, ampoker2)
 
@@ -1184,10 +1184,9 @@ MACHINE_CONFIG_START(ampoker2_state::sigma2k)
 	ampoker2(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", sigma2k)
-	MCFG_VIDEO_START_OVERRIDE(ampoker2_state, sigma2k)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sigma2k)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_sigma2k, this));
 MACHINE_CONFIG_END
-
 
 /*************************
 *        Rom Load        *

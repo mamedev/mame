@@ -24,7 +24,7 @@ ToDo:
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
@@ -45,7 +45,7 @@ public:
 	{ }
 
 	void init_ampro();
-	DECLARE_MACHINE_RESET(ampro);
+	void machine_reset_ampro();
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_READ8_MEMBER(io_r);
@@ -134,7 +134,7 @@ static void ampro_floppies(device_slot_interface &device)
 static INPUT_PORTS_START( ampro )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( ampro_state, ampro )
+void ampro_state::machine_reset_ampro()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -155,7 +155,7 @@ MACHINE_CONFIG_START(ampro_state::ampro)
 	MCFG_DEVICE_PROGRAM_MAP(ampro_mem)
 	MCFG_DEVICE_IO_MAP(ampro_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
-	MCFG_MACHINE_RESET_OVERRIDE(ampro_state, ampro)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ampro, this));
 
 	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(16'000'000) / 8) // 2MHz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg0))

@@ -33,7 +33,7 @@ public:
 	DECLARE_READ8_MEMBER(beta_neutral_r);
 	DECLARE_READ8_MEMBER(beta_enable_r);
 	DECLARE_READ8_MEMBER(beta_disable_r);
-	DECLARE_MACHINE_RESET(atm);
+	void machine_reset_atm();
 
 	void atm(machine_config &config);
 	void atmtb2(machine_config &config);
@@ -140,7 +140,7 @@ void atm_state::atm_switch(address_map &map)
 	map(0x4000, 0xffff).r(this, FUNC(atm_state::beta_disable_r));
 }
 
-MACHINE_RESET_MEMBER(atm_state,atm)
+void atm_state::machine_reset_atm()
 {
 	uint8_t *messram = m_ram->pointer();
 	m_program = &m_maincpu->space(AS_PROGRAM);
@@ -177,11 +177,11 @@ static const gfx_layout spectrum_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( atm )
+static GFXDECODE_START( gfx_atm )
 	GFXDECODE_ENTRY( "maincpu", 0x1fd00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( atmtb2 )
+static GFXDECODE_START( gfx_atmtb2 )
 	GFXDECODE_ENTRY( "maincpu", 0x13d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -192,18 +192,18 @@ MACHINE_CONFIG_START(atm_state::atm)
 	MCFG_DEVICE_PROGRAM_MAP(atm_mem)
 	MCFG_DEVICE_IO_MAP(atm_io)
 	MCFG_DEVICE_OPCODES_MAP(atm_switch)
-	MCFG_MACHINE_RESET_OVERRIDE(atm_state, atm )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_atm, this));
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", atm)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_atm)
 
 	MCFG_DEVICE_REMOVE("exp")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atm_state::atmtb2)
 	atm(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", atmtb2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_atmtb2)
 MACHINE_CONFIG_END
 
 

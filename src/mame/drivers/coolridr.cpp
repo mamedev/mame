@@ -3002,7 +3002,7 @@ void coolridr_state::system_h1_sound_map(address_map &map)
 
 
 
-static GFXDECODE_START( coolridr )
+static GFXDECODE_START( gfx_coolridr )
 //  GFXDECODE_ENTRY( nullptr, 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
@@ -3289,7 +3289,7 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	MCFG_315_5649_AN5_CB(IOPORT("AN5"))
 	MCFG_315_5649_AN6_CB(IOPORT("AN6"))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", coolridr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_coolridr)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

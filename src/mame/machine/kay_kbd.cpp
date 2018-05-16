@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "machine/kay_kbd.h"
 
+#include "cpu/mcs48/mcs48.h"
+#include "speaker.h"
+
 #define LOG_GENERAL (1U << 0)
 #define LOG_TXD     (1U << 1)
 
@@ -107,8 +110,6 @@ xxx0 M000   set keyclick mute to M
 The Kaypro II was sold with a different keyboard using an 8751 (MCS-51)
 MCU, but we don't have a dump for it.
 */
-#include "cpu/mcs48/mcs48.h"
-#include "speaker.h"
 
 
 DEFINE_DEVICE_TYPE(KAYPRO_10_KEYBOARD, kaypro_10_keyboard_device, "kaypro10kbd", "Kaypro 10 Keyboard")
@@ -228,7 +229,7 @@ INPUT_PORTS_START(kaypro_keyboard_typewriter)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)          PORT_CHAR('g')  PORT_CHAR('G')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)          PORT_CHAR('c')  PORT_CHAR('C')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_NAME("Pad ENTER")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)                                       PORT_NAME("Pad ,")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD)   PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD)) PORT_NAME("Pad ,")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)  PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) PORT_NAME("Pad -")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN) // 0xf9
 

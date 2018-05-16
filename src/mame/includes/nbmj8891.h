@@ -88,7 +88,7 @@ public:
 	void init_pairsnb();
 	void init_mjnanpas();
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(_1layer);
+	void video_start__1layer() ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vramflip(int vram);

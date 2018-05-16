@@ -79,7 +79,7 @@ MACHINE_CONFIG_START(nes_state::nes)
 	MCFG_NES_CONTROL_PORT_ADD("ctrl2", nes_control_port2_devices, "joypad")
 	MCFG_NESCTRL_BRIGHTPIXEL_CB(nes_state, bright_pixel)
 
-	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_cart, nullptr)
+	MCFG_DEVICE_ADD("nes_slot", NES_CART_SLOT, NTSC_APU_CLOCK, nes_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "nes")
 	MCFG_SOFTWARE_LIST_ADD("ade_list", "nes_ade")         // Camerica/Codemasters Aladdin Deck Enhancer mini-carts
 	MCFG_SOFTWARE_LIST_ADD("ntb_list", "nes_ntbrom")      // Sunsoft Nantettate! Baseball mini-carts
@@ -98,6 +98,9 @@ MACHINE_CONFIG_START(nes_state::nespal)
 	MCFG_PPU2C07_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
 	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+
+	MCFG_DEVICE_MODIFY("nes_slot")
+	MCFG_DEVICE_CLOCK(PAL_APU_CLOCK)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -131,6 +134,9 @@ MACHINE_CONFIG_START(nes_state::nespalc)
 	MCFG_PPUPALC_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
 	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+
+	MCFG_DEVICE_MODIFY("nes_slot")
+	MCFG_DEVICE_CLOCK(PALC_APU_CLOCK)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -187,7 +193,7 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 }
 
 
-MACHINE_START_MEMBER( nes_state, fds )
+void nes_state::machine_start_fds()
 {
 	m_ciram = std::make_unique<uint8_t[]>(0x800);
 	m_io_disksel = ioport("FLIPDISK");
@@ -198,7 +204,7 @@ MACHINE_START_MEMBER( nes_state, fds )
 	save_pointer(NAME(m_ciram.get()), 0x800);
 }
 
-MACHINE_RESET_MEMBER( nes_state, fds )
+void nes_state::machine_reset_fds()
 {
 	// Reset the mapper variables
 	m_disk->pcb_reset();
@@ -209,8 +215,8 @@ MACHINE_RESET_MEMBER( nes_state, fds )
 
 MACHINE_CONFIG_START(nes_state::fds)
 	famicom(config);
-	MCFG_MACHINE_START_OVERRIDE( nes_state, fds )
-	MCFG_MACHINE_RESET_OVERRIDE( nes_state, fds )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fds, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_fds, this));
 
 	MCFG_DEVICE_REMOVE("nes_slot")
 	MCFG_DEVICE_ADD("disk", NES_DISKSYS, 0)
@@ -224,7 +230,7 @@ MACHINE_CONFIG_START(nes_state::fds)
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER( nes_state, famitwin )
+void nes_state::machine_start_famitwin()
 {
 	// start the base nes stuff
 	machine_start();
@@ -240,7 +246,7 @@ MACHINE_START_MEMBER( nes_state, famitwin )
 	}
 }
 
-MACHINE_RESET_MEMBER( nes_state, famitwin )
+void nes_state::machine_reset_famitwin()
 {
 	// Reset the mapper variables. Will also mark the char-gen ram as dirty
 	m_cartslot->pcb_reset();
@@ -255,8 +261,8 @@ MACHINE_RESET_MEMBER( nes_state, famitwin )
 MACHINE_CONFIG_START(nes_state::famitwin)
 	famicom(config);
 
-	MCFG_MACHINE_START_OVERRIDE( nes_state, famitwin )
-	MCFG_MACHINE_RESET_OVERRIDE( nes_state, famitwin )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_famitwin, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_famitwin, this));
 
 	MCFG_DEVICE_MODIFY("nes_slot")
 	MCFG_NES_CARTRIDGE_NOT_MANDATORY

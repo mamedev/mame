@@ -218,7 +218,7 @@ void atarisy1_state::update_interrupts()
 }
 
 
-MACHINE_START_MEMBER(atarisy1_state,atarisy1)
+void atarisy1_state::machine_start_atarisy1()
 {
 	atarigen_state::machine_start();
 
@@ -227,7 +227,7 @@ MACHINE_START_MEMBER(atarisy1_state,atarisy1)
 }
 
 
-MACHINE_RESET_MEMBER(atarisy1_state,atarisy1)
+void atarisy1_state::machine_reset_atarisy1()
 {
 	atarigen_state::machine_reset();
 
@@ -695,7 +695,7 @@ static const gfx_layout anlayout =
 };
 
 
-static GFXDECODE_START( atarisy1 )
+static GFXDECODE_START( gfx_atarisy1 )
 	GFXDECODE_ENTRY( "alpha", 0x00000, anlayout,       0, 64 )
 GFXDECODE_END
 
@@ -716,8 +716,8 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_DEVICE_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(atarisy1_state,atarisy1)
-	MCFG_MACHINE_RESET_OVERRIDE(atarisy1_state,atarisy1)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_atarisy1, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_atarisy1, this));
 
 	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
 	MCFG_ADC0808_EOC_CB(WRITELINE("ajsint", input_merger_device, in_w<1>))
@@ -750,7 +750,7 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_TIMER_DRIVER_ADD("yreset_timer", atarisy1_state, atarisy1_reset_yscroll_callback)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarisy1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarisy1)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
@@ -770,7 +770,7 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarisy1_state, video_int_write_line))
 
-	MCFG_VIDEO_START_OVERRIDE(atarisy1_state,atarisy1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_atarisy1, this));
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_6))

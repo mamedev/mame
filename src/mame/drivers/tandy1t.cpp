@@ -112,7 +112,7 @@ public:
 
 	void machine_start() override;
 
-	DECLARE_MACHINE_RESET(tandy1000rl);
+	void machine_reset_tandy1000rl();
 
 	struct
 	{
@@ -405,7 +405,7 @@ void tandy1000_state::tandy1000_set_bios_bank()
 	m_biosbank->set_bank( bank );
 }
 
-MACHINE_RESET_MEMBER(tandy1000_state, tandy1000rl)
+void tandy1000_state::machine_reset_tandy1000rl()
 {
 	m_tandy_bios_bank = 6;
 	tandy1000_set_bios_bank();
@@ -642,7 +642,7 @@ void tandy1000_state::cfg_fdc_525(device_t *device)
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
-static GFXDECODE_START( t1000 )
+static GFXDECODE_START( gfx_t1000 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, t1000_charlayout, 3, 1 )
 GFXDECODE_END
 
@@ -653,7 +653,7 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
 	MCFG_VIDEO_SET_SCREEN("pcvideo_t1000:screen")
-	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_t1000:palette", t1000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_t1000:palette", gfx_t1000)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("sn76496", NCR7496, XTAL(14'318'181)/4)
@@ -733,7 +733,7 @@ MACHINE_CONFIG_START(tandy1000_state::t1000rl)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
-	MCFG_MACHINE_RESET_OVERRIDE(tandy1000_state,tandy1000rl)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_tandy1000rl, this));
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_EXTRA_OPTIONS("384K")
 MACHINE_CONFIG_END

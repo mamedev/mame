@@ -1347,10 +1347,10 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(goldnpkr);
 	DECLARE_PALETTE_INIT(witchcrd);
-	DECLARE_VIDEO_START(wcrdxtnd);
+	void video_start_wcrdxtnd() ATTR_COLD;
 	DECLARE_PALETTE_INIT(wcrdxtnd);
-	DECLARE_MACHINE_START(mondial);
-	DECLARE_MACHINE_RESET(mondial);
+	void machine_start_mondial() ATTR_COLD;
+	void machine_reset_mondial();
 	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void goldnpkr_base(machine_config &config);
@@ -1479,7 +1479,7 @@ void goldnpkr_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldnpkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-VIDEO_START_MEMBER(goldnpkr_state,wcrdxtnd)
+void goldnpkr_state::video_start_wcrdxtnd()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldnpkr_state::wcrdxtnd_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
@@ -4110,12 +4110,12 @@ static const gfx_layout tilelayout =
 *           Graphics Decode Information           *
 **************************************************/
 
-static GFXDECODE_START( goldnpkr )
+static GFXDECODE_START( gfx_goldnpkr )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( wcrdxtnd )
+static GFXDECODE_START( gfx_wcrdxtnd )
 	GFXDECODE_ENTRY( "gfx0", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 16 )
@@ -4274,13 +4274,13 @@ DISCRETE_SOUND_END
 *          Machine Start & Reset          *
 ******************************************/
 
-MACHINE_START_MEMBER(goldnpkr_state, mondial)
+void goldnpkr_state::machine_start_mondial()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x4000);
 }
 
-MACHINE_RESET_MEMBER(goldnpkr_state, mondial)
+void goldnpkr_state::machine_reset_mondial()
 {
 	uint8_t seldsw = (ioport("SELDSW")->read() );
 	popmessage("ROM Bank: %02X", seldsw);
@@ -4323,7 +4323,7 @@ MACHINE_CONFIG_START(goldnpkr_state::goldnpkr_base)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldnpkr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldnpkr)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, goldnpkr)
 MACHINE_CONFIG_END
@@ -4415,10 +4415,10 @@ MACHINE_CONFIG_START(goldnpkr_state::wildcard)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, mux_port_w))
 
 	/* video hardware */
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", wildcard)
+//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wildcard)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
-//  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
+//  set_video_start_cb(config, driver_callback_delegate(&video_start_wildcard, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4439,10 +4439,10 @@ MACHINE_CONFIG_START(goldnpkr_state::wcrdxtnd)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, mux_port_w))
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", wcrdxtnd)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wcrdxtnd)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, wcrdxtnd)
-	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, wcrdxtnd)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_wcrdxtnd, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4469,10 +4469,10 @@ MACHINE_CONFIG_START(goldnpkr_state::wildcrdb)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, goldnpkr_state, wcfalcon_snd_w))
 
 	/* video hardware */
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", wildcard)
+//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wildcard)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
-//  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
+//  set_video_start_cb(config, driver_callback_delegate(&video_start_wildcard, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4532,8 +4532,8 @@ MACHINE_CONFIG_START(goldnpkr_state::mondial)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mondial_map)
 
-	MCFG_MACHINE_START_OVERRIDE(goldnpkr_state, mondial)
-	MCFG_MACHINE_RESET_OVERRIDE(goldnpkr_state, mondial)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mondial, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mondial, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4731,7 +4731,7 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldnpkr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldnpkr)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, witchcrd)
 

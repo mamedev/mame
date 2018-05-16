@@ -6,7 +6,7 @@
 
 /**********************************************************/
 
-VIDEO_START_MEMBER(taitoz_state,taitoz)
+void taitoz_state::video_start_taitoz()
 {
 	m_road_palbank = 3;
 	m_sci_spriteframe = 0;

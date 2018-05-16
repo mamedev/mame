@@ -522,7 +522,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 /* VIDEO START (move to video file) */
 
 
-VIDEO_START_MEMBER(raiden2_state,raiden2)
+void raiden2_state::video_start_raiden2()
 {
 	back_data = make_unique_clear<uint16_t[]>(0x800/2);
 	fore_data =  make_unique_clear<uint16_t[]>(0x800/2);
@@ -743,7 +743,7 @@ void raiden2_state::common_reset()
 	tx_bank = 0;
 }
 
-MACHINE_RESET_MEMBER(raiden2_state,raiden2)
+void raiden2_state::machine_reset_raiden2()
 {
 	common_reset();
 	sprcpt_init();
@@ -755,7 +755,7 @@ MACHINE_RESET_MEMBER(raiden2_state,raiden2)
 	//cop_init();
 }
 
-MACHINE_RESET_MEMBER(raiden2_state,raidendx)
+void raiden2_state::machine_reset_raidendx()
 {
 	common_reset();
 	sprcpt_init();
@@ -768,7 +768,7 @@ MACHINE_RESET_MEMBER(raiden2_state,raidendx)
 	//cop_init();
 }
 
-MACHINE_RESET_MEMBER(raiden2_state,zeroteam)
+void raiden2_state::machine_reset_zeroteam()
 {
 	bg_bank = 0;
 	fg_bank = 2;
@@ -783,7 +783,7 @@ MACHINE_RESET_MEMBER(raiden2_state,zeroteam)
 	//cop_init();
 }
 
-MACHINE_RESET_MEMBER(raiden2_state,xsedae)
+void raiden2_state::machine_reset_xsedae()
 {
 	bg_bank = 0;
 	fg_bank = 2;
@@ -1421,7 +1421,7 @@ static const gfx_layout raiden2_spritelayout =
 	16*16*4
 };
 
-static GFXDECODE_START( raiden2 )
+static GFXDECODE_START( gfx_raiden2 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, raiden2_charlayout,   0x700, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, raiden2_tilelayout,   0x400, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, raiden2_spritelayout, 0x000, 4096 ) // really 128, but using the top bits for priority
@@ -1437,7 +1437,7 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	MCFG_DEVICE_PROGRAM_MAP(raiden2_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", raiden2_state,  raiden2_interrupt)
 
-	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,raiden2)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_raiden2, this));
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'636'363)/8)
 	MCFG_DEVICE_PROGRAM_MAP(raiden2_sound_map)
@@ -1448,7 +1448,7 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(32'000'000)/4,512,0,40*8,282,0,30*8) /* hand-tuned to match ~55.47 */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1459,7 +1459,7 @@ MACHINE_CONFIG_START(raiden2_state::raiden2)
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, raiden2_state, m_videoram_private_w))
 
-	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_raiden2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1487,7 +1487,7 @@ MACHINE_CONFIG_START(raiden2_state::xsedae)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(xsedae_mem)
 
-	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,xsedae)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_xsedae, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1499,7 +1499,7 @@ MACHINE_CONFIG_START(raiden2_state::raidendx)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(raidendx_mem)
 
-	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,raidendx)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_raidendx, this));
 MACHINE_CONFIG_END
 
 
@@ -1510,7 +1510,7 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_DEVICE_PROGRAM_MAP(zeroteam_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", raiden2_state,  raiden2_interrupt)
 
-	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,zeroteam)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_zeroteam, this));
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'636'363)/8)
 	MCFG_DEVICE_PROGRAM_MAP(zeroteam_sound_map)
@@ -1522,7 +1522,7 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(32'000'000)/4,512,0,40*8,282,0,32*8) /* hand-tuned to match ~55.47 */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1533,7 +1533,7 @@ MACHINE_CONFIG_START(raiden2_state::zeroteam)
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, raiden2_state, m_videoram_private_w))
 
-	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_raiden2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

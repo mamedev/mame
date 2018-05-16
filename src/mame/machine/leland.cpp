@@ -315,7 +315,7 @@ WRITE8_MEMBER(leland_state::indyheat_analog_w)
  *
  *************************************/
 
-MACHINE_START_MEMBER(leland_state,leland)
+void leland_state::machine_start_leland()
 {
 	/* allocate extra stuff */
 	m_battery_ram = reinterpret_cast<uint8_t *>(memshare("battery")->ptr());
@@ -340,7 +340,7 @@ MACHINE_START_MEMBER(leland_state,leland)
 }
 
 
-MACHINE_RESET_MEMBER(leland_state,leland)
+void leland_state::machine_reset_leland()
 {
 	m_master_int_timer->adjust(m_screen->time_until_pos(8), 8);
 
@@ -379,7 +379,7 @@ MACHINE_RESET_MEMBER(leland_state,leland)
 }
 
 
-MACHINE_START_MEMBER(leland_state,ataxx)
+void leland_state::machine_start_ataxx()
 {
 	/* set the odd data banks */
 	m_battery_ram = reinterpret_cast<uint8_t *>(memshare("battery")->ptr());
@@ -399,7 +399,7 @@ MACHINE_START_MEMBER(leland_state,ataxx)
 }
 
 
-MACHINE_RESET_MEMBER(leland_state,ataxx)
+void leland_state::machine_reset_ataxx()
 {
 	memset(m_extra_tram.get(), 0, ATAXX_EXTRA_TRAM_SIZE);
 	m_master_int_timer->adjust(m_screen->time_until_pos(8), 8);

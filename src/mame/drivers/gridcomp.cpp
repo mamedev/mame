@@ -118,8 +118,8 @@ public:
 	required_device<ram_device> m_ram;
 
 	void init_gridcomp();
-	DECLARE_MACHINE_START(gridcomp);
-	DECLARE_MACHINE_RESET(gridcomp);
+	void machine_start_gridcomp() ATTR_COLD;
+	void machine_reset_gridcomp();
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -292,7 +292,7 @@ void gridcomp_state::init_gridcomp()
 	DBG_LOG(0, "init", ("driver_init()\n"));
 }
 
-MACHINE_START_MEMBER(gridcomp_state, gridcomp)
+void gridcomp_state::machine_start_gridcomp()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -304,7 +304,7 @@ MACHINE_START_MEMBER(gridcomp_state, gridcomp)
 	m_videoram = (uint16_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x400);
 }
 
-MACHINE_RESET_MEMBER(gridcomp_state, gridcomp)
+void gridcomp_state::machine_reset_gridcomp()
 {
 	DBG_LOG(0, "init", ("machine_reset()\n"));
 
@@ -370,8 +370,8 @@ MACHINE_CONFIG_START(gridcomp_state::grid1101)
 	MCFG_DEVICE_IO_MAP(grid1101_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(gridcomp_state, irq_callback)
 
-	MCFG_MACHINE_START_OVERRIDE(gridcomp_state, gridcomp)
-	MCFG_MACHINE_RESET_OVERRIDE(gridcomp_state, gridcomp)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_gridcomp, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gridcomp, this));
 
 	MCFG_DEVICE_ADD(I80130_TAG, I80130, XTAL(15'000'000)/3)
 	MCFG_I80130_IRQ_CALLBACK(INPUTLINE("maincpu", 0))

@@ -115,7 +115,7 @@ WRITE_LINE_MEMBER(williams2_state::tshoot_main_irq)
  *
  *************************************/
 
-MACHINE_START_MEMBER(williams_state,williams_common)
+void williams_state::machine_start_williams_common()
 {
 	/* configure the memory bank */
 	membank("bank1")->configure_entry(1, memregion("maincpu")->base() + 0x10000);
@@ -123,7 +123,7 @@ MACHINE_START_MEMBER(williams_state,williams_common)
 }
 
 
-MACHINE_RESET_MEMBER(williams_state,williams_common)
+void williams_state::machine_reset_williams_common()
 {
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
 	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
@@ -135,15 +135,15 @@ MACHINE_RESET_MEMBER(williams_state,williams_common)
 }
 
 
-MACHINE_START_MEMBER(williams_state,williams)
+void williams_state::machine_start_williams()
 {
-	MACHINE_START_CALL_MEMBER(williams_common);
+	machine_start_williams_common();
 }
 
 
-MACHINE_RESET_MEMBER(williams_state,williams)
+void williams_state::machine_reset_williams()
 {
-	MACHINE_RESET_CALL_MEMBER(williams_common);
+	machine_reset_williams_common();
 }
 
 
@@ -196,7 +196,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_endscreen_callback)
  *
  *************************************/
 
-MACHINE_START_MEMBER(williams2_state,williams2)
+void williams2_state::machine_start_williams2()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(1, 4, memregion("maincpu")->base() + 0x10000, 0x10000);
@@ -205,7 +205,7 @@ MACHINE_START_MEMBER(williams2_state,williams2)
 }
 
 
-MACHINE_RESET_MEMBER(williams2_state,williams2)
+void williams2_state::machine_reset_williams2()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -426,16 +426,16 @@ WRITE8_MEMBER(williams2_state::williams2_7segment_w)
  *
  *************************************/
 
-MACHINE_START_MEMBER(williams_state,defender)
+void williams_state::machine_start_defender()
 {
 }
 
 
-MACHINE_RESET_MEMBER(williams_state,defender)
+void williams_state::machine_reset_defender()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	MACHINE_RESET_CALL_MEMBER(williams_common);
+	machine_reset_williams_common();
 
 	defender_bank_select_w(space, 0, 0);
 }
@@ -495,7 +495,7 @@ WRITE8_MEMBER(williams_state::sinistar_vram_select_w)
  *
  *************************************/
 
-MACHINE_START_MEMBER(blaster_state,blaster)
+void blaster_state::machine_start_blaster()
 {
 	/* banking is different for blaster */
 	membank("bank1")->configure_entries(1, 16, memregion("maincpu")->base() + 0x18000, 0x4000);
@@ -510,9 +510,9 @@ MACHINE_START_MEMBER(blaster_state,blaster)
 }
 
 
-MACHINE_RESET_MEMBER(blaster_state,blaster)
+void blaster_state::machine_reset_blaster()
 {
-	MACHINE_RESET_CALL_MEMBER(williams_common);
+	machine_reset_williams_common();
 }
 
 
@@ -614,16 +614,16 @@ WRITE8_MEMBER(tshoot_state::lamp_w)
  *
  *************************************/
 
-MACHINE_START_MEMBER(joust2_state,joust2)
+void joust2_state::machine_start_joust2()
 {
-	MACHINE_START_CALL_MEMBER(williams2);
+	machine_start_williams2();
 	save_item(NAME(m_joust2_current_sound_data));
 }
 
 
-MACHINE_RESET_MEMBER(joust2_state,joust2)
+void joust2_state::machine_reset_joust2()
 {
-	MACHINE_RESET_CALL_MEMBER(williams2);
+	machine_reset_williams2();
 }
 
 

@@ -23,7 +23,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/terminal.h"
 #include "machine/z80dma.h"
 #include "machine/z80ctc.h"
@@ -40,7 +40,7 @@ public:
 	{ }
 
 	void init_ts802();
-	DECLARE_MACHINE_RESET(ts802);
+	void machine_reset_ts802();
 	DECLARE_READ8_MEMBER(port00_r) { return 0x80; };
 	DECLARE_READ8_MEMBER(port0c_r) { return 1; };
 	DECLARE_READ8_MEMBER(port0e_r) { return 0; };
@@ -143,7 +143,7 @@ static void ts802_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_RESET_MEMBER( ts802_state, ts802 )
+void ts802_state::machine_reset_ts802()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -191,7 +191,7 @@ MACHINE_CONFIG_START(ts802_state::ts802)
 	MCFG_DEVICE_PROGRAM_MAP(ts802_mem)
 	MCFG_DEVICE_IO_MAP(ts802_io)
 	//MCFG_Z80_DAISY_CHAIN(daisy_chain_intf) // causes problems
-	MCFG_MACHINE_RESET_OVERRIDE(ts802_state, ts802)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ts802, this));
 
 	/* Devices */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)

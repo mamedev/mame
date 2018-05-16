@@ -805,7 +805,7 @@ MACHINE_CONFIG_START(taitopjc_state::taitopjc)
 
 	MCFG_PALETTE_ADD("palette", 32768)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_DEVICE_ADD("tc0780fpa", TC0780FPA, 0)
 

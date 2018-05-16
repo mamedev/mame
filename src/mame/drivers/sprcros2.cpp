@@ -358,7 +358,7 @@ static const gfx_layout fg_layout =
 	8*8*2
 };
 
-static GFXDECODE_START( sprcros2 )
+static GFXDECODE_START( gfx_sprcros2 )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0,   16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 256, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, fg_layout,     512, 64 )
@@ -473,7 +473,7 @@ MACHINE_CONFIG_START(sprcros2_state::sprcros2)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 343, 8, 256-8, 262, 16, 240) // TODO: Wrong screen parameters
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprcros2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sprcros2)
 
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)

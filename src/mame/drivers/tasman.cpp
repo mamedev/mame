@@ -70,7 +70,7 @@ public:
 	DECLARE_READ32_MEMBER(test_r);
 	// DECLARE_READ32_MEMBER(rng_r);
 	void init_kingtut();
-	DECLARE_VIDEO_START(kongambl);
+	void video_start_kongambl() ATTR_COLD;
 	uint8_t m_irq_mask;
 
 	virtual void machine_reset() override { m_irq_mask = 0; };
@@ -86,7 +86,7 @@ public:
 };
 
 
-VIDEO_START_MEMBER(kongambl_state,kongambl)
+void kongambl_state::video_start_kongambl()
 {
 	#if CUSTOM_DRAW
 
@@ -605,7 +605,7 @@ static const gfx_layout charlayout8_tasman =
 	8*64
 };
 
-static GFXDECODE_START( tasman )
+static GFXDECODE_START( gfx_tasman )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout8_tasman, 0, 0x8000/(1 << 8) )
 GFXDECODE_END
 
@@ -664,7 +664,7 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_FORMAT(XRGB)
 
-	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_kongambl, this));
 
 	MCFG_K055555_ADD("k055555")
 
@@ -674,7 +674,7 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_K055673_PALETTE("palette")
 
 #if CUSTOM_DRAW
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tasman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tasman)
 #endif
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)

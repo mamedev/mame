@@ -855,7 +855,7 @@ static const gfx_layout mcr68_sprite_layout =
 	32*32
 };
 
-static GFXDECODE_START( mcr68 )
+static GFXDECODE_START( gfx_mcr68 )
 	GFXDECODE_SCALE( "gfx1", 0, mcr68_bg_layout,     0, 4, 2, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, mcr68_sprite_layout, 0, 4 )
 GFXDECODE_END
@@ -903,8 +903,8 @@ MACHINE_CONFIG_START(mcr68_state::mcr68)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
-	MCFG_MACHINE_START_OVERRIDE(mcr68_state,mcr68)
-	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,mcr68)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mcr68, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mcr68, this));
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 7723800 / 10)
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 2))
@@ -920,11 +920,11 @@ MACHINE_CONFIG_START(mcr68_state::mcr68)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr68_state, scanline_cb, "screen", 0, 1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr68)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcr68)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_FORMAT(xxxxxxxRRRBBBGGG)
 
-	MCFG_VIDEO_START_OVERRIDE(mcr68_state,mcr68)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_mcr68, this));
 
 	/* sound hardware -- determined by specific machine */
 	SPEAKER(config, "speaker").front_center();

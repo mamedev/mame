@@ -74,7 +74,7 @@ uint32_t rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &b
 
 
 
-VIDEO_START_MEMBER(rohga_state,wizdfire)
+void rohga_state::video_start_wizdfire()
 {
 	m_sprgen[0]->alloc_sprite_bitmap();
 	m_sprgen[1]->alloc_sprite_bitmap();

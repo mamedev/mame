@@ -39,7 +39,7 @@ enum
  *
  *************************************/
 
-VIDEO_START_MEMBER(midyunit_state,common)
+void midyunit_state::video_start_common()
 {
 	/* allocate memory */
 	m_cmos_ram = std::make_unique<uint16_t[]>((0x2000 * 4)/2);
@@ -69,47 +69,41 @@ VIDEO_START_MEMBER(midyunit_state,common)
 }
 
 
-VIDEO_START_MEMBER(midyunit_state,midyunit_4bit)
+void midyunit_state::video_start_midyunit_4bit()
 {
-	int i;
-
-	VIDEO_START_CALL_MEMBER(common);
+	video_start_common();
 
 	/* init for 4-bit */
-	for (i = 0; i < 65536; i++)
+	for (int i = 0; i < 65536; i++)
 		m_pen_map[i] = ((i & 0xf000) >> 8) | (i & 0x000f);
 	m_palette_mask = 0x00ff;
 }
 
 
-VIDEO_START_MEMBER(midyunit_state,midyunit_6bit)
+void midyunit_state::video_start_midyunit_6bit()
 {
-	int i;
-
-	VIDEO_START_CALL_MEMBER(common);
+	video_start_common();
 
 	/* init for 6-bit */
-	for (i = 0; i < 65536; i++)
+	for (int i = 0; i < 65536; i++)
 		m_pen_map[i] = ((i & 0xc000) >> 8) | (i & 0x0f3f);
 	m_palette_mask = 0x0fff;
 }
 
 
-VIDEO_START_MEMBER(midyunit_state,mkyawdim)
+void midyunit_state::video_start_mkyawdim()
 {
-	VIDEO_START_CALL_MEMBER(midyunit_6bit);
+	video_start_midyunit_6bit();
 	m_yawdim_dma = 1;
 }
 
 
-VIDEO_START_MEMBER(midyunit_state,midzunit)
+void midyunit_state::video_start_midzunit()
 {
-	int i;
-
-	VIDEO_START_CALL_MEMBER(common);
+	video_start_common();
 
 	/* init for 8-bit */
-	for (i = 0; i < 65536; i++)
+	for (int i = 0; i < 65536; i++)
 		m_pen_map[i] = i & 0x1fff;
 	m_palette_mask = 0x1fff;
 }

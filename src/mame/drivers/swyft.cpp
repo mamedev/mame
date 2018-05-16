@@ -335,9 +335,9 @@ public:
 	optional_ioport m_y6;
 	optional_ioport m_y7;*/
 
-	DECLARE_MACHINE_START(swyft);
-	DECLARE_MACHINE_RESET(swyft);
-	DECLARE_VIDEO_START(swyft);
+	void machine_start_swyft() ATTR_COLD;
+	void machine_reset_swyft();
+	void video_start_swyft() ATTR_COLD;
 
 	uint32_t screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -573,7 +573,7 @@ void swyft_state::swyft_mem(address_map &map)
 	map(0x0e4000, 0x0e4fff).rw(this, FUNC(swyft_state::swyft_via1_r), FUNC(swyft_state::swyft_via1_w));
 }
 
-MACHINE_START_MEMBER(swyft_state,swyft)
+void swyft_state::machine_start_swyft()
 {
 	m_via0->write_ca1(1);
 	m_via0->write_ca2(1);
@@ -586,11 +586,11 @@ MACHINE_START_MEMBER(swyft_state,swyft)
 	m_via1->write_cb2(1);
 }
 
-MACHINE_RESET_MEMBER(swyft_state,swyft)
+void swyft_state::machine_reset_swyft()
 {
 }
 
-VIDEO_START_MEMBER(swyft_state,swyft)
+void swyft_state::video_start_swyft()
 {
 }
 
@@ -768,8 +768,8 @@ MACHINE_CONFIG_START(swyft_state::swyft)
 	MCFG_DEVICE_ADD("maincpu",M68008, XTAL(15'897'600)/2) //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
 	MCFG_DEVICE_PROGRAM_MAP(swyft_mem)
 
-	MCFG_MACHINE_START_OVERRIDE(swyft_state,swyft)
-	MCFG_MACHINE_RESET_OVERRIDE(swyft_state,swyft)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_swyft, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_swyft, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -782,7 +782,7 @@ MACHINE_CONFIG_START(swyft_state::swyft)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(swyft_state,swyft)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_swyft, this));
 
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
 	// acia rx and tx clocks come from one of the VIA pins and are tied together, fix this below? acia e clock comes from 68008

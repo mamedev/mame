@@ -310,7 +310,7 @@ static const gfx_layout balllayout =
 	16*8    /* every sprite takes 16 consecutive bytes */
 };
 
-static GFXDECODE_START( bking )
+static GFXDECODE_START( gfx_bking )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0,           4  ) /* playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, crowlayout, 4*8,         4  ) /* crow */
 	GFXDECODE_ENTRY( "gfx3", 0, balllayout, 4*8+4*4,     4  ) /* ball 1 */
@@ -345,7 +345,7 @@ void bking_state::machine_start()
 	save_item(NAME(m_hit));
 }
 
-MACHINE_START_MEMBER(bking_state,bking3)
+void bking_state::machine_start_bking3()
 {
 	bking_state::machine_start();
 
@@ -380,7 +380,7 @@ void bking_state::machine_reset()
 	m_soundnmi->in_w<1>(0);
 }
 
-MACHINE_RESET_MEMBER(bking_state,bking3)
+void bking_state::machine_reset_bking3()
 {
 	bking_state::machine_reset();
 
@@ -417,7 +417,7 @@ MACHINE_CONFIG_START(bking_state::bking)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bking_state, screen_vblank_bking))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bking)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bking)
 	MCFG_PALETTE_ADD("palette", 4*8+4*4+4*2+4*2)
 	MCFG_PALETTE_INIT_OWNER(bking_state, bking)
 
@@ -452,8 +452,8 @@ MACHINE_CONFIG_START(bking_state::bking3)
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(3'000'000))      /* xtal is 3MHz, divided by 4 internally */
 
-	MCFG_MACHINE_START_OVERRIDE(bking_state,bking3)
-	MCFG_MACHINE_RESET_OVERRIDE(bking_state,bking3)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bking3, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_bking3, this));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 MACHINE_CONFIG_END

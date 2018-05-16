@@ -164,7 +164,7 @@ static const gfx_layout tk80bs_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( tk80bs )
+static GFXDECODE_START( gfx_tk80bs )
 	GFXDECODE_ENTRY( "chargen", 0x0000, tk80bs_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -184,7 +184,7 @@ MACHINE_CONFIG_START(tk80bs_state::tk80bs)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tk80bs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tk80bs)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255, 0)

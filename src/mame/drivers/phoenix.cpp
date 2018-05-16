@@ -29,7 +29,8 @@ Notes:
 To Do:
 
 Phoenix:
-- Emulate the different sound system used at least by phoenixc2 and griffono.
+- Emulate the different sound system used at least by phoenixc2, griffono,
+   and nextfase.
 - Better documentation of the bootlegs.
 
 Survival:
@@ -423,18 +424,18 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( phoenix )
+static GFXDECODE_START( gfx_phoenix )
 	GFXDECODE_ENTRY( "bgtiles", 0, charlayout, 0, 32 )
 	GFXDECODE_ENTRY( "fgtiles", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( pleiads )
+static GFXDECODE_START( gfx_pleiads )
 	GFXDECODE_ENTRY( "bgtiles", 0, charlayout, 0, 64 )
 	GFXDECODE_ENTRY( "fgtiles", 0, charlayout, 0, 64 )
 GFXDECODE_END
 
 
-MACHINE_RESET_MEMBER(phoenix_state,phoenix)
+void phoenix_state::machine_reset_phoenix()
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x4000);
 }
@@ -446,7 +447,7 @@ MACHINE_CONFIG_START(phoenix_state::phoenix)
 	MCFG_DEVICE_ADD("maincpu", I8085A, CPU_CLOCK)  /* 2.75 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(phoenix_memory_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_phoenix, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -454,11 +455,11 @@ MACHINE_CONFIG_START(phoenix_state::phoenix)
 	MCFG_SCREEN_UPDATE_DRIVER(phoenix_state, screen_update_phoenix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phoenix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phoenix)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(phoenix_state,phoenix)
-	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_phoenix, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -485,7 +486,7 @@ MACHINE_CONFIG_START(phoenix_state::pleiads)
 	MCFG_DEVICE_PROGRAM_MAP(pleiads_memory_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pleiads)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pleiads)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(phoenix_state,pleiads)
@@ -516,7 +517,7 @@ MACHINE_CONFIG_START(phoenix_state::survival)
 	MCFG_I8085A_SID(READLINE(*this, phoenix_state, survival_sid_callback))
 	MCFG_DEVICE_PROGRAM_MAP(survival_memory_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_phoenix, this));
 
 	/* video hardware */
 
@@ -528,11 +529,11 @@ MACHINE_CONFIG_START(phoenix_state::survival)
 	MCFG_SCREEN_UPDATE_DRIVER(phoenix_state, screen_update_phoenix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phoenix)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phoenix)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(phoenix_state,survival)
-	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_phoenix, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1244,6 +1245,10 @@ ROM_START( griffono )  // verified single PCB with piggyback sound PCB instead o
 	ROM_LOAD( "sn74s471n.11k",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
 ROM_END
 
+/*
+  There is no MN6221AA Melody-Alarm Generator.
+  There is a EPSON Electronics 7910CG Multi-Melody IC instead.
+*/
 ROM_START( nextfase )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nf01.bin",   0x0000, 0x0800, CRC(b31ce820) SHA1(dfdb17995a14b66d2571c2c8de481d2792f9ce6a) )

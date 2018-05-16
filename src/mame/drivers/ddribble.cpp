@@ -221,7 +221,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( ddribble )
+static GFXDECODE_START( gfx_ddribble )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,    48,  1 )   /* colors 48-63 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, charlayout,    16,  1 )   /* colors 16-31 */
 	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout,  32,  1 )   /* colors 32-47 */
@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(ddribble_state::ddribble)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddribble_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD(m_gfxdecode, "palette", ddribble)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_ddribble)
 	MCFG_PALETTE_ADD("palette", 64 + 256)
 	MCFG_PALETTE_INDIRECT_ENTRIES(64)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

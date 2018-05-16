@@ -729,19 +729,19 @@ static const gfx_layout nakajies_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( wales210 )
+static GFXDECODE_START( gfx_wales210 )
 	GFXDECODE_ENTRY( "bios", 0x55043, nakajies_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( dator3k )
+static GFXDECODE_START( gfx_dator3k )
 	GFXDECODE_ENTRY( "bios", 0x54fb1, nakajies_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( drwrt200 )
+static GFXDECODE_START( gfx_drwrt200 )
 	GFXDECODE_ENTRY( "bios", 0xdbbeb, nakajies_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( drwrt400 )
+static GFXDECODE_START( gfx_drwrt400 )
 	GFXDECODE_ENTRY( "bios", 0x580b6, nakajies_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -757,7 +757,7 @@ MACHINE_CONFIG_START(nakajies_state::nakajies210)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wales210)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wales210)
 	MCFG_PALETTE_ADD( "palette", 2 )
 	MCFG_PALETTE_INIT_OWNER(nakajies_state, nakajies)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
@@ -775,12 +775,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nakajies_state::dator3k)
 	nakajies210(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", dator3k)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_dator3k)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nakajies_state::nakajies220)
 	nakajies210(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", drwrt400)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_drwrt400)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nakajies_state::nakajies250)
@@ -788,7 +788,7 @@ MACHINE_CONFIG_START(nakajies_state::nakajies250)
 	MCFG_SCREEN_MODIFY( "screen" )
 	MCFG_SCREEN_SIZE( 80 * 6, 16 * 8 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 16 * 8 - 1 )
-	MCFG_GFXDECODE_MODIFY("gfxdecode", drwrt200)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_drwrt200)
 MACHINE_CONFIG_END
 
 

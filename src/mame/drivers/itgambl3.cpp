@@ -227,7 +227,7 @@ static const gfx_layout gfxlayout_8x8x8 =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( itgambl3 )
+static GFXDECODE_START( gfx_itgambl3 )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x8,   0, 16  )
 GFXDECODE_END
 
@@ -276,7 +276,7 @@ MACHINE_CONFIG_START(itgambl3_state::itgambl3)
 	MCFG_SCREEN_UPDATE_DRIVER(itgambl3_state, screen_update_itgambl3)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itgambl3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_itgambl3)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(itgambl3_state, itgambl3)
 

@@ -130,7 +130,7 @@ void redalert_state::redalert_audio_map(address_map &map)
  *
  *************************************/
 
-SOUND_START_MEMBER(redalert_state,redalert)
+void redalert_state::sound_start_redalert()
 {
 	save_item(NAME(m_ay8910_latch_1));
 	save_item(NAME(m_ay8910_latch_2));
@@ -227,7 +227,7 @@ MACHINE_CONFIG_START(redalert_state::redalert_audio)
 	redalert_audio_m37b(config);
 	redalert_audio_voice(config);
 
-	MCFG_SOUND_START_OVERRIDE( redalert_state, redalert )
+	set_sound_start_cb(config, driver_callback_delegate(&sound_start_redalert, this));
 
 MACHINE_CONFIG_END
 
@@ -243,7 +243,7 @@ MACHINE_CONFIG_START(redalert_state::ww3_audio)
 
 	redalert_audio_m37b(config);
 
-	MCFG_SOUND_START_OVERRIDE( redalert_state, redalert )
+	set_sound_start_cb(config, driver_callback_delegate(&sound_start_redalert, this));
 
 MACHINE_CONFIG_END
 
@@ -330,7 +330,7 @@ void redalert_state::demoneye_audio_map(address_map &map)
  *
  *************************************/
 
-SOUND_START_MEMBER( redalert_state, demoneye )
+void redalert_state::sound_start_demoneye()
 {
 	save_item(NAME(m_ay8910_latch_1));
 	save_item(NAME(m_ay8910_latch_2));
@@ -355,7 +355,7 @@ MACHINE_CONFIG_START(redalert_state::demoneye_audio)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, redalert_state, demoneye_ay8910_data_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, redalert_state, demoneye_ay8910_latch_1_w))
 
-	MCFG_SOUND_START_OVERRIDE( redalert_state, demoneye )
+	set_sound_start_cb(config, driver_callback_delegate(&sound_start_demoneye, this));
 
 	SPEAKER(config, "mono").front_center();
 

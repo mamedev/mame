@@ -1566,14 +1566,14 @@ static GFXLAYOUT_RAW( txlayout, 8, 8, 8*8, 8*8*8 )
 static GFXLAYOUT_RAW( f1layout, 2048, 1, 2048*8, 2048*8 )
 
 
-static GFXDECODE_START( ms32 )
+static GFXDECODE_START( gfx_ms32 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x0000, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x2000, 0x10 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x1000, 0x10 )
 	GFXDECODE_ENTRY( "gfx4", 0, txlayout,     0x6000, 0x10 )
 GFXDECODE_END
 
-static GFXDECODE_START( f1superb )
+static GFXDECODE_START( gfx_f1superb )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x0000, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x2000, 0x10 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x1000, 0x10 )
@@ -1723,7 +1723,7 @@ MACHINE_CONFIG_START(ms32_state::ms32)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ms32_state, screen_update_ms32)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ms32)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ms32)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 
 
@@ -1748,9 +1748,9 @@ MACHINE_CONFIG_START(ms32_state::f1superb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(f1superb_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", f1superb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1superb)
 
-	MCFG_VIDEO_START_OVERRIDE(ms32_state,f1superb)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_f1superb, this));
 MACHINE_CONFIG_END
 
 

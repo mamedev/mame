@@ -2413,7 +2413,7 @@ static const gfx_layout layout_16x8x6 =
 	16*8*2
 };
 
-static GFXDECODE_START( ssv )
+static GFXDECODE_START( gfx_ssv )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x8, 0, 0x8000/64 ) // [0] Sprites (256 colors)
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x6, 0, 0x8000/64 ) // [1] Sprites (64 colors)
 GFXDECODE_END
@@ -2440,7 +2440,7 @@ static const gfx_layout layout_16x8x6_ram =
 	16*8*8
 };
 
-static GFXDECODE_START( eaglshot )
+static GFXDECODE_START( gfx_eaglshot )
 	GFXDECODE_ENTRY( nullptr, 0, layout_16x8x8_ram, 0, 0x8000/64 ) // [0] Sprites (256 colors, decoded from ram)
 	GFXDECODE_ENTRY( nullptr, 0, layout_16x8x6_ram, 0, 0x8000/64 ) // [1] Sprites (64 colors, decoded from ram)
 GFXDECODE_END
@@ -2456,7 +2456,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( gdfs )
+static GFXDECODE_START( gfx_gdfs )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x8,   0, 0x8000/64  ) // [0] Sprites (256 colors)
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x6,   0, 0x8000/64  ) // [1] Sprites (64 colors)
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,  0, 0x8000/256 ) // [3] Tilemap
@@ -2559,7 +2559,7 @@ MACHINE_CONFIG_START(ssv_state::ssv)
 	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ssv)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -2623,8 +2623,8 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gdfs)
-	MCFG_VIDEO_START_OVERRIDE(ssv_state,gdfs)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gdfs)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gdfs, this));
 MACHINE_CONFIG_END
 
 
@@ -2838,8 +2838,8 @@ MACHINE_CONFIG_START(ssv_state::eaglshot)
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xca - 0x2a)*2-1, 0, (0xf6 - 0x16)-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_eaglshot)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", eaglshot)
-	MCFG_VIDEO_START_OVERRIDE(ssv_state,eaglshot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_eaglshot)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_eaglshot, this));
 MACHINE_CONFIG_END
 
 

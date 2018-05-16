@@ -119,7 +119,7 @@ public:
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(statriv2);
-	DECLARE_VIDEO_START(vertical);
+	void video_start_vertical() ATTR_COLD;
 	uint32_t screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
 	void statriv2(machine_config &config);
@@ -177,7 +177,7 @@ void statriv2_state::video_start()
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::horizontal_tile_info), this), TILEMAP_SCAN_ROWS, 8, 15, 64, 16);
 }
 
-VIDEO_START_MEMBER(statriv2_state,vertical)
+void statriv2_state::video_start_vertical()
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::vertical_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
@@ -570,7 +570,7 @@ static const gfx_layout horizontal_tiles_layout =
 	16*8
 };
 
-static GFXDECODE_START( horizontal )
+static GFXDECODE_START( gfx_horizontal )
 	GFXDECODE_ENTRY( "tiles", 0, horizontal_tiles_layout, 0, 64 )
 GFXDECODE_END
 
@@ -586,7 +586,7 @@ static const gfx_layout vertical_tiles_layout =
 	8*8
 };
 
-static GFXDECODE_START( vertical )
+static GFXDECODE_START( gfx_vertical )
 	GFXDECODE_ENTRY( "tiles", 0, vertical_tiles_layout, 0, 64 )
 GFXDECODE_END
 
@@ -625,7 +625,7 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	MCFG_DEVICE_ADD("tms", TMS9927, MASTER_CLOCK/2/8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", horizontal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_horizontal)
 	MCFG_PALETTE_ADD("palette", 2*64)
 	MCFG_PALETTE_INIT_OWNER(statriv2_state, statriv2)
 
@@ -644,8 +644,8 @@ MACHINE_CONFIG_START(statriv2_state::statriv2v)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 392, 0, 256, 262, 0, 256)
 
-	MCFG_VIDEO_START_OVERRIDE(statriv2_state, vertical)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", vertical)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_vertical, this));
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_vertical)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(statriv2_state::funcsino)

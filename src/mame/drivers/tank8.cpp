@@ -319,7 +319,7 @@ static const gfx_layout tank_layout =
 };
 
 
-static GFXDECODE_START( tank8 )
+static GFXDECODE_START( gfx_tank8 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_1, 0, 10 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_2, 0, 10 )
 	GFXDECODE_ENTRY( "gfx2", 0, tank_layout,   0, 8 )
@@ -345,7 +345,7 @@ MACHINE_CONFIG_START(tank8_state::tank8)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tank8_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tank8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tank8)
 	MCFG_PALETTE_ADD("palette", 20)
 	MCFG_PALETTE_INDIRECT_ENTRIES(10)
 	MCFG_PALETTE_INIT_OWNER(tank8_state, tank8)

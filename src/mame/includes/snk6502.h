@@ -69,15 +69,15 @@ public:
 	TILE_GET_INFO_MEMBER(satansat_get_fg_tile_info);
 
 	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(sasuke);
-	DECLARE_VIDEO_START(satansat);
+	void machine_reset_sasuke();
+	void video_start_satansat() ATTR_COLD;
 	DECLARE_PALETTE_INIT(satansat);
-	DECLARE_MACHINE_RESET(vanguard);
-	DECLARE_VIDEO_START(snk6502);
+	void machine_reset_vanguard();
+	void video_start_snk6502()  ATTR_COLD;
 	DECLARE_PALETTE_INIT(snk6502);
-	DECLARE_MACHINE_RESET(satansat);
-	DECLARE_MACHINE_RESET(pballoon);
-	DECLARE_VIDEO_START(pballoon);
+	void machine_reset_satansat();
+	void machine_reset_pballoon();
+	void video_start_pballoon() ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

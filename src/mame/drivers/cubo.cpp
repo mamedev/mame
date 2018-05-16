@@ -1061,7 +1061,7 @@ MACHINE_CONFIG_START(cubo_state::cubo)
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE
 
-	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_amiga_aga, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

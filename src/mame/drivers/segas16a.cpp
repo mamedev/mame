@@ -1952,7 +1952,7 @@ INPUT_PORTS_END
 //  GRAPHICS DECODING
 //**************************************************************************
 
-static GFXDECODE_START( segas16a )
+static GFXDECODE_START( gfx_segas16a )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1024 )
 GFXDECODE_END
 
@@ -2004,7 +2004,7 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 	MCFG_SEGAIC16VID_ADD("segaic16vid")
 	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas16a)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas16a)
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	// sound hardware

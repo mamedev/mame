@@ -202,7 +202,7 @@ TODO:
 #include "speaker.h"
 
 
-MACHINE_RESET_MEMBER(gladiatr_state,gladiator)
+void gladiatr_state::machine_reset_gladiator()
 {
 	// 6809 bank memory set
 	membank("bank2")->set_entry(0);
@@ -607,7 +607,7 @@ WRITE8_MEMBER(ppking_state::ppking_qxcomu_w)
 	// ...
 }
 
-MACHINE_RESET_MEMBER(ppking_state, ppking)
+void ppking_state::machine_reset_ppking()
 {
 	// yes, it expects to read DSW1 without sending commands first ...
 	m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;;
@@ -924,13 +924,13 @@ static const gfx_layout spritelayout  =
 	64*8
 };
 
-static GFXDECODE_START( ppking )
+static GFXDECODE_START( gfx_ppking )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x100, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( gladiatr )
+static GFXDECODE_START( gfx_gladiatr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x200, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0x000, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x100, 32 )
@@ -956,7 +956,7 @@ MACHINE_CONFIG_START(ppking_state::ppking)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET_OVERRIDE(ppking_state, ppking)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ppking, this));
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5L on main board
@@ -978,10 +978,10 @@ MACHINE_CONFIG_START(ppking_state::ppking)
 	MCFG_SCREEN_UPDATE_DRIVER(ppking_state, screen_update_ppking)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ppking)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppking)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_VIDEO_START_OVERRIDE(ppking_state, ppking)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ppking, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1018,7 +1018,7 @@ MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 	MCFG_DEVICE_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(gladiatr_cpu3_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gladiator, this));
 	MCFG_NVRAM_ADD_0FILL("nvram") // NEC uPD449 CMOS SRAM
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5L on main board
@@ -1070,10 +1070,10 @@ MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 	MCFG_SCREEN_UPDATE_DRIVER(gladiatr_state, screen_update_gladiatr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gladiatr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gladiatr)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_VIDEO_START_OVERRIDE(gladiatr_state,gladiatr)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gladiatr, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -325,7 +325,7 @@ static const gfx_layout spritelayout16x16bis =
 	32*32
 };
 
-static GFXDECODE_START( redclash )
+static GFXDECODE_START( gfx_redclash )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,          0,  8 )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, spritelayout8x8,   4*8, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout16x16, 4*8, 16 )
@@ -361,7 +361,7 @@ MACHINE_CONFIG_START(redclash_state::zerohour)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, redclash_state, screen_vblank_redclash))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", redclash)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_redclash)
 	MCFG_PALETTE_ADD("palette", 4*8+4*16+32)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+32)
 	MCFG_PALETTE_INIT_OWNER(redclash_state,redclash)
@@ -388,7 +388,7 @@ MACHINE_CONFIG_START(redclash_state::redclash)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, redclash_state, screen_vblank_redclash))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", redclash)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_redclash)
 	MCFG_PALETTE_ADD("palette", 4*8+4*16+32)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+32)
 	MCFG_PALETTE_INIT_OWNER(redclash_state,redclash)

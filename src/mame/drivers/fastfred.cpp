@@ -138,7 +138,7 @@ READ8_MEMBER(fastfred_state::boggy84_custom_io_r)
 */
 
 
-MACHINE_START_MEMBER(fastfred_state,imago)
+void fastfred_state::machine_start_imago()
 {
 	machine_start();
 	m_gfxdecode->gfx(1)->set_source(m_imago_sprites);
@@ -603,17 +603,17 @@ static const gfx_layout imago_char_1bpp =
 	8*8
 };
 
-static GFXDECODE_START( fastfred )
+static GFXDECODE_START( gfx_fastfred )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( jumpcoas )
+static GFXDECODE_START( gfx_jumpcoas )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( imago )
+static GFXDECODE_START( gfx_imago )
 	GFXDECODE_ENTRY( "gfx1", 0,      charlayout,          0, 32 )
 	GFXDECODE_ENTRY( nullptr,   0xb800, imago_spritelayout,  0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0,      charlayout,          0, 32 )
@@ -663,12 +663,12 @@ MACHINE_CONFIG_START(fastfred_state::fastfred)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fastfred_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fastfred)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fastfred)
 
 	MCFG_PALETTE_ADD("palette", 32*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(fastfred_state,fastfred)
-	MCFG_VIDEO_START_OVERRIDE(fastfred_state,fastfred)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_fastfred, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -692,7 +692,7 @@ MACHINE_CONFIG_START(fastfred_state::jumpcoas)
 	MCFG_DEVICE_REMOVE("audiocpu")
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", jumpcoas)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_jumpcoas)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("soundlatch")
@@ -711,14 +711,14 @@ MACHINE_CONFIG_START(fastfred_state::imago)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, fastfred_state, imago_dma_irq_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, fastfred_state, imago_charbank_w))
 
-	MCFG_MACHINE_START_OVERRIDE(fastfred_state,imago)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_imago, this));
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256+64+2) /* 256 for characters, 64 for the stars and 2 for the web */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", imago)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_imago)
 
-	MCFG_VIDEO_START_OVERRIDE(fastfred_state,imago)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_imago, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(fastfred_state, screen_update_imago)
 MACHINE_CONFIG_END

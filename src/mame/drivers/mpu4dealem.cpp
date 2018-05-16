@@ -33,7 +33,7 @@ public:
 	}
 
 	optional_shared_ptr<uint8_t> m_dealem_videoram;
-	DECLARE_MACHINE_RESET(dealem_vid);
+	void machine_reset_dealem_vid();
 	DECLARE_PALETTE_INIT(dealem);
 	uint32_t screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(dealem_vsync_changed);
@@ -56,7 +56,7 @@ static const gfx_layout dealemcharlayout =
 };
 
 
-static GFXDECODE_START( dealem )
+static GFXDECODE_START( gfx_dealem )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dealemcharlayout, 0, 32 )
 GFXDECODE_END
 
@@ -175,7 +175,7 @@ void mpu4dealem_state::dealem_memmap(address_map &map)
 	map(0x8000, 0xffff).rom().nopw();/* 64k  paged ROM (4 pages) */
 }
 
-MACHINE_RESET_MEMBER(mpu4dealem_state,dealem_vid)
+void mpu4dealem_state::machine_reset_dealem_vid()
 {
 	m_vfd->reset(); //for debug ports only
 
@@ -198,8 +198,8 @@ MACHINE_RESET_MEMBER(mpu4dealem_state,dealem_vid)
 
 /* machine driver for Zenitone Deal 'Em board */
 MACHINE_CONFIG_START(mpu4dealem_state::dealem)
-	MCFG_MACHINE_START_OVERRIDE(mpu4dealem_state,mod2)                          /* main mpu4 board initialisation */
-	MCFG_MACHINE_RESET_OVERRIDE(mpu4dealem_state,dealem_vid)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mod2, this));                          /* main mpu4 board initialisation */
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dealem_vid, this));
 
 	MCFG_DEVICE_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
 	MCFG_DEVICE_PROGRAM_MAP(dealem_memmap)
@@ -222,7 +222,7 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	MCFG_SCREEN_UPDATE_DRIVER(mpu4dealem_state, screen_update_dealem)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dealem)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dealem)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(mpu4dealem_state,dealem)

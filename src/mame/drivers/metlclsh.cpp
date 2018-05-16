@@ -248,7 +248,7 @@ static const gfx_layout tilelayout8 =
 	8*8
 };
 
-static GFXDECODE_START( metlclsh )
+static GFXDECODE_START( gfx_metlclsh )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x00, 2 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout16, 0x10, 1 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout8,  0x20, 4 ) // [2] Foreground
@@ -296,7 +296,7 @@ MACHINE_CONFIG_START(metlclsh_state::metlclsh)
 	MCFG_SCREEN_UPDATE_DRIVER(metlclsh_state, screen_update_metlclsh)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", metlclsh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_metlclsh)
 	MCFG_PALETTE_ADD("palette", 3 * 16)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

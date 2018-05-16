@@ -246,13 +246,13 @@ static const gfx_layout layout_16x16x4 =
 	16*16*2
 };
 
-static GFXDECODE_START( firebatl )
+static GFXDECODE_START( gfx_firebatl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,   0, 16 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,  16,  1 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x2,   512, 64 ) // [2] Layer 1
 GFXDECODE_END
 
-static GFXDECODE_START( clshroad )
+static GFXDECODE_START( gfx_clshroad )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,    0, 16 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x90,  1 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x4,      0, 16 ) // [2] Layer 1
@@ -298,12 +298,12 @@ MACHINE_CONFIG_START(clshroad_state::firebatl)
 	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firebatl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firebatl)
 	MCFG_PALETTE_ADD("palette", 512+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(clshroad_state,firebatl)
 
-	MCFG_VIDEO_START_OVERRIDE(clshroad_state,firebatl)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_firebatl, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -339,11 +339,11 @@ MACHINE_CONFIG_START(clshroad_state::clshroad)
 	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", clshroad)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_clshroad)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(clshroad_state,clshroad)
-	MCFG_VIDEO_START_OVERRIDE(clshroad_state,clshroad)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_clshroad, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

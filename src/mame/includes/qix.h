@@ -115,8 +115,8 @@ public:
 	void init_zookeep();
 	void init_kram3();
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_START(qixmcu);
-	DECLARE_VIDEO_START(qix);
+	void machine_start_qixmcu() ATTR_COLD;
+	void video_start_qix()      ATTR_COLD;
 	TIMER_CALLBACK_MEMBER(pia_w_callback);
 	TIMER_CALLBACK_MEMBER(deferred_sndpia1_porta_w);
 	DECLARE_WRITE_LINE_MEMBER(qix_vsync_changed);

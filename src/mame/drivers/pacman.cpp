@@ -378,7 +378,7 @@ Boards:
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(pacman_state,mschamp)
+void pacman_state::machine_reset_mschamp()
 {
 	uint8_t *rom = memregion("maincpu")->base() + 0x10000;
 	int whichbank = ioport("GAME")->read() & 1;
@@ -390,12 +390,12 @@ MACHINE_RESET_MEMBER(pacman_state,mschamp)
 	membank("bank2")->set_entry(whichbank);
 }
 
-MACHINE_RESET_MEMBER(pacman_state,superabc)
+void pacman_state::machine_reset_superabc()
 {
 	superabc_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
-MACHINE_RESET_MEMBER(pacman_state,maketrax)
+void pacman_state::machine_reset_maketrax()
 {
 	m_maketrax_counter = 0;
 	m_maketrax_offset = 0;
@@ -3489,25 +3489,25 @@ static const gfx_layout crush4_spritelayout =
 };
 
 
-static GFXDECODE_START( pacman )
+static GFXDECODE_START( gfx_pacman )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, spritelayout, 0, 128 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( s2650games )
+static GFXDECODE_START( gfx_s2650games )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0x4000, spritelayout, 0, 128 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( superabc )
+static GFXDECODE_START( gfx_superabc )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0x8000, spritelayout, 0, 128 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( crush4 )
+static GFXDECODE_START( gfx_crush4 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, crush4_tilelayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, crush4_spritelayout, 0, 128 )
 GFXDECODE_END
@@ -3541,7 +3541,7 @@ MACHINE_CONFIG_START(pacman_state::pacman)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pacman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pacman)
 	MCFG_PALETTE_ADD("palette", 128*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pacman_state,pacman)
@@ -3552,7 +3552,7 @@ MACHINE_CONFIG_START(pacman_state::pacman)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacman_state, vblank_irq))
 
-	MCFG_VIDEO_START_OVERRIDE(pacman_state,pacman)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pacman, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3564,7 +3564,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pacman_state::maketrax)
 	pacman(config);
-	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,maketrax)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_maketrax, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pacman_state::korosuke)
@@ -3597,7 +3597,7 @@ MACHINE_CONFIG_START(pacman_state::birdiy)
 	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, pacman_state, coin_lockout_global_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pacman_state, coin_counter_w))
 
-	MCFG_VIDEO_START_OVERRIDE(pacman_state,birdiy)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_birdiy, this));
 MACHINE_CONFIG_END
 
 
@@ -3702,8 +3702,8 @@ MACHINE_CONFIG_START(pacman_state::theglobp)
 	MCFG_DEVICE_PROGRAM_MAP(epos_map)
 	MCFG_DEVICE_IO_MAP(epos_portmap)
 
-	MCFG_MACHINE_START_OVERRIDE(pacman_state,theglobp)
-	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,theglobp)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_theglobp, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_theglobp, this));
 MACHINE_CONFIG_END
 
 
@@ -3715,8 +3715,8 @@ MACHINE_CONFIG_START(pacman_state::acitya)
 	MCFG_DEVICE_PROGRAM_MAP(epos_map)
 	MCFG_DEVICE_IO_MAP(epos_portmap)
 
-	MCFG_MACHINE_START_OVERRIDE(pacman_state,acitya)
-	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,acitya)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_acitya, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_acitya, this));
 MACHINE_CONFIG_END
 
 
@@ -3728,8 +3728,8 @@ MACHINE_CONFIG_START(pacman_state::eeekk)
 	MCFG_DEVICE_PROGRAM_MAP(epos_map)
 	MCFG_DEVICE_IO_MAP(epos_portmap)
 
-	MCFG_MACHINE_START_OVERRIDE(pacman_state,eeekk)
-	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,eeekk)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_eeekk, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_eeekk, this));
 MACHINE_CONFIG_END
 
 
@@ -3796,7 +3796,7 @@ MACHINE_CONFIG_START(pacman_state::s2650games)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pacman_state, coin_counter_w))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", s2650games)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_s2650games)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*8, 32*8)
@@ -3805,7 +3805,7 @@ MACHINE_CONFIG_START(pacman_state::s2650games)
 	MCFG_SCREEN_UPDATE_DRIVER(pacman_state, screen_update_s2650games)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacman_state, s2650_interrupt))
 
-	MCFG_VIDEO_START_OVERRIDE(pacman_state,s2650games)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_s2650games, this));
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("namco")
@@ -3862,7 +3862,7 @@ MACHINE_CONFIG_START(pacman_state::mschamp)
 	MCFG_DEVICE_PROGRAM_MAP(mschamp_map)
 	MCFG_DEVICE_IO_MAP(mschamp_portmap)
 
-	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,mschamp)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mschamp, this));
 MACHINE_CONFIG_END
 
 
@@ -3875,10 +3875,10 @@ MACHINE_CONFIG_START(pacman_state::superabc)
 
 	MCFG_NVRAM_ADD_0FILL("28c16.u17")
 
-	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,superabc)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_superabc, this));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", superabc)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_superabc)
 MACHINE_CONFIG_END
 
 
@@ -3886,7 +3886,7 @@ MACHINE_CONFIG_START(pacman_state::crush4)
 	mschamp(config);
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", crush4)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_crush4)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pacman_state::crushs)

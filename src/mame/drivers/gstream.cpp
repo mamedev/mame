@@ -544,7 +544,7 @@ static const gfx_layout layout32x32 =
 	32*32*8,
 };
 
-static GFXDECODE_START( gstream )
+static GFXDECODE_START( gfx_gstream )
 	GFXDECODE_ENTRY( "gfx2", 0, layout32x32, 0x1000, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, layout32x32, 0x1400, 4 )
 	GFXDECODE_ENTRY( "gfx4", 0, layout32x32, 0x1800, 4 )
@@ -552,7 +552,7 @@ static GFXDECODE_START( gstream )
 GFXDECODE_END
 
 
-static GFXDECODE_START( x2222 )
+static GFXDECODE_START( gfx_x2222 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout32x32, 0, 0x80 )
 	GFXDECODE_ENTRY( "gfx3", 0, layout32x32, 0, 0x80 )
 	GFXDECODE_ENTRY( "gfx4", 0, layout32x32, 0, 0x80 )
@@ -845,7 +845,7 @@ MACHINE_CONFIG_START(gstream_state::gstream)
 	MCFG_PALETTE_ADD("palette", 0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
 	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gstream)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gstream)
 
 	SPEAKER(config, "mono").front_center();
 
@@ -876,7 +876,7 @@ MACHINE_CONFIG_START(gstream_state::x2222)
 
 	MCFG_PALETTE_ADD_BBBBBGGGGGGRRRRR("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x2222)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x2222)
 
 	// unknown sound hw (no sound roms dumped)
 

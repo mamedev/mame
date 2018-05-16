@@ -279,7 +279,7 @@ static const gfx_layout layout_16x16x4_swap =
 };
 
 
-static GFXDECODE_START( powerins )
+static GFXDECODE_START( gfx_powerins )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,      0x000, 0x20 ) // [0] Tiles
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,        0x200, 0x10 ) // [1] Tiles
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x4_swap, 0x400, 0x40 ) // [2] Sprites
@@ -296,7 +296,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(powerins_state, powerinsa)
+void powerins_state::machine_start_powerinsa()
 {
 	membank("okibank")->configure_entries(0, 5, memregion("oki1")->base() + 0x30000, 0x10000);
 }
@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(powerins_state::powerins)
 	MCFG_SCREEN_UPDATE_DRIVER(powerins_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerins)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerins)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -360,7 +360,7 @@ MACHINE_CONFIG_START(powerins_state::powerinsa)
 
 	MCFG_DEVICE_REMOVE("soundcpu")
 
-	MCFG_MACHINE_START_OVERRIDE(powerins_state, powerinsa)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_powerinsa, this));
 
 	MCFG_DEVICE_REPLACE("oki1", OKIM6295, 990000, okim6295_device::PIN7_LOW) // pin7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, powerinsa_oki_map)

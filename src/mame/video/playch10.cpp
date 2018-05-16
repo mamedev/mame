@@ -82,7 +82,7 @@ void playch10_state::video_start()
 			8, 8, 32, 32);
 }
 
-VIDEO_START_MEMBER(playch10_state,playch10_hboard)
+void playch10_state::video_start_playch10_hboard()
 {
 	const uint8_t *bios = memregion("maincpu")->base();
 	m_pc10_bios = (bios[3] == 0x2a) ? 1 : 2;

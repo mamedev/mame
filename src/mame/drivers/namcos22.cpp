@@ -3721,12 +3721,12 @@ static const gfx_layout namcos22_cg_layout =
 
 #undef XOR
 
-static GFXDECODE_START( namcos22 )
+static GFXDECODE_START( gfx_namcos22 )
 	GFXDECODE_ENTRY( nullptr,      0, namcos22_cg_layout,   0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, texture_tile_layout,  0, 0x80 )
 GFXDECODE_END
 
-static GFXDECODE_START( super )
+static GFXDECODE_START( gfx_super )
 	GFXDECODE_ENTRY( nullptr,      0, namcos22_cg_layout,   0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, texture_tile_layout,  0, 0x80 )
 	GFXDECODE_ENTRY( "sprite",  0, sprite_layout,        0, 0x80 )
@@ -3796,7 +3796,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos22)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos22)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3864,7 +3864,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22s)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22s)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_super)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -3952,7 +3952,7 @@ MACHINE_CONFIG_START(namcos22_state::propcycl)
 	MCFG_TIMER_DRIVER_ADD("pc_p_int", namcos22_state, propcycl_pedal_interrupt)
 MACHINE_CONFIG_END
 
-MACHINE_START_MEMBER(namcos22_state,adillor)
+void namcos22_state::machine_start_adillor()
 {
 	machine_start();
 
@@ -3966,7 +3966,7 @@ MACHINE_CONFIG_START(namcos22_state::adillor)
 	/* basic machine hardware */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ar_tb_upd", namcos22_state, adillor_trackball_update, attotime::from_msec(20))
 
-	MCFG_MACHINE_START_OVERRIDE(namcos22_state,adillor)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_adillor, this));
 MACHINE_CONFIG_END
 
 

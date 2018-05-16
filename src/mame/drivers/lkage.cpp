@@ -459,7 +459,7 @@ static const gfx_layout sprite_layout =
 	32*8
 };
 
-static GFXDECODE_START( lkage )
+static GFXDECODE_START( gfx_lkage )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tile_layout,  /*128*/0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprite_layout,  0, 16 )
 GFXDECODE_END
@@ -511,7 +511,7 @@ MACHINE_CONFIG_START(lkage_state::lkage)
 	MCFG_SCREEN_UPDATE_DRIVER(lkage_state, screen_update_lkage)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lkage)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lkage)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -562,7 +562,7 @@ MACHINE_CONFIG_START(lkage_state::lkageb)
 	MCFG_SCREEN_UPDATE_DRIVER(lkage_state, screen_update_lkage)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lkage)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lkage)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 

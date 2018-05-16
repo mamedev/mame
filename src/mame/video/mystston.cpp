@@ -213,7 +213,7 @@ void mystston_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
  *
  *************************************/
 
-VIDEO_START_MEMBER(mystston_state,mystston)
+void mystston_state::video_start_mystston()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mystston_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 16, 16, 16, 32);
 
@@ -232,7 +232,7 @@ VIDEO_START_MEMBER(mystston_state,mystston)
  *
  *************************************/
 
-VIDEO_RESET_MEMBER(mystston_state,mystston)
+void mystston_state::video_reset_mystston()
 {
 	m_interrupt_timer->adjust(m_screen->time_until_pos(FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
 }
@@ -296,7 +296,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( mystston )
+static GFXDECODE_START( gfx_mystston )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   4*8, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 2*8, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0*8, 2 )
@@ -311,10 +311,10 @@ GFXDECODE_END
  *************************************/
 
 MACHINE_CONFIG_START(mystston_state::mystston_video)
-	MCFG_VIDEO_START_OVERRIDE(mystston_state,mystston)
-	MCFG_VIDEO_RESET_OVERRIDE(mystston_state,mystston)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_mystston, this));
+	set_video_reset_cb(config, driver_callback_delegate(&video_reset_mystston, this));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mystston)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mystston)
 	MCFG_PALETTE_ADD("palette", 0x40)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

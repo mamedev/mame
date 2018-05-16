@@ -67,7 +67,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "bus/rs232/rs232.h"
 #include "machine/am9517a.h"
 #include "machine/clock.h"

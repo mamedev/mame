@@ -32,7 +32,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(s2k_get_bg_tile_info);
 	DECLARE_PALETTE_INIT(ampoker2);
-	DECLARE_VIDEO_START(sigma2k);
+	void video_start_sigma2k() ATTR_COLD;
 
 protected:
 	virtual void video_start() override;

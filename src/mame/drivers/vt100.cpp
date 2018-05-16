@@ -316,7 +316,7 @@ static const gfx_layout vt100_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( vt100 )
+static GFXDECODE_START( gfx_vt100 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vt100_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -334,7 +334,7 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_SCREEN_UPDATE_DRIVER(vt100_state, screen_update_vt100)
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vt100_video:palette", vt100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vt100_video:palette", gfx_vt100)
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEFAULT_LAYOUT( layout_vt100 )

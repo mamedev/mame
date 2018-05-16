@@ -316,12 +316,12 @@ static const gfx_layout char_rom_layout =
 	8*8
 };
 
-static GFXDECODE_START( tiamc1 )
+static GFXDECODE_START( gfx_tiamc1 )
 	GFXDECODE_ENTRY( nullptr, 0x0000, char_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprites16x16_layout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( kot )
+static GFXDECODE_START( gfx_kot )
 	GFXDECODE_ENTRY( nullptr, 0x0000, char_rom_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprites16x16_layout, 0, 16 )
 GFXDECODE_END
@@ -345,7 +345,7 @@ MACHINE_CONFIG_START(tiamc1_state::tiamc1)
 	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_tiamc1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tiamc1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tiamc1)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(tiamc1_state, tiamc1)
 
@@ -363,10 +363,10 @@ MACHINE_CONFIG_START(tiamc1_state::kot)
 	MCFG_DEVICE_IO_MAP(kotrybolov_io_map)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_VIDEO_START_OVERRIDE(tiamc1_state, kot)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_kot, this));
 	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_kot)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", kot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_kot)
 
 	MCFG_DEVICE_REMOVE("2x8253")
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)

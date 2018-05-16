@@ -8,7 +8,7 @@
 #include "bus/abcbus/abcbus.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
@@ -17,7 +17,9 @@
 #include "machine/e0516.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/discrete.h"
 #include "video/mc6845.h"
 #include "video/saa5050.h"
@@ -61,6 +63,9 @@
 #define RS232_A_TAG         "rs232a"
 #define RS232_B_TAG         "rs232b"
 #define ABC_KEYBOARD_PORT_TAG   "kb"
+#define TIMER_CTC_TAG		"timer_ctc"
+#define TIMER_CASSETTE_TAG  "timer_cass"
+
 
 
 //**************************************************************************
@@ -96,7 +101,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;
-	required_device<z80sio2_device> m_sio;
+	required_device<z80sio_device> m_sio;
 	optional_device<discrete_sound_device> m_discrete;
 	optional_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
@@ -105,21 +110,11 @@ public:
 	optional_shared_ptr<uint8_t> m_char_ram;
 	required_ioport m_io_sb;
 
-	enum
-	{
-		TIMER_ID_CTC,
-		TIMER_ID_CASSETTE
-	};
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void video_start() override;
-
 	void bankswitch();
-	void clock_cassette(int state);
+	void cassette_output_tick(int state);
 
 	virtual DECLARE_READ8_MEMBER( m1_r );
 	DECLARE_READ8_MEMBER( pling_r );
@@ -130,16 +125,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( sio_txdb_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_dtrb_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_rtsb_w );
+	TIMER_DEVICE_CALLBACK_MEMBER( ctc_tick );
+	TIMER_DEVICE_CALLBACK_MEMBER( cassette_input_tick );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( bac );
 
 	// memory state
 	bool m_fetch_charram;        // opcode fetched from character RAM region (0x7800-0x7fff)
-	uint16_t m_char_ram_start;
-	uint16_t m_char_ram_mask;
-
-	// sound state
-	int m_pling;
 
 	// serial state
 	uint8_t m_sb;
@@ -156,7 +148,6 @@ public:
 	uint8_t m_fgctl;                  // HR foreground control
 
 	// timers
-	emu_timer *m_ctc_timer;
 	emu_timer *m_cassette_timer;
 	void common(machine_config &config);
 	void abc800_m1(address_map &map);
@@ -212,7 +203,6 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	offs_t translate_trom_offset(offs_t offset);
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( m1_r ) override;
@@ -244,8 +234,6 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	virtual void video_start() override;
 
 	void bankswitch();
 

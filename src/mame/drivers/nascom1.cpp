@@ -420,7 +420,7 @@ static const gfx_layout nascom1_charlayout =
 	8 * 16
 };
 
-static GFXDECODE_START( nascom1 )
+static GFXDECODE_START( gfx_nascom1 )
 	GFXDECODE_ENTRY("gfx1", 0x0000, nascom1_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -442,7 +442,7 @@ static const gfx_layout nascom2_charlayout =
 	8 * 16
 };
 
-static GFXDECODE_START( nascom2 )
+static GFXDECODE_START( gfx_nascom2 )
 	GFXDECODE_ENTRY("gfx1", 0x0000, nascom2_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -668,7 +668,7 @@ MACHINE_CONFIG_START(nascom_state::nascom)
 	MCFG_SCREEN_UPDATE_DRIVER(nascom1_state, screen_update_nascom)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nascom1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nascom1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// uart
@@ -712,7 +712,7 @@ MACHINE_CONFIG_START(nascom2_state::nascom2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 14 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(nascom2_state, screen_update_nascom)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", nascom2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_nascom2)
 
 	// generic sockets for ram/rom (todo: support ram here)
 	MCFG_GENERIC_SOCKET_ADD("socket1", generic_plain_slot, "nascom_socket")

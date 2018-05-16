@@ -163,7 +163,7 @@ public:
 	DECLARE_WRITE32_MEMBER(namcos21_video_enable_w);
 	DECLARE_READ32_MEMBER(rso_r);
 	DECLARE_WRITE32_MEMBER(rso_w);
-	DECLARE_VIDEO_START(gal3);
+	void video_start_gal3() ATTR_COLD;
 	uint32_t screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_palette(  );
 	void gal3(machine_config &config);
@@ -175,7 +175,7 @@ public:
 };
 
 
-VIDEO_START_MEMBER(gal3_state,gal3)
+void gal3_state::video_start_gal3()
 {
 	m_generic_paletteram_16.allocate(0x10000);
 
@@ -600,7 +600,7 @@ static const gfx_layout tile_layout =
 	8*64 /* sprite offset */
 };
 
-static GFXDECODE_START( namcos21 )
+static GFXDECODE_START( gfx_namcos21 )
 	GFXDECODE_ENTRY( "obj_board1", 0x000000, tile_layout,  0x000, 0x20 )
 GFXDECODE_END
 
@@ -647,10 +647,10 @@ MACHINE_CONFIG_START(gal3_state::gal3)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_gal3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos21)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos21)
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 
-	MCFG_VIDEO_START_OVERRIDE(gal3_state,gal3)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gal3, this));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

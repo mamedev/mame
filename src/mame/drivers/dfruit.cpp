@@ -342,7 +342,7 @@ static const gfx_layout char_layout =
 };
 #endif
 
-static GFXDECODE_START( dfruit )
+static GFXDECODE_START( gfx_dfruit )
 	GFXDECODE_ENTRY( "gfx1", 0, bg2_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, sp2_layout, 0, 16 )
 	//GFXDECODE_ENTRY( nullptr,           0, char_layout,  0, 16 )  // Ram-based
@@ -377,8 +377,8 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_DEVICE_PROGRAM_MAP(dfruit_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dfruit_state, dfruit_irq_scanline, "screen", 0, 1)
 
-	//MCFG_MACHINE_START_OVERRIDE(dfruit_state,4enraya)
-	//MCFG_MACHINE_RESET_OVERRIDE(dfruit_state,4enraya)
+	//set_machine_start_cb(config, driver_callback_delegate(&machine_start_4enraya, this));
+	//set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_4enraya, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -390,7 +390,7 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dfruit_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dfruit )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dfruit )
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)

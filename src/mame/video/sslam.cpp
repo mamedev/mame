@@ -137,7 +137,7 @@ WRITE16_MEMBER(sslam_state::powerbls_bg_tileram_w)
 	m_bg_tilemap->mark_tile_dirty(offset>>1);
 }
 
-VIDEO_START_MEMBER(sslam_state,sslam)
+void sslam_state::video_start_sslam()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_md_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_md_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -150,7 +150,7 @@ VIDEO_START_MEMBER(sslam_state,sslam)
 	save_item(NAME(m_sprites_x_offset));
 }
 
-VIDEO_START_MEMBER(sslam_state,powerbls)
+void sslam_state::video_start_powerbls()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sslam_state::get_powerbls_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 

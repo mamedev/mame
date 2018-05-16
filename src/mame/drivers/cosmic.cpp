@@ -902,12 +902,12 @@ static const gfx_layout cosmic_spritelayout32 =
 };
 
 
-static GFXDECODE_START( panic )
+static GFXDECODE_START( gfx_panic )
 	GFXDECODE_ENTRY( "gfx1", 0, cosmic_spritelayout16, 16, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, cosmic_spritelayout32, 16, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( cosmica )
+static GFXDECODE_START( gfx_cosmica )
 	GFXDECODE_ENTRY( "gfx1", 0, cosmic_spritelayout16,  8, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, cosmic_spritelayout32,  8, 16 )
 GFXDECODE_END
@@ -973,7 +973,7 @@ static const char *const cosmicg_sample_names[] =
 };
 
 
-MACHINE_START_MEMBER(cosmic_state,cosmic)
+void cosmic_state::machine_start_cosmic()
 {
 	save_item(NAME(m_sound_enabled));
 	save_item(NAME(m_march_select));
@@ -985,7 +985,7 @@ MACHINE_START_MEMBER(cosmic_state,cosmic)
 	save_item(NAME(m_color_registers));
 }
 
-MACHINE_RESET_MEMBER(cosmic_state,cosmic)
+void cosmic_state::machine_reset_cosmic()
 {
 	m_pixel_clock = 0;
 	m_background_enable = 0;
@@ -994,7 +994,7 @@ MACHINE_RESET_MEMBER(cosmic_state,cosmic)
 	m_color_registers[2] = 0;
 }
 
-MACHINE_RESET_MEMBER(cosmic_state,cosmicg)
+void cosmic_state::machine_reset_cosmicg()
 {
 	m_pixel_clock = 0;
 	m_background_enable = 0;
@@ -1010,8 +1010,8 @@ MACHINE_CONFIG_START(cosmic_state::cosmic)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80,Z80_MASTER_CLOCK/6) /* 1.8026 MHz */
 
-	MCFG_MACHINE_START_OVERRIDE(cosmic_state,cosmic)
-	MCFG_MACHINE_RESET_OVERRIDE(cosmic_state,cosmic)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cosmic, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cosmic, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1042,7 +1042,7 @@ MACHINE_CONFIG_START(cosmic_state::panic)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cosmic_state, panic_scanline, "screen", 0, 1)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panic)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_panic)
 	MCFG_PALETTE_ADD("palette", 16+8*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,panic)
@@ -1072,7 +1072,7 @@ MACHINE_CONFIG_START(cosmic_state::cosmica)
 	MCFG_DEVICE_PROGRAM_MAP(cosmica_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cosmica)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cosmica)
 	MCFG_PALETTE_ADD("palette", 8+16*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,cosmica)
@@ -1098,8 +1098,8 @@ MACHINE_CONFIG_START(cosmic_state::cosmicg)
 		fed to the tms9904 or tms9980.  Also, I have never heard of a tms9900/9980 operating under
 		1.5MHz.  So, if someone can check this... */
 
-	MCFG_MACHINE_START_OVERRIDE(cosmic_state,cosmic)
-	MCFG_MACHINE_RESET_OVERRIDE(cosmic_state,cosmicg)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cosmic, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cosmicg, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1135,7 +1135,7 @@ MACHINE_CONFIG_START(cosmic_state::magspot)
 	MCFG_DEVICE_PROGRAM_MAP(magspot_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panic)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_panic)
 	MCFG_PALETTE_ADD("palette", 16+8*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,magspot)
@@ -1171,7 +1171,7 @@ MACHINE_CONFIG_START(cosmic_state::nomnlnd)
 	MCFG_DEVICE_PROGRAM_MAP(magspot_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panic)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_panic)
 	MCFG_PALETTE_ADD("palette", 16+8*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,nomnlnd)

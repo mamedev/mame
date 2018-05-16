@@ -427,7 +427,7 @@ MACHINE_CONFIG_START(quickpick5_state::quickpick5)
 	MCFG_K05324X_OFFSETS(-(44+80), 20)
 	MCFG_K05324X_CB(quickpick5_state, sprite_callback)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

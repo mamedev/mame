@@ -268,7 +268,7 @@ static const gfx_layout charset_8x16 =
 };
 
 
-static GFXDECODE_START( sbc6510 )
+static GFXDECODE_START( gfx_sbc6510 )
 	GFXDECODE_ENTRY( "videocpu", 0x1500, charset_8x16, 0, 128 )
 GFXDECODE_END
 
@@ -286,7 +286,7 @@ MACHINE_CONFIG_START(sbc6510_state::sbc6510)
 	MCFG_CPU_AVR8_EEPROM("eeprom")
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette") // for F4 displayer only
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbc6510)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbc6510)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)

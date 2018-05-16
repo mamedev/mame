@@ -703,7 +703,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static GFXDECODE_START( ltcasino )
+static GFXDECODE_START( gfx_ltcasino )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 64 )
 GFXDECODE_END
 
@@ -723,7 +723,7 @@ MACHINE_CONFIG_START(ltcasino_state::ltcasino)
 	MCFG_SCREEN_UPDATE_DRIVER(ltcasino_state, screen_update_ltcasino)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ltcasino)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ltcasino)
 	MCFG_PALETTE_ADD("palette", 2*64)
 	MCFG_PALETTE_INIT_OWNER(ltcasino_state, ltcasino)
 

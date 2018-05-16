@@ -991,7 +991,7 @@ static const gfx_layout layout_16x16x4 =
 	16*16*4
 };
 
-static GFXDECODE_START( psikyo )
+static GFXDECODE_START( gfx_psikyo )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x000, 0x20 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x800, 0x48 ) // [1] Layer 0 + 1
 GFXDECODE_END
@@ -1044,11 +1044,11 @@ MACHINE_CONFIG_START(psikyo_state::sngkace)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, psikyo_state, screen_vblank_psikyo))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psikyo)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(psikyo_state,sngkace)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_sngkace, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1090,11 +1090,11 @@ MACHINE_CONFIG_START(psikyo_state::gunbird)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, psikyo_state, screen_vblank_psikyo))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psikyo)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_psikyo, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1131,11 +1131,11 @@ MACHINE_CONFIG_START(psikyo_state::s1945bl) /* Bootleg hardware based on the unp
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, psikyo_state, screen_vblank_psikyo))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psikyo)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_psikyo, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1176,11 +1176,11 @@ MACHINE_CONFIG_START(psikyo_state::s1945)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, psikyo_state, screen_vblank_psikyo))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psikyo)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_psikyo, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

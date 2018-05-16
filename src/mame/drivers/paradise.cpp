@@ -678,21 +678,21 @@ static const gfx_layout torus_layout_16x16x8 =
 	128*8
 };
 
-static GFXDECODE_START( paradise )
+static GFXDECODE_START( gfx_paradise )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x100, 1  ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,   0x400, 16 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8,   0x300, 1  ) // [2] Midground
 	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,   0x000, 1  ) // [3] Foreground
 GFXDECODE_END
 
-static GFXDECODE_START( torus )
+static GFXDECODE_START( gfx_torus )
 	GFXDECODE_ENTRY( "gfx1", 0, torus_layout_16x16x8, 0x100, 1  ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,        0x400, 16 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8,        0x300, 1  ) // [2] Midground
 	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,        0x000, 1  ) // [3] Foreground
 GFXDECODE_END
 
-static GFXDECODE_START( madball )
+static GFXDECODE_START( gfx_madball )
 	GFXDECODE_ENTRY( "gfx1", 0, torus_layout_16x16x8, 0x500, 1  ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,        0x400, 16 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8,        0x300, 1  ) // [2] Midground
@@ -749,7 +749,7 @@ MACHINE_CONFIG_START(paradise_state::paradise)
 	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_paradise)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", paradise)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_paradise)
 	MCFG_PALETTE_ADD("palette", 0x800 + 16)
 
 
@@ -779,7 +779,7 @@ MACHINE_CONFIG_START(paradise_state::torus)
 	MCFG_DEVICE_PROGRAM_MAP(torus_map)
 	MCFG_DEVICE_IO_MAP(torus_io_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", torus)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_torus)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_torus)
 
@@ -789,7 +789,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(paradise_state::madball)
 	torus(config);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", madball)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_madball)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_madball)

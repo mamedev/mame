@@ -93,7 +93,7 @@ static const gfx_layout charlayout =
 };
 #endif
 
-static GFXDECODE_START( neptunp2 )
+static GFXDECODE_START( gfx_neptunp2 )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 GFXDECODE_END
 
@@ -114,7 +114,7 @@ MACHINE_CONFIG_START(neptunp2_state::neptunp2)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", neptunp2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_neptunp2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	/* sound hardware */

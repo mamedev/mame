@@ -611,7 +611,7 @@ TILE_GET_INFO_MEMBER(pgm_state::get_pgm_bg_tilemap_tile_info)
 
 /*** Video - Start / Update ****************************************************/
 
-VIDEO_START_MEMBER(pgm_state,pgm)
+void pgm_state::video_start_pgm()
 {
 	int i;
 

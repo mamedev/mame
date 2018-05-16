@@ -1066,17 +1066,10 @@ READ32_MEMBER( sh4_base_device::sh4_internal_r )
 	return m_m[offset];
 }
 
-void sh34_base_device::sh4_set_frt_input(int state)
+void sh34_base_device::set_frt_input(int state)
 {
 	if (m_cpu_type != CPU_TYPE_SH4)
 		fatalerror("sh4_set_frt_input uses m_m[] with SH3\n");
-
-	if(state == PULSE_LINE)
-	{
-		sh4_set_frt_input(ASSERT_LINE);
-		sh4_set_frt_input(CLEAR_LINE);
-		return;
-	}
 
 	if(m_sh2_state->m_frt_input == state) {
 		return;

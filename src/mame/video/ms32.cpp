@@ -113,7 +113,7 @@ void ms32_state::video_start()
 	save_item(NAME(m_brt_b));
 }
 
-VIDEO_START_MEMBER(ms32_state,f1superb)
+void ms32_state::video_start_f1superb()
 {
 	ms32_state::video_start();
 

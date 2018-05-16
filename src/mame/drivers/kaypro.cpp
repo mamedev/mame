@@ -150,11 +150,11 @@ static const gfx_layout kaypro484_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( kayproii )
+static GFXDECODE_START( gfx_kayproii )
 	GFXDECODE_ENTRY( "chargen", 0x0000, kayproii_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( kaypro484 )
+static GFXDECODE_START( gfx_kaypro484 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, kaypro484_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -202,8 +202,8 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	MCFG_DEVICE_IO_MAP(kayproii_io)
 	MCFG_Z80_DAISY_CHAIN(kayproii_daisy_chain)
 
-	MCFG_MACHINE_START_OVERRIDE(kaypro_state, kayproii )
-	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_kayproii, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_kaypro, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -211,11 +211,11 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(80*7, 24*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*7-1,0,24*10-1)
-	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
+	set_video_start_cb(config, driver_callback_delegate(&video_start_kaypro, this));
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kayproii)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kayproii)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kayproii)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_DEVICE_IO_MAP(kaypro484_io)
 	MCFG_Z80_DAISY_CHAIN(kaypro484_daisy_chain)
 
-	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_kaypro, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -302,10 +302,10 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(80*8, 25*16)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*16-1)
-	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
+	set_video_start_cb(config, driver_callback_delegate(&video_start_kaypro, this));
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kaypro484)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kaypro484)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kaypro484)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(kaypro_state, kaypro)
 

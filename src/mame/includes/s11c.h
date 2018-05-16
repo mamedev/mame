@@ -18,7 +18,7 @@ public:
 		: s11b_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_MACHINE_RESET(s11c);
+	void machine_reset_s11c();
 	void init_s11c();
 
 	void s11c(machine_config &config);

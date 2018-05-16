@@ -236,7 +236,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( cswat )
+static GFXDECODE_START( gfx_cswat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -274,7 +274,7 @@ MACHINE_CONFIG_START(cswat_state::cswat)
 
 	MCFG_SCREEN_UPDATE_DRIVER(cswat_state, screen_update_cswat)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cswat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cswat)
 	MCFG_PALETTE_ADD("palette", 4*256)
 
 	/* sound hardware */

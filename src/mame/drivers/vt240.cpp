@@ -639,7 +639,7 @@ static const gfx_layout vt240_chars_8x10 =
 	8*10
 };
 
-static GFXDECODE_START( vt240 )
+static GFXDECODE_START( gfx_vt240 )
 	GFXDECODE_ENTRY( "charcpu", 0x338*10-3, vt240_chars_8x10, 0, 8 )
 GFXDECODE_END
 
@@ -673,7 +673,7 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'097'280), 1024, 0, 800, 629, 0, 480)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vt240)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vt240)
 
 	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(16'097'280) / 16) // actually /8?
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)

@@ -87,7 +87,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void init_fp1100();
-	DECLARE_MACHINE_RESET(fp1100);
+	void machine_reset_fp1100();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	required_device<palette_device> m_palette;
@@ -557,7 +557,7 @@ static const gfx_layout chars_8x8 =
 	8*8
 };
 
-static GFXDECODE_START( fp1100 )
+static GFXDECODE_START( gfx_fp1100 )
 	GFXDECODE_ENTRY( "sub_ipl", 0x2400, chars_8x8, 0, 1 )
 GFXDECODE_END
 
@@ -593,7 +593,7 @@ INTERRUPT_GEN_MEMBER( fp1100_state::vblank_irq )
 //      m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
 }
 
-MACHINE_RESET_MEMBER( fp1100_state, fp1100 )
+void fp1100_state::machine_reset_fp1100()
 {
 	int i;
 	uint8_t slot_type;
@@ -648,7 +648,7 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, fp1100_state, portc_w))
 	MCFG_UPD7810_TXD(WRITELINE(*this, fp1100_state, cass_w))
 
-	MCFG_MACHINE_RESET_OVERRIDE(fp1100_state, fp1100)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_fp1100, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -658,7 +658,7 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fp1100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fp1100)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

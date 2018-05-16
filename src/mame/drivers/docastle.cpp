@@ -553,7 +553,7 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( docastle )
+static GFXDECODE_START( gfx_docastle )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     0, 32*2 )
 GFXDECODE_END
@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	MCFG_SCREEN_UPDATE_DRIVER(docastle_state, screen_update_docastle)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", docastle)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_docastle)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(docastle_state, docastle)
 
@@ -676,7 +676,7 @@ MACHINE_CONFIG_START(docastle_state::dorunrun)
 	MCFG_DEVICE_PROGRAM_MAP(dorunrun_map2)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_dorunrun, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(docastle_state::idsoccer)
@@ -693,7 +693,7 @@ MACHINE_CONFIG_START(docastle_state::idsoccer)
 	MCFG_TMS1025_READ_PORT_CB(PORT4, IOPORT("JOYS_RIGHT")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_dorunrun, this));
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) /* Crystal verified on American Soccer board. */

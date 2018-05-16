@@ -788,11 +788,11 @@ static const gfx_layout ballbros_tilelayout =
 	32*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( superman )
+static GFXDECODE_START( gfx_superman )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout,    0, 256 )   /* sprites & playfield */
 GFXDECODE_END
 
-static GFXDECODE_START( ballbros )
+static GFXDECODE_START( gfx_ballbros )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, ballbros_tilelayout,    0, 256 )  /* sprites & playfield */
 GFXDECODE_END
 
@@ -800,7 +800,7 @@ GFXDECODE_END
 /**************************************************************************/
 
 
-MACHINE_START_MEMBER(taitox_state,taitox)
+void taitox_state::machine_start_taitox()
 {
 	int banks = memregion("audiocpu")->bytes() / 0x4000;
 	membank("z80bank")->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);
@@ -841,7 +841,7 @@ MACHINE_CONFIG_START(taitox_state::superman)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taitox, this));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -855,11 +855,11 @@ MACHINE_CONFIG_START(taitox_state::superman)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superman)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -889,7 +889,7 @@ MACHINE_CONFIG_START(taitox_state::daisenpu)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taitox, this));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -903,11 +903,11 @@ MACHINE_CONFIG_START(taitox_state::daisenpu)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superman)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -935,7 +935,7 @@ MACHINE_CONFIG_START(taitox_state::gigandes)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taitox, this));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -949,11 +949,11 @@ MACHINE_CONFIG_START(taitox_state::gigandes)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superman)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_superman)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -983,7 +983,7 @@ MACHINE_CONFIG_START(taitox_state::ballbros)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_taitox, this));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -997,11 +997,11 @@ MACHINE_CONFIG_START(taitox_state::ballbros)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ballbros)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ballbros)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(taitox_state, kyustrkr_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_kyustrkr_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

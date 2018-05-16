@@ -353,7 +353,7 @@ static const gfx_layout sorcerer_charlayout =
 };
 
 /* This will show the 128 characters in the ROM + whatever happens to be in the PCG */
-static GFXDECODE_START( sorcerer )
+static GFXDECODE_START( gfx_sorcerer )
 	GFXDECODE_ENTRY( "maincpu", 0xf800, sorcerer_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -431,7 +431,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_SCREEN_UPDATE_DRIVER(sorcerer_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sorcerer)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sorcerer)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
@@ -489,7 +489,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcererd)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sorcererd_mem)
 
-	MCFG_MACHINE_START_OVERRIDE(sorcerer_state, sorcererd )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sorcererd, this));
 
 	MCFG_DEVICE_ADD("fdc", MICROPOLIS, 0)
 	MCFG_MICROPOLIS_DEFAULT_DRIVE4_TAGS

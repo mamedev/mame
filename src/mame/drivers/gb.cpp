@@ -478,8 +478,6 @@ void megaduck_state::megaduck_map(address_map &map)
 	map(0xffff, 0xffff).rw(this, FUNC(megaduck_state::gb_ie_r), FUNC(megaduck_state::gb_ie_w));                                  /* interrupt enable register */
 }
 
-static GFXDECODE_START( gb )
-GFXDECODE_END
 
 static INPUT_PORTS_START( gameboy )
 	PORT_START("INPUTS")
@@ -630,11 +628,11 @@ MACHINE_CONFIG_START(gb_state::gameboy)
 	MCFG_SCREEN_SIZE( 458, 154 )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gb)
 
-	MCFG_DMG_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", DMG_PPU, "maincpu")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -658,8 +656,8 @@ MACHINE_CONFIG_START(gb_state::supergb)
 	MCFG_LR35902_TIMER_CB( WRITE8(*this, gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 
-	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb)
-	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sgb, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sgb, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -672,11 +670,11 @@ MACHINE_CONFIG_START(gb_state::supergb)
 	MCFG_SCREEN_SIZE(32*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
 
-	MCFG_SGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", SGB_PPU, "maincpu")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -699,8 +697,8 @@ MACHINE_CONFIG_START(gb_state::supergb2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sgb_map)
 
-	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb)
-	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_sgb, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sgb, this));
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_horizont) /* runs on a TV, not an LCD */
@@ -714,7 +712,7 @@ MACHINE_CONFIG_START(gb_state::supergb2)
 	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
 
 	MCFG_DEVICE_REMOVE("ppu")
-	MCFG_SGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", SGB_PPU, "maincpu")
 MACHINE_CONFIG_END
 
 
@@ -726,7 +724,7 @@ MACHINE_CONFIG_START(gb_state::gbpocket)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbp)
 
 	MCFG_DEVICE_REMOVE("ppu")
-	MCFG_MGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", MGB_PPU, "maincpu")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gb_state::gbcolor)
@@ -736,8 +734,8 @@ MACHINE_CONFIG_START(gb_state::gbcolor)
 	MCFG_DEVICE_PROGRAM_MAP(gbc_map)
 	MCFG_LR35902_TIMER_CB( WRITE8(*this, gb_state, gb_timer_callback ) )
 
-	MCFG_MACHINE_START_OVERRIDE(gb_state,gbc)
-	MCFG_MACHINE_RESET_OVERRIDE(gb_state,gbc)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_gbc, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gbc, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -751,12 +749,12 @@ MACHINE_CONFIG_START(gb_state::gbcolor)
 	MCFG_SCREEN_SIZE( 458, 154 )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbc)
 
-	MCFG_CGB_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", CGB_PPU, "maincpu")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -790,20 +788,20 @@ MACHINE_CONFIG_START(megaduck_state::megaduck)
 	MCFG_SCREEN_VBLANK_TIME(0)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MACHINE_START_OVERRIDE(megaduck_state, megaduck)
-	MCFG_MACHINE_RESET_OVERRIDE(megaduck_state, megaduck)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_megaduck, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_megaduck, this));
 
 	MCFG_SCREEN_UPDATE_DEVICE("ppu", dmg_ppu_device, screen_update)
 	MCFG_SCREEN_SIZE(20*8, 18*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(megaduck_state,megaduck)
 
-	MCFG_DMG_PPU_ADD("ppu", "maincpu")
+	MCFG_DEVICE_ADD("ppu", DMG_PPU, "maincpu")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

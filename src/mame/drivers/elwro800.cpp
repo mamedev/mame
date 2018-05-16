@@ -61,7 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(elwro800jr_fdc_control_w);
 	DECLARE_READ8_MEMBER(elwro800jr_io_r);
 	DECLARE_WRITE8_MEMBER(elwro800jr_io_w);
-	DECLARE_MACHINE_RESET(elwro800);
+	void machine_reset_elwro800();
 	INTERRUPT_GEN_MEMBER(elwro800jr_interrupt);
 	DECLARE_READ8_MEMBER(i8255_port_c_r);
 	DECLARE_WRITE8_MEMBER(i8255_port_c_w);
@@ -520,7 +520,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(elwro800_state,elwro800)
+void elwro800_state::machine_reset_elwro800()
 {
 	uint8_t *messram = m_ram->pointer();
 
@@ -561,7 +561,7 @@ static const gfx_layout elwro800_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( elwro800 )
+static GFXDECODE_START( gfx_elwro800 )
 	GFXDECODE_ENTRY( "maincpu", 0x3c00, elwro800_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -575,7 +575,7 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 	MCFG_DEVICE_OPCODES_MAP(elwro800_m1)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", elwro800_state,  elwro800jr_interrupt)
 
-	MCFG_MACHINE_RESET_OVERRIDE(elwro800_state,elwro800)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_elwro800, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -589,9 +589,9 @@ MACHINE_CONFIG_START(elwro800_state::elwro800)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(elwro800_state, spectrum )
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", elwro800)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_elwro800)
 
-	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum )
+	set_video_start_cb(config, driver_callback_delegate(&video_start_spectrum, this));
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 

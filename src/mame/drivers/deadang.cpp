@@ -301,7 +301,7 @@ static const gfx_layout popnrun_spritelayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( deadang )
+static GFXDECODE_START( gfx_deadang )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, charlayout,    512, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, spritelayout,  768, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0x000000, spritelayout, 1024, 16 )
@@ -309,7 +309,7 @@ static GFXDECODE_START( deadang )
 	GFXDECODE_ENTRY( "gfx5", 0x000000, spritelayout,    0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( popnrun )
+static GFXDECODE_START( gfx_popnrun )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, popnrun_charlayout,   0x20, 4 )
 	// TODO: probably runs on ROM based palette or just uses the first three entries?
 	GFXDECODE_ENTRY( "gfx2", 0x000000, spritelayout,    0, 8 )
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(deadang_state::deadang)
 	MCFG_SCREEN_UPDATE_DRIVER(deadang_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deadang)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deadang)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -420,7 +420,7 @@ MACHINE_CONFIG_START(popnrun_state::popnrun)
 
 	MCFG_DEVICE_REMOVE("watchdog")
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", popnrun)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_popnrun)
 
 	MCFG_DEVICE_REMOVE("ym1")
 	MCFG_DEVICE_REMOVE("ym2")

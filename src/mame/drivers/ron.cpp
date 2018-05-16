@@ -397,7 +397,7 @@ static const gfx_layout charlayout_2bpp =
 	8*8
 };
 
-static GFXDECODE_START( ron )
+static GFXDECODE_START( gfx_ron )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_1bpp,     0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout_2bpp,     4, 1 )
 GFXDECODE_END
@@ -506,7 +506,7 @@ MACHINE_CONFIG_START(ron_state::ron)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ron_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ron)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ron)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	//MCFG_PALETTE_ADD("palette", 512)

@@ -90,7 +90,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_state::coolpool_scanline)
 {
 	uint16_t *vram = &m_vram_base[(params->rowaddr << 8) & 0x1ff00];
 	uint32_t *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = m_tlc34076->get_pens();
+	const pen_t *pens = m_tlc34076->pens();
 	int coladdr = params->coladdr;
 	int x;
 
@@ -129,13 +129,13 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(coolpool_state::from_shiftreg)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(coolpool_state,amerdart)
+void coolpool_state::machine_reset_amerdart()
 {
 	m_nvram_write_enable = 0;
 }
 
 
-MACHINE_RESET_MEMBER(coolpool_state,coolpool)
+void coolpool_state::machine_reset_coolpool()
 {
 	m_nvram_write_enable = 0;
 }
@@ -735,7 +735,7 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	MCFG_GENERIC_LATCH_16_ADD("dsp2main")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", 1))
 
-	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_amerdart, this));
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD("nvram_timer", coolpool_state, nvram_write_timeout)
@@ -780,7 +780,7 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 	MCFG_GENERIC_LATCH_16_ADD("dsp2main")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", 1))
 
-	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_coolpool, this));
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD("nvram_timer", coolpool_state, nvram_write_timeout)

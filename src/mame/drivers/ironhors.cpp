@@ -244,7 +244,7 @@ static const gfx_layout ironhors_spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( ironhors )
+static GFXDECODE_START( gfx_ironhors )
 	GFXDECODE_ENTRY( "gfx1", 0, ironhors_charlayout,         0, 16*8 )
 	GFXDECODE_ENTRY( "gfx1", 0, ironhors_spritelayout, 16*8*16, 16*8 )
 	GFXDECODE_ENTRY( "gfx1", 0, ironhors_charlayout,   16*8*16, 16*8 )  /* to handle 8x8 sprites */
@@ -286,7 +286,7 @@ static const gfx_layout farwest_spritelayout2 =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( farwest )
+static GFXDECODE_START( gfx_farwest )
 	GFXDECODE_ENTRY( "gfx1", 0, farwest_charlayout,         0, 16*8 )
 	GFXDECODE_ENTRY( "gfx2", 0, farwest_spritelayout, 16*8*16, 16*8 )
 	GFXDECODE_ENTRY( "gfx2", 0, farwest_spritelayout2,16*8*16, 16*8 )  /* to handle 8x8 sprites */
@@ -400,7 +400,7 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ironhors)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ironhors)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(ironhors_state, ironhors)
@@ -456,8 +456,8 @@ MACHINE_CONFIG_START(ironhors_state::farwest)
 	MCFG_DEVICE_PROGRAM_MAP(farwest_slave_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", farwest)
-	MCFG_VIDEO_START_OVERRIDE(ironhors_state,farwest)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_farwest)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_farwest, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update_farwest)
 

@@ -287,13 +287,13 @@ static const gfx_layout spritelayout_alt =
 	128*8
 };
 
-static GFXDECODE_START( inufuku )
+static GFXDECODE_START( gfx_inufuku )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,    0, 256*16 )  // bg
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 256*16 )  // text
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  0, 256*16 )  // sprite
 GFXDECODE_END
 
-static GFXDECODE_START( _3on3dunk )
+static GFXDECODE_START( gfx_3on3dunk )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,    0, 256*16 )  // bg
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 256*16 )  // text
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_alt,  0, 256*16 )  // sprite
@@ -365,7 +365,7 @@ MACHINE_CONFIG_START(inufuku_state::inufuku)
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", inufuku)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_inufuku)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
 
@@ -386,7 +386,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(inufuku_state::_3on3dunk)
 	inufuku(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", _3on3dunk)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_3on3dunk)
 MACHINE_CONFIG_END
 
 

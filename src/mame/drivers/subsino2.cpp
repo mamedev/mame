@@ -173,7 +173,7 @@ public:
 	void init_ptrain();
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_0);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
-	DECLARE_VIDEO_START(subsino2);
+	void video_start_subsino2() ATTR_COLD;
 	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
 	required_device<cpu_device> m_maincpu;
@@ -624,7 +624,7 @@ WRITE8_MEMBER(subsino2_state::ss9601_disable_w)
                                 Video Update
 ***************************************************************************/
 
-VIDEO_START_MEMBER(subsino2_state,subsino2)
+void subsino2_state::video_start_subsino2()
 {
 	// SS9601 Regs:
 
@@ -1535,7 +1535,7 @@ static const gfx_layout ss9601_8x8_layout =
 	8*8*8
 };
 
-static GFXDECODE_START( ss9601 )
+static GFXDECODE_START( gfx_ss9601 )
 	GFXDECODE_ENTRY( "tilemap", 0, ss9601_8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -2382,12 +2382,12 @@ MACHINE_CONFIG_START(subsino2_state::bishjan)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
 
-	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
+	set_video_start_cb(config, driver_callback_delegate(&video_start_subsino2, this));
 
 	// sound hardware
 	// SS9904
@@ -2433,12 +2433,12 @@ MACHINE_CONFIG_START(subsino2_state::mtrain)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
 
-	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
+	set_video_start_cb(config, driver_callback_delegate(&video_start_subsino2, this));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2467,12 +2467,12 @@ MACHINE_CONFIG_START(subsino2_state::saklove)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
 
-	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
+	set_video_start_cb(config, driver_callback_delegate(&video_start_subsino2, this));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2505,12 +2505,12 @@ MACHINE_CONFIG_START(subsino2_state::xplan)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ss9601)
 	MCFG_PALETTE_ADD( "palette", 256 )
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
 
-	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
+	set_video_start_cb(config, driver_callback_delegate(&video_start_subsino2, this));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

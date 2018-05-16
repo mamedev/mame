@@ -370,7 +370,7 @@ static const gfx_layout bgcharlayout =
 };
 
 
-static GFXDECODE_START( m52 )
+static GFXDECODE_START( gfx_m52 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,                0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout,          128*4,  16 )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, bgcharlayout, 128*4+16*4+0*4,   1 )
@@ -404,7 +404,7 @@ MACHINE_CONFIG_START(m52_state::m52)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m52_state,  irq0_line_hold)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m52)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m52)
 	MCFG_PALETTE_ADD("palette", 128*4+16*4+3*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(512+32+32)
 	MCFG_PALETTE_INIT_OWNER(m52_state, m52)

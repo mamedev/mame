@@ -103,7 +103,7 @@ static const gfx_layout apple2gs_dbltext_layout =
 	8*8         /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( apple2gs )
+static GFXDECODE_START( gfx_apple2gs )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, apple2gs_text_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, apple2gs_dbltext_layout, 0, 2 )
 GFXDECODE_END
@@ -340,12 +340,12 @@ MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(apple2gs_state, apple2gs)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apple2gs )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apple2gs )
 
-	MCFG_MACHINE_START_OVERRIDE(apple2gs_state, apple2gs )
-	MCFG_MACHINE_RESET_OVERRIDE(apple2gs_state, apple2gs )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_apple2gs, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_apple2gs, this));
 
-	MCFG_VIDEO_START_OVERRIDE(apple2gs_state, apple2gs )
+	set_video_start_cb(config, driver_callback_delegate(&video_start_apple2gs, this));
 
 	/* keyboard controller */
 	MCFG_DEVICE_ADD("ay3600", AY3600, 0)
@@ -425,7 +425,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2gs_state::apple2gsr1)
 	apple2gs(config);
-	MCFG_MACHINE_START_OVERRIDE(apple2gs_state, apple2gsr1 )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_apple2gsr1, this));
 
 	#if RUN_ADB_MICRO
 	MCFG_DEVICE_REPLACE(ADBMICRO_TAG, M50740, XTAL(3'579'545))

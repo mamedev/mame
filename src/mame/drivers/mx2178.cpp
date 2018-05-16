@@ -120,7 +120,7 @@ static const gfx_layout mx2178_charlayout =
 	8*16                    /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( mx2178 )
+static GFXDECODE_START( gfx_mx2178 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mx2178_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -141,7 +141,7 @@ MACHINE_CONFIG_START(mx2178_state::mx2178)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mx2178)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mx2178)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */

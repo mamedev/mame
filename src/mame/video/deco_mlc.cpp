@@ -17,7 +17,7 @@
 
 /******************************************************************************/
 
-VIDEO_START_MEMBER(deco_mlc_state,mlc)
+void deco_mlc_state::video_start_mlc()
 {
 	int max_color = (0x800 / m_gfxdecode->gfx(0)->granularity());
 	m_colour_mask=max_color - 1;

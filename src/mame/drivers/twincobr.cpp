@@ -644,7 +644,7 @@ static const gfx_layout tilelayout =
 	8*8             /* every tile takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( twincobr )
+static GFXDECODE_START( gfx_twincobr )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   1536, 32 )  /* colors 1536-1791 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,   1280, 16 )  /* colors 1280-1535 */
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,   1024, 16 )  /* colors 1024-1079 */
@@ -669,7 +669,7 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET_OVERRIDE(twincobr_state,twincobr)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_twincobr, this));
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, twincobr_state, int_enable_w))
@@ -702,11 +702,11 @@ MACHINE_CONFIG_START(twincobr_state::twincobr)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, twincobr_state, twincobr_vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twincobr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_twincobr)
 	MCFG_PALETTE_ADD("palette", 1792)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(twincobr_state,toaplan0)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_toaplan0, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

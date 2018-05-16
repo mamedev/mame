@@ -37,8 +37,8 @@ public:
 	DECLARE_WRITE8_MEMBER(dealer_pal_w);
 	void init_dealer();
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_START(epos);
-	DECLARE_MACHINE_START(dealer);
+	void machine_start_epos()   ATTR_COLD;
+	void machine_start_dealer() ATTR_COLD;
 	DECLARE_PALETTE_INIT(epos);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void set_pal_color( uint8_t offset, uint8_t data );

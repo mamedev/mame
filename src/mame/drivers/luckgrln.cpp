@@ -963,7 +963,7 @@ static const gfx_layout tiles8x32_layout =
 	32*8
 };
 
-static GFXDECODE_START( luckgrln )
+static GFXDECODE_START( gfx_luckgrln )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0x400, 64 )
 	GFXDECODE_ENTRY( "reels", 0, tiles8x32_layout, 0, 64 )
 GFXDECODE_END
@@ -994,7 +994,7 @@ MACHINE_CONFIG_START(luckgrln_state::luckgrln)
 	MCFG_SCREEN_UPDATE_DRIVER(luckgrln_state, screen_update_luckgrln)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", luckgrln)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_luckgrln)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	SPEAKER(config, "mono").front_center();

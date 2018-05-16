@@ -455,7 +455,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( amusco )
+static GFXDECODE_START( gfx_amusco )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 ) // current palette has only 8 colors...
 GFXDECODE_END
 
@@ -579,7 +579,7 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 74*8-1, 0*10, 24*10-1)    // visible scr: 74*8 24*10
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amusco)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amusco)
 
 	MCFG_PALETTE_ADD("palette",8*8)
 	MCFG_PALETTE_INIT_OWNER(amusco_state, amusco)

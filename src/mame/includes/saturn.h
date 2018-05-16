@@ -1,5 +1,9 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
+#ifndef MAME_INCLUDES_SATURN_H
+#define MAME_INCLUDES_SATURN_H
+
+#pragma once
 
 #include "machine/timer.h"
 #include "cpu/m68000/m68000.h"
@@ -109,7 +113,7 @@ public:
 	required_device<palette_device> m_palette;
 
 	bitmap_rgb32 m_tmpbitmap;
-	DECLARE_VIDEO_START(stv_vdp2);
+	void video_start_stv_vdp2() ATTR_COLD;
 	uint32_t screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_slave_scanline);
@@ -450,4 +454,6 @@ public:
 #define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
 
 
-GFXDECODE_EXTERN( stv );
+extern gfx_decode_entry const gfx_stv[];
+
+#endif // MAME_INCLUDES_SATURN_H

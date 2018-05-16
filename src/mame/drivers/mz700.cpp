@@ -360,11 +360,11 @@ static const gfx_layout mz700_layout =
 	8 * 8       /* code takes 8 times 8 bits */
 };
 
-static GFXDECODE_START( mz700 )
+static GFXDECODE_START( gfx_mz700 )
 	GFXDECODE_ENTRY("cgrom", 0, mz700_layout, 0, 4)
 GFXDECODE_END
 
-static GFXDECODE_START( mz800 )
+static GFXDECODE_START( gfx_mz800 )
 	GFXDECODE_ENTRY("monitor", 0x1000, mz700_layout, 0, 4)    // for mz800 viewer only
 GFXDECODE_END
 
@@ -385,7 +385,7 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	MCFG_MACHINE_RESET_OVERRIDE(mz_state, mz700)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mz700, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz700)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz700)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -450,8 +450,7 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	MCFG_MACHINE_RESET_OVERRIDE(mz_state, mz800)
-	MCFG_GFXDECODE_MODIFY("gfxdecode",mz800)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mz800, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz800)

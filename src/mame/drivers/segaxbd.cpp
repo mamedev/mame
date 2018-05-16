@@ -1691,7 +1691,7 @@ INPUT_PORTS_END
 //  GRAPHICS DEFINITIONS
 //**************************************************************************
 
-static GFXDECODE_START( segaxbd )
+static GFXDECODE_START( gfx_segaxbd )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1024 )
 GFXDECODE_END
 
@@ -1744,7 +1744,7 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 	MCFG_CXD1095_IN_PORTD_CB(IOPORT("IO1PORTD"))
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segaxbd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segaxbd)
 	MCFG_PALETTE_ADD("palette", 8192*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

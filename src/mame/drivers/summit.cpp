@@ -299,7 +299,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( summit )
+static GFXDECODE_START( gfx_summit )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(summit_state::summit)
 	MCFG_SCREEN_UPDATE_DRIVER(summit_state, screen_update_summit)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", summit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_summit)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(summit_state, summit)

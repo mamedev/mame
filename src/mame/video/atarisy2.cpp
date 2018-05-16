@@ -77,7 +77,7 @@ const atari_motion_objects_config atarisy2_state::s_mob_config =
 	0                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(atarisy2_state,atarisy2)
+void atarisy2_state::video_start_atarisy2()
 {
 	/* reset the statics */
 	m_yscroll_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atarisy2_state::reset_yscroll_callback),this));

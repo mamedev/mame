@@ -146,7 +146,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( xorworld )
+static GFXDECODE_START( gfx_xorworld )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout,  0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, spritelayout, 0, 64 )
 GFXDECODE_END
@@ -180,7 +180,7 @@ MACHINE_CONFIG_START(xorworld_state::xorworld)
 	MCFG_SCREEN_UPDATE_DRIVER(xorworld_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xorworld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xorworld)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(xorworld_state, xorworld)
 

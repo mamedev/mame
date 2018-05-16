@@ -695,7 +695,7 @@ MACHINE_CONFIG_START(srmp6_state::srmp6)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

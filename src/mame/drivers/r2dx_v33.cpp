@@ -120,8 +120,8 @@ public:
 
 	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
 
-	DECLARE_MACHINE_RESET(r2dx_v33);
-	DECLARE_MACHINE_RESET(nzeroteam);
+	void machine_reset_r2dx_v33();
+	void machine_reset_nzeroteam();
 
 	void nzerotea(machine_config &config);
 	void rdx_v33(machine_config &config);
@@ -585,7 +585,7 @@ static const gfx_layout rdx_v33_spritelayout =
 	16*16*4
 };
 
-static GFXDECODE_START( rdx_v33 )
+static GFXDECODE_START( gfx_rdx_v33 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, rdx_v33_charlayout,   0x700, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x400, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, rdx_v33_spritelayout, 0x000, 4096 )
@@ -765,12 +765,12 @@ static INPUT_PORTS_START( zerotm2k )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(r2dx_v33_state,r2dx_v33)
+void r2dx_v33_state::machine_reset_r2dx_v33()
 {
 	common_reset();
 }
 
-MACHINE_RESET_MEMBER(r2dx_v33_state,nzeroteam)
+void r2dx_v33_state::machine_reset_nzeroteam()
 {
 	common_reset();
 
@@ -791,7 +791,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	MCFG_DEVICE_PROGRAM_MAP(rdx_v33_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
 
-	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,r2dx_v33)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_r2dx_v33, this));
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -803,11 +803,11 @@ MACHINE_CONFIG_START(r2dx_v33_state::rdx_v33)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rdx_v33)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_raiden2, this));
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))
@@ -828,7 +828,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_DEVICE_PROGRAM_MAP(nzerotea_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", r2dx_v33_state,  rdx_v33_interrupt)
 
-	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,nzeroteam)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_nzeroteam, this));
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_DEVICE_PROGRAM_MAP(zeroteam_sound_map)
@@ -841,11 +841,11 @@ MACHINE_CONFIG_START(r2dx_v33_state::nzerotea)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rdx_v33)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
 	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_raiden2, this));
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, raiden2_state, tilemap_enable_w))

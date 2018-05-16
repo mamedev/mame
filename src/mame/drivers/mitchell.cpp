@@ -1062,22 +1062,22 @@ static const gfx_layout spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( mgakuen )
+static GFXDECODE_START( gfx_mgakuen )
 	GFXDECODE_ENTRY( "gfx1", 0, marukin_charlayout, 0,  64 ) /* colors 0-1023 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
 
-static GFXDECODE_START( marukin )
+static GFXDECODE_START( gfx_marukin )
 	GFXDECODE_ENTRY( "gfx1", 0, marukin_charlayout, 0, 128 ) /* colors 0-2047 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
 
-static GFXDECODE_START( pkladiesbl )
+static GFXDECODE_START( gfx_pkladiesbl )
 	GFXDECODE_ENTRY( "gfx1", 0, pkladiesbl_charlayout, 0, 128 ) /* colors 0-2047 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
 
-static GFXDECODE_START( mitchell )
+static GFXDECODE_START( gfx_mitchell )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 128 ) /* colors 0-2047 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
@@ -1108,7 +1108,7 @@ static const gfx_layout mstworld_spritelayout =
 };
 
 
-static GFXDECODE_START( mstworld )
+static GFXDECODE_START( gfx_mstworld )
 	GFXDECODE_ENTRY( "gfx1", 0, mstworld_charlayout,   0x000, 0x40 )
 	GFXDECODE_ENTRY( "gfx2", 0, mstworld_spritelayout, 0x000, 0x40 )
 GFXDECODE_END
@@ -1120,7 +1120,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mitchell_state,mitchell)
+void mitchell_state::machine_start_mitchell()
 {
 	save_item(NAME(m_dial_selected));
 	save_item(NAME(m_keymatrix));
@@ -1138,7 +1138,7 @@ MACHINE_START_MEMBER(mitchell_state,mitchell)
 	}
 }
 
-MACHINE_RESET_MEMBER(mitchell_state,mitchell)
+void mitchell_state::machine_reset_mitchell()
 {
 	m_sample_select = false;
 	m_dial_selected = 0;
@@ -1169,8 +1169,8 @@ MACHINE_CONFIG_START(mitchell_state::mgakuen)
 	MCFG_DEVICE_IO_MAP(mitchell_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
-	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
-	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mitchell, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mitchell, this));
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -1183,12 +1183,12 @@ MACHINE_CONFIG_START(mitchell_state::mgakuen)
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mgakuen)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mgakuen)
 
 	MCFG_PALETTE_ADD("palette", 1024)   /* less colors than the others */
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pang, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1210,8 +1210,8 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
-	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
-	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mitchell, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mitchell, this));
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -1224,12 +1224,12 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mitchell)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mitchell)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pang, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1259,7 +1259,7 @@ static const gfx_layout blcharlayout =
 };
 
 
-static GFXDECODE_START( spangbl )
+static GFXDECODE_START( gfx_spangbl )
 	GFXDECODE_ENTRY( "gfx1", 0, blcharlayout,     0, 128 ) /* colors 0-2047 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0,  16 ) /* colors 0- 255 */
 GFXDECODE_END
@@ -1291,7 +1291,7 @@ MACHINE_CONFIG_START(mitchell_state::spangbl)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // Z80A CPU; clock unknown
 	MCFG_DEVICE_PROGRAM_MAP(spangbl_sound_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", spangbl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spangbl)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
@@ -1330,8 +1330,8 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	MCFG_DEVICE_ADD("audiocpu", Z80,6000000)        /* 6 MHz? */
 	MCFG_DEVICE_PROGRAM_MAP(mstworld_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
-	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mitchell, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mitchell, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1342,12 +1342,12 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mstworld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mstworld)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pang, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1379,12 +1379,12 @@ MACHINE_CONFIG_START(mitchell_state::marukin)
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", marukin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marukin)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pang, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1434,12 +1434,12 @@ MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkladiesbl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkladiesbl)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pang, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

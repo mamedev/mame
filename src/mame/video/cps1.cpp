@@ -1551,6 +1551,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2amf",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 }, // probably wrong but this set is not completely dumped anyway
 	{"sf2amf2",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2dkot2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2level",    HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2m1",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2m2",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m3",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
@@ -1682,7 +1683,7 @@ CPS1 VIDEO RENDERER
 #define CPS2_OBJ_YOFFS  0x0a    /* Y offset (always 0x0010) */
 
 
-MACHINE_RESET_MEMBER(cps_state,cps)
+void cps_state::machine_reset_cps()
 {
 	const char *gamename = machine().system().name;
 	const struct CPS1config *pCFG = &cps1_config_table[0];
@@ -2242,11 +2243,11 @@ void cps_state::cps1_update_transmasks()
 	}
 }
 
-VIDEO_START_MEMBER(cps_state,cps)
+void cps_state::video_start_cps()
 {
 	int i;
 
-	MACHINE_RESET_CALL_MEMBER(cps);
+	machine_reset_cps();
 
 	/* Put in some const */
 	m_scroll_size    = 0x4000;  /* scroll1, scroll2, scroll3 */
@@ -2339,16 +2340,16 @@ VIDEO_START_MEMBER(cps_state,cps)
 	machine().save().register_postload(save_prepost_delegate(FUNC(cps_state::cps1_get_video_base), this));
 }
 
-VIDEO_START_MEMBER(cps_state,cps1)
+void cps_state::video_start_cps1()
 {
 	m_cps_version = 1;
-	VIDEO_START_CALL_MEMBER(cps);
+	video_start_cps();
 }
 
-VIDEO_START_MEMBER(cps_state,cps2)
+void cps_state::video_start_cps2()
 {
 	m_cps_version = 2;
-	VIDEO_START_CALL_MEMBER(cps);
+	video_start_cps();
 }
 
 /***************************************************************************

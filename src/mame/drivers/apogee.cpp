@@ -209,7 +209,7 @@ static const gfx_layout apogee_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( apogee )
+static GFXDECODE_START( gfx_apogee )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, apogee_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -219,7 +219,7 @@ MACHINE_CONFIG_START(apogee_state::apogee)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
 	MCFG_DEVICE_PROGRAM_MAP(apogee_mem)
-	MCFG_MACHINE_RESET_OVERRIDE(apogee_state, radio86 )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_radio86, this));
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(16'000'000)/9)
@@ -249,7 +249,7 @@ MACHINE_CONFIG_START(apogee_state::apogee)
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apogee)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apogee)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(apogee_state,radio86)
 

@@ -275,7 +275,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( cbuster )
+static GFXDECODE_START( gfx_cbuster )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 128 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,       0, 128 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,       0, 128 )  /* Tiles 16x16 */
@@ -318,7 +318,7 @@ MACHINE_CONFIG_START(cbuster_state::twocrude)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cbuster_state, screen_update_twocrude)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cbuster)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cbuster)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 

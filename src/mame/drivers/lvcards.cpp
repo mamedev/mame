@@ -83,14 +83,14 @@ TODO:
 #include "speaker.h"
 
 
-MACHINE_START_MEMBER(lvcards_state,lvpoker)
+void lvcards_state::machine_start_lvpoker()
 {
 	save_item(NAME(m_payout));
 	save_item(NAME(m_pulse));
 	save_item(NAME(m_result));
 }
 
-MACHINE_RESET_MEMBER(lvcards_state,lvpoker)
+void lvcards_state::machine_reset_lvpoker()
 {
 	m_payout = 0;
 	m_pulse = 0;
@@ -449,7 +449,7 @@ static const gfx_layout charlayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( lvcards )
+static GFXDECODE_START( gfx_lvcards )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -471,7 +471,7 @@ MACHINE_CONFIG_START(lvcards_state::lvcards)
 	MCFG_SCREEN_UPDATE_DRIVER(lvcards_state, screen_update_lvcards)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lvcards)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lvcards)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(lvcards_state, lvcards)
 
@@ -491,8 +491,8 @@ MACHINE_CONFIG_START(lvcards_state::lvpoker)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(lvpoker_map)
-	MCFG_MACHINE_START_OVERRIDE(lvcards_state,lvpoker)
-	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_lvpoker, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_lvpoker, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lvcards_state::ponttehk)
@@ -502,7 +502,7 @@ MACHINE_CONFIG_START(lvcards_state::ponttehk)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ponttehk_map)
-	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_lvpoker, this));
 
 	// video hardware
 	MCFG_DEVICE_REMOVE("palette")

@@ -1850,7 +1850,7 @@ static const gfx_layout supracan_gfx1bpp_alt =
 };
 
 
-static GFXDECODE_START( supracan )
+static GFXDECODE_START( gfx_supracan )
 	GFXDECODE_RAM( "vram",  0, supracan_gfx8bpp,   0, 1 )
 	GFXDECODE_RAM( "vram",  0, supracan_gfx4bpp,   0, 0x10 )
 	GFXDECODE_RAM( "vram",  0, supracan_gfx2bpp,   0, 0x40 )
@@ -1907,7 +1907,7 @@ MACHINE_CONFIG_START(supracan_state::supracan)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(supracan_state, supracan)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supracan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supracan)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "supracan_cart")
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)

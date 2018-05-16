@@ -1581,7 +1581,7 @@ static const gfx_layout pc88va_chars_16x16 =
 };
 
 /* decoded for debugging purpose, this will be nuked in the end... */
-static GFXDECODE_START( pc88va )
+static GFXDECODE_START( gfx_pc88va )
 	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_8x8,    0, 1 )
 	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_16x16,  0, 1 )
 GFXDECODE_END
@@ -1815,7 +1815,7 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 
 	MCFG_PALETTE_ADD("palette", 32)
 //  MCFG_PALETTE_INIT_OWNER(pc88va_state, pc8801 )
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc88va )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc88va)
 
 	MCFG_DEVICE_ADD("d8255_2", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8("d8255_2s", i8255_device, pb_r))

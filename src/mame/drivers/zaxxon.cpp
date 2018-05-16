@@ -902,7 +902,7 @@ static const gfx_layout zaxxon_spritelayout =
 };
 
 
-static GFXDECODE_START( zaxxon )
+static GFXDECODE_START( gfx_zaxxon )
 	GFXDECODE_ENTRY( "gfx_tx", 0, gfx_8x8x2_planar,  0, 64*2 )  /* characters */
 	GFXDECODE_ENTRY( "gfx_bg", 0, gfx_8x8x3_planar,  0, 32*2 )  /* background tiles */
 	GFXDECODE_ENTRY( "gfx_spr", 0, zaxxon_spritelayout,  0, 32*2 )  /* sprites */
@@ -941,7 +941,7 @@ MACHINE_CONFIG_START(zaxxon_state::root)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, zaxxon_state, bg_enable_w)) // BEN
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zaxxon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zaxxon)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(zaxxon_state, zaxxon)
 
@@ -1014,7 +1014,7 @@ MACHINE_CONFIG_START(zaxxon_state::razmataze)
 	MCFG_DEVICE_REMOVE("ppi8255")
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,razmataz)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_razmataz, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_razmataz)
 
@@ -1065,7 +1065,7 @@ MACHINE_CONFIG_START(zaxxon_state::congo)
 	MCFG_PALETTE_ENTRIES(512)
 	MCFG_PALETTE_INIT_OWNER(zaxxon_state, zaxxon)
 
-	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,congo)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_congo, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_congo)
 

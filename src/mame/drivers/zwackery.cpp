@@ -52,7 +52,7 @@ public:
 		m_fg_tilemap(nullptr)
 	{ }
 
-	DECLARE_VIDEO_START(zwackery);
+	void video_start_zwackery() ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 	DECLARE_WRITE16_MEMBER(videoram_w);
 	DECLARE_READ8_MEMBER(spriteram_r);
@@ -183,7 +183,7 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-VIDEO_START_MEMBER( zwackery_state, zwackery )
+void zwackery_state::video_start_zwackery()
 {
 	const uint8_t *colordatabase = (const uint8_t *)memregion("bg_color")->base();
 	gfx_element *gfx0 = m_gfxdecode->gfx(0);
@@ -397,7 +397,7 @@ static const gfx_layout mcr68_sprite_layout =
 	32*32
 };
 
-static GFXDECODE_START( zwackery )
+static GFXDECODE_START( gfx_zwackery )
 	GFXDECODE_ENTRY( "gfx1",    0, zwackery_layout,     0,     16 )
 	GFXDECODE_ENTRY( "sprites", 0, mcr68_sprite_layout, 0x800, 32 )
 	GFXDECODE_ENTRY( "gfx1",    0, zwackery_layout,     0,     16 )  // yes, an extra copy
@@ -529,11 +529,11 @@ MACHINE_CONFIG_START(zwackery_state::zwackery)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", zwackery_state, scanline_cb, "screen", 0, 1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zwackery)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zwackery)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xRRRRRBBBBBGGGGG_inverted)
 
-	MCFG_VIDEO_START_OVERRIDE(zwackery_state, zwackery)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_zwackery, this));
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();

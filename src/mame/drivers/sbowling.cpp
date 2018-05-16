@@ -363,7 +363,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( sbowling )
+static GFXDECODE_START( gfx_sbowling )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x18, 1 )
 GFXDECODE_END
 
@@ -423,7 +423,7 @@ MACHINE_CONFIG_START(sbowling_state::sbowling)
 	MCFG_SCREEN_UPDATE_DRIVER(sbowling_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbowling)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbowling)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_INIT_OWNER(sbowling_state, sbowling)

@@ -400,7 +400,7 @@ void system1_state::machine_start()
 }
 
 
-MACHINE_START_MEMBER(system1_state,system2)
+void system1_state::machine_start_system2()
 {
 	system1_state::machine_start();
 	m_mute_xor = 0x01;
@@ -2143,7 +2143,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( system1 )
+static GFXDECODE_START( gfx_system1 )
 	GFXDECODE_ENTRY( "tiles", 0, charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -2181,7 +2181,7 @@ MACHINE_CONFIG_START(system1_state::sys1ppi)
 	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", system1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_system1)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
@@ -2486,10 +2486,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(system1_state::sys2)
 	sys1ppi(config);
 
-	MCFG_MACHINE_START_OVERRIDE(system1_state,system2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_system2, this));
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(system1_state,system2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_system2, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system2)
 MACHINE_CONFIG_END

@@ -781,7 +781,7 @@ static const gfx_layout tiles8x8_layout =
 	8*8*4
 };
 
-static GFXDECODE_START( bmcpokr )
+static GFXDECODE_START( gfx_bmcpokr )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -824,7 +824,7 @@ MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bmcpokr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bmcpokr)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

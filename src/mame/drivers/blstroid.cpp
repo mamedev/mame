@@ -161,7 +161,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( blstroid )
+static GFXDECODE_START( gfx_blstroid )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout,  256, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, molayout,    0, 16 )
 GFXDECODE_END
@@ -186,7 +186,7 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blstroid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blstroid)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
@@ -204,7 +204,7 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, blstroid_state, video_int_write_line))
 
-	MCFG_VIDEO_START_OVERRIDE(blstroid_state,blstroid)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_blstroid, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

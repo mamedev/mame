@@ -195,7 +195,7 @@ static const gfx_layout cchance_layout =
 
 
 
-static GFXDECODE_START( cchance )
+static GFXDECODE_START( gfx_cchance )
 	GFXDECODE_ENTRY( "gfx1", 0, cchance_layout,   0x0, 32  )
 GFXDECODE_END
 
@@ -218,7 +218,7 @@ MACHINE_CONFIG_START(cchance_state::cchance)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cchance_state,  irq0_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cchance)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cchance)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")

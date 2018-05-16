@@ -415,7 +415,7 @@ static const gfx_layout splayout =
 };
 
 
-static GFXDECODE_START( rpunch )
+static GFXDECODE_START( gfx_rpunch )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout, 256, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, splayout,   0, 16*4 )
@@ -444,7 +444,7 @@ static const gfx_layout bootleg_sprite_layout =
 	32*32*2,
 };
 
-static GFXDECODE_START( svolleybl )
+static GFXDECODE_START( gfx_svolleybl )
 	GFXDECODE_ENTRY( "gfx1", 0, bootleg_tile_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, bootleg_tile_layout,   256, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, bootleg_sprite_layout,   0, 16*4 )
@@ -480,14 +480,14 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rpunch)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rpunch)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2) // verified from rpunch schematics
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, rpunch_state, rpunch_gga_data_w))
 
-	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_rpunch, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -503,7 +503,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rpunch_state::svolley)
 	rpunch(config);
-	MCFG_VIDEO_START_OVERRIDE(rpunch_state,svolley)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_svolley, this));
 MACHINE_CONFIG_END
 
 
@@ -531,14 +531,14 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", svolleybl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_svolleybl)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2)
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, rpunch_state, rpunch_gga_data_w))
 
-	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_rpunch, this));
 
 	/* sound hardware */
 

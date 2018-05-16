@@ -814,18 +814,18 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( segag80r )
+static GFXDECODE_START( gfx_segag80r )
 	GFXDECODE_ENTRY( nullptr, 0x0000, charlayout, 0, 16 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( spaceod )
+static GFXDECODE_START( gfx_spaceod )
 	GFXDECODE_ENTRY( nullptr,           0x0000, charlayout,        0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x6_planar, 64, 1 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( monsterb )
+static GFXDECODE_START( gfx_monsterb )
 	GFXDECODE_ENTRY( nullptr,           0x0000, charlayout,        0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x2_planar, 64, 16 )
 GFXDECODE_END
@@ -848,7 +848,7 @@ MACHINE_CONFIG_START(segag80r_state::g80r_base)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segag80r)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segag80r)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -893,7 +893,7 @@ MACHINE_CONFIG_START(segag80r_state::spaceod)
 	/* background board changes */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", spaceod)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spaceod)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
 
@@ -911,7 +911,7 @@ MACHINE_CONFIG_START(segag80r_state::monsterb)
 	MCFG_DEVICE_IO_MAP(main_ppi8255_portmap)
 
 	/* background board changes */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
 
@@ -936,7 +936,7 @@ MACHINE_CONFIG_START(segag80r_state::pignewt)
 	/* basic machine hardware */
 
 	/* background board changes */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
 
@@ -961,7 +961,7 @@ MACHINE_CONFIG_START(segag80r_state::sindbadm)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segag80r_state, sindbadm_misc_w))
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64)
 

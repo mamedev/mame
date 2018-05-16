@@ -563,7 +563,7 @@ static const gfx_layout tilelayout =
 	256*8   /* every tile takes 256 consecutive bytes */
 };
 
-static GFXDECODE_START( sidearms )
+static GFXDECODE_START( gfx_sidearms )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   768, 64 ) /* colors 768-1023 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0, 32 ) /* colors   0-511 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 512, 16 ) /* colors 512-767 */
@@ -592,7 +592,7 @@ static const gfx_layout turtship_tilelayout =
 	256*8   /* every tile takes 256 consecutive bytes */
 };
 
-static GFXDECODE_START( turtship )
+static GFXDECODE_START( gfx_turtship )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          768, 64 )  /* colors 768-1023 */
 	GFXDECODE_ENTRY( "gfx2", 0, turtship_tilelayout,   0, 32 )  /* colors   0-511 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,        512, 16 )  /* colors 512-767 */
@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(sidearms_state::sidearms)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sidearms)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sidearms)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
@@ -672,7 +672,7 @@ MACHINE_CONFIG_START(sidearms_state::turtship)
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turtship)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turtship)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
@@ -724,7 +724,7 @@ MACHINE_CONFIG_START(sidearms_state::whizz)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turtship)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turtship)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)

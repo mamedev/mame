@@ -190,7 +190,7 @@ public:
 	DECLARE_WRITE8_MEMBER(supercrd_colorram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_PALETTE_INIT(supercrd);
-	DECLARE_VIDEO_START(supercrd);
+	void video_start_supercrd() ATTR_COLD;
 	uint32_t screen_update_supercrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -270,7 +270,7 @@ TILE_GET_INFO_MEMBER(supercrd_state::get_bg_tile_info)
 }
 
 
-VIDEO_START_MEMBER(supercrd_state, supercrd)
+void supercrd_state::video_start_supercrd()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supercrd_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 29);
 }
@@ -406,7 +406,7 @@ static const gfx_layout charlayout =
    in the first and second half of the bipolar PROM.
 */
 
-static GFXDECODE_START( supercrd )  /* Adressing the first half of the palette */
+static GFXDECODE_START( gfx_supercrd )  /* Adressing the first half of the palette */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -435,11 +435,11 @@ MACHINE_CONFIG_START(supercrd_state::supercrd)
 	MCFG_SCREEN_UPDATE_DRIVER(supercrd_state, screen_update_supercrd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supercrd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supercrd)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(supercrd_state, supercrd)
-	MCFG_VIDEO_START_OVERRIDE(supercrd_state, supercrd)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_supercrd, this));
 
 //  MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8)
 //  MCFG_MC6845_SHOW_BORDER_AREA(false)

@@ -862,14 +862,14 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( trackfld )
+static GFXDECODE_START( gfx_trackfld )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
 GFXDECODE_END
 
 
 
-MACHINE_START_MEMBER(trackfld_state,trackfld)
+void trackfld_state::machine_start_trackfld()
 {
 	save_item(NAME(m_irq_mask));
 	save_item(NAME(m_nmi_mask));
@@ -881,7 +881,7 @@ MACHINE_START_MEMBER(trackfld_state,trackfld)
 	save_item(NAME(m_old_gfx_bank));
 }
 
-MACHINE_RESET_MEMBER(trackfld_state,trackfld)
+void trackfld_state::machine_reset_trackfld()
 {
 	m_bg_bank = 0;
 	m_sprite_bank1 = 0;
@@ -910,8 +910,8 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/4)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
-	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_trackfld, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_trackfld, this));
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 1D
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, trackfld_state, flipscreen_w)) // FLIP
@@ -937,11 +937,11 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, trackfld_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trackfld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trackfld)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(trackfld_state,trackfld)
-	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_trackfld, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -986,8 +986,8 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 //  MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/4)
 //  MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
-	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_trackfld, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_trackfld, this));
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, trackfld_state, flipscreen_w))
@@ -1013,11 +1013,11 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, trackfld_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trackfld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trackfld)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(trackfld_state,trackfld)
-	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_trackfld, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1069,8 +1069,8 @@ MACHINE_CONFIG_START(trackfld_state::hyprolyb)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(hyprolyb_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
-	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_trackfld, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_trackfld, this));
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("vlm")
@@ -1090,7 +1090,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(trackfld_state::atlantol)
 	hyprolyb(config);
 
-	MCFG_VIDEO_START_OVERRIDE(trackfld_state,atlantol)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_atlantol, this));
 MACHINE_CONFIG_END
 
 

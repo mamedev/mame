@@ -326,7 +326,7 @@ static const gfx_layout spritelayout =
 	8*8*4
 };
 
-static GFXDECODE_START( strnskil )
+static GFXDECODE_START( gfx_strnskil )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout,   512, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0,   64 )
 GFXDECODE_END
@@ -368,7 +368,7 @@ MACHINE_CONFIG_START(strnskil_state::strnskil)
 	MCFG_SCREEN_UPDATE_DRIVER(strnskil_state, screen_update_strnskil)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", strnskil)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_strnskil)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(strnskil_state, strnskil)

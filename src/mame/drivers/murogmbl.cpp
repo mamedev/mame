@@ -327,11 +327,11 @@ static const gfx_layout layout8x8x2 =
 	8*8
 };
 
-static GFXDECODE_START( murogmbl )
+static GFXDECODE_START( gfx_murogmbl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x2,  0x0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( slotunbl )
+static GFXDECODE_START( gfx_slotunbl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x2,  0x0, 1 )
 GFXDECODE_END
 
@@ -340,8 +340,7 @@ MACHINE_CONFIG_START(murogmbl_state::murogmbl)
 	MCFG_DEVICE_ADD("maincpu", Z80, 1000000) /* Z80? */
 	MCFG_DEVICE_PROGRAM_MAP(murogmbl_map)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", murogmbl)
-
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_murogmbl)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -366,7 +365,7 @@ MACHINE_CONFIG_START(slotunbl_state::slotunbl)
 	MCFG_DEVICE_ADD("maincpu", Z80, 1000000) /* Z80? */
 	MCFG_DEVICE_PROGRAM_MAP(slotunbl_map)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slotunbl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slotunbl)
 
 
 	/* video hardware */

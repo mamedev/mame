@@ -1783,7 +1783,7 @@ MACHINE_CONFIG_START(gottlieb_state::gottlieb_core)
 	MCFG_SCREEN_RAW_PARAMS(SYSTEM_CLOCK/4, GOTTLIEB_VIDEO_HCOUNT, 0, GOTTLIEB_VIDEO_HBLANK, GOTTLIEB_VIDEO_VCOUNT, 0, GOTTLIEB_VIDEO_VBLANK)
 	MCFG_SCREEN_UPDATE_DRIVER(gottlieb_state, screen_update_gottlieb)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gfxdecode)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	// basic speaker configuration
@@ -1865,7 +1865,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gottlieb_state::screwloo)
 	gottlieb2(config);
 
-	MCFG_VIDEO_START_OVERRIDE(gottlieb_state,screwloo)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_screwloo, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gottlieb_state::cobram3)

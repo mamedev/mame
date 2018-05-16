@@ -117,7 +117,7 @@
 #include "includes/astrocde.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/nvram.h"
 #include "machine/74259.h"
@@ -1214,7 +1214,7 @@ MACHINE_CONFIG_START(astrocde_state::astrocade_16color_base)
 	MCFG_PALETTE_ENTRIES(4096)
 
 	MCFG_PALETTE_INIT_OWNER(astrocde_state,profpac)
-	MCFG_VIDEO_START_OVERRIDE(astrocde_state,profpac)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_profpac, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(astrocde_state, screen_update_profpac)

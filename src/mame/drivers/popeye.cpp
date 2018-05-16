@@ -569,7 +569,7 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( popeye )
+static GFXDECODE_START( gfx_popeye )
 	GFXDECODE_SCALE( "gfx1", 0, charlayout,   16, 16, 2, 2 ) /* chars */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16+16*2, 8 ) /* sprites */
 GFXDECODE_END
@@ -603,7 +603,7 @@ MACHINE_CONFIG_START(tnx1_state::config)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tnx1_state, screen_vblank))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popeye)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popeye)
 	MCFG_PALETTE_ADD("palette", 16+16*2+8*4)
 	MCFG_PALETTE_INIT_OWNER(tnx1_state, palette_init)
 

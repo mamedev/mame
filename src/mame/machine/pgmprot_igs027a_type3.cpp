@@ -152,9 +152,7 @@ void pgm_arm_type3_state::_55857G_arm7_map(address_map &map)
 }
 
 
-
-
-MACHINE_RESET_MEMBER(pgm_arm_type3_state, pgm_arm_type3_reset)
+void pgm_arm_type3_state::machine_reset_pgm_arm_type3_reset()
 {
 	// internal roms aren't fully dumped
 	uint16_t *temp16 = (uint16_t *)memregion("prot")->base();
@@ -178,12 +176,12 @@ MACHINE_RESET_MEMBER(pgm_arm_type3_state, pgm_arm_type3_reset)
 			temp16[(base) / 2] = regionhack; base += 2;
 		}
 	}
-	MACHINE_RESET_CALL_MEMBER(pgm);
+	machine_reset_pgm();
 }
 
-MACHINE_START_MEMBER(pgm_arm_type3_state,pgm_arm_type3)
+void pgm_arm_type3_state::machine_start_pgm_arm_type3()
 {
-	MACHINE_START_CALL_MEMBER(pgm);
+	machine_start_pgm();
 	/* register type specific Save State stuff here */
 }
 
@@ -193,7 +191,7 @@ MACHINE_START_MEMBER(pgm_arm_type3_state,pgm_arm_type3)
 MACHINE_CONFIG_START(pgm_arm_type3_state::pgm_arm_type3)
 	pgmbase(config);
 
-	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type3_state, pgm_arm_type3 )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pgm_arm_type3, this));
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(svg_68k_mem)
@@ -202,7 +200,7 @@ MACHINE_CONFIG_START(pgm_arm_type3_state::pgm_arm_type3)
 	MCFG_DEVICE_ADD("prot", ARM7, XTAL(33'000'000))    // 55857G - 33Mhz Xtal, at least on SVG
 	MCFG_DEVICE_PROGRAM_MAP(_55857G_arm7_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(pgm_arm_type3_state, pgm_arm_type3_reset)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pgm_arm_type3_reset, this));
 MACHINE_CONFIG_END
 
 

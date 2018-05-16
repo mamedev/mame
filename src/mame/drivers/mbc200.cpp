@@ -295,7 +295,7 @@ static const gfx_layout mbc200_chars_8x8 =
 	8*8
 };
 
-static GFXDECODE_START( mbc200 )
+static GFXDECODE_START( gfx_mbc200 )
 	GFXDECODE_ENTRY( "subcpu", 0x1800, mbc200_chars_8x8, 0, 1 )
 GFXDECODE_END
 
@@ -317,7 +317,7 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mbc200)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mbc200)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(8'000'000) / 4) // HD46505SP

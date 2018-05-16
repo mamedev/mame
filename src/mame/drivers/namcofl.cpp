@@ -484,7 +484,7 @@ static const gfx_layout layout16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( namcofl )
+static GFXDECODE_START( gfx_namcofl )
 	GFXDECODE_ENTRY( NAMCOFL_TILEGFXREGION,   0, layout8x8x8,   0x1000, 0x08 )
 	GFXDECODE_ENTRY( NAMCOFL_SPRITEGFXREGION, 0, layout16x16x8, 0x0000, 0x10 )
 	GFXDECODE_ENTRY( NAMCOFL_ROTGFXREGION,    0, layout16x16x8, 0x1800, 0x08 )
@@ -528,7 +528,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_adc_cb)
 }
 
 
-MACHINE_START_MEMBER(namcofl_state,namcofl)
+void namcofl_state::machine_start_namcofl()
 {
 	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::raster_interrupt_callback),this));
 	m_network_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
@@ -543,7 +543,7 @@ MACHINE_START_MEMBER(namcofl_state,namcofl)
 }
 
 
-MACHINE_RESET_MEMBER(namcofl_state,namcofl)
+void namcofl_state::machine_reset_namcofl()
 {
 	m_network_interrupt_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y + 3));
 	m_vblank_interrupt_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y + 1));
@@ -567,8 +567,8 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namcofl_state, mcu_irq2_cb, attotime::from_hz(60))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namcofl_state, mcu_adc_cb, attotime::from_hz(60))
 
-	MCFG_MACHINE_START_OVERRIDE(namcofl_state,namcofl)
-	MCFG_MACHINE_RESET_OVERRIDE(namcofl_state,namcofl)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcofl, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcofl, this));
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -580,12 +580,12 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 
 	MCFG_PALETTE_ADD("palette", 8192)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcofl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcofl)
 
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(namcofl_state,namcofl)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_namcofl, this));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

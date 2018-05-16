@@ -351,7 +351,7 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( wink )
+static GFXDECODE_START( gfx_wink )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 4 )
 GFXDECODE_END
 
@@ -411,7 +411,7 @@ MACHINE_CONFIG_START(wink_state::wink)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wink_state, nmi_clock_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wink)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wink)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 

@@ -3717,25 +3717,25 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( tharrier )
+static GFXDECODE_START( gfx_tharrier )
 	GFXDECODE_ENTRY( "fgtile",  0, charlayout, 0x000, 16 ) /* color 0x200-0x2ff */
 	GFXDECODE_ENTRY( "bgtile",  0, tilelayout, 0x000, 16 ) /* color 0x000-0x0ff */
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 16 ) /* color 0x100-0x1ff */
 GFXDECODE_END
 
-static GFXDECODE_START( macross )
+static GFXDECODE_START( gfx_macross )
 	GFXDECODE_ENTRY( "fgtile",  0, charlayout, 0x200, 16 ) /* color 0x200-0x2ff */
 	GFXDECODE_ENTRY( "bgtile",  0, tilelayout, 0x000, 16 ) /* color 0x000-0x0ff */
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 16 ) /* color 0x100-0x1ff */
 GFXDECODE_END
 
-static GFXDECODE_START( macross2 )
+static GFXDECODE_START( gfx_macross2 )
 	GFXDECODE_ENTRY( "fgtile",  0, charlayout, 0x300, 16 ) /* color 0x300-0x3ff */
 	GFXDECODE_ENTRY( "bgtile",  0, tilelayout, 0x000, 16 ) /* color 0x000-0x0ff */
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 32 ) /* color 0x100-0x2ff */
 GFXDECODE_END
 
-static GFXDECODE_START( bjtwin )
+static GFXDECODE_START( gfx_bjtwin )
 	GFXDECODE_ENTRY( "fgtile",  0, charlayout, 0x000, 16 ) /* color 0x000-0x0ff */
 	GFXDECODE_ENTRY( "bgtile",  0, charlayout, 0x000, 16 ) /* color 0x000-0x0ff */
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 16 ) /* color 0x100-0x1ff */
@@ -3744,14 +3744,14 @@ GFXDECODE_END
 
 
 
-static GFXDECODE_START( bioship )
+static GFXDECODE_START( gfx_bioship )
 	GFXDECODE_ENTRY( "fgtile",  0, charlayout, 0x300, 16 ) /* color 0x300-0x3ff */
 	GFXDECODE_ENTRY( "bgtile",  0, tilelayout, 0x100, 16 ) /* color 0x100-0x1ff */
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x200, 16 ) /* color 0x200-0x2ff */
 	GFXDECODE_ENTRY( "gfx4",    0, tilelayout, 0x000, 16 ) /* color 0x000-0x0ff */
 GFXDECODE_END
 
-static GFXDECODE_START( strahl )
+static GFXDECODE_START( gfx_strahl )
 	GFXDECODE_ENTRY( "fgtile",  0, charlayout, 0x000, 16 ) /* color 0x000-0x0ff */
 	GFXDECODE_ENTRY( "bgtile",  0, tilelayout, 0x300, 16 ) /* color 0x300-0x3ff */
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 16 ) /* color 0x100-0x1ff */
@@ -3858,10 +3858,10 @@ MACHINE_CONFIG_START(nmk16_state::tharrier)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tharrier)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tharrier)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tharrier)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3897,11 +3897,11 @@ MACHINE_CONFIG_START(nmk16_state::mustang)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3940,11 +3940,11 @@ MACHINE_CONFIG_START(nmk16_state::mustangb)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3978,11 +3978,11 @@ MACHINE_CONFIG_START(nmk16_state::bioship)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_bioship)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bioship)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bioship)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bioship)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_bioship, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4018,11 +4018,11 @@ MACHINE_CONFIG_START(nmk16_state::vandyke)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4061,11 +4061,11 @@ MACHINE_CONFIG_START(nmk16_state::vandykeb)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4087,11 +4087,11 @@ MACHINE_CONFIG_START(nmk16_state::acrobatm)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4131,11 +4131,11 @@ MACHINE_CONFIG_START(nmk16_state::tdragonb)    /* bootleg using Raiden sound har
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4166,11 +4166,11 @@ MACHINE_CONFIG_START(nmk16_state::tdragon)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4214,11 +4214,11 @@ MACHINE_CONFIG_START(nmk16_state::ssmissin)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4243,11 +4243,11 @@ MACHINE_CONFIG_START(nmk16_state::strahl)
 	NMK_HACKY_SCREEN_LOWRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_strahl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", strahl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_strahl)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,strahl)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_strahl, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4283,11 +4283,11 @@ MACHINE_CONFIG_START(nmk16_state::hachamf)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4329,11 +4329,11 @@ MACHINE_CONFIG_START(nmk16_state::macross)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4369,11 +4369,11 @@ MACHINE_CONFIG_START(nmk16_state::blkheart)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4408,11 +4408,11 @@ MACHINE_CONFIG_START(nmk16_state::gunnail)
 	NMK_HACKY_SCREEN_HIRES
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_gunnail)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gunnail, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4452,11 +4452,11 @@ MACHINE_CONFIG_START(nmk16_state::macross2)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_gunnail)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross2)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4498,11 +4498,11 @@ MACHINE_CONFIG_START(nmk16_state::tdragon2)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tdragon2)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross2)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4551,11 +4551,11 @@ MACHINE_CONFIG_START(nmk16_state::raphero)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tdragon2)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross2)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,raphero)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_raphero, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4593,11 +4593,11 @@ MACHINE_CONFIG_START(nmk16_state::bjtwin)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_bjtwin)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bjtwin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bjtwin)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bjtwin)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_bjtwin, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4655,11 +4655,11 @@ MACHINE_CONFIG_START(nmk16_state::manybloc)
 
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tharrier)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tharrier)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5125,19 +5125,19 @@ static const gfx_layout layout_16x16x4_swapped =
 	16*16*4
 };
 
-static GFXDECODE_START( grdnstrm )
+static GFXDECODE_START( gfx_grdnstrm )
 	GFXDECODE_ENTRY( "fgtile",  0, layout_8x8x4,   256*2, 16 ) // [2] Layer 1
 	GFXDECODE_ENTRY( "bgtile",  0, layout_16x16x8, 256*0, 1 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 256*1, 16 ) // [0] Sprites
 GFXDECODE_END
 
-static GFXDECODE_START( stagger1 )
+static GFXDECODE_START( gfx_stagger1 )
 	GFXDECODE_ENTRY( "fgtile",  0, layout_8x8x4,   256*2, 16 ) // [2] Layer 1
 	GFXDECODE_ENTRY( "bgtile",  0, layout_16x16x4, 256*0, 16 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 256*1, 16 ) // [0] Sprites
 GFXDECODE_END
 
-static GFXDECODE_START( redhawkb )
+static GFXDECODE_START( gfx_redhawkb )
 	GFXDECODE_ENTRY( "fgtile",  0, layout_8x8x4,           256*2, 16 ) // [2] Layer 1
 	GFXDECODE_ENTRY( "bgtile",  0, layout_16x16x4_swapped, 256*0, 16 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4_swapped, 256*1, 16 ) // [0] Sprites
@@ -5167,11 +5167,11 @@ MACHINE_CONFIG_START(nmk16_state::stagger1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_afega)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stagger1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stagger1)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,afega)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_afega, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -5204,7 +5204,7 @@ MACHINE_CONFIG_START(nmk16_state::redhawkb)
 
 	/* basic machine hardware */
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", redhawkb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_redhawkb)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_redhawkb)
 MACHINE_CONFIG_END
@@ -5215,8 +5215,8 @@ MACHINE_CONFIG_START(nmk16_state::grdnstrm)
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", grdnstrm)
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,firehawk)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_grdnstrm)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_firehawk, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_firehawk)
 MACHINE_CONFIG_END
@@ -5229,8 +5229,8 @@ MACHINE_CONFIG_START(nmk16_state::grdnstrmk) /* Side by side with PCB, the music
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(57) /* Side by side with PCB, MAME is too fast at 56 */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", grdnstrm)
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,grdnstrm)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_grdnstrm)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_grdnstrm, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nmk16_state::popspops)
@@ -5258,11 +5258,11 @@ MACHINE_CONFIG_START(nmk16_state::firehawk)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_firehawk)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", grdnstrm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_grdnstrm)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,firehawk)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_firehawk, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -5299,11 +5299,11 @@ MACHINE_CONFIG_START(nmk16_state::twinactn)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_macross, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

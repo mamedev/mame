@@ -71,7 +71,7 @@ void aerofgt_state::aerofgt_register_state_globals(  )
 	save_item(NAME(m_spritepalettebank));
 }
 
-VIDEO_START_MEMBER(aerofgt_state,pspikes)
+void aerofgt_state::video_start_pspikes()
 {
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::get_pspikes_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 	/* no bg2 in this game */
@@ -82,7 +82,7 @@ VIDEO_START_MEMBER(aerofgt_state,pspikes)
 	save_item(NAME(m_spikes91_lookup));
 }
 
-VIDEO_START_MEMBER(aerofgt_state,karatblz)
+void aerofgt_state::video_start_karatblz()
 {
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_tile_info<0>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_tile_info<1>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
@@ -94,7 +94,7 @@ VIDEO_START_MEMBER(aerofgt_state,karatblz)
 	aerofgt_register_state_globals();
 }
 
-VIDEO_START_MEMBER(aerofgt_state,spinlbrk)
+void aerofgt_state::video_start_spinlbrk()
 {
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::spinlbrk_tile_info<0>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_tile_info<1>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -109,7 +109,7 @@ VIDEO_START_MEMBER(aerofgt_state,spinlbrk)
 	aerofgt_register_state_globals();
 }
 
-VIDEO_START_MEMBER(aerofgt_state,turbofrc)
+void aerofgt_state::video_start_turbofrc()
 {
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -365,7 +365,7 @@ uint32_t aerofgt_state::screen_update_aerofgt(screen_device &screen, bitmap_ind1
 ***************************************************************************/
 
 // BOOTLEG
-VIDEO_START_MEMBER(aerofgt_state,wbbc97)
+void aerofgt_state::video_start_wbbc97()
 {
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::get_pspikes_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	/* no bg2 in this game */

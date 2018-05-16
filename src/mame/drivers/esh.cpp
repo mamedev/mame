@@ -331,7 +331,7 @@ static const gfx_layout esh_gfx_layout =
 	8*8
 };
 
-static GFXDECODE_START( esh )
+static GFXDECODE_START( gfx_esh )
 	GFXDECODE_ENTRY("gfx1", 0, esh_gfx_layout, 0x0, 0x20)
 	GFXDECODE_ENTRY("gfx2", 0, esh_gfx_layout, 0x0, 0x20)
 GFXDECODE_END
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(esh_state::esh)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(esh_state, esh)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esh)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

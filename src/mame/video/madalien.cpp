@@ -117,7 +117,7 @@ WRITE8_MEMBER(madalien_state::madalien_videoram_w)
 }
 
 
-VIDEO_START_MEMBER(madalien_state,madalien)
+void madalien_state::video_start_madalien()
 {
 	int i;
 
@@ -361,7 +361,7 @@ static const gfx_layout tilelayout =
 };
 
 
-static GFXDECODE_START( madalien )
+static GFXDECODE_START( gfx_madalien )
 	GFXDECODE_ENTRY( nullptr,   0, charlayout,     0x20, 2 ) /* foreground characters, stored in RAM */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, headlightlayout,   0, 1 )
@@ -374,11 +374,11 @@ MACHINE_CONFIG_START(madalien_state::madalien_video)
 	MCFG_SCREEN_UPDATE_DRIVER(madalien_state, screen_update_madalien)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", madalien)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_madalien)
 	MCFG_PALETTE_ADD("palette", 0x30)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x20)
 	MCFG_PALETTE_INIT_OWNER(madalien_state,madalien)
-	MCFG_VIDEO_START_OVERRIDE(madalien_state,madalien)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_madalien, this));
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

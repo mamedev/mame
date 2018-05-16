@@ -50,7 +50,7 @@ protected:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual bool map_first() override { return true; }
+	virtual bool map_first() const override { return true; }
 
 	virtual void config_map(address_map &map) override;
 

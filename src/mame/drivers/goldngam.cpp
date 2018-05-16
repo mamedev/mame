@@ -582,7 +582,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( goldngam )
+static GFXDECODE_START( gfx_goldngam )
 	GFXDECODE_ENTRY( "maincpu", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -613,7 +613,7 @@ MACHINE_CONFIG_START(goldngam_state::swisspkr)
 	MCFG_SCREEN_UPDATE_DRIVER(goldngam_state, screen_update_goldngam)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldngam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goldngam)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(goldngam_state, goldngam)

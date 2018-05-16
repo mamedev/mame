@@ -215,7 +215,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc3_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(urashima);
+	void video_start_urashima() ATTR_COLD;
 	uint32_t screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(jalmah_mcu_sim);
@@ -369,7 +369,7 @@ void jalmah_state::video_start()
 	m_sc3_tilemap_3->set_transparent_pen(15);
 }
 
-VIDEO_START_MEMBER(jalmah_state,urashima)
+void jalmah_state::video_start_urashima()
 {
 	m_sc0_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc0_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range0_16x16),this),16,16,256,32);
 	m_sc3_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jalmah_state::get_sc3_tile_info),this),tilemap_mapper_delegate(FUNC(jalmah_state::range2_8x8),this),8,8,128,64);
@@ -1388,7 +1388,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( jalmah )
+static GFXDECODE_START( gfx_jalmah )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x300, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x200, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x100, 16 )
@@ -1396,7 +1396,7 @@ static GFXDECODE_START( jalmah )
 GFXDECODE_END
 
 /*different color offsets*/
-static GFXDECODE_START( urashima )
+static GFXDECODE_START( gfx_urashima )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x000, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x100, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x100, 16 )
@@ -1431,7 +1431,7 @@ MACHINE_CONFIG_START(jalmah_state::jalmah)
 
 	//M50747 MCU
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jalmah)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jalmah)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1457,9 +1457,9 @@ MACHINE_CONFIG_START(jalmah_state::urashima)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(urashima)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", urashima)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_urashima)
 
-	MCFG_VIDEO_START_OVERRIDE(jalmah_state,urashima)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_urashima, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(jalmah_state, screen_update_urashima)
 MACHINE_CONFIG_END

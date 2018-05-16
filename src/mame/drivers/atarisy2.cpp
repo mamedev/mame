@@ -195,7 +195,7 @@ void atarisy2_state::scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-MACHINE_START_MEMBER(atarisy2_state,atarisy2)
+void atarisy2_state::machine_start_atarisy2()
 {
 	atarigen_state::machine_start();
 
@@ -209,7 +209,7 @@ MACHINE_START_MEMBER(atarisy2_state,atarisy2)
 }
 
 
-MACHINE_RESET_MEMBER(atarisy2_state,atarisy2)
+void atarisy2_state::machine_reset_atarisy2()
 {
 	atarigen_state::machine_reset();
 	m_slapstic->slapstic_reset();
@@ -1167,7 +1167,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( atarisy2 )
+static GFXDECODE_START( gfx_atarisy2 )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 128, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, molayout,   0, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, anlayout,  64, 8 )
@@ -1191,8 +1191,8 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, MASTER_CLOCK/2/16/16/16/10)
 
-	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
-	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_atarisy2, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_atarisy2, this));
 
 	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK/32) // 625 kHz
 	MCFG_ADC0808_IN0_CB(IOPORT("ADC0")) // J102 pin 5 (POT1)
@@ -1209,7 +1209,7 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarisy2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarisy2)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT_CLASS(2, atarisy2_state, RRRRGGGGBBBBIIII)
 
@@ -1233,7 +1233,7 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_atarisy2, this));
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", NOOP)

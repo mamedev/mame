@@ -101,11 +101,11 @@ static const gfx_layout spritelayout =
 	64*8        /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( stfight )
-	GFXDECODE_ENTRY( "tx_gfx", 0x0000, charlayout,   0,                16 )
-	GFXDECODE_ENTRY( "fg_gfx", 0x0000, fglayout,     0,             16 )
-	GFXDECODE_ENTRY( "bg_gfx", 0x0000, bglayout,     0,       16 )
-	GFXDECODE_ENTRY( "bg_gfx", 0x0020, bglayout,     0,       16 )
+static GFXDECODE_START( gfx_stfight )
+	GFXDECODE_ENTRY( "tx_gfx", 0x0000,  charlayout,   0, 16 )
+	GFXDECODE_ENTRY( "fg_gfx", 0x0000,  fglayout,     0, 16 )
+	GFXDECODE_ENTRY( "bg_gfx", 0x0000,  bglayout,     0, 16 )
+	GFXDECODE_ENTRY( "bg_gfx", 0x0020,  bglayout,     0, 16 )
 	GFXDECODE_ENTRY( "spr_gfx", 0x0000, spritelayout, 0, 32 )
 GFXDECODE_END
 
@@ -119,7 +119,7 @@ MACHINE_CONFIG_START(stfight_video_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DRIVER(stfight_video_device, screen_update_stfight)
 	MCFG_SCREEN_PALETTE("^palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "^palette", stfight)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "^palette", gfx_stfight)
 MACHINE_CONFIG_END
 
 /*

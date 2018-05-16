@@ -533,7 +533,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( lsasquad )
+static GFXDECODE_START( gfx_lsasquad )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 256, 16 )
 GFXDECODE_END
@@ -543,15 +543,11 @@ WRITE8_MEMBER(lsasquad_state::unk)
 {
 }
 
-MACHINE_START_MEMBER(lsasquad_state,lsasquad)
+void lsasquad_state::machine_start_lsasquad()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
-}
-
-MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
-{
 }
 
 /* Note: lsasquad clock values are not verified */
@@ -572,8 +568,7 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
-	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
-	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_lsasquad, this));
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
@@ -592,7 +587,7 @@ MACHINE_CONFIG_START(lsasquad_state::lsasquad)
 	MCFG_SCREEN_UPDATE_DRIVER(lsasquad_state, screen_update_lsasquad)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lsasquad)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lsasquad)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
@@ -640,8 +635,7 @@ MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
-	MCFG_MACHINE_START_OVERRIDE(lsasquad_state,lsasquad)
-	MCFG_MACHINE_RESET_OVERRIDE(lsasquad_state,lsasquad)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_lsasquad, this));
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
@@ -658,7 +652,7 @@ MACHINE_CONFIG_START(lsasquad_state::daikaiju)
 	MCFG_SCREEN_UPDATE_DRIVER(lsasquad_state, screen_update_daikaiju)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lsasquad)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lsasquad)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */

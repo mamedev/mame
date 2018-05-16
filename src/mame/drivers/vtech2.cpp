@@ -353,7 +353,7 @@ static const gfx_layout gfxlayout_4bpp_dh =
 	2*4                     /* one byte per code */
 };
 
-static GFXDECODE_START( vtech2 )
+static GFXDECODE_START( gfx_vtech2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_80, 0, 256 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_40, 0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_1bpp, 0, 256 )
@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(vtech2_state::laser350)
 	MCFG_SCREEN_UPDATE_DRIVER(vtech2_state, screen_update_laser)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vtech2 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vtech2)
 	MCFG_PALETTE_ADD("palette", 512+16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(vtech2_state, vtech2)
@@ -457,13 +457,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vtech2_state::laser500)
 	laser350(config);
-	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser500 )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_laser500, this));
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(vtech2_state::laser700)
 	laser350(config);
-	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser700 )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_laser700, this));
 
 	/* Second 5.25" floppy drive */
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD( FLOPPY_1, vtech2_floppy_interface )

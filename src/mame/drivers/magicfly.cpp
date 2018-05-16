@@ -477,7 +477,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(magicfly);
 	DECLARE_PALETTE_INIT(bchance);
-	DECLARE_VIDEO_START(7mezzo);
+	void video_start_7mezzo() ATTR_COLD;
 	uint32_t screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
@@ -563,7 +563,7 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_7mezzo_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-VIDEO_START_MEMBER(magicfly_state, 7mezzo)
+void magicfly_state::video_start_7mezzo()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magicfly_state::get_7mezzo_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }
@@ -927,7 +927,7 @@ static const gfx_layout charlayout =
 *           Graphics Decode Information           *
 **************************************************/
 
-static GFXDECODE_START( magicfly )
+static GFXDECODE_START( gfx_magicfly )
 	GFXDECODE_ENTRY( "gfxbnk1", 0, tilelayout, 16, 1 )
 	GFXDECODE_ENTRY( "gfxbnk0", 0, charlayout, 0, 8 )
 GFXDECODE_END
@@ -954,7 +954,7 @@ MACHINE_CONFIG_START(magicfly_state::magicfly)
 	MCFG_SCREEN_UPDATE_DRIVER(magicfly_state, screen_update_magicfly)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magicfly)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magicfly)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(magicfly_state, magicfly)
 
@@ -975,7 +975,7 @@ MACHINE_CONFIG_START(magicfly_state::_7mezzo)
 	magicfly(config);
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(magicfly_state, 7mezzo)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_7mezzo, this));
 
 MACHINE_CONFIG_END
 

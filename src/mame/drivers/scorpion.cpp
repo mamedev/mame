@@ -30,8 +30,8 @@ public:
 	DECLARE_WRITE8_MEMBER(scorpion_0000_w);
 	DECLARE_WRITE8_MEMBER(scorpion_port_7ffd_w);
 	DECLARE_WRITE8_MEMBER(scorpion_port_1ffd_w);
-	DECLARE_MACHINE_START(scorpion);
-	DECLARE_MACHINE_RESET(scorpion);
+	void machine_start_scorpion() ATTR_COLD;
+	void machine_reset_scorpion();
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
 	void scorpion(machine_config &config);
 	void profi(machine_config &config);
@@ -206,7 +206,7 @@ void scorpion_state::scorpion_switch(address_map &map)
 	map(0x4000, 0xffff).r(this, FUNC(scorpion_state::beta_disable_r));
 }
 
-MACHINE_RESET_MEMBER(scorpion_state,scorpion)
+void scorpion_state::machine_reset_scorpion()
 {
 	uint8_t *messram = m_ram->pointer();
 	m_program = &m_maincpu->space(AS_PROGRAM);
@@ -230,7 +230,8 @@ MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 	m_port_1ffd_data = 0;
 	scorpion_update_memory();
 }
-MACHINE_START_MEMBER(scorpion_state,scorpion)
+
+void scorpion_state::machine_start_scorpion()
 {
 }
 
@@ -275,17 +276,17 @@ static const gfx_layout profi_8_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( scorpion )
+static GFXDECODE_START( gfx_scorpion )
 	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( profi )
+static GFXDECODE_START( gfx_profi )
 	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
 	GFXDECODE_ENTRY( "maincpu", 0x1abfc, profi_8_charlayout, 0, 8 )
 	/* There are more characters after this, that haven't been decoded */
 GFXDECODE_END
 
-static GFXDECODE_START( quorum )
+static GFXDECODE_START( gfx_quorum )
 	GFXDECODE_ENTRY( "maincpu", 0x1fb00, quorum_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -296,9 +297,9 @@ MACHINE_CONFIG_START(scorpion_state::scorpion)
 	MCFG_DEVICE_IO_MAP(scorpion_io)
 	MCFG_DEVICE_OPCODES_MAP(scorpion_switch)
 
-	MCFG_MACHINE_START_OVERRIDE(scorpion_state, scorpion )
-	MCFG_MACHINE_RESET_OVERRIDE(scorpion_state, scorpion )
-	MCFG_GFXDECODE_MODIFY("gfxdecode", scorpion)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_scorpion, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_scorpion, this));
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_scorpion)
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 
@@ -313,12 +314,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scorpion_state::profi)
 	scorpion(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", profi)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_profi)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scorpion_state::quorum)
 	scorpion(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", quorum)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_quorum)
 MACHINE_CONFIG_END
 
 

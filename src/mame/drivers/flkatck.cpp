@@ -179,7 +179,7 @@ static const gfx_layout gfxlayout =
 	32*8
 };
 
-static GFXDECODE_START( flkatck )
+static GFXDECODE_START( gfx_flkatck )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 32 )
 GFXDECODE_END
 
@@ -233,7 +233,7 @@ MACHINE_CONFIG_START(flkatck_state::flkatck)
 	MCFG_SCREEN_UPDATE_DRIVER(flkatck_state, screen_update_flkatck)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flkatck)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flkatck)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)

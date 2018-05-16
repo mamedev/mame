@@ -271,7 +271,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( sderby2 )
+static GFXDECODE_START( gfx_sderby2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1024 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 1024 )
 GFXDECODE_END
@@ -316,7 +316,7 @@ MACHINE_CONFIG_START(sderby2_state::sderby2)
 	MCFG_PALETTE_ADD("palette", 256+256*3)
 	MCFG_PALETTE_INIT_OWNER(sderby2_state,sderby2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sderby2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby2)
 
 	// sound hardware
 MACHINE_CONFIG_END

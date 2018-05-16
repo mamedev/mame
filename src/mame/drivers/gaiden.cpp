@@ -305,7 +305,7 @@ void gaiden_state::machine_reset()
 	m_spr_offset_y = 0;
 }
 
-MACHINE_RESET_MEMBER(gaiden_state,raiga)
+void gaiden_state::machine_reset_raiga()
 {
 	gaiden_state::machine_reset();
 	m_jumppoints = raiga_jumppoints_00;
@@ -691,7 +691,7 @@ static const gfx_layout spritelayout =
 	16*8    /* offset to next sprite */
 };
 
-static GFXDECODE_START( gaiden )
+static GFXDECODE_START( gfx_gaiden )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0x100, 16 )  /* tiles 8x8  */
 	GFXDECODE_ENTRY( "gfx2", 0, tile2layout,       0x000, 0x1000 )  /* tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tile2layout,       0x000, 0x1000 ) /* tiles 16x16 (only colors 0x00-0x0f and 0x80-0x8f are used) */
@@ -720,7 +720,7 @@ static const gfx_layout mastninj_spritelayout =
 	32*8 /* offset to next tile */
 };
 
-static GFXDECODE_START( mastninj )
+static GFXDECODE_START( gfx_mastninj )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0x000, 16 )  /* tiles 8x8  */
 	GFXDECODE_ENTRY( "gfx2", 0, mastninj_tile2layout,       0x300, 16 ) /* tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, mastninj_tile2layout,       0x200, 16 ) /* tiles 16x16 */
@@ -749,7 +749,7 @@ static const gfx_layout drgnbowl_spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( drgnbowl )
+static GFXDECODE_START( gfx_drgnbowl )
 	GFXDECODE_ENTRY( "gfx1", 0,       tilelayout,                0, 16 )    /* tiles 8x8  */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, drgnbowl_tile2layout,  0x300, 16 )    /* tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0x20000, drgnbowl_tile2layout,  0x200, 16 )    /* tiles 16x16 */
@@ -778,7 +778,7 @@ MACHINE_CONFIG_START(gaiden_state::shadoww)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_gaiden)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gaiden)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaiden)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -793,7 +793,7 @@ MACHINE_CONFIG_START(gaiden_state::shadoww)
 	MCFG_TECMO_MIXER_REVSPRITETILE
 	MCFG_TECMO_MIXER_BGPEN(0x000 + 0x200)
 
-	MCFG_VIDEO_START_OVERRIDE(gaiden_state,gaiden)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gaiden, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -829,9 +829,9 @@ MACHINE_CONFIG_START(gaiden_state::raiga)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(raiga_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_raiga, this));
 
-	MCFG_VIDEO_START_OVERRIDE(gaiden_state,raiga)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_raiga, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaiden_state::drgnbowl)
@@ -854,13 +854,13 @@ MACHINE_CONFIG_START(gaiden_state::drgnbowl)
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_drgnbowl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drgnbowl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drgnbowl)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* NOT using Tecmo Sprite device - significant changes, maybe a clone of something else */
 
-	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_drgnbowl, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -952,7 +952,7 @@ WRITE8_MEMBER(gaiden_state::adpcm_bankswitch_w)
 	m_adpcm_bank->set_entry(data & 7);
 }
 
-MACHINE_START_MEMBER(gaiden_state,mastninj)
+void gaiden_state::machine_start_mastninj()
 {
 	gaiden_state::machine_start();
 
@@ -999,7 +999,7 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* ?? MHz */
 	MCFG_DEVICE_PROGRAM_MAP(mastninj_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(gaiden_state,mastninj)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mastninj, this));
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1012,13 +1012,13 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_drgnbowl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mastninj)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastninj)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* NOT using Tecmo Sprite device - significant changes, maybe a clone of something else */
 
-	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_drgnbowl, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

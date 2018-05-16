@@ -1223,7 +1223,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( coinmstr )
+static GFXDECODE_START( gfx_coinmstr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 46*32 )
 GFXDECODE_END
 
@@ -1280,7 +1280,7 @@ MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	MCFG_SCREEN_UPDATE_DRIVER(coinmstr_state, screen_update_coinmstr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", coinmstr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_coinmstr)
 	MCFG_PALETTE_ADD("palette", 46*32*4)
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 14000000 / 16)

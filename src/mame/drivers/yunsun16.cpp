@@ -547,7 +547,7 @@ static const gfx_layout layout_16x16x8 =
 };
 
 
-static GFXDECODE_START( yunsun16 )
+static GFXDECODE_START( gfx_yunsun16 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x1000, 0x10 ) // [0] Layers
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x0000, 0x20 ) // [1] Sprites
 GFXDECODE_END
@@ -573,14 +573,14 @@ void yunsun16_state::machine_reset()
 	m_sprites_scrolldy = -0x0f;
 }
 
-MACHINE_START_MEMBER(yunsun16_state, shocking)
+void yunsun16_state::machine_start_shocking()
 {
 	machine_start();
 	membank("okibank")->configure_entries(0, 0x80000 / 0x20000, memregion("oki")->base(), 0x20000);
 	membank("okibank")->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER(yunsun16_state, shocking)
+void yunsun16_state::machine_reset_shocking()
 {
 	machine_reset();
 	membank("okibank")->set_entry(0);
@@ -608,7 +608,7 @@ MACHINE_CONFIG_START(yunsun16_state::magicbub)
 	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update_yunsun16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yunsun16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yunsun16)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -641,8 +641,8 @@ MACHINE_CONFIG_START(yunsun16_state::shocking)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", yunsun16_state,  irq2_line_hold)
 
-	MCFG_MACHINE_START_OVERRIDE(yunsun16_state, shocking)
-	MCFG_MACHINE_RESET_OVERRIDE(yunsun16_state, shocking)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_shocking, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_shocking, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -650,7 +650,7 @@ MACHINE_CONFIG_START(yunsun16_state::shocking)
 	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update_yunsun16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yunsun16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yunsun16)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

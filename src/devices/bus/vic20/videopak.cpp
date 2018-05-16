@@ -88,7 +88,7 @@ MC6845_UPDATE_ROW( vic20_video_pak_device::crtc_update_row )
 //  GFXDECODE( vic20_video_pak )
 //-------------------------------------------------
 
-static GFXDECODE_START( vic20_video_pak )
+static GFXDECODE_START( gfx_vic20_video_pak )
 	GFXDECODE_ENTRY(MC6845_TAG, 0x0000, gfx_8x8x1, 0, 1)
 GFXDECODE_END
 
@@ -104,7 +104,7 @@ MACHINE_CONFIG_START(vic20_video_pak_device::device_add_mconfig)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vic20_video_pak)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vic20_video_pak)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, H46505, MC6845_SCREEN_TAG, XTAL(14'318'181) / 8)

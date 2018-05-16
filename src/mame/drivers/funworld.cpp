@@ -2960,11 +2960,11 @@ static const gfx_layout charlayout =
    in the first and second half of the bipolar PROM.
 */
 
-static GFXDECODE_START( fw1stpal )  /* Adressing the first half of the palette */
+static GFXDECODE_START( gfx_fw1stpal )  /* Adressing the first half of the palette */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( fw2ndpal )  /* Adressing the second half of the palette */
+static GFXDECODE_START( gfx_fw2ndpal )  /* Adressing the second half of the palette */
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x100, 16 )
 GFXDECODE_END
 
@@ -3046,13 +3046,13 @@ READ8_MEMBER(funworld_state::funquiz_ay8910_b_r)
 *     Machine Start & Reset     *
 ********************************/
 
-MACHINE_START_MEMBER(funworld_state, lunapark)
+void funworld_state::machine_start_lunapark()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x8000);
 }
 
-MACHINE_RESET_MEMBER(funworld_state, lunapark)
+void funworld_state::machine_reset_lunapark()
 {
 	uint8_t seldsw = (ioport("SELDSW")->read() );
 	popmessage("ROM Bank: %02X", seldsw);
@@ -3090,11 +3090,11 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 	MCFG_SCREEN_UPDATE_DRIVER(funworld_state, screen_update_funworld)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fw1stpal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fw1stpal)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(funworld_state, funworld)
-	MCFG_VIDEO_START_OVERRIDE(funworld_state, funworld)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_funworld, this));
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* 2MHz, veryfied on jollycrd & royalcrd */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -3115,7 +3115,7 @@ MACHINE_CONFIG_START(funworld_state::fw2ndpal)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(funworld_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
 MACHINE_CONFIG_END
 
 
@@ -3138,7 +3138,7 @@ MACHINE_CONFIG_START(funworld_state::magicrd2)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(magicrd2_map)
-	MCFG_VIDEO_START_OVERRIDE(funworld_state, magicrd2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_magicrd2, this));
 
 	MCFG_DEVICE_REMOVE("crtc")
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
@@ -3193,8 +3193,8 @@ MACHINE_CONFIG_START(funworld_state::lunapark)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(lunapark_map)  // mirrored video RAM (4000/5000 to 6000/7000).
-	MCFG_MACHINE_START_OVERRIDE(funworld_state, lunapark)
-	MCFG_MACHINE_RESET_OVERRIDE(funworld_state, lunapark)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_lunapark, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_lunapark, this));
 MACHINE_CONFIG_END
 
 
@@ -3202,14 +3202,14 @@ MACHINE_CONFIG_START(funworld_state::chinatow)
 	fw2ndpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(chinatow_map)
-	MCFG_VIDEO_START_OVERRIDE(funworld_state, chinatow)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_chinatow, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(funworld_state::rcdino4)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(chinatow_map)
-	MCFG_VIDEO_START_OVERRIDE(funworld_state, chinatow)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_chinatow, this));
 MACHINE_CONFIG_END
 
 
@@ -3217,7 +3217,7 @@ MACHINE_CONFIG_START(funworld_state::intrgmes)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(intergames_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
 MACHINE_CONFIG_END
 
 
@@ -3225,7 +3225,7 @@ MACHINE_CONFIG_START(funworld_state::fw_a7_11)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(fw_a7_11_map)
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
+//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
 MACHINE_CONFIG_END
 
 

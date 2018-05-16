@@ -164,7 +164,7 @@ static const gfx_layout partner_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( partner )
+static GFXDECODE_START( gfx_partner )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, partner_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -174,7 +174,7 @@ MACHINE_CONFIG_START(partner_state::partner)
 	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
 	MCFG_DEVICE_PROGRAM_MAP(partner_mem)
 
-	MCFG_MACHINE_RESET_OVERRIDE(partner_state, partner )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_partner, this));
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
@@ -194,7 +194,7 @@ MACHINE_CONFIG_START(partner_state::partner)
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", partner)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_partner)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(partner_state,radio86)
 

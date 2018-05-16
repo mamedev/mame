@@ -194,16 +194,16 @@ protected:
 	uint32_t screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_MACHINE_START(cpu_z80)
+	void machine_start_cpu_z80() ATTR_COLD
 	{
 		m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 	}
 
-	DECLARE_VIDEO_START(bluehawk)
+	void video_start_bluehawk() ATTR_COLD
 	{
 	}
 
-	DECLARE_VIDEO_START(flytiger)
+	void video_start_flytiger() ATTR_COLD
 	{
 		m_paletteram_flytiger = make_unique_clear<uint8_t[]>(0x1000);
 		save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
@@ -215,7 +215,7 @@ protected:
 		save_item(NAME(m_flytiger_pri));
 	}
 
-	DECLARE_VIDEO_START(primella)
+	void video_start_primella() ATTR_COLD
 	{
 		/* Register for save/restore */
 		save_item(NAME(m_tx_pri));
@@ -261,13 +261,13 @@ protected:
 	uint32_t screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pollux(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_VIDEO_START(lastday)
+	void video_start_lastday() ATTR_COLD
 	{
 		/* Register for save/restore */
 		save_item(NAME(m_sprites_disabled));
 	}
 
-	DECLARE_VIDEO_START(gulfstrm)
+	void video_start_gulfstrm() ATTR_COLD
 	{
 		m_palette_bank = 0;
 
@@ -275,7 +275,7 @@ protected:
 		save_item(NAME(m_palette_bank));
 	}
 
-	DECLARE_VIDEO_START(pollux)
+	void video_start_pollux() ATTR_COLD
 	{
 		m_paletteram_flytiger = make_unique_clear<uint8_t[]>(0x1000);
 		save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
@@ -1369,21 +1369,21 @@ const gfx_layout rshark_spritelayout =
 	128*8
 };
 
-GFXDECODE_START( lastday )
+GFXDECODE_START( gfx_lastday )
 	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16+64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16+64 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16+64 )
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,         512, 16+64 )
 GFXDECODE_END
 
-GFXDECODE_START( flytiger )
+GFXDECODE_START( gfx_flytiger )
 	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16+64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16+64 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16+64 )
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,         512, 32+64 )
 GFXDECODE_END
 
-GFXDECODE_START( bluehawk )
+GFXDECODE_START( gfx_bluehawk )
 	GFXDECODE_ENTRY( "gfx1", 0, bluehawk_charlayout,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16 )
@@ -1391,14 +1391,14 @@ GFXDECODE_START( bluehawk )
 	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,           0, 16 )
 GFXDECODE_END
 
-GFXDECODE_START( primella )
+GFXDECODE_START( gfx_primella )
 	GFXDECODE_ENTRY( "gfx1", 0, bluehawk_charlayout,  0, 16 )
 	/* no sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         768, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         512, 16 )
 GFXDECODE_END
 
-GFXDECODE_START( rshark )
+GFXDECODE_START( gfx_rshark )
 	/* no chars */
 	GFXDECODE_ENTRY( "gfx1", 0, rshark_spritelayout,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16 )
@@ -1407,7 +1407,7 @@ GFXDECODE_START( rshark )
 	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,      1024, 16 )
 GFXDECODE_END
 
-GFXDECODE_START( popbingo )
+GFXDECODE_START( gfx_popbingo )
 	/* no chars */
 	GFXDECODE_ENTRY( "gfx1", 0, rshark_spritelayout,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,           0,  1 )
@@ -1484,7 +1484,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4MHz verified for Last Day / D-day */
 	MCFG_DEVICE_PROGRAM_MAP(lastday_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cpu_z80, this));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
@@ -1498,7 +1498,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx5", 0x00000)
@@ -1506,7 +1506,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
 	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
 
-	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, lastday)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_lastday, this));
 
 	/* sound hardware */
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
@@ -1537,7 +1537,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)  /* ??? */
 	MCFG_DEVICE_PROGRAM_MAP(lastday_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cpu_z80, this));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
@@ -1551,7 +1551,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx5", 0x00000)
@@ -1559,7 +1559,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
 	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
 
-	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, gulfstrm)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gulfstrm, this));
 
 	/* sound hardware */
 	sound_2203(config); /* 3.579545MHz */
@@ -1575,7 +1575,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4Mhz */
 	MCFG_DEVICE_PROGRAM_MAP(pollux_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cpu_z80, this));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
@@ -1589,7 +1589,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastday)
 	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx5", 0x00000)
@@ -1597,7 +1597,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
 	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
 
-	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, pollux)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pollux, this));
 
 	/* sound hardware */
 	sound_2203(config); /* 3.579545MHz or 4Mhz ??? */
@@ -1613,7 +1613,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* ??? */
 	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cpu_z80, this));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
@@ -1627,7 +1627,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bluehawk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bluehawk)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx3", 0x3c000)
@@ -1637,7 +1637,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
 	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
 
-	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, bluehawk)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_bluehawk, this));
 
 	/* sound hardware */
 	sound_2151(config); /* 3.579545MHz or 4Mhz ??? */
@@ -1653,7 +1653,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4Mhz */
 	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cpu_z80, this));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
@@ -1667,7 +1667,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flytiger)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flytiger)
 	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 2, "gfx3", 0x3c000)
@@ -1676,7 +1676,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
 	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
 
-	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, flytiger)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_flytiger, this));
 
 	/* sound hardware */
 	sound_2151(config);
@@ -1692,7 +1692,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::primella)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)   /* 4MHz */
 	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cpu_z80, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1703,7 +1703,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::primella)
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_primella)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", primella)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_primella)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg1", "gfxdecode", 1, "gfx2", -0x4000)
@@ -1713,7 +1713,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::primella)
 	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(10)
 	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
 
-	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, primella)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_primella, this));
 
 	/* sound hardware */
 	sound_2151_4mhz(config); /* PCB has only 1 OSC at 16Mhz */
@@ -1753,7 +1753,7 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rshark)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rshark)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1805,7 +1805,7 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popbingo)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popbingo)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

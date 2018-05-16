@@ -695,7 +695,7 @@ static const gfx_layout tiles8x8_layout =
 	8*16
 };
 
-static GFXDECODE_START( dwarfd )
+static GFXDECODE_START( gfx_dwarfd )
 	GFXDECODE_REVERSEBITS("gfx1", 0, tiles8x8_layout, 0, 8)
 GFXDECODE_END
 
@@ -751,7 +751,7 @@ MACHINE_CONFIG_START(dwarfd_state::dwarfd)
 	MCFG_I8275_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
 	MCFG_I8275_DRQ_CALLBACK(WRITELINE(*this, dwarfd_state, drq_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dwarfd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dwarfd)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(dwarfd_state, dwarfd)
 

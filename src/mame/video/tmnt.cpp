@@ -206,7 +206,7 @@ K05324X_CB_MEMBER(tmnt_state::prmrsocr_sprite_callback)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(tmnt_state,cuebrick)
+void tmnt_state::video_start_cuebrick()
 {
 	m_layer_colorbase[0] = 0;
 	m_layer_colorbase[1] = 32;
@@ -214,7 +214,7 @@ VIDEO_START_MEMBER(tmnt_state,cuebrick)
 	m_sprite_colorbase = 16;
 }
 
-VIDEO_START_MEMBER(tmnt_state,mia)
+void tmnt_state::video_start_mia()
 {
 	m_layer_colorbase[0] = 0;
 	m_layer_colorbase[1] = 32;
@@ -225,7 +225,7 @@ VIDEO_START_MEMBER(tmnt_state,mia)
 	save_item(NAME(m_tmnt_priorityflag));
 }
 
-VIDEO_START_MEMBER(tmnt_state,tmnt)
+void tmnt_state::video_start_tmnt()
 {
 	m_layer_colorbase[0] = 0;
 	m_layer_colorbase[1] = 32;
@@ -238,7 +238,7 @@ VIDEO_START_MEMBER(tmnt_state,tmnt)
 	m_palette->set_shadow_factor(0.75);
 }
 
-VIDEO_START_MEMBER(tmnt_state,lgtnfght)/* also tmnt2, ssriders */
+void tmnt_state::video_start_lgtnfght()/* also tmnt2, ssriders */
 {
 	m_k053245->set_z_rejection(0);
 
@@ -250,7 +250,7 @@ VIDEO_START_MEMBER(tmnt_state,lgtnfght)/* also tmnt2, ssriders */
 	save_item(NAME(m_lasten));
 }
 
-VIDEO_START_MEMBER(tmnt_state,glfgreat)
+void tmnt_state::video_start_glfgreat()
 {
 	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tmnt_state::glfgreat_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
 	m_roz_tilemap->set_transparent_pen(0);
@@ -263,7 +263,7 @@ VIDEO_START_MEMBER(tmnt_state,glfgreat)
 	save_item(NAME(m_glfgreat_roz_rom_mode));
 }
 
-VIDEO_START_MEMBER(tmnt_state,prmrsocr)
+void tmnt_state::video_start_prmrsocr()
 {
 	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tmnt_state::prmrsocr_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
 	m_roz_tilemap->set_transparent_pen(0);
@@ -274,7 +274,7 @@ VIDEO_START_MEMBER(tmnt_state,prmrsocr)
 	save_item(NAME(m_glfgreat_roz_char_bank));
 }
 
-VIDEO_START_MEMBER(tmnt_state,blswhstl)
+void tmnt_state::video_start_blswhstl()
 {
 	m_blswhstl_rombank = -1;
 	save_item(NAME(m_blswhstl_rombank));

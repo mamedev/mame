@@ -560,7 +560,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static GFXDECODE_START( fresh )
+static GFXDECODE_START( gfx_fresh )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
@@ -612,7 +612,7 @@ MACHINE_CONFIG_START(fresh_state::fresh)
 	MCFG_PALETTE_ADD("palette", 0x1000) // or 0xc00
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fresh)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fresh)
 
 	/* sound hw? */
 	SPEAKER(config, "mono").front_center();

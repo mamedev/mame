@@ -873,7 +873,7 @@ static const gfx_layout _16x16x8_layout =
 
 
 
-static GFXDECODE_START( rabbit )
+static GFXDECODE_START( gfx_rabbit )
 	/* this seems to be sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_8x8x4_layout,   0x0, 0x1000  )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_16x16x4_layout, 0x0, 0x1000  )
@@ -907,7 +907,7 @@ MACHINE_CONFIG_START(rabbit_state::rabbit)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rabbit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rabbit)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -90,7 +90,7 @@ public:
 		, m_keyboard(*this, "X%d", 0)
 	{ }
 
-	DECLARE_MACHINE_RESET(wmg);
+	void machine_reset_wmg();
 	void init_wmg();
 	DECLARE_READ8_MEMBER(wmg_nvram_r);
 	DECLARE_WRITE8_MEMBER(wmg_nvram_w);
@@ -413,7 +413,7 @@ WRITE8_MEMBER( wmg_state::wmg_d000_w )
 }
 
 
-MACHINE_RESET_MEMBER( wmg_state, wmg )
+void wmg_state::machine_reset_wmg()
 {
 	address_space &space1 = m_maincpu->space(AS_PROGRAM);
 	m_wmg_c400=0xff;
@@ -421,7 +421,7 @@ MACHINE_RESET_MEMBER( wmg_state, wmg )
 	m_wmg_port_select=0;
 	m_wmg_vram_bank=0;
 	wmg_c400_w( space1, 0, 0);
-	MACHINE_RESET_CALL_MEMBER(williams_common);
+	machine_reset_williams_common();
 	m_maincpu->reset();
 }
 
@@ -499,8 +499,8 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	MCFG_DEVICE_ADD("soundcpu", M6808, SOUND_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(wmg_cpu2)
 
-	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
-	MCFG_MACHINE_RESET_OVERRIDE(wmg_state, wmg)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_williams, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_wmg, this));
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams_va11_callback)
@@ -514,7 +514,7 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 6, 298, 260, 7, 247)
 	MCFG_SCREEN_UPDATE_DRIVER(williams_state, screen_update_williams)
 
-	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_williams, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

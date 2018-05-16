@@ -85,8 +85,8 @@ public:
 	DECLARE_WRITE8_MEMBER(hrx_data_w);
 	DECLARE_READ8_MEMBER(hrx_attr_r);
 	DECLARE_WRITE8_MEMBER(hrx_attr_w);
-	DECLARE_MACHINE_START(mtx512);
-	DECLARE_MACHINE_RESET(mtx512);
+	void machine_start_mtx512() ATTR_COLD;
+	void machine_reset_mtx512();
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_trg1_w);

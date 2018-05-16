@@ -303,7 +303,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( pktgaldx )
+static GFXDECODE_START( gfx_pktgaldx )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0, 32 )    /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0, 32 )    /* Tiles (16x16) */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 32 )    /* Sprites (16x16) */
@@ -321,7 +321,7 @@ static const gfx_layout bootleg_spritelayout =
 	16*64
 };
 
-static GFXDECODE_START( bootleg )
+static GFXDECODE_START( gfx_bootleg )
 	GFXDECODE_ENTRY( "gfx1", 0, bootleg_spritelayout,     0, 64 )
 GFXDECODE_END
 
@@ -356,7 +356,7 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pktgaldx)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pktgaldx)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -417,7 +417,7 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldb)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bootleg)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bootleg)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

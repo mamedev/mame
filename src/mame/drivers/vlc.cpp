@@ -202,7 +202,7 @@ public:
 	DECLARE_WRITE16_MEMBER( nevada_sec_w );
 	DECLARE_WRITE16_MEMBER( vram_w );
 
-	DECLARE_MACHINE_START(nevada);
+	void machine_start_nevada() ATTR_COLD;
 	void init_nevada();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -272,7 +272,7 @@ WRITE16_MEMBER( nevada_state::vram_w )
 }
 
 /***************************************************************************/
-static GFXDECODE_START( nevada )
+static GFXDECODE_START( gfx_nevada )
 	/* Todo  , just for sample */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 8 )
 GFXDECODE_END
@@ -570,7 +570,7 @@ INPUT_PORTS_END
 *     Machine start      *
 *************************/
 
-MACHINE_START_MEMBER(nevada_state, nevada)
+void nevada_state::machine_start_nevada()
 {
 	m_nvram->set_base(m_ram62256, 0x1000);
 }
@@ -589,7 +589,7 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(150))   /* 150ms Ds1232 TD to Ground */
 
-	MCFG_MACHINE_START_OVERRIDE(nevada_state, nevada)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_nevada, this));
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", nevada_state, nvram_init)
 
@@ -602,7 +602,7 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 	MCFG_SCREEN_UPDATE_DRIVER(nevada_state, screen_update_nevada)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nevada)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nevada)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(nevada_state, nevada)
 

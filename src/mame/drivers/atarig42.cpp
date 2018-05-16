@@ -463,7 +463,7 @@ static const gfx_layout anlayout =
 	32*8
 };
 
-static GFXDECODE_START( atarig42 )
+static GFXDECODE_START( gfx_atarig42 )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 0x000, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, anlayout, 0x000, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x000, 64 )
@@ -529,7 +529,7 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarig42)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarig42)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
@@ -545,7 +545,7 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarig42_state, video_int_write_line))
 
-	MCFG_VIDEO_START_OVERRIDE(atarig42_state,atarig42)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_atarig42, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

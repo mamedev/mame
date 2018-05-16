@@ -373,7 +373,7 @@ static const gfx_layout tiles16x16_layout =
 };
 
 
-static GFXDECODE_START( divebomb )
+static GFXDECODE_START( gfx_divebomb )
 	GFXDECODE_ENTRY( "fgrom", 0, tiles8x8_layout, 0x400+0x400, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, tiles16x16_layout, 0x400+0x400+0x400, 16 )
 GFXDECODE_END
@@ -431,10 +431,10 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	MCFG_K051316_OFFSETS(-88, -16)
 	MCFG_K051316_CB(divebomb_state, zoom_callback_2)
 
-	MCFG_MACHINE_START_OVERRIDE(divebomb_state, divebomb)
-	MCFG_MACHINE_RESET_OVERRIDE(divebomb_state, divebomb)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_divebomb, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_divebomb, this));
 
-	MCFG_VIDEO_START_OVERRIDE(divebomb_state, divebomb)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_divebomb, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -448,7 +448,7 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("spritecpu", INPUT_LINE_NMI))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("rozcpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", divebomb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_divebomb)
 	MCFG_PALETTE_ADD("palette", 0x400+0x400+0x400+0x100)
 
 	MCFG_PALETTE_INIT_OWNER(divebomb_state, divebomb)
@@ -549,7 +549,7 @@ ROM_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(divebomb_state, divebomb)
+void divebomb_state::machine_start_divebomb()
 {
 	m_rozbank->configure_entries(0, 16, memregion("rozcpudata")->base(), 0x4000);
 
@@ -558,7 +558,7 @@ MACHINE_START_MEMBER(divebomb_state, divebomb)
 }
 
 
-MACHINE_RESET_MEMBER(divebomb_state, divebomb)
+void divebomb_state::machine_reset_divebomb()
 {
 	for (int chip = 0; chip < 2; chip++)
 	{

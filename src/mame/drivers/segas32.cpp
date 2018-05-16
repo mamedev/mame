@@ -2184,7 +2184,7 @@ static const gfx_layout bgcharlayout =
 };
 
 
-static GFXDECODE_START( segas32 )
+static GFXDECODE_START( gfx_segas32 )
 	GFXDECODE_ENTRY( "gfx1", 0, bgcharlayout,   0x00, 0x3ff  )
 GFXDECODE_END
 
@@ -2231,7 +2231,7 @@ MACHINE_CONFIG_START(segas32_state::device_add_mconfig)
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas32)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas32)
 	MCFG_PALETTE_ADD("palette", 0x4000)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2553,7 +2553,7 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas32)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas32)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 

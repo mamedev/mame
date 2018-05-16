@@ -461,20 +461,20 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-static GFXDECODE_START( argus )
+static GFXDECODE_START( gfx_argus )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0*16,  8 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  8*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 24*16, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, charlayout, 40*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( valtric )
+static GFXDECODE_START( gfx_valtric )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout, 32*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( butasan )
+static GFXDECODE_START( gfx_butasan )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 12*16, 16 )
@@ -503,13 +503,13 @@ MACHINE_CONFIG_START(argus_state::argus)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(argus_state, screen_update_argus)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", argus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_argus)
 	MCFG_PALETTE_ADD("palette", 896)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
 
-	MCFG_VIDEO_START_OVERRIDE(argus_state,argus)
-	MCFG_VIDEO_RESET_OVERRIDE(argus_state,argus)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_argus, this));
+	set_video_reset_cb(config, driver_callback_delegate(&video_reset_argus, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -545,13 +545,13 @@ MACHINE_CONFIG_START(argus_state::valtric)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(argus_state, screen_update_valtric)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", valtric)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_valtric)
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
 
-	MCFG_VIDEO_START_OVERRIDE(argus_state,valtric)
-	MCFG_VIDEO_RESET_OVERRIDE(argus_state,valtric)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_valtric, this));
+	set_video_reset_cb(config, driver_callback_delegate(&video_reset_valtric, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -593,13 +593,13 @@ MACHINE_CONFIG_START(argus_state::butasan)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(argus_state, screen_update_butasan)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", butasan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_butasan)
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
 
-	MCFG_VIDEO_START_OVERRIDE(argus_state,butasan)
-	MCFG_VIDEO_RESET_OVERRIDE(argus_state,butasan)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_butasan, this));
+	set_video_reset_cb(config, driver_callback_delegate(&video_reset_butasan, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

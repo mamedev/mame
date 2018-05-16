@@ -160,7 +160,7 @@ static const gfx_layout mikro80_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( mikro80 )
+static GFXDECODE_START( gfx_mikro80 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikro80_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -184,7 +184,7 @@ MACHINE_CONFIG_START(mikro80_state::mikro80)
 	MCFG_SCREEN_UPDATE_DRIVER(mikro80_state, screen_update_mikro80)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mikro80)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mikro80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	SPEAKER(config, "speaker").front_center();

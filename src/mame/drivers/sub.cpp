@@ -280,7 +280,7 @@ static const gfx_layout tiles16x32_layout =
 	64*8
 };
 
-static GFXDECODE_START( sub )
+static GFXDECODE_START( gfx_sub )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x80 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x32_layout, 0, 0x80 )
 GFXDECODE_END
@@ -334,7 +334,7 @@ MACHINE_CONFIG_START(sub_state::sub)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sub_state, main_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sub)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sub)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
 	MCFG_PALETTE_INIT_OWNER(sub_state, sub)

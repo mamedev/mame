@@ -317,7 +317,7 @@ static const gfx_layout spritelayout =
 	8*8*2*4
 };
 
-static GFXDECODE_START( homerun )
+static GFXDECODE_START( gfx_homerun )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 )
 GFXDECODE_END
@@ -372,7 +372,7 @@ MACHINE_CONFIG_START(homerun_state::dynashot)
 	MCFG_SCREEN_UPDATE_DRIVER(homerun_state, screen_update_homerun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homerun)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homerun)
 	MCFG_PALETTE_ADD("palette", 16*4)
 
 	/* sound hardware */

@@ -311,6 +311,6 @@ void rm380z_state::config_memory_map()
 	}
 }
 
-MACHINE_RESET_MEMBER( rm380z_state, rm480z )
+void rm380z_state::machine_reset_rm480z()
 {
 }

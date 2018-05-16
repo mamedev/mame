@@ -322,7 +322,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( magmax )
+static GFXDECODE_START( gfx_magmax )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0,  1 ) /*no color codes*/
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      1*16, 16 ) /*16 color codes*/
 GFXDECODE_END
@@ -350,7 +350,7 @@ MACHINE_CONFIG_START(magmax_state::magmax)
 	MCFG_SCREEN_UPDATE_DRIVER(magmax_state, screen_update_magmax)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magmax)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magmax)
 	MCFG_PALETTE_ADD("palette", 1*16 + 16*16 + 256)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(magmax_state, magmax)

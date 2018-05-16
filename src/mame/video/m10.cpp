@@ -95,7 +95,7 @@ inline void m10_state::plot_pixel_m10( bitmap_ind16 &bm, int x, int y, int col )
 				(IREMM10_HBSTART - 1) - (x - IREMM10_HBEND)) = col; // only when flip_screen(?)
 }
 
-VIDEO_START_MEMBER(m10_state,m10)
+void m10_state::video_start_m10()
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
 	m_tx_tilemap->set_transparent_pen(0);
@@ -105,7 +105,7 @@ VIDEO_START_MEMBER(m10_state,m10)
 	return ;
 }
 
-VIDEO_START_MEMBER(m10_state,m15)
+void m10_state::video_start_m15()
 {
 	m_gfxdecode->set_gfx(0,std::make_unique<gfx_element>(m_palette, charlayout, m_chargen, 0, 8, 0));
 

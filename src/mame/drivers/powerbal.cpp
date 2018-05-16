@@ -45,10 +45,10 @@ private:
 	int         m_bg_yoffset;
 
 	TILE_GET_INFO_MEMBER(powerbal_get_bg_tile_info);
-	DECLARE_MACHINE_START(powerbal);
-	DECLARE_MACHINE_RESET(powerbal);
-	DECLARE_VIDEO_START(powerbal);
-	DECLARE_VIDEO_START(atombjt);
+	void machine_start_powerbal() ATTR_COLD;
+	void machine_reset_powerbal();
+	void video_start_powerbal() ATTR_COLD;
+	void video_start_atombjt() ATTR_COLD;
 	uint32_t screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_powerbal( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE16_MEMBER(magicstk_coin_eeprom_w);
@@ -555,7 +555,7 @@ void powerbal_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
-VIDEO_START_MEMBER(powerbal_state,powerbal)
+void powerbal_state::video_start_powerbal()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(powerbal_state::powerbal_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
@@ -564,7 +564,7 @@ VIDEO_START_MEMBER(powerbal_state,powerbal)
 	m_bg_tilemap->set_scrolly(0, m_bg_yoffset);
 }
 
-VIDEO_START_MEMBER(powerbal_state,atombjt)
+void powerbal_state::video_start_atombjt()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(powerbal_state::powerbal_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
@@ -607,19 +607,19 @@ static const gfx_layout tilelayout =
 
 
 
-static GFXDECODE_START( powerbal )
+static GFXDECODE_START( gfx_powerbal )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0x100, 16 )    /* colors 0x100-0x1ff */
 	GFXDECODE_ENTRY( "gfx1", 0, magicstk_charlayout, 0x000, 16 )    /* colors 0x000-0x0ff */
 GFXDECODE_END
 
 
 
-MACHINE_START_MEMBER(powerbal_state,powerbal)
+void powerbal_state::machine_start_powerbal()
 {
 	save_item(NAME(m_tilebank));
 }
 
-MACHINE_RESET_MEMBER(powerbal_state,powerbal)
+void powerbal_state::machine_reset_powerbal()
 {
 	m_tilebank = 0;
 	configure_oki_banks();
@@ -632,8 +632,8 @@ MACHINE_CONFIG_START(powerbal_state::powerbal)
 	MCFG_DEVICE_PROGRAM_MAP(powerbal_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", powerbal_state, irq2_line_hold)
 
-	MCFG_MACHINE_START_OVERRIDE(powerbal_state,powerbal)
-	MCFG_MACHINE_RESET_OVERRIDE(powerbal_state,powerbal)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_powerbal, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_powerbal, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -644,11 +644,11 @@ MACHINE_CONFIG_START(powerbal_state::powerbal)
 	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerbal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerbal)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(powerbal_state,powerbal)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_powerbal, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -668,8 +668,8 @@ MACHINE_CONFIG_START(powerbal_state::magicstk)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
-	MCFG_MACHINE_START_OVERRIDE(powerbal_state,powerbal)
-	MCFG_MACHINE_RESET_OVERRIDE(powerbal_state,powerbal)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_powerbal, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_powerbal, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -680,11 +680,11 @@ MACHINE_CONFIG_START(powerbal_state::magicstk)
 	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerbal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerbal)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(powerbal_state,powerbal)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_powerbal, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -706,7 +706,7 @@ MACHINE_CONFIG_START(powerbal_state::atombjt)
 	MCFG_SCREEN_SIZE(512, 256) \
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1) \
 
-	MCFG_VIDEO_START_OVERRIDE(powerbal_state,atombjt)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_atombjt, this));
 MACHINE_CONFIG_END
 
 /*

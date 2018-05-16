@@ -44,7 +44,7 @@ WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 {
 	m_fmirq = state ? true : false;
 	/* TODO: seems to die very often */
-	machine().device<pic8259_device>(":pic8259_slave")->ir4_w(state || (m_pcmirq ? ASSERT_LINE : CLEAR_LINE));
+	m_bus->int_w<5>(state || (m_pcmirq ? ASSERT_LINE : CLEAR_LINE));
 }
 
 
@@ -274,7 +274,7 @@ WRITE8_MEMBER(pc9801_86_device::pcm_w)
 					m_head = m_tail = m_count = 0;
 				if(!(data & 0x10))
 				{
-					machine().device<pic8259_device>(":pic8259_slave")->ir4_w(m_fmirq ? ASSERT_LINE : CLEAR_LINE);
+					m_bus->int_w<5>(m_fmirq ? ASSERT_LINE : CLEAR_LINE);
 					if(!(queue_count() < m_irq_rate) || !(data & 0x80))
 						m_pcmirq = false; //TODO: this needs research
 				}
@@ -356,6 +356,6 @@ void pc9801_86_device::device_timer(emu_timer& timer, device_timer_id id, int pa
 	if((queue_count() < m_irq_rate) && (m_pcm_ctrl & 0x20))
 	{
 		m_pcmirq = true;
-		machine().device<pic8259_device>(":pic8259_slave")->ir4_w(ASSERT_LINE);
+		m_bus->int_w<5>(ASSERT_LINE);
 	}
 }

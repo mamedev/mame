@@ -484,7 +484,7 @@ static const gfx_layout car_layout =
 };
 
 
-static GFXDECODE_START( sprint2 )
+static GFXDECODE_START( gfx_sprint2 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, car_layout, 4, 4 )
 GFXDECODE_END
@@ -509,7 +509,7 @@ MACHINE_CONFIG_START(sprint2_state::sprint2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint2_state, screen_vblank_sprint2))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprint2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sprint2)
 	MCFG_PALETTE_ADD("palette", 12)
 	MCFG_PALETTE_INDIRECT_ENTRIES(4)
 	MCFG_PALETTE_INIT_OWNER(sprint2_state, sprint2)

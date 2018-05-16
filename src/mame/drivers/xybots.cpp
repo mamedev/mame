@@ -160,7 +160,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( xybots )
+static GFXDECODE_START( gfx_xybots )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,    512, 16 ) /* playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,    256, 48 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, anlayout,        0, 64 ) /* characters 8x8 */
@@ -188,7 +188,7 @@ MACHINE_CONFIG_START(xybots_state::xybots)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xybots)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xybots)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)

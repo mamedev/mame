@@ -228,7 +228,7 @@ static const gfx_layout pts_16x16_8bits_layout =
 	16*16*8
 };
 
-static GFXDECODE_START( ygv608 )
+static GFXDECODE_START( gfx_ygv608 )
 	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_8x8_4bits_layout,    0,  16 )
 	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_16x16_4bits_layout,  0,  16 )
 	GFXDECODE_DEVICE( DEVICE_SELF, 0x00000000, pts_32x32_4bits_layout,  0,  16 )
@@ -316,7 +316,7 @@ void ygv608_device::port_map(address_map &map)
 
 ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t(mconfig, YGV608, tag, owner, clock),
-	  device_gfx_interface(mconfig, *this, GFXDECODE_NAME(ygv608)),
+	  device_gfx_interface(mconfig, *this, gfx_ygv608),
 	  device_memory_interface(mconfig, *this),
 	  device_video_interface(mconfig, *this),
 	  m_io_space_config("io", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(ygv608_device::regs_map), this)),

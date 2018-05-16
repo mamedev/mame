@@ -463,7 +463,7 @@ WRITE_LINE_MEMBER(dkong_state::s2650_interrupt)
  *
  *************************************/
 
-MACHINE_START_MEMBER(dkong_state,dkong2b)
+void dkong_state::machine_start_dkong2b()
 {
 	m_hardware_type = HARDWARE_TKG04;
 
@@ -471,17 +471,16 @@ MACHINE_START_MEMBER(dkong_state,dkong2b)
 	save_item(NAME(m_dma_latch));
 }
 
-MACHINE_START_MEMBER(dkong_state,s2650)
+void dkong_state::machine_start_s2650()
 {
 	uint8_t   *p = memregion("user1")->base();
 	const char *game_name = machine().system().name;
-	int i;
 
-	MACHINE_START_CALL_MEMBER(dkong2b);
+	machine_start_dkong2b();
 
-	for (i = 0; i < 0x200; i++)
+	for (int i = 0; i < 0x200; i++)
 		m_rev_map[i] = -1;
-	for (i = 0; i < 0x200; i++)
+	for (int i = 0; i < 0x200; i++)
 		m_rev_map[p[0x0000 + i]] = i;
 
 	m_hunchloopback = 0;
@@ -504,40 +503,40 @@ MACHINE_START_MEMBER(dkong_state,s2650)
 		fatalerror("Unknown game <%s> in S2650 start.\n", game_name);
 }
 
-MACHINE_START_MEMBER(dkong_state,radarscp)
+void dkong_state::machine_start_radarscp()
 {
-	MACHINE_START_CALL_MEMBER(dkong2b);
+	machine_start_dkong2b();
 	m_hardware_type = HARDWARE_TRS02;
 	m_vidhw = DKONG_BOARD;
 }
 
-MACHINE_START_MEMBER(dkong_state,radarscp1)
+void dkong_state::machine_start_radarscp1()
 {
-	MACHINE_START_CALL_MEMBER(dkong2b);
+	machine_start_dkong2b();
 	m_hardware_type = HARDWARE_TRS01;
 	m_vidhw = DKONG_BOARD;
 }
 
-MACHINE_START_MEMBER(dkong_state,dkong3)
+void dkong_state::machine_start_dkong3()
 {
 	m_hardware_type = HARDWARE_TKG04;
 }
 
-MACHINE_RESET_MEMBER(dkong_state,dkong)
+void dkong_state::machine_reset_dkong()
 {
 	/* nothing */
 }
 
-MACHINE_RESET_MEMBER(dkong_state,ddk)
+void dkong_state::machine_reset_ddk()
 {
 	dk_braze_a15(!membank("bank1")->entry());
 }
 
-MACHINE_RESET_MEMBER(dkong_state,strtheat)
+void dkong_state::machine_reset_strtheat()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	MACHINE_RESET_CALL_MEMBER(dkong);
+	machine_reset_dkong();
 
 	/* The initial state of the counter is 0x08 */
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
@@ -545,11 +544,11 @@ MACHINE_RESET_MEMBER(dkong_state,strtheat)
 	membank("bank1")->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER(dkong_state,drakton)
+void dkong_state::machine_reset_drakton()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	MACHINE_RESET_CALL_MEMBER(dkong);
+	machine_reset_dkong();
 
 	/* The initial state of the counter is 0x09 */
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
@@ -1614,7 +1613,7 @@ static const gfx_layout spritelayout =
 	16*8                                    /* every sprite takes 16 consecutive bytes */
 };
 
-static GFXDECODE_START( dkong )
+static GFXDECODE_START( gfx_dkong )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x2_planar,   0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout,       0, 64 )
 GFXDECODE_END
@@ -1698,8 +1697,8 @@ MACHINE_CONFIG_START(dkong_state::dkong_base)
 	MCFG_DEVICE_ADD("maincpu", Z80, CLOCK_1H)
 	MCFG_DEVICE_PROGRAM_MAP(dkong_map)
 
-	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
-	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,dkong)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_dkong2b, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_dkong, this));
 
 	MCFG_DEVICE_ADD("dma8257", I8257, CLOCK_1H)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, dkong_state, busreq_w))
@@ -1716,18 +1715,18 @@ MACHINE_CONFIG_START(dkong_state::dkong_base)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dkong_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dkong)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dkong)
 	MCFG_PALETTE_ADD("palette", DK2B_PALETTE_LENGTH)
 
 	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong2b)
-	MCFG_VIDEO_START_OVERRIDE(dkong_state,dkong)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_dkong, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dkong_state::radarscp)
 	dkong_base(config);
 
 	/* basic machine hardware */
-	MCFG_MACHINE_START_OVERRIDE(dkong_state,radarscp)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_radarscp, this));
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(RS_PALETTE_LENGTH)
 	MCFG_PALETTE_INIT_OWNER(dkong_state,radarscp)
@@ -1740,7 +1739,7 @@ MACHINE_CONFIG_START(dkong_state::radarscp1)
 	dkong_base(config);
 
 	/* basic machine hardware */
-	MCFG_MACHINE_START_OVERRIDE(dkong_state,radarscp1)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_radarscp1, this));
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(RS_PALETTE_LENGTH)
 	MCFG_PALETTE_INIT_OWNER(dkong_state,radarscp1)
@@ -1754,7 +1753,7 @@ MACHINE_CONFIG_START(dkong_state::dkong2b)
 	dkong_base(config);
 
 	/* basic machine hardware */
-	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_dkong2b, this));
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(DK2B_PALETTE_LENGTH)
 
@@ -1779,7 +1778,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dkong_state::ddk_braze)
 	dkj_braze(config);
 
-	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,ddk)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ddk, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dkong_state::dk3_braze)
@@ -1795,7 +1794,7 @@ MACHINE_CONFIG_START(dkong_state::dkong3)
 	MCFG_DEVICE_PROGRAM_MAP(dkong3_map)
 	MCFG_DEVICE_IO_MAP(dkong3_io_map)
 
-	MCFG_MACHINE_START_OVERRIDE(dkong_state, dkong3)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_dkong3, this));
 
 	MCFG_DEVICE_ADD("z80dma", Z80DMA, CLOCK_1H)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
@@ -1811,11 +1810,11 @@ MACHINE_CONFIG_START(dkong_state::dkong3)
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("n2a03a", INPUT_LINE_NMI))
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("n2a03b", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dkong)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dkong)
 	MCFG_PALETTE_ADD("palette", DK3_PALETTE_LENGTH)
 
 	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong3)
-	MCFG_VIDEO_START_OVERRIDE(dkong_state,dkong)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_dkong, this));
 
 	/* sound hardware */
 	dkong3_audio(config);
@@ -1875,7 +1874,7 @@ MACHINE_CONFIG_START(dkong_state::s2650)
 	MCFG_I8257_IN_MEMR_CB(READ8(*this, dkong_state, hb_dma_read_byte))
 	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, dkong_state, hb_dma_write_byte))
 
-	MCFG_MACHINE_START_OVERRIDE(dkong_state,s2650)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_s2650, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dkong_state::herbiedk)
@@ -1908,7 +1907,7 @@ MACHINE_CONFIG_START(dkong_state::strtheat)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(epos_readport)
 
-	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,strtheat)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_strtheat, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dkong_state::drakton)
@@ -1918,7 +1917,7 @@ MACHINE_CONFIG_START(dkong_state::drakton)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(epos_readport)
 
-	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,drakton)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_drakton, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dkong_state::drktnjr)
@@ -1928,7 +1927,7 @@ MACHINE_CONFIG_START(dkong_state::drktnjr)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(epos_readport)
 
-	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,drakton)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_drakton, this));
 MACHINE_CONFIG_END
 
 /*************************************

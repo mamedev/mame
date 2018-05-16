@@ -379,7 +379,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( mrgame )
+static GFXDECODE_START( gfx_mrgame )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 16 )
 	GFXDECODE_ENTRY( "chargen", 0, spritelayout, 0, 16 )
 GFXDECODE_END
@@ -500,7 +500,7 @@ MACHINE_CONFIG_START(mrgame_state::mrgame)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(mrgame_state, mrgame)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrgame)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrgame)
 
 	/* Sound */
 	SPEAKER(config, "lspeaker").front_left();

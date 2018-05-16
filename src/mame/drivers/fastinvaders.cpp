@@ -638,7 +638,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( fastinvaders )
+static GFXDECODE_START( gfx_fastinvaders )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -674,7 +674,7 @@ MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastinvaders_state, scanline_timer, 
 	MCFG_SCREEN_UPDATE_DRIVER(fastinvaders_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fastinvaders)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fastinvaders)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */

@@ -1579,22 +1579,22 @@ static const gfx_layout t1_charlayout8 =
 };
 
 /* type 1 (opengolf + racinfrc) use 6 and 8 bpp planar layouts for the 53936 */
-static GFXDECODE_START( opengolf )
+static GFXDECODE_START( gfx_opengolf )
 	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout8, 0x0000, 8 )
 	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( racinfrc )
+static GFXDECODE_START( gfx_racinfrc )
 	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout6, 0x0000, 8 )
 	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 8 )
 GFXDECODE_END
 
 /* type 3 & 4 games use a simple 8bpp decode for the 53936 */
-static GFXDECODE_START( type3 )
+static GFXDECODE_START( gfx_type3 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1000, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( type4 )
+static GFXDECODE_START( gfx_type4 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1800, 8 )
 GFXDECODE_END
 
@@ -1630,8 +1630,8 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START_OVERRIDE(konamigx_state,konamigx)
-	MCFG_MACHINE_RESET_OVERRIDE(konamigx_state,konamigx)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_konamigx, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_konamigx, this));
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -1671,7 +1671,7 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	MCFG_K055673_SET_SCREEN("screen")
 	MCFG_K055673_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_5bpp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_konamigx_5bpp, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1730,7 +1730,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(konamigx_state::dragoonj)
 	konamigx(config);
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state, dragoonj)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_dragoonj, this));
 
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(24+16, 16)
@@ -1745,7 +1745,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konamigx_state::le2)
 	konamigx(config);
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state, le2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_le2, this));
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_type2_scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_MODIFY("k056832")
@@ -1758,7 +1758,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konamigx_state::konamigx_6bpp)
 	konamigx(config);
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_6bpp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_konamigx_6bpp, this));
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 0, "none")
@@ -1783,8 +1783,8 @@ MACHINE_CONFIG_START(konamigx_state::opengolf)
 	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", opengolf)
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state, opengolf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_opengolf)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_opengolf, this));
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -53, -23)
@@ -1802,8 +1802,8 @@ MACHINE_CONFIG_START(konamigx_state::racinfrc)
 	//MCFG_SCREEN_RAW_PARAMS(6000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	//MCFG_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", racinfrc)
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state, racinfrc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_racinfrc)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_racinfrc, this));
 
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(24-8+16, 0)
@@ -1830,8 +1830,8 @@ MACHINE_CONFIG_START(konamigx_state::gxtype3)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", type3)
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_type3)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_konamigx_type3, this));
 
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(0, 16)
@@ -1889,8 +1889,8 @@ MACHINE_CONFIG_START(konamigx_state::gxtype4)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", type4)
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_type4)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_konamigx_type4, this));
 
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(0, 16)
@@ -1920,7 +1920,7 @@ MACHINE_CONFIG_START(konamigx_state::gxtype4_vsn)
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
 
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4_vsn)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_konamigx_type4_vsn, this));
 
 	MCFG_DEVICE_MODIFY("k056832")
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 0, 2, "none")   // set djmain_hack to 2 to kill layer association or half the tilemaps vanish on screen 0
@@ -1931,7 +1931,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konamigx_state::gxtype4sd2)
 	gxtype4(config);
-	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4_sd2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_konamigx_type4_sd2, this));
 
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -81, -23)
@@ -3725,7 +3725,7 @@ ROM_END
 /**********************************************************************************/
 /* initializers */
 
-MACHINE_START_MEMBER(konamigx_state,konamigx)
+void konamigx_state::machine_start_konamigx()
 {
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_intck));
@@ -3740,7 +3740,7 @@ MACHINE_START_MEMBER(konamigx_state,konamigx)
 	save_item(NAME(m_prev_pixel_clock));
 }
 
-MACHINE_RESET_MEMBER(konamigx_state,konamigx)
+void konamigx_state::machine_reset_konamigx()
 {
 	m_gx_wrport1_0 = m_gx_wrport1_1 = 0;
 	m_gx_wrport2 = 0;

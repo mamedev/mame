@@ -164,7 +164,7 @@ static const gfx_layout tile_16x16_layout =
 };
 
 
-static GFXDECODE_START( dreambal )
+static GFXDECODE_START( gfx_dreambal )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0x000, 32 )    /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0x000, 32 )    /* Tiles (16x16) */
 GFXDECODE_END
@@ -325,7 +325,7 @@ MACHINE_CONFIG_START(dreambal_state::dreambal)
 
 	MCFG_PALETTE_ADD("palette", 0x400/2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dreambal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dreambal)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93lc46b
 

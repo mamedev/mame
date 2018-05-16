@@ -845,7 +845,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( jack )
+static GFXDECODE_START( gfx_jack )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -861,7 +861,7 @@ static const gfx_layout joinem_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( joinem )
+static GFXDECODE_START( gfx_joinem )
 	GFXDECODE_ENTRY( "gfx1", 0, joinem_charlayout, 0, 32 )
 GFXDECODE_END
 
@@ -877,14 +877,14 @@ void jack_state::machine_reset()
 }
 
 
-MACHINE_START_MEMBER(jack_state,striv)
+void jack_state::machine_start_striv()
 {
 	save_item(NAME(m_question_address));
 	save_item(NAME(m_question_rom));
 	save_item(NAME(m_remap_address));
 }
 
-MACHINE_RESET_MEMBER(jack_state,striv)
+void jack_state::machine_reset_striv()
 {
 	m_question_address = 0;
 	m_question_rom = 0;
@@ -894,7 +894,7 @@ MACHINE_RESET_MEMBER(jack_state,striv)
 }
 
 
-MACHINE_START_MEMBER(jack_state,joinem)
+void jack_state::machine_start_joinem()
 {
 	m_joinem_palette_bank = 0;
 
@@ -902,7 +902,7 @@ MACHINE_START_MEMBER(jack_state,joinem)
 	save_item(NAME(m_joinem_palette_bank));
 }
 
-MACHINE_RESET_MEMBER(jack_state,joinem)
+void jack_state::machine_reset_joinem()
 {
 	joinem_control_w(m_maincpu->space(AS_PROGRAM), 0, 0, 0xff);
 }
@@ -931,7 +931,7 @@ MACHINE_CONFIG_START(jack_state::jack)
 	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_jack)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jack)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
@@ -962,8 +962,8 @@ MACHINE_CONFIG_START(jack_state::striv)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(striv_map)
 
-	MCFG_MACHINE_START_OVERRIDE(jack_state,striv)
-	MCFG_MACHINE_RESET_OVERRIDE(jack_state,striv)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_striv, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_striv, this));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -988,20 +988,20 @@ MACHINE_CONFIG_START(jack_state::joinem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jack_state, joinem_vblank_irq)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(jack_state, irq0_line_hold, 250) // ??? controls game speed
 
-	MCFG_MACHINE_START_OVERRIDE(jack_state,joinem)
-	MCFG_MACHINE_RESET_OVERRIDE(jack_state,joinem)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_joinem, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_joinem, this));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_joinem)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", joinem)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_joinem)
 
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(jack_state, joinem)
 
-	MCFG_VIDEO_START_OVERRIDE(jack_state,joinem)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_joinem, this));
 MACHINE_CONFIG_END
 
 

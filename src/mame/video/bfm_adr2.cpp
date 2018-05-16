@@ -133,7 +133,7 @@ static const gfx_layout charlayout =
 // characters are grouped by 64 (512 pixels)
 // there are max 128 of these groups
 
-static GFXDECODE_START( adder2 )
+static GFXDECODE_START( gfx_adder2 )
 	GFXDECODE_ENTRY( ":gfx1",  0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -141,7 +141,7 @@ DEFINE_DEVICE_TYPE(BFM_ADDER2, bfm_adder2_device, "bfm_adder2", "BFM ADDER2")
 
 bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t(mconfig, BFM_ADDER2, tag, owner, clock)
-	, device_gfx_interface(mconfig, *this, GFXDECODE_NAME(adder2), "palette")
+	, device_gfx_interface(mconfig, *this, gfx_adder2, "palette")
 	, m_cpu(*this, "adder2")
 {
 }

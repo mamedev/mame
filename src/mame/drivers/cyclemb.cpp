@@ -958,7 +958,7 @@ static const gfx_layout spritelayout_32x32 =
 	64*8*4    /* every sprite takes (64*8=16x6)*4) bytes */
 };
 
-static GFXDECODE_START( cyclemb )
+static GFXDECODE_START( gfx_cyclemb )
 	GFXDECODE_ENTRY( "tilemap_data", 0, charlayout,     0, 0x40 )
 	GFXDECODE_ENTRY( "sprite_data", 0, spritelayout_16x16,    0x00, 0x40 )
 	GFXDECODE_ENTRY( "sprite_data", 0, spritelayout_32x32,    0x00, 0x40 )
@@ -985,7 +985,7 @@ MACHINE_CONFIG_START(cyclemb_state::cyclemb)
 	MCFG_SCREEN_UPDATE_DRIVER(cyclemb_state, screen_update_cyclemb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cyclemb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyclemb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(cyclemb_state, cyclemb)
 

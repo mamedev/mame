@@ -488,7 +488,7 @@ static const gfx_layout sp2_layout =
 #undef O2
 
 
-static GFXDECODE_START( lastbank )
+static GFXDECODE_START( gfx_lastbank )
 	GFXDECODE_ENTRY( "gfx1",        0, bg2_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1",        0, sp2_layout, 0, 16 )
 GFXDECODE_END
@@ -524,8 +524,8 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	//MCFG_MACHINE_START_OVERRIDE(lastbank_state,lastbank)
-	//MCFG_MACHINE_RESET_OVERRIDE(lastbank_state,lastbank)
+	//set_machine_start_cb(config, driver_callback_delegate(&machine_start_lastbank, this));
+	//set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_lastbank, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -537,13 +537,13 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lastbank_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastbank )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastbank )
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
 	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
 
-//  MCFG_VIDEO_START_OVERRIDE(lastbank_state,lastbank)
+//  set_video_start_cb(config, driver_callback_delegate(&video_start_lastbank, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

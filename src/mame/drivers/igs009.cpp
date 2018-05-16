@@ -115,7 +115,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(gp98);
+	void video_start_gp98() ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void gp98(machine_config &config);
@@ -286,7 +286,7 @@ void igs009_state::video_start()
 }
 
 
-VIDEO_START_MEMBER(igs009_state,gp98)
+void igs009_state::video_start_gp98()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -757,7 +757,7 @@ static const gfx_layout layout_8x32x6 =
 	8*32*2
 };
 
-static GFXDECODE_START( jingbell )
+static GFXDECODE_START( gfx_jingbell )
 	GFXDECODE_ENTRY( "reels", 0, layout_8x32x6, 0, 16 )
 	GFXDECODE_ENTRY( "tiles", 0, layout_8x8x6,  0, 16 )
 GFXDECODE_END
@@ -784,7 +784,7 @@ static const gfx_layout tiles8x32_layout =
 	32*16
 };
 
-static GFXDECODE_START( gp98 )
+static GFXDECODE_START( gfx_gp98 )
 	GFXDECODE_ENTRY( "reels", 0, tiles8x32_layout, 0, 16 )
 	GFXDECODE_ENTRY( "tiles", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
@@ -844,7 +844,7 @@ MACHINE_CONFIG_START(igs009_state::jingbell)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs009_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jingbell)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jingbell)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -864,9 +864,9 @@ MACHINE_CONFIG_START(igs009_state::gp98)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(gp98_portmap)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gp98)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gp98)
 
-	MCFG_VIDEO_START_OVERRIDE(igs009_state,gp98)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gp98, this));
 MACHINE_CONFIG_END
 
 

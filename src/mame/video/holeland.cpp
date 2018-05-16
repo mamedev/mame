@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(holeland_state::crzrally_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(holeland_state,holeland)
+void holeland_state::video_start_holeland()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(holeland_state::holeland_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
@@ -65,7 +65,7 @@ VIDEO_START_MEMBER(holeland_state,holeland)
 	save_item(NAME(m_palette_offset));
 }
 
-VIDEO_START_MEMBER(holeland_state,crzrally)
+void holeland_state::video_start_crzrally()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(holeland_state::crzrally_get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 

@@ -72,13 +72,13 @@ public:
 	TILE_GET_INFO_MEMBER(rallyx_fg_get_tile_info);
 	TILE_GET_INFO_MEMBER(locomotn_bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(locomotn_fg_get_tile_info);
-	DECLARE_MACHINE_START(rallyx);
-	DECLARE_VIDEO_START(rallyx);
+	void machine_start_rallyx() ATTR_COLD;
+	void video_start_rallyx()   ATTR_COLD;
 	DECLARE_PALETTE_INIT(rallyx);
-	DECLARE_VIDEO_START(jungler);
+	void video_start_jungler()  ATTR_COLD;
 	DECLARE_PALETTE_INIT(jungler);
-	DECLARE_VIDEO_START(locomotn);
-	DECLARE_VIDEO_START(commsega);
+	void video_start_locomotn() ATTR_COLD;
+	void video_start_commsega() ATTR_COLD;
 	uint32_t screen_update_rallyx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jungler(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_locomotn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

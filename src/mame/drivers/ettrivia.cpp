@@ -209,7 +209,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( ettrivia )
+static GFXDECODE_START( gfx_ettrivia )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 32*4, 32 )
 GFXDECODE_END
@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(ettrivia_state::ettrivia)
 	MCFG_SCREEN_UPDATE_DRIVER(ettrivia_state, screen_update_ettrivia)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ettrivia)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ettrivia)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(ettrivia_state, ettrivia)
 

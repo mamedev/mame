@@ -1743,7 +1743,7 @@ static const gfx_layout charset_16x16 =
 	16*16
 };
 
-static GFXDECODE_START( pc9801 )
+static GFXDECODE_START( gfx_pc9801 )
 	GFXDECODE_ENTRY( "chargen", 0x00000, charset_8x8,     0x000, 0x01 )
 	GFXDECODE_ENTRY( "chargen", 0x00800, charset_8x16,    0x000, 0x01 )
 	GFXDECODE_ENTRY( "kanji",   0x00000, charset_16x16,   0x000, 0x01 )
@@ -2038,7 +2038,7 @@ PALETTE_INIT_MEMBER(pc9801_state,pc9801)
 		palette.set_pen_color(i, pal1bit(0), pal1bit(0), pal1bit(0));
 }
 
-MACHINE_START_MEMBER(pc9801_state,pc9801_common)
+void pc9801_state::machine_start_pc9801_common()
 {
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
@@ -2056,45 +2056,45 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 	save_pointer(NAME(m_egc.regs), 8);
 }
 
-MACHINE_START_MEMBER(pc9801_state,pc9801f)
+void pc9801_state::machine_start_pc9801f()
 {
-	MACHINE_START_CALL_MEMBER(pc9801_common);
+	machine_start_pc9801_common();
 
 	m_fdc_2hd->set_rate(500000);
 	m_fdc_2dd->set_rate(250000);
 	m_sys_type = 0x00 >> 6;
 }
 
-MACHINE_START_MEMBER(pc9801_state,pc9801rs)
+void pc9801_state::machine_start_pc9801rs()
 {
-	MACHINE_START_CALL_MEMBER(pc9801_common);
+	machine_start_pc9801_common();
 
 	m_sys_type = 0x80 >> 6;
 }
 
-MACHINE_START_MEMBER(pc9801_state,pc9801bx2)
+void pc9801_state::machine_start_pc9801bx2()
 {
-	MACHINE_START_CALL_MEMBER(pc9801rs);
+	machine_start_pc9801rs();
 
 	save_pointer(NAME(m_sdip), 24);
 }
 
 
-MACHINE_START_MEMBER(pc9801_state,pc9821)
+void pc9801_state::machine_start_pc9821()
 {
-	MACHINE_START_CALL_MEMBER(pc9801rs);
+	machine_start_pc9801rs();
 
 	save_pointer(NAME(m_sdip), 24);
 }
 
-MACHINE_START_MEMBER(pc9801_state,pc9821ap2)
+void pc9801_state::machine_start_pc9821ap2()
 {
-	MACHINE_START_CALL_MEMBER(pc9821);
+	machine_start_pc9821();
 
 	// ...
 }
 
-MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
+void pc9801_state::machine_reset_pc9801_common()
 {
 	memset(m_tvram.get(), 0, sizeof(uint16_t) * 0x2000);
 	/* this looks like to be some kind of backup ram, system will boot with green colors otherwise */
@@ -2120,9 +2120,9 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 	memset(&m_egc, 0, sizeof(m_egc));
 }
 
-MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
+void pc9801_state::machine_reset_pc9801f()
 {
-	MACHINE_RESET_CALL_MEMBER(pc9801_common);
+	machine_reset_pc9801_common();
 
 	uint8_t op_mode;
 	uint8_t *ROM;
@@ -2142,9 +2142,9 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 		ROM[i] = PRG[i+op_mode*0x8000+0x10000];
 }
 
-MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
+void pc9801_state::machine_reset_pc9801rs()
 {
-	MACHINE_RESET_CALL_MEMBER(pc9801_common);
+	machine_reset_pc9801_common();
 
 	m_gate_a20 = 0;
 	m_fdc_ctrl = 3;
@@ -2161,9 +2161,9 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	}
 }
 
-MACHINE_RESET_MEMBER(pc9801_state,pc9821)
+void pc9801_state::machine_reset_pc9821()
 {
-	MACHINE_RESET_CALL_MEMBER(pc9801rs);
+	machine_reset_pc9801rs();
 
 	m_pc9821_window_bank = 0x08;
 }
@@ -2225,8 +2225,36 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc9801_state::pc9801_cbus)
 	MCFG_PC9801CBUS_SLOT_ADD("cbus0", pc9801_cbus_devices, "pc9801_26")
+	MCFG_PC9801CBUS_INT0_CALLBACK(WRITELINE("ir3", input_merger_device, in_w<0>))
+	MCFG_PC9801CBUS_INT1_CALLBACK(WRITELINE("ir5", input_merger_device, in_w<0>))
+	MCFG_PC9801CBUS_INT2_CALLBACK(WRITELINE("ir6", input_merger_device, in_w<0>))
+	MCFG_PC9801CBUS_INT3_CALLBACK(WRITELINE("ir9", input_merger_device, in_w<0>))
+	MCFG_PC9801CBUS_INT4_CALLBACK(WRITELINE("pic8259_slave", pic8259_device, ir2_w))
+	MCFG_PC9801CBUS_INT5_CALLBACK(WRITELINE("ir12", input_merger_device, in_w<0>))
+	MCFG_PC9801CBUS_INT6_CALLBACK(WRITELINE("ir13", input_merger_device, in_w<0>))
+
 	MCFG_PC9801CBUS_SLOT_ADD("cbus1", pc9801_cbus_devices, nullptr)
+	MCFG_PC9801CBUS_INT0_CALLBACK(WRITELINE("ir3", input_merger_device, in_w<1>))
+	MCFG_PC9801CBUS_INT1_CALLBACK(WRITELINE("ir5", input_merger_device, in_w<1>))
+	MCFG_PC9801CBUS_INT2_CALLBACK(WRITELINE("ir6", input_merger_device, in_w<1>))
+	MCFG_PC9801CBUS_INT3_CALLBACK(WRITELINE("ir9", input_merger_device, in_w<1>))
+	MCFG_PC9801CBUS_INT4_CALLBACK(WRITELINE("pic8259_slave", pic8259_device, ir3_w))
+	MCFG_PC9801CBUS_INT5_CALLBACK(WRITELINE("ir12", input_merger_device, in_w<1>))
+	MCFG_PC9801CBUS_INT6_CALLBACK(WRITELINE("ir13", input_merger_device, in_w<1>))
 //  TODO: six max slots
+
+	MCFG_INPUT_MERGER_ANY_HIGH("ir3")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic8259_master", pic8259_device, ir3_w))
+	MCFG_INPUT_MERGER_ANY_HIGH("ir5")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic8259_master", pic8259_device, ir5_w))
+	MCFG_INPUT_MERGER_ANY_HIGH("ir6")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic8259_master", pic8259_device, ir6_w))
+	MCFG_INPUT_MERGER_ANY_HIGH("ir9")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir1_w))
+	MCFG_INPUT_MERGER_ANY_HIGH("ir12")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir4_w))
+	MCFG_INPUT_MERGER_ANY_HIGH("ir13")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir5_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc9801_state::pc9801_sasi)
@@ -2352,7 +2380,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 
 	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc9801)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc9801)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc9801_state::pc9801)
@@ -2363,8 +2391,8 @@ MACHINE_CONFIG_START(pc9801_state::pc9801)
 
 	pc9801_common(config);
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801f)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801f)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pc9801f, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pc9801f, this));
 
 	// TODO: maybe force dips to avoid beep error
 	MCFG_RAM_ADD(RAM_TAG)
@@ -2404,8 +2432,8 @@ MACHINE_CONFIG_START(pc9801_state::pc9801rs)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x18000)
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801rs)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pc9801rs, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pc9801rs, this));
 
 	MCFG_DEVICE_MODIFY("i8237")
 	MCFG_DEVICE_CLOCK(MAIN_CLOCK_X1*8); // unknown clock
@@ -2434,8 +2462,8 @@ MACHINE_CONFIG_START(pc9801_state::pc9801vm)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 	MCFG_RAM_EXTRA_OPTIONS("640K")
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801_common)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801_common)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pc9801_common, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pc9801_common, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc9801_state::pc9801ux)
@@ -2455,7 +2483,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801bx2)
 	MCFG_DEVICE_IO_MAP(pc9821_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801bx2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pc9801bx2, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc9801_state::pc9821)
@@ -2470,8 +2498,8 @@ MACHINE_CONFIG_START(pc9801_state::pc9821)
 	MCFG_PIT8253_CLK1(MAIN_CLOCK_X2)
 	MCFG_PIT8253_CLK2(MAIN_CLOCK_X2)
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9821)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pc9821, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pc9821, this));
 
 	MCFG_DEVICE_MODIFY("i8237")
 	MCFG_DEVICE_CLOCK(16000000); // unknown clock
@@ -2488,7 +2516,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9821ap2)
 	MCFG_DEVICE_IO_MAP(pc9821_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821ap2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pc9821ap2, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc9801_state::pc9821v20)

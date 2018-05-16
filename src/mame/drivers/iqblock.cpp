@@ -332,7 +332,7 @@ static const gfx_layout tilelayout3 =
 };
 #endif
 
-static GFXDECODE_START( iqblock )
+static GFXDECODE_START( gfx_iqblock )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout1, 0, 16 )    /* only odd color codes are used */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2, 0,  4 )    /* only color codes 0 and 3 used */
 GFXDECODE_END
@@ -362,7 +362,7 @@ MACHINE_CONFIG_START(iqblock_state::iqblock)
 	MCFG_SCREEN_UPDATE_DRIVER(iqblock_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", iqblock)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_iqblock)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

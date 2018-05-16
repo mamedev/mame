@@ -25,7 +25,7 @@
 
 #include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"
@@ -291,8 +291,8 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	MCFG_DEVICE_IO_MAP(mtx_io)
 	MCFG_Z80_DAISY_CHAIN(mtx_daisy_chain)
 
-	MCFG_MACHINE_START_OVERRIDE(mtx_state,mtx512)
-	MCFG_MACHINE_RESET_OVERRIDE(mtx_state,mtx512)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mtx512, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mtx512, this));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9929a", TMS9929A, XTAL(10'738'635) / 2 )

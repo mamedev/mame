@@ -435,13 +435,13 @@ static const gfx_layout sauro_spritelayout =
 	16*16     /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( sauro )
+static GFXDECODE_START( gfx_sauro )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx3", 0, sauro_spritelayout, 0, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( trckydoc )
+static GFXDECODE_START( gfx_trckydoc )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, trckydoc_spritelayout, 0, 64 )
 GFXDECODE_END
@@ -489,9 +489,9 @@ MACHINE_CONFIG_START(sauro_state::trckydoc)
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, sauro_state, coin1_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, sauro_state, coin2_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trckydoc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trckydoc)
 
-	MCFG_VIDEO_START_OVERRIDE(sauro_state,trckydoc)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_trckydoc, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(sauro_state, screen_update_trckydoc)
 
@@ -516,9 +516,9 @@ MACHINE_CONFIG_START(sauro_state::sauro)
 	MCFG_DEVICE_PROGRAM_MAP(sauro_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(sauro_state, irq0_line_hold,  8*60) // ?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sauro)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sauro)
 
-	MCFG_VIDEO_START_OVERRIDE(sauro_state,sauro)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_sauro, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(sauro_state, screen_update_sauro)
 

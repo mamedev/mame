@@ -329,7 +329,7 @@ static const gfx_layout layout8x8x8_2 =
 	32*8*2
 };
 
-static GFXDECODE_START( midas )
+static GFXDECODE_START( gfx_midas )
 	GFXDECODE_ENTRY( "sprites", 0, layout16x16x8, 0, 0x100 )
 	GFXDECODE_ENTRY( "tiles",   0, layout8x8x8_2, 0,  0x80 )
 GFXDECODE_END
@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(midas_state::livequiz)
 
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", midas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_midas)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -678,7 +678,7 @@ MACHINE_CONFIG_START(midas_state::hammer)
 
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", midas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_midas)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(XRGB)
 

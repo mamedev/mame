@@ -554,7 +554,7 @@ static const gfx_layout tilelayout =
 };
 
 
-static GFXDECODE_START( mil4000 )
+static GFXDECODE_START( gfx_mil4000 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,     0, 0x800/32 )
 GFXDECODE_END
 
@@ -578,7 +578,7 @@ MACHINE_CONFIG_START(mil4000_state::mil4000)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x800)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mil4000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mil4000)
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.

@@ -416,7 +416,7 @@ static const gfx_layout sprite_layout =
 	64*8
 };
 
-static GFXDECODE_START( skykid )
+static GFXDECODE_START( gfx_skykid )
 	GFXDECODE_ENTRY( "gfx1", 0, text_layout,   0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   64*4, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 64*4+128*4, 64 )
@@ -457,7 +457,7 @@ MACHINE_CONFIG_START(skykid_state::skykid)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, skykid_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skykid)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skykid)
 	MCFG_PALETTE_ADD("palette", 64*4+128*4+64*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(skykid_state, skykid)

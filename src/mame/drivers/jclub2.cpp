@@ -246,7 +246,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void init_darkhors();
-	DECLARE_VIDEO_START(darkhors);
+	void video_start_darkhors() ATTR_COLD;
 
 	void darkhors(machine_config &config);
 	void darkhors_map(address_map &map);
@@ -388,7 +388,7 @@ void darkhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-VIDEO_START_MEMBER(darkhors_state,darkhors)
+void darkhors_state::video_start_darkhors()
 {
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
 	m_tmap2= &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
@@ -1105,7 +1105,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*2
 };
 
-static GFXDECODE_START( darkhors )
+static GFXDECODE_START( gfx_darkhors )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0, 0x10000/64 ) // color codes should be doubled
 GFXDECODE_END
 
@@ -1228,8 +1228,8 @@ MACHINE_CONFIG_START(darkhors_state::darkhors)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darkhors)
-	MCFG_VIDEO_START_OVERRIDE(darkhors_state, darkhors)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darkhors)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_darkhors, this));
 
 	// layout
 	MCFG_DEFAULT_LAYOUT(layout_jclub2)

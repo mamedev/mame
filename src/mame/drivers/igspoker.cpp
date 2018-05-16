@@ -134,7 +134,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(cpokerpk);
+	void video_start_cpokerpk() ATTR_COLD;
 	uint32_t screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt);
@@ -238,7 +238,7 @@ uint32_t igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_i
 	return 0;
 }
 
-VIDEO_START_MEMBER(igspoker_state,cpokerpk)
+void igspoker_state::video_start_cpokerpk()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
 }
@@ -1879,7 +1879,7 @@ static const gfx_layout charlayout2 =
 };
 
 
-static GFXDECODE_START( igspoker )
+static GFXDECODE_START( gfx_igspoker )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, charlayout2,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, charlayout2,  0, 16 )
@@ -1898,7 +1898,7 @@ static const gfx_layout charlayoutcpk =
 	64*8
 };
 
-static GFXDECODE_START( cpokerpk )
+static GFXDECODE_START( gfx_cpokerpk )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayoutcpk,   0, 16 )
 	/* these not used? */
 	GFXDECODE_ENTRY( "gfx2", 0x04000, charlayout2,  0, 1 )
@@ -1929,7 +1929,7 @@ MACHINE_CONFIG_START(igspoker_state::igspoker)
 	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_igs_video)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igspoker)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igspoker)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1964,7 +1964,7 @@ MACHINE_CONFIG_START(igspoker_state::number10)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_cpokerpk)
-	MCFG_VIDEO_START_OVERRIDE(igspoker_state,cpokerpk)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cpokerpk, this));
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000) / 12, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1974,7 +1974,7 @@ MACHINE_CONFIG_START(igspoker_state::cpokerpk)
 	number10(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(cpokerpk_io_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cpokerpk)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cpokerpk)
 MACHINE_CONFIG_END
 
 

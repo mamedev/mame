@@ -78,7 +78,7 @@ static const gfx_layout pcd_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( pcx )
+static GFXDECODE_START( gfx_pcx )
 	GFXDECODE_DEVICE( "char", 0x0000, pcd_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -445,7 +445,7 @@ void pcx_video_device::device_start()
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rate(600*2);  // FIXME: fix the keyboard when the mc2661 baud rate calc is fixed
 
-	decode_gfx(GFXDECODE_NAME(pcx));
+	decode_gfx(gfx_pcx);
 }
 
 void pcx_video_device::device_reset()

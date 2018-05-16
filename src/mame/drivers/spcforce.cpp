@@ -243,7 +243,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( spcforce )
+static GFXDECODE_START( gfx_spcforce )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(spcforce_state::spcforce)
 	MCFG_SCREEN_UPDATE_DRIVER(spcforce_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spcforce)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spcforce)
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(colortable_source))
 	MCFG_PALETTE_INIT_OWNER(spcforce_state, spcforce)
 

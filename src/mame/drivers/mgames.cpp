@@ -630,7 +630,7 @@ static const gfx_layout tiles16x16_layout =
 	16*16
 };
 
-static GFXDECODE_START( mgames )
+static GFXDECODE_START( gfx_mgames )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
@@ -652,7 +652,7 @@ MACHINE_CONFIG_START(mgames_state::mgames)
 	MCFG_SCREEN_UPDATE_DRIVER(mgames_state, screen_update_mgames)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mgames)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mgames)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(mgames_state, mgames)
 

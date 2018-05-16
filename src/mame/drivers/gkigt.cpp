@@ -567,7 +567,7 @@ static const gfx_layout igt_gameking_layout =
 };
 
 
-static GFXDECODE_START( igt_gameking )
+static GFXDECODE_START( gfx_igt_gameking )
 	GFXDECODE_ENTRY( "cg", 0, igt_gameking_layout,   0x0, 1  )
 GFXDECODE_END
 
@@ -621,7 +621,7 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_RS232_RXD_HANDLER(WRITELINE("quart1", sc28c94_device, rx_d_w))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igt_gameking)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igt_gameking)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

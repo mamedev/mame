@@ -346,7 +346,7 @@ static const gfx_layout spritelayout =
 	16*8    /* ofset to next tile */
 };
 
-static GFXDECODE_START( kchamp )
+static GFXDECODE_START( gfx_kchamp )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,   32*4, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, spritelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, spritelayout, 0, 16 )
@@ -384,15 +384,15 @@ INTERRUPT_GEN_MEMBER(kchamp_state::sound_int)
 }
 
 
-MACHINE_START_MEMBER(kchamp_state,kchamp)
+void kchamp_state::machine_start_kchamp()
 {
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_sound_nmi_enable));
 }
 
-MACHINE_START_MEMBER(kchamp_state,kchampvs)
+void kchamp_state::machine_start_kchampvs()
 {
-	MACHINE_START_CALL_MEMBER(kchamp);
+	machine_start_kchamp();
 
 	save_item(NAME(m_msm_play_lo_nibble));
 }
@@ -421,7 +421,7 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, kchamp_state, nmi_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, kchamp_state, sound_reset_w))
 
-	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchampvs)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_kchampvs, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -433,7 +433,7 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, kchamp_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kchamp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kchamp)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
 
@@ -481,7 +481,7 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, kchamp_state, flipscreen_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, kchamp_state, nmi_enable_w))
 
-	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchamp)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_kchamp, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -493,7 +493,7 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, kchamp_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kchamp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kchamp)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
 

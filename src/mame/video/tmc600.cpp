@@ -112,7 +112,7 @@ static const gfx_layout tmc600_charlayout =
 	8*8                     // every char takes 8 x 8 bytes
 };
 
-static GFXDECODE_START( tmc600 )
+static GFXDECODE_START( gfx_tmc600 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, tmc600_charlayout, 0, 36 )
 GFXDECODE_END
 
@@ -120,7 +120,7 @@ MACHINE_CONFIG_START(tmc600_state::tmc600_video)
 	// video hardware
 	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", CDP1869_TAG":palette", tmc600)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, CDP1869_TAG":palette", gfx_tmc600)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

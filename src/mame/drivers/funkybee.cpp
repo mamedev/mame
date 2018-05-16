@@ -270,7 +270,7 @@ static const gfx_layout spritelayout =
 	4*16*8
 };
 
-static GFXDECODE_START( funkybee )
+static GFXDECODE_START( gfx_funkybee )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 16, 4 )
@@ -310,7 +310,7 @@ MACHINE_CONFIG_START(funkybee_state::funkybee)
 	MCFG_SCREEN_UPDATE_DRIVER(funkybee_state, screen_update_funkybee)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funkybee)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funkybee)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(funkybee_state, funkybee)
 

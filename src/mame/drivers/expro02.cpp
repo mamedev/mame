@@ -892,12 +892,12 @@ static const gfx_layout layout_16x16x4 =
 };
 
 
-static GFXDECODE_START( expro02 )
+static GFXDECODE_START( gfx_expro02 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x100,      0x40 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x400,      0x40 ) // [0] View2 tiles
 GFXDECODE_END
 
-static GFXDECODE_START( expro02_noview2 )
+static GFXDECODE_START( gfx_expro02_noview2 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x100,      0x40 ) // [0] Sprites
 GFXDECODE_END
 
@@ -925,7 +925,7 @@ MACHINE_CONFIG_START(expro02_state::expro02)
 	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", expro02)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_expro02)
 	MCFG_PALETTE_ADD("palette", 2048 + 32768)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 	MCFG_PALETTE_INIT_OWNER(expro02_state, expro02)
@@ -980,7 +980,7 @@ MACHINE_CONFIG_START(expro02_state::comad_noview2)
 	comad(config);
 	MCFG_DEVICE_REMOVE("view2_0")
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", expro02_noview2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_expro02_noview2)
 MACHINE_CONFIG_END
 
 

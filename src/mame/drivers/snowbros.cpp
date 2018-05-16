@@ -1623,7 +1623,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( snowbros )
+static GFXDECODE_START( gfx_snowbros )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 16 )
 GFXDECODE_END
 
@@ -1640,13 +1640,13 @@ static const gfx_layout honeydol_tilelayout8bpp =
 	32*32
 };
 
-static GFXDECODE_START( honeydol )
+static GFXDECODE_START( gfx_honeydol )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 64 ) // how does it use 0-15
 	GFXDECODE_ENTRY( "gfx2", 0, honeydol_tilelayout8bpp,  0, 4 )
 
 GFXDECODE_END
 
-static GFXDECODE_START( twinadv )
+static GFXDECODE_START( gfx_twinadv )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 64 )
 GFXDECODE_END
 
@@ -1663,7 +1663,7 @@ static const gfx_layout tilelayout_wb =
 	16*64
 };
 
-static GFXDECODE_START( wb )
+static GFXDECODE_START( gfx_wb )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout_wb,  0, 16 )
 GFXDECODE_END
 
@@ -1697,16 +1697,16 @@ static const gfx_layout sb3_tilebglayout =
 };
 
 
-static GFXDECODE_START( sb3 )
+static GFXDECODE_START( gfx_sb3 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sb3_tilebglayout,  0, 2 )
 GFXDECODE_END
 
-static GFXDECODE_START( hyperpac )
+static GFXDECODE_START( gfx_hyperpac )
 	GFXDECODE_ENTRY( "gfx1", 0, hyperpac_tilelayout,  0, 16 )
 GFXDECODE_END
 
-MACHINE_RESET_MEMBER(snowbros_state,semiprot)
+void snowbros_state::machine_reset_semiprot()
 {
 	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 	int i;
@@ -1715,7 +1715,7 @@ MACHINE_RESET_MEMBER(snowbros_state,semiprot)
 		m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 }
 
-MACHINE_RESET_MEMBER(snowbros_state,finalttr)
+void snowbros_state::machine_reset_finalttr()
 {
 	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 	int i;
@@ -1746,7 +1746,7 @@ MACHINE_CONFIG_START(snowbros_state::snowbros)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, snowbros_state, screen_vblank_snowbros))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", snowbros)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_snowbros)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1778,7 +1778,7 @@ MACHINE_CONFIG_START(snowbros_state::wintbob)
 	MCFG_DEVICE_REMOVE("pandora")
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", wb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wb)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_wintbob)
 	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
@@ -1798,7 +1798,7 @@ MACHINE_CONFIG_START(snowbros_state::semicom)
 	MCFG_DEVICE_PROGRAM_MAP(hyperpac_sound_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", hyperpac)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_hyperpac)
 
 	MCFG_DEVICE_MODIFY("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(NOOP)
@@ -1830,7 +1830,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(snowbros_state::semiprot)
 	semicom(config);
-	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, semiprot )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_semiprot, this));
 MACHINE_CONFIG_END
 
 
@@ -1854,7 +1854,7 @@ MACHINE_CONFIG_START(snowbros_state::honeydol)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_honeydol)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", honeydol)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_honeydol)
 	MCFG_PALETTE_ADD("palette", 0x800/2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1895,7 +1895,7 @@ MACHINE_CONFIG_START(snowbros_state::twinadv)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_twinadv)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twinadv)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_twinadv)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1941,7 +1941,7 @@ MACHINE_CONFIG_START(snowbros_state::finalttr)
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_CLOCK(XTAL(3'579'545))
 
-	MCFG_MACHINE_RESET_OVERRIDE (snowbros_state, finalttr )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_finalttr, this));
 
 	MCFG_DEVICE_REPLACE("ymsnd", YM2151, XTAL(3'579'545)) /* possible but less likely 4MHz (12MHz/3) */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
@@ -1957,7 +1957,7 @@ MACHINE_CONFIG_START(snowbros_state::_4in1)
 	semicom(config);
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", snowbros)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_snowbros)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(snowbros_state::snowbro3) /* PCB has 16MHz & 12MHz OSCs */
@@ -1977,7 +1977,7 @@ MACHINE_CONFIG_START(snowbros_state::snowbro3) /* PCB has 16MHz & 12MHz OSCs */
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbro3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sb3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sb3)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2009,7 +2009,7 @@ MACHINE_CONFIG_START(snowbros_state::yutnori)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, snowbros_state, screen_vblank_snowbros))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hyperpac)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hyperpac)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

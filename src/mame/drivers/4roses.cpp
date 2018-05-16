@@ -431,7 +431,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( 4roses )
+static GFXDECODE_START( gfx_4roses )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -458,11 +458,11 @@ MACHINE_CONFIG_START(_4roses_state::_4roses)
 	MCFG_SCREEN_UPDATE_DRIVER(_4roses_state, screen_update_funworld)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 4roses)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_4roses)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_INIT_OWNER(_4roses_state,funworld)
-	MCFG_VIDEO_START_OVERRIDE(_4roses_state,funworld)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_funworld, this));
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8) /* 2MHz, guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)

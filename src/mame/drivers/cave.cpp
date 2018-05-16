@@ -1910,7 +1910,7 @@ static const gfx_layout layout_sprites =
                                 Dangun Feveron
 ***************************************************************************/
 
-static GFXDECODE_START( dfeveron )
+static GFXDECODE_START( gfx_dfeveron )
 	/* There are only $800 colors here, the first half for sprites
 	   the second half for tiles. We use $8000 virtual colors instead
 	   for consistency with games having $8000 real colors.
@@ -1925,7 +1925,7 @@ GFXDECODE_END
                                 Dodonpachi
 ***************************************************************************/
 
-static GFXDECODE_START( ddonpach )
+static GFXDECODE_START( gfx_ddonpach )
 	/* Layers 01 are 4 bit deep and use the first 16 of every 256
 	   colors for any given color code (a palette_init function
 	   is provided for these layers, filling the 8000-83ff entries
@@ -1942,7 +1942,7 @@ GFXDECODE_END
                                 Donpachi
 ***************************************************************************/
 
-static GFXDECODE_START( donpachi )
+static GFXDECODE_START( gfx_donpachi )
 	/* There are only $800 colors here, the first half for sprites
 	   the second half for tiles. We use $8000 virtual colors instead
 	   for consistency with games having $8000 real colors.
@@ -1958,7 +1958,7 @@ GFXDECODE_END
                                 Esprade
 ***************************************************************************/
 
-static GFXDECODE_START( esprade )
+static GFXDECODE_START( gfx_esprade )
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x8, 0x4000, 0x40 ) // [0] Layer 0
 	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x8, 0x4000, 0x40 ) // [1] Layer 1
@@ -1969,7 +1969,7 @@ GFXDECODE_END
                                 Hotdog Storm
 ***************************************************************************/
 
-static GFXDECODE_START( hotdogst )
+static GFXDECODE_START( gfx_hotdogst )
 	/* There are only $800 colors here, the first half for sprites
 	   the second half for tiles. We use $8000 virtual colors instead
 	   for consistency with games having $8000 real colors.
@@ -1985,7 +1985,7 @@ GFXDECODE_END
                                 Koro Koro Quest
 ***************************************************************************/
 
-static GFXDECODE_START( korokoro )
+static GFXDECODE_START( gfx_korokoro )
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x4400, 0x40 ) // [0] Layer 0
 GFXDECODE_END
@@ -1994,7 +1994,7 @@ GFXDECODE_END
                                 Mazinger Z
 ***************************************************************************/
 
-static GFXDECODE_START( mazinger )
+static GFXDECODE_START( gfx_mazinger )
 	/*  Sprites are 4 bit deep.
 	    Layer 0 is 4 bit deep.
 	    Layer 1 uses 64 color palettes, but the game only fills the
@@ -2012,7 +2012,7 @@ GFXDECODE_END
                                Poka Poka Satan
 ***************************************************************************/
 
-static GFXDECODE_START( ppsatan )
+static GFXDECODE_START( gfx_ppsatan )
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x4000, 0x40 ) // [0] Layer 0
 	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4, 0x4000, 0x40 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x4, 0x4000, 0x40 ) // [2] Layer 2
@@ -2022,7 +2022,7 @@ GFXDECODE_END
                                 Power Instinct 2
 ***************************************************************************/
 
-static GFXDECODE_START( pwrinst2 )
+static GFXDECODE_START( gfx_pwrinst2 )
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x0800+0x8000, 0x40 ) // [0] Layer 0
 	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4, 0x1000+0x8000, 0x40 ) // [1] Layer 1
@@ -2035,7 +2035,7 @@ GFXDECODE_END
                                 Sailor Moon
 ***************************************************************************/
 
-static GFXDECODE_START( sailormn )
+static GFXDECODE_START( gfx_sailormn )
 	/* 4 bit sprites ? */
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4,   0x4400, 0x40 ) // [0] Layer 0
@@ -2048,7 +2048,7 @@ GFXDECODE_END
                                 Uo Poko
 ***************************************************************************/
 
-static GFXDECODE_START( uopoko )
+static GFXDECODE_START( gfx_uopoko )
 //  "sprites"
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x8, 0x4000, 0x40 ) // [0] Layer 0
 GFXDECODE_END
@@ -2062,7 +2062,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(cave_state,cave)
+void cave_state::machine_start_cave()
 {
 	m_vblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cave_state::cave_vblank_end), this));
 
@@ -2077,7 +2077,7 @@ MACHINE_START_MEMBER(cave_state,cave)
 	save_item(NAME(m_agallet_vblank_irq));
 }
 
-MACHINE_RESET_MEMBER(cave_state,cave)
+void cave_state::machine_reset_cave()
 {
 	std::fill(std::begin(m_soundbuf_data), std::end(m_soundbuf_data), 0);
 	m_soundbuf_wptr = 0;
@@ -2101,8 +2101,8 @@ MACHINE_CONFIG_START(cave_state::dfeveron)
 	MCFG_DEVICE_PROGRAM_MAP(dfeveron_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cave, this));
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2115,11 +2115,11 @@ MACHINE_CONFIG_START(cave_state::dfeveron)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dfeveron)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dfeveron)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2142,8 +2142,8 @@ MACHINE_CONFIG_START(cave_state::ddonpach)
 	MCFG_DEVICE_PROGRAM_MAP(ddonpach_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cave, this));
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2156,11 +2156,11 @@ MACHINE_CONFIG_START(cave_state::ddonpach)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddonpach)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddonpach)
 	MCFG_PALETTE_ADD("palette", 0x8000 + 0x40*16)   // $400 extra entries for layers 1&2
 	MCFG_PALETTE_INIT_OWNER(cave_state,ddonpach)
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_3_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2182,8 +2182,8 @@ MACHINE_CONFIG_START(cave_state::donpachi)
 	MCFG_DEVICE_PROGRAM_MAP(donpachi_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cave, this));
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2196,11 +2196,11 @@ MACHINE_CONFIG_START(cave_state::donpachi)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", donpachi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_donpachi)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_3_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2229,8 +2229,8 @@ MACHINE_CONFIG_START(cave_state::esprade)
 	MCFG_DEVICE_PROGRAM_MAP(esprade_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cave, this));
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2243,11 +2243,11 @@ MACHINE_CONFIG_START(cave_state::esprade)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esprade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprade)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_3_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2269,8 +2269,8 @@ MACHINE_CONFIG_START(cave_state::gaia)
 	MCFG_DEVICE_PROGRAM_MAP(gaia_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cave, this));
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
 
@@ -2284,11 +2284,11 @@ MACHINE_CONFIG_START(cave_state::gaia)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esprade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprade)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_3_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2310,8 +2310,8 @@ MACHINE_CONFIG_START(cave_state::guwange)
 	MCFG_DEVICE_PROGRAM_MAP(guwange_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cave, this));
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2324,11 +2324,11 @@ MACHINE_CONFIG_START(cave_state::guwange)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esprade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprade)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_3_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2353,8 +2353,8 @@ MACHINE_CONFIG_START(cave_state::hotdogst)
 	MCFG_DEVICE_PROGRAM_MAP(hotdogst_sound_map)
 	MCFG_DEVICE_IO_MAP(hotdogst_sound_portmap)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cave, this));
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2367,11 +2367,11 @@ MACHINE_CONFIG_START(cave_state::hotdogst)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hotdogst)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hotdogst)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_3_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2403,8 +2403,8 @@ MACHINE_CONFIG_START(cave_state::korokoro)
 	MCFG_DEVICE_PROGRAM_MAP(korokoro_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cave, this));
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2417,11 +2417,11 @@ MACHINE_CONFIG_START(cave_state::korokoro)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1-2, 0, 240-1-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", korokoro)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_korokoro)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,korokoro)
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_1_layer, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2456,8 +2456,8 @@ MACHINE_CONFIG_START(cave_state::mazinger)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cave, this));
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2470,11 +2470,11 @@ MACHINE_CONFIG_START(cave_state::mazinger)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mazinger)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mazinger)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,mazinger)
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2513,8 +2513,8 @@ MACHINE_CONFIG_START(cave_state::metmqstr)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)    /* start with the watchdog armed */
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cave, this));    /* start with the watchdog armed */
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2527,11 +2527,11 @@ MACHINE_CONFIG_START(cave_state::metmqstr)
 	MCFG_SCREEN_VISIBLE_AREA(0x7d, 0x7d + 0x180-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", donpachi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_donpachi)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_3_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2569,8 +2569,8 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cave, this));
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
@@ -2585,11 +2585,11 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", uopoko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_1_layer, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2629,8 +2629,8 @@ MACHINE_CONFIG_START(cave_state::ppsatan)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cave, this));
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_lev2", cave_state, timer_lev2_cb, attotime::from_hz(60))
@@ -2660,12 +2660,12 @@ MACHINE_CONFIG_START(cave_state::ppsatan)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_ppsatan_right)
 	MCFG_TIMER_DRIVER_ADD("int_timer_right", cave_state, cave_vblank_start_right)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ppsatan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppsatan)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,ppsatan)
 	MCFG_DEFAULT_LAYOUT(layout_ppsatan)
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_3_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2694,8 +2694,8 @@ MACHINE_CONFIG_START(cave_state::pwrinst2)
 	MCFG_DEVICE_PROGRAM_MAP(pwrinst2_sound_map)
 	MCFG_DEVICE_IO_MAP(pwrinst2_sound_portmap)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cave, this));
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2708,11 +2708,11 @@ MACHINE_CONFIG_START(cave_state::pwrinst2)
 	MCFG_SCREEN_VISIBLE_AREA(0x70, 0x70 + 0x140-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pwrinst2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pwrinst2)
 	MCFG_PALETTE_ADD("palette", 0x8000+0x2800)
 	MCFG_PALETTE_INIT_OWNER(cave_state,pwrinst2)
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_4_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_4_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2748,11 +2748,11 @@ TIMER_DEVICE_CALLBACK_MEMBER( cave_state::sailormn_startup )
 	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
-MACHINE_RESET_MEMBER(cave_state,sailormn)
+void cave_state::machine_reset_sailormn()
 {
 	timer_device *startup = machine().device<timer_device>("startup");
 	startup->adjust(attotime::from_usec(1000), 0, attotime::zero);
-	MACHINE_RESET_CALL_MEMBER(cave);
+	machine_reset_cave();
 }
 
 MACHINE_CONFIG_START(cave_state::sailormn)
@@ -2771,8 +2771,8 @@ MACHINE_CONFIG_START(cave_state::sailormn)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,sailormn)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sailormn, this));
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2785,11 +2785,11 @@ MACHINE_CONFIG_START(cave_state::sailormn)
 	MCFG_SCREEN_VISIBLE_AREA(0+1, 320+1-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sailormn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sailormn)
 	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OWNER(cave_state,sailormn) // 4 bit sprites, 6 bit tiles
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,sailormn_3_layers) /* Layer 2 has 1 banked ROM */
+	set_video_start_cb(config, driver_callback_delegate(&video_start_sailormn_3_layers, this)); /* Layer 2 has 1 banked ROM */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2829,8 +2829,8 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cave, this));
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
@@ -2845,11 +2845,11 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", uopoko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_1_layer, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2885,8 +2885,8 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cave, this));
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
@@ -2901,11 +2901,11 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", uopoko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_1_layer, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2930,7 +2930,7 @@ MACHINE_CONFIG_START(cave_state::uopoko)
 	MCFG_DEVICE_PROGRAM_MAP(uopoko_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cave, this));
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2943,11 +2943,11 @@ MACHINE_CONFIG_START(cave_state::uopoko)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", uopoko)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
-	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cave_1_layer, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

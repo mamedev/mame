@@ -37,8 +37,8 @@ public:
 	DECLARE_READ8_MEMBER(beta_neutral_r);
 	DECLARE_READ8_MEMBER(beta_enable_r);
 	DECLARE_READ8_MEMBER(beta_disable_r);
-	DECLARE_MACHINE_RESET(pentagon);
-	DECLARE_VIDEO_START(pentagon);
+	void machine_reset_pentagon();
+	void video_start_pentagon() ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_on);
 	TIMER_CALLBACK_MEMBER(irq_off);
@@ -210,7 +210,7 @@ void pentagon_state::pentagon_switch(address_map &map)
 	map(0x4000, 0xffff).r(this, FUNC(pentagon_state::beta_disable_r));
 }
 
-MACHINE_RESET_MEMBER(pentagon_state,pentagon)
+void pentagon_state::machine_reset_pentagon()
 {
 	uint8_t *messram = m_ram->pointer();
 	m_program = &m_maincpu->space(AS_PROGRAM);
@@ -237,7 +237,7 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 	pentagon_update_memory();
 }
 
-VIDEO_START_MEMBER(pentagon_state,pentagon)
+void pentagon_state::video_start_pentagon()
 {
 	m_frame_invert_count = 16;
 	m_frame_number = 0;
@@ -267,7 +267,7 @@ static const gfx_layout spectrum_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( pentagon )
+static GFXDECODE_START( gfx_pentagon )
 	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -281,15 +281,15 @@ MACHINE_CONFIG_START(pentagon_state::pentagon)
 	MCFG_DEVICE_IO_MAP(pentagon_io)
 	MCFG_DEVICE_OPCODES_MAP(pentagon_switch)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pentagon_state,  pentagon_interrupt)
-	MCFG_MACHINE_RESET_OVERRIDE(pentagon_state, pentagon )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pentagon, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	//MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 304)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 287)
-	MCFG_VIDEO_START_OVERRIDE(pentagon_state, pentagon )
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pentagon, this));
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pentagon)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pentagon)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

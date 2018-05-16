@@ -1379,84 +1379,84 @@ static const gfx_layout kickball_spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( pspikes )
+static GFXDECODE_START( gfx_pspikes )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 64 )    /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, pspikes_spritelayout, 1024, 64 )    /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
-static GFXDECODE_START( pspikesb )
+static GFXDECODE_START( gfx_pspikesb )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikesb_charlayout,      0, 64 )   /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, pspikesb_spritelayout, 1024, 64 )   /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
-static GFXDECODE_START( spikes91 )
+static GFXDECODE_START( gfx_spikes91 )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikesb_charlayout,      0, 64 )   /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, spikes91_spritelayout, 1024, 64 )   /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
-static GFXDECODE_START( kickball )
+static GFXDECODE_START( gfx_kickball )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 64 )    /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, kickball_spritelayout, 1024, 64 )    /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
-static GFXDECODE_START( turbofrc )
+static GFXDECODE_START( gfx_turbofrc )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, pspikes_charlayout,   256, 16 )
 	GFXDECODE_ENTRY( "spritegfx", 0, pspikes_spritelayout, 512, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, pspikes_spritelayout, 768, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( aerofgt )
+static GFXDECODE_START( gfx_aerofgt )
 	GFXDECODE_ENTRY( "gfx1", 0, aerofgt_charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, aerofgt_charlayout,   256, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, aerofgt_spritelayout, 512, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( aerfboot )
+static GFXDECODE_START( gfx_aerfboot )
 	GFXDECODE_ENTRY( "gfx1", 0,       aerfboot_charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x20000, aerfboot_charlayout,   256, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0,       aerfboot_spritelayout, 512, 16 )
 	GFXDECODE_ENTRY( "spritegfx", 0,       aerfboot_spritelayout, 768, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( aerfboo2 )
+static GFXDECODE_START( gfx_aerfboo2 )
 	GFXDECODE_ENTRY( "gfx1", 0,       aerfboo2_charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0,       aerfboo2_charlayout,   256, 16 )
 	GFXDECODE_ENTRY( "spritegfx", 0,       aerfboo2_spritelayout, 512, 16 )
 	GFXDECODE_ENTRY( "spritegfx", 0x100000,aerfboo2_spritelayout, 768, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( wbbc97 )
+static GFXDECODE_START( gfx_wbbc97 )
 	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 64 )    /* colors    0-1023 in 8 banks */
 	GFXDECODE_ENTRY( "gfx2", 0, wbbc97_spritelayout, 1024, 64 ) /* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
 
-MACHINE_START_MEMBER(aerofgt_state,common)
+void aerofgt_state::machine_start_common()
 {
 }
 
-MACHINE_START_MEMBER(aerofgt_state,aerofgt)
+void aerofgt_state::machine_start_aerofgt()
 {
 	m_soundbank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
 
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 }
 
-MACHINE_START_MEMBER(aerofgt_state,spinlbrk)
+void aerofgt_state::machine_start_spinlbrk()
 {
 	m_soundbank->configure_entries(0, 2, memregion("audiocpu")->base()+0x8000, 0x8000);
 
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 }
 
-MACHINE_RESET_MEMBER(aerofgt_state,common)
+void aerofgt_state::machine_reset_common()
 {
 }
 
-MACHINE_RESET_MEMBER(aerofgt_state,aerofgt)
+void aerofgt_state::machine_reset_aerofgt()
 {
-	MACHINE_RESET_CALL_MEMBER(common);
+	machine_reset_common();
 
 	m_soundbank->set_entry(0); /* needed by spinlbrk */
 }
@@ -1473,8 +1473,8 @@ MACHINE_CONFIG_START(aerofgt_state::pspikes)
 	MCFG_DEVICE_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_aerofgt, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_aerofgt, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1485,7 +1485,7 @@ MACHINE_CONFIG_START(aerofgt_state::pspikes)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikes)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pspikes)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pspikes)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1496,7 +1496,7 @@ MACHINE_CONFIG_START(aerofgt_state::pspikes)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pspikes, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1523,8 +1523,8 @@ MACHINE_CONFIG_START(aerofgt_state::spikes91)
 
 	/* + Z80 for sound */
 
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1535,13 +1535,13 @@ MACHINE_CONFIG_START(aerofgt_state::spikes91)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_spikes91)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spikes91)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spikes91)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pspikes, this));
 
 	/* sound hardware */
 	/* the sound hardware is completely different on this:
@@ -1559,8 +1559,8 @@ MACHINE_CONFIG_START(aerofgt_state::pspikesb)
 	MCFG_DEVICE_PROGRAM_MAP(pspikesb_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
 
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1571,13 +1571,13 @@ MACHINE_CONFIG_START(aerofgt_state::pspikesb)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikesb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pspikesb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pspikesb)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pspikes, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1604,8 +1604,8 @@ MACHINE_CONFIG_START(aerofgt_state::kickball)
 	MCFG_DEVICE_PROGRAM_MAP(kickball_sound_map)
 	MCFG_DEVICE_IO_MAP(kickball_sound_portmap)
 
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1616,7 +1616,7 @@ MACHINE_CONFIG_START(aerofgt_state::kickball)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikes)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kickball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kickball)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1627,7 +1627,7 @@ MACHINE_CONFIG_START(aerofgt_state::kickball)
 
 	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0) // still accessed as if it exists, in clone hardware?
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pspikes, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1651,8 +1651,8 @@ MACHINE_CONFIG_START(aerofgt_state::pspikesc)
 	MCFG_DEVICE_PROGRAM_MAP(pspikesc_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
 
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1663,7 +1663,7 @@ MACHINE_CONFIG_START(aerofgt_state::pspikesc)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikes)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pspikes)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pspikes)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1674,7 +1674,7 @@ MACHINE_CONFIG_START(aerofgt_state::pspikesc)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pspikes, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1695,8 +1695,8 @@ MACHINE_CONFIG_START(aerofgt_state::karatblz)
 	MCFG_DEVICE_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_aerofgt, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_aerofgt, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1707,7 +1707,7 @@ MACHINE_CONFIG_START(aerofgt_state::karatblz)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_karatblz)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbofrc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbofrc)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1723,7 +1723,7 @@ MACHINE_CONFIG_START(aerofgt_state::karatblz)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_karatblz, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1752,8 +1752,8 @@ MACHINE_CONFIG_START(aerofgt_state::karatblzbl)
 	MCFG_DEVICE_PROGRAM_MAP(karatblzbl_sound_map)
 	MCFG_DEVICE_IO_MAP(karatblzbl_sound_portmap)
 
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1764,7 +1764,7 @@ MACHINE_CONFIG_START(aerofgt_state::karatblzbl)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_karatblz)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbofrc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbofrc)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1780,7 +1780,7 @@ MACHINE_CONFIG_START(aerofgt_state::karatblzbl)
 
 	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_karatblz, this));
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -1809,8 +1809,8 @@ MACHINE_CONFIG_START(aerofgt_state::spinlbrk)
 	MCFG_DEVICE_IO_MAP(spinlbrk_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,spinlbrk)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_spinlbrk, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_aerofgt, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1821,7 +1821,7 @@ MACHINE_CONFIG_START(aerofgt_state::spinlbrk)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_spinlbrk)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbofrc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbofrc)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 1024) // doesn't fully initialize palette at start-up ...
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1838,7 +1838,7 @@ MACHINE_CONFIG_START(aerofgt_state::spinlbrk)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,spinlbrk)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_spinlbrk, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1868,8 +1868,8 @@ MACHINE_CONFIG_START(aerofgt_state::turbofrc)
 	MCFG_DEVICE_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_aerofgt, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_aerofgt, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1880,7 +1880,7 @@ MACHINE_CONFIG_START(aerofgt_state::turbofrc)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_turbofrc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbofrc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbofrc)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1896,7 +1896,7 @@ MACHINE_CONFIG_START(aerofgt_state::turbofrc)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_turbofrc, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1926,8 +1926,8 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgtb)
 	MCFG_DEVICE_IO_MAP(aerofgt_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_aerofgt, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_aerofgt, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1939,7 +1939,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgtb)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_turbofrc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbofrc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_turbofrc)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1955,7 +1955,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgtb)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_turbofrc, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1985,8 +1985,8 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 	MCFG_DEVICE_IO_MAP(aerofgt_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_aerofgt, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_aerofgt, this));
 
 	MCFG_DEVICE_ADD("io", VS9209, 0)
 	MCFG_VS9209_IN_PORTA_CB(IOPORT("P1"))
@@ -2010,7 +2010,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_aerofgt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aerofgt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aerofgt)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2019,7 +2019,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_turbofrc, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2047,8 +2047,8 @@ MACHINE_CONFIG_START(aerofgt_state::aerfboot)
 	MCFG_DEVICE_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(aerfboot_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2060,13 +2060,13 @@ MACHINE_CONFIG_START(aerofgt_state::aerfboot)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_aerfboot)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aerfboot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aerfboot)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_turbofrc, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2087,8 +2087,8 @@ MACHINE_CONFIG_START(aerofgt_state::aerfboo2)
 	MCFG_DEVICE_PROGRAM_MAP(aerfboo2_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq2_line_hold)
 
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2100,13 +2100,13 @@ MACHINE_CONFIG_START(aerofgt_state::aerfboo2)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_aerfboo2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aerfboo2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aerfboo2)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_turbofrc, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2125,8 +2125,8 @@ MACHINE_CONFIG_START(aerofgt_state::wbbc97)
 	MCFG_DEVICE_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(wbbc97_sound_map)
 								/* IRQs are triggered by the YM3812 */
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_common, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_common, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2136,7 +2136,7 @@ MACHINE_CONFIG_START(aerofgt_state::wbbc97)
 	MCFG_SCREEN_VISIBLE_AREA(0*8+14, 44*8-1+4, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_wbbc97)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wbbc97)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wbbc97)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2147,7 +2147,7 @@ MACHINE_CONFIG_START(aerofgt_state::wbbc97)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,wbbc97)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_wbbc97, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

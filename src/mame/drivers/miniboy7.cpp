@@ -489,7 +489,7 @@ static const gfx_layout tilelayout =
 *      Graphics Decode Information      *
 ****************************************/
 
-static GFXDECODE_START( miniboy7 )
+static GFXDECODE_START( gfx_miniboy7 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 128 ) /* text layer */
 
 	/* 0x000 cards
@@ -527,7 +527,7 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 37*8-1)    /* Taken from MC6845, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", miniboy7)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_miniboy7)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(miniboy7_state, miniboy7)

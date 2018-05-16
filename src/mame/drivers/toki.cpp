@@ -447,7 +447,7 @@ static const gfx_layout toki_tilelayout =
 	128*8
 };
 
-static GFXDECODE_START( toki )
+static GFXDECODE_START( gfx_toki )
 	GFXDECODE_ENTRY( "gfx1", 0, toki_charlayout, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, toki_tilelayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, toki_tilelayout, 32*16, 16 )
@@ -482,7 +482,7 @@ static const gfx_layout tokib_spriteslayout =
 	16*16
 };
 
-static GFXDECODE_START( tokib )
+static GFXDECODE_START( gfx_tokib )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar,   16*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tokib_spriteslayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tokib_tilelayout,   32*16, 16 )
@@ -517,7 +517,7 @@ MACHINE_CONFIG_START(toki_state::toki) /* KOYO 20.000MHz near the cpu */
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toki)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toki)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -570,7 +570,7 @@ MACHINE_CONFIG_START(toki_state::tokib)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tokib)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tokib)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

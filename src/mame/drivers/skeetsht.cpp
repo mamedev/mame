@@ -90,7 +90,7 @@ void skeetsht_state::video_start()
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(skeetsht_state::scanline_update)
 {
-	const rgb_t *const pens = m_tlc34076->get_pens();
+	const pen_t *const pens = m_tlc34076->pens();
 	uint16_t *vram = &m_tms_vram[(params->rowaddr << 8) & 0x3ff00];
 	uint32_t *dest = &bitmap.pix32(scanline);
 	int coladdr = params->coladdr;

@@ -465,7 +465,7 @@ static const gfx_layout rx78_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( rx78 )
+static GFXDECODE_START( gfx_rx78 )
 	GFXDECODE_ENTRY( "roms", 0x1a27, rx78_charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -490,7 +490,7 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rx78)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rx78)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "rx78_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")

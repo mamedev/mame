@@ -879,13 +879,13 @@ static const gfx_layout robokid_layout16x16 =
 	128*8
 };
 
-static GFXDECODE_START( ninjakd2 )
+static GFXDECODE_START( gfx_ninjakd2 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,    0x200, 16)    // fg
 	GFXDECODE_ENTRY( "gfx2", 0, layout16x16,  0x100, 16)    // sprites
 	GFXDECODE_ENTRY( "gfx3", 0, layout16x16,  0x000, 16)    // bg
 GFXDECODE_END
 
-static GFXDECODE_START( robokid )
+static GFXDECODE_START( gfx_robokid )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8,           0x300, 16) // fg
 	GFXDECODE_ENTRY( "gfx2", 0, robokid_layout16x16, 0x200, 16) // sprites
 	GFXDECODE_ENTRY( "gfx3", 0, robokid_layout16x16, 0x000, 16) // bg0
@@ -914,14 +914,14 @@ void ninjakd2_state::machine_reset()
 	m_rom_bank_mask = num_banks - 1;
 }
 
-MACHINE_START_MEMBER(ninjakd2_state,omegaf)
+void ninjakd2_state::machine_start_omegaf()
 {
 	omegaf_io_protection_start();
 
 	machine_start();
 }
 
-MACHINE_RESET_MEMBER(ninjakd2_state,omegaf)
+void ninjakd2_state::machine_reset_omegaf()
 {
 	omegaf_io_protection_reset();
 
@@ -949,7 +949,7 @@ MACHINE_CONFIG_START(ninjakd2_state::ninjakd2_core)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ninjakd2_state, screen_vblank_ninjakd2))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ninjakd2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ninjakd2)
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -1004,7 +1004,7 @@ MACHINE_CONFIG_START(ninjakd2_state::mnight)
 	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,mnight)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_mnight, this));
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("pcm")
@@ -1020,7 +1020,7 @@ MACHINE_CONFIG_START(ninjakd2_state::arkarea)
 	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,arkarea)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_arkarea, this));
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("pcm")
@@ -1037,13 +1037,13 @@ MACHINE_CONFIG_START(ninjakd2_state::robokid)
 	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", robokid)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_robokid)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(0x400)  // RAM is this large, but still only 0x300 colors used
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,robokid)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_robokid, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ninjakd2_state, screen_update_robokid)
 MACHINE_CONFIG_END
@@ -1058,11 +1058,11 @@ MACHINE_CONFIG_START(ninjakd2_state::omegaf)
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
-	MCFG_MACHINE_START_OVERRIDE(ninjakd2_state,omegaf)
-	MCFG_MACHINE_RESET_OVERRIDE(ninjakd2_state,omegaf)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_omegaf, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_omegaf, this));
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,omegaf)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_omegaf, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ninjakd2_state, screen_update_omegaf)
 MACHINE_CONFIG_END

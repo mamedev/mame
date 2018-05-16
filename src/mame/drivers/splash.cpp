@@ -468,18 +468,18 @@ static const gfx_layout tilelayout16 =
 	32*8
 };
 
-static GFXDECODE_START( splash )
+static GFXDECODE_START( gfx_splash )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout8 ,0,128 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout16,0,128 )
 GFXDECODE_END
 
 
-MACHINE_START_MEMBER(splash_state,splash)
+void splash_state::machine_start_splash()
 {
 	save_item(NAME(m_adpcm_data));
 }
 
-MACHINE_RESET_MEMBER(splash_state,splash)
+void splash_state::machine_reset_splash()
 {
 	m_adpcm_data = 0;
 	m_ret = 0x100;
@@ -511,12 +511,12 @@ MACHINE_CONFIG_START(splash_state::splash)
 	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", splash)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_splash)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_MACHINE_START_OVERRIDE(splash_state, splash )
-	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_splash, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_splash, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(splash_state::splash)
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(splash_state, roldfrog)
+void splash_state::machine_start_roldfrog()
 {
 	save_item(NAME(m_ret));
 	save_item(NAME(m_vblank_irq));
@@ -574,12 +574,12 @@ MACHINE_CONFIG_START(splash_state::roldfrog)
 	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", splash)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_splash)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_MACHINE_START_OVERRIDE(splash_state, roldfrog )
-	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_roldfrog, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_splash, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(funystrp_state::funystrp)
 	MCFG_SCREEN_UPDATE_DRIVER(funystrp_state, screen_update_funystrp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", splash)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_splash)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

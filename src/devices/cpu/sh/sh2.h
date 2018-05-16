@@ -82,7 +82,7 @@ public:
 	DECLARE_READ32_MEMBER( sh7604_r );
 	DECLARE_READ32_MEMBER(sh2_internal_a5);
 
-	void sh2_set_frt_input(int state);
+	virtual void set_frt_input(int state) override;
 	void sh2_notify_dma_data_available();
 	void func_fastirq();
 

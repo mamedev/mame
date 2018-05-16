@@ -190,11 +190,11 @@ static const gfx_layout llc2_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( llc1 )
+static GFXDECODE_START( gfx_llc1 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, llc1_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( llc2 )
+static GFXDECODE_START( gfx_llc2 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, llc2_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -206,8 +206,8 @@ MACHINE_CONFIG_START(llc_state::llc1)
 	MCFG_DEVICE_PROGRAM_MAP(llc1_mem)
 	MCFG_DEVICE_IO_MAP(llc1_io)
 
-	MCFG_MACHINE_START_OVERRIDE(llc_state, llc1 )
-	MCFG_MACHINE_RESET_OVERRIDE(llc_state, llc1 )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_llc1, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_llc1, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -218,7 +218,7 @@ MACHINE_CONFIG_START(llc_state::llc1)
 	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", llc1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_llc1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEFAULT_LAYOUT(layout_llc1)
 
@@ -250,7 +250,7 @@ MACHINE_CONFIG_START(llc_state::llc2)
 	MCFG_DEVICE_PROGRAM_MAP(llc2_mem)
 	MCFG_DEVICE_IO_MAP(llc2_io)
 
-	MCFG_MACHINE_RESET_OVERRIDE(llc_state, llc2 )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_llc2, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -261,7 +261,7 @@ MACHINE_CONFIG_START(llc_state::llc2)
 	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", llc2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_llc2)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */

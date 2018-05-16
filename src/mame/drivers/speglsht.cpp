@@ -144,9 +144,9 @@ public:
 	DECLARE_READ32_MEMBER(cop_r);
 	DECLARE_READ32_MEMBER(irq_ack_clear);
 	void init_speglsht();
-	DECLARE_MACHINE_RESET(speglsht);
+	void machine_reset_speglsht();
 	virtual void machine_start() override;
-	DECLARE_VIDEO_START(speglsht);
+	void video_start_speglsht() ATTR_COLD;
 	uint32_t screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
@@ -352,19 +352,19 @@ static INPUT_PORTS_START( speglsht )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
-static GFXDECODE_START( speglsht )
+static GFXDECODE_START( gfx_speglsht )
 GFXDECODE_END
 
 
-MACHINE_RESET_MEMBER(speglsht_state,speglsht)
+void speglsht_state::machine_reset_speglsht()
 {
 	std::fill(&m_shared[0],&m_shared[m_shared.bytes()],0);
 }
 
-VIDEO_START_MEMBER(speglsht_state,speglsht)
+void speglsht_state::video_start_speglsht()
 {
 	m_bitmap = std::make_unique<bitmap_ind16>(512, 5122 );
-//  VIDEO_START_CALL_MEMBER(st0016);
+//  video_start_st0016();
 }
 
 #define PLOT_PIXEL_RGB(x,y,r,g,b)   if(y>=0 && x>=0 && x<512 && y<512) \
@@ -422,7 +422,7 @@ MACHINE_CONFIG_START(speglsht_state::speglsht)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speglsht_state,  irq4_line_assert)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_MACHINE_RESET_OVERRIDE(speglsht_state,speglsht)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_speglsht, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -432,10 +432,10 @@ MACHINE_CONFIG_START(speglsht_state::speglsht)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 239-8)
 	MCFG_SCREEN_UPDATE_DRIVER(speglsht_state, screen_update_speglsht)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speglsht)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speglsht)
 	MCFG_PALETTE_ADD("palette", 16*16*4+1)
 
-	MCFG_VIDEO_START_OVERRIDE(speglsht_state,speglsht)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_speglsht, this));
 MACHINE_CONFIG_END
 
 ROM_START( speglsht )

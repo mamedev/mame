@@ -373,7 +373,7 @@ static const gfx_layout bestleag_char16layout =
 	16*16
 };
 
-static GFXDECODE_START( bestleag )
+static GFXDECODE_START( gfx_bestleag )
 	GFXDECODE_ENTRY( "gfx1", 0, bestleag_charlayout,     0x200, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, bestleag_char16layout,   0x000, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, bestleag_char16layout,   0x300, 16 )
@@ -392,7 +392,7 @@ MACHINE_CONFIG_START(bestleag_state::bestleag)
 	MCFG_SCREEN_UPDATE_DRIVER(bestleag_state, screen_update_bestleag)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bestleag)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bestleag)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 

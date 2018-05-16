@@ -48,6 +48,8 @@ public:
 			m_screen(*this, "screen"),
 			m_soundlatch(*this, "soundlatch") { }
 
+	void video_start() override;
+
 	/* machine state */
 	uint8_t   m_current_port;
 	optional_shared_ptr<uint8_t> m_trvquest_question;
@@ -80,15 +82,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(audio_trigger_w);
 	DECLARE_WRITE_LINE_MEMBER(r6532_irq);
 	DECLARE_WRITE8_MEMBER(r6532_soundlatch_w);
-	DECLARE_MACHINE_START(gameplan);
-	DECLARE_MACHINE_RESET(gameplan);
-	DECLARE_MACHINE_START(trvquest);
-	DECLARE_MACHINE_RESET(trvquest);
-	DECLARE_VIDEO_START(gameplan);
-	DECLARE_VIDEO_RESET(gameplan);
-	DECLARE_VIDEO_START(leprechn);
-	DECLARE_VIDEO_START(trvquest);
-	DECLARE_VIDEO_START(common);
+	void machine_start_gameplan()   ATTR_COLD;
+	void machine_reset_gameplan();
+	void machine_start_trvquest()   ATTR_COLD;
+	void machine_reset_trvquest();
+	void video_reset_gameplan();
 	uint32_t screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(trvquest_interrupt);

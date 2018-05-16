@@ -723,7 +723,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( wiz )
+static GFXDECODE_START( gfx_wiz )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x6000, charlayout,   0, 32 )
@@ -735,7 +735,7 @@ static GFXDECODE_START( wiz )
 	GFXDECODE_ENTRY( "gfx2", 0x6000, spritelayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( stinger )
+static GFXDECODE_START( gfx_stinger )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout,   0, 32 )
@@ -810,7 +810,7 @@ MACHINE_CONFIG_START(wiz_state::kungfut)
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_kungfut)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stinger)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stinger)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(wiz_state, wiz)
 
@@ -837,7 +837,7 @@ MACHINE_CONFIG_START(wiz_state::wiz)
 	MCFG_DEVICE_PROGRAM_MAP(wiz_main_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", wiz)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wiz)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_wiz)
 MACHINE_CONFIG_END

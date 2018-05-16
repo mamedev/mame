@@ -340,7 +340,7 @@ static const gfx_layout layout =
 	128*8
 };
 
-static GFXDECODE_START( taotaido )
+static GFXDECODE_START( gfx_taotaido )
 	GFXDECODE_ENTRY( "gfx1", 0, layout,  0x000, 256  ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, layout,  0x300, 256  ) /* bg tiles */
 GFXDECODE_END
@@ -373,7 +373,7 @@ MACHINE_CONFIG_START(taotaido_state::taotaido)
 
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taotaido)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taotaido)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

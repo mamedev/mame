@@ -912,7 +912,7 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( cvs )
+static GFXDECODE_START( gfx_cvs )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 256+4 )
 	GFXDECODE_ENTRY( nullptr,   0x0000, charlayout, 0, 256+4 )
 GFXDECODE_END
@@ -925,7 +925,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(cvs_state,cvs)
+void cvs_state::machine_start_cvs()
 {
 	/* allocate memory */
 	if (m_gfxdecode->gfx(1) != nullptr)
@@ -949,7 +949,7 @@ MACHINE_START_MEMBER(cvs_state,cvs)
 	save_item(NAME(m_stars_scroll));
 }
 
-MACHINE_RESET_MEMBER(cvs_state,cvs)
+void cvs_state::machine_reset_cvs()
 {
 	m_character_banking_mode = 0;
 	m_character_ram_page_start = 0;
@@ -984,13 +984,13 @@ MACHINE_CONFIG_START(cvs_state::cvs)
 	//MCFG_S2650_SENSE_INPUT(READLINE(*this, cvs_state, cvs_393hz_clock_r))
 	MCFG_S2650_SENSE_INPUT(READLINE("tms", tms5110_device, romclk_hack_r))
 
-	MCFG_MACHINE_START_OVERRIDE(cvs_state,cvs)
-	MCFG_MACHINE_RESET_OVERRIDE(cvs_state,cvs)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_cvs, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_cvs, this));
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(cvs_state,cvs)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_cvs, this));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cvs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cvs)
 
 	MCFG_PALETTE_ADD("palette", (256+4)*8+8+1)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)

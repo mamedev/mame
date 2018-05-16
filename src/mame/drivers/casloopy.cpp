@@ -538,7 +538,7 @@ MACHINE_CONFIG_START(casloopy_state::casloopy)
 
 	MCFG_PALETTE_ADD("palette", 512)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "loopy_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,ic1")

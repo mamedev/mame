@@ -837,7 +837,7 @@ static const gfx_layout fontlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( apexc )
+static GFXDECODE_START( gfx_apexc )
 	GFXDECODE_ENTRY( "chargen", 0, fontlayout, 0, 2 )
 GFXDECODE_END
 
@@ -870,7 +870,7 @@ MACHINE_CONFIG_START(apexc_state::apexc)
 	MCFG_SCREEN_UPDATE_DRIVER(apexc_state, screen_update_apexc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apexc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apexc)
 	MCFG_PALETTE_ADD("palette", APEXC_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(apexc_state, apexc)
 

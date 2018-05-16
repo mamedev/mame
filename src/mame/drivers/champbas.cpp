@@ -435,12 +435,12 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( talbot )
+static GFXDECODE_START( gfx_talbot )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x100, 0x100>>2 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x000, 0x100>>2 )
 GFXDECODE_END
 
-static GFXDECODE_START( champbas )
+static GFXDECODE_START( gfx_champbas )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 0x200>>2 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 0x200>>2 )
 GFXDECODE_END
@@ -479,7 +479,7 @@ static const gfx_layout spritelayout_4bpp =
 	64*8
 };
 
-static GFXDECODE_START( exctsccr )
+static GFXDECODE_START( gfx_exctsccr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_3bpp,   0x000, 0x080>>3 ) /* chars */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_3bpp, 0x080, 0x080>>3 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_4bpp, 0x100, 0x100>>4 ) /* sprites */
@@ -551,11 +551,11 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", talbot)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_talbot)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
-	MCFG_VIDEO_START_OVERRIDE(champbas_state,champbas)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_champbas, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -598,11 +598,11 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_champbas)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
-	MCFG_VIDEO_START_OVERRIDE(champbas_state,champbas)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_champbas, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -709,11 +709,11 @@ MACHINE_CONFIG_START(champbas_state::exctsccr)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_exctsccr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exctsccr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exctsccr)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(champbas_state,exctsccr)
-	MCFG_VIDEO_START_OVERRIDE(champbas_state,exctsccr)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_exctsccr, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -775,11 +775,11 @@ MACHINE_CONFIG_START(champbas_state::exctsccrb)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_exctsccr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exctsccr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exctsccr)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(champbas_state,exctsccr)
-	MCFG_VIDEO_START_OVERRIDE(champbas_state,exctsccr)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_exctsccr, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -224,7 +224,7 @@ void suna16_state::bestbest_map(address_map &map)
 	map(0x5e0000, 0x5fffff).ram().share("spriteram2");    // Sprites (Chip 2)
 }
 
-MACHINE_START_MEMBER(suna16_state,bestbest)
+void suna16_state::machine_start_bestbest()
 {
 	save_item(NAME(m_prot));
 }
@@ -307,7 +307,7 @@ void suna16_state::bestbest_sound_map(address_map &map)
                             Back Street Soccer
 ***************************************************************************/
 
-MACHINE_START_MEMBER(suna16_state, bssoccer)
+void suna16_state::machine_start_bssoccer()
 {
 	m_bank1->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
 	m_bank2->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
@@ -396,14 +396,14 @@ void suna16_state::uballoon_pcm_1_io_map(address_map &map)
 	map(0x03, 0x03).w(this, FUNC(suna16_state::uballoon_pcm_1_bankswitch_w));  // Rom Bank
 }
 
-MACHINE_START_MEMBER(suna16_state,uballoon)
+void suna16_state::machine_start_uballoon()
 {
 	m_bank1->configure_entries(0, 2, memregion("pcm1")->base() + 0x400, 0x10000);
 
 	save_item(NAME(m_prot));
 }
 
-MACHINE_RESET_MEMBER(suna16_state,uballoon)
+void suna16_state::machine_reset_uballoon()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uballoon_pcm_1_bankswitch_w(space, 0, 0);
@@ -776,12 +776,12 @@ static const gfx_layout layout_8x8x4 =
 	8*8*4
 };
 
-static GFXDECODE_START( suna16 )
+static GFXDECODE_START( gfx_suna16 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4, 0, 16*2 ) // [0] Sprites
 GFXDECODE_END
 
 // Two sprites chips
-static GFXDECODE_START( bestbest )
+static GFXDECODE_START( gfx_bestbest )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4, 0, 256*8/16 ) // [0] Sprites (Chip 1)
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4, 0, 256*8/16 ) // [1] Sprites (Chip 2)
 GFXDECODE_END
@@ -832,7 +832,7 @@ MACHINE_CONFIG_START(suna16_state::bssoccer)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START_OVERRIDE(suna16_state,bssoccer)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bssoccer, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -843,7 +843,7 @@ MACHINE_CONFIG_START(suna16_state::bssoccer)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
@@ -894,8 +894,8 @@ MACHINE_CONFIG_START(suna16_state::uballoon)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START_OVERRIDE(suna16_state,uballoon)
-	MCFG_MACHINE_RESET_OVERRIDE(suna16_state,uballoon)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_uballoon, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_uballoon, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -906,7 +906,7 @@ MACHINE_CONFIG_START(suna16_state::uballoon)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
@@ -950,8 +950,8 @@ MACHINE_CONFIG_START(suna16_state::sunaq)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START_OVERRIDE(suna16_state,uballoon)
-	MCFG_MACHINE_RESET_OVERRIDE(suna16_state,uballoon)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_uballoon, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_uballoon, this));
 
 
 	/* video hardware */
@@ -963,7 +963,7 @@ MACHINE_CONFIG_START(suna16_state::sunaq)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
@@ -1012,7 +1012,7 @@ MACHINE_CONFIG_START(suna16_state::bestbest)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_START_OVERRIDE(suna16_state, bestbest)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bestbest, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1023,7 +1023,7 @@ MACHINE_CONFIG_START(suna16_state::bestbest)
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_bestbest)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bestbest)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bestbest)
 	MCFG_PALETTE_ADD("palette", 256*8)
 
 

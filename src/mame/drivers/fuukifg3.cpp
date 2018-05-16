@@ -467,7 +467,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( fuuki32 )
+static GFXDECODE_START( gfx_fuuki32 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x400*2, 0x40 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8, 0x400*0, 0x40 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8, 0x400*1, 0x40 ) // [2] Layer 2
@@ -549,7 +549,7 @@ MACHINE_CONFIG_START(fuuki32_state::fuuki32)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fuuki32_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fuuki32)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fuuki32)
 	MCFG_PALETTE_ADD("palette", 0x4000 / 2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

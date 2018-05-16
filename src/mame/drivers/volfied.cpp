@@ -201,7 +201,7 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-static GFXDECODE_START( volfied )
+static GFXDECODE_START( gfx_volfied )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 4096, 256 )
 GFXDECODE_END
 
@@ -269,7 +269,7 @@ MACHINE_CONFIG_START(volfied_state::volfied)
 	MCFG_SCREEN_UPDATE_DRIVER(volfied_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", volfied)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_volfied)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

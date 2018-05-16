@@ -763,7 +763,7 @@ static const gfx_layout helper8x8x4_layout =
 };
 
 
-static GFXDECODE_START( helper )
+static GFXDECODE_START( gfx_helper )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x2_layout,    0x0, 128  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x4_layout,    0x0, 32  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x8_layout,    0x0, 2  )
@@ -787,7 +787,7 @@ MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(24)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", helper)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_helper)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -64,7 +64,7 @@ static const gfx_layout fearlayout =
 };
 
 
-static GFXDECODE_START( igs_fear )
+static GFXDECODE_START( gfx_igs_fear )
 	GFXDECODE_ENTRY( "gfx1", 0, fearlayout,   0, 16  )
 	GFXDECODE_ENTRY( "gfx2", 0, fearlayout,   0, 16  )
 	GFXDECODE_ENTRY( "gfx3", 0, fearlayout,   0, 16  )
@@ -88,13 +88,13 @@ MACHINE_CONFIG_START(igs_fear_state::igs_fear)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 
-	MCFG_VIDEO_START_OVERRIDE(igs_fear_state, igs_fear)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_igs_fear, this));
 	MCFG_SCREEN_UPDATE_DRIVER(igs_fear_state, screen_update_igs_fear)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs_fear)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs_fear)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

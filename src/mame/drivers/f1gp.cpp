@@ -73,7 +73,7 @@ void f1gp_state::f1gp_cpu1_map(address_map &map)
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // PALETTE
 	map(0xfff000, 0xfff001).portr("INPUTS");
 	map(0xfff000, 0xfff001).w(this, FUNC(f1gp_state::f1gp_gfxctrl_w));
-//  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
+	map(0xfff002, 0xfff003).portr("WHEEL");
 	map(0xfff004, 0xfff005).portr("DSW1");
 	map(0xfff002, 0xfff005).w(this, FUNC(f1gp_state::f1gp_fgscroll_w));
 	map(0xfff006, 0xfff007).portr("DSW2");
@@ -95,7 +95,7 @@ void f1gp_state::f1gp2_cpu1_map(address_map &map)
 	map(0xffd000, 0xffdfff).ram().w(this, FUNC(f1gp_state::f1gp_fgvideoram_w)).share("fgvideoram");             // CHARACTER
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");            // PALETTE
 	map(0xfff000, 0xfff001).portr("INPUTS").w(this, FUNC(f1gp_state::f1gp2_gfxctrl_w));
-//  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
+	map(0xfff002, 0xfff003).portr("WHEEL");
 	map(0xfff004, 0xfff005).portr("DSW1");
 	map(0xfff006, 0xfff007).portr("DSW2");
 	map(0xfff009, 0xfff009).r(this, FUNC(f1gp_state::command_pending_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
@@ -173,6 +173,7 @@ void f1gp_state::f1gpb_cpu1_map(address_map &map)
 	map(0xffd000, 0xffdfff).ram().w(this, FUNC(f1gp_state::f1gp_fgvideoram_w)).share("fgvideoram");
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("INPUTS");
+	map(0xfff002, 0xfff003).portr("WHEEL");
 	map(0xfff004, 0xfff005).portr("DSW1");
 	map(0xfff006, 0xfff007).portr("DSW2");
 	map(0xfff008, 0xfff009).nopr(); //?
@@ -195,13 +196,17 @@ void f1gp_state::f1gpb_cpu2_map(address_map &map)
 }
 
 static INPUT_PORTS_START( f1gp )
-	PORT_START("INPUTS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_START("INPUTS") 
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_CONDITION("JOY_TYPE", 0x01, NOTEQUALS, 0x01)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_CONDITION("JOY_TYPE", 0x01, NOTEQUALS, 0x01)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_CONDITION("JOY_TYPE", 0x01, NOTEQUALS, 0x01)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_CONDITION("JOY_TYPE", 0x01, NOTEQUALS, 0x01)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("JOY_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("JOY_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_CONDITION("JOY_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_CONDITION("JOY_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Brake Button")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Accelerator Button")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -213,8 +218,14 @@ static INPUT_PORTS_START( f1gp )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("WHEEL")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5)
+	
 	PORT_START("DSW1")
-	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW1:1" )        /* Listed as "Unused" */
+	// listed as "unused" in manual, actually enables free play
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Free_Play ) )      PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0100, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x0e00, 0x0e00, DEF_STR( Coin_A ) )       PORT_CONDITION("DSW1",0x8000,EQUALS,0x8000) PORT_DIPLOCATION("SW1:2,3,4")
 	PORT_DIPSETTING(      0x0a00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 2C_1C ) )
@@ -251,9 +262,9 @@ static INPUT_PORTS_START( f1gp )
 	PORT_DIPSETTING(      0x0000, "Multi Player Game Only" )        PORT_CONDITION("DSW1",0x0004,EQUALS,0x0000)
 	PORT_DIPSETTING(      0x0008, "Multi Player Off" )          PORT_CONDITION("DSW1",0x0004,NOTEQUALS,0x0000)
 	PORT_DIPSETTING(      0x0000, "Multi Player Off" )          PORT_CONDITION("DSW1",0x0004,NOTEQUALS,0x0000)
-	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:5" )        /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW2:6" )        /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:7" )        /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:5" )        /* Listed as "Unused", reverses joystick left/right directions? */
+	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW2:6" )        /* Listed as "Unused", two buttons to accelerate? */
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:7" )        /* Listed as "Unused", reverses button activeness? */
 	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" )        /* Listed as "Unused" */
 
 	PORT_START("DSW2")
@@ -268,7 +279,12 @@ static INPUT_PORTS_START( f1gp )
 	PORT_DIPUNUSED_DIPLOC( 0x1000, 0x1000, "SW3:5" )        /* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW3:6" )        /* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW3:7" )        /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW3:8" )        /* Listed as "Unused" */
+	// listed as "Unused" in manual, it selects between joystick or steering wheel
+	PORT_DIPNAME( 0x8000, 0x8000, "Input Method" )      PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(      0x8000, "Joystick" )
+	// TODO: doesn't work in-game, reads from $fff002 ingame too but doesn't have an effect, 
+	//       maybe outputs threshold to $fff000 or it's not supposed to be enabled like the manual claims.
+	PORT_DIPSETTING(      0x0000, "Steering Wheel" )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x001f, 0x0010, DEF_STR( Region ) )           /* Jumpers?? */
@@ -279,6 +295,12 @@ static INPUT_PORTS_START( f1gp )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hong_Kong ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Taiwan ) )
 	/* all other values are invalid */
+	
+	PORT_START("JOY_TYPE")
+	PORT_CONFNAME( 0x01, 0x01, "Joystick Type" )
+	PORT_CONFSETTING(    0x01, "2-Way" )
+	// in "free run" course select lets you go up/down
+	PORT_CONFSETTING(    0x00, "4-Way" )
 INPUT_PORTS_END
 
 
@@ -287,7 +309,7 @@ static INPUT_PORTS_START( f1gp2 )
 	PORT_INCLUDE( f1gp )
 
 	PORT_MODIFY("INPUTS")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Turbo Button")
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Region ) )
@@ -350,21 +372,21 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( f1gp )
+static GFXDECODE_START( gfx_f1gp )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x100, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x200, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout2,  0x300, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( f1gp2 )
+static GFXDECODE_START( gfx_f1gp2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x000,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x200, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0x100, 16 )
 GFXDECODE_END
 
 
-MACHINE_START_MEMBER(f1gp_state,f1gpb)
+void f1gp_state::machine_start_f1gpb()
 {
 	m_acia->write_cts(0);
 	m_acia->write_dcd(0);
@@ -375,14 +397,14 @@ MACHINE_START_MEMBER(f1gp_state,f1gpb)
 	save_item(NAME(m_scroll));
 }
 
-MACHINE_START_MEMBER(f1gp_state,f1gp)
+void f1gp_state::machine_start_f1gp()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x8000);
 
-	MACHINE_START_CALL_MEMBER(f1gpb);
+	machine_start_f1gpb();
 }
 
-MACHINE_RESET_MEMBER(f1gp_state,f1gp)
+void f1gp_state::machine_reset_f1gp()
 {
 	m_roz_bank = 0;
 	m_flipscreen = 0;
@@ -408,8 +430,8 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
-	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gp)
-	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_f1gp, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_f1gp, this));
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
@@ -427,7 +449,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", f1gp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_f1gp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -445,7 +467,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_f1gp, this));
 
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
 	MCFG_K053936_WRAP(1)
@@ -482,8 +504,8 @@ MACHINE_CONFIG_START(f1gp_state::f1gpb)
 	/* NO sound CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
-	MCFG_MACHINE_START_OVERRIDE(f1gp_state,f1gpb)
-	MCFG_MACHINE_RESET_OVERRIDE(f1gp_state,f1gp)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_f1gpb, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_f1gp, this));
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("sub", M68K_IRQ_3))
@@ -501,13 +523,13 @@ MACHINE_CONFIG_START(f1gp_state::f1gpb)
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gpb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", f1gp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_f1gp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	//MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 
-	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gpb)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_f1gpb, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -527,7 +549,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gp2)
 	MCFG_DEVICE_PROGRAM_MAP(f1gp2_cpu1_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", f1gp2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1gp2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gp2)
@@ -543,7 +565,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gp2)
 	MCFG_DEVICE_MODIFY("k053936")
 	MCFG_K053936_OFFSETS(-48, -21)
 
-	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gp2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_f1gp2, this));
 MACHINE_CONFIG_END
 
 

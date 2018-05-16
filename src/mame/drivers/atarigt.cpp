@@ -76,7 +76,7 @@ void atarigt_state::update_interrupts()
 }
 
 
-MACHINE_RESET_MEMBER(atarigt_state,atarigt)
+void atarigt_state::machine_reset_atarigt()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -759,7 +759,7 @@ static const gfx_layout anlayout =
 };
 
 
-static GFXDECODE_START( atarigt )
+static GFXDECODE_START( gfx_atarigt )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 0x000, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, anlayout, 0x000, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x000, 64 )
@@ -798,7 +798,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(atarigt_state, scanline_int_gen, 250)
 
-	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_atarigt, this));
 
 	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16) // should be 447 kHz according to schematics, but that fails the self-test
 	MCFG_ADC0808_IN2_CB(IOPORT("AN4"))
@@ -810,7 +810,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarigt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigt)
 	MCFG_PALETTE_ADD("palette", 32768)
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigt_state, get_playfield_tile_info, 8,8, atarigt_playfield_scan, 128,64)
@@ -824,7 +824,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	MCFG_SCREEN_UPDATE_DRIVER(atarigt_state, screen_update_atarigt)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarigt_state, video_int_write_line))
 
-	MCFG_VIDEO_START_OVERRIDE(atarigt_state,atarigt)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_atarigt, this));
 
 	MCFG_ATARIRLE_ADD("rle", modesc)
 

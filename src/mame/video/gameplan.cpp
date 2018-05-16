@@ -265,7 +265,7 @@ TIMER_CALLBACK_MEMBER(gameplan_state::via_0_ca1_timer_callback)
  *
  *************************************/
 
-VIDEO_START_MEMBER(gameplan_state,common)
+void gameplan_state::video_start()
 {
 	m_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
 	m_videoram = std::make_unique<uint8_t[]>(m_videoram_size);
@@ -277,32 +277,13 @@ VIDEO_START_MEMBER(gameplan_state,common)
 }
 
 
-VIDEO_START_MEMBER(gameplan_state,gameplan)
-{
-	VIDEO_START_CALL_MEMBER(common);
-}
-
-
-VIDEO_START_MEMBER(gameplan_state,leprechn)
-{
-	VIDEO_START_CALL_MEMBER(common);
-}
-
-
-VIDEO_START_MEMBER(gameplan_state,trvquest)
-{
-	VIDEO_START_CALL_MEMBER(common);
-}
-
-
-
 /*************************************
  *
  *  Reset
  *
  *************************************/
 
-VIDEO_RESET_MEMBER(gameplan_state,gameplan)
+void gameplan_state::video_reset_gameplan()
 {
 	m_via_0_ca1_timer->adjust(m_screen->time_until_pos(VBSTART));
 }
@@ -316,8 +297,7 @@ VIDEO_RESET_MEMBER(gameplan_state,gameplan)
  *************************************/
 
 MACHINE_CONFIG_START(gameplan_state::gameplan_video)
-	MCFG_VIDEO_START_OVERRIDE(gameplan_state,gameplan)
-	MCFG_VIDEO_RESET_OVERRIDE(gameplan_state,gameplan)
+	set_video_reset_cb(config, driver_callback_delegate(&video_reset_gameplan, this));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(GAMEPLAN_PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
@@ -326,7 +306,6 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(gameplan_state::leprechn_video)
-	MCFG_VIDEO_START_OVERRIDE(gameplan_state,leprechn)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(gameplan_state, screen_update_leprechn)
 MACHINE_CONFIG_END
@@ -334,7 +313,6 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gameplan_state::trvquest_video)
 	gameplan_video(config);
-	MCFG_VIDEO_START_OVERRIDE(gameplan_state,trvquest)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(gameplan_state, screen_update_gameplan)
 MACHINE_CONFIG_END

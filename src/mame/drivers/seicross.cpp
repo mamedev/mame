@@ -381,7 +381,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( seicross )
+static GFXDECODE_START( gfx_seicross )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 16 )
 GFXDECODE_END
@@ -420,7 +420,7 @@ MACHINE_CONFIG_START(seicross_state::no_nvram)
 	MCFG_SCREEN_UPDATE_DRIVER(seicross_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seicross)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seicross)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(seicross_state, seicross)
 

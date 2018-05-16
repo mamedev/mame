@@ -562,7 +562,7 @@ static const gfx_layout ie15_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( ie15 )
+static GFXDECODE_START( gfx_ie15 )
 	GFXDECODE_ENTRY("chargen", 0x0000, ie15_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -610,7 +610,7 @@ MACHINE_CONFIG_START(ie15_device::device_add_mconfig)
 		IE15_HORZ_START+IE15_DISP_HORZ, IE15_TOTAL_VERT, IE15_VERT_START,
 		IE15_VERT_START+IE15_DISP_VERT);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ie15)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ie15)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 

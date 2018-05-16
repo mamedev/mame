@@ -1870,7 +1870,7 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static GFXDECODE_START( taito_b )
+static GFXDECODE_START( gfx_taito_b )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 256 )  /* text */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 256 )  /* sprites & playfield */
 GFXDECODE_END
@@ -1898,7 +1898,7 @@ static const gfx_layout rambo3_tilelayout =
 	32*8
 };
 
-static GFXDECODE_START( rambo3 )
+static GFXDECODE_START( gfx_rambo3 )
 	GFXDECODE_ENTRY( "gfx1", 0, rambo3_charlayout,  0, 256 )  /* text */
 	GFXDECODE_ENTRY( "gfx1", 0, rambo3_tilelayout,  0, 256 )  /* sprites & playfield */
 GFXDECODE_END
@@ -1974,11 +1974,11 @@ MACHINE_CONFIG_START(taitob_state::rastsag2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order0, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
@@ -2031,11 +2031,11 @@ MACHINE_CONFIG_START(taitob_state::masterw)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order2, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
@@ -2109,11 +2109,11 @@ MACHINE_CONFIG_START(taitob_state::ashura)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order0, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
@@ -2166,11 +2166,11 @@ MACHINE_CONFIG_START(taitob_state::crimec)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order1, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
@@ -2224,12 +2224,12 @@ MACHINE_CONFIG_START(taitob_state::hitice)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,hitice)
-	MCFG_VIDEO_RESET_OVERRIDE(taitob_state,hitice)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_hitice, this));
+	set_video_reset_cb(config, driver_callback_delegate(&video_reset_hitice, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
@@ -2287,11 +2287,11 @@ MACHINE_CONFIG_START(taitob_state::rambo3p)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rambo3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rambo3)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order0, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
@@ -2345,11 +2345,11 @@ MACHINE_CONFIG_START(taitob_state::rambo3)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order2, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
@@ -2408,11 +2408,11 @@ MACHINE_CONFIG_START(taitob_state::pbobble)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order1, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
@@ -2471,11 +2471,11 @@ MACHINE_CONFIG_START(taitob_state::spacedx)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order1, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
@@ -2528,11 +2528,11 @@ MACHINE_CONFIG_START(taitob_state::spacedxo)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order2, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
@@ -2591,11 +2591,11 @@ MACHINE_CONFIG_START(taitob_state::qzshowby)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order1, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x00)
@@ -2648,11 +2648,11 @@ MACHINE_CONFIG_START(taitob_state::viofight)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order2, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
@@ -2710,11 +2710,11 @@ MACHINE_CONFIG_START(taitob_state::silentd)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order2, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
@@ -2767,11 +2767,11 @@ MACHINE_CONFIG_START(taitob_state::selfeena)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order2, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
@@ -2833,11 +2833,11 @@ MACHINE_CONFIG_START(taitob_state::ryujin)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order2, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0x30)
@@ -2897,11 +2897,11 @@ MACHINE_CONFIG_START(taitob_state::sbm)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_taitob_color_order0, this));
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
@@ -2952,11 +2952,11 @@ MACHINE_CONFIG_START(taitob_c_state::realpunc)
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_realpunc)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitob_state, screen_vblank_taitob))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taito_b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_VIDEO_START_OVERRIDE(taitob_state,realpunc)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_realpunc, this));
 
 	MCFG_HD63484_ADD("hd63484", 0, realpunc_hd63484_map)
 	MCFG_HD63484_AUTO_CONFIGURE_SCREEN(false)

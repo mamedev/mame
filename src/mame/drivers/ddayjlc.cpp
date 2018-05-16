@@ -514,7 +514,7 @@ static const gfx_layout spritelayout =
 	16*16,
 };
 
-static GFXDECODE_START( ddayjlc )
+static GFXDECODE_START( gfx_ddayjlc )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0x000, 16 ) // upper 16 colors are unused
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0x200,  1 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0x100, 16 )
@@ -617,7 +617,7 @@ MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddayjlc_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddayjlc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddayjlc)
 	MCFG_PALETTE_ADD("palette", 0x200+4)
 	MCFG_PALETTE_INIT_OWNER(ddayjlc_state, ddayjlc)
 

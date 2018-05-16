@@ -1599,29 +1599,29 @@ static const gfx_layout metlhawk_sprite_layout = {
 	32*32*8
 };
 
-static GFXDECODE_START( metlhawk )
+static GFXDECODE_START( gfx_metlhawk )
 	GFXDECODE_ENTRY( "sprites",  0x000000, metlhawk_sprite_layout, 0*256, 16 )
 	GFXDECODE_ENTRY( "tiles",    0x000000, layout8x8x8,           16*256, 16 )
 	GFXDECODE_ENTRY( "roztiles", 0x000000, layout16x16x8,          0*256, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( namcos2 )
+static GFXDECODE_START( gfx_namcos2 )
 	GFXDECODE_ENTRY( "sprites",  0x000000, obj_layout,   0*256, 16 )
 	GFXDECODE_ENTRY( "tiles",    0x000000, layout8x8x8, 16*256, 16 )
 	GFXDECODE_ENTRY( "roztiles", 0x000000, layout8x8x8,  0*256, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( finallap )
+static GFXDECODE_START( gfx_finallap )
 	GFXDECODE_ENTRY( "sprites", 0x000000, obj_layout,   0*256, 16 )
 	GFXDECODE_ENTRY( "tiles",   0x000000, layout8x8x8, 16*256, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( sgunner )
+static GFXDECODE_START( gfx_sgunner )
 	GFXDECODE_ENTRY( "sprites",  0x000000, layout16x16x8, 0*256, 16 )
 	GFXDECODE_ENTRY( "tiles",    0x000000, layout8x8x8,  16*256, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( luckywld )
+static GFXDECODE_START( gfx_luckywld )
 	GFXDECODE_ENTRY( "sprites",  0x000000, layout16x16x8, 0*256, 16 )
 	GFXDECODE_ENTRY( "tiles",    0x000000, layout8x8x8,  16*256, 16 )
 	GFXDECODE_ENTRY( "roztiles", 0x000000, layout16x16x8, 0*256, 16 )
@@ -1710,8 +1710,8 @@ MACHINE_CONFIG_START(namcos2_state::base)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000)) /* CPU slices per frame */
 
-	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
-	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcos2, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos2, this));
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
@@ -1724,7 +1724,7 @@ MACHINE_CONFIG_START(namcos2_state::base)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos2)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -1794,8 +1794,8 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	MCFG_MACHINE_START_OVERRIDE(namcos2_state,gollygho)
-	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_gollygho, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos2, this));
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
@@ -1808,7 +1808,7 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcos2)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -1848,8 +1848,8 @@ MACHINE_CONFIG_START(namcos2_state::finallap)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
-	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcos2, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos2, this));
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
@@ -1862,7 +1862,7 @@ MACHINE_CONFIG_START(namcos2_state::finallap)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_finallap)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", finallap)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_finallap)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -1870,7 +1870,7 @@ MACHINE_CONFIG_START(namcos2_state::finallap)
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(namcos2_state, finallap)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_finallap, this));
 
 	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
 	MCFG_GFX_PALETTE("palette")
@@ -1907,8 +1907,8 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
-	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcos2, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos2, this));
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
@@ -1921,7 +1921,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sgunner)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sgunner)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -1929,7 +1929,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner)
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_sgunner, this));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1968,8 +1968,8 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
-	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,sgunner2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcos2, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sgunner2, this));
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
@@ -1982,7 +1982,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sgunner)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sgunner)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -1990,7 +1990,7 @@ MACHINE_CONFIG_START(namcos2_state::sgunner2)
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_sgunner, this));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -2024,8 +2024,8 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
-	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcos2, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos2, this));
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
@@ -2038,7 +2038,7 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_luckywld)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", luckywld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_luckywld)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -2046,7 +2046,7 @@ MACHINE_CONFIG_START(namcos2_state::luckywld)
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(namcos2_state, luckywld)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_luckywld, this));
 
 	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
 	MCFG_GFX_PALETTE("palette")
@@ -2083,8 +2083,8 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
-	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_namcos2, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_namcos2, this));
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	configure_c148_standard(config);
@@ -2097,7 +2097,7 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_metlhawk)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", metlhawk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_metlhawk)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -2105,7 +2105,7 @@ MACHINE_CONFIG_START(namcos2_state::metlhawk)
 	MCFG_DEVICE_ADD("c116", NAMCO_C116, 0)
 	MCFG_GFX_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(namcos2_state, metlhawk)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_metlhawk, this));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

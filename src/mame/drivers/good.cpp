@@ -281,7 +281,7 @@ static const gfx_layout good_layout2 =
 };
 
 
-static GFXDECODE_START( good )
+static GFXDECODE_START( gfx_good )
 	GFXDECODE_ENTRY( "gfx1", 0, good_layout2,  0x100, 16  ) /* fg tiles */
 	GFXDECODE_ENTRY( "gfx1", 0, good_layout2,  0x200, 16  ) /* fg tiles */
 GFXDECODE_END
@@ -293,7 +293,7 @@ MACHINE_CONFIG_START(good_state::good)
 	MCFG_DEVICE_PROGRAM_MAP(good_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", good_state,  irq2_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", good)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_good)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

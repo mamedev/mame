@@ -263,7 +263,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( yiear )
+static GFXDECODE_START( gfx_yiear )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   16, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  0, 1 )
 GFXDECODE_END
@@ -299,7 +299,7 @@ MACHINE_CONFIG_START(yiear_state::yiear)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, yiear_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yiear)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yiear)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(yiear_state, yiear)
 

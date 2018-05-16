@@ -292,7 +292,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( foodf )
+static GFXDECODE_START( gfx_foodf )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 32 )
 GFXDECODE_END
@@ -336,7 +336,7 @@ MACHINE_CONFIG_START(foodf_state::foodf)
 	MCFG_TIMER_DRIVER_ADD("scan_timer", foodf_state, scanline_update_timer)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", foodf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_foodf)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("playfield", "gfxdecode", 2, foodf_state, get_playfield_tile_info, 8,8, SCAN_COLS, 32,32, 0)

@@ -1058,13 +1058,13 @@ static const gfx_layout spyhunt_alphalayout =
 };
 
 
-static GFXDECODE_START( mcr3 )
+static GFXDECODE_START( gfx_mcr3 )
 	GFXDECODE_SCALE( "gfx1", 0, mcr_bg_layout,     0, 4, 2, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout, 0, 4 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( spyhunt )
+static GFXDECODE_START( gfx_spyhunt )
 	GFXDECODE_ENTRY( "gfx1", 0, spyhunt_charlayout,  3*16, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout,   0*16, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spyhunt_alphalayout, 4*16, 1 )
@@ -1110,7 +1110,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_mcr3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcr3)
 	MCFG_PALETTE_ADD("palette", 64)
 MACHINE_CONFIG_END
 
@@ -1170,12 +1170,12 @@ MACHINE_CONFIG_START(mcr3_state::mcrscroll)
 	MCFG_SCREEN_SIZE(30*16, 30*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_spyhunt)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", spyhunt)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spyhunt)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+4)
 
 	MCFG_PALETTE_INIT_OWNER(mcr3_state,spyhunt)
-	MCFG_VIDEO_START_OVERRIDE(mcr3_state,spyhunt)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_spyhunt, this));
 MACHINE_CONFIG_END
 
 

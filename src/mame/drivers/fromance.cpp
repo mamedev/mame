@@ -852,7 +852,7 @@ static const gfx_layout bglayout =
 };
 
 
-static GFXDECODE_START( fromance )
+static GFXDECODE_START( gfx_fromance )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,   0, 128 )
 GFXDECODE_END
@@ -864,7 +864,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(fromance_state,fromance)
+void fromance_state::machine_start_fromance()
 {
 	uint8_t *ROM = memregion("sub")->base();
 
@@ -879,7 +879,7 @@ MACHINE_START_MEMBER(fromance_state,fromance)
 	/* video-related elements are saved in video_start */
 }
 
-MACHINE_RESET_MEMBER(fromance_state,fromance)
+void fromance_state::machine_reset_fromance()
 {
 	m_portselect = 0;
 
@@ -914,8 +914,8 @@ MACHINE_CONFIG_START(fromance_state::nekkyoku)
 	MCFG_GENERIC_LATCH_8_ADD("sublatch")
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
-	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fromance, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_fromance, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -925,13 +925,13 @@ MACHINE_CONFIG_START(fromance_state::nekkyoku)
 	MCFG_SCREEN_UPDATE_DRIVER(fromance_state, screen_update_fromance)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 14318180 / 2) // clock not verified
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
 
-	MCFG_VIDEO_START_OVERRIDE(fromance_state,nekkyoku)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_nekkyoku, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -960,8 +960,8 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 	MCFG_GENERIC_LATCH_8_ADD("sublatch")
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
-	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fromance, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_fromance, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -971,13 +971,13 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 	MCFG_SCREEN_UPDATE_DRIVER(fromance_state, screen_update_fromance)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
 
-	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_fromance, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1006,8 +1006,8 @@ MACHINE_CONFIG_START(fromance_state::fromance)
 	MCFG_GENERIC_LATCH_8_ADD("sublatch")
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
-	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_fromance, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_fromance, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1017,13 +1017,13 @@ MACHINE_CONFIG_START(fromance_state::fromance)
 	MCFG_SCREEN_UPDATE_DRIVER(fromance_state, screen_update_fromance)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
 
-	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_fromance, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

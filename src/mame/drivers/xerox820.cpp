@@ -592,11 +592,11 @@ static const gfx_layout xerox820_gfxlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( xerox820 )
+static GFXDECODE_START( gfx_xerox820 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, xerox820_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( xerox820ii )
+static GFXDECODE_START( gfx_xerox820ii )
 	GFXDECODE_ENTRY( "chargen", 0x0000, xerox820_charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "chargen", 0x0800, xerox820_gfxlayout, 0, 1 )
 GFXDECODE_END
@@ -615,7 +615,7 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(10'694'250), 700, 0, 560, 260, 0, 240)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xerox820)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xerox820)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
@@ -691,7 +691,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820ii_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(10'694'250), 700, 0, 560, 260, 0, 240)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xerox820ii)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xerox820ii)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */

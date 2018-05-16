@@ -54,7 +54,7 @@
 };
 
 #define GFXDECODEINFO(NUM,ENTRIES) \
-static GFXDECODE_START( NUM )\
+static GFXDECODE_START( gfx_##NUM )\
 	GFXDECODE_ENTRY( "gfx1", 0x0000000, tilelayout16_##NUM,0,   ENTRIES )                       \
 GFXDECODE_END
 
@@ -195,10 +195,10 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0080000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0080000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
-	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -626,10 +626,10 @@ MACHINE_CONFIG_START(gaelco2_state::play2000)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0200000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0200000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
-	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -731,10 +731,10 @@ MACHINE_CONFIG_START(bang_state::bang)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0200000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0200000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
-	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -969,10 +969,10 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0400000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0400000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
-	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1264,7 +1264,7 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0400000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0400000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -1285,7 +1285,7 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2_dual)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2_dual, this));
 
 	/* sound hardware */
 	/* the chip is stereo, but the game sound is mono because the right channel
@@ -1581,10 +1581,10 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0400000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0400000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
-	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1624,10 +1624,10 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0080000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0080000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
-	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1860,7 +1860,7 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0200000)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x0200000)
 	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -1882,7 +1882,7 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	MCFG_SCREEN_PALETTE("palette")
 
 
-	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2_dual)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gaelco2_dual, this));
 
 	/* sound hardware */
 	/* the chip is stereo, but the game sound is mono because the right channel

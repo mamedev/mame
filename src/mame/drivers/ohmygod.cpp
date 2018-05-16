@@ -295,7 +295,7 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( ohmygod )
+static GFXDECODE_START( gfx_ohmygod )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* colors   0-255 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 512, 16 ) /* colors 512-767 */
 GFXDECODE_END
@@ -340,7 +340,7 @@ MACHINE_CONFIG_START(ohmygod_state::ohmygod)
 	MCFG_SCREEN_UPDATE_DRIVER(ohmygod_state, screen_update_ohmygod)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ohmygod)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ohmygod)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)

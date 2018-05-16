@@ -260,7 +260,7 @@ static const gfx_layout wrally_tilelayout16 =
 	64*8
 };
 
-static GFXDECODE_START( wrally )
+static GFXDECODE_START( gfx_wrally )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, wrally_tilelayout16, 0, 64*8 )
 GFXDECODE_END
 
@@ -283,7 +283,7 @@ MACHINE_CONFIG_START(wrally_state::wrally)
 	MCFG_SCREEN_UPDATE_DRIVER(wrally_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wrally)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wrally)
 	MCFG_PALETTE_ADD("palette", 1024*8)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 

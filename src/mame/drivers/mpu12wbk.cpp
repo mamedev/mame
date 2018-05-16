@@ -478,7 +478,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( mpu12wbk )
+static GFXDECODE_START( gfx_mpu12wbk )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -503,7 +503,7 @@ MACHINE_CONFIG_START(mpu12wbk_state::mpu12wbk)
 	MCFG_SCREEN_UPDATE_DRIVER(mpu12wbk_state, screen_update_mpu12wbk)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mpu12wbk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mpu12wbk)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(mpu12wbk_state, mpu12wbk)
 

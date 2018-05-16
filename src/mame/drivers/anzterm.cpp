@@ -395,7 +395,7 @@ gfx_layout const printfont =
 	64                                          // stride
 };
 
-GFXDECODE_START( anzterm )
+GFXDECODE_START( gfx_anzterm )
 	GFXDECODE_ENTRY("crtc", 0x0000, screenfont, 0, 1)
 	GFXDECODE_ENTRY("prnt", 0x0000, printfont,  0, 1)
 GFXDECODE_END
@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(anzterm_state::anzterm)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", anzterm)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_anzterm)
 MACHINE_CONFIG_END
 
 

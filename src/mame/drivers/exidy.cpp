@@ -798,7 +798,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( exidy )
+static GFXDECODE_START( gfx_exidy )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0, 2 )
 GFXDECODE_END
 
@@ -810,7 +810,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(exidy_state,teetert)
+void exidy_state::machine_start_teetert()
 {
 	save_item(NAME(m_last_dial));
 }
@@ -828,7 +828,7 @@ MACHINE_CONFIG_START(exidy_state::base)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exidy_state,  exidy_vblank_interrupt)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exidy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exidy)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -906,7 +906,7 @@ MACHINE_CONFIG_START(exidy_state::teetert)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(exidy_state, nmi_line_pulse, 10*60)
 
-	MCFG_MACHINE_START_OVERRIDE(exidy_state, teetert )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_teetert, this));
 
 MACHINE_CONFIG_END
 

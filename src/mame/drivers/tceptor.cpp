@@ -289,7 +289,7 @@ static const gfx_layout tile_layout =
 	2*8*8
 };
 
-static GFXDECODE_START( tceptor )
+static GFXDECODE_START( gfx_tceptor )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,     0,  256 )
 
 	/* decode in video_start */
@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(tceptor_state::tceptor)
 	MCFG_ADC0808_IN3_CB(IOPORT("STICKY"))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tceptor)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tceptor)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INDIRECT_ENTRIES(1024)
 	MCFG_PALETTE_INIT_OWNER(tceptor_state, tceptor)

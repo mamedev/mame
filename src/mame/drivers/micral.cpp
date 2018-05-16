@@ -73,7 +73,7 @@ public:
 	{ }
 
 	void init_micral();
-	DECLARE_MACHINE_RESET(micral);
+	void machine_reset_micral();
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(unk_r);
@@ -354,7 +354,7 @@ void micral_state::init_micral()
 	//membank("bankw0")->configure_entry(0, &main[0xf800]);
 }
 
-MACHINE_RESET_MEMBER( micral_state, micral )
+void micral_state::machine_reset_micral()
 {
 	//membank("bankr0")->set_entry(0); // point at rom
 	//membank("bankw0")->set_entry(0); // always write to ram
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(micral_state::micral)
 	MCFG_DEVICE_PROGRAM_MAP(mem_kbd)
 	MCFG_DEVICE_IO_MAP(io_kbd)
 
-	MCFG_MACHINE_RESET_OVERRIDE(micral_state, micral)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_micral, this));
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -393,7 +393,7 @@ MACHINE_CONFIG_START(micral_state::micral)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", micral)
+	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_micral)
 
 	MCFG_DEVICE_ADD("crtc", CRT5037, 4000000 / 8)  // xtal freq unknown
 	MCFG_TMS9927_CHAR_WIDTH(8)  // unknown

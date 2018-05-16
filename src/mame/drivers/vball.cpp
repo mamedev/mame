@@ -390,7 +390,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( vb )
+static GFXDECODE_START( gfx_vb )
 	GFXDECODE_ENTRY( "fg_tiles", 0, charlayout,     0, 8 )  /* 8x8 chars */
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 128, 8 )  /* 16x16 sprites */
 GFXDECODE_END
@@ -413,7 +413,7 @@ MACHINE_CONFIG_START(vball_state::vball)
 	MCFG_SCREEN_UPDATE_DRIVER(vball_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vb)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vb)
 	MCFG_PALETTE_ADD("palette", 256)
 
 

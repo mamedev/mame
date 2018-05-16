@@ -255,7 +255,7 @@ static const gfx_layout spritelayout =
 	128*8  /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( speedbal )
+static GFXDECODE_START( gfx_speedbal )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  256, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  512, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,   0, 16 )
@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(speedbal_state::speedbal)
 	MCFG_SCREEN_UPDATE_DRIVER(speedbal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speedbal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speedbal)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)

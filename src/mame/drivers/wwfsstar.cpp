@@ -402,7 +402,7 @@ static const gfx_layout tiles16x16_layout =
 	64*8
 };
 
-static GFXDECODE_START( wwfsstar )
+static GFXDECODE_START( gfx_wwfsstar )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,     0, 16 )    /* colors   0-255 */
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 128, 16 )    /* colors   128-383 */
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16_layout, 256,  8 )    /* colors   256-383 */
@@ -429,7 +429,7 @@ MACHINE_CONFIG_START(wwfsstar_state::wwfsstar)
 	MCFG_SCREEN_UPDATE_DRIVER(wwfsstar_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wwfsstar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wwfsstar)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

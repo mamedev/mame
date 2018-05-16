@@ -1330,7 +1330,7 @@ static const gfx_layout spritelayout =
 	16*16*4
 };
 
-static GFXDECODE_START( djmain )
+static GFXDECODE_START( gfx_djmain )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0,  (0x4440/4)/16 )
 GFXDECODE_END
 
@@ -1399,7 +1399,7 @@ MACHINE_CONFIG_START(djmain_state::djmainj)
 
 	MCFG_PALETTE_ADD("palette", 0x4440/4)
 	MCFG_PALETTE_FORMAT(XBGR)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", djmain)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_djmain)
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(djmain_state, tile_callback)

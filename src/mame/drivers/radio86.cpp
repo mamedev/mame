@@ -345,7 +345,7 @@ static const gfx_layout radio86_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( radio86 )
+static GFXDECODE_START( gfx_radio86 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, radio86_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -356,7 +356,7 @@ MACHINE_CONFIG_START(radio86_state::radio86)
 	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(16'000'000) / 9)
 	MCFG_DEVICE_PROGRAM_MAP(radio86_mem)
 	MCFG_DEVICE_IO_MAP(radio86_io)
-	MCFG_MACHINE_RESET_OVERRIDE(radio86_state, radio86 )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_radio86, this));
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
@@ -373,7 +373,7 @@ MACHINE_CONFIG_START(radio86_state::radio86)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000) / 2, 516, 0, 78*6, 310, 0, 30*10)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", radio86)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_radio86)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(radio86_state,radio86)
 

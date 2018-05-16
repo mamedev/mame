@@ -464,7 +464,7 @@ READ8_MEMBER(astrof_state::tomahawk_protection_r)
  *
  *************************************/
 
-MACHINE_START_MEMBER(astrof_state,astrof)
+void astrof_state::machine_start_astrof()
 {
 	/* the 74175 outputs all HI's if not otherwise set */
 	astrof_set_video_control_2(0xff);
@@ -482,16 +482,16 @@ MACHINE_START_MEMBER(astrof_state,astrof)
 }
 
 
-MACHINE_START_MEMBER(astrof_state,abattle)
+void astrof_state::machine_start_abattle()
 {
 	/* register for state saving */
 	save_item(NAME(m_abattle_count));
 
-	MACHINE_START_CALL_MEMBER(astrof);
+	machine_start_astrof();
 }
 
 
-MACHINE_START_MEMBER(astrof_state,spfghmk2)
+void astrof_state::machine_start_spfghmk2()
 {
 	/* the 74175 outputs all HI's if not otherwise set */
 	spfghmk2_set_video_control_2(0xff);
@@ -507,7 +507,7 @@ MACHINE_START_MEMBER(astrof_state,spfghmk2)
 }
 
 
-MACHINE_START_MEMBER(astrof_state,tomahawk)
+void astrof_state::machine_start_tomahawk()
 {
 	/* the 74175 outputs all HI's if not otherwise set */
 	tomahawk_set_video_control_2(0xff);
@@ -526,7 +526,7 @@ MACHINE_START_MEMBER(astrof_state,tomahawk)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(astrof_state,abattle)
+void astrof_state::machine_reset_abattle()
 {
 	m_abattle_count = 0;
 }
@@ -933,7 +933,7 @@ MACHINE_CONFIG_START(astrof_state::astrof)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(astrof_map)
 
-	MCFG_MACHINE_START_OVERRIDE(astrof_state,astrof)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_astrof, this));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -949,8 +949,8 @@ MACHINE_CONFIG_START(astrof_state::abattle)
 
 	/* basic machine hardware */
 
-	MCFG_MACHINE_START_OVERRIDE(astrof_state,abattle)
-	MCFG_MACHINE_RESET_OVERRIDE(astrof_state,abattle)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_abattle, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_abattle, this));
 MACHINE_CONFIG_END
 
 
@@ -961,7 +961,7 @@ MACHINE_CONFIG_START(astrof_state::spfghmk2)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(spfghmk2_map)
 
-	MCFG_MACHINE_START_OVERRIDE(astrof_state,spfghmk2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_spfghmk2, this));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -979,7 +979,7 @@ MACHINE_CONFIG_START(astrof_state::tomahawk)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(tomahawk_map)
 
-	MCFG_MACHINE_START_OVERRIDE(astrof_state,tomahawk)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_tomahawk, this));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

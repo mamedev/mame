@@ -330,7 +330,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( brkthru )
+static GFXDECODE_START( gfx_brkthru )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0x00,  1 )  /* use colors 0x00-0x07 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout1,  0x80, 16 )  /* use colors 0x80-0xff */
 	GFXDECODE_ENTRY( "gfx2", 0x01000, tilelayout2,  0x80, 16 )
@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(brkthru_state::brkthru)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", brkthru)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_brkthru)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)
@@ -425,7 +425,7 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", brkthru)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_brkthru)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)

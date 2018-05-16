@@ -357,7 +357,7 @@ static const gfx_layout scroll1layout_bionicc=
 	512   /* each tile takes 512 consecutive bytes */
 };
 
-static GFXDECODE_START( bionicc )
+static GFXDECODE_START( gfx_bionicc )
 	GFXDECODE_ENTRY( "gfx1", 0, vramlayout_bionicc,    768, 64 )    /* colors 768-1023 */
 	GFXDECODE_ENTRY( "gfx2", 0, scroll2layout_bionicc,   0,  4 )    /* colors   0-  63 */
 	GFXDECODE_ENTRY( "gfx3", 0, scroll1layout_bionicc, 256,  4 )    /* colors 256- 319 */
@@ -414,7 +414,7 @@ MACHINE_CONFIG_START(bionicc_state::bionicc)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bionicc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bionicc)
 
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 

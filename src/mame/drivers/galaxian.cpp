@@ -5693,23 +5693,23 @@ static const gfx_layout galaxian_spritelayout_0x80 =
  *
  *************************************/
 
-static GFXDECODE_START(galaxian)
+static GFXDECODE_START(gfx_galaxian)
 	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_charlayout,   0, 8, GALAXIAN_XSCALE,1)
 	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_spritelayout, 0, 8, GALAXIAN_XSCALE,1)
 GFXDECODE_END
 
-static GFXDECODE_START(gmgalax)
+static GFXDECODE_START(gfx_gmgalax)
 	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_charlayout,   0, 16, GALAXIAN_XSCALE,1)
 	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_spritelayout, 0, 16, GALAXIAN_XSCALE,1)
 GFXDECODE_END
 
 /* separate character and sprite ROMs */
-static GFXDECODE_START(pacmanbl)
+static GFXDECODE_START(gfx_pacmanbl)
 	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_charlayout,   0, 8, GALAXIAN_XSCALE,1)
 	GFXDECODE_SCALE("gfx2", 0x0000, galaxian_spritelayout, 0, 8, GALAXIAN_XSCALE,1)
 GFXDECODE_END
 
-static GFXDECODE_START(tenspot)
+static GFXDECODE_START(gfx_tenspot)
 	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_charlayout_0x200,   0, 8, GALAXIAN_XSCALE,1)
 	GFXDECODE_SCALE("gfx2", 0x0000, galaxian_spritelayout_0x80, 0, 8, GALAXIAN_XSCALE,1)
 GFXDECODE_END
@@ -5789,7 +5789,7 @@ MACHINE_CONFIG_START(galaxian_state::galaxian_base)
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxian)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(galaxian_state, galaxian)
 
@@ -5909,7 +5909,7 @@ MACHINE_CONFIG_START(galaxian_state::pacmanbl)
 	galaxian(config);
 
 	/* separate tile/sprite ROMs */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pacmanbl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pacmanbl)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::tenspot)
@@ -5924,14 +5924,14 @@ MACHINE_CONFIG_START(galaxian_state::tenspot)
 	//MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* separate tile/sprite ROMs */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", tenspot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_tenspot)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::zigzag)
 	galaxian_base(config);
 
 	/* separate tile/sprite ROMs */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pacmanbl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pacmanbl)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -5947,7 +5947,7 @@ MACHINE_CONFIG_START(galaxian_state::gmgalax)
 	galaxian(config);
 
 	/* banked video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gmgalax)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64)
 	MCFG_PALETTE_INIT_OWNER(galaxian_state, galaxian)

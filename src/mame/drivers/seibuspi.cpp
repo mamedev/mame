@@ -1756,7 +1756,7 @@ static const gfx_layout spi_spritelayout5 =
 };
 #endif
 
-static GFXDECODE_START( spi )
+static GFXDECODE_START( gfx_spi )
 	GFXDECODE_ENTRY( "gfx1", 0, spi_charlayout,   5632, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spi_tilelayout,   4096, 24 )
 	GFXDECODE_ENTRY( "gfx3", 0, spi_spritelayout,    0, 96 )
@@ -1801,7 +1801,7 @@ static const gfx_layout sys386f_spritelayout =
 	16*32
 };
 
-static GFXDECODE_START( sys386f )
+static GFXDECODE_START( gfx_sys386f )
 	GFXDECODE_ENTRY( "gfx1", 0, spi_charlayout,          5632, 16 ) // Not used
 	GFXDECODE_ENTRY( "gfx2", 0, spi_tilelayout,          4096, 24 ) // Not used
 	GFXDECODE_ENTRY( "gfx3", 0, sys386f_spritelayout,       0, 96 )
@@ -1851,7 +1851,7 @@ void seibuspi_state::machine_start()
 	if (m_z80_rom != nullptr) save_pointer(NAME(m_z80_rom->base()), m_z80_rom->bytes());
 }
 
-MACHINE_RESET_MEMBER(seibuspi_state,spi)
+void seibuspi_state::machine_reset_spi()
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
@@ -1873,7 +1873,7 @@ MACHINE_CONFIG_START(seibuspi_state::spi)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, spi)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_spi, this));
 
 	MCFG_DS2404_ADD("ds2404", 1995, 1, 1)
 
@@ -1888,7 +1888,7 @@ MACHINE_CONFIG_START(seibuspi_state::spi)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spi)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
 
@@ -1916,7 +1916,7 @@ MACHINE_CONFIG_START(seibuspi_state::ejanhs)
 	spi(config);
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, ejanhs)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ejanhs, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seibuspi_state::rdft2)
@@ -1928,7 +1928,7 @@ MACHINE_CONFIG_END
 
 /* single boards */
 
-MACHINE_RESET_MEMBER(seibuspi_state,sxx2e)
+void seibuspi_state::machine_reset_sxx2e()
 {
 	m_z80_bank->set_entry(0);
 	m_z80_lastbank = 0;
@@ -1945,7 +1945,7 @@ MACHINE_CONFIG_START(seibuspi_state::sxx2e)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(sxx2e_soundmap)
 
-	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, sxx2e)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sxx2e, this));
 
 	MCFG_DEVICE_REMOVE("soundflash1")
 	MCFG_DEVICE_REMOVE("soundflash2")
@@ -2014,7 +2014,7 @@ MACHINE_CONFIG_START(seibuspi_state::sys386i)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spi)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spi)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
 
@@ -2073,11 +2073,11 @@ MACHINE_CONFIG_START(seibuspi_state::sys386f)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_sys386f)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sys386f)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys386f)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 8192)
 
-	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, sys386f)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_sys386f, this));
 
 	/* sound hardware */
 	 // Single PCBs only output mono sound

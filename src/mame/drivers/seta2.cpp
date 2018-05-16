@@ -117,6 +117,8 @@ reelquak:
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
+
+#include "diserial.h"
 #include "speaker.h"
 
 
@@ -224,7 +226,7 @@ void seta2_state::gundamex_map(address_map &map)
                       Wakakusamonogatari Mahjong Yonshimai
 ***************************************************************************/
 
-MACHINE_START_MEMBER(seta2_state, mj4simai)
+void seta2_state::machine_start_mj4simai()
 {
 	save_item(NAME(m_keyboard_row));
 }
@@ -2376,7 +2378,7 @@ static const gfx_layout layout_2bpp_hi =
 
 /*  Tiles are 8bpp, but the hardware is additionally able to discard
     some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static GFXDECODE_START( seta2 )
+static GFXDECODE_START( gfx_seta2 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_4bpp_lo, 0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_4bpp_hi, 0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_6bpp,    0, 0x8000/16 )   // 6bpp, but 4bpp color granularity
@@ -2458,7 +2460,7 @@ static const gfx_layout funcube_layout_2bpp_hi =
 
 /*  Tiles are 8bpp, but the hardware is additionally able to discard
     some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static GFXDECODE_START( funcube )
+static GFXDECODE_START( gfx_funcube )
 	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_4bpp_lo, 0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_4bpp_hi, 0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_6bpp,    0, 0x8000/16 )   // 6bpp, but 4bpp color granularity
@@ -2495,7 +2497,7 @@ static const gfx_layout staraudi_layout_6bpp =
 
 /*  Tiles are 8bpp, but the hardware is additionally able to discard
     some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static GFXDECODE_START( staraudi )
+static GFXDECODE_START( gfx_staraudi )
 	GFXDECODE_ENTRY( "sprites", 0, staraudi_layout_4bpp_lo, 0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, funcube_layout_4bpp_hi,  0, 0x8000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, staraudi_layout_6bpp,    0, 0x8000/16 )   // 6bpp, but 4bpp color granularity
@@ -2543,7 +2545,7 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seta2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seta2)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2557,7 +2559,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::mj4simai)
 	seta2(config);
-	MCFG_MACHINE_START_OVERRIDE(seta2_state, mj4simai)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mj4simai, this));
 
 MACHINE_CONFIG_END
 
@@ -2599,7 +2601,7 @@ MACHINE_CONFIG_START(seta2_state::myangel)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,yoffset)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_yoffset, this));
 MACHINE_CONFIG_END
 
 
@@ -2612,7 +2614,7 @@ MACHINE_CONFIG_START(seta2_state::myangel2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,yoffset)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_yoffset, this));
 MACHINE_CONFIG_END
 
 
@@ -2661,7 +2663,7 @@ MACHINE_CONFIG_START(seta2_state::reelquak)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x80, 0x170-1)
 
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,xoffset)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_xoffset, this));
 MACHINE_CONFIG_END
 
 
@@ -2695,7 +2697,7 @@ MACHINE_CONFIG_START(staraudi_state::staraudi)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
 	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x150-1, 0x100, 0x1f0-1)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", staraudi)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_staraudi)
 MACHINE_CONFIG_END
 
 
@@ -2715,7 +2717,7 @@ MACHINE_CONFIG_START(seta2_state::telpacfl)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x180-1, 0xff, 0x1ef-1)
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,xoffset1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_xoffset1, this));
 MACHINE_CONFIG_END
 
 
@@ -2734,13 +2736,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta2_state::funcube_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-MACHINE_START_MEMBER(seta2_state, funcube)
+void seta2_state::machine_start_funcube()
 {
 	save_item(NAME(m_funcube_coin_start_cycles));
 	save_item(NAME(m_funcube_hopper_motor));
 }
 
-MACHINE_RESET_MEMBER(seta2_state, funcube)
+void seta2_state::machine_reset_funcube()
 {
 	m_funcube_coin_start_cycles = 0;
 	m_funcube_hopper_motor = 0;
@@ -2765,8 +2767,8 @@ MACHINE_CONFIG_START(seta2_state::funcube)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_MACHINE_START_OVERRIDE(seta2_state, funcube)
-	MCFG_MACHINE_RESET_OVERRIDE(seta2_state, funcube)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_funcube, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_funcube, this));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2778,7 +2780,7 @@ MACHINE_CONFIG_START(seta2_state::funcube)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funcube)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funcube)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2833,7 +2835,7 @@ MACHINE_CONFIG_START(seta2_state::namcostr)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funcube)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funcube)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

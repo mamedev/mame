@@ -190,16 +190,13 @@ void gaelco3d_state::machine_start()
 }
 
 
-MACHINE_RESET_MEMBER(gaelco3d_state,common)
+void gaelco3d_state::machine_reset_common()
 {
-	uint16_t *src;
-	int i;
-
 	m_framenum = 0;
 
 	/* boot the ADSP chip */
-	src = (uint16_t *)memregion("user1")->base();
-	for (i = 0; i < (src[3] & 0xff) * 8; i++)
+	uint16_t *src = (uint16_t *)memregion("user1")->base();
+	for (int i = 0; i < (src[3] & 0xff) * 8; i++)
 	{
 		uint32_t opcode = ((src[i*4+0] & 0xff) << 16) | ((src[i*4+1] & 0xff) << 8) | (src[i*4+2] & 0xff);
 		m_adsp_ram_base[i] = opcode;
@@ -214,7 +211,7 @@ MACHINE_RESET_MEMBER(gaelco3d_state,common)
 	/* keep the TMS32031 halted until the code is ready to go */
 	m_tms->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	for (i = 0; i < SOUND_CHANNELS; i++)
+	for (int i = 0; i < SOUND_CHANNELS; i++)
 	{
 		char buffer[10];
 		sprintf(buffer, "dac%d", i + 1);
@@ -225,15 +222,15 @@ MACHINE_RESET_MEMBER(gaelco3d_state,common)
 
 void gaelco3d_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER( common );
+	machine_reset_common();
 	m_tms_offset_xor = 0;
 	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
 }
 
 
-MACHINE_RESET_MEMBER(gaelco3d_state,gaelco3d2)
+void gaelco3d_state::machine_reset_gaelco3d2()
 {
-	MACHINE_RESET_CALL_MEMBER( common );
+	machine_reset_common();
 	m_tms_offset_xor = BYTE_XOR_BE(0);
 	m_fp_clock = 27;
 	m_fp_state = 0;
@@ -1012,7 +1009,7 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d2)
 	MCFG_DEVICE_MODIFY("tms")
 	MCFG_DEVICE_CLOCK(50000000)
 
-	MCFG_MACHINE_RESET_OVERRIDE(gaelco3d_state,gaelco3d2)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_gaelco3d2, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaelco3d_state::footbpow)

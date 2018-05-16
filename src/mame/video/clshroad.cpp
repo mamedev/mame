@@ -199,7 +199,7 @@ WRITE8_MEMBER(clshroad_state::vram_1_w)
 }
 
 
-VIDEO_START_MEMBER(clshroad_state,firebatl)
+void clshroad_state::video_start_firebatl()
 {
 	/* These 2 use the graphics and scroll value */
 	m_tilemap_0a = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0a),this),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);
@@ -217,7 +217,7 @@ VIDEO_START_MEMBER(clshroad_state,firebatl)
 	m_tilemap_1->configure_groups(*m_gfxdecode->gfx(2), 0x0f);
 }
 
-VIDEO_START_MEMBER(clshroad_state,clshroad)
+void clshroad_state::video_start_clshroad()
 {
 	/* These 2 use the graphics and scroll value */
 	m_tilemap_0a = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_0a),this),TILEMAP_SCAN_ROWS,16,16,0x20,0x10);

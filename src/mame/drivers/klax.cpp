@@ -165,7 +165,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( klax )
+static GFXDECODE_START( gfx_klax )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 16 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,    0, 16 )      /* sprites & playfield */
 GFXDECODE_END
@@ -181,7 +181,7 @@ static const gfx_layout bootleg_layout =
 	8*8
 };
 
-static GFXDECODE_START( klax2bl )
+static GFXDECODE_START( gfx_klax2bl )
 	GFXDECODE_ENTRY( "gfx1", 0, bootleg_layout,  256, 16 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,    0, 16 )      /* sprites & playfield */
 GFXDECODE_END
@@ -205,7 +205,7 @@ MACHINE_CONFIG_START(klax_state::klax)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", klax)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_klax)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)
@@ -246,7 +246,7 @@ MACHINE_CONFIG_START(klax_state::klax2bl)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 6000000) /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_sound_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", klax2bl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_klax2bl)
 
 	// guess, probably something like this
 	MCFG_DEVICE_ADD("msm", MSM5205, 375000)    /* ? */

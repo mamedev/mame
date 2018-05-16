@@ -91,7 +91,7 @@ WRITE8_MEMBER(sauro_state::sauro_scroll_fg_w)
 	m_fg_tilemap->set_scrollx(0, scroll);
 }
 
-VIDEO_START_MEMBER(sauro_state,sauro)
+void sauro_state::video_start_sauro()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),this), TILEMAP_SCAN_COLS,
 			8, 8, 32, 32);
@@ -162,7 +162,7 @@ uint32_t sauro_state::screen_update_sauro(screen_device &screen, bitmap_ind16 &b
 
 /* Tricky Doc */
 
-VIDEO_START_MEMBER(sauro_state,trckydoc)
+void sauro_state::video_start_trckydoc()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),this), TILEMAP_SCAN_COLS,
 			8, 8, 32, 32);

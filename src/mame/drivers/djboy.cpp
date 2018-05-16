@@ -429,7 +429,7 @@ static const gfx_layout tile_layout =
 	16*16*4
 };
 
-static GFXDECODE_START( djboy )
+static GFXDECODE_START( gfx_djboy )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0x100, 16 ) /* sprite bank */
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 0x000, 16 ) /* background tiles */
 GFXDECODE_END
@@ -523,7 +523,7 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, djboy_state, screen_vblank_djboy))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", djboy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_djboy)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)

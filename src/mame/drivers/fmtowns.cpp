@@ -2755,7 +2755,7 @@ static const gfx_layout text_chars =
 	8*16
 };
 
-static GFXDECODE_START( towns )
+static GFXDECODE_START( gfx_towns )
 	GFXDECODE_ENTRY( "user",   0x180000 + 0x3d800, text_chars,  0, 16 )
 	GFXDECODE_ENTRY( "user",   0x180000, fnt_chars_16x16,  0, 16 )
 GFXDECODE_END
@@ -2767,7 +2767,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_DEVICE_IO_MAP(towns_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
-	//MCFG_MACHINE_RESET_OVERRIDE(towns_state,towns)
+	//set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_towns, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2777,7 +2777,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
 	MCFG_SCREEN_UPDATE_DRIVER(towns_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette16_0", towns)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette16_0", gfx_towns)
 	MCFG_PALETTE_ADD("palette256", 256)
 	MCFG_PALETTE_ADD("palette16_0", 16)
 	MCFG_PALETTE_ADD("palette16_1", 16)
@@ -2865,7 +2865,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_UPD71071_DMA_WRITE_0_CB(WRITE16(*this, towns_state, towns_fdc_dma_w))
 	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(*this, towns_state, towns_scsi_dma_w))
 
-	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
+	//set_video_start_cb(config, driver_callback_delegate(&video_start_towns, this));
 
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, towns_state, towns_rxrdy_irq))

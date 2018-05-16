@@ -87,9 +87,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(color_bank_1_w);
 	DECLARE_WRITE_LINE_MEMBER(color_bank_2_w);
 
-	DECLARE_MACHINE_START(ambush);
-	DECLARE_MACHINE_START(mariobl);
-	DECLARE_MACHINE_START(dkong3abl);
+	void machine_start_ambush() ATTR_COLD;
+	void machine_start_mariobl() ATTR_COLD;
+	void machine_start_dkong3abl() ATTR_COLD;
 
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
@@ -557,7 +557,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( ambush )
+static GFXDECODE_START( gfx_ambush )
 	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x2_planar, 0, 64)
 	GFXDECODE_ENTRY("gfx1", 0, spritelayout,     0, 64)
 GFXDECODE_END
@@ -576,12 +576,12 @@ static const gfx_layout spritelayout_mariobl =
 	32*8
 };
 
-static GFXDECODE_START( mariobl )
+static GFXDECODE_START( gfx_mariobl )
 	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x2_planar,     0, 32)
 	GFXDECODE_ENTRY("gfx2", 0, spritelayout_mariobl, 0, 32)
 GFXDECODE_END
 
-static GFXDECODE_START( dkong3abl )
+static GFXDECODE_START( gfx_dkong3abl )
 	GFXDECODE_ENTRY("gfx1", 0, gfx_8x8x2_planar, 0, 64)
 	GFXDECODE_ENTRY("gfx2", 0, spritelayout,     0, 32)
 GFXDECODE_END
@@ -637,7 +637,7 @@ void ambush_state::register_save_states()
 	save_item(NAME(m_color_bank));
 }
 
-MACHINE_START_MEMBER( ambush_state, ambush )
+void ambush_state::machine_start_ambush()
 {
 	register_save_states();
 
@@ -647,7 +647,7 @@ MACHINE_START_MEMBER( ambush_state, ambush )
 	m_char_tilemap->set_scroll_cols(32);
 }
 
-MACHINE_START_MEMBER( ambush_state, mariobl )
+void ambush_state::machine_start_mariobl()
 {
 	register_save_states();
 
@@ -657,7 +657,7 @@ MACHINE_START_MEMBER( ambush_state, mariobl )
 	m_gfxdecode->gfx(0)->set_granularity(8);
 }
 
-MACHINE_START_MEMBER( ambush_state, dkong3abl )
+void ambush_state::machine_start_dkong3abl()
 {
 	register_save_states();
 
@@ -704,7 +704,7 @@ MACHINE_CONFIG_START(ambush_state::ambush)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_MACHINE_START_OVERRIDE(ambush_state, ambush)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ambush, this));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -712,7 +712,7 @@ MACHINE_CONFIG_START(ambush_state::ambush)
 	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ambush)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ambush)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(ambush_state, ambush)
@@ -740,12 +740,12 @@ MACHINE_CONFIG_START(ambush_state::mariobl)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, ambush_state, coin_counter_1_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, ambush_state, color_bank_1_w))
 
-	MCFG_MACHINE_START_OVERRIDE(ambush_state, mariobl)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mariobl, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update_bootleg)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", mariobl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mariobl)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(ambush_state, mario)
@@ -761,9 +761,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ambush_state::dkong3abl)
 	mariobl(config);
-	MCFG_MACHINE_START_OVERRIDE(ambush_state, dkong3abl)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_dkong3abl, this));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", dkong3abl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_dkong3abl)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(ambush_state, dkong3)

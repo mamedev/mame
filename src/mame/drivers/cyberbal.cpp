@@ -372,13 +372,13 @@ static const gfx_layout molayout =
 	16*8
 };
 
-static GFXDECODE_START( cyberbal )
+static GFXDECODE_START( gfx_cyberbal )
 	GFXDECODE_ENTRY( "gfx2", 0, pfanlayout,     0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0, molayout,   0x600, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, pfanlayout, 0x780, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( interleaved )
+static GFXDECODE_START( gfx_interleaved )
 	GFXDECODE_ENTRY( "gfx2", 0, pfanlayout_interleaved,     0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0, molayout,               0x600, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, pfanlayout_interleaved, 0x780, 8 )
@@ -417,7 +417,7 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", interleaved)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_interleaved)
 
 	MCFG_PALETTE_ADD("lpalette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
@@ -491,7 +491,7 @@ MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cyberbal)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyberbal)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 

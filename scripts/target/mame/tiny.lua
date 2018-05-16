@@ -71,6 +71,7 @@ MACHINES["GEN_LATCH"] = true
 MACHINES["OUTPUT_LATCH"] = true
 MACHINES["TICKET"] = true
 MACHINES["WATCHDOG"] = true
+MACHINES["Z80DAISY"] = true
 
 
 --------------------------------------------------

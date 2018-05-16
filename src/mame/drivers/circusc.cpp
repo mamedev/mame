@@ -302,7 +302,7 @@ static const gfx_layout spritelayout =
 	32*4*8    /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( circusc )
+static GFXDECODE_START( gfx_circusc )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 )
 GFXDECODE_END
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(circusc_state::circusc)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, circusc_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", circusc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_circusc)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(circusc_state, circusc)

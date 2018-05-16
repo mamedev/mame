@@ -753,13 +753,13 @@ static const gfx_layout wwf_sprite_layout = {
  *
  *************************************/
 
-static GFXDECODE_START( ddragon3 )
+static GFXDECODE_START( gfx_ddragon3 )
 	GFXDECODE_ENTRY( "gfx1", 0, wwf_tile_layout,   512, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, wwf_tile_layout,   256, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, wwf_sprite_layout,  0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( wwfwfest )
+static GFXDECODE_START( gfx_wwfwfest )
 	GFXDECODE_ENTRY( "gfx3", 0, wwf_tile_layout,     0x0c00, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, wwf_tile_layout,     0x1000, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, wwf_sprite_layout,   0x0400, 16 )
@@ -837,7 +837,7 @@ MACHINE_CONFIG_START(ddragon3_state::ddragon3)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddragon3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon3)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -917,7 +917,7 @@ MACHINE_CONFIG_START(wwfwfest_state::wwfwfest)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wwfwfest)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wwfwfest)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -938,7 +938,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wwfwfest_state::wwfwfstb)
 	wwfwfest(config);
-	MCFG_VIDEO_START_OVERRIDE(wwfwfest_state,wwfwfstb)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_wwfwfstb, this));
 MACHINE_CONFIG_END
 
 

@@ -658,7 +658,7 @@ static const gfx_layout tiles8x8_layout_6bpp =
 *      Graphics Decode Information      *
 ****************************************/
 
-static GFXDECODE_START( fortecar )
+static GFXDECODE_START( gfx_fortecar )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout_3bpp, 0x000, 0x20 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout_6bpp, 0x100, 0x04 )
 GFXDECODE_END
@@ -713,7 +713,7 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 
 	MCFG_V3021_ADD("rtc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fortecar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fortecar)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(fortecar_state, fortecar)
 

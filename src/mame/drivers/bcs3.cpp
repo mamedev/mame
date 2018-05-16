@@ -50,7 +50,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "imagedev/cassette.h"
 #include "screen.h"
@@ -326,7 +326,7 @@ static const gfx_layout bcs3_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( bcs3 )
+static GFXDECODE_START( gfx_bcs3 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bcs3_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -399,7 +399,7 @@ MACHINE_CONFIG_START(bcs3_state::bcs3)
 	MCFG_SCREEN_VISIBLE_AREA(0,28*8-1,0,12*10-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bcs3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bcs3)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(5'000'000) / 2)
@@ -426,7 +426,7 @@ MACHINE_CONFIG_START(bcs3_state::bcs3a)
 	MCFG_SCREEN_VISIBLE_AREA(0,29*8-1,0,12*10-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3a)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bcs3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bcs3)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(7'000'000) / 2)

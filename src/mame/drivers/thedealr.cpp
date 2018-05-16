@@ -68,8 +68,8 @@ public:
 	DECLARE_WRITE8_MEMBER(unk_w);
 
 	// machine
-	DECLARE_MACHINE_START(thedealr);
-	DECLARE_MACHINE_RESET(thedealr);
+	void machine_start_thedealr() ATTR_COLD;
+	void machine_reset_thedealr();
 	TIMER_DEVICE_CALLBACK_MEMBER(thedealr_interrupt);
 
 	// video
@@ -135,7 +135,7 @@ void thedealr_state::iox_reset()
 	m_iox_coins     =   0x00;
 }
 
-MACHINE_RESET_MEMBER(thedealr_state,thedealr)
+void thedealr_state::machine_reset_thedealr()
 {
 	iox_reset();
 }
@@ -496,7 +496,7 @@ static const gfx_layout layout_planes_2roms =
 	16*16*2
 };
 
-static GFXDECODE_START( thedealr )
+static GFXDECODE_START( gfx_thedealr )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms, 0, 32 )
 GFXDECODE_END
 
@@ -506,7 +506,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(thedealr_state,thedealr)
+void thedealr_state::machine_start_thedealr()
 {
 	save_item(NAME(m_iox_status));
 	save_item(NAME(m_iox_ret));
@@ -546,8 +546,8 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_MACHINE_RESET_OVERRIDE(thedealr_state,thedealr)
-	MCFG_MACHINE_START_OVERRIDE(thedealr_state,thedealr)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_thedealr, this));
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_thedealr, this));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -560,7 +560,7 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("subcpu", INPUT_LINE_NMI))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thedealr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thedealr)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(thedealr_state,thedealr)
 

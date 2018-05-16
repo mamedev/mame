@@ -187,7 +187,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( shaolins )
+static GFXDECODE_START( gfx_shaolins )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 16*8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*8*16, 16*8 )
 GFXDECODE_END
@@ -210,7 +210,7 @@ MACHINE_CONFIG_START(shaolins_state::shaolins)
 	MCFG_SCREEN_UPDATE_DRIVER(shaolins_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shaolins)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shaolins)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(shaolins_state, shaolins)

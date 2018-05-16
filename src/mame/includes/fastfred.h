@@ -79,9 +79,9 @@ public:
 
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(fastfred);
-	DECLARE_MACHINE_START(imago);
-	DECLARE_VIDEO_START(fastfred);
-	DECLARE_VIDEO_START(imago);
+	void machine_start_imago()  ATTR_COLD;
+	void video_start_fastfred() ATTR_COLD;
+	void video_start_imago()    ATTR_COLD;
 
 	uint32_t screen_update_fastfred(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

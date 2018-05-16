@@ -23,6 +23,7 @@
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
+#include "diserial.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

@@ -259,7 +259,7 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_palette_w)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(gaelco2_state,gaelco2)
+void gaelco2_state::video_start_gaelco2()
 {
 	m_videoram = m_spriteram->live();
 
@@ -279,7 +279,7 @@ VIDEO_START_MEMBER(gaelco2_state,gaelco2)
 	m_dual_monitor = 0;
 }
 
-VIDEO_START_MEMBER(gaelco2_state,gaelco2_dual)
+void gaelco2_state::video_start_gaelco2_dual()
 {
 	m_videoram = m_spriteram->live();
 

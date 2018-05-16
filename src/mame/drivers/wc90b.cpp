@@ -307,7 +307,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every char takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( wc90b )
+static GFXDECODE_START( gfx_wc90b )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,       0x100, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,       0x200, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x02000, tilelayout,       0x200, 0x10 )
@@ -377,7 +377,7 @@ MACHINE_CONFIG_START(wc90b_state::wc90b)
 	MCFG_SCREEN_UPDATE_DRIVER(wc90b_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wc90b)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wc90b)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)

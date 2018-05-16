@@ -311,7 +311,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( espial )
+static GFXDECODE_START( gfx_espial )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  0, 64 )
 GFXDECODE_END
@@ -342,7 +342,7 @@ MACHINE_CONFIG_START(espial_state::espial)
 	MCFG_SCREEN_UPDATE_DRIVER(espial_state, screen_update_espial)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", espial)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_espial)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(espial_state, espial)
 
@@ -368,7 +368,7 @@ MACHINE_CONFIG_START(espial_state::netwars)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*8, 64*8)
 
-	MCFG_VIDEO_START_OVERRIDE(espial_state,netwars)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_netwars, this));
 MACHINE_CONFIG_END
 
 

@@ -89,7 +89,7 @@ public:
 	void init_astoneag();
 	void init_showhanc();
 	void init_showhand();
-	DECLARE_VIDEO_START(astrocorp);
+	void video_start_astrocorp() ATTR_COLD;
 	uint32_t screen_update_astrocorp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -107,7 +107,7 @@ public:
                                 Video
 ***************************************************************************/
 
-VIDEO_START_MEMBER(astrocorp_state,astrocorp)
+void astrocorp_state::video_start_astrocorp()
 {
 	m_screen->register_screen_bitmap(m_bitmap);
 
@@ -483,7 +483,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static GFXDECODE_START( astrocorp )
+static GFXDECODE_START( gfx_astrocorp )
 	GFXDECODE_ENTRY("sprites", 0, layout_16x16x8, 0, 1)
 GFXDECODE_END
 
@@ -528,11 +528,11 @@ MACHINE_CONFIG_START(astrocorp_state::showhand)
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrocorp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_astrocorp)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_astrocorp, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -583,11 +583,11 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrocorp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_astrocorp)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_astrocorp, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

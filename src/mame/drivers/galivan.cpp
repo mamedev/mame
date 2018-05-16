@@ -374,7 +374,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( galivan )
+static GFXDECODE_START( gfx_galivan )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,            0,   8 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         8*16,  16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 8*16+16*16, 256 )
@@ -382,7 +382,7 @@ GFXDECODE_END
 
 
 
-MACHINE_START_MEMBER(galivan_state,galivan)
+void galivan_state::machine_start_galivan()
 {
 	/* configure ROM banking */
 	uint8_t *rombase = memregion("maincpu")->base();
@@ -396,7 +396,7 @@ MACHINE_START_MEMBER(galivan_state,galivan)
 	save_item(NAME(m_layers));
 }
 
-MACHINE_START_MEMBER(galivan_state,ninjemak)
+void galivan_state::machine_start_ninjemak()
 {
 	/* configure ROM banking */
 	uint8_t *rombase = memregion("maincpu")->base();
@@ -409,7 +409,7 @@ MACHINE_START_MEMBER(galivan_state,ninjemak)
 	save_item(NAME(m_ninjemak_dispdisable));
 }
 
-MACHINE_RESET_MEMBER(galivan_state,galivan)
+void galivan_state::machine_reset_galivan()
 {
 	m_maincpu->reset();
 
@@ -420,7 +420,7 @@ MACHINE_RESET_MEMBER(galivan_state,galivan)
 	m_galivan_scrolly[0] = m_galivan_scrolly[1] = 0;
 }
 
-MACHINE_RESET_MEMBER(galivan_state,ninjemak)
+void galivan_state::machine_reset_ninjemak()
 {
 	m_maincpu->reset();
 
@@ -442,8 +442,8 @@ MACHINE_CONFIG_START(galivan_state::galivan)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(galivan_state, irq0_line_hold,  XTAL(8'000'000)/2/512)   // ?
 
-	MCFG_MACHINE_START_OVERRIDE(galivan_state,galivan)
-	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,galivan)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_galivan, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_galivan, this));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
@@ -457,12 +457,12 @@ MACHINE_CONFIG_START(galivan_state::galivan)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galivan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galivan)
 	MCFG_PALETTE_ADD("palette", 8*16+16*16+256*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(galivan_state, galivan)
 
-	MCFG_VIDEO_START_OVERRIDE(galivan_state,galivan)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_galivan, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -500,8 +500,8 @@ MACHINE_CONFIG_START(galivan_state::ninjemak)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(galivan_state, irq0_line_hold,  XTAL(8'000'000)/2/512)   // ?
 
-	MCFG_MACHINE_START_OVERRIDE(galivan_state,ninjemak)
-	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,ninjemak)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_ninjemak, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_ninjemak, this));
 
 	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
 
@@ -517,12 +517,12 @@ MACHINE_CONFIG_START(galivan_state::ninjemak)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galivan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galivan)
 	MCFG_PALETTE_ADD("palette", 8*16+16*16+256*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(galivan_state, galivan)
 
-	MCFG_VIDEO_START_OVERRIDE(galivan_state,ninjemak)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ninjemak, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

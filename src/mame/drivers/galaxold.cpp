@@ -2220,23 +2220,23 @@ static const gfx_layout rockclim_charlayout =
 	8*8*2
 };
 
-static GFXDECODE_START( rockclim )
+static GFXDECODE_START( gfx_rockclim )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_charlayout,   32, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_spritelayout, 32, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, rockclim_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( galaxian )
+static GFXDECODE_START( gfx_galaxian )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( gmgalax )
+static GFXDECODE_START( gfx_gmgalax )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_spritelayout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( _4in1 )
+static GFXDECODE_START( gfx_4in1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, _4in1_charlayout,      0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x4000, _4in1_spritelayout,    0, 8 )
 GFXDECODE_END
@@ -2248,7 +2248,7 @@ MACHINE_CONFIG_START(galaxold_state::galaxold_base)
 	MCFG_DEVICE_ADD("maincpu", Z80, PIXEL_CLOCK/2) /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(galaxold_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,galaxold)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_galaxold, this));
 
 	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
 	MCFG_7474_OUTPUT_CB(WRITELINE(*this, galaxold_state,galaxold_7474_9m_1_callback))
@@ -2261,7 +2261,7 @@ MACHINE_CONFIG_START(galaxold_state::galaxold_base)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxian)
 	MCFG_PALETTE_ADD("palette", 32+2+64)        /* 32 for the characters, 2 for the bullets, 64 for the stars */
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,galaxold)
 
@@ -2270,7 +2270,7 @@ MACHINE_CONFIG_START(galaxold_state::galaxold_base)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,galaxold)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_galaxold, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2295,7 +2295,7 @@ MACHINE_CONFIG_START(galaxold_state::mooncrst)
 	MCFG_DEVICE_PROGRAM_MAP(mooncrst_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_mooncrst, this));
 
 	/* sound hardware */
 	mooncrst_audio(config);
@@ -2315,7 +2315,7 @@ MACHINE_CONFIG_START(galaxold_state::videotron)
 	MCFG_DEVICE_PROGRAM_MAP(hustlerb3_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_mooncrst, this));
 MACHINE_CONFIG_END
 
 
@@ -2323,7 +2323,7 @@ MACHINE_CONFIG_START(galaxold_state::porter)
 	mooncrst(config);
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state, pisces)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pisces, this));
 MACHINE_CONFIG_END
 
 
@@ -2339,7 +2339,7 @@ MACHINE_CONFIG_START(galaxold_state::scramblb)
 	MCFG_PALETTE_ENTRIES(32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,scrambold)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_scrambold, this));
 MACHINE_CONFIG_END
 
 
@@ -2355,7 +2355,7 @@ MACHINE_CONFIG_START(galaxold_state::scramb2)
 	MCFG_PALETTE_ENTRIES(32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,scrambold)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_scrambold, this));
 MACHINE_CONFIG_END
 
 
@@ -2371,7 +2371,7 @@ MACHINE_CONFIG_START(galaxold_state::scrambler)
 	MCFG_PALETTE_ENTRIES(32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,scrambold)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_scrambold, this));
 MACHINE_CONFIG_END
 
 
@@ -2388,7 +2388,7 @@ MACHINE_CONFIG_START(galaxold_state::guttang)
 
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,galaxold)
 //  MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_mooncrst, this));
 MACHINE_CONFIG_END
 
 
@@ -2400,9 +2400,9 @@ MACHINE_CONFIG_START(galaxold_state::_4in1)
 	MCFG_DEVICE_PROGRAM_MAP(_4in1_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", _4in1)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_4in1)
 
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,pisces)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pisces, this));
 MACHINE_CONFIG_END
 
 
@@ -2413,10 +2413,10 @@ MACHINE_CONFIG_START(galaxold_state::bagmanmc)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bagmanmc_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state, devilfsg )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_devilfsg, this));
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state, bagmanmc)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_bagmanmc, this));
 MACHINE_CONFIG_END
 
 
@@ -2428,7 +2428,7 @@ MACHINE_CONFIG_START(galaxold_state::dkongjrm)
 	MCFG_DEVICE_PROGRAM_MAP(dkongjrm_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,dkongjrm)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_dkongjrm, this));
 MACHINE_CONFIG_END
 
 
@@ -2437,7 +2437,7 @@ MACHINE_CONFIG_START(galaxold_state::dkongjrmc)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(dkongjrmc_map)
 
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,dkongjrmc)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_dkongjrmc, this));
 MACHINE_CONFIG_END
 
 
@@ -2447,10 +2447,10 @@ MACHINE_CONFIG_START(galaxold_state::rockclim)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(rockclim_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", rockclim)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_rockclim)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,rockclim)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_rockclim, this));
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(64+64+2)    /* 64 colors only, but still uses bullets so we need to keep the palette big */
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
@@ -2469,14 +2469,14 @@ MACHINE_CONFIG_START(galaxold_state::ozon1)
 	MCFG_DEVICE_IO_MAP(ozon1_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxold_state,  nmi_line_pulse)
 
-	MCFG_MACHINE_RESET_REMOVE()
+	remove_machine_reset_cb(config);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ozon1)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ozon1, this));
 	MCFG_DEVICE_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
@@ -2503,9 +2503,9 @@ MACHINE_CONFIG_START(galaxold_state::drivfrcg)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gmgalax)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gmgalax)
 
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,drivfrcg)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_drivfrcg, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2523,7 +2523,7 @@ MACHINE_CONFIG_START(galaxold_state::bongo)
 	MCFG_DEVICE_IO_MAP(bongo_io)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,bongo)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_bongo, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 
@@ -2548,7 +2548,7 @@ MACHINE_CONFIG_START(galaxold_state::hunchbkg)
 	/* the nmi line seems to be inverted on the cpu plugin board */
 	MCFG_7474_COMP_OUTPUT_CB(INPUTLINE("maincpu", S2650_SENSE_LINE))
 
-	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,hunchbkg)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_hunchbkg, this));
 
 	galaxian_audio(config);
 MACHINE_CONFIG_END
@@ -2582,7 +2582,7 @@ MACHINE_CONFIG_START(galaxold_state::racknrol)
 	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxian)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
@@ -2591,7 +2591,7 @@ MACHINE_CONFIG_START(galaxold_state::racknrol)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_racknrol, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2610,7 +2610,7 @@ MACHINE_CONFIG_START(galaxold_state::hexpoola)
 	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxian)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
@@ -2619,7 +2619,7 @@ MACHINE_CONFIG_START(galaxold_state::hexpoola)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_racknrol, this));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2635,9 +2635,9 @@ MACHINE_CONFIG_START(galaxold_state::ckongg)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ckongg_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gmgalax)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
 
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ckongs)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ckongs, this));
 MACHINE_CONFIG_END
 
 
@@ -2648,9 +2648,9 @@ MACHINE_CONFIG_START(galaxold_state::ckongmc)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ckongmc_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gmgalax)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
 
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ckongs)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ckongs, this));
 MACHINE_CONFIG_END
 
 

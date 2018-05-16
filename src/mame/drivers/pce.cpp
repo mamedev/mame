@@ -321,14 +321,14 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 	MCFG_DEVICE_IO_MAP(pce_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
-	MCFG_MACHINE_RESET_OVERRIDE(pce_state, mess_pce )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pce, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mess_pce, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260:palette")
+	MCFG_SCREEN_PALETTE("huc6260")
 
 	MCFG_DEVICE_ADD( "huc6260", HUC6260, MAIN_CLOCK )
 	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6270", huc6270_device, next_pixel))
@@ -374,14 +374,14 @@ MACHINE_CONFIG_START(pce_state::sgx)
 	MCFG_DEVICE_IO_MAP(sgx_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
-	MCFG_MACHINE_RESET_OVERRIDE(pce_state, mess_pce )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_pce, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mess_pce, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
-	MCFG_SCREEN_PALETTE("huc6260:palette")
+	MCFG_SCREEN_PALETTE("huc6260")
 
 	MCFG_DEVICE_ADD( "huc6260", HUC6260, MAIN_CLOCK )
 	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6202", huc6202_device, next_pixel))

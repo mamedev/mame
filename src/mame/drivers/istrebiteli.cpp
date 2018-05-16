@@ -411,7 +411,7 @@ static const gfx_layout projectile_layout =
 	1
 };
 
-static GFXDECODE_START( istrebiteli )
+static GFXDECODE_START( gfx_istrebiteli )
 	GFXDECODE_ENTRY( "chars", 0x0000, char_layout, 0, 2 )
 	GFXDECODE_ENTRY( "sprite", 0x0000, sprite_layout, 2, 2 )
 	GFXDECODE_ENTRY( "sprite", 0x0000, sprite_layout, 0, 2 )
@@ -440,7 +440,7 @@ MACHINE_CONFIG_START(istrebiteli_state::istreb)
 	MCFG_SCREEN_UPDATE_DRIVER(istrebiteli_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", istrebiteli)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_istrebiteli)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(istrebiteli_state, istrebiteli)
 

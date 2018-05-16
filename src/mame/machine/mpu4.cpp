@@ -442,7 +442,7 @@ void mpu4_state::update_meters()
 }
 
 /* called if board is reset */
-MACHINE_RESET_MEMBER(mpu4_state,mpu4)
+void mpu4_state::machine_reset_mpu4()
 {
 	m_vfd->reset();
 
@@ -2163,7 +2163,7 @@ void mpu4_state::mpu4_config_common()
 	m_lamp_strobe_ext_persistence = 0;
 }
 
-MACHINE_START_MEMBER(mpu4_state,mod2)
+void mpu4_state::machine_start_mod2()
 {
 	mpu4_config_common();
 
@@ -2171,7 +2171,7 @@ MACHINE_START_MEMBER(mpu4_state,mod2)
 	m_mod_number=2;
 }
 
-MACHINE_START_MEMBER(mpu4_state,mpu4yam)
+void mpu4_state::machine_start_mpu4yam()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	mpu4_config_common();
@@ -2181,7 +2181,7 @@ MACHINE_START_MEMBER(mpu4_state,mpu4yam)
 	mpu4_install_mod4yam_space(space);
 }
 
-MACHINE_START_MEMBER(mpu4_state,mpu4oki)
+void mpu4_state::machine_start_mpu4oki()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	mpu4_config_common();
@@ -2191,7 +2191,7 @@ MACHINE_START_MEMBER(mpu4_state,mpu4oki)
 	mpu4_install_mod4oki_space(space);
 }
 
-MACHINE_START_MEMBER(mpu4_state,mpu4bwb)
+void mpu4_state::machine_start_mpu4bwb()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	mpu4_config_common();
@@ -2201,7 +2201,7 @@ MACHINE_START_MEMBER(mpu4_state,mpu4bwb)
 	mpu4_install_mod4bwb_space(space);
 }
 
-MACHINE_START_MEMBER(mpu4_state,mpu4cry)
+void mpu4_state::machine_start_mpu4cry()
 {
 	mpu4_config_common();
 
@@ -3089,8 +3089,8 @@ MACHINE_CONFIG_END
 /* machine driver for MOD 2 board */
 MACHINE_CONFIG_START(mpu4_state::mpu4base)
 
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mod2    )
-	MCFG_MACHINE_RESET_OVERRIDE(mpu4_state,mpu4)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mod2, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_mpu4, this));
 	MCFG_DEVICE_ADD("maincpu", MC6809, MPU4_MASTER_CLOCK) // MC68B09P
 	MCFG_DEVICE_PROGRAM_MAP(mpu4_memmap)
 
@@ -3129,7 +3129,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mod4yam)
 	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4yam)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mpu4yam, this));
 
 	mpu4_std_6reel(config);
 
@@ -3140,7 +3140,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mod4oki)
 	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mpu4oki, this));
 
 	mpu4_common2(config);
 	mpu4_std_6reel(config);
@@ -3152,7 +3152,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mod4oki_alt)
 	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mpu4oki, this));
 
 	mpu4_common2(config);
 	mpu4_type2_6reel(config);
@@ -3164,7 +3164,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mod4oki_5r)
 	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4oki)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mpu4oki, this));
 
 	mpu4_common2(config);
 	mpu4_std_5reel(config);
@@ -3176,7 +3176,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::bwboki)
 	mpu4base(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4bwb)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mpu4bwb, this));
 	mpu4_common2(config);
 	mpu4_bwb_5reel(config);
 
@@ -3187,7 +3187,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpu4_state::mpu4crys)
 	mod2(config);
-	MCFG_MACHINE_START_OVERRIDE(mpu4_state,mpu4cry)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_mpu4cry, this));
 
 	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)

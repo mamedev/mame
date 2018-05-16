@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(fastfred_state::get_tile_info)
  *
  *************************************/
 
-VIDEO_START_MEMBER(fastfred_state,fastfred)
+void fastfred_state::video_start_fastfred()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fastfred_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
@@ -325,7 +325,7 @@ WRITE_LINE_MEMBER(fastfred_state::imago_charbank_w)
 	}
 }
 
-VIDEO_START_MEMBER(fastfred_state,imago)
+void fastfred_state::video_start_imago()
 {
 	m_web_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fastfred_state::imago_get_tile_info_web),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 	m_bg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fastfred_state::imago_get_tile_info_bg),this), TILEMAP_SCAN_ROWS,8,8,32,32);

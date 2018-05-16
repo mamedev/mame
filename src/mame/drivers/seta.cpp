@@ -1386,6 +1386,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 
+#include "diserial.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -2212,7 +2213,7 @@ void seta_state::keroppi_map(address_map &map)
 	map(0xe00600, 0xe00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 }
 
-MACHINE_START_MEMBER(seta_state,keroppi)
+void seta_state::machine_start_keroppi()
 {
 	m_keroppi_prize_hop = 0;
 	m_keroppi_protection_count = 0;
@@ -2371,7 +2372,7 @@ void seta_state::drgnunit_map(address_map &map)
 ***************************************************************************/
 
 // Coin drop
-MACHINE_RESET_MEMBER(setaroul_state, setaroul)
+void setaroul_state::machine_reset_setaroul()
 {
 	m_coin_start_cycles = 0;
 }
@@ -3475,7 +3476,7 @@ void seta_state::downtown_sub_map(address_map &map)
                         Caliber 50 / U.S. Classic
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(seta_state,calibr50)
+void seta_state::machine_reset_calibr50()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	calibr50_sub_bankswitch_w(space, 0, 0);
@@ -7538,7 +7539,7 @@ static const gfx_layout layout_packed_6bits_2roms =
                                 Blandia
 ***************************************************************************/
 
-static GFXDECODE_START( blandia )
+static GFXDECODE_START( gfx_blandia )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0,             32 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32*1, 32 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32+64*32*0, 32 ) // [2] Layer 2
@@ -7550,7 +7551,7 @@ GFXDECODE_END
                                 DownTown
 ***************************************************************************/
 
-static GFXDECODE_START( downtown )
+static GFXDECODE_START( gfx_downtown )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       512*0, 32 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_planes_2roms_split, 512*0, 32 ) // [1] Layer 1
 GFXDECODE_END
@@ -7559,7 +7560,7 @@ GFXDECODE_END
                                 The Roulette
 ***************************************************************************/
 
-static GFXDECODE_START( setaroul )
+static GFXDECODE_START( gfx_setaroul )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0x100, 16 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8bpp,               512*0, 32 ) // [1] Layer 1
 GFXDECODE_END
@@ -7568,7 +7569,7 @@ GFXDECODE_END
                                 J.J.Squawkers
 ***************************************************************************/
 
-static GFXDECODE_START( jjsquawk )
+static GFXDECODE_START( gfx_jjsquawk )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0,             32 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 16*32+64*32*0, 32 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_2roms, 16*32+64*32*1, 32 ) // [2] Layer 2
@@ -7580,7 +7581,7 @@ GFXDECODE_END
                             Mobile Suit Gundam
 ***************************************************************************/
 
-static GFXDECODE_START( msgundam )
+static GFXDECODE_START( gfx_msgundam )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms, 512*0, 32 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_packed,       512*2, 32 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "gfx3", 0, layout_packed,       512*1, 32 ) // [2] Layer 2
@@ -7590,7 +7591,7 @@ GFXDECODE_END
                        Daioh (prototype)
 ***************************************************************************/
 
-static GFXDECODE_START( daiohp )
+static GFXDECODE_START( gfx_daiohp )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes,             512*0, 32 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_planes_2roms_split, 512*2, 32 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "gfx3", 0, layout_planes_2roms_split, 512*1, 32 ) // [2] Layer 2
@@ -7600,7 +7601,7 @@ GFXDECODE_END
                                 Quiz Kokology 2
 ***************************************************************************/
 
-static GFXDECODE_START( qzkklgy2 )
+static GFXDECODE_START( gfx_qzkklgy2 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,    512*0, 32 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_packed,          512*0, 32 ) // [1] Layer 1
 GFXDECODE_END
@@ -7609,13 +7610,13 @@ GFXDECODE_END
                                 Thundercade
 ***************************************************************************/
 
-static GFXDECODE_START( tndrcade )
+static GFXDECODE_START( gfx_tndrcade )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms, 512*0, 32 ) // [0] Sprites
 GFXDECODE_END
 
 // TODO: pairlove sets up two identical palette banks at 0-1ff and 0x200-0x3ff in-game, 0x200-0x3ff only in service mode.
 //       Maybe there's a color offset register to somewhere?
-static GFXDECODE_START( pairlove )
+static GFXDECODE_START( gfx_pairlove )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms, 512*1, 32 ) // [0] Sprites
 GFXDECODE_END
 
@@ -7623,7 +7624,7 @@ GFXDECODE_END
                                 Orbs
 ***************************************************************************/
 
-static GFXDECODE_START( orbs )
+static GFXDECODE_START( gfx_orbs )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes, 512*0, 32 ) // [0] Sprites
 GFXDECODE_END
 
@@ -7651,7 +7652,7 @@ static const gfx_layout wiggie_layout =
 };
 
 
-static GFXDECODE_START( wiggie )
+static GFXDECODE_START( gfx_wiggie )
 	GFXDECODE_ENTRY( "gfx1", 0, wiggie_layout,   0x0, 32  ) /* bg tiles */
 GFXDECODE_END
 
@@ -7671,7 +7672,7 @@ static const gfx_layout superbar_layout =
 };
 
 
-static GFXDECODE_START( superbar )
+static GFXDECODE_START( gfx_superbar )
 	GFXDECODE_ENTRY( "gfx1", 0, superbar_layout,   0x0, 32  ) /* bg tiles */
 GFXDECODE_END
 
@@ -7679,7 +7680,7 @@ GFXDECODE_END
                                 U.S. Classic
 ***************************************************************************/
 
-static GFXDECODE_START( usclssic )
+static GFXDECODE_START( gfx_usclssic )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0,           32 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 512+64*32*0, 32 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 512+64*32*1, 32 ) // [2] Layer 1
@@ -7690,7 +7691,7 @@ GFXDECODE_END
                                 Zing Zing Zip
 ***************************************************************************/
 
-static GFXDECODE_START( zingzip )
+static GFXDECODE_START( gfx_zingzip )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       16*32*0,         32 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 16*32*2,         32 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "gfx3", 0, layout_packed,             16*32*1,         32 ) // [2] Layer 2
@@ -7726,7 +7727,7 @@ static const gfx_layout layout_zzbl_6bpp =
 
 
 
-static GFXDECODE_START( zingzipbl )
+static GFXDECODE_START( gfx_zingzipbl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_zzbl,       16*32*0,         32 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_zzbl_6bpp, 16*32*2,      32 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "gfx3", 0, layout_zzbl, 16*32*1,       32 ) // [2] Layer 2
@@ -7738,7 +7739,7 @@ GFXDECODE_END
                                 Crazy Fight
 ***************************************************************************/
 
-static GFXDECODE_START( crazyfgt )
+static GFXDECODE_START( gfx_crazyfgt )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes,             0,             32 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32*1, 32 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32+64*32*0, 32 ) // [2] Layer 2
@@ -7750,7 +7751,7 @@ GFXDECODE_END
                                  Jockey Club
 ***************************************************************************/
 
-static GFXDECODE_START( jockeyc )
+static GFXDECODE_START( gfx_jockeyc )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes,             0,       32 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_planes_2roms_split, 16*32*0, 32 ) // [1] Layer 1
 GFXDECODE_END
@@ -7835,10 +7836,10 @@ MACHINE_CONFIG_START(seta_state::tndrcade)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -7890,10 +7891,10 @@ MACHINE_CONFIG_START(seta_state::twineagl)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", downtown)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_downtown)
 	MCFG_PALETTE_ADD("palette", 512)
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,twineagl_1_layer)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_twineagl_1_layer, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7936,10 +7937,10 @@ MACHINE_CONFIG_START(seta_state::downtown)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", downtown)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_downtown)
 	MCFG_PALETTE_ADD("palette", 512)
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_1_layer, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -7974,7 +7975,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::calibr50_interrupt)
 }
 
 
-MACHINE_START_MEMBER(seta_state, usclssic)
+void seta_state::machine_start_usclssic()
 {
 	m_buttonmux->ab_w(0xff);
 }
@@ -8001,8 +8002,8 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, right_w)) MCFG_DEVCB_BIT(1)
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("upd4701", upd4701_device, left_w)) MCFG_DEVCB_BIT(2)
 
-	MCFG_MACHINE_START_OVERRIDE(seta_state,usclssic)
-	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_usclssic, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_calibr50, this));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8017,13 +8018,13 @@ MACHINE_CONFIG_START(seta_state::usclssic)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_usclssic)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", usclssic)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_usclssic)
 
 	MCFG_PALETTE_ADD("palette", 16*32 + 64*32*2)        /* sprites, layer */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
 	MCFG_PALETTE_INIT_OWNER(seta_state,usclssic) /* layer is 6 planes deep */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_1_layer, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8063,7 +8064,7 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 	MCFG_UPD4701_PORTX("ROT1")
 	MCFG_UPD4701_PORTY("ROT2")
 
-	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_calibr50, this));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8078,10 +8079,10 @@ MACHINE_CONFIG_START(seta_state::calibr50)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", downtown)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_downtown)
 	MCFG_PALETTE_ADD("palette", 512)
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_1_layer, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8128,10 +8129,10 @@ MACHINE_CONFIG_START(seta_state::metafox)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", downtown)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_downtown)
 	MCFG_PALETTE_ADD("palette", 512)
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_1_layer, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8168,10 +8169,10 @@ MACHINE_CONFIG_START(seta_state::atehate)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8213,13 +8214,13 @@ MACHINE_CONFIG_START(seta_state::blandia)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blandia)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blandia)
 
 	MCFG_PALETTE_ADD("palette", (16*32+64*32*4)*2)  /* sprites, layer1, layer2, palette effect */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600*2)
 	MCFG_PALETTE_INIT_OWNER(seta_state,blandia)              /* layers 1&2 are 6 planes deep */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8250,13 +8251,13 @@ MACHINE_CONFIG_START(seta_state::blandiap)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blandia)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blandia)
 
 	MCFG_PALETTE_ADD("palette", (16*32+64*32*4)*2)  /* sprites, layer1, layer2, palette effect */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600*2)
 	MCFG_PALETTE_INIT_OWNER(seta_state,blandia)              /* layers 1&2 are 6 planes deep */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8290,10 +8291,10 @@ MACHINE_CONFIG_START(seta_state::blockcar)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8364,10 +8365,10 @@ MACHINE_CONFIG_START(seta_state::daioh)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8401,10 +8402,10 @@ MACHINE_CONFIG_START(seta_state::daiohp)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", daiohp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_daiohp)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8444,10 +8445,10 @@ MACHINE_CONFIG_START(seta_state::drgnunit)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", downtown)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_downtown)
 	MCFG_PALETTE_ADD("palette", 512)
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_1_layer, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8480,10 +8481,10 @@ MACHINE_CONFIG_START(seta_state::qzkklgy2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", qzkklgy2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_qzkklgy2)
 	MCFG_PALETTE_ADD("palette", 512)
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_1_layer, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -8519,7 +8520,7 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", setaroul_state, interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_MACHINE_RESET_OVERRIDE(setaroul_state, setaroul)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_setaroul, this));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8542,12 +8543,12 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, setaroul_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", setaroul)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_setaroul)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(setaroul_state,setaroul)
 
-	MCFG_VIDEO_START_OVERRIDE(setaroul_state,setaroul_1_layer)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_setaroul_1_layer, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -8586,10 +8587,10 @@ MACHINE_CONFIG_START(seta_state::eightfrc)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8629,13 +8630,13 @@ MACHINE_CONFIG_START(seta_state::extdwnhl)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zingzip)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zingzip)
 
 	MCFG_PALETTE_ADD("palette", 16*32+16*32+64*32*2)    /* sprites, layer2, layer1 */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
 	MCFG_PALETTE_INIT_OWNER(seta_state,zingzip)          /* layer 1 gfx is 6 planes deep */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -8656,7 +8657,10 @@ INTERRUPT_GEN_MEMBER(seta_state::wrofaero_interrupt)
 	device.execute().set_input_line(2, HOLD_LINE );
 }
 
-MACHINE_START_MEMBER(seta_state,wrofaero){ uPD71054_timer_init(); }
+void seta_state::machine_start_wrofaero()
+{
+	uPD71054_timer_init();
+}
 #endif  // __uPD71054_TIMER
 
 
@@ -8681,7 +8685,7 @@ MACHINE_CONFIG_START(seta_state::gundhara)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 #if __uPD71054_TIMER
-	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_wrofaero, this));
 #endif  // __uPD71054_TIMER
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -8697,13 +8701,13 @@ MACHINE_CONFIG_START(seta_state::gundhara)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jjsquawk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jjsquawk)
 
 	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
 	MCFG_PALETTE_INIT_OWNER(seta_state,gundhara)             /* layers are 6 planes deep (seta_state,but have only 4 palettes) */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8758,13 +8762,13 @@ MACHINE_CONFIG_START(seta_state::jjsquawk)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jjsquawk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jjsquawk)
 
 	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
 	MCFG_PALETTE_INIT_OWNER(seta_state,jjsquawk)             /* layers are 6 planes deep */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8793,13 +8797,13 @@ MACHINE_CONFIG_START(seta_state::jjsquawb)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jjsquawk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jjsquawk)
 
 	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
 	MCFG_PALETTE_INIT_OWNER(seta_state,jjsquawk)             /* layers are 6 planes deep */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8838,10 +8842,10 @@ MACHINE_CONFIG_START(seta_state::kamenrid)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8876,10 +8880,10 @@ MACHINE_CONFIG_START(seta_state::orbs)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", orbs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_orbs)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -8904,7 +8908,7 @@ MACHINE_CONFIG_START(seta_state::keroppij)
 	MCFG_DEVICE_PROGRAM_MAP(keroppi_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_MACHINE_START_OVERRIDE(seta_state,keroppi)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_keroppi, this));
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -8919,10 +8923,10 @@ MACHINE_CONFIG_START(seta_state::keroppij)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", orbs)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_orbs)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -8935,7 +8939,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta_state::keroppi)
 	keroppij(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", tndrcade)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_tndrcade)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -8970,10 +8974,10 @@ MACHINE_CONFIG_START(seta_state::krzybowl)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9014,13 +9018,13 @@ MACHINE_CONFIG_START(seta_state::madshark)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jjsquawk)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jjsquawk)
 
 	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
 	MCFG_PALETTE_INIT_OWNER(seta_state,jjsquawk)             /* layers are 6 planes deep */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9060,10 +9064,10 @@ MACHINE_CONFIG_START(seta_state::magspeed)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9104,10 +9108,10 @@ MACHINE_CONFIG_START(seta_state::msgundam)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9142,10 +9146,10 @@ MACHINE_CONFIG_START(seta_state::oisipuzl)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,oisipuzl_2_layers) // flip is inverted for the tilemaps
+	set_video_start_cb(config, driver_callback_delegate(&video_start_oisipuzl_2_layers, this)); // flip is inverted for the tilemaps
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -9182,10 +9186,10 @@ MACHINE_CONFIG_START(seta_state::triplfun)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,oisipuzl_2_layers) // flip is inverted for the tilemaps
+	set_video_start_cb(config, driver_callback_delegate(&video_start_oisipuzl_2_layers, this)); // flip is inverted for the tilemaps
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -9226,10 +9230,10 @@ MACHINE_CONFIG_START(seta_state::kiwame)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -9269,10 +9273,10 @@ MACHINE_CONFIG_START(seta_state::rezon)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9309,10 +9313,10 @@ MACHINE_CONFIG_START(seta_state::thunderl)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9385,10 +9389,10 @@ MACHINE_CONFIG_START(seta_state::wiggie)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wiggie)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wiggie)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9403,7 +9407,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::superbar)
 	wiggie(config);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", superbar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_superbar)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta_state::wits)
@@ -9426,10 +9430,10 @@ MACHINE_CONFIG_START(seta_state::wits)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9463,10 +9467,10 @@ MACHINE_CONFIG_START(seta_state::umanclub)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9504,10 +9508,10 @@ MACHINE_CONFIG_START(seta_state::utoukond)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -9546,7 +9550,7 @@ MACHINE_CONFIG_START(seta_state::wrofaero)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 #if __uPD71054_TIMER
-	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_wrofaero, this));
 #endif  // __uPD71054_TIMER
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -9562,10 +9566,10 @@ MACHINE_CONFIG_START(seta_state::wrofaero)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9608,13 +9612,13 @@ MACHINE_CONFIG_START(seta_state::zingzip)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zingzip)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zingzip)
 
 	MCFG_PALETTE_ADD("palette", 16*32+16*32+64*32*2)    /* sprites, layer2, layer1 */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
 	MCFG_PALETTE_INIT_OWNER(seta_state,zingzip)              /* layer 1 gfx is 6 planes deep */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9626,7 +9630,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta_state::zingzipbl)
 	zingzip(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", zingzipbl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zingzipbl)
 
 	MCFG_DEVICE_REMOVE("maincpu")
 
@@ -9664,10 +9668,10 @@ MACHINE_CONFIG_START(seta_state::pairlove)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pairlove)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pairlove)
 	MCFG_PALETTE_ADD("palette", 2048)   /* sprites only */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_no_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9712,13 +9716,13 @@ MACHINE_CONFIG_START(seta_state::crazyfgt)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crazyfgt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crazyfgt)
 
 	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer1, layer2 */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
 	MCFG_PALETTE_INIT_OWNER(seta_state,gundhara)             /* layers are 6 planes deep (seta_state,but have only 4 palettes) */
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_seta_2_layers, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9783,12 +9787,12 @@ MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jockeyc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jockeyc)
 
 	MCFG_PALETTE_ADD("palette", 512 * 1)
 	MCFG_PALETTE_INIT_OWNER(seta_state,palette_init_RRRRRGGGGGBBBBB_proms)
 
-	MCFG_VIDEO_START_OVERRIDE(jockeyc_state,jockeyc_1_layer)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_jockeyc_1_layer, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

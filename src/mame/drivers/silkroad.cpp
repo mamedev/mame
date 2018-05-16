@@ -270,7 +270,7 @@ static const gfx_layout tiles16x16x6_layout =
 	16*32
 };
 
-static GFXDECODE_START( silkroad )
+static GFXDECODE_START( gfx_silkroad )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x6_layout,  0x0000, 256 )
 GFXDECODE_END
 
@@ -290,7 +290,7 @@ MACHINE_CONFIG_START(silkroad_state::silkroad)
 	MCFG_SCREEN_UPDATE_DRIVER(silkroad_state, screen_update_silkroad)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", silkroad)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_silkroad)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 
 

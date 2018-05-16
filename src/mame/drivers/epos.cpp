@@ -428,7 +428,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(epos_state,epos)
+void epos_state::machine_start_epos()
 {
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_counter));
@@ -445,7 +445,7 @@ void epos_state::machine_reset()
 }
 
 
-MACHINE_START_MEMBER(epos_state,dealer)
+void epos_state::machine_start_dealer()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0x0000], 0x10000);
@@ -454,7 +454,7 @@ MACHINE_START_MEMBER(epos_state,dealer)
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
 
-	MACHINE_START_CALL_MEMBER(epos);
+	machine_start_epos();
 }
 
 MACHINE_CONFIG_START(epos_state::epos) /* EPOS TRISTAR 8000 PCB */
@@ -499,7 +499,7 @@ MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_MACHINE_START_OVERRIDE(epos_state,dealer)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_dealer, this));
 
 	// RAM-based palette instead of prom
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 32)

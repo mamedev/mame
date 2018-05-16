@@ -339,14 +339,14 @@ Notes (23-Jan-2016 AS):
 #include "speaker.h"
 
 
-MACHINE_START_MEMBER(psychic5_state, psychic5)
+void psychic5_state::machine_start_psychic5()
 {
 	membank("mainbank")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_bank_latch));
 }
 
-MACHINE_START_MEMBER(psychic5_state, bombsa)
+void psychic5_state::machine_start_bombsa()
 {
 	membank("mainbank")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 
@@ -707,13 +707,13 @@ static const gfx_layout spritelayout =
 	128*8   /* every char takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( psychic5 )
+static GFXDECODE_START( gfx_psychic5 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,   32*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( bombsa )
+static GFXDECODE_START( gfx_bombsa )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 32*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0*16,  16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,   16*16, 16 )
@@ -740,20 +740,20 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))      /* Allow time for 2nd cpu to interleave */
 
-	MCFG_MACHINE_START_OVERRIDE(psychic5_state,psychic5)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_psychic5, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240) // was 53.8 Hz before, assume same as Bombs Away
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_psychic5)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psychic5)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psychic5)
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
 
-	MCFG_VIDEO_START_OVERRIDE(psychic5_state,psychic5)
-	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_psychic5, this));
+	set_video_reset_cb(config, driver_callback_delegate(&video_reset_psychic5, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -794,18 +794,18 @@ MACHINE_CONFIG_START(psychic5_state::bombsa)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_START_OVERRIDE(psychic5_state,bombsa)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_bombsa, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240) /* Guru says : VSync - 54Hz . HSync - 15.25kHz */
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_bombsa)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bombsa)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bombsa)
 	MCFG_PALETTE_ADD("palette", 768)
 
-	MCFG_VIDEO_START_OVERRIDE(psychic5_state,bombsa)
-	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_bombsa, this));
+	set_video_reset_cb(config, driver_callback_delegate(&video_reset_psychic5, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

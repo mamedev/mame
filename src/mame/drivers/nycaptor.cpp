@@ -699,7 +699,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( nycaptor )
+static GFXDECODE_START( gfx_nycaptor )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )//16 colors
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )//palette 2, 16 colors
 GFXDECODE_END
@@ -723,7 +723,7 @@ void nycaptor_state::machine_start()
 
 void nycaptor_state::machine_reset()
 {
-//  MACHINE_RESET_CALL_MEMBER(ta7630);
+//  machine_reset_ta7630();
 
 	m_generic_control_reg = 0;
 
@@ -761,7 +761,7 @@ MACHINE_CONFIG_START(nycaptor_state::nycaptor)
 	MCFG_SCREEN_UPDATE_DRIVER(nycaptor_state, screen_update_nycaptor)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nycaptor)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nycaptor)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -836,7 +836,7 @@ MACHINE_CONFIG_START(nycaptor_state::cyclshtg)
 	MCFG_SCREEN_UPDATE_DRIVER(nycaptor_state, screen_update_nycaptor)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nycaptor)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nycaptor)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -906,7 +906,7 @@ MACHINE_CONFIG_START(nycaptor_state::bronx)
 	MCFG_SCREEN_UPDATE_DRIVER(nycaptor_state, screen_update_nycaptor)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nycaptor)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nycaptor)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

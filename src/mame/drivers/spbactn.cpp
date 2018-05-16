@@ -364,7 +364,7 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( spbactn )
+static GFXDECODE_START( gfx_spbactn )
 	GFXDECODE_ENTRY( "gfx1", 0, fgtilelayout,   0x0200, 16 + 240 )
 	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout,   0x0300, 16 + 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0x0000, 0x1000 )
@@ -396,7 +396,7 @@ static const gfx_layout proto_spr_layout =
 };
 
 
-static GFXDECODE_START( spbactnp )
+static GFXDECODE_START( gfx_spbactnp )
 	GFXDECODE_ENTRY( "gfx1", 0, proto_fgtilelayout,   0x0200, 16 + 240 )
 	GFXDECODE_ENTRY( "gfx2", 0, proto_fgtilelayout,   0x0300, 16 + 128 ) // wrong
 	GFXDECODE_ENTRY( "gfx3", 0, proto_spr_layout,   0x0000, 16 + 384 )
@@ -428,10 +428,10 @@ MACHINE_CONFIG_START(spbactn_state::spbactn)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 #endif
-	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactn)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_spbactn, this));
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactn)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spbactn)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spbactn)
 	MCFG_PALETTE_ADD("palette", 0x2800/2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -482,10 +482,10 @@ MACHINE_CONFIG_START(spbactn_state::spbactnp)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactnp)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_spbactnp, this));
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactnp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spbactnp)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spbactnp)
 	MCFG_PALETTE_ADD("palette", 0x2800/2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 

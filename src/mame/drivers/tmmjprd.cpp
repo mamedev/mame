@@ -747,7 +747,7 @@ static const gfx_layout sprite_16x16x8_layout =
 
 
 // gfx decoding is ugly.. 16*16 tiles can start at varying different offsets..
-static GFXDECODE_START( tmmjprd )
+static GFXDECODE_START( gfx_tmmjprd )
 	/* this seems to be sprites */
 //  GFXDECODE_ENTRY( "gfx1", 0, sprite_8x8x4_layout,   0x0, 0x1000  )
 //  GFXDECODE_ENTRY( "gfx1", 0, sprite_16x16x4_layout, 0x0, 0x1000  )
@@ -776,7 +776,7 @@ MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tmmjprd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tmmjprd)
 
 //  MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)

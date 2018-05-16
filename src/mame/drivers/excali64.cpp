@@ -92,7 +92,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_hs);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_MACHINE_RESET(excali64);
+	void machine_reset_excali64();
 	required_device<palette_device> m_palette;
 
 	void excali64(machine_config &config);
@@ -410,7 +410,7 @@ WRITE8_MEMBER( excali64_state::port70_w )
 		membank("bankr1")->set_entry(2);
 }
 
-MACHINE_RESET_MEMBER( excali64_state, excali64 )
+void excali64_state::machine_reset_excali64()
 {
 	membank("bankr1")->set_entry(1); // read from ROM
 	membank("bankr2")->set_entry(1); // read from ROM
@@ -447,7 +447,7 @@ static const gfx_layout excali64_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( excali64 )
+static GFXDECODE_START( gfx_excali64 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, excali64_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -555,7 +555,7 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(excali64_state, excali64)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_excali64, this));
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	//MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
@@ -588,7 +588,7 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 40)
 	MCFG_PALETTE_INIT_OWNER(excali64_state, excali64)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", excali64)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_excali64)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(16'000'000) / 16) // 1MHz for lowres; 2MHz for highres
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)

@@ -258,7 +258,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( malzak )
+static GFXDECODE_START( gfx_malzak )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,         0,  16 )
 GFXDECODE_END
 
@@ -316,7 +316,7 @@ MACHINE_CONFIG_START(malzak_state::malzak)
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(malzak_state, screen_update_malzak)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", malzak)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_malzak)
 	MCFG_PALETTE_ADD("palette", 128)
 	MCFG_PALETTE_INIT_OWNER(malzak_state, malzak)
 

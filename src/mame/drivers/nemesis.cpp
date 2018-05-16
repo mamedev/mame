@@ -1410,7 +1410,7 @@ static const gfx_layout spritelayout6464 =
 	spritelayout6464_yoffset
 };
 
-static GFXDECODE_START( nemesis )
+static GFXDECODE_START( gfx_nemesis )
 	GFXDECODE_RAM( "charram", 0x0, charlayout,   0, 0x80 )
 	GFXDECODE_RAM( "charram", 0x0, spritelayout, 0, 0x80 )
 	GFXDECODE_RAM( "charram", 0x0, spritelayout3216, 0, 0x80 )
@@ -1490,7 +1490,7 @@ MACHINE_CONFIG_START(nemesis_state::nemesis)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nemesis_state, nemesis_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1559,7 +1559,7 @@ MACHINE_CONFIG_START(nemesis_state::gx400)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1630,7 +1630,7 @@ MACHINE_CONFIG_START(nemesis_state::konamigt)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1699,7 +1699,7 @@ MACHINE_CONFIG_START(nemesis_state::rf2_gx400)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1760,7 +1760,7 @@ MACHINE_CONFIG_START(nemesis_state::salamand)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nemesis_state, nemesis_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(8)
@@ -1812,7 +1812,7 @@ MACHINE_CONFIG_START(nemesis_state::blkpnthr)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nemesis_state, blkpnthr_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(8)
@@ -1859,7 +1859,7 @@ MACHINE_CONFIG_START(nemesis_state::citybomb)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nemesis_state, nemesis_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(8)
@@ -1910,7 +1910,7 @@ MACHINE_CONFIG_START(nemesis_state::nyanpani)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nemesis_state, nemesis_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(8)
@@ -1965,7 +1965,7 @@ MACHINE_CONFIG_START(nemesis_state::hcrash)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_MEMBITS(8)
@@ -2728,7 +2728,7 @@ MACHINE_CONFIG_START(nemesis_state::bubsys)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 

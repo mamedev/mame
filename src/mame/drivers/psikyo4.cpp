@@ -138,7 +138,7 @@ ROMs -
 
 static GFXLAYOUT_RAW( layout_16x16x8, 16, 16, 16*8, 16*16*8 )
 
-static GFXDECODE_START( ps4 )
+static GFXDECODE_START( gfx_ps4 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x40 ) // 8bpp tiles
 GFXDECODE_END
 
@@ -663,7 +663,7 @@ MACHINE_CONFIG_START(psikyo4_state::ps4big)
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", ps4)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_ps4)
 	MCFG_PALETTE_ADD("lpalette", (0x2000/4) + 1) /* palette + clear colour */
 	MCFG_PALETTE_ADD("rpalette", (0x2000/4) + 1)
 

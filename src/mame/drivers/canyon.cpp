@@ -225,7 +225,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( canyon )
+static GFXDECODE_START( gfx_canyon )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,   0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 0, 2 )
 GFXDECODE_END
@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(canyon_state::canyon)
 	MCFG_SCREEN_UPDATE_DRIVER(canyon_state, screen_update_canyon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", canyon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_canyon)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(canyon_state, canyon)
 

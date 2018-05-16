@@ -196,8 +196,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port82_w); // banking 128k
 	DECLARE_WRITE8_MEMBER(port84_w); // dac port 48k
 	DECLARE_INPUT_CHANGED_MEMBER(brk_key);
-	DECLARE_MACHINE_RESET(lynx48k);
-	DECLARE_MACHINE_RESET(lynx128k);
+	void machine_reset_lynx48k();
+	void machine_reset_lynx128k();
 	void init_lynx48k();
 	void init_lynx128k();
 	DECLARE_FLOPPY_FORMATS(camplynx_floppy_formats);
@@ -724,7 +724,7 @@ READ8_MEMBER( camplynx_state::port82_r )
 	return data;
 }
 
-MACHINE_RESET_MEMBER(camplynx_state, lynx48k)
+void camplynx_state::machine_reset_lynx48k()
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_port58 = 0;
@@ -733,7 +733,7 @@ MACHINE_RESET_MEMBER(camplynx_state, lynx48k)
 	m_maincpu->reset();
 }
 
-MACHINE_RESET_MEMBER(camplynx_state, lynx128k)
+void camplynx_state::machine_reset_lynx128k()
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_port58 = 0;
@@ -869,7 +869,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx48k)
 	MCFG_DEVICE_PROGRAM_MAP(lynx48k_mem)
 	MCFG_DEVICE_IO_MAP(lynx48k_io)
 
-	MCFG_MACHINE_RESET_OVERRIDE(camplynx_state, lynx48k)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_lynx48k, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -914,7 +914,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx128k)
 	MCFG_DEVICE_PROGRAM_MAP(lynx128k_mem)
 	MCFG_DEVICE_IO_MAP(lynx128k_io)
 
-	MCFG_MACHINE_RESET_OVERRIDE(camplynx_state, lynx128k)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_lynx128k, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

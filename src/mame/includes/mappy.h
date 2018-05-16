@@ -65,11 +65,11 @@ public:
 	TILE_GET_INFO_MEMBER(phozon_get_tile_info);
 	TILE_GET_INFO_MEMBER(mappy_get_tile_info);
 	virtual void machine_start() override;
-	DECLARE_VIDEO_START(superpac);
+	void video_start_superpac() ATTR_COLD;
 	DECLARE_PALETTE_INIT(superpac);
-	DECLARE_VIDEO_START(phozon);
+	void video_start_phozon()   ATTR_COLD;
 	DECLARE_PALETTE_INIT(phozon);
-	DECLARE_VIDEO_START(mappy);
+	void video_start_mappy()    ATTR_COLD;
 	DECLARE_PALETTE_INIT(mappy);
 	uint32_t screen_update_superpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

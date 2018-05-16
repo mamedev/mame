@@ -71,7 +71,7 @@ void toaplan2_state::truxton2_postload()
 	m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
-VIDEO_START_MEMBER(toaplan2_state,toaplan2)
+void toaplan2_state::video_start_toaplan2()
 {
 	/* our current VDP implementation needs this bitmap to work with */
 	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
@@ -89,9 +89,9 @@ VIDEO_START_MEMBER(toaplan2_state,toaplan2)
 	}
 }
 
-VIDEO_START_MEMBER(toaplan2_state,truxton2)
+void toaplan2_state::video_start_truxton2()
 {
-	VIDEO_START_CALL_MEMBER( toaplan2 );
+	video_start_toaplan2();
 
 	/* Create the Text tilemap for this game */
 	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_tx_gfxram16.target()));
@@ -100,9 +100,9 @@ VIDEO_START_MEMBER(toaplan2_state,truxton2)
 	create_tx_tilemap(0x1d5, 0x16a);
 }
 
-VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
+void toaplan2_state::video_start_fixeightbl()
 {
-	VIDEO_START_CALL_MEMBER( toaplan2 );
+	video_start_toaplan2();
 
 	/* Create the Text tilemap for this game */
 	create_tx_tilemap();
@@ -116,25 +116,25 @@ VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
 	m_vdp0->init_scroll_regs();
 }
 
-VIDEO_START_MEMBER(toaplan2_state,bgaregga)
+void toaplan2_state::video_start_bgaregga()
 {
-	VIDEO_START_CALL_MEMBER( toaplan2 );
+	video_start_toaplan2();
 
 	/* Create the Text tilemap for this game */
 	create_tx_tilemap(0x1d4, 0x16b);
 }
 
-VIDEO_START_MEMBER(toaplan2_state,bgareggabl)
+void toaplan2_state::video_start_bgareggabl()
 {
-	VIDEO_START_CALL_MEMBER( toaplan2 );
+	video_start_toaplan2();
 
 	/* Create the Text tilemap for this game */
 	create_tx_tilemap(4, 4);
 }
 
-VIDEO_START_MEMBER(toaplan2_state,batrider)
+void toaplan2_state::video_start_batrider()
 {
-	VIDEO_START_CALL_MEMBER( toaplan2 );
+	video_start_toaplan2();
 
 	m_vdp0->disable_sprite_buffer(); // disable buffering on this game
 

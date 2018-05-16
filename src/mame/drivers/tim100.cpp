@@ -108,7 +108,7 @@ const gfx_layout tim100_charlayout =
 	8*16                /* space between characters */
 };
 
-static GFXDECODE_START( tim100 )
+static GFXDECODE_START( gfx_tim100 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, tim100_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -173,7 +173,7 @@ MACHINE_CONFIG_START(tim100_state::tim100)
 	MCFG_SCREEN_SIZE(600, 352)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*12-1, 0, 16*16-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tim100 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tim100 )
 
 	MCFG_DEVICE_ADD("crtc", I8275, XTAL(4'915'200))
 	MCFG_I8275_CHARACTER_WIDTH(12)

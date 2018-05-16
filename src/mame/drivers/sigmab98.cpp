@@ -281,8 +281,8 @@ public:
 	void init_haekaka();
 	void init_gocowboy();
 
-	DECLARE_MACHINE_RESET(sigmab98);
-	DECLARE_MACHINE_RESET(sammymdl);
+	void machine_reset_sigmab98();
+	void machine_reset_sammymdl();
 
 	virtual void video_start() override;
 	uint32_t screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -347,7 +347,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lufykzku_c8_w);
 	DECLARE_WRITE8_MEMBER(lufykzku_watchdog_w);
 
-	DECLARE_MACHINE_RESET(lufykzku);
+	void machine_reset_lufykzku();
 	void init_lufykzku();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_irq);
@@ -2566,13 +2566,13 @@ static const gfx_layout sigmab98_16x16x8_layout =
 	16*16*8
 };
 
-static GFXDECODE_START( sigmab98 )
+static GFXDECODE_START( gfx_sigmab98 )
 	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x4_layout, 0, 0x100/16  )
 	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x8_layout, 0, 0x100/256 )
 GFXDECODE_END
 
 // Larger palette
-static GFXDECODE_START( lufykzku )
+static GFXDECODE_START( gfx_lufykzku )
 	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x4_layout, 0, 0x1000/16 )
 	GFXDECODE_ENTRY( "sprites", 0, sigmab98_16x16x8_layout, 0, 0x1000/16 )
 GFXDECODE_END
@@ -2819,7 +2819,7 @@ INPUT_PORTS_END
                              Sigma B-98 Games
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(sigmab98_state,sigmab98)
+void sigmab98_state::machine_reset_sigmab98()
 {
 	m_rombank = 0;
 	membank("rombank")->set_entry(0);
@@ -2839,7 +2839,7 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	MCFG_DEVICE_IO_MAP(gegege_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sigmab98_state,  sigmab98_vblank_interrupt)
 
-	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sigmab98)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sigmab98, this));
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -2855,7 +2855,7 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sigmab98)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sigmab98)
 	MCFG_PALETTE_ADD("palette", 0x1000 + 1)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -2899,7 +2899,7 @@ MACHINE_CONFIG_END
                            Banpresto Medal Games
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(lufykzku_state,lufykzku)
+void lufykzku_state::machine_reset_lufykzku()
 {
 	m_rombank = 0;
 	membank("romrambank")->set_entry(0);
@@ -2923,7 +2923,7 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	MCFG_DEVICE_IO_MAP(lufykzku_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lufykzku_state, lufykzku_irq, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET_OVERRIDE(lufykzku_state, lufykzku)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_lufykzku, this));
 
 	MCFG_NVRAM_ADD_0FILL("nvram")   // battery backed RAM
 	// No EEPROM
@@ -2949,7 +2949,7 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lufykzku)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lufykzku)
 	MCFG_PALETTE_ADD("palette", 0x1000 + 1)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -2969,7 +2969,7 @@ MACHINE_CONFIG_END
                              Sammy Medal Games
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(sigmab98_state,sammymdl)
+void sigmab98_state::machine_reset_sammymdl()
 {
 	m_maincpu->set_state_int(Z80_PC, 0x400);  // code starts at 400 ??? (000 = cart header)
 }
@@ -2994,7 +2994,7 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	MCFG_DEVICE_IO_MAP( animalc_io )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymdl_irq, "screen", 0, 1)
 
-	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl )
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_sammymdl, this));
 
 	MCFG_NVRAM_ADD_0FILL("nvram")   // battery backed RAM
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
@@ -3013,7 +3013,7 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sigmab98_state, screen_vblank_sammymdl))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sigmab98)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sigmab98)
 	MCFG_PALETTE_ADD("palette", 0x1000 + 1)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)

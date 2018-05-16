@@ -189,7 +189,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( toobin )
+static GFXDECODE_START( gfx_toobin )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, molayout,   256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, anlayout,   512, 64 )
@@ -226,7 +226,7 @@ MACHINE_CONFIG_START(toobin_state::toobin)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 640, 0, 512, 416, 0, 384)
 	MCFG_SCREEN_UPDATE_DRIVER(toobin_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toobin)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toobin)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	/* sound hardware */

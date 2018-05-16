@@ -128,7 +128,7 @@ const gfx_layout u5_charlayout =
 	8*16                    // every char takes 16 bytes
 };
 
-GFXDECODE_START( zorba )
+GFXDECODE_START( gfx_zorba )
 	GFXDECODE_ENTRY( "chargen", 0x0000, u5_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -145,13 +145,12 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zorba)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_zorba)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT(m_palette)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(m_beep, BEEP, 800) // should be horizontal frequency / 16, so depends on CRTC parameters
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 1.00); // should be horizontal frequency / 16, so depends on CRTC parameters
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq0")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, zorba_state, irq_w<0>))

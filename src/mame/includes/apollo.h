@@ -32,8 +32,9 @@
 #include "bus/isa/isa_cards.h"
 #include "bus/isa/3c505.h"
 
-
 #include "bus/rs232/rs232.h"
+
+#include "diserial.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -205,8 +206,8 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(apollo);
-	DECLARE_MACHINE_START(apollo);
+	void machine_reset_apollo();
+	void machine_start_apollo() ATTR_COLD;
 
 	IRQ_CALLBACK_MEMBER(apollo_irq_acknowledge);
 	IRQ_CALLBACK_MEMBER(apollo_pic_acknowledge);

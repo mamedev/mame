@@ -215,7 +215,7 @@ psoldier dip locations still need verification.
 
 /*****************************************************************************/
 
-MACHINE_RESET_MEMBER(m92_state,m92)
+void m92_state::machine_reset_m92()
 {
 	m_sprite_buffer_busy = 1;
 }
@@ -849,12 +849,12 @@ static const gfx_layout spritelayout2 =
 	32*8
 };
 
-static GFXDECODE_START( m92 )
+static GFXDECODE_START( gfx_m92 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 128 )
 GFXDECODE_END
 
-static GFXDECODE_START( psoldier )
+static GFXDECODE_START( gfx_psoldier )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2, 0, 128 )
 GFXDECODE_END
@@ -882,7 +882,7 @@ static const gfx_layout bootleg_spritelayout =
 };
 
 
-static GFXDECODE_START( bootleg )
+static GFXDECODE_START( gfx_bootleg )
 	GFXDECODE_ENTRY( "gfx1", 0, bootleg_charlayout,   0x400, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, bootleg_spritelayout, 0x400, 128 )
 GFXDECODE_END
@@ -905,7 +905,7 @@ MACHINE_CONFIG_START(m92_state::m92)
 	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	MCFG_MACHINE_RESET_OVERRIDE(m92_state,m92)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_m92, this));
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m92_state, m92_scanline_interrupt, "screen", 0, 1)
 
@@ -920,11 +920,11 @@ MACHINE_CONFIG_START(m92_state::m92)
 	MCFG_SCREEN_UPDATE_DRIVER(m92_state, screen_update_m92)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m92)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m92)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_VIDEO_START_OVERRIDE(m92_state,m92)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_m92, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1004,7 +1004,7 @@ MACHINE_CONFIG_START(m92_state::ppan)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(m92_state, screen_update_ppan)
 
-	MCFG_VIDEO_START_OVERRIDE(m92_state,ppan)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ppan, this));
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1036,7 +1036,7 @@ MACHINE_CONFIG_START(m92_state::nbbatman2bl)
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("irem")
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", bootleg)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bootleg)
 
 	/* 8951 MCU as sound CPU */
 	/* OKI6295 (AD-65) as sound */
@@ -1050,7 +1050,7 @@ MACHINE_CONFIG_START(m92_state::psoldier)
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(psoldier_decryption_table)
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", psoldier)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_psoldier)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::dsoccr94j)
@@ -1058,7 +1058,7 @@ MACHINE_CONFIG_START(m92_state::dsoccr94j)
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_V25_CONFIG(dsoccr94_decryption_table)
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", psoldier)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_psoldier)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(m92_state::gunforc2)

@@ -395,7 +395,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(polepos_state::polepos_scanline)
 }
 
 
-MACHINE_RESET_MEMBER(polepos_state,polepos)
+void polepos_state::machine_reset_polepos()
 {
 	/* set the interrupt vectors (this shouldn't be needed) */
 	m_subcpu->set_input_line_vector(0, Z8000_NVI);
@@ -827,7 +827,7 @@ static const gfx_layout smallspritelayout =
 	16*32
 };
 
-static GFXDECODE_START( polepos )
+static GFXDECODE_START( gfx_polepos )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_2bpp,   0x0000, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout_2bpp,   0x0200,  64 )
 	GFXDECODE_ENTRY( "gfx3", 0, smallspritelayout, 0x0300, 128 )
@@ -892,7 +892,7 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* some interleaving */
 
-	MCFG_MACHINE_RESET_OVERRIDE(polepos_state,polepos)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_polepos, this));
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, polepos_scanline, "screen", 0, 1)
@@ -914,13 +914,13 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_SCREEN_UPDATE_DRIVER(polepos_state, screen_update_polepos)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", polepos)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_polepos)
 	MCFG_PALETTE_ADD("palette", 0x0f00)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_DEFAULT_LAYOUT(layout_polepos)
 
 	MCFG_PALETTE_INIT_OWNER(polepos_state,polepos)
-	MCFG_VIDEO_START_OVERRIDE(polepos_state,polepos)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_polepos, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1005,7 +1005,7 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* some interleaving */
 
-	MCFG_MACHINE_RESET_OVERRIDE(polepos_state,polepos)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_polepos, this));
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, polepos_scanline, "screen", 0, 1)
@@ -1027,13 +1027,13 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	MCFG_SCREEN_UPDATE_DRIVER(polepos_state, screen_update_polepos)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", polepos)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_polepos)
 	MCFG_PALETTE_ADD("palette", 0x0f00)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_DEFAULT_LAYOUT(layout_topracer)
 
 	MCFG_PALETTE_INIT_OWNER(polepos_state,polepos)
-	MCFG_VIDEO_START_OVERRIDE(polepos_state,polepos)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_polepos, this));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -2997,18 +2997,18 @@ static const gfx_layout layout_053936_16 =
 	8*8*8*4
 };
 
-static GFXDECODE_START( i4100 )
+static GFXDECODE_START( gfx_i4100 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 GFXDECODE_END
 
-static GFXDECODE_START( i4220 )
+static GFXDECODE_START( gfx_i4220 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,  0x0,  0x10 ) // [3] 8 Bit Tiles 16x16
 GFXDECODE_END
 
-static GFXDECODE_START( blzntrnd )
+static GFXDECODE_START( gfx_blzntrnd )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
@@ -3016,7 +3016,7 @@ static GFXDECODE_START( blzntrnd )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_053936,   0x0,  0x10 ) // [4] 053936 Tiles
 GFXDECODE_END
 
-static GFXDECODE_START( gstrik2 )
+static GFXDECODE_START( gfx_gstrik2 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
@@ -3025,7 +3025,7 @@ static GFXDECODE_START( gstrik2 )
 GFXDECODE_END
 
 // same as i4220:
-static GFXDECODE_START( i4300 )
+static GFXDECODE_START( gfx_i4300 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
@@ -3067,7 +3067,7 @@ MACHINE_CONFIG_START(metro_state::i4100_config)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", imagetek_i4100_device, screen_update)
 	MCFG_SCREEN_PALETTE("vdp:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vdp:palette", i4100)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vdp:palette", gfx_i4100)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::i4220_config)
@@ -3083,7 +3083,7 @@ MACHINE_CONFIG_START(metro_state::i4220_config)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp2", imagetek_i4100_device, screen_update)
 	MCFG_SCREEN_PALETTE("vdp2:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vdp2:palette", i4220)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vdp2:palette", gfx_i4220)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::i4300_config)
@@ -3099,7 +3099,7 @@ MACHINE_CONFIG_START(metro_state::i4300_config)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp3", imagetek_i4100_device, screen_update)
 	MCFG_SCREEN_PALETTE("vdp3:palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vdp3:palette", i4300)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vdp3:palette", gfx_i4300)
 MACHINE_CONFIG_END
 
 // TODO: these comes from the CRTC inside the i4100
@@ -3748,9 +3748,9 @@ MACHINE_CONFIG_START(metro_state::blzntrnd)
 	MCFG_SCREEN_PALETTE("vdp2:palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, metro_state, karatour_vblank_irq))
 
-	MCFG_VIDEO_START_OVERRIDE(metro_state,blzntrnd)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_blzntrnd, this));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "vdp2:palette", blzntrnd)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vdp2:palette", gfx_blzntrnd)
 
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
 	MCFG_K053936_OFFSETS(-77, -21)
@@ -3773,8 +3773,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::gstrik2)
 	blzntrnd(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gstrik2)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,gstrik2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gstrik2)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_gstrik2, this));
 
 	MCFG_DEVICE_MODIFY("k053936")
 	MCFG_K053936_OFFSETS(-77, -19)

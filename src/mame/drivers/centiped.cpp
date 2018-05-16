@@ -444,7 +444,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(centiped_state::generate_interrupt)
 	m_screen->update_partial(scanline);
 }
 
-MACHINE_START_MEMBER(centiped_state,centiped)
+void centiped_state::machine_start_centiped()
 {
 	save_item(NAME(m_oldpos));
 	save_item(NAME(m_sign));
@@ -453,16 +453,16 @@ MACHINE_START_MEMBER(centiped_state,centiped)
 }
 
 
-MACHINE_RESET_MEMBER(centiped_state,centiped)
+void centiped_state::machine_reset_centiped()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_prg_bank = 0;
 }
 
 
-MACHINE_RESET_MEMBER(centiped_state,magworm)
+void centiped_state::machine_reset_magworm()
 {
-	MACHINE_RESET_CALL_MEMBER(centiped);
+	machine_reset_centiped();
 
 	/* kludge: clear RAM so that magworm can be reset cleanly */
 	memset(m_rambase, 0, 0x400);
@@ -1670,12 +1670,12 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( centiped )
+static GFXDECODE_START( gfx_centiped )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   4, 4*4*4 )
 GFXDECODE_END
 
-static GFXDECODE_START( milliped )
+static GFXDECODE_START( gfx_milliped )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 4 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 4*4, 4*4*4*4 )
 GFXDECODE_END
@@ -1699,7 +1699,7 @@ static const gfx_layout warlords_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( warlords )
+static GFXDECODE_START( gfx_warlords )
 	GFXDECODE_ENTRY( "gfx1", 0x000, warlords_charlayout, 0,   8 )
 	GFXDECODE_ENTRY( "gfx1", 0x200, warlords_charlayout, 8*4, 8*4 )
 GFXDECODE_END
@@ -1716,8 +1716,8 @@ MACHINE_CONFIG_START(centiped_state::centiped_base)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6502, 12096000/8)  /* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
 
-	MCFG_MACHINE_START_OVERRIDE(centiped_state,centiped)
-	MCFG_MACHINE_RESET_OVERRIDE(centiped_state,centiped)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_centiped, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_centiped, this));
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
@@ -1741,10 +1741,10 @@ MACHINE_CONFIG_START(centiped_state::centiped_base)
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_centiped)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", centiped)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_centiped)
 	MCFG_PALETTE_ADD("palette", 4+4*4*4*4)
 
-	MCFG_VIDEO_START_OVERRIDE(centiped_state,centiped)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_centiped, this));
 
 MACHINE_CONFIG_END
 
@@ -1817,7 +1817,7 @@ MACHINE_CONFIG_START(centiped_state::magworm)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(magworm_map)
-	MCFG_MACHINE_RESET_OVERRIDE(centiped_state,magworm)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_magworm, this));
 
 	MCFG_DEVICE_MODIFY("outlatch") // 12A
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
@@ -1844,11 +1844,11 @@ MACHINE_CONFIG_START(centiped_state::milliped)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, control_select_w)) // CNTRLSEL
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", milliped)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_milliped)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4*4+4*4*4*4*4)
 
-	MCFG_VIDEO_START_OVERRIDE(centiped_state,milliped)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_milliped, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_milliped)
 
@@ -1890,12 +1890,12 @@ MACHINE_CONFIG_START(centiped_state::warlords)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led3")) MCFG_DEVCB_INVERT // LED 4
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", warlords)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_warlords)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(8*4+8*4)
 
 	MCFG_PALETTE_INIT_OWNER(centiped_state,warlords)
-	MCFG_VIDEO_START_OVERRIDE(centiped_state,warlords)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_warlords, this));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_warlords)
 
@@ -1952,10 +1952,10 @@ MACHINE_CONFIG_START(centiped_state::bullsdrt)
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_bullsdrt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", centiped)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_centiped)
 	MCFG_PALETTE_ADD("palette", 4+4*4*4*4)
 
-	MCFG_VIDEO_START_OVERRIDE(centiped_state,bullsdrt)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_bullsdrt, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

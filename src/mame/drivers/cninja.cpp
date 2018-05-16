@@ -702,14 +702,14 @@ static const gfx_layout tilelayout_8bpp =
 	64*8
 };
 
-static GFXDECODE_START( cninja )
+static GFXDECODE_START( gfx_cninja )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 32 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 32 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,  512, 64 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,768, 32 )  /* Sprites 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( cninjabl )
+static GFXDECODE_START( gfx_cninjabl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_boot,  0, 32 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,0, 32 )    /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,512, 64 )  /* Tiles 16x16 */
@@ -717,7 +717,7 @@ static GFXDECODE_START( cninjabl )
 GFXDECODE_END
 
 
-static GFXDECODE_START( robocop2 )
+static GFXDECODE_START( gfx_robocop2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 32 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 32 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,  512, 64 )  /* Tiles 16x16 */
@@ -725,7 +725,7 @@ static GFXDECODE_START( robocop2 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_8bpp,  512, 1 )  /* Tiles 16x16 */
 GFXDECODE_END
 
-static GFXDECODE_START( mutantf )
+static GFXDECODE_START( gfx_mutantf )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 64 )    /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0, 64 )    /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,          0, 80 )    /* Tiles 16x16 */
@@ -785,12 +785,12 @@ DECOSPR_PRIORITY_CB_MEMBER(cninja_state::pri_callback)
 	return 0;
 }
 
-MACHINE_START_MEMBER(cninja_state,robocop2)
+void cninja_state::machine_start_robocop2()
 {
 	save_item(NAME(m_priority));
 }
 
-MACHINE_RESET_MEMBER(cninja_state,robocop2)
+void cninja_state::machine_reset_robocop2()
 {
 	m_priority = 0;
 }
@@ -815,7 +815,7 @@ MACHINE_CONFIG_START(cninja_state::cninja)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninja)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cninja)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninja)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
@@ -903,11 +903,11 @@ MACHINE_CONFIG_START(cninja_state::stoneage)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninja)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cninja)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninja)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_VIDEO_START_OVERRIDE(cninja_state,stoneage)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_stoneage, this));
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
@@ -1003,7 +1003,7 @@ MACHINE_CONFIG_START(cninja_state::cninjabl)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninjabl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cninjabl)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninjabl)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
@@ -1075,7 +1075,7 @@ MACHINE_CONFIG_START(cninja_state::edrandy)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_edrandy)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cninja)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninja)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
@@ -1162,10 +1162,10 @@ MACHINE_CONFIG_START(cninja_state::robocop2)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_robocop2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MACHINE_START_OVERRIDE(cninja_state,robocop2)
-	MCFG_MACHINE_RESET_OVERRIDE(cninja_state,robocop2)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_robocop2, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_robocop2, this));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", robocop2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_robocop2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 
@@ -1254,11 +1254,11 @@ MACHINE_CONFIG_START(cninja_state::mutantf)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248) // same as robocop2? verify this from real pcb
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_mutantf)
 
-	MCFG_MACHINE_START_OVERRIDE(cninja_state,robocop2)
-	MCFG_MACHINE_RESET_OVERRIDE(cninja_state,robocop2)
-	MCFG_VIDEO_START_OVERRIDE(cninja_state,mutantf)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_robocop2, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_robocop2, this));
+	set_video_start_cb(config, driver_callback_delegate(&video_start_mutantf, this));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mutantf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mutantf)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XBGR)
 

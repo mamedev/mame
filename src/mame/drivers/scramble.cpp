@@ -1274,27 +1274,27 @@ static const gfx_layout ad2083_spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( scramble )
+static GFXDECODE_START( gfx_scramble )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, scramble_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, scramble_spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( devilfsh )
+static GFXDECODE_START( gfx_devilfsh )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, devilfsh_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, devilfsh_spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( newsin7 )
+static GFXDECODE_START( gfx_newsin7 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, newsin7_charlayout,   0, 4 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, newsin7_spritelayout, 0, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( mrkougar )
+static GFXDECODE_START( gfx_mrkougar )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mrkougar_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mrkougar_spritelayout, 0, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( ad2083 )
+static GFXDECODE_START( gfx_ad2083 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ad2083_charlayout,    0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, ad2083_spritelayout,  0, 8 )
 GFXDECODE_END
@@ -1326,7 +1326,7 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,scramble)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_scramble, this));
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -1346,11 +1346,11 @@ MACHINE_CONFIG_START(scramble_state::scramble)
 	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scramble)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scramble)
 	MCFG_PALETTE_ADD("palette", 32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scramble_state,scrambold)
-	MCFG_VIDEO_START_OVERRIDE(scramble_state,scrambold)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_scrambold, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1393,7 +1393,7 @@ MACHINE_CONFIG_START(scramble_state::devilfsh)
 	MCFG_DEVICE_PROGRAM_MAP(mars_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", devilfsh)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_devilfsh)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
@@ -1408,11 +1408,11 @@ MACHINE_CONFIG_START(scramble_state::newsin7)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scramble_state,  irq0_line_hold) // newsin7a has a corrupt opcode at 0x67, the irq routine instead of NMI avoids it by jumping to 0x68 after doing some other things, probably intentional. newsin7 has this fixed, maybe a bootleg?
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", newsin7)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_newsin7)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
-	MCFG_VIDEO_START_OVERRIDE(scramble_state,newsin7)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_newsin7, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::mrkougb)
@@ -1437,7 +1437,7 @@ MACHINE_CONFIG_START(scramble_state::mrkougar)
 	mrkougb(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", mrkougar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mrkougar)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::ckongs)
@@ -1451,7 +1451,7 @@ MACHINE_CONFIG_START(scramble_state::ckongs)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
-	MCFG_VIDEO_START_OVERRIDE(scramble_state,ckongs)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ckongs, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::hotshock)
@@ -1467,13 +1467,13 @@ MACHINE_CONFIG_START(scramble_state::hotshock)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_IO_MAP(hotshock_sound_io_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,galaxold)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_galaxold, this));
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
-	MCFG_VIDEO_START_OVERRIDE(scramble_state,pisces)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_pisces, this));
 
 	MCFG_DEVICE_MODIFY("8910.1")
 	MCFG_SOUND_ROUTES_RESET()
@@ -1495,7 +1495,7 @@ MACHINE_CONFIG_START(scramble_state::cavelon)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
-	MCFG_VIDEO_START_OVERRIDE(scramble_state,ckongs)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ckongs, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::mimonscr)
@@ -1506,7 +1506,7 @@ MACHINE_CONFIG_START(scramble_state::mimonscr)
 	MCFG_DEVICE_PROGRAM_MAP(mimonscr_map)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(scramble_state,mimonkey)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_mimonkey, this));
 MACHINE_CONFIG_END
 
 /* Triple Punch and Mariner are different - only one CPU, one 8910 */
@@ -1548,7 +1548,7 @@ MACHINE_CONFIG_START(scramble_state::mariner)
 	MCFG_PALETTE_ENTRIES(32+64+2+16) /* 32 for characters, 64 for stars, 2 for bullets, 16 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scramble_state,mariner)
-	MCFG_VIDEO_START_OVERRIDE(scramble_state,mariner)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_mariner, this));
 MACHINE_CONFIG_END
 
 /* Hunchback replaces the Z80 with a S2650 CPU */
@@ -1579,7 +1579,7 @@ MACHINE_CONFIG_START(scramble_state::hncholms)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(18432000/6/2/2)
 
-	MCFG_VIDEO_START_OVERRIDE(scramble_state,scorpion)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_scorpion, this));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(scramble_state::ad2083)
@@ -1600,7 +1600,7 @@ MACHINE_CONFIG_START(scramble_state::ad2083)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,galaxold)
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_galaxold, this));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1611,11 +1611,11 @@ MACHINE_CONFIG_START(scramble_state::ad2083)
 	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ad2083)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ad2083)
 	MCFG_PALETTE_ADD("palette", 32+64+2+8)  /* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scramble_state,turtles)
-	MCFG_VIDEO_START_OVERRIDE(scramble_state,ad2083)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_ad2083, this));
 
 	/* sound hardware */
 
@@ -1636,7 +1636,7 @@ MACHINE_CONFIG_START(scramble_state::harem)
 	MCFG_DEVICE_PROGRAM_MAP(harem_sound_map)
 	MCFG_DEVICE_IO_MAP(harem_sound_io_map)
 
-	MCFG_VIDEO_START_OVERRIDE(scramble_state,harem)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_harem, this));
 
 	/* extra AY8910 with I/O ports */
 	MCFG_DEVICE_ADD("8910.3", AY8910, 14318000/8)

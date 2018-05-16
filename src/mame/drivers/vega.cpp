@@ -696,7 +696,7 @@ static const gfx_layout tile_layout3 =
 };
 
 
-static GFXDECODE_START( test_decode )
+static GFXDECODE_START( gfx_test_decode )
 	GFXDECODE_ENTRY( "gfx1", 0,  text_charlayout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0,  tile_layout2, 16, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0,  tile_layout3, 16, 1 )
@@ -832,7 +832,7 @@ MACHINE_CONFIG_START(vega_state::vega)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(vega_state, vega)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", test_decode)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_test_decode)
 
 	/* sound hardware */
 

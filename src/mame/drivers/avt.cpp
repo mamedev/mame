@@ -418,7 +418,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
@@ -935,7 +935,7 @@ static const gfx_layout tilelayout =
 *           Graphics Decode Information           *
 **************************************************/
 
-static GFXDECODE_START( avt )
+static GFXDECODE_START( gfx_avt )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
 GFXDECODE_END
 
@@ -973,7 +973,7 @@ MACHINE_CONFIG_START(avt_state::avt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)  /* 240x224 (through CRTC) */
 	MCFG_SCREEN_UPDATE_DRIVER(avt_state, screen_update_avt)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", avt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_avt)
 
 	MCFG_PALETTE_ADD("palette", 8*16)
 	MCFG_PALETTE_INIT_OWNER(avt_state, avt)

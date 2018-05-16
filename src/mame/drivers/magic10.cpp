@@ -685,7 +685,7 @@ static const gfx_layout tiles16x16_layout =
 *      Graphics Decode      *
 ****************************/
 
-static GFXDECODE_START( magic10 )
+static GFXDECODE_START( gfx_magic10 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 16 )
 GFXDECODE_END
@@ -715,7 +715,7 @@ MACHINE_CONFIG_START(magic10_state::magic10)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magic10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magic10)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

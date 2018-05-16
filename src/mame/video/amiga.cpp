@@ -124,12 +124,10 @@ PALETTE_INIT_MEMBER(amiga_state,amiga)
  *
  *************************************/
 
-VIDEO_START_MEMBER( amiga_state, amiga )
+void amiga_state::video_start_amiga()
 {
-	int j;
-
 	/* generate tables that produce the correct playfield color for dual playfield mode */
-	for (j = 0; j < 64; j++)
+	for (int j = 0; j < 64; j++)
 	{
 		int pf1pix = ((j >> 0) & 1) | ((j >> 1) & 2) | ((j >> 2) & 4);
 		int pf2pix = ((j >> 1) & 1) | ((j >> 2) & 2) | ((j >> 3) & 4);

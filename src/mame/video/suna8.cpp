@@ -163,10 +163,10 @@ void suna8_state::suna8_vh_start_common(bool has_text, GFXBANK_TYPE_T gfxbank_ty
 #endif
 }
 
-VIDEO_START_MEMBER(suna8_state,suna8_text)              { suna8_vh_start_common( true,  GFXBANK_TYPE_SPARKMAN); }
-VIDEO_START_MEMBER(suna8_state,suna8_sparkman)          { suna8_vh_start_common( false, GFXBANK_TYPE_SPARKMAN); }
-VIDEO_START_MEMBER(suna8_state,suna8_brickzn)           { suna8_vh_start_common( false, GFXBANK_TYPE_BRICKZN);  }
-VIDEO_START_MEMBER(suna8_state,suna8_starfigh)          { suna8_vh_start_common( false, GFXBANK_TYPE_STARFIGH); }
+void suna8_state::video_start_suna8_text()     { suna8_vh_start_common( true,  GFXBANK_TYPE_SPARKMAN); }
+void suna8_state::video_start_suna8_sparkman() { suna8_vh_start_common( false, GFXBANK_TYPE_SPARKMAN); }
+void suna8_state::video_start_suna8_brickzn()  { suna8_vh_start_common( false, GFXBANK_TYPE_BRICKZN);  }
+void suna8_state::video_start_suna8_starfigh() { suna8_vh_start_common( false, GFXBANK_TYPE_STARFIGH); }
 
 /***************************************************************************
 

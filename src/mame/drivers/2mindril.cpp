@@ -64,8 +64,8 @@ public:
 	DECLARE_READ16_MEMBER(drill_irq_r);
 	DECLARE_WRITE16_MEMBER(drill_irq_w);
 	void init_drill();
-	DECLARE_MACHINE_START(drill);
-	DECLARE_MACHINE_RESET(drill);
+	void machine_start_drill() ATTR_COLD;
+	void machine_reset_drill();
 	INTERRUPT_GEN_MEMBER(drill_vblank_irq);
 	//INTERRUPT_GEN_MEMBER(drill_device_irq);
 	void tile_decode();
@@ -312,7 +312,7 @@ static const gfx_layout tile_layout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( 2mindril )
+static GFXDECODE_START( gfx_2mindril )
 	GFXDECODE_ENTRY( nullptr,   0x000000, charlayout,       0x0000, 0x0400>>4 ) /* Dynamically modified */
 	GFXDECODE_ENTRY( "gfx2", 0x000000, tile_layout,      0x0000, 0x2000>>4 ) /* Tiles area */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, spriteram_layout, 0x1000, 0x1000>>4 ) /* Sprites area */
@@ -339,14 +339,14 @@ WRITE_LINE_MEMBER(_2mindril_state::irqhandler)
 }
 
 
-MACHINE_START_MEMBER(_2mindril_state,drill)
+void _2mindril_state::machine_start_drill()
 {
 	save_item(NAME(m_defender_sensor));
 	save_item(NAME(m_shutter_sensor));
 	save_item(NAME(m_irq_reg));
 }
 
-MACHINE_RESET_MEMBER(_2mindril_state,drill)
+void _2mindril_state::machine_reset_drill()
 {
 	m_defender_sensor = 0;
 	m_shutter_sensor = 0;
@@ -359,7 +359,7 @@ MACHINE_CONFIG_START(_2mindril_state::drill)
 	MCFG_DEVICE_PROGRAM_MAP(drill_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _2mindril_state,  drill_vblank_irq)
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(_2mindril_state, drill_device_irq, 60)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 2mindril)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_2mindril)
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSW"))
@@ -368,8 +368,8 @@ MACHINE_CONFIG_START(_2mindril_state::drill)
 	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, _2mindril_state, coins_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("COINS"))
 
-	MCFG_MACHINE_START_OVERRIDE(_2mindril_state,drill)
-	MCFG_MACHINE_RESET_OVERRIDE(_2mindril_state,drill)
+	set_machine_start_cb(config, driver_callback_delegate(&machine_start_drill, this));
+	set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_drill, this));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(_2mindril_state::drill)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
-	MCFG_VIDEO_START_OVERRIDE(_2mindril_state,f3)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_f3, this));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

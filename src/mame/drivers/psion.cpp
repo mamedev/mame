@@ -565,7 +565,7 @@ static const gfx_layout psion_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( psion )
+static GFXDECODE_START( gfx_psion )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, psion_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -586,7 +586,7 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(psion_state, psion)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psion)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psion)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)

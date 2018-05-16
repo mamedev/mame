@@ -206,7 +206,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( timelimt )
+static GFXDECODE_START( gfx_timelimt )
 	GFXDECODE_ENTRY( "tiles_1", 0, charlayout,   32, 1 )    /* seems correct */
 	GFXDECODE_ENTRY( "tiles_2", 0, charlayout,    0, 1 )    /* seems correct */
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 64, 4 )    /* seems correct */
@@ -255,7 +255,7 @@ MACHINE_CONFIG_START(timelimt_state::timelimt)
 	MCFG_SCREEN_UPDATE_DRIVER(timelimt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", timelimt)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_timelimt)
 	MCFG_PALETTE_ADD("palette", 64+32)
 	MCFG_PALETTE_INIT_OWNER(timelimt_state, timelimt)
 

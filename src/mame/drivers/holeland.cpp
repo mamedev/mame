@@ -263,12 +263,12 @@ static const gfx_layout crzrally_spritelayout =
 	8*16
 };
 
-static GFXDECODE_START( holeland )
+static GFXDECODE_START( gfx_holeland )
 	GFXDECODE_ENTRY( "gfx1", 0, holeland_charlayout,   0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, holeland_spritelayout, 0, 256 )
 GFXDECODE_END
 
-static GFXDECODE_START( crzrally )
+static GFXDECODE_START( gfx_crzrally )
 	GFXDECODE_ENTRY( "gfx1", 0, crzrally_charlayout,   0, 256 )
 	GFXDECODE_ENTRY( "gfx2", 0, crzrally_spritelayout, 0, 256 )
 GFXDECODE_END
@@ -299,9 +299,9 @@ MACHINE_CONFIG_START(holeland_state::holeland)
 	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_holeland)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", holeland)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_holeland)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	MCFG_VIDEO_START_OVERRIDE(holeland_state,holeland)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_holeland, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -380,9 +380,9 @@ MACHINE_CONFIG_START(holeland_state::crzrally)
 	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_crzrally)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crzrally)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crzrally)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-	MCFG_VIDEO_START_OVERRIDE(holeland_state,crzrally)
+	set_video_start_cb(config, driver_callback_delegate(&video_start_crzrally, this));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

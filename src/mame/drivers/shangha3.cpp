@@ -443,7 +443,7 @@ static const gfx_layout charlayout =
 	128*8
 };
 
-static GFXDECODE_START( shangha3 )
+static GFXDECODE_START( gfx_shangha3 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 128 )
 GFXDECODE_END
 
@@ -466,7 +466,7 @@ MACHINE_CONFIG_START(shangha3_state::shangha3)
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shangha3)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
@@ -507,7 +507,7 @@ MACHINE_CONFIG_START(shangha3_state::heberpop)
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shangha3)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
@@ -551,7 +551,7 @@ MACHINE_CONFIG_START(shangha3_state::blocken)
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shangha3)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)

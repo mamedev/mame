@@ -315,7 +315,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( skyarmy )
+static GFXDECODE_START( gfx_skyarmy )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 8 )
 GFXDECODE_END
@@ -344,7 +344,7 @@ MACHINE_CONFIG_START(skyarmy_state::skyarmy)
 	MCFG_SCREEN_UPDATE_DRIVER(skyarmy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skyarmy)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skyarmy)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(skyarmy_state, skyarmy)
 

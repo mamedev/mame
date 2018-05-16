@@ -363,7 +363,7 @@ static const gfx_layout tile_layout =
 	8*16
 };
 
-static GFXDECODE_START( quizshow )
+static GFXDECODE_START( gfx_quizshow )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 4 )
 GFXDECODE_END
 
@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(quizshow_state::quizshow)
 	MCFG_SCREEN_UPDATE_DRIVER(quizshow_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizshow)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quizshow)
 	MCFG_PALETTE_ADD("palette", 8*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(2)
 	MCFG_PALETTE_INIT_OWNER(quizshow_state, quizshow)

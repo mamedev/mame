@@ -488,7 +488,7 @@ static const gfx_layout gpworld_tile_layout =
 	8*8
 };
 
-static GFXDECODE_START( gpworld )
+static GFXDECODE_START( gfx_gpworld )
 	GFXDECODE_ENTRY("gfx1", 0, gpworld_tile_layout, 0x0, 0x100)
 GFXDECODE_END
 
@@ -509,7 +509,7 @@ MACHINE_CONFIG_START(gpworld_state::gpworld)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gpworld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gpworld)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	/* sound hardware */

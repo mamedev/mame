@@ -582,7 +582,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( meadows )
+static GFXDECODE_START( gfx_meadows )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 1 )     /* character generator */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 1 )        /* sprite prom 1 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0, 1 )        /* sprite prom 2 */
@@ -591,7 +591,7 @@ static GFXDECODE_START( meadows )
 GFXDECODE_END
 
 
-static GFXDECODE_START( minferno )
+static GFXDECODE_START( gfx_minferno )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 4 )
 GFXDECODE_END
 
@@ -642,7 +642,7 @@ MACHINE_CONFIG_START(meadows_state::meadows)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, meadows_state, meadows_vblank_irq)) // one interrupt per frame!?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", meadows)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_meadows)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* audio hardware */
@@ -674,7 +674,7 @@ MACHINE_CONFIG_START(meadows_state::minferno)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, meadows_state, minferno_vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", minferno)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_minferno)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* audio hardware */
@@ -703,7 +703,7 @@ MACHINE_CONFIG_START(meadows_state::bowl3d)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, meadows_state, meadows_vblank_irq)) // one interrupt per frame!?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", meadows)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_meadows)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* audio hardware */

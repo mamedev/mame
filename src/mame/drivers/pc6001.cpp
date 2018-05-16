@@ -1477,7 +1477,7 @@ static const gfx_layout kanji_layout =
 	8*16
 };
 
-static GFXDECODE_START( pc6001m2 )
+static GFXDECODE_START( gfx_pc6001m2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, char_layout, 2, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, kanji_layout, 2, 1 )
 GFXDECODE_END
@@ -1494,7 +1494,7 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 
 //  MCFG_DEVICE_ADD("subcpu", I8049, 7987200)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc6001m2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc6001m2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1545,7 +1545,7 @@ MACHINE_CONFIG_START(pc6001mk2_state::pc6001mk2)
 	MCFG_DEVICE_PROGRAM_MAP(pc6001mk2_map)
 	MCFG_DEVICE_IO_MAP(pc6001mk2_io)
 
-//  MCFG_MACHINE_RESET_OVERRIDE(pc6001mk2_state,pc6001mk2)
+//  set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pc6001mk2, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pc6001mk2_state, screen_update_pc6001mk2)
@@ -1554,7 +1554,7 @@ MACHINE_CONFIG_START(pc6001mk2_state::pc6001mk2)
 	MCFG_PALETTE_ENTRIES(16+16)
 	MCFG_PALETTE_INIT_OWNER(pc6001mk2_state,pc6001mk2)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pc6001m2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pc6001m2)
 
 	MCFG_DEVICE_ADD("upd7752", UPD7752, PC6001_MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1583,7 +1583,7 @@ MACHINE_CONFIG_START(pc6001sr_state::pc6001sr)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc6001sr_state,  sr_vrtc_irq)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state, irq_callback)
 
-//  MCFG_MACHINE_RESET_OVERRIDE(pc6001sr_state,pc6001sr)
+//  set_machine_reset_cb(config, driver_callback_delegate(&machine_reset_pc6001sr, this));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pc6001sr_state, screen_update_pc6001sr)
